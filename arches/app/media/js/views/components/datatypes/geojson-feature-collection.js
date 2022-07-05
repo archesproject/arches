@@ -7,7 +7,9 @@ define([
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
+    'codemirror/mode/javascript/javascript',
     'bindings/ckeditor',
+    'views/components/icon-selector'
 ], function($, ko, _, arches, geojsonFeatureCollectionDatatypeTemplate) {
     var name = 'geojson-feature-collection-datatype-config';
     const viewModel = function(params) {
@@ -24,6 +26,9 @@ define([
                     return icon.name.indexOf(self.iconFilter()) >= 0;
                 });
             });
+            if (!this.config.layerIcon()){
+                this.config.layerIcon(this.layer.icon);
+            }
             this.count = params.mapSource.count;
             this.loading = params.loading || ko.observable(false);
             var overlays = JSON.parse(this.layer.layer_definitions);

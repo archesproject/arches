@@ -12,6 +12,9 @@ define([
     'views/map-layer-manager-data',
     'bindings/mapbox-gl',
     'bindings/codemirror',
+    'codemirror/mode/javascript/javascript',
+    'datatype-config-components',
+    'views/components/icon-selector',
     'views/components/datatypes/geojson-feature-collection',
 ], function($, ko, _, arches, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data) {
     var vm = {

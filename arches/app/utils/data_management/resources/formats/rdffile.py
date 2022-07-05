@@ -428,7 +428,7 @@ class JsonLdReader(Reader):
                     for line in self.print_buf:
                         # print(line) # uncomment this line to print errors directly to the screen
                         self.logger.debug(line)
-
+                raise
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
@@ -490,13 +490,25 @@ class JsonLdReader(Reader):
             # or "http://www.w3.org/2000/01/rdf-schema#label"
             if k in ["@id", "@type"]:
                 continue
+
+            # extract all @values for the current node
+            values = [
+                {
+                    "value": vi["@value"],
+                    "clss": vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal"),
+                    "language": vi.get("@language", None),
+                }
+                for vi in v
+                if "@value" in vi
+                and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal") == "http://www.w3.org/2000/01/rdf-schema#Literal"
+            ]
+
             # always a list
             for vi in v:
                 if "@value" in vi:
-                    # We're a literal value
                     value = vi["@value"]
-                    clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
                     uri = None
+                    clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
                     is_literal = True
                 else:
                     # We're an entity
@@ -545,7 +557,6 @@ class JsonLdReader(Reader):
                 # if we made it this far then it means that we've found at least 1 match
                 options = tree_node["children"][key]
                 possible = []
-                ignore = []
 
                 # options is a list of potential matches in the graph tree
                 # based on property/class combination
@@ -568,10 +579,17 @@ class JsonLdReader(Reader):
                             data={},
                         )
                     if is_literal and o["datatype"].is_a_literal_in_rdf():
-                        if len(o["datatype"].validate_from_rdf(value)) == 0:
-                            possible.append([o, value, potential_tile])
+                        # import each value separately if there are no languages in the values and this is card n string
+                        if o["datatype"].is_multilingual_rdf(values):
+                            if len(o["datatype"].validate_from_rdf(values)) == 0:
+                                possible.append([o, values, potential_tile])
+                            else:
+                                self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
                         else:
-                            self.printline(f"Could not validate {value} as a {o['datatype']}", indent + 1)
+                            if len(o["datatype"].validate_from_rdf(value)) == 0:
+                                possible.append([o, value, potential_tile])
+                            else:
+                                self.printline(f"Could not validate {value} as a {o['datatype']}", indent + 1)
                     elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
                         if self.is_concept_node(uri):
                             self.printline("This is a concept node, so we'll test if the incoming data can fit here", indent + 1)
@@ -588,7 +606,11 @@ class JsonLdReader(Reader):
                             except:
                                 self.printline(f"Errored testing concept {uri} in collection {collid}", indent + 1)
                         elif self.is_semantic_node(o):
-                            possible.append([o, "", potential_tile])
+                            if uri != "":
+                                if o["node_id"] in uri:
+                                    possible.append([o, "", potential_tile])
+                            else:
+                                possible.append([o, "", potential_tile])
                         elif o["datatype"].accepts_rdf_uri(uri):
                             # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
                             possible.append([o, uri, potential_tile])
@@ -596,10 +618,7 @@ class JsonLdReader(Reader):
                             # This is when the current option doesn't match, but could be
                             # non-ambiguous resource-instance vs semantic node
                             continue
-                    else:
-                        raise ValueError("No possible match?")
-
-                # self.printline(f"Possible is: {[x[0]['name'] for x in possible]}", indent+1)
+                # print(f"Possible is: {[x[0]['name'] for x in possible]}")
 
                 if not possible:
                     # self.printline(f"Tried: {options}")
@@ -632,7 +651,10 @@ class JsonLdReader(Reader):
 
                 if not self.is_semantic_node(branch[0]):
                     graph_node = branch[0]
-                    node_value = graph_node["datatype"].from_rdf(vi)
+                    if graph_node["datatype"].is_multilingual_rdf(values):
+                        node_value = graph_node["datatype"].from_rdf(values)
+                    else:
+                        node_value = graph_node["datatype"].from_rdf(vi)
                     # node_value might be None if the validation of the datatype fails
                     # XXX Should we check this here, or raise in the datatype?
 
@@ -672,7 +694,7 @@ class JsonLdReader(Reader):
                 if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
                     # iterating through a root node *-list type
                     pass
-                elif bnodeid == branch[0]["nodegroup_id"]:
+                elif bnodeid == branch[0]["nodegroup_id"] and not (branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result):
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
                     tile = Tile(

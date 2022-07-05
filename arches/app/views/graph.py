@@ -37,6 +37,7 @@ from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
+from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import PublishedModelError, UnpublishedModelError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
@@ -120,6 +121,8 @@ class GraphSettingsView(GraphBaseView):
         node.ontologyclass = data.get("ontology_class") if data.get("graph").get("ontology_id") is not None else None
         node.name = graph.name
         graph.root.name = node.name
+        if node.ontologyclass:
+            graph.root.ontologyclass = node.ontologyclass
 
         if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
@@ -267,9 +270,8 @@ class GraphDataView(View):
         if self.action == "export_graph":
             graph = get_graphs_for_export([graphid])
             graph["metadata"] = system_metadata()
+            graph_name = I18n_String(graph["graph"][0]["name"])
             f = JSONSerializer().serialize(graph, indent=4)
-            graph_name = JSONDeserializer().deserialize(f)["graph"][0]["name"]
-
             response = HttpResponse(f, content_type="json/plain")
             response["Content-Disposition"] = 'attachment; filename="%s.json"' % (graph_name)
             return response
@@ -290,7 +292,7 @@ class GraphDataView(View):
             buffer.close()
 
             response = HttpResponse()
-            response["Content-Disposition"] = "attachment; filename=" + file_name + ".zip"
+            response["Content-Disposition"] = "attachment; filename=" + str(file_name) + ".zip"
             response["Content-length"] = str(len(zip_stream))
             response["Content-Type"] = "application/zip"
             response.write(zip_stream)
@@ -473,7 +475,7 @@ class GraphPublicationView(View):
 
             if self.action == "publish":
                 try:
-                    graph.publish(notes)
+                    graph.publish(notes=notes, user=request.user)
                 except UnpublishedModelError as e:
                     return JSONErrorResponse(e.title, e.message)
             elif self.action == "unpublish":

@@ -27,6 +27,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User, Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -276,8 +277,29 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["displayname"] = self.displayname(context)
-        document["displaydescription"] = self.displaydescription(context)
+
+        document["displayname"] = []
+        displayname = self.displayname(context)
+        if displayname is not None:
+            try:
+                display_name = JSONDeserializer().deserialize(displayname)
+                for key in display_name.keys():
+                    document["displayname"].append({"value": display_name[key]["value"], "language": key})
+            except:
+                display_name = {"value": displayname, "language": get_language()}
+                document["displayname"].append(display_name)
+
+        document["displaydescription"] = []
+        displaydescription = self.displaydescription(context)
+        if displaydescription is not None:
+            try:
+                display_description = JSONDeserializer().deserialize(displaydescription)
+                for key in display_description.keys():
+                    document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
+            except:
+                display_description = {"value": displaydescription, "language": get_language()}
+                document["displaydescription"].append(display_description)
+
         document["map_popup"] = self.map_popup(context)
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
@@ -307,15 +329,17 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                     for index, term in enumerate(node_terms):
                         terms.append(
                             {
-                                "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
                                 "_source": {
-                                    "value": term,
+                                    "value": term.value,
                                     "nodeid": nodeid,
                                     "nodegroupid": tile.nodegroup_id,
                                     "tileid": tile.tileid,
+                                    "language": term.lang,
                                     "resourceinstanceid": tile.resourceinstance_id,
                                     "provisional": False,
                                 },
@@ -335,21 +359,22 @@ class Resource(models.ResourceInstance):
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                                     for index, term in enumerate(node_terms):
                                         terms.append(
                                             {
-                                                "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
                                                 "_source": {
-                                                    "value": term,
+                                                    "value": term.value,
                                                     "nodeid": nodeid,
                                                     "nodegroupid": tile.nodegroup_id,
                                                     "tileid": tile.tileid,
+                                                    "language": term.lang,
                                                     "resourceinstanceid": tile.resourceinstance_id,
                                                     "provisional": True,
                                                 },
                                             }
                                         )
-
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
@@ -598,7 +623,7 @@ class Resource(models.ResourceInstance):
 
         return new_resource
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         Serialize to a different form then used by the internal class structure
 

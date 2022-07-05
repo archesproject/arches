@@ -220,14 +220,7 @@ TILE_CACHE_TIMEOUT = 600 #seconds
 CLUSTER_DISTANCE_MAX = 5000 #meters
 GRAPH_MODEL_CACHE_TIMEOUT = None
 
-MOBILE_OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
-MOBILE_DEFAULT_ONLINE_BASEMAP = {'default': 'mapbox://styles/mapbox/streets-v9'}
-MOBILE_IMAGE_SIZE_LIMITS = {
-    # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
-    # Not to exceed the limit defined in DATA_UPLOAD_MAX_MEMORY_SIZE
-    "full": min(1500000, DATA_UPLOAD_MAX_MEMORY_SIZE), # ~1.5 Mb
-    "thumb": 400,  # max width/height in pixels, this will maintain the aspect ratio of the original image
-}
+OAUTH_CLIENT_ID = ''  #'9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 
 APP_TITLE = 'Arches | Heritage Data Management'
 COPYRIGHT_TEXT = 'All Rights Reserved.'
@@ -314,7 +307,7 @@ LANGUAGE_CODE = "en"
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
 #   ('de', _('German')),
-#   ('en', _('English')),
+    ('en', _('English')),
 #   ('en-gb', _('British English')),
 #   ('es', _('Spanish')),
 ]

@@ -314,7 +314,6 @@ class Tile(models.TileModel):
         """
 
         tile_errors = []
-
         for nodeid, value in self.data.items():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
@@ -515,7 +514,6 @@ class Tile(models.TileModel):
         Indexes all the nessesary documents related to resources to support the map, search, and reports
 
         """
-
         Resource.objects.get(pk=self.resourceinstance_id).index()
 
     # # flatten out the nested tiles into a single array
@@ -689,7 +687,7 @@ class Tile(models.TileModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form then used by the internal class structure
 

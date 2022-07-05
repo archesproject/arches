@@ -6,7 +6,8 @@ require([
     'views/graph/graph-page-view',
     'views/graph/graph-settings-data',
     'bindings/color-picker',
-    'models/node'
+    'models/node',
+    'views/components/icon-selector'
 ], function($, _, ko, koMapping, PageView, data, colorpicker, NodeModel) {
     /**
     * prep data for models

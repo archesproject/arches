@@ -53,7 +53,6 @@ define([
                 this.filter.subscribe(this.filterFunction, this, 'change');
                 this.filterFunction();
             }
-            this.scrollContainerSelector = '.related-resources-nodes';
             this.selectNode = function(e) {
                 _.each(self.selectedItems(), function(item) {
                     if (this.entityid != item.entityid) {

@@ -129,6 +129,16 @@ define([
                     const data = await response.json();
                     self.response(data); 
                 }
+                else {
+                    const data = await response.json();
+                    this.alert(new AlertViewModel(
+                        'ep-alert-red',
+                        data["data"]["title"],
+                        data["data"]["message"],
+                        null,
+                        function(){}
+                    ));
+                }
             };
         },
         template: branchCSVImporterTemplate,

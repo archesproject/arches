@@ -131,6 +131,7 @@ define([
             },
             loading: loading,
             showIds: ko.observable(false),
+            showGrid: ko.observable(false),
             cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -150,6 +151,9 @@ define([
             },
             collapseAll: function() {
                 toggleAll(false);
+            },
+            toggleGrid: function() {
+                self.showGrid(!this.showGrid());
             },
             selectAllCards: function() {
                 selectAll(true);

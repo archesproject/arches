@@ -1,8 +1,9 @@
 define([
     'knockout', 
+    'underscore',
     'uuid', 
     'templates/views/components/datatypes/domain-value.htm',
-], function(ko, uuid, domainValueDatatypeTemplate) {
+], function(ko, _, uuid, domainValueDatatypeTemplate) {
     const name = 'domain-value-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -13,14 +14,14 @@ define([
             var filter = params.filterValue();
             this.op = ko.observable(filter.op || '');
             this.searchValue = ko.observable(filter.val || '');
-            this.filterValue = ko.computed(function() {
+            this.filterValue = ko.computed(function () {
                 return {
                     op: self.op(),
                     val: self.searchValue()
                 };
             });
             params.filterValue(this.filterValue());
-            this.filterValue.subscribe(function(val) {
+            this.filterValue.subscribe(function (val) {
                 params.filterValue(val);
             });
 
@@ -28,15 +29,24 @@ define([
             this.isEditable = true;
 
             if (params.graph) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
+                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
                 if (cards.length) {
-                    this.isEditable = cards[0].is_editable;
+                    this.isEditable = cards[0].is_editable
                 }
             } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable');
+                this.isEditable = params.widget.card.get('is_editable')
             }
 
             this.options = params.config.options;
+            params.config.options().map(option => { 
+                option.text = ko.observable(ko.unwrap(option.text));
+                option.text.subscribe(value => {
+                    if(value != option.text) {
+                        self.options.valueHasMutated();
+                    }
+                });
+                return option;
+            });
             var setupOption = function(option) {
                 option.remove = function() {
                     self.options.remove(option);

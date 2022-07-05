@@ -1,7 +1,7 @@
 {% extends "base-manager.htm" %}
 {% load i18n %}
 
-{% load staticfiles %}
+{% load static %}
 {% load webpack_static from webpack_loader %}
 
 {% block title %}
@@ -11,7 +11,6 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% webpack_static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% webpack_static 'css/plugins/smartadmin-production.css' %}" type="text/css" media="screen">
     {{ block.super }}
     <link rel="stylesheet" href="{% webpack_static 'node_modules/jqtree/jqtree.css' %}">
 {% endblock css %}
@@ -47,41 +46,21 @@
         <div class="container content arches-forms-container" id="forms-container">
 
             <!-- RDM Tree and CRUD Forms -->
-            <div class="row">
+            <div class="rdm flex row">
 
                 <!-- Begin RDM Tree -->
                 <div class="col-md-5 col-lg-4">
-
-
-
                     <div class="left-inner arches-box-grey-border padding-10 hidden-xs hidden-sm" id="sidebar" style="background: #ffffff;">
-
-
-                        <ul class="nav nav-tabs map-service-nav-tabs">
-                            <li class="active">
-                                <a class="config-title-tab mar-no" data-toggle="tab" href="#rdm-panel" aria-expanded="false"><i class="ion-android-share-alt"></i> {% trans "Thesauri" %} </a>
-                            </li>
-                            <li class="">
-                                <a class="config-title-tab mar-no" data-toggle="tab" href="#dropdown-panel" aria-expanded="false"><i class="ion-ios-browsers-outline"></i> {% trans "Collections" %} </a>
-                            </li>
-                        </ul>
-
-
-
-
-                        <!-- RDM Tree Container -->
-                        <div class="tab-content" style="margin-top: 8px;">
-                            <section id="rdm-panel" role="tabpanel" class="tab-pane active" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
-                                <div class="concept_tree" id="jqtree">
-                                </div>
-                            </section>
-
-                            <section id="dropdown-panel" role="tabpanel" class="tab-pane" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
-                                <div class="concept_tree" id="ddtree">
-                                </div>
-                            </section>
-
-                            <div class="btn-group pull-right hidden-xs" style="top: 15px; position: absolute; right: 14px;">
+                        <div class="rdm tabs">
+                            <ul class="nav nav-tabs map-service-nav-tabs">
+                                <li class="active">
+                                    <a class="config-title-tab mar-no" data-toggle="tab" href="#rdm-panel" aria-expanded="false"><i class="ion-android-share-alt"></i> {% trans "Thesauri" %} </a>
+                                </li>
+                                <li class="">
+                                    <a class="config-title-tab mar-no" data-toggle="tab" href="#dropdown-panel" aria-expanded="false"><i class="ion-ios-browsers-outline"></i> {% trans "Collections" %} </a>
+                                </li>
+                            </ul>
+                            <div class="btn-group hidden-xs">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">{% trans "Tools" %}
                                     <i class="fa fa-chevron-down"></i>
                                     <span class="sr-only">{% trans "Toggle Dropdown" %}</span>
@@ -99,6 +78,22 @@
                                     <li><a href="javascript:void(0);">{% trans "Close" %}</a></li>
                                 </ul>
                             </div>
+                        </div>
+
+
+
+
+                        <!-- RDM Tree Container -->
+                        <div class="rdm tab-content" style="margin-top: 8px;">
+                            <section id="rdm-panel" role="tabpanel" class="tab-pane active" style="height: 600px; overflow-x:hidden;">
+                                <div class="concept_tree" id="jqtree">
+                                </div>
+                            </section>
+
+                            <section id="dropdown-panel" role="tabpanel" class="tab-pane" style="height: 600px; overflow-y: scroll; overflow-x:hidden;">
+                                <div class="concept_tree" id="ddtree">
+                                </div>
+                            </section>
                         </div>
                         <!-- End RDM Tree Container -->
 

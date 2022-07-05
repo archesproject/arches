@@ -3,9 +3,10 @@ define([
     'knockout-mapping',
     'underscore',
     'views/components/search/base-filter',
+    'arches',
     'templates/views/components/search/term-filter.htm',
-    'bindings/term-search',
-], function(ko, koMapping, _, BaseFilter, termFilterTemplate) {
+    'bindings/term-search', 
+], function(ko, koMapping, _, BaseFilter, arches, termFilterTemplate) {
     var componentName = 'term-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -15,10 +16,21 @@ define([
             this.filter.terms = ko.observableArray();
             this.filter.tags = ko.observableArray();
 
+            this.language = ko.observable();
+            this.languages = ko.observableArray();
+            const languages = arches.languages.slice();
+            languages.unshift({"code": "*", "name": "All"})
+            this.languages(languages);
+
             var updatedTerms = ko.computed(function() {
                 return ko.toJS(this.filter.terms);
             }, this);
+
             updatedTerms.subscribe(function() {
+                this.updateQuery();
+            }, this);
+
+            this.language.subscribe(function() {
                 this.updateQuery();
             }, this);
 
@@ -51,6 +63,7 @@ define([
             var queryObj = this.query();
             if (terms.length > 0){
                 queryObj[componentName] = ko.toJSON(terms);
+                queryObj['language'] = this.language()?.code;
             } else {
                 delete queryObj[componentName];
             }

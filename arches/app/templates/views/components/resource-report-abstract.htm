@@ -1,20 +1,13 @@
-{% load staticfiles %}
+{% load static %}
+{% load template_tags %}
 {% load i18n %}
 
 <!--ko if: loading() -->
 <div class='loading-mask'></div>
 <!--/ko-->
 <!-- ko ifnot: loading() -->
-<div 
-    style="
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    "
-    data-bind="
-        style: { height: $data.summary ? 'inherit' : 'calc(100vh - 50px)' }
-    "
->
+<div class="resource-report-abstract-container"
+    data-bind="style: { height: $data.summary ? 'inherit' : 'calc(100vh - 50px)' }">
     <div class="resource-component-abstract"
         data-bind='
             component: { 
@@ -40,7 +33,7 @@
             padding: 0 20px;
         "
     >
-        <div data-bind="text: '{% trans 'Arches' %}' + ' ' + $data.version"></div>
+        <div data-bind="text: {% quoted_trans 'Arches' %} + ' ' + $data.version"></div>
         <div>
             <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
         </div>

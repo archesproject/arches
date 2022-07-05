@@ -58,12 +58,32 @@ define([
                 return window.location.pathname === "/search" || window.location.pathname === "/plugins/c8261a41-a409-4e45-b049-c925c28a57da";
             });
 
+            var getHiddenOffsetWidth = function(hiddenElement) {
+                var width = 0;
+                hiddenElement.style.display = "block";
+                hiddenElement.style.position = "absolute";
+                width = hiddenElement.offsetWidth;
+                hiddenElement.removeAttribute('style');
+                return width;
+            };
+
+            // this is used to manage the popover menu for the unexpanded side nav 
+            let listeles = document.querySelectorAll('div.sidenav-menu > ul > li');
+            listeles.forEach(function(listele){
+                let menutitle = listele.querySelector('.menu-title');
+                if(menutitle){
+                    let width = getHiddenOffsetWidth(menutitle);
+                    let ulele = listele.querySelector('ul');
+                    if(ulele){
+                        ulele.style.minWidth = (width + 40) + "px";
+                    }
+                }
+            });
+
             PageView.prototype.constructor.call(this, options);
             return this;
         }
-
     });
+    
     return BaseManager;
-
-
 });

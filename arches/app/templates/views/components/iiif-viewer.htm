@@ -1,5 +1,6 @@
 {% extends "views/components/workbench.htm" %}
-{% load staticfiles %}
+{% load static %}
+{% load template_tags %}
 {% load i18n %}
 {% load webpack_static from webpack_loader %}
 
@@ -119,7 +120,7 @@
     </div>
 
     <div class="install-buttons">
-        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">{% trans 'Reset to defaults' %}</button>
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings"><span>{% trans 'Reset to defaults' %}</span></button>
     </div>
 </div>
 </div>
@@ -319,9 +320,9 @@
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
                     disabled: manifestLoading(),
                     css: { 'disabled': manifestLoading() }
-                ">{% trans 'Load manifest' %}</button>
+                "><span>{% trans 'Load manifest' %}</span></button>
                 <!--ko if: manifestData() -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor"><span>{% trans 'Cancel' %}</span></button>
                 <!--/ko -->
                 <!--ko if: manifestLoading() -->
                 <span class="manifest-editor-loading">
@@ -351,7 +352,7 @@
                     <div style="display: flex; align-items: center">
                         {% block gallery_header %}
                         <div>
-                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : {% quoted_trans "No manifest selected..." %}"></span>
                         </div>
                         <div>
                             <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">

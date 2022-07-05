@@ -27,7 +27,6 @@ class GuardedAdmin(GuardedModelAdmin):
 
 admin.site.register(
     [
-        models.DLanguage,
         models.MapLayer,
         models.MapSource,
         models.Geocoder,
@@ -39,6 +38,7 @@ admin.site.register(
         models.SearchComponent,
         models.IIIFManifest,
         models.GroupMapSettings,
+        models.Language,
         models.NodeGroup,
         models.SpatialView,
     ]

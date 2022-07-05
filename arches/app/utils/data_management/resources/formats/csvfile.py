@@ -7,6 +7,7 @@ import sys
 import uuid
 import traceback
 import logging
+import re
 from time import time
 from copy import deepcopy
 from io import StringIO
@@ -20,6 +21,7 @@ from arches.app.models.models import (
     NodeGroup,
     ResourceXResource,
     ResourceInstance,
+    Language,
     FunctionXGraph,
     GraphXMapping,
     TileModel,
@@ -33,7 +35,7 @@ import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 
 logger = logging.getLogger(__name__)
 
@@ -72,10 +74,20 @@ class CsvWriter(Writer):
 
         return configs
 
-    def transform_value_for_export(self, datatype, value, concept_export_value_type, node):
+    def transform_value_for_export(self, datatype, value, concept_export_value_type, node, column=None):
         datatype_instance = self.datatype_factory.get_instance(datatype)
-        value = datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
-        return value
+
+        # for export of multilingual nodes/columns
+        if column:
+            lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
+            matches = lang_regex.match(column)
+            if len(matches.groups()) > 0:
+                lang = matches.groups()[0]
+                return datatype_instance.transform_export_values(
+                    value, concept_export_value_type=concept_export_value_type, node=node, language=lang
+                )
+
+        return datatype_instance.transform_export_values(value, concept_export_value_type=concept_export_value_type, node=node)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # use the graph id from the mapping file, not the one passed in to the method
@@ -83,16 +95,35 @@ class CsvWriter(Writer):
         super(CsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csv_records = []
+        languages = kwargs.get("languages")
+
+        # Return data for specified languages - current language if none are specified, or if specified languages are all invalid
+        language_codes = Language.objects.values_list("code", flat=True)
+
+        if not (languages is None or languages == "all"):
+            try:
+                requested_languages = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
+                if len(requested_languages) > 0:
+                    language_codes = requested_languages
+            except:
+                pass
+
         other_group_records = []
         mapping = {}
         concept_export_value_lookup = {}
+        csv_header = ["ResourceID"]
         for resource_export_config in self.resource_export_configs:
             for node in resource_export_config["nodes"]:
-                if node["file_field_name"] != "" and node["export"] == True:
-                    mapping[node["arches_nodeid"]] = node["file_field_name"]
+                datatype_instance = self.datatype_factory.get_instance(node["data_type"])
+                if node["file_field_name"] == "ResourceID":
+                    pass
+                elif node["file_field_name"] != "" and node["export"] is True:
+                    column_headers = datatype_instance.get_column_header(node, language_codes=language_codes)
+                    mapping[node["arches_nodeid"]] = column_headers
+                    csv_header += column_headers if isinstance(column_headers, list) else [column_headers]
                 if "concept_export_value" in node:
                     concept_export_value_lookup[node["arches_nodeid"]] = node["concept_export_value"]
-        csv_header = ["ResourceID"] + list(mapping.values())
+
         csvs_for_export = []
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
@@ -113,27 +144,41 @@ class CsvWriter(Writer):
                 if tile.data != {}:
                     for k in list(tile.data.keys()):
                         if tile.data[k] != "" and k in mapping and tile.data[k] is not None:
-                            if mapping[k] not in csv_record and tile.nodegroup_id not in csv_record["populated_node_groups"]:
+                            if (
+                                (isinstance(mapping[k], str) and mapping[k] not in csv_record)
+                                or isinstance(mapping[k], list)
+                                and len(set(mapping[k]).intersection(csv_record)) == 0
+                            ) and tile.nodegroup_id not in csv_record["populated_node_groups"]:
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
                                 if tile.data[k] is not None:
-                                    value = self.transform_value_for_export(
-                                        self.node_datatypes[k], tile.data[k], concept_export_value_type, k
-                                    )
-                                    csv_record[mapping[k]] = value
+                                    if isinstance(mapping[k], list):
+                                        for column in mapping[k]:
+                                            csv_record[column] = self.transform_value_for_export(
+                                                self.node_datatypes[k], tile.data[k], concept_export_value_type, k, column
+                                            )
+                                    else:
+                                        value = self.transform_value_for_export(
+                                            self.node_datatypes[k], tile.data[k], concept_export_value_type, k
+                                        )
+                                        csv_record[mapping[k]] = value
+
                                 del tile.data[k]
                             else:
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(
-                                    self.node_datatypes[k],
-                                    tile.data[k],
-                                    concept_export_value_type,
-                                    k,
-                                )
-                                other_group_record[mapping[k]] = value
+                                if isinstance(mapping[k], list):
+                                    for column in mapping[k]:
+                                        other_group_record[column] = self.transform_value_for_export(
+                                            self.node_datatypes[k], tile.data[k], concept_export_value_type, k, column
+                                        )
+                                else:
+                                    value = self.transform_value_for_export(
+                                        self.node_datatypes[k], tile.data[k], concept_export_value_type, k
+                                    )
+                                    other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
 
@@ -414,6 +459,20 @@ class CsvReader(Reader):
         if save_count % (settings.BULK_IMPORT_BATCH_SIZE / 4) == 0:
             print("%s resources processed" % str(save_count))
 
+    def scan_for_new_languages(self, business_data=None):
+        new_languages = []
+        first_business_data_row = next(iter(business_data))
+        for column in first_business_data_row.keys():
+            column_regex = re.compile("^.+ \(([A-Za-z-]+)\)$")
+            match = column_regex.match(column)
+            if match is not None:
+                new_language_candidate = match.groups()[0]
+                existing_language_count = Language.objects.filter(code=new_language_candidate).count()
+                if existing_language_count == 0:
+                    new_languages.append(new_language_candidate)
+
+        return new_languages
+
     def import_business_data(
         self,
         business_data=None,
@@ -496,6 +555,7 @@ class CsvReader(Reader):
 
         try:
             with transaction.atomic():
+                language_codes = Language.objects.values_list("code", flat=True)
                 save_count = 0
                 try:
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
@@ -744,6 +804,17 @@ class CsvReader(Reader):
                             for row in mapping["nodes"]:
                                 if key.upper() == row["file_field_name"].upper():
                                     new_row.append({row["arches_nodeid"]: value})
+                                # there is no way to match the node value in the csv to a language, so a bar delimited format
+                                # is used to push this value deeper into the import process.  A later check will retrieve this
+                                # value and add it to the i18n string object
+                                else:
+                                    column_regex = re.compile("{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
+                                    column_match = column_regex.match(key.upper())
+                                    if column_match is not None:
+                                        language = column_match.groups()[0]
+                                        if language in [code.upper() for code in language_codes]:
+                                            new_row.append({row["arches_nodeid"]: value + "|" + language.lower()})
+
                     return new_row
 
                 def transform_value(datatype, value, source, nodeid):
@@ -755,12 +826,25 @@ class CsvReader(Reader):
                     if datatype != "":
                         errors = []
                         datatype_instance = datatype_factory.get_instance(datatype)
+                        config = {}
+                        if datatype in ["concept", "concept-list"]:
+                            config = Node.objects.get(nodeid=nodeid).config
+                            value = datatype_instance.transform_value_for_tile(value, **config)
+
+                        # the below is needed for Domain Datatype transform_for_tile method
+                        # config["nodeid"] = nodeid
+
                         try:
-                            if datatype in ["concept", "concept-list"]:
-                                config = Node.objects.get(nodeid=nodeid).config
-                                config["nodeid"] = nodeid
-                            else:
-                                config = {}
+                            language = None
+                            try:
+                                regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
+                                match = regex.match(value)
+                                if match is not None:
+                                    language = match.groups()[1]
+                                    value = match.groups()[0]
+                            except:
+                                pass
+                            config["language"] = language
                             value = datatype_instance.transform_value_for_tile(value, **config)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
@@ -868,8 +952,8 @@ class CsvReader(Reader):
 
                     row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
 
-                    missing_display_nodes = [n for n in display_nodes if n not in row_keys]
-                    if len(missing_display_nodes) > 0:
+                    missing_display_nodes = set(row_keys[0]).intersection_update(display_nodes)
+                    if missing_display_nodes is not None:
                         errors = []
                         for mdn in missing_display_nodes:
                             mdn_name = all_nodes.filter(nodeid=mdn).values_list("name", flat=True)[0]
@@ -934,12 +1018,26 @@ class CsvReader(Reader):
                                             for source_key in list(source_tile.keys()):
                                                 # Check for source and target key match.
                                                 if source_key == target_key:
-                                                    if tile_to_populate.data[source_key] is None:
+                                                    datatype_instance = datatype_factory.get_instance(node_datatypes[source_key])
+                                                    if (
+                                                        tile_to_populate.data[source_key] is None
+                                                        or datatype_instance.has_multicolumn_data()
+                                                    ):
                                                         # If match populate target_tile node with transformed value.
                                                         value = transform_value(
                                                             node_datatypes[source_key], source_tile[source_key], row_number, source_key
                                                         )
-                                                        tile_to_populate.data[source_key] = value["value"]
+
+                                                        # if a multicolumn data type with value as dict, those should be merged.
+                                                        if datatype_instance.has_multicolumn_data() and isinstance(
+                                                            tile_to_populate.data[source_key], dict
+                                                        ):
+                                                            tile_to_populate.data[source_key] = {
+                                                                **tile_to_populate.data[source_key],
+                                                                **value["value"],
+                                                            }
+                                                        else:
+                                                            tile_to_populate.data[source_key] = value["value"]
                                                         # tile_to_populate.request = value['request']
                                                         # Delete key from source_tile so
                                                         # we do not populate another tile based on the same data.

@@ -62,6 +62,11 @@ class mappedCSVFileImportTests(ArchesTestCase):
     def tearDownClass(cls):
         pass
 
+    def test_nonexistent_language_check(self):
+        new_languages = BusinessDataImporter("tests/fixtures/data/csv/required_node_import_new_languages.csv").scan_for_new_languages()
+        self.assertNotEqual(new_languages, None)
+        self.assertEqual(len(new_languages), 2)
+
     def test_single_1(self):
         og_tile_count = TileModel.objects.count()
         BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-1_to_1.csv").import_business_data()

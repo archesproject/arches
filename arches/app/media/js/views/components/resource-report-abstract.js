@@ -58,7 +58,7 @@ define([
                 }
             } 
             else if (self.resourceid) {
-                url = arches.urls.api_resource_report(self.resourceid) + "?v=beta&uncompacted=true";
+                url = arches.urls.api_resource_report(self.resourceid) + "?v=beta&uncompacted=true&exclude=related_resources";
 
                 self.fetchResourceData(url).then(function(responseJson) {
                     var template = responseJson.template;
@@ -89,7 +89,17 @@ define([
             });
         };
         
-        this.preloadResourceData = function(responseJson) {            
+        this.preloadResourceData = function(responseJson) {
+            const displayName = (() => {
+                try{
+                    return JSON.parse(responseJson.displayname)?.[arches.activeLanguage]?.value;
+                } catch (e){
+                    return responseJson.displayname
+                }
+            })();
+
+            responseJson.displayname = displayName;
+
             var graphModel = new GraphModel({
                 data: responseJson.graph,
                 datatypes: responseJson.datatypes,

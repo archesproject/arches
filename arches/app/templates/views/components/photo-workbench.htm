@@ -1,4 +1,5 @@
 {% extends "views/components/workbench.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -33,7 +34,7 @@
 
     <div style="position: absolute; bottom: 0px; width: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
         <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
-            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "Close" %}'"></div>
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: {% quoted_trans "Close" %}"></div>
             <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
                 <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
                 <div class="gallery-thumbnails">
@@ -58,7 +59,7 @@
             </div>
         </div>
 
-        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: '{% trans "View Gallery" %}', fadeVisible: showThumbnails, delay:400, fade: 200"></div>
+        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: {% quoted_trans "View Gallery" %}, fadeVisible: showThumbnails, delay:400, fade: 200"></div>
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
@@ -186,7 +187,7 @@
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                         provisionalTileViewModel.deleteAllProvisionalEdits();
-                    }">{% trans 'Delete all edits' %}</div>
+                    }"><span>{% trans 'Delete all edits' %}</span></div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {
@@ -304,24 +305,24 @@
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-warning': $parent.card.isWritable
-                }">{% trans 'Delete' %}</button>
+                }"><span>{% trans 'Delete' %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset"><span>{% trans 'Cancel' %}</span></button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
                         disabled: (!$parent.card.isWritable && !self.preview),
                         'btn-mint': $parent.card.isWritable
-                    }">{% trans 'Save' %}</button>
+                    }"><span>{% trans 'Save' %}</span></button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-mint': $parent.card.isWritable
-                }">{% trans 'Add'  %}</button>
+                }"><span>{% trans 'Add'  %}</span></button>
                 <!-- /ko -->
             </div>
                 <!--/ko-->

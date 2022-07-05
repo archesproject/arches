@@ -1,3 +1,4 @@
+{% load template_tags %}
 {% load i18n %}
 
 <!-- ko if: bufferNodeId() -->
@@ -13,10 +14,10 @@
         <div>{% trans 'Units:' %}</div>
         <select data-bind="
             options: [{
-                text: '{% trans 'meters' %}',
+                text: {% quoted_trans 'meters' %},
                 value: 'm'
             }, {
-                text: '{% trans 'feet' %}',
+                text: {% quoted_trans 'feet' %},
                 value: 'ft'
             }],
             optionsText: 'text',
@@ -39,8 +40,8 @@
     <div class="map-coordinate-editor-button-container">
         <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: function() {
             bufferNodeId(null);
-        }">{% trans 'Cancel' %}</button>
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: addBufferResult">{% trans 'Add Feature' %}</button>
+        }"><span>{% trans 'Cancel' %}</span></button>
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: addBufferResult"><span>{% trans 'Add Feature' %}</span></button>
     </div>
 </div>
 <!-- /ko-->

@@ -17,10 +17,10 @@
     <div style="display: flex; flex-direction: row">
         <span><i data-bind="class: report.get('iconclass') || 'fa fa-file-o'"></i></span>
         <!--ko if: report.get('displayname')-->
-        <span style="padding-left: 5px" data-bind="text: report.get('displayname') || '(Resource Instance Name)'"></span>
+        <span style="padding: 0 5px;" data-bind="text: report.get('displayname') || '(Resource Instance Name)'"></span>
         <!--/ko-->
         <!--ko ifnot: report.get('displayname')-->
-        <span style="padding-left: 5px">{% trans "(Resource Instance Name)" %}</span>
+        <span style="padding: 0 5px">{% trans "(Resource Instance Name)" %}</span>
         <!--/ko-->
     </div>
     <div><span data-bind="text: tabs()[activeTabIndex()].name"></span></div>
@@ -38,7 +38,7 @@
 {% block header_form %}
 <div style="display: flex; flex-direction: row">
 <div id="card-save-tile-btn" class="install-buttons">
-    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab">{% trans "Add Tab" %}</button>
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab"><span>{% trans "Add Tab" %}</span></button>
 </div>
 </div>
 <div data-bind="sortable: {

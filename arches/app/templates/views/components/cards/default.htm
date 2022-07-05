@@ -3,9 +3,9 @@
 
 <!-- ko if: state === 'editor-tree' && self.card.model.visible() -->
 {% block editor_tree %}
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (self.card.tiles().length > 0 && self.card.expanded()), 'jstree-closed' : (self.card.tiles().length > 0 && !self.card.expanded()), 'jstree-leaf': self.card.tiles().length === 0}, scrollTo: self.card.scrollTo, container: '.resource-editor-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){self.card.expanded(!self.card.expanded())}"></i>
-    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': self.card.highlight(), 'jstree-clicked': self.card.selected, 'child-selected': self.card.isChildSelected(), 'func-node': self.card.isFuncNode(),'unsaved-edit': self.card.isDirty() === true}, event: {
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0, 'hide-background': !self.showGrid()}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
+    <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
+    <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode(),'unsaved-edit': card.isDirty() === true}, event: {
         mousedown: function(d, e) {
             e.stopPropagation();
             self.card.canAdd() ? self.card.selected(true) : self.card.tiles()[0].selected(true);
@@ -31,9 +31,9 @@
             beforeMove: self.beforeMove,
             afterMove: self.card.reorderTiles
         }">
-            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0}, event: {'dragstart': function () { console.log('dragging...') }}">
-                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
-                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data);}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': self.card.highlight(), 'unsaved-edit': !!$data.dirty()}">
+            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0, 'hide-background': !self.showGrid()}, event: {'dragstart': function () { console.log('dragging...') }}">
+                <i class="jstree-icon" role="presentation" data-bind="click: function(){expanded(!expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
+                <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data);}, css:{'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight(), 'unsaved-edit': !!$data.dirty()}">
                     <i class="fa " role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits(),'fa-pencil':$data.dirty()===true,'fa-file':!$data.dirty()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
@@ -43,10 +43,11 @@
                             name: self.form.widgetLookup[self.card.widgets()[0].widget_id()].name,
                             params: {
                                 tile: $data,
-                                node: self.form.nodeLookup[self.card.widgets()[0].node_id()],
-                                config: self.form.widgetLookup[self.card.widgets()[0].widget_id()].config,
-                                label: self.form.widgetLookup[self.card.widgets()[0].widget_id()].label,
-                                value: $data.data[self.card.widgets()[0].node_id()],
+                                node: self.form.nodeLookup[card.widgets()[0].node_id()],
+                                config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
+                                label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
+                                inResourceEditor: self.inResourceEditor,
+                                value: $data.data[card.widgets()[0].node_id()],
                                 type: 'resource-editor',
                                 state: 'display_value',
                                 disabled: !self.card.isWritable && !self.preview
@@ -86,8 +87,8 @@
 
 <!-- ko if: state === 'designer-tree' -->
 {% block designer_tree %}
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0, 'hide-background': !self.showGrid()}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
+    <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span data-bind="text: card.model.name"></span>
@@ -104,9 +105,9 @@
                 afterMove: function() { card.model.save() }
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
-                    'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0
+                    'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0, 'hide-background': !self.showGrid()
                 }">
-                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': self.showGrid}"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function() { widget.selected(true) }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
@@ -152,8 +153,8 @@
 
 <!-- ko if: state === 'permissions-tree' -->
 {% block permissions_tree %}
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0, 'hide-background': !self.showGrid()}">
+    <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
     <a class="jstree-anchor permissions-card" href="#" tabindex="-1" data-bind="css:{'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'filtered': card.highlight()}, click: function () { card.selectChildCards() },">
         <i class="fa fa-file-o" role="presentation"></i>
         <span style="padding-right: 5px;" data-bind="text: card.model.name">
@@ -176,9 +177,10 @@
                 afterMove: function() { card.model.save() }
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
-                    'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0
+                    'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0,
+                    'hide-background': !self.showGrid()
                 }">
-                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': self.showGrid}"></i>
                 <a class="jstree-anchor permissions-widget" href="#" tabindex="-1">
                     <i class="fa fa-file" role="presentation" ></i>
                     <strong style="margin-right: 10px;" >
@@ -249,7 +251,7 @@
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
-                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
+                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}"><span>{% trans 'Delete all edits' %}</span></div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
@@ -302,6 +304,7 @@
                             form: self.form,
                             config: widget.configJSON,
                             label: widget.label(),
+                            inResourceEditor: self.inResourceEditor,
                             value: self.tile.data[widget.node_id()],
                             node: self.form.nodeLookup[widget.node_id()],
                             expanded: self.expanded,
@@ -345,6 +348,7 @@
                                         tile: tile,
                                         node: self.form.nodeLookup[card.widgets()[0].node_id()],
                                         config: self.form.widgetLookup[card.widgets()[0].widget_id()].config,
+                                        inResourceEditor: self.inResourceEditor,
                                         label: self.form.widgetLookup[card.widgets()[0].widget_id()].label,
                                         value: tile.data[card.widgets()[0].node_id()],
                                         type: 'resource-editor',
@@ -366,21 +370,21 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: tile.tileid && self.deleteTile -->
-                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }"><span>{% trans 'Delete this record' %}</span></button>
                 <!-- /ko -->
 
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel edit' %}</button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset"><span>{% trans 'Cancel edit' %}</span></button>
                     <!-- /ko -->
 
                     <!-- ko if: tile.tileid -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }"><span>{% trans 'Save edit' %}</span></button>
                     <!-- /ko -->
                 <!-- /ko -->
                 
                 <!-- ko if: !tile.tileid && !showChildCards() -->
-                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
+                <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }"><span>{% trans 'Add' %}</span></button>
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
@@ -388,7 +392,7 @@
             <!-- ko if: card.showSummary() === true -->
             {% block card_summary %}
             {% include 'views/components/cards/default-card-report.htm' %}
-            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-primary" data-bind="text: '{% trans "New" %}', click: function(){card.showForm(true)}"></button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-primary" data-bind="click: function(){card.showForm(true)}"><span>{% trans "New" %}</span></button>
             {% endblock card_summary %}
             <!-- /ko -->
 

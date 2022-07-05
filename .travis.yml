@@ -18,7 +18,6 @@ addons:
 
 services:
   - postgresql
-  - couchdb
 
 before_install:
   - echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
@@ -39,9 +38,6 @@ before_install:
 cache:
   - apt
   - pip
-
-before_script:
-  - ./arches/install/ci_install/setup_couch.sh
 
 language:
   - python

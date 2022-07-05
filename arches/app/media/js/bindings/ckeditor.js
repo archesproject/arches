@@ -2,7 +2,10 @@ define([
     'jquery',
     'underscore',
     'knockout',
-], function($, _, ko) {
+    'arches',
+    'ckeditor-jquery',
+    'ckeditor',
+], function($, _, ko, arches) {
     /**
     * A knockout.js binding for the "ckeditor" rich text editor widget
     * - pass options to ckeditor using the following syntax in the knockout
@@ -13,16 +16,36 @@ define([
     * @name ckeditor
     */
 
-    const initialize = function(element, valueAccessor, allBindings) {
+    const initialize = function (element, valueAccessor, allBindings) {
         var modelValue = valueAccessor();
         var value = ko.utils.unwrapObservable(valueAccessor());
+        const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
+        const direction = allBindings.get('direction') || ko.observable(arches.activeLanguageDir);
         var $element = $(element);
-        var options = {};
+        var options = {bodyId: 'ckeditor'};
+        const languageList = [];
+        
+        for(const lang of Object.keys(arches.languages)){
+            languageList.push(`${lang}:${arches.languages[lang]}`)
+        }
+
+        CKEDITOR.config.language_list = languageList;
+        CKEDITOR.config.language = language();
+        CKEDITOR.config.contentsLangDirection = direction();
+
+        direction.subscribe(newValue => {
+            CKEDITOR.config.contentsLangDirection = newValue;
+            CKEDITOR.replace('ckeditor', CKEDITOR.config);
+        });
+
+        language.subscribe(newValue => {
+            CKEDITOR.config.language = newValue;
+        });
 
         if (allBindings.has('ckeditorOptions')){
             var opts = allBindings.get('ckeditorOptions');
             options = (typeof opts === 'object') ? opts : {};
-        }
+        };
 
         // Set initial value and create the CKEditor
         $element.html(value);
@@ -34,9 +57,8 @@ define([
             }
         });
 
-
         // bind to change events and link it to the observable
-        var onChange = function(e) {
+        var onChange = function (e) {
             var self = this;
 
             if (ko.isWriteableObservable(self)) {
@@ -48,6 +70,11 @@ define([
             return true;
         };
         editor.on('change', onChange, modelValue, element);
+        editor.on('afterCommandExec', (event => {
+            if(event.data.name == 'language'){
+                language(event.data.commandData);
+            }
+        }), modelValue, element);
 
         modelValue.subscribe(function(newValue){
             var self = this;
@@ -62,9 +89,8 @@ define([
             }
         }, this);
 
-
         // Handle disposal if KO removes an editor through template binding
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
             editor.updateElement();
             editor.destroy();
         });
@@ -72,10 +98,9 @@ define([
 
     ko.bindingHandlers.ckeditor = {
         init: (element, valueAccessor, allBindings) => {
-            window.jQuery = $;
-            require(['ckeditor', 'ckeditor-jquery',], () => {
+            require(['ckeditor-jquery', 'ckeditor'], () => {
                 initialize(element, valueAccessor, allBindings);
-            });
+            })
         }
     };
 

@@ -47,10 +47,9 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PG_SUPERUSER = ""
 PG_SUPERUSER_PW = ""
-
-COUCHDB_URL = "http://admin:admin@localhost:5984"  # defaults to localhost:5984
 
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
@@ -185,7 +184,7 @@ TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
 
-# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
@@ -214,7 +213,7 @@ LANGUAGE_CODE = "en"
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
     # ("de", _("German")),
-    # ("en", _("English")),
+    ("en", "English"),
     # ("en-gb", _("British English")),
     # ("es", _("Spanish")),
     # ("ar", _("Arabic")),
@@ -301,14 +300,7 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
-MOBILE_OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
-MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
-MOBILE_IMAGE_SIZE_LIMITS = {
-    # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
-    # Not to exceed the limit defined in DATA_UPLOAD_MAX_MEMORY_SIZE
-    "full": min(1500000, DATA_UPLOAD_MAX_MEMORY_SIZE),  # ~1.5 Mb
-    "thumb": 400,  # max width/height in pixels, this will maintain the aspect ratio of the original image
-}
+OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 
 TEMPLATES = [
     {
@@ -614,6 +606,12 @@ MAP_MAX_ZOOM = 20
 # causing your application to break.
 OVERRIDE_RESOURCE_MODEL_LOCK = False
 
+# If True, allows users to selectively enable two-factor authentication
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+
+# If True, users cannot log in unless they have enabled two-factor authentication
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {
@@ -730,7 +728,6 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
-
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

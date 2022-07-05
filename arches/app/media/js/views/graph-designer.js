@@ -37,6 +37,7 @@ define([
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
+            viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {

@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load l10n %}
 {% load i18n %}
 {% load webpack_static from webpack_loader %}
@@ -133,10 +133,6 @@
         "title": "{% trans "Delete Resource?" %}",
         "text": "{% trans "Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
     }'
-    confirmSurveyDelete='{
-        "title": "{% trans "Delete survey?" %}",
-        "text": "{% trans "Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?" %}"
-    }'
     exportHtmlTemplates='[{% for template in export_html_templates %} "{{ template }}", {% endfor %}]'
     geocoderDefault="{{ map_info.geocoder_default }}"
     geocoderPlaceHolder="{% trans 'Find an address...' %}"
@@ -200,6 +196,7 @@
         "tile_history": "{% url "tile_history" %}",
         "download_files": "{% url "download_files" %}",
         "time_wheel_config": "{% url "time_wheel_config" %}",
+        "two_factor_authentication_reset": "{% url "two-factor-authentication-reset" %}",
         "reindex": "{% url "reindex" %}",
         "permission_data": "{% url "permission_data" %}",
         "resource_permission_data": "{% url "resource_permission_data" %}",
@@ -208,7 +205,7 @@
         "feature_popup_content": "{% url "feature_popup_content" %}",
         "related_resource_candidates": "{% url "related_resource_candidates" %}",
         "relatable_resources": "{% url "relatable_resources" %}",
-        "collector_manager": "{% url "collector_manager" %}",
+        "languages": "{% url "language" %}",
         "help_template": "{% url "help_templates" %}",
         "api_node_value": "{% url "api_node_value" %}",
         "api_bulk_resource_report": "{% url "api_bulk_resource_report" %}",
@@ -218,6 +215,7 @@
         "ontology_properties": "{% url "ontology_properties" %}",
         "iiifmanifest": "{% url "iiifmanifest" %}",
         "manifest_manager": "{% url "manifest_manager" %}",
+        "etl_manager": "{% url "etl_manager" %}",
         "iiifannotations": "{% url "iiifannotations" %}",
         "iiifannotationnodes": "{% url "iiifannotationnodes" %}",
         "get_dsl": "{% url "get_dsl" %}",
@@ -252,8 +250,6 @@
         "export_mapping_file": "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
         "add_resource": "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
         "function_manager": "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
-        "mobile_survey_resources": "{% url "mobile_survey_resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
-        "collector_designer": "{% url "collector_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
         "plugin": "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
         "transaction_reverse":  "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
         "api_tiles": "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}",
@@ -266,6 +262,9 @@
     resourceDataUrl="{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
     apiSearchComponentDataUrl="{% url 'api_search_component_data' 'aaaa'%}"
     validateJsonUrl="{% url 'validatejson' 'aaaa'%}"
+    activeLanguage='{{ app_settings.ACTIVE_LANGUAGE }}'
+    activeLanguageDir='{{ app_settings.ACTIVE_LANGUAGE_DIR }}'
+    languages='{{ app_settings.LANGUAGES }}'
     mapboxApiKey='{{ map_info.mapbox_api_key }}'
     mapboxGlyphs='{{ map_info.mapbox_glyphs }}'
     mapboxSprites='{{ map_info.mapbox_sprites }}'
@@ -317,6 +316,14 @@
         "title": "{% trans "Request Failed..." %}",
         "text": "{% trans "Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}"
     }'
+    confirmSendTwoFactorAuthenticationEmail='{
+        title: "{% trans "Send Two-Factor Authentication email?" %}",
+        text: "{% trans "This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?" %}"
+    }'
+    twoFactorAuthenticationEmailSuccess='{
+        title: "{% trans "Success!" %}",
+        text: "{% trans "An email with instructions to change two-factor authentication settings has been sent to your registered email address." %}"
+    }'
     resourceCopyFailed='{
         "title": "{% trans "Resource Copy Failed..."%}",
         "text": "{% trans "Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists." %}"
@@ -335,32 +342,25 @@
         "icon": "{{ resource.iconclass }}"
     },{% endfor %}]'
     translations='{
-        "deactivateSurveyTitle": "{% trans "You are deactivating an active survey" %}",
-        "deactivateSurveyMessage": "{% trans "Users will not be able to download this survey to their device" %}",
-        "activateSurveyTitle": "{% trans "You are activating this survey" %}",
-        "activateSurveyMessage": "{% trans "Users will immediately be able to download this survey and begin collecting data" %}",
-        "mapAddPoint": "{% trans "Add point" %}",
-        "mapAddLine": "{% trans "Add line" %}",
-        "mapAddPolygon": "{% trans "Add polygon" %}",
-        "mapSelectDrawing": "{% trans "Select drawing" %}",
-        "riSelectCreateNew": "{% trans "Create a new ${graphName}" %}",
-        "riSelectPlaceholder": "{% trans "Add new Relationship" %}",
-        "reNetworkReponseError": "{% trans "Network response was not ok" %}",
-        "workflowWastbinWarning": "{% trans "You are about to delete ${val}." %}",
-        "workflowWastbinWarning2": "{% trans "Are you sure you want to continue?" %}",
-        "workflowWastbinWarning3": "{% trans "You are about to quit the workflow." %}",
-        "termSearchConcept": "{% trans "Concepts" %}",
-        "termSearchTerm": "{% trans "Term Matches" %}",
-        "timeWheelDateMatches": "{% trans "${total} date values" %}",
-        "cardConstraintsPlaceholder": "{% trans "Select Widgets" %}",
-        "cardFunctionNodeDesc": "{% trans "(This card data will define the resource description.)" %}",
-        "cardFunctionNodeName": "{% trans "(This card data will define the resource name.)" %}",
-        "mobileSurveyNameLong": "{% trans "Model Details" %}",
-        "mobileSurveyDesc": "{% trans "Summary of how this model participates in the survey" %}",
-        "groupingErrorTitle": "{% trans "Settings Conflict: Remove this card from grouped card?" %}",
-        "groupingErrorMessage": "{% trans "The cardinality of this card cannot be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" %}",
-        "modelDoesNotExist": "{% trans "Referenced model does not exist -- Delete and select a new model" %}",
-        "idColumnSelection": "{% trans "Use as an id" %}"
+        "mapAddPoint": {% trans "Add point" as mapAddPoint %} "{{ mapAddPoint|escapejs }}",
+        "mapAddLine": {% trans "Add line" as mapAddLine %} "{{ mapAddLine|escapejs }}",
+        "mapAddPolygon": {% trans "Add polygon" as mapAddPolygon %} "{{ mapAddPolygon|escapejs }}",
+        "mapSelectDrawing": {% trans "Select drawing" as mapSelectDrawing %} "{{ mapSelectDrawing|escapejs }}",
+        "riSelectCreateNew": {% trans "Create a new ${graphName}" as riSelectCreateNew %} "{{ riSelectCreateNew|escapejs }}",
+        "riSelectPlaceholder": {% trans "Add new Relationship" as riSelectPlaceholder %} "{{ riSelectPlaceholder|escapejs }}",
+        "reNetworkReponseError": {% trans "Network response was not ok" as reNetworkReponseError %} "{{ reNetworkReponseError|escapejs }}",
+        "workflowWastbinWarning": {% trans "You are about to delete ${val}." as workflowWastbinWarning %} "{{ workflowWastbinWarning|escapejs }}",
+        "workflowWastbinWarning2": {% trans "Are you sure you want to continue?" as workflowWastbinWarning2 %} "{{ workflowWastbinWarning2|escapejs }}",
+        "workflowWastbinWarning3": {% trans "You are about to quit the workflow." as workflowWastbinWarning3 %} "{{ workflowWastbinWarning3|escapejs }}",
+        "termSearchConcept": {% trans "Concepts" as termSearchConcept %} "{{ termSearchConcept|escapejs }}",
+        "termSearchTerm": {% trans "Term Matches" as termSearchTerm %} "{{ termSearchTerm|escapejs }}",
+        "timeWheelDateMatches": {% trans "${total} date values" as timeWheelDateMatches %} "{{ timeWheelDateMatches|escapejs }}",
+        "cardConstraintsPlaceholder": {% trans "Select Widgets" as cardConstraintsPlaceholder %} "{{ cardConstraintsPlaceholder|escapejs }}",
+        "cardFunctionNodeDesc": {% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} "{{ cardFunctionNodeDesc|escapejs }}",
+        "cardFunctionNodeName": {% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} "{{ cardFunctionNodeName|escapejs }}",
+        "groupingErrorTitle": {% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} "{{ groupingErrorTitle|escapejs }}",
+        "groupingErrorMessage": {% trans "The cardinality of this card can"t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}",
+        "modelDoesNotExist": {% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} "{{ modelDoesNotExist|escapejs }}"
     }'
     userEmail='{{ user.email }}'
     useSemanticRelationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
@@ -539,53 +539,53 @@
         'leaflet',
         'leaflet-draw'
     ], function (L) {
-        L.drawLocal.draw.toolbar.actions.title = '{% trans "Cancel drawing" %}';
-        L.drawLocal.draw.toolbar.actions.text = '{% trans "Cancel" %}';
+        L.drawLocal.draw.toolbar.actions.title = "{% trans "Cancel drawing" %}";
+        L.drawLocal.draw.toolbar.actions.text = "{% trans "Cancel" %}";
 
-        L.drawLocal.draw.toolbar.finish.title = '{% trans "Finish drawing" %}';
-        L.drawLocal.draw.toolbar.finish.text = '{% trans "Finish" %}';
+        L.drawLocal.draw.toolbar.finish.title = "{% trans "Finish drawing" %}";
+        L.drawLocal.draw.toolbar.finish.text = "{% trans "Finish" %}";
 
-        L.drawLocal.draw.toolbar.undo.title = '{% trans "Delete last point drawn" %}';
-        L.drawLocal.draw.toolbar.undo.text = '{% trans "Delete last point" %}';
+        L.drawLocal.draw.toolbar.undo.title = "{% trans "Delete last point drawn" %}";
+        L.drawLocal.draw.toolbar.undo.text = "{% trans "Delete last point" %}";
 
-        L.drawLocal.draw.toolbar.buttons.polyline = '{% trans "Draw a polyline" %}';
-        L.drawLocal.draw.toolbar.buttons.polygon = '{% trans "Draw a polygon" %}';
-        L.drawLocal.draw.toolbar.buttons.rectangle = '{% trans "Draw a rectangle" %}';
-        L.drawLocal.draw.toolbar.buttons.circle = '{% trans "Draw a circle" %}';
-        L.drawLocal.draw.toolbar.buttons.marker = '{% trans "Draw a marker" %}';
+        L.drawLocal.draw.toolbar.buttons.polyline = "{% trans "Draw a polyline" %}";
+        L.drawLocal.draw.toolbar.buttons.polygon = "{% trans "Draw a polygon" %}";
+        L.drawLocal.draw.toolbar.buttons.rectangle = "{% trans "Draw a rectangle" %}";
+        L.drawLocal.draw.toolbar.buttons.circle = "{% trans "Draw a circle" %}";
+        L.drawLocal.draw.toolbar.buttons.marker = "{% trans "Draw a marker" %}";
 
-        L.drawLocal.draw.handlers.circle.tooltip.start = '{% trans "Click and drag to draw circle." %}';
-        L.drawLocal.draw.handlers.circle.radius = '{% trans "Radius" %}';
+        L.drawLocal.draw.handlers.circle.tooltip.start = "{% trans "Click and drag to draw circle." %}";
+        L.drawLocal.draw.handlers.circle.radius = "{% trans "Radius" %}";
 
-        L.drawLocal.draw.handlers.marker.tooltip.start = '{% trans "Click map to place marker." %}';
+        L.drawLocal.draw.handlers.marker.tooltip.start = "{% trans "Click map to place marker." %}";
 
-        L.drawLocal.draw.handlers.polygon.tooltip.start = '{% trans "Click to start drawing shape." %}';
-        L.drawLocal.draw.handlers.polygon.tooltip.cont = '{% trans "Click to continue drawing shape." %}';
-        L.drawLocal.draw.handlers.polygon.tooltip.end = '{% trans "Click first point to close this shape." %}';
+        L.drawLocal.draw.handlers.polygon.tooltip.start = "{% trans "Click to start drawing shape." %}";
+        L.drawLocal.draw.handlers.polygon.tooltip.cont = "{% trans "Click to continue drawing shape." %}";
+        L.drawLocal.draw.handlers.polygon.tooltip.end = "{% trans "Click first point to close this shape." %}";
 
-        L.drawLocal.draw.handlers.polyline.error = '{% trans "<strong>Error:</strong> shape edges cannot cross!" %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.start = '{% trans "Click to start drawing line." %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.cont = '{% trans "Click to continue drawing line." %}';
-        L.drawLocal.draw.handlers.polyline.tooltip.end = '{% trans "Click last point to finish line." %}';
+        L.drawLocal.draw.handlers.polyline.error = "{% trans "<strong>Error:</strong> shape edges cannot cross!" %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.start = "{% trans "Click to start drawing line." %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.cont = "{% trans "Click to continue drawing line." %}";
+        L.drawLocal.draw.handlers.polyline.tooltip.end = "{% trans "Click last point to finish line." %}";
 
-        L.drawLocal.draw.handlers.rectangle.tooltip.start = '{% trans "Click and drag to draw rectangle." %}';
-        L.drawLocal.draw.handlers.simpleshape.tooltip.end = '{% trans "Release mouse to finish drawing." %}';
+        L.drawLocal.draw.handlers.rectangle.tooltip.start = "{% trans "Click and drag to draw rectangle." %}";
+        L.drawLocal.draw.handlers.simpleshape.tooltip.end = "{% trans "Release mouse to finish drawing." %}";
 
-        L.drawLocal.edit.toolbar.actions.save.title = '{% trans "Apply changes." %}';
-        L.drawLocal.edit.toolbar.actions.save.text = '{% trans "Apply" %}';
+        L.drawLocal.edit.toolbar.actions.save.title = "{% trans "Apply changes." %}";
+        L.drawLocal.edit.toolbar.actions.save.text = "{% trans "Apply" %}";
 
-        L.drawLocal.edit.toolbar.actions.cancel.title = '{% trans "Undo edits, discards all changes." %}';
-        L.drawLocal.edit.toolbar.actions.cancel.text = '{% trans "Undo" %}';
+        L.drawLocal.edit.toolbar.actions.cancel.title = "{% trans "Undo edits, discards all changes." %}";
+        L.drawLocal.edit.toolbar.actions.cancel.text = "{% trans "Undo" %}";
 
-        L.drawLocal.edit.toolbar.buttons.edit = '{% trans "Edit drawings." %}';
-        L.drawLocal.edit.toolbar.buttons.editDisabled = '{% trans "No drawings to edit." %}';
-        L.drawLocal.edit.toolbar.buttons.remove = '{% trans "Delete drawings." %}';
-        L.drawLocal.edit.toolbar.buttons.removeDisabled = '{% trans "No drawings to delete." %}';
+        L.drawLocal.edit.toolbar.buttons.edit = "{% trans "Edit drawings." %}";
+        L.drawLocal.edit.toolbar.buttons.editDisabled = "{% trans "No drawings to edit." %}";
+        L.drawLocal.edit.toolbar.buttons.remove = "{% trans "Delete drawings." %}";
+        L.drawLocal.edit.toolbar.buttons.removeDisabled = "{% trans "No drawings to delete." %}";
 
-        L.drawLocal.edit.handlers.edit.tooltip.text = '{% trans "Drag handles, or marker to edit feature." %}';
-        L.drawLocal.edit.handlers.edit.tooltip.subtext = '{% trans "Click undo to cancel changes." %}';
+        L.drawLocal.edit.handlers.edit.tooltip.text = "{% trans "Drag handles, or marker to edit feature." %}";
+        L.drawLocal.edit.handlers.edit.tooltip.subtext = "{% trans "Click undo to cancel changes." %}";
 
-        L.drawLocal.edit.handlers.remove.tooltip.text = '{% trans "Click on a feature to remove" %}';
+        L.drawLocal.edit.handlers.remove.tooltip.text = "{% trans "Click on a feature to remove" %}";
     });
 </script>
 {% endblock arches_modules %}

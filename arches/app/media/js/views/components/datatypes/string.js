@@ -1,7 +1,8 @@
 define([
     'knockout',
+    'arches',
     'templates/views/components/datatypes/string.htm',
-], function(ko, stringDatatypeTemplate) {
+], function(ko, arches, stringDatatypeTemplate) {
     var name = 'string-datatype-config';
     const viewModel = function(params) {
         var self = this;
@@ -9,12 +10,16 @@ define([
         if (this.search) {
             var filter = params.filterValue();
             this.op = ko.observable(filter.op || '~');
+            this.languages = ko.observableArray();
+            this.languages(arches.languages);
+            this.language = ko.observable();
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
                 return {
                     op: self.op(),
+                    lang: self.language()?.code,
                     val: self.searchValue()
-                };
+                }
             }).extend({ throttle: 750 });
             params.filterValue(this.filterValue());
             this.filterValue.subscribe(function(val) {

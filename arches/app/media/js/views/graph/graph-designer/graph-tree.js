@@ -73,6 +73,8 @@ define([
             this.toggleIds = function() {
                 self.showIds(!self.showIds());
             };
+            this.showGrid = ko.observable(false);
+            this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -243,6 +245,9 @@ define([
                     item.expanded(false);
                 }
             }, this);
+        },
+        toggleGrid: function(){
+            this.showGrid(!this.showGrid());
         }
     });
     return GraphTree;

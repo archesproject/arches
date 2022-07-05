@@ -1,13 +1,13 @@
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
 <div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
 
     <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
-        <h3 class="search-listing-title"><a class="search-candidate-title" href="" data-bind="click: $parent.viewReport.bind($parent)"><i class="search-listing-icon" data-bind="css: iconclass"></i> <span data-bind="text: displayname"></span></a></h3>
+        <h3 class="search-listing-title" data-bind="css: {'i18n-alt':$parent.getLocalizedText(displayname).alternative}"><a class="search-candidate-title" href="" data-bind="click: $parent.viewReport.bind($parent)"><i class="search-listing-icon" data-bind="css: iconclass"></i> <span data-bind="text: $parent.getLocalizedText(displayname).displayText"></span></a></h3>
 
-        <div class="search-listing-body" data-bind="html: displaydescription">
+        <div class="search-listing-body" data-bind="html: $parent.getLocalizedText(displaydescription).displayText">
         </div>
 
         <div class="search-listing-footer">

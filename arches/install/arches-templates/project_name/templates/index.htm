@@ -15,7 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 {% load webpack_static from webpack_loader %}
@@ -145,11 +145,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <li>
                             <a class="vertical-nav-list-link" href="#info-block-3" data-number="4" aria-label="Go to the search tools section">
                                 <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="vertical-nav-list-link" href="#info-block-4" data-number="5" aria-label="Go to the mobile section">
-                                <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
                             </a>
                         </li>
                     </ul>
@@ -312,36 +307,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </section>
             <!-- End Info Block 3 -->
-
-            <!-- Info Block 4 -->
-            <section id="info-block-4" class="app-info-block relative">
-                <div>
-                    <!-- Heading Info -->
-                    <div class="sub-section">
-                    </div>
-                    <!-- Content -->
-                    <div class="row">
-                        <div class="col-md-6 col-lg-4 text-center">
-                            <img class="iphone" src="{% webpack_static 'img/landing/IPhone_8_map.png' %}" alt="Arches Designer">
-                        </div>
-                        <div class="col-md-6 col-lg-8">
-                            <div class="mobile-description-container">
-                                <div class="box-highlight">
-                                    <h2 class="app-info-block-title">{% trans "Work on the go..." %}</h2>
-                                    <p>
-                                        {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
-                                    </p>
-                                    <br>
-                                    <p>
-                                        {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- End Info Block 4 -->
         </article>
     </main>
 
@@ -376,9 +341,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <ul class="splash-link-container">
                                 <li>
                                     <a class="splash-link-address" href="http://https://www.archesproject.org/what-is-arches/" target="_blank">{% trans "What is Arches" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/collector/" target="_blank">{% trans "Arches Collector" %}</a>
                                 </li>
                                 <li>
                                     <a class="splash-link-address" href="https://www.archesproject.org/implementation-considerations/" target="_blank">{% trans "Implementation Considerations" %}</a>

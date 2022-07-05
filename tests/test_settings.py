@@ -93,6 +93,9 @@ REMOTE_BROWSERS = [
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
 
@@ -111,4 +114,7 @@ LANGUAGES = [
 try:
     from settings_local import *
 except ImportError:
-    pass
+    try:
+        from settings_docker import *
+    except ImportError:
+        pass

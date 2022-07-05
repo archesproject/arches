@@ -23,6 +23,7 @@ define([
     * @param  {boolean} params.graphids (optional) - if params.node is not supplied then you need to supply a list of graphids that can be used to get resource instances for the dropdown
     * @param  {boolean} params.multiple - whether to display multiple values in the dropdown/table
     * @param  {boolean} params.allowInstanceCreation - whether the dropdown will give the user the option to create a new resource instance
+    * @param  {string} params.searchString (optional) - will limit the search results by the search string (it has to be full URL) and will override node.config.searchString if there is one
     * @param  {function} params.termFilter (optional) - a function to override the default term filter used when typing into the dropdown to search for resources
     * this.termFilter = function(term, data){
     *    return data["advanced-search"] = JSON.stringify([{
@@ -40,18 +41,21 @@ define([
         this.graphLookupKeys = ko.observable(Object.keys(this.graphLookup)); // used for informing the widget when to disable/enable the dropdown
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
-        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
-        if (!!params.configForm) {
-            this.allowInstanceCreation = false;
-        }
         this.renderContext = params.renderContext;
-
         /* 
             shoehorn logic to piggyback off of search context functionality. 
             Should be refactored when we get the chance for better component clarity.
         */ 
         if (params.renderContext === 'workflow') {
             self.renderContext = 'search';
+        }
+
+        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
+        if (self.renderContext === 'search') {
+            this.allowInstanceCreation = params.allowInstanceCreation === true ? true : false;
+        }
+        if (!!params.configForm) {
+            this.allowInstanceCreation = false;
         }
 
         this.multiple = params.multiple || false;
@@ -61,6 +65,8 @@ define([
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
         this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
+        this.graphIds = ko.observableArray();
+        this.searchString = params.searchString || ko.unwrap(params.node?.config.searchString);
 
         this.waitingForGraphToDownload = ko.computed(function(){
             if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
@@ -323,15 +329,19 @@ define([
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
-                if (self.renderContext !== 'search') {
+                if (!(self.renderContext === 'search') || self.allowInstanceCreation) {
                     if (item._source) {
-                        var ret = self.makeObject(item._id, item._source);
-                        self.setValue(ret);
-                        window.setTimeout(function() {
-                            if(self.displayOntologyTable){
-                                self.resourceToAdd("");
-                            }
-                        }, 250);
+                        if (self.renderContext === 'search'){
+                            self.value(item._id);
+                        } else {
+                            var ret = self.makeObject(item._id, item._source);
+                            self.setValue(ret);
+                            window.setTimeout(function() {
+                                if(self.displayOntologyTable){
+                                    self.resourceToAdd("");
+                                }
+                            }, 250);    
+                        }
                     } else {
                         // This section is used when creating a new resource Instance
                         if(!self.preview){
@@ -350,7 +360,11 @@ define([
                             };
                             params.complete.subscribe(function() {
                                 if (params.resourceid()) {
-                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                    if (self.renderContext === 'search'){
+                                        self.value(params.resourceid());
+                                        clearNewInstance();
+                                    } else {
+                                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
                                         .then(function(response){
                                             if(response.ok) {
                                                 return response.json();
@@ -365,6 +379,7 @@ define([
                                         .finally(function(){
                                             clearNewInstance();
                                         });
+                                    }
                                 } else {
                                     clearNewInstance();
                                 }
@@ -391,10 +406,9 @@ define([
                     } else {
                         self.url(arches.urls.search_results);
                         var queryString = new URLSearchParams();
-                        if (!!params.node && ko.unwrap(params.node.config.searchString) !== ""){
-                            var searchUrl = new URL(ko.unwrap(params.node.config.searchString));
+                        if (self.searchString) {
+                            const searchUrl = new URL(self.searchString);
                             queryString = new URLSearchParams(searchUrl.search);
-                            self.allowInstanceCreation = false;
                         } 
                         queryString.set('paging-filter', page);
 
@@ -433,7 +447,7 @@ define([
                     }
                 },
                 results: function(data, page) {
-                    if (!data['paging-filter'].paginator.has_next && self.renderContext !== 'search') {
+                    if (!data['paging-filter'].paginator.has_next && self.allowInstanceCreation) {
                         self.resourceTypesToDisplayInDropDown().forEach(function(graphid) {
                             var graph = self.graphLookup[graphid];
                             var val = {
@@ -442,6 +456,9 @@ define([
                                 isGraph: true
                             };
                             data.results.hits.hits.push(val);
+                            if (!self.graphIds().includes(graphid)) {
+                                self.graphIds.push(graphid);
+                            }
                         });
                     }
                     return {
@@ -471,7 +488,7 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
-                if(self.renderContext === "search" && self.value() !== "") {
+                if(self.renderContext === "search" && self.value() !== "" && !self.graphIds().includes(self.value())) {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
@@ -506,6 +523,8 @@ define([
                             callback(ret);
                         }
                     });
+                } else if (self.graphIds().includes(self.value())){
+                    self.value(null);
                 }
             }
         };
