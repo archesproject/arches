@@ -731,6 +731,7 @@ footer .footer-links {
 }
 
 .tp-caption {
+    position: absolute;
     top: auto !important;
     bottom: 20vh;
 }

@@ -154,25 +154,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Splash Screen -->
                 <div class="fullscreenbanner-container">
                     <div class="fullscreenbanner">
-                        <ul>
+                        <ul style="padding: 0px;" >
                             <!-- SLIDE 1 -->
                             <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                                 <!-- MAIN IMAGE -->
-                                <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
-                                <!-- LAYERS -->
-                                <!-- NEW LAYER -->
-                                <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
-                                    <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                                    <p>{% trans "A web and mobile platform for" %}</p>
-                                    <p style="padding-bottom: 15px;">{% trans "managing your most important resource information" %}</p>
-                                </div>
+                                <div>
+                                    <img 
+                                        src="{% webpack_static 'img/landing/landing-primary.jpg' %}" 
+                                        alt="slidebg1" 
+                                        data-bgfit="cover" 
+                                        data-bgposition="center center" 
+                                        data-bgrepeat="no-repeat"
+                                    >
 
-                                <!-- Gradient -->
-                                <div class="image-gradient"></div>
-
-                                <!-- Attribution -->
-                                <div class="image-attribution">
-                                    <span>{% trans "Glarus thrust, Tectonic Area Sardona, Switzerland | Jonas Wagner https://www.flickr.com/photos/80225884@N06/ | Attribution 2.0 Generic (CC BY 2.0)" %}</span>
+                                    <!-- LAYERS -->
+                                    <!-- NEW LAYER -->
+                                    <div 
+                                        class="tp-caption sft start text-bold v5-splash-caption" 
+                                        delay="4500" 
+                                        data-hoffset="0"
+                                        data-y="400" 
+                                        data-speed="800" 
+                                        data-start="100" 
+                                        data-easing="Back.easeInOut" 
+                                        data-endspeed="300" 
+                                        data-x="0"
+                                    >
+                                        <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                                        <p>{% trans "A web and mobile platform for" %}</p>
+                                        <p style="padding-bottom: 15px;">{% trans "managing your most important resource information" %}</p>
+                                    </div>
+    
+                                    <!-- Gradient -->
+                                    <div class="image-gradient"></div>
+    
+                                    <!-- Attribution -->
+                                    <div class="image-attribution">
+                                        <span>{% trans "Glarus thrust, Tectonic Area Sardona, Switzerland | Jonas Wagner https://www.flickr.com/photos/80225884@N06/ | Attribution 2.0 Generic (CC BY 2.0)" %}</span>
+                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -426,7 +445,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         },
         shim: {
             'jquery': {
-                deps: ['jquery-lib'],
                 exports: '$'
             },
             'bootstrap': {

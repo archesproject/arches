@@ -19,7 +19,7 @@ define([
             this.language = ko.observable();
             this.languages = ko.observableArray();
             const languages = arches.languages.slice();
-            languages.unshift({"code": "*", "name": "All"})
+            languages.unshift({"code": "*", "name": "All"});
             this.languages(languages);
 
             var updatedTerms = ko.computed(function() {

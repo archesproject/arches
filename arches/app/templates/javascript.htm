@@ -359,7 +359,7 @@
         "cardFunctionNodeDesc": {% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} "{{ cardFunctionNodeDesc|escapejs }}",
         "cardFunctionNodeName": {% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} "{{ cardFunctionNodeName|escapejs }}",
         "groupingErrorTitle": {% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} "{{ groupingErrorTitle|escapejs }}",
-        "groupingErrorMessage": {% trans "The cardinality of this card can"t be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}",
+        "groupingErrorMessage": {% trans "The cardinality of this card cannot be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}",
         "modelDoesNotExist": {% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} "{{ modelDoesNotExist|escapejs }}"
     }'
     userEmail='{{ user.email }}'
@@ -393,7 +393,7 @@
                 "modulename": "{{ datatype.modulename }}",
                 "classname": "{{ datatype.classname }}",
                 "configcomponent": "{{ datatype.configcomponent }}",
-                "defaultconfig": "{{ datatype.defaultconfig }}",
+                "defaultconfig": {{ datatype.defaultconfig }},
                 "configname": "{{ datatype.configname }}",
                 "isgeometric": "{{ datatype.isgeometric }}",
                 "defaultwidget": "{{ datatype.defaultwidget }}",

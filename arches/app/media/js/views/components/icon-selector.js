@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['knockout', 'templates/views/components/icon-selector.htm'], function(ko, iconSelectorTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -21,8 +21,6 @@ define(['knockout'], function(ko) {
             this.iconList = params.iconList;
             this.label = params.label;
         },
-        template: {
-            require: 'text!templates/views/components/icon-selector.htm'
-        }
+        template: iconSelectorTemplate
     });
 });

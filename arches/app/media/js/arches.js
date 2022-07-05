@@ -76,6 +76,7 @@ define(['utils/set-csrf-token'], function() {
         graphs: JSON.parse(archesData.getAttribute('graphs')),
         hexBinBounds: JSON.parse(archesData.getAttribute('hexBinBounds')),
         hexBinSize: JSON.parse(archesData.getAttribute('hexBinSize')),
+        languages: JSON.parse(archesData.getAttribute('languages')),
         mapDefaultX: JSON.parse(archesData.getAttribute('mapDefaultX')),
         mapDefaultY: JSON.parse(archesData.getAttribute('mapDefaultY')),
         mapDefaultZoom: JSON.parse(archesData.getAttribute('mapDefaultZoom')),

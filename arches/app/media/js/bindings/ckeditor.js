@@ -3,8 +3,6 @@ define([
     'underscore',
     'knockout',
     'arches',
-    'ckeditor-jquery',
-    'ckeditor',
 ], function($, _, ko, arches) {
     /**
     * A knockout.js binding for the "ckeditor" rich text editor widget
