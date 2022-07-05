@@ -119,7 +119,7 @@ class Command(BaseCommand):
             print(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
             print("Only announcing timing data")
-        if options["verbosity"]:
+        if options["verbosity"] > 1:
             print("Logging detailed error information: set log level to DEBUG to view messages")
             print("Verbosity level 2 will log based on the application's LOGGING settings in settings.py")
             print("Verbosity level 3 will include level 2 logging as well as logging to the console")
