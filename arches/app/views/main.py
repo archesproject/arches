@@ -68,13 +68,13 @@ def templates(request, template):
 
 
 def language_switcher(request):
-    requested_language = request.POST.get('language')
+    requested_language = request.POST.get("language")
 
-    referrer = request.META.get('HTTP_REFERER')
-    origin = request.META.get('HTTP_ORIGIN')
+    referrer = request.META.get("HTTP_REFERER")
+    origin = request.META.get("HTTP_ORIGIN")
     relative_path = referrer.split(origin)[1]
 
-    path_segments = relative_path.split('/')
+    path_segments = relative_path.split("/")
 
     for language_tuple in settings.LANGUAGES:
         language_code = language_tuple[0]
@@ -82,7 +82,7 @@ def language_switcher(request):
         if path_segments[1] == language_code:
             path_segments[1] = requested_language
 
-    updated_relative_path = '/'.join(path_segments)
+    updated_relative_path = "/".join(path_segments)
 
     return redirect(origin + updated_relative_path)
 
