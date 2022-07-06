@@ -20,8 +20,9 @@ import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 from arches import __version__
 from arches.app.models.system_settings import settings
-from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponseNotFound, HttpResponse, HttpResponseRedirect
+from django.utils import translation
 
 
 def index(request):
@@ -64,6 +65,26 @@ def templates(request, template):
         return render(request, template)
     except Exception as e:
         print(e)
+
+
+def language_switcher(request):
+    requested_language = request.POST.get('language')
+
+    referrer = request.META.get('HTTP_REFERER')
+    origin = request.META.get('HTTP_ORIGIN')
+    relative_path = referrer.split(origin)[1]
+
+    path_segments = relative_path.split('/')
+
+    for language_tuple in settings.LANGUAGES:
+        language_code = language_tuple[0]
+
+        if path_segments[1] == language_code:
+            path_segments[1] = requested_language
+
+    updated_relative_path = '/'.join(path_segments)
+
+    return redirect(origin + updated_relative_path)
 
 
 def help_templates(request):

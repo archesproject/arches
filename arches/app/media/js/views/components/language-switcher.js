@@ -1,4 +1,4 @@
-define(['knockout', 'templates/views/components/language-switcher.htm'], function(ko, languageSwitcherTemplate) {
+define(['knockout', 'templates/views/components/language-switcher.htm', 'js-cookie'], function(ko, languageSwitcherTemplate, Cookies) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -15,6 +15,7 @@ define(['knockout', 'templates/views/components/language-switcher.htm'], functio
         viewModel: function(params) {
             this.formid = Math.random();
             this.value = ko.observable(params.current_language);
+            this.csrfToken = Cookies.get('csrftoken');
             this.value.subscribe(function(val){
                 document.getElementById(this.formid).submit();
             }, this);
