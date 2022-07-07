@@ -48,6 +48,7 @@ define([
             this.component_id = ko.observable();
             this.constraints = ko.observableArray();
             this.appliedFunctions = attributes.appliedFunctions;
+            this.primaryDescriptorFunction = attributes.primaryDescriptorFunction;
 
             this.set('cards', this.cards);
             this.set('nodes', this.nodes);
@@ -74,6 +75,7 @@ define([
             this.set('config', {});
             this.set('constraints', this.constraints);
             this.set('appliedFunctions', this.appliedFunctions);
+            this.set('primaryDescriptorFunction', this.primaryDescriptorFunction);
 
             this.cardComponentLookup = cardComponentLookup;
             this.configKeys = ko.observableArray();
@@ -287,9 +289,9 @@ define([
                         this._card(JSON.stringify(this.toJSON()));
                     }, this);
                     this.disposables.push(nodeDatatypeSubscription);
-    
+
                     if (datatype.defaultwidget_id) {
-                        var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
+                        var cardWidgetData = _.find(ko.unwrap(attributes.data.widgets), function(widget) {
                             return widget.node_id === node.nodeid;
                         });
                         var widget = new CardWidgetModel(cardWidgetData, {
@@ -313,9 +315,9 @@ define([
             }, this);
 
             widgetsToDelete.forEach(function(widget) {
-                this.get('widgets').remove(widget);  
+                this.get('widgets').remove(widget);
             }, this);
-            
+
             // let's sort the widgets according to sortorder
             this.get('widgets').sort(function(w, ww) {
                 return w.get('sortorder')() - ww.get('sortorder')();
@@ -386,7 +388,7 @@ define([
         },
 
         save: function(callback) {
-            AbstractModel.prototype.save.call(this, function(request, status, self) {
+            return AbstractModel.prototype.save.call(this, function(request, status, self) {
                 if (status === 'success') {
                     this._card(JSON.stringify(this.toJSON()));
                 }

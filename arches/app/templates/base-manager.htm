@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
 {% extends "base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
@@ -112,6 +112,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <h5 class="hidden-xs">{% trans "Login" %}</h5>
                                 {% else %}
                                 <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
+                                <i class="fa fa-sign-out"></i>
                                 {% endif %}
                             </div>
                         </a>
@@ -143,7 +144,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Search Bar -->
                         {% if nav.search %}
-                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right ep-tools-search" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
                               <i class="ion-search"></i>
 
@@ -152,7 +153,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% endif %}
 
                         <!-- Prov edit history-->
-                        {% if user_is_reviewer == False and user|can_edit_resource_instance %}
+                        {% if user_is_reviewer == False and user_can_edit %}
                         <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
                               <i class="ion-clock"></i>
@@ -160,7 +161,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
-                        {% if nav.res_edit and user|can_edit_resource_instance %}
+                        {% if nav.res_edit and user_can_edit %}
                         <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit Resource" %}'>
                               <i class="ion-edit"></i>
@@ -294,7 +295,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
 
                                         <!--Menu list item-->
-                                        {% if request.user|can_edit_resource_instance %}
+                                        {% if user_can_edit %}
                                         <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %} data-bind="click: navigate.bind(self, '{% url 'resource' %}')">
                                             <a href="{% url 'resource' %}">
                                                 <i class="fa fa-building-o"></i>
@@ -371,7 +372,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <!-- Recently Added -->
-                                        {% if request.user|can_edit_resource_instance %}
+                                        {% if user_can_edit %}
                                         <li{% if 'edit-history' in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'edit_history' %}" data-bind="click: navigate.bind(this, '{% url 'edit_history' %}') ">
                                                 <i class="ti-ticket"></i>
@@ -477,6 +478,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 graphs: {{graphs}},
                 createableResources: {{createable_resources}},
                 help: "{{nav.help.template}}",
+                userCanEditResources: JSON.parse('{{ user_can_edit }}'.toLowerCase()),
+                userCanReadResources: JSON.parse('{{ user_can_read }}'.toLowerCase())
             };
         });
         {% endautoescape %}

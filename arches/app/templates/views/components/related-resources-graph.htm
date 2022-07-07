@@ -1,0 +1,276 @@
+{% extends "views/components/workbench.htm" %}
+{% load static %}
+{% load i18n %}
+
+{% block workbench_wrapper_classes %}related-resources-graph-workbench{% endblock workbench_wrapper_classes %}
+
+{% block tabs %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('information');
+}, css: {
+    'active': activeTab() === 'information'
+}">
+    <i class="fa fa-info"></i>
+    <span class="map-sidebar-text">{% trans "Info" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('search');
+}, css: {
+    'active': activeTab() === 'search'
+}">
+    <i class="fa fa-search"></i>
+    <span class="map-sidebar-text">{% trans "Search" %}</span>
+</div>
+{% comment %} Uncomment this section to show additional tabs...
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('analyze');
+}, css: {
+    'active': activeTab() === 'analyze'
+}">
+    <i class="fa fa-line-chart"></i>
+    <span class="map-sidebar-text">{% trans "Analyze" %}</span>
+</div>
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('settings');
+}, css: {
+    'active': activeTab() === 'settings'
+}">
+    <i class="fa fa-cog"></i>
+    <span class="map-sidebar-text">{% trans "Settings" %}</span>
+</div>
+{% endcomment %}
+<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+    toggleTab('legend');
+}, css: {
+    'active': activeTab() === 'legend'
+}">
+    <i class="fa fa-list"></i>
+    <span class="map-sidebar-text">{% trans "Legend" %}</span>
+</div>
+{% endblock tabs %}
+
+{% block sidepanel %}
+<!--ko if: activeTab() === 'information' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
+</div>
+<div class="workbench-card-sidepanel-border"></div>
+
+<div class="related-resource-graph-information-content" data-bind="using: informationElement">
+    <!--ko if: $data -->
+    <!--ko if: $parent.edgeInformation() -->
+    <div class="edge-node-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($parent.edgeInformation().source.id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().source.id}">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().sourceGraph.fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().source.displayname, click: function() {
+                $parent.informationElement($parent.edgeInformation().source);
+            }"></div>
+            <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().sourceGraph.name"></div>
+        </div>
+    </div>
+    <div class="edge-relationship-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($parent.edgeInformation().id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().id}">
+        <div class="edge-relationship-arrow">
+            <div></div>
+        </div>
+        <div class="edge-relationship-details">
+            <div class="edge-relationship-prefix">{% trans "Has relationship" %}</div>
+            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || 'Related to' "></div>
+            <div class="edge-relationship-sufix">{% trans "with" %}</div>
+        </div>
+    </div>
+    <div class="edge-node-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($parent.edgeInformation().target.id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().target.id}">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().targetGraph.fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().target.displayname, click: function() {
+                $parent.informationElement($parent.edgeInformation().target);
+            }"></div>
+            <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().targetGraph.name"></div>
+        </div>
+    </div>
+    <!--/ko -->
+    <!--ko if: !$data.source -->
+    <div class="edge-node-information node-display-name-header">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.informationGraph().fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: displayname"></div>
+            <div class="edge-node-graph-name" data-bind="text: $parent.informationGraph().name"></div>
+            <div class="edge-node-links">
+                <span data-bind="click: $parent.viewInformationNodeReport">
+                    <i class="fa fa-info"></i>
+                    {% trans "Report" %}
+                </span>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <span data-bind="click: $parent.editInformationNode">
+                    <i class="fa fa-pencil"></i>
+                    {% trans "Edit" %}
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="relationships-list-header">{% trans "Relationships" %}</div>
+    <div class="relationships-list-count">
+        <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
+        {% trans "relationships shown" %}
+        <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
+        <a href="javascript:void(0);" data-bind="click: function() {
+            $parent.expandNode($data);
+        }">{% trans "Load more" %}</a>
+        <!--/ko -->
+    </div>
+    <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
+        <div class="relationships-list-item">
+            <span data-bind="text: label || 'Related to', click: function() {
+                informationElement(edge);
+            }, event: {
+                mouseover: function() {
+                    hoverElementId(edge.id)
+                },
+                mouseout: function() {
+                    hoverElementId(null);
+                }
+            }, css: {'element-hover': hoverElementId() === edge.id}" class="relationships-list-item-type"></span>
+            <i class="relationships-list-icon fa fa-angle-right"></i>
+            <span class="relationships-list-item-name" data-bind="click: function() {
+                informationElement(node);
+            }, event: {
+                mouseover: function() {
+                    hoverElementId(node.id)
+                },
+                mouseout: function() {
+                    hoverElementId(null);
+                }
+            }, css: {'element-hover': hoverElementId() === node.id}">
+                <span data-bind="text: node.displayname"></span>
+            </span>
+        </div>
+    </div>
+    <!--/ko -->
+    <!--/ko -->
+</div>
+<!--/ko -->
+
+<!--ko if: activeTab() === 'search' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
+</div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="related-resources-search-body">
+<div class="related-reasources-search-container">
+    <input type="text" class="form-control" placeholder="{% trans "Filter..." %}" data-bind="value: nodeSearchFilter, valueUpdate: 'afterkeydown'">
+    <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
+</div>
+<div class="related-reasources-search-list" data-bind="foreach: searchNodes">
+    <div class="edge-node-information" data-bind="event: {
+            mouseover: function() {
+                $parent.hoverElementId($data.id)
+            },
+            mouseout: function() {
+                $parent.hoverElementId(null);
+            }
+        }, css: {'element-hover': $parent.hoverElementId() === $data.id}">
+        <div class="edge-node-graph-color" data-bind="style: {backgroundColor: graph.fillColor}"></div>
+        <div class="edge-node-title">
+            <div class="edge-node-display-name" data-bind="text: displayname, click: function() {
+                $parent.informationElement($data);
+            }"></div>
+            <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
+            <div class="relationships-list-count shim">
+                <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
+                {% trans "relationships shown" %}
+                <!--ko if: shownRelationsCount() !== totalRelations -->
+                <a href="javascript:void(0);" data-bind="click: function() {
+                    $parent.expandNode($data);
+                }">{% trans "Load more" %}</a>
+                <!--/ko -->
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'analyze' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Analyze Network" %}</h4>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'settings' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Settings" %}</h4>
+</div>
+<!--/ko -->
+<!--ko if: activeTab() === 'legend' -->
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
+</div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="legend-listing-container" data-bind="foreach: legendEntries">
+    <div class="legend-listing related-resource-legend">
+        <div class="edge-node-information">
+            <div class="edge-node-graph-color" data-bind="style: {backgroundColor: fillColor}"></div>
+            <div class="edge-node-title">
+                <div class="edge-node-display-name" data-bind="text: name"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/ko -->
+{% endblock sidepanel %}
+
+{% block content_management %}
+<div class="related-resources-graph-controls">
+    <span class="ion-information-circled" data-bind="click: function() { selectionMode('information'); }, css: {
+        'active-graph-control': selectionMode() === 'information'
+    }"></span>
+    <span class="ion-plus" data-bind="click: function() { selectionMode('expand'); }, css: {
+        'active-graph-control': selectionMode() === 'expand'
+    }"></span>
+    <span class="ion-asterisk" data-bind="click: function() { selectionMode('focus'); }, css: {
+        'active-graph-control': selectionMode() === 'focus'
+    }"></span>
+    <span class="ion-eye-disabled" data-bind="click: function() { selectionMode('delete'); }, css: {
+        'active-graph-control': selectionMode() === 'delete'
+    }"></span>
+    <span class="ion-refresh" data-bind="click: refreshLayout"></span>
+</div>
+<div class="related-resources-graph-controls-instructions">
+<!--ko if: selectionMode() === 'information' -->
+{% trans "Click a node/edge for info" %}
+<!--/ko -->
+<!--ko if: selectionMode() === 'expand' -->
+{% trans "Click a node to show more relationships" %}
+<!--/ko -->
+<!--ko if: selectionMode() === 'focus' -->
+{% trans "Click a node refocus" %}
+<!--/ko -->
+<!--ko if: selectionMode() === 'delete' -->
+{% trans "Click a node/edge to remove" %}
+<!--/ko -->
+</div>
+<!--ko if: cytoscapeConfig() -->
+<div class="related-resources-graph-cytoscape" data-bind="cytoscape: {
+    afterRender: viz,
+    config: cytoscapeConfig
+}"></div>
+<!--/ko -->
+{% endblock content_management %}

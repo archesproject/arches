@@ -6,6 +6,7 @@ import uuid
 import csv
 import zipfile
 from io import StringIO
+from io import BytesIO
 
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
@@ -74,6 +75,51 @@ def get_function_x_graph_data_for_export(functionids, graphid):
     return FunctionXGraph.objects.filter(function_id__in=functionids, graph_id=graphid)
 
 
+def sort(object, dict_key=None):
+    """
+    This is meant realy just to sort graph data for export
+    """
+
+    def handle_dictionary(d):
+        """Called to handle a Dictionary"""
+        obj = {}
+        for key, value in d.items():
+            obj[str(key)] = sort(value, key)
+        return obj
+
+    def handle_list(l, sort_key=None):
+        """Called to handle a list"""
+        arr = []
+        for item in l:
+            arr.append(sort(item))
+        if sort_key:
+            try:
+                arr = sorted(arr, key=lambda k: k[sort_key])
+            except:
+                pass
+        return arr
+
+    if isinstance(object, dict):
+        return handle_dictionary(object)
+    elif isinstance(object, list):
+        if dict_key == "cards":
+            return handle_list(object, "cardid")
+        elif dict_key == "cards_x_nodes_x_widgets":
+            return handle_list(object, "id")
+        elif dict_key == "functions_x_graphs":
+            return handle_list(object, "id")
+        elif dict_key == "nodegroups":
+            return handle_list(object, "nodegroupid")
+        elif dict_key == "nodes":
+            return handle_list(object, "nodeid")
+        elif dict_key == "edges":
+            return handle_list(object, "edgeid")
+        else:
+            return handle_list(object)
+    else:
+        return object
+
+
 def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs["graph"] = []
@@ -103,13 +149,17 @@ def get_graphs_for_export(graphids=None):
         function_ids = []
         for function in resource_graph["functions"]:
             function_ids.append(function["function_id"])
-        resource_graph["functions_x_graphs"] = get_function_x_graph_data_for_export(function_ids, resource_graph["graphid"])
+        resource_graph["functions_x_graphs"] = JSONSerializer().serializeToPython(
+            get_function_x_graph_data_for_export(function_ids, resource_graph["graphid"])
+        )
         del resource_graph["functions"]
         del resource_graph["domain_connections"]
-        resource_graph["cards_x_nodes_x_widgets"] = get_card_x_node_x_widget_data_for_export(resource_graph)
-        resource_graph["resource_2_resource_constraints"] = r2r_constraints_for_export(resource_graph)
+        resource_graph["cards_x_nodes_x_widgets"] = JSONSerializer().serializeToPython(
+            get_card_x_node_x_widget_data_for_export(resource_graph)
+        )
+        resource_graph["resource_2_resource_constraints"] = JSONSerializer().serializeToPython(r2r_constraints_for_export(resource_graph))
         graphs["graph"].append(resource_graph)
-    return graphs
+    return sort(graphs)
 
 
 def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=None):
@@ -208,11 +258,8 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     files_for_export.append({"name": file_name, "outputfile": dest})
 
     if data_dir is not None:
-        with open(os.path.join(data_dir), "w") as config_file:
-            json.dump(export_json, config_file, indent=4)
-
         file_name = Graph.objects.get(graphid=graphid).name
-        buffer = StringIO()
+        buffer = BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
                 f["outputfile"].seek(0)
@@ -222,7 +269,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
-        with open(os.path.join(data_dir), "w") as archive:
+        with open(os.path.join(data_dir, file_name + ".zip"), "wb") as archive:
             archive.write(zip_stream)
     else:
         return files_for_export

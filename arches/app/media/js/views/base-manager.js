@@ -5,7 +5,6 @@ define([
     'backbone',
     'views/page-view',
     'view-data',
-    'bindings/datatable',
     'uuid',
     'core-js',
     'dom-4',
@@ -47,6 +46,8 @@ define([
                 });
             });
             options.viewModel.createableResources = ko.observableArray(data.createableResources);
+            options.viewModel.userCanReadResources = data.userCanReadResources;
+            options.viewModel.userCanEditResources = data.userCanEditResources;
 
             options.viewModel.setResourceOptionDisable = function(option, item) {
               if (item) {

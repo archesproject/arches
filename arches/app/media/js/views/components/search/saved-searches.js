@@ -7,7 +7,6 @@ function($, ko, arches) {
     return ko.components.register(componentName, {
         viewModel: function(params) {
             var self = this;
-            var mediaUrl = arches.urls.uploadedfiles;
             self.items = ko.observableArray([]);
             $.ajax({
                 type: "GET",
@@ -15,7 +14,8 @@ function($, ko, arches) {
                 context: this
             }).done(function(response) {
                 response.saved_searches.forEach(function(search) {
-                    var searchImageUrl = (search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '';
+                    var searchImageUrl = arches.urls.url_subpath + ((search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '');
+                    searchImageUrl = searchImageUrl.replace('//', '/');
                     self.items.push({
                         image: searchImageUrl,
                         title: search.SEARCH_NAME,

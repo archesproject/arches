@@ -18,12 +18,16 @@ STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
 FUNCTION_LOCATIONS.append('{{ project_name }}.functions')
+ETL_MODULE_LOCATIONS.append('{{ project_name }}.etl_modules')
 SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 LOCALE_PATHS.append(os.path.join(APP_ROOT, 'locale'))
+
+FILE_TYPE_CHECKING = False
+FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
@@ -39,7 +43,8 @@ ELASTICSEARCH_PREFIX = '{{ project_name }}'
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
 #     'module': '{{ project_name }}.search_indexes.sample_index.SampleIndex',
-#     'name': 'my_new_custom_index' <-- follow ES index naming rules
+#     'name': 'my_new_custom_index', <-- follow ES index naming rules
+#     'should_update_asynchronously': False  <-- denotes if asynchronously updating the index would affect custom functionality within the project.
 # }]
 
 KIBANA_URL = "http://localhost:5601/"
@@ -73,31 +78,68 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.gis',
-    'arches',
-    'arches.app.models',
-    'arches.management',
-    'guardian',
-    'captcha',
-    'revproxy',
-    'corsheaders',
-    'oauth2_provider',
-    'django_celery_results',
-    'compressor',
-    '{{ project_name }}',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.gis",
+    "arches",
+    "arches.app.models",
+    "arches.management",
+    "guardian",
+    "captcha",
+    "revproxy",
+    "corsheaders",
+    "oauth2_provider",
+    "django_celery_results",
+    "compressor",
+    # "silk",
+    "{{ project_name }}",
 )
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    #'arches.app.utils.middleware.TokenMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "arches.app.utils.middleware.ModifyAuthorizationHeader",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "arches.app.utils.middleware.SetAnonymousUser",
+    # "silk.middleware.SilkyMiddleware",
+]
 
 ALLOWED_HOSTS = []
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = '{{ project_name }}.wsgi.application'
+
+# URL that handles the media served from MEDIA_ROOT, used for managing stored files.
+# It must end in a slash if set to a non-empty value.
+MEDIA_URL = '/files/'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT =  os.path.join(APP_ROOT)
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/media/'
+
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = ''
+
+# when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
+FORCE_SCRIPT_NAME = None
 
 RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import.log')
 DEFAULT_RESOURCE_IMPORT_USER = {'username': 'admin', 'userid': 1}
@@ -132,8 +174,6 @@ LOGGING = {
     }
 }
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT =  os.path.join(APP_ROOT)
 
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
@@ -145,17 +185,24 @@ SESSION_COOKIE_NAME = '{{ project_name }}'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
+    },
+    'user_permission': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'user_permission_cache',
+    },
 }
 
 # Hide nodes and cards in a report that have no data
 HIDE_EMPTY_NODES_IN_REPORT = False
 
-BYPASS_CARDINALITY_TILE_VALIDATION = False
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 
 DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported from and exported to csv
+
+# This is used to indicate whether the data in the CSV and SHP exports should be
+# ordered as seen in the resource cards or not.
+EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
 CACHE_BY_USER = {'anonymous': 3600 * 24}
@@ -209,12 +256,24 @@ CELERY_BEAT_SCHEDULE = {
     "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",),},
 }
 
+# Set to True if you want to send celery tasks to the broker without being able to detect celery.
+# This might be necessary if the worker pool is regulary fully active, with no idle workers, or if
+# you need to run the celery task using solo pool (e.g. on Windows). You may need to provide another
+# way of monitoring celery so you can detect the background task not being available.
+CELERY_CHECK_ONLY_INSPECT_BROKER = False
+
 CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
+
+ACCESSIBILITY_MODE = False
 
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests outside of Arches will checked against nodegroup permissions.
 RESTRICT_MEDIA_ACCESS = False
 
+# By setting RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER to True, if the user is attempting
+# to export search results above the SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+# value and is not signed in with a user account then the request will not be allowed.
+RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
@@ -245,7 +304,7 @@ LANGUAGE_CODE = "en"
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
 #   ('de', _('German')),
-#   ('en', _('English')),
+    ('en', _('English')),
 #   ('en-gb', _('British English')),
 #   ('es', _('Spanish')),
 ]

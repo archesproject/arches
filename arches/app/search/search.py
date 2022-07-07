@@ -18,8 +18,9 @@ import urllib.parse
 import urllib.error
 import uuid
 import logging
+import warnings
 from datetime import datetime
-from elasticsearch import Elasticsearch, helpers
+from elasticsearch import Elasticsearch, helpers, ElasticsearchWarning
 from elasticsearch.exceptions import RequestError
 from elasticsearch.helpers import BulkIndexError
 from arches.app.models.system_settings import settings
@@ -36,6 +37,7 @@ class SearchEngine(object):
         self.prefix = kwargs.pop("prefix", "").lower()
         self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
+        warnings.filterwarnings("ignore", category=ElasticsearchWarning)
 
     def _add_prefix(self, *args, **kwargs):
         if args:
@@ -217,6 +219,10 @@ class SearchEngine(object):
             def __init__(self, **kwargs):
                 self.queue = []
                 self.batch_size = kwargs.pop("batch_size", 500)
+                kwargs.pop("maxsize", "")
+                kwargs.pop("timeout", "")
+                kwargs.pop("retry_on_timeout", "")
+                kwargs.pop("max_retries", "")
                 self.kwargs = kwargs
 
             def add(self, op_type="index", index=None, id=None, data=None):

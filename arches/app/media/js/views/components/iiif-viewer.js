@@ -1,3 +1,5 @@
+const {map} = require("jquery");
+
 define([
     'arches',
     'jquery',
@@ -8,6 +10,7 @@ define([
     'text!templates/views/components/iiif-popup.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
+    'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
 ], function(arches, $, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
@@ -36,41 +39,145 @@ define([
         this.canvasLabel = ko.observable();
         this.zoomToCanvas = !(params.zoom && params.center);
         this.annotationNodes = ko.observableArray();
+        this.compareMode = ko.observable(false);
+        this.primaryCanvas = ko.observable();
+        this.canvasObject = ko.observable();
+        this.secondaryCanvasObject = ko.observable();
+        this.secondaryCanvas = ko.observable();
+        this.compareInstruction = ko.observable();
+        this.primaryTilesLoaded = ko.observable(false);
+        this.secondaryTilesLoaded = ko.observable(false);
+        this.selectPrimaryPanel = ko.observable(true);
+        this.secondaryLabel = ko.observable();
+        this.imageToolSelector = ko.observable(this.canvas());
+        this.floatingLocation = ko.observable("left");
+        this.showImageModifiers = ko.observable(false);
+        this.renderContext = ko.observable(params.renderContext);
+        this.showModeSelector = ko.observable(true);
+        this.primaryLayerLoaded = true;
+        this.secondaryLayerLoaded = true;
+        let primaryPanelFilters
+        let secondaryPanelFilters;
+        const layers = [];
+        const secondaryLayers = [];
+        const cachedAnnotations = {};
+
+        this.selectPrimaryPanel.subscribe((value) => {
+            // if true, primary panel is being selected
+            if(value){
+                this.imageToolSelector(this.canvas());
+                // preserve state of secondary filters, if secondaryCanvas is set
+                if(self.secondaryCanvas()) {
+                    secondaryPanelFilters = self.canvasFilterObject();
+                    if(primaryPanelFilters) {
+                        self.brightness(primaryPanelFilters.brightness);
+                        self.saturation(primaryPanelFilters.saturation);
+                        self.contrast(primaryPanelFilters.contrast);
+                        self.greyscale(primaryPanelFilters.greyscale);
+                    }
+                }
+            } else {
+                this.imageToolSelector(this.secondaryCanvas());
+                primaryPanelFilters = self.canvasFilterObject();
+                if(secondaryPanelFilters) {
+                    self.brightness(secondaryPanelFilters.brightness);
+                    self.saturation(secondaryPanelFilters.saturation);
+                    self.contrast(secondaryPanelFilters.contrast);
+                    self.greyscale(secondaryPanelFilters.greyscale);
+                } else {
+                    self.brightness(100);
+                    self.saturation(100);
+                    self.contrast(100);
+                    self.greyscale(false);
+                }
+            }
+        });
+
+        this.imageToolSelector.subscribe((value) => {
+            if(this.selectPrimaryPanel() && this.canvas() !== this.imageToolSelector()){
+                this.canvas(this.imageToolSelector());
+            } else if (!this.selectPrimaryPanel() && this.secondaryCanvas() !== this.imageToolSelector()){
+                this.secondaryCanvas(this.imageToolSelector());
+            }
+        });
+
+        this.compareMode.subscribe((mode) => {
+            if(!mode){
+                const map = self.map();
+
+                if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)){
+                    try {
+                        map.removeLayer(secondaryCanvasLayer)
+                    } catch(e){
+                        ; // ignore/smother if remove layer fails
+                    }
+                }
+
+                if(sideBySideControl && sideBySideControl?._map){
+                    map.removeControl(sideBySideControl);
+                }
+    
+                self.secondaryCanvas(undefined);
+                self.secondaryLabel(undefined);
+                self.showImageModifiers(false);
+                self.selectPrimaryPanel(true);
+            } else {
+                self.selectPrimaryPanel(false);
+                self.canvasClick(self.canvasObject());
+                self.selectPrimaryPanel(true);
+            }
+        });
+
+        this.panelRadio = ko.pureComputed(() => {
+            if(!this.compareMode()){
+                return "single";
+            } else {
+                return "double";
+            }
+        });
+
+        this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
+            self.annotationNodes(
+                json.map((node) => {
+                    const annotations = ko.observableArray();
+                    const updateAnnotations = async function() {
+                        var canvas = self.canvas();
+                        if (canvas) {
+                            const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid;
+                            if(!cachedAnnotations[annotationsUrl]){
+                                const response = await window.fetch(annotationsUrl);
+
+                                const jsonResponse = await response.json();
+                                cachedAnnotations[annotationsUrl] = jsonResponse;
+                            }
+                            const annotation = cachedAnnotations[annotationsUrl];
+
+                            annotation.features.forEach(function(feature) {
+                                feature.properties.graphName = node['graph_name'];
+                            });
+                            annotations(annotation.features);
+
+                        }
+                    };
+                    self.canvas.subscribe(updateAnnotations);
+                    updateAnnotations();
+                    return {
+                        name: node['graph_name'] + ' - ' + node.name,
+                        icon: node.icon,
+                        active: ko.observable(false),
+                        opacity: ko.observable(100),
+                        annotations: annotations
+                    };
+                })
+            );
+        };
+
         window.fetch(arches.urls.iiifannotationnodes)
             .then(function(response) {
                 return response.json();
             })
-            .then(function(json) {
-                self.annotationNodes(
-                    json.map(function(node) {
-                        var annotations = ko.observableArray();
-                        var updateAnnotations = function() {
-                            var canvas = self.canvas();
-                            if (canvas) {
-                                window.fetch(arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid)
-                                    .then(function(response) {
-                                        return response.json();
-                                    })
-                                    .then(function(json) {
-                                        json.features.forEach(function(feature) {
-                                            feature.properties.graphName = node['graph_name'];
-                                        });
-                                        annotations(json.features);
-                                    });
-                            }
-                        };
-                        self.canvas.subscribe(updateAnnotations);
-                        updateAnnotations();
-                        return {
-                            name: node['graph_name'] + ' - ' + node.name,
-                            icon: node.icon,
-                            active: ko.observable(false),
-                            opacity: ko.observable(100),
-                            annotations: annotations
-                        };
-                    })
-                );
-            });
+            .then(self.buildAnnotationNodes);
+
         var annotationLayer = ko.computed(function() {
             var annotationFeatures = [];
             self.annotationNodes().forEach(function(node) {
@@ -116,36 +223,40 @@ define([
                     return style;
                 },
                 onEachFeature: function(feature, layer) {
-                    var popup = L.popup({
-                        closeButton: false,
-                        maxWidth: 349
-                    })
-                        .setContent(iiifPopup)
-                        .on('add', function() {
-                            var popupData = {
-                                'closePopup': function() {
-                                    popup.remove();
-                                },
-                                'name': ko.observable(''),
-                                'description': ko.observable(''),
-                                'graphName': feature.properties.graphName,
-                                'resourceinstanceid': feature.properties.resourceId,
-                                'reportURL': arches.urls.resource_report
-                            };
-                            window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
-                                .then(function(response) {
-                                    return response.json();
-                                })
-                                .then(function(descriptors) {
-                                    popupData.name(descriptors.displayname);
-                                    popupData.description(descriptors['map_popup']);
-                                });
-                            var popupElement = popup.getElement()
-                                .querySelector('.mapboxgl-popup-content');
-                            ko.applyBindingsToDescendants(popupData, popupElement);
-                        });
-                    layer.bindPopup(popup);
-
+                    if (params.onEachFeature) {
+                        params.onEachFeature(feature, layer);
+                    }
+                    else {
+                        var popup = L.popup({
+                            closeButton: false,
+                            maxWidth: 349
+                        })
+                            .setContent(iiifPopup)
+                            .on('add', function() {
+                                var popupData = {
+                                    'closePopup': function() {
+                                        popup.remove();
+                                    },
+                                    'name': ko.observable(''),
+                                    'description': ko.observable(''),
+                                    'graphName': feature.properties.graphName,
+                                    'resourceinstanceid': feature.properties.resourceId,
+                                    'reportURL': arches.urls.resource_report
+                                };
+                                window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
+                                    .then(function(response) {
+                                        return response.json();
+                                    })
+                                    .then(function(descriptors) {
+                                        popupData.name(descriptors.displayname);
+                                        popupData.description(descriptors['map_popup']);
+                                    });
+                                var popupElement = popup.getElement()
+                                    .querySelector('.mapboxgl-popup-content');
+                                ko.applyBindingsToDescendants(popupData, popupElement);
+                            });
+                        layer.bindPopup(popup);
+                    }
                 }
             });
         });
@@ -236,6 +347,54 @@ define([
             }
         };
 
+        const splitSelectConfig = {
+            clickBubble: true,
+            multiple: false,
+            closeOnSelect: true,
+            allowClear: true,
+            data: () => {
+                results = this.canvases();
+                return { results };
+            },
+            id: function(item) {
+                return self.getCanvasService(item);
+            },
+            containerCssClass: "split-controls-drop",
+            dropdownCssClass: "split-controls-drop",
+            dropdownAutoWidth: true,
+            formatResult: function(item) {
+                return `<div class="image"><img src="${item.thumbnail}"/></div><div class="title">${item.label}</div>`; 
+            },
+            formatSelection: function(item) {
+                return item?.label;
+            },
+            clear: function(abc) {
+                self.canvases('');
+            },
+            isEmpty: ko.computed(function() {
+                return self.canvases() === '' || !self.canvases();
+            }, this),
+            initSelection: function(element, callback) {
+                const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
+                callback(canvasObj);
+            }
+        }
+
+        this.rightSideSelectConfig = {
+            ...splitSelectConfig,
+            value: this.secondaryCanvas
+        };
+
+        this.leftSideSelectConfig = {
+            ...splitSelectConfig,
+            value: this.canvas
+        };
+
+        this.imageToolConfig = {
+            ...splitSelectConfig,
+            value: this.imageToolSelector
+        };
+
         this.getManifestData = function() {
             var manifestURL = self.manifest();
             if (manifestURL) {
@@ -276,7 +435,10 @@ define([
         if (!params.manifest) params.expandGallery = true;
         this.expandGallery = ko.observable(params.expandGallery);
         this.expandGallery.subscribe(function(expandGallery) {
-            if (expandGallery) self.showGallery(true);
+            if (expandGallery) { 
+                self.compareMode(false);
+                self.showGallery(true);
+            }
         });
         this.showGallery.subscribe(function(showGallery) {
             if (!showGallery) self.expandGallery(false);
@@ -293,11 +455,31 @@ define([
             afterRender: this.map
         };
 
-        var canvasLayer;
+        this.imagePropertyUpdate = (location, viewmodel, event) => {
+            if(self.floatingLocation() == location || !self.showImageModifiers()){
+                self.showImageModifiers(!self.showImageModifiers());
+            }
+            self.floatingLocation(location);
+            if(self.floatingLocation() == "left") {
+                self.selectPrimaryPanel(true)
+            } else {
+                self.selectPrimaryPanel(false);
+            }
+
+        };
+
+        this.fileUpdate = (...params) => {
+            console.log(params);
+        };
+
+        let canvasLayer;
+        let secondaryCanvasLayer;
+        let sideBySideControl;
         this.brightness = ko.observable(100);
         this.contrast = ko.observable(100);
         this.saturation = ko.observable(100);
         this.greyscale = ko.observable(false);
+
         this.canvasFilter = ko.pureComputed(function() {
             var b = self.brightness() / 100;
             var c = self.contrast() / 100;
@@ -306,11 +488,32 @@ define([
             return 'brightness(' + b + ') contrast(' + c + ') ' +
                 'saturate(' + s + ') grayscale(' + g + ')';
         });
+
+        this.canvasFilterObject = ko.pureComputed(() => {
+            const brightness = self.brightness();
+            const contrast = self.contrast();
+            const saturation = self.saturation();
+            const greyscale = self.greyscale();
+
+            return { brightness, contrast, saturation, greyscale };
+        })
+
+        this.canvasFilter.subscribe((value) => {
+            console.log(value);
+        })
         var updateCanvasLayerFilter = function() {
             var filter = self.canvasFilter();
             var map = self.map();
+            let layer;
             if (map) {
-                map.getContainer().querySelector('.leaflet-tile-pane').style.filter = filter;
+                if(self.selectPrimaryPanel()){
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-primary')
+                } else {
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-secondary')
+                }
+                if(layer && layer !== null){
+                    layer.style.filter = filter;
+                }
             }
         };
         this.canvasFilter.subscribe(updateCanvasLayerFilter);
@@ -322,40 +525,162 @@ define([
             self.greyscale(false);
         };
 
-        var addCanvasLayer = function() {
-            var map = self.map();
-            var canvas = self.canvas();
+        const zoomToBounds = (map, layer) => {
+            var initialZoom = layer._getInitialZoom(map.getSize());
+            var imageSize = layer._imageSizes[initialZoom];
+            var sw = map.options.crs.pointToLatLng(L.point(0, imageSize.y), initialZoom);
+            var ne = map.options.crs.pointToLatLng(L.point(imageSize.x, 0), initialZoom);
+            var bounds = L.latLngBounds(sw, ne);
+            map.fitBounds(bounds);
+        }
+
+        const loadComparison = () => {
+            const map = self.map();
+            if(map && canvasLayer.getContainer() && secondaryCanvasLayer?.getContainer() /*self.primaryLayerLoaded && self.secondaryLayerLoaded*/){
+                // remove the control if it's been added to the map already  
+                if(self.zoomToCanvas){
+                    zoomToBounds(map, canvasLayer);
+                    //map.fitBounds(canvasLayer.getBounds())
+                    self.zoomToCanvas = false;
+                }
+                // add the control back, comparing the appropriate layers
+                if(!sideBySideControl){
+                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer);
+                } else {
+                    sideBySideControl.setLeftLayers(canvasLayer);
+                    sideBySideControl.setRightLayers(secondaryCanvasLayer);
+                }
+
+                if(!sideBySideControl?._map) {
+                    sideBySideControl.addTo(map);
+                }
+            }
+        };
+
+        var updatePrimaryCanvasLayer = function() {
+            const map = self.map();
+            const canvas = self.canvas();
+
+            if(self.selectPrimaryPanel() && canvas && canvas != self.imageToolSelector()){
+                self.imageToolSelector(canvas);
+            }
+
             if (map && canvas) {
-                if (canvasLayer) {
-                    map.removeLayer(canvasLayer);
+                if (canvasLayer && map.hasLayer(canvasLayer)) {
+                    try {
+                        map.removeLayer(canvasLayer);
+                    } catch(e){
+                        ; // ignore/smother if remove layer fails
+                    }
                     canvasLayer = undefined;
                 }
                 if (canvas) {
-                    canvasLayer = L.tileLayer.iiif(canvas + '/info.json', {
-                        fitBounds: self.zoomToCanvas
-                    });
+                    const layerInfoUrl = canvas + '/info.json'
+                    canvasLayer = getLayer(layerInfoUrl, layers);
+    
+                    if(!canvasLayer){
+                        canvasLayer = L.tileLayer.iiif(layerInfoUrl, {
+                            fitBounds: false,
+                            className: "iiif-layer-primary"
+                        });
+
+                        canvasLayer.on('load', () => {
+                            if(self.compareMode()){
+                                loadComparison();
+                            } else if (!self.compareMode() && self.zoomToCanvas && canvasLayer){
+                                zoomToBounds(map, canvasLayer);
+                                self.zoomToCanvas = false;
+                            }
+                        });
+
+                        layers.push(canvasLayer);
+                    }
                     canvasLayer.addTo(map);
                     updateCanvasLayerFilter();
+
                 }
             }
-            self.zoomToCanvas = false;
         };
+
+        const getLayer = (url, layers) => {
+            const match = layers.filter(layer => layer._infoUrl == url);
+            if(match.length > 0){
+                return match[0];
+            }
+        }
+
+        const updateSecondaryCanvasLayer = () => {
+            const map = self.map();
+            const primaryCanvas = self.canvas();
+            const secondaryCanvas = self.secondaryCanvas();
+            if(secondaryCanvas && secondaryCanvas != self.imageToolSelector()){
+                self.selectPrimaryPanel(false);
+                self.imageToolSelector(secondaryCanvas);
+            }
+
+            if (map && primaryCanvas && secondaryCanvas) {
+                if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)) {
+                    try {
+                        map.removeLayer(secondaryCanvasLayer);
+                    } catch(e){
+                        ; // ignore/smother if remove layer fails
+                    }
+                    secondaryCanvasLayer = undefined;
+                }
+
+                const layerInfoUrl = secondaryCanvas + '/info.json'
+                secondaryCanvasLayer = getLayer(layerInfoUrl, secondaryLayers);
+
+                if(!secondaryCanvasLayer){
+                    secondaryCanvasLayer = L.tileLayer.iiif(layerInfoUrl, {
+                        fitBounds: false,
+                        className: "iiif-layer-secondary"
+                    });
+
+                    secondaryCanvasLayer.on('load', () => {
+                        if(self.compareMode()){
+                            loadComparison();
+                        }
+                    });
+
+                    secondaryLayers.push(secondaryCanvasLayer);
+                }
+                secondaryCanvasLayer.addTo(map);
+                
+                updateCanvasLayerFilter();
+            }
+        };
+
         this.map.subscribe(function(map) {
             L.control.fullscreen({
                 fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
             }).addTo(map);
-            addCanvasLayer();
+            updatePrimaryCanvasLayer();
             map.addLayer(annotationFeatureGroup);
         });
-        this.canvas.subscribe(addCanvasLayer);
+        this.canvas.subscribe(updatePrimaryCanvasLayer);
+        this.secondaryCanvas.subscribe(updateSecondaryCanvasLayer);
+
+        this.setSecondaryCanvas = (canvas) => {
+            const service = self.getCanvasService(canvas);
+            if(service){
+                self.secondaryCanvas(service);
+            }
+        }
 
         this.selectCanvas = function(canvas) {
-            var service = self.getCanvasService(canvas);
-            self.zoomToCanvas = true;
-            if (service) self.canvas(service);
+            
+            const service = self.getCanvasService(canvas);
 
-            self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-            self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+            if (service && self.selectPrimaryPanel()) {
+                self.canvas(service);
+                self.canvasObject(canvas);
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true))
+            } else {
+                self.secondaryCanvas(service);
+                self.secondaryCanvasObject(canvas);
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true))
+            }
         };
 
         this.canvasClick = function(canvas) {
@@ -378,7 +703,18 @@ define([
                             canvasIndex = sequence.canvases.findIndex(function(c){return c.images[0].resource.service['@id'] === self.canvas();});
                         }
                         var canvas = sequence.canvases[canvasIndex];
-                        self.selectCanvas(canvas);
+
+                        self.secondaryCanvasLayer = undefined;
+                        self.canvasLayer = undefined;
+                        const service = self.getCanvasService(canvas);
+                        self.zoomToCanvas = true;
+                        self.canvas(service);
+                        self.canvasObject(canvas);
+
+                        if(self.compareMode()){
+                            self.secondaryCanvas(service);
+                            self.secondaryCanvasObject(canvas);
+                        }
                     }    
                 }
                 self.updateCanvas = true;

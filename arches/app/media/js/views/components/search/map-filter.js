@@ -9,18 +9,27 @@ define([
     'views/components/widgets/map/map-styles',
     'turf',
     'geohash',
-    'mapbox-gl',
-    'mapbox-gl-draw',
     'geojson-extent',
     'uuid',
     'geojsonhint',
-    'codemirror/mode/javascript/javascript'
-], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash, mapboxgl, MapboxDraw, geojsonExtent, uuid, geojsonhint) {
+], function($, _, arches, ko, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
                 var self = this;
+
+                this.dependenciesLoaded = ko.observable(false)
+
+                require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
+                    self.mapboxgl = mapbox;
+                    self.MapboxDraw = mbdraw;
+                    self.dependenciesLoaded(true);
+                    if(self.map()){
+                        self.map.valueHasMutated()
+                    }
+                });
+
                 options.name = "Map Filter";
                 BaseFilter.prototype.initialize.call(this, options);
 
@@ -98,7 +107,7 @@ define([
 
                 this.searchGeometries = ko.observableArray(null);
                 this.searchAggregations = ko.observable();
-                this.drawMode = ko.observable();
+                this.selectedTool = ko.observable();
                 this.geoJSONString = ko.observable(undefined);
                 this.geoJSONErrors = ko.observableArray();
                 this.pageLoaded = false;
@@ -133,7 +142,7 @@ define([
                         geoJSON.features = geoJSON.features.slice(0, 1);
                         if(geoJSON.features.length > 0){
                             var extent = geojsonExtent(geoJSON);
-                            var bounds = new mapboxgl.LngLatBounds(extent);
+                            var bounds = new this.mapboxgl.LngLatBounds(extent);
                             this.map().fitBounds(bounds, {
                                 padding: parseInt(this.buffer(), 10)
                             });
@@ -241,7 +250,7 @@ define([
 
                 this.drawModes = _.pluck(this.spatialFilterTypes, 'drawMode');
 
-                this.drawMode.subscribe(function(selectedDrawTool){
+                this.selectedTool.subscribe(function(selectedDrawTool){
                     if(!!selectedDrawTool){
                         if(selectedDrawTool === 'extent'){
                             this.searchByExtent();
@@ -283,7 +292,7 @@ define([
                     if (self.filter.feature_collection() && self.filter.feature_collection()['features'].length > 0) {
                         var geojsonFC = self.filter.feature_collection();
                         var extent = geojsonExtent(geojsonFC);
-                        var bounds = new mapboxgl.LngLatBounds(extent);
+                        var bounds = new this.mapboxgl.LngLatBounds(extent);
                         self.map().fitBounds(bounds, {
                             padding: self.buffer()
                         });
@@ -352,14 +361,17 @@ define([
             },
 
             setupDraw: function() {
+                if(!this.map() || !this.dependenciesLoaded()){
+                    return;
+                }
                 var self = this;
-                var modes = MapboxDraw.modes;
+                var modes = this.MapboxDraw.modes;
                 modes.static = {
                     toDisplayFeatures: function(state, geojson, display) {
                         display(geojson);
                     }
                 };
-                this.draw = new MapboxDraw({
+                this.draw = new this.MapboxDraw({
                     displayControlsDefault: false,
                     modes: modes
                 });
@@ -372,7 +384,7 @@ define([
                     })
                     self.searchGeometries(e.features);
                     self.updateFilter();
-                    self.drawMode(undefined);
+                    self.selectedTool(undefined);
                 });
                 this.map().on('draw.update', function(e) {
                     self.searchGeometries(e.features);
@@ -384,7 +396,7 @@ define([
             },
 
             searchByExtent: function() {
-                if (_.contains(this.drawModes, this.drawMode())) {
+                if (_.contains(this.drawModes, this.selectedTool())) {
                     this.draw.deleteAll();
                 }
                 var bounds = this.map().getBounds();
@@ -408,7 +420,7 @@ define([
                 });
                 this.searchGeometries([boundsFeature]);
                 this.updateFilter();
-                this.drawMode(undefined);
+                this.selectedTool(undefined);
             },
 
             useMaxBuffer: function (unit, buffer, maxBuffer) {
@@ -469,7 +481,7 @@ define([
                             this.filter.inverted(feature.properties.inverted);
                         }
                     }, this);
-                    this.drawMode(undefined);
+                    this.selectedTool(undefined);
                     this.geoJSONString(undefined);
                 }
             },
@@ -501,7 +513,7 @@ define([
                         }
                     };
                 }
-                var bounds = new mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
+                var bounds = new this.mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
                 var maxZoom = ko.unwrap(this.maxZoom);
                 this.map().fitBounds(bounds, {
                     maxZoom: maxZoom > 17 ? 17 : maxZoom

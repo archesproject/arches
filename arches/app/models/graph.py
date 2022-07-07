@@ -20,7 +20,7 @@ import uuid
 from copy import copy, deepcopy
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -182,6 +182,7 @@ class Graph(models.GraphModel):
             node.isrequired = nodeobj.get("isrequired", False)
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
+            self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -356,6 +357,7 @@ class Graph(models.GraphModel):
             if nodeid is not None:
                 node = self.nodes[nodeid]
                 self.update_es_node_mapping(node, datatype_factory, se)
+                self.create_node_alias(node)
                 node.save()
             else:
                 for node in self.nodes.values():
@@ -515,9 +517,14 @@ class Graph(models.GraphModel):
 
             return branch_copy
 
-    def make_name_unique(self, name, names_to_check):
+    def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """
+<<<<<<< HEAD
         Makes a name unique among a list of name
+=======
+        Makes a name unique among a list of names
+
+>>>>>>> dev/6.2.x
         Arguments:
         name -- the name to check and modfiy to make unique in the list of "names_to_check"
         names_to_check -- a list of names that "name" should be unique among
@@ -526,7 +533,7 @@ class Graph(models.GraphModel):
         i = 1
         temp_node_name = name
         while temp_node_name in names_to_check:
-            temp_node_name = "{0}_{1}".format(name, i)
+            temp_node_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
             i += 1
         return temp_node_name
 
@@ -703,8 +710,17 @@ class Graph(models.GraphModel):
         for edge_id, edge in copy_of_self.edges.items():
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
+            copied_domainnode = edge.domainnode
+            copied_rangenode = edge.rangenode
+            # edge.domainnode_id and rangenode_id refer to orignial nodeid - not new id.
+            # edge.domainnode and edge.rangenode point to the new copied nodes
+            # We have to update those identifiers here
             edge.domainnode_id = edge.domainnode.pk
             edge.rangenode_id = edge.rangenode.pk
+            # in Django 3, this breaks the reference to the domainnode and rangenode
+            # so we have to repair them here
+            edge.domainnode = copied_domainnode
+            edge.rangenode = copied_rangenode
 
         copy_of_self.edges = {edge.pk: edge for edge_id, edge in copy_of_self.edges.items()}
 
@@ -1305,6 +1321,18 @@ class Graph(models.GraphModel):
                 if node.name in sibling_node_names:
                     message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
                     raise GraphValidationError(message)
+
+    def create_node_alias(self, node):
+        """
+        Assigns a unique, slugified version of a node's name as that node's alias.
+        """
+
+        with connection.cursor() as cursor:
+            cursor.callproc("__arches_slugify", [node.name])
+            row = cursor.fetchone()
+            aliases = [n.alias for n in self.nodes.values() if node.alias != n.alias]
+            node.alias = self.make_name_unique(row[0], aliases, "_n")
+        return node.alias
 
     def validate(self):
         """

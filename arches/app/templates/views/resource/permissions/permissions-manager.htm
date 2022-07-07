@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 {% load template_tags %}
 <div id="related-resources-drag-panel" style="height: calc(100vh - 102px);" class="search-container related-resources-container">
@@ -12,7 +12,6 @@
 
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <!-- <img class="rr-splash-img" src="{% static "/img/Workflow.png" %}" alt="Resource Editor"> -->
                 <i class="fa fa-lock"></i>
             </div>
 
@@ -49,7 +48,7 @@
                     <div class="identities-column">{% trans 'Person/Group' %}</div><div class="permissions-column">{% trans 'Permissions' %}</div>
                 </div>
                 <div class="permissions-list-table-body">
-                     <!--ko foreach: filteredPermissions() --> 
+                     <!--ko foreach: filteredPermissions() -->
                         <!--ko if: $data.creatorOrSuperUser -->
                         <div class="permissions-table-row">
                             <div style="display: inline-flex">
@@ -105,6 +104,6 @@
         </div>
         </div>
 
-    
+
     <!--/ko-->
 </div>

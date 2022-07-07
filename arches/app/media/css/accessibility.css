@@ -1,0 +1,79 @@
+.navbar-toggle {
+    margin-top: 11px;
+    background: #000;
+}
+
+.nav>li>a:focus, .navbar-toggle:focus {
+    box-shadow: inset 0 0 0 3px #13ce67;
+    color: #000;
+    text-decoration: underline;
+}
+
+.v5-splash-navbar .navbar-nav>li>a:hover {
+    text-decoration: underline;
+}
+
+.v5-splash-caption {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.application-name h1 {
+    color: #fff;
+    font-size: 24px;
+}
+
+.app-info-block-header {
+    font-size: 20px;
+}
+
+.sub-block-description {
+    color: #555;
+}
+
+.link-spacing {
+    color: #91a5cf;
+}
+
+.vertical-nav-list-link:focus {
+    background: #13ce67;
+}
+
+.vertical-nav-list-ref{
+    background: white;
+    border-radius: 5px;
+}
+
+.down-button {
+    border: 3px solid #fff;
+}
+
+.down-button-icon {
+    opacity: 1;
+}
+
+.down-button:hover,
+.down-button:focus {
+    color: #13ce67;
+    border: 3px solid #13ce67;
+}
+
+.wide-box .box-highlight p {
+    color: #555;
+}
+
+.mobile-description-container p {
+    color: #555;
+}
+
+.splash-link-address:focus,
+.splash-link-address:hover,
+.link-spacing:focus,
+.link-spacing:hover {
+    color: #7AD02F;
+    text-decoration: underline;
+}
+
+div.search-facet-item:focus {
+    box-shadow: inset 0 0 0 3px #000;
+    outline: none;
+}

@@ -60,4 +60,13 @@
       <skos:Concept rdf:about="http://localhost:8000/dcd28b8a-0840-4a7f-a0d6-0341438552e6"/>
     </skos:member>
   </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/c66a18f6-eb8a-43cb-92d1-f74feaaf29ed">
+    <skos:prefLabel xml:lang="en-us">{"id": "d69c2a78-71b3-4b75-b463-e651d85bff64", "value": "Personal Activity Types"}</skos:prefLabel>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/524eed3f-ef74-42d7-8e7b-00e02ffb4cda"/>
+    </skos:member>
+    <skos:member>
+      <skos:Concept rdf:about="http://localhost:8000/19900458-92d4-4b57-a08a-d7fdc9fa1acc"/>
+    </skos:member>
+  </skos:Collection>
 </rdf:RDF>

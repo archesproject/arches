@@ -15,7 +15,7 @@ define([
 
             self.imgs = ko.computed(function() {
                 var imgs = [];
-                var nodes = self.nodes();
+                var nodes = ko.unwrap(self.nodes);
                 self.tiles().forEach(function(tile) {
                     _.each(tile.data, function(val, key) {
                         val = koMapping.toJS(val);
@@ -28,7 +28,7 @@ define([
                                     _.contains(nodes, key)
                                 ) {
                                     imgs.push({
-                                        src: item.url,
+                                        src: (arches.urls.url_subpath + ko.unwrap(item.url)).replace('//', '/'),
                                         alt: item.name
                                     });
                                 }

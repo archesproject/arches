@@ -1,5 +1,5 @@
 {% extends "views/components/iiif-viewer.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% block tabs %}
@@ -25,22 +25,21 @@
 {% block sidepanel %}
 <!--ko foreach: { data: [$data], as: 'self' }-->
 <!--ko if: activeTab() === 'manifest'-->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Service' %}</h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Service' %}</h4>
 </div>
-
-<div class="iiif-image-tools" style="margin-top: 20px;">
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+<div class="iiif-image-tools">
     <div class="form-group">
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Title" %}</label>
-        <input type="text" placeholder="Manifest Title" class="form-control input-lg" style="height: 36px;"
+        <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
             data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
         </div>  
         <div class="row widget-wrapper">  
         <label class="control-label">{% trans "Description" %}</label>
-        <textarea rows="10" type="text" placeholder='Manifest Description' class="form-control input-lg"
+        <textarea rows="10" type="text" placeholder='Service Description' class="form-control input-lg"
             data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
         </div>
         <div class="row widget-wrapper">
@@ -110,28 +109,25 @@
         <!--/ko-->
     </div>
 </div>
+</div>
 <!--/ko-->
 
 <!--ko if: activeTab() === 'canvas'-->
-<div class="workbench-header-buffer">
-    <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Canvases' %}</h4>
-    </div>
+<div class="workbench-card-sidepanel-header-container">
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Canvases' %}</h4>
 </div>
 
-<div class="iiif-image-tools" style="margin-top: 20px;">
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
+<div class="iiif-image-tools">
     <!--ko if: canvases().length > 0-->
     <label class="control-label">{% trans "Images" %}</label>
     <div>{% trans "Select image to delete from the image service" %}</div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
-        <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']}">
+        <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: (($parent.selectPrimaryPanel() && ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']) || !$parent.selectPrimaryPanel() && ko.unwrap($parent.secondaryCanvas) === $data.images[0].resource.service['@id'])}">
             <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
-            <!--ko if: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
-            <span class='file-name manifest-manager-canvas-name' data-bind="text: $parent.canvasLabel, click: $parent.canvasClick, clickBubble: false"></span>
-            <!--/ko-->
-            <!--ko ifnot: ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id'] -->
+            <span data-bind="text: console.log($parent.canvasLabel(), $parent.canvas(), $data.images[0])"></span>
             <span class='file-name manifest-manager-canvas-name' data-bind="text: label, click: $parent.canvasClick, clickBubble: false"></span>
-            <!--/ko-->
         </div>
     </div>
 
@@ -174,6 +170,7 @@
         </div>
     </div>
 </div>
+</div>
 <!--/ko-->
 <!--/ko-->
 {{ block.super }}
@@ -182,14 +179,14 @@
 {% block main_menu %}
 <div>
     <ul class="nav nav-tabs">
-            <li>
+            <li data-bind="if: shouldShowCreateService">
                 <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
                     <div class='tab-label'>
                         {% trans 'Create New Service' %}
                     </div>
                 </div>
             </li>
-            <li>
+            <li data-bind="if: shouldShowEditService">
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>
@@ -204,7 +201,14 @@
 
 <!--ko if: createService -->
 <div data-bind="dropzone: dropzoneOptions4create" class="file-select loader-select" style="height: 100%;">
-    <div style="display:flex; flex-direction: column; align-items: center;">
+    <div style="
+            display:flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        "
+    >
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
@@ -255,23 +259,30 @@
 {% endblock main_menu %}
 
 {% block gallery_header %}
-<div class="iiif-gallery-header">
     <div>
         <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
-        <span class="iiif-gallery-manifest-label">|</span>
-        <span>{% trans "Filter" %}</span>
-        <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
-
-            <!-- Clear Search -->
-            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
-        </div>
+    </div>                 
+    <div>
+        <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
+            <!-- ko if: !expandGallery() -->
+            {% trans "Info" %}
+            <!-- /ko -->
+            <!-- ko if: expandGallery() -->
+            {% trans "Close" %}
+            <!-- /ko -->
+        </span>
     </div>
-    <div style="display: inline-flex; padding: 5px">
-        <div class="iiif-gallery-sequence-label" style="padding:0 5px" data-bind="click: toggleManifestEditor">
-            {% trans "Switch Image Service" %}
-        </div>
-        |
+    <div 
+        class="iiif-gallery-sequence-label" 
+        style="padding:0 5px" 
+        data-bind="
+            if: shouldShowEditService,
+            click: toggleManifestEditor,
+        "
+    >
+        {% trans "Switch Image Service" %}
+    </div>
+    <div data-bind="if: renderContext() != 'manifest-workflow'">
         <div data-bind="dropzone: dropzoneOptions4create" >
             <div>
             <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
@@ -283,5 +294,13 @@
             </div>
         </div>
     </div>
-</div>
+    <div>
+        <span>{% trans "Filter" %}</span>
+        <div class="list-filter" data-bind="">
+            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+
+            <!-- Clear Search -->
+            <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+        </div>
+    </div>
 {% endblock gallery_header %}

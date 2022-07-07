@@ -139,10 +139,21 @@ define([
             return values;
         };
 
+        this.selectWorkflowTile = function(tile) {  // used for cardinality 'n' cards in workflows
+            tile.selected(true);
+            self.tile = tile;
+            params.dirty(true);
+        }
+
         this.saveTile = function(callback) {
             self.loading(true);
+            self.tile.transactionId = params.form?.workflowId || undefined;
+            self.tile.resourceinstance_id = self.tile.resourceinstance_id || ko.unwrap(params.form?.resourceId);
             self.tile.save(function(response) {
                 self.loading(false);
+                if(params?.form?.error){
+                    params.form.error(response.responseJSON.message);
+                }
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
@@ -165,11 +176,28 @@ define([
             });
         };
 
-        if (params.saveFunction) {
-            params.saveFunction(self.saveTile);
+        var saveTileInWorkflow = function() {
+            self.saveTile(function() {
+                params.form.complete(true);
+            });
+        };
+        if (params.save) {
+            params.save = saveTileInWorkflow;
         }
-        else if (params.form && params.form.saveFunction) {
-            params.form.saveFunction(self.saveTile);
+        if (params.form && params.form.save) {
+            params.form.save = saveTileInWorkflow;
+        }
+
+        /*
+            TODO: Reverse this logic to be in-line with card UX in resource_editor using this logic:
+                    params.card && params.card.cardinality === 'n'
+                    && params.form.componentData.cardinalityOverride !== '1'
+        */ 
+        if (params.renderContext === 'workflow') {
+            if (params.form.componentData.cardinalityOverride === 'n') {
+                self.card.selected(true);  // cardinality 'n' cards will display appropriately
+                self.inResourceEditor = true;
+            }
         }
 
         this.saveTileAddNew = function() {
@@ -198,18 +226,21 @@ define([
                 }
             }, function() {
                 self.loading(false);
+                if (typeof self.onDeleteSuccess === 'function') self.onDeleteSuccess();
                 if (params.form.onDeleteSuccess) {
                     params.form.onDeleteSuccess(self.tile);
                 }
             });
         };
         
-        this.createParentAndChild = function(parenttile, childcard) {
-            if (parenttile.tileid === "") {
-                var callback = function(){childcard.selected(true);};
-                parenttile.save(function() {
-                    return;
-                }, callback);
+        this.createParentAndChild = async (parenttile, childcard) => {
+            try{
+                const newSave = await self.card.saveParentTile(parenttile);
+                if(newSave){
+                    childcard.selected(true);
+                }
+            } catch (err){
+                console.log(err);
             }
         };
 

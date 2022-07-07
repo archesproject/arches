@@ -1,5 +1,5 @@
  {% load i18n %}
- {% load staticfiles %}
+ {% load static %}
 <div class="col-xs-12 concept-report-loading hidden">{% trans "Loading..." %}</div>
 {% if concept %}
     <div class="col-xs-12 concept-report-content">
@@ -242,7 +242,7 @@
                     <div class="row margin-top-10">
                         <div class="col-xs-12 shadow-wrapper margin-bottom-10">
                             <div class="box-shadow shadow-effect-1">
-                                <img style="width: 100%;" src="{{MEDIA_URL}}{{value.value}}" data-img="{{MEDIA_URL}}{{value.value}}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
+                                <img style="width: 100%;" src="{{value.full_image_url}}" data-img="{{value.full_image_url}}" alt="Image Name" title="" class="superbox-img img-bordered arches-RDM-image">
                             </div>
 
                             <div class="margin-left-5 margin-top-10">

@@ -11,7 +11,8 @@ define([
             var bindings = allBindingsAccessor();
             var pan = value;
             var duration = bindings.duration;
-            var gt = $(element).find('.gallery-thumbnails')[0];
+            var thumbnailclass = "." + bindings.thumbnailclass;
+            var gt = $(element).find(thumbnailclass)[0];
             pan.subscribe(function(val){
                 if (val === 'right') {
                     $(gt).animate({scrollLeft: '+=' + $(gt).width()}, duration);

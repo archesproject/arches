@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}
@@ -26,51 +26,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 {% block main_content %}
-<div class='scroll-y'>
-    <div class='resource-report' data-bind='component: {
-        name: reportLookup[report.get("template_id")()].componentname,
-        params: {
-            report: report
+<div 
+    data-bind="
+        component: { 
+            name: 'resource-report-abstract',
+            params: {
+                resourceid: '{{ resourceid }}'
+            }
         }
-    }'></div>
-
-    <footer 
-        id="footer" 
-        style="
-            background: #f8f8f8; 
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-            padding-right: 50px;
-        "
-    >
-        <div>
-            {% blocktrans %}Arches {{ version }}{% endblocktrans %}
-        </div>
-        <div>
-            <a href="http://archesproject.org" target="_blank">http://archesproject.org</a>
-        </div>
-    </footer>
-</div>
+    "
+></div>
 {% endblock main_content %}
-
-{% block pre_require_js %}
-{{ block.super }}
-<script>{% autoescape off %}
-define('resource-report-data', [], function () {
-    return {
-        templates: {{templates_json}},
-        datatypes: {{ datatypes_json }},
-        cards: {{cards}},
-        tiles: {{tiles}},
-        graph: {{graph_json}},
-        related_resources: {{related_resources}},
-        displayname: "{{displayname | escapejs}}",
-        cardComponents: {{card_components_json}},
-        resourceid: '{{resourceid}}',
-        cardwidgets: {{cardwidgets}},
-        hideEmptyNodes: JSON.parse('{{hide_empty_nodes}}'.toLowerCase())
-    };
-});
-{% endautoescape %}</script>
-{% endblock pre_require_js %}

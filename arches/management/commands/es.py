@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
+import uuid
+import logging
 from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 from arches.app.search.base_index import get_index
@@ -33,6 +35,7 @@ from arches.app.search.mappings import (
 )
 import arches.app.utils.index_database as index_database_util
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
@@ -53,6 +56,7 @@ class Command(BaseCommand):
                 "index_concepts",
                 "index_resources",
                 "index_resources_by_type",
+                "index_resources_by_transaction",
                 "index_resource_relations",
                 "add_index",
                 "delete_index",
@@ -65,6 +69,7 @@ class Command(BaseCommand):
             + "'index_concepts'=Indexes all concepts from the database"
             + "'index_resources'=Indexes all resources from the database"
             + "'index_resources_by_type'=Indexes only resources of a given resource_model/graph"
+            + "'index_resources_by_transaction'=Indexes only resources of a given transaction"
             + "'index_resource_relations'=Indexes all resource to resource relation records"
             + "'add_index'=Register a new index in Elasticsearch"
             + "'delete_index'=Deletes a named index from Elasticsearch",
@@ -85,6 +90,15 @@ class Command(BaseCommand):
             dest="resource_types",
             default="",
             help="UUID of resource_model to index resources of.",
+        )
+
+        parser.add_argument(
+            "-t",
+            "--transaction",
+            action="store",
+            dest="transaction",
+            default="",
+            help="The transaction id of the resources to index.",
         )
 
         parser.add_argument(
@@ -117,6 +131,25 @@ class Command(BaseCommand):
 
         parser.add_argument("-n", "--name ", action="store", dest="name", default=None, help="Name of the custom index")
 
+        parser.add_argument(
+            "-mp",
+            "--use_multiprocessing",
+            action="store_true",
+            dest="use_multiprocessing",
+            default=False,
+            help="indexes the batches in parallel processes",
+        )
+
+        parser.add_argument(
+            "-mxp",
+            "--max_subprocesses",
+            action="store",
+            type=int,
+            dest="max_subprocesses",
+            default=0,
+            help="Changes the process pool size when using use_multiprocessing. Default is ceil(cpu_count()/2)",
+        )
+
     def handle(self, *args, **options):
         if options["operation"] == "setup_indexes":
             self.setup_indexes(name=options["name"])
@@ -132,18 +165,33 @@ class Command(BaseCommand):
 
         if options["operation"] == "index_database":
             self.index_database(
-                batch_size=options["batch_size"], clear_index=options["clear_index"], name=options["name"], quiet=options["quiet"]
+                batch_size=options["batch_size"],
+                clear_index=options["clear_index"],
+                name=options["name"],
+                quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
             )
 
         if options["operation"] == "reindex_database":
-            self.reindex_database(batch_size=options["batch_size"], name=options["name"], quiet=options["quiet"])
+            self.reindex_database(
+                batch_size=options["batch_size"],
+                name=options["name"],
+                quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
+            )
 
         if options["operation"] == "index_concepts":
             index_database_util.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
 
         if options["operation"] == "index_resources":
             index_database_util.index_resources(
-                clear_index=options["clear_index"], batch_size=options["batch_size"], quiet=options["quiet"]
+                clear_index=options["clear_index"],
+                batch_size=options["batch_size"],
+                quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
             )
 
         if options["operation"] == "index_resources_by_type":
@@ -152,6 +200,21 @@ class Command(BaseCommand):
                 clear_index=options["clear_index"],
                 batch_size=options["batch_size"],
                 quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
+            )
+
+        if options["operation"] == "index_resources_by_transaction":
+            try:
+                uuid.UUID(options["transaction"])
+            except ValueError:
+                logger.error("A valid transaction id is required. Use -t or --transaction , eg. -t 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'")
+            index_database_util.index_resources_by_transaction(
+                transaction_id=options["transaction"],
+                batch_size=options["batch_size"],
+                quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
             )
 
         if options["operation"] == "index_resource_relations":
@@ -165,16 +228,43 @@ class Command(BaseCommand):
         es_index = get_index(name)
         es_index.delete_index()
 
-    def index_database(self, batch_size, clear_index=True, name=None, quiet=False):
+    def index_database(self, batch_size, clear_index=True, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0):
         if name is not None:
-            index_database_util.index_custom_indexes(index_name=name, clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+            index_database_util.index_custom_indexes(
+                index_name=name,
+                clear_index=clear_index,
+                batch_size=batch_size,
+                quiet=quiet,
+                use_multiprocessing=use_multiprocessing,
+                max_subprocesses=max_subprocesses,
+            )
         else:
-            index_database_util.index_db(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+            index_database_util.index_db(
+                clear_index=clear_index,
+                batch_size=batch_size,
+                quiet=quiet,
+                use_multiprocessing=use_multiprocessing,
+                max_subprocesses=max_subprocesses,
+            )
 
-    def reindex_database(self, batch_size, name=None, quiet=False):
+    def reindex_database(
+        self,
+        batch_size,
+        name=None,
+        quiet=False,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+    ):
         self.delete_indexes(name=name)
         self.setup_indexes(name=name)
-        self.index_database(batch_size=batch_size, clear_index=False, name=name, quiet=quiet)
+        self.index_database(
+            batch_size=batch_size,
+            clear_index=False,
+            name=name,
+            quiet=quiet,
+            use_multiprocessing=use_multiprocessing,
+            max_subprocesses=max_subprocesses,
+        )
 
     def setup_indexes(self, name=None):
         if name is None:

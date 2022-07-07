@@ -135,7 +135,7 @@
                             params: {
                                 state: 'report',
                                 card: card,
-                                pageVm: $root,
+                                pageVm: {...$root, report: $parent.report},
                                 hideEmptyNodes: $parent.hideEmptyNodes
                             }
                         } -->

@@ -15,8 +15,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
+{% load compress %}
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -39,7 +40,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
 
     {% block css %}
-        <link href="{% static 'css/arches.css' %}" rel="stylesheet">
+        {% compress css %}
+        <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen">
+    	{% endcompress %}
+        {% if app_settings.ACCESSIBILITY_MODE %}
+        <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+        {% endif %}
         <link href="{% static 'css/package.css' %}" rel="stylesheet">
         <link href="{% static 'css/project.css' %}" rel="stylesheet">
     {% endblock css%}

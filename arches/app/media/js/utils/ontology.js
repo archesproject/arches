@@ -1,15 +1,16 @@
-define(['arches'], function(arches) {
+define(['arches', 'knockout'], function(arches, ko) {
     var ontologyUtils = {
         /**
          * makeFriendly - makes a shortened name from an fully qalified name
          * (eg: "http://www.cidoc-crm.org/cidoc-crm/E74_Group")
          *
-         * @param  {ontolgoyName} the request method name
+         * @param  {ontologyName} the request method name
          * @return {string}
          */
-        makeFriendly: function(ontolgoyName) {
-            if (!!ontolgoyName) {
-                var parts = ontolgoyName.split("/");
+        makeFriendly: function(ontologyName) {
+            ontologyName = ko.unwrap(ontologyName);
+            if (!!ontologyName) {
+                var parts = ontologyName.split("/");
                 return parts[parts.length - 1];
             }
             return '';

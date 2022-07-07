@@ -17,8 +17,13 @@ define([
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
+
+            this.shouldShowEditService = params.shouldShowEditService || ko.observable(true);
             this.editService = ko.observable(false);
+            
+            this.shouldShowCreateService = params.shouldShowCreateService || ko.observable(true);
             this.createService = ko.observable(true);
+
             this.remoteManifest = ko.observable(true);
             this.alert = params.alert || ko.observable(); 
             this.addCanvas = function(canvas) { //the function name needs to be better
@@ -31,11 +36,15 @@ define([
                 self.canvas(canvas.images[0].resource.service['@id']);
             };
 
-            IIIFViewerViewmodel.apply(this, [params]);
+            IIIFViewerViewmodel.apply(this, [{...params, renderContext: params?.renderContext ? params.renderContext: 'manifestManager'}]);
             this.showTabs(false);
             this.mainMenu.subscribe(function(val){
                 val || self.showTabs(true);
             });
+
+            if(this.renderContext() == "manifest-workflow"){
+                this.showModeSelector(false)
+            }
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
@@ -223,7 +232,7 @@ define([
             });
 
             this.manifest.subscribe(function(){
-                if (self.manifest().charAt(0) == '/') {
+                if (self.manifest() && self.manifest().charAt(0) == '/') {
                     self.remoteManifest(false);
                 }
                 else {
@@ -237,6 +246,7 @@ define([
                 dictDefaultMessage: '',
                 autoProcessQueue: false,
                 uploadMultiple: true,
+                acceptedFiles: ["image/jpeg", "image/png", "image/tiff"].join(','),
                 autoQueue: false,
                 clickable: ".fileinput-create-button." + this.uniqueidClass(),
                 previewsContainer: '#hidden-dz-create-previews',

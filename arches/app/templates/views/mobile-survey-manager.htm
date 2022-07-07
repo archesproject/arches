@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% block main_content %}
@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- Image -->
             <div class="img-circle rr-splash-img-container surveys">
-                <img class="rr-splash-img" src="{% static "/img/multiple_inputs.png" %}" alt="Resource Editor">
+                <img class="rr-splash-img" src="{% static "img/multiple_inputs.png" %}" alt="Resource Editor">
             </div>
 
             <!-- Splash Title -->
@@ -95,7 +95,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                             </div>
                             <div class="resource-grid-tools-container mpm-manager">
-                                
+
                                 <button class="btn btn-shim btn-rr graph-btn btn-labeled btn-sm fa fa-trash" data-bind="click: function(val){$parent.deleteMobileSurvey(val)}, clickBubble: false, css: {'disabled': active()}" aria-expanded="true">{% trans 'delete' %}</button>
 
                                 <div>
@@ -103,7 +103,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     {% trans "Status" %}: <span class="resource-status" data-bind="text:active()?'{% trans "Active" %}':'{% trans "Inactive" %}'"></span>
                                     </p>
                                 </div>
-                                
+
                             </div>
                         </div>
                         <!-- /ko -->

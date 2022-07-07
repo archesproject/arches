@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "views/resource/resource-base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% block graph_header_title %}
@@ -42,7 +42,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="header">
                         <div class="list-filter" data-bind="">
                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
-    
+
                             <!-- Clear Search -->
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
@@ -127,14 +127,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         resourceId: resourceId,
                         creator: creator,
                         userIsCreator: userIsCreator,
-                        alert: alert, 
+                        alert: alert,
                         permissionLabelLookup: {
                             'view_resourceinstance':'{% trans 'Read' %}',
                             'change_resourceinstance':'{% trans 'Update' %}',
                             'no_access_to_resourceinstance':'{% trans 'No Access' %}',
                             'delete_resourceinstance':'{% trans 'Delete' %}',
                         },
-                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}', 
+                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}',
                         alertMessage: '{% trans 'Would you like to proceed?' %}'},
                 }"></div>
             </div>
@@ -143,10 +143,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!--ko if: selection() === 'root' -->
                 <!--ko if: resourceId() -->
                 <div class='resource-report editor-report' data-bind='component: {
-                    name: reportLookup[report.get("template_id")()].componentname,
+                    name: "resource-report-abstract",
                     params: {
                         report: report,
-                        editorContext: true
+                        editorContext: true,
+                        cache: false
                     }
                 }'></div>
                 <!--/ko -->
@@ -155,7 +156,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Image -->
                     <div class="img-lg img-circle rr-splash-img-container">
-                        <img class="rr-splash-img" src="{% static "/img/inspection.png" %}" alt="Resource Editor">
+                        <img class="rr-splash-img" src="{% static "img/inspection.png" %}" alt="Resource Editor">
                     </div>
 
                     <!-- Splash Title -->
@@ -306,6 +307,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 relationship_types: {{ relationship_types }},
                 datatypes: {{datatypes_json}},
                 appliedFunctions: {{applied_functions}},
+                primaryDescriptorFunction: {{ primary_descriptor_function }},
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
