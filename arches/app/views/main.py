@@ -79,14 +79,13 @@ def language_switcher(request):
 
         # regex to replace the first instance of a language code surrounded by forward slashes
         updated_path = re.sub(
-            "/{language_code}/".format(language_code=language_code), 
+            "/{language_code}/".format(language_code=language_code),
             "/{requested_language}/".format(requested_language=requested_language),
             updated_path,
-            count=1
+            count=1,
         )
 
     return redirect(updated_path)
-
 
 
 def help_templates(request):
