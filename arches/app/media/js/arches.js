@@ -5,69 +5,32 @@ define(['utils/set-csrf-token'], function() {
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
     }
-    function removeWhitespace(string){
-        return string.replace(/(\r\n|\n|\r)/gm, "");
-    }
     function convertToCamelCase(string) {
         return string.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
     }
-    
-    function buildUrls() {
-        function acceptUserInput(url){
-            return function(input) {
-                return url.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', input);
-            };
+
+    const archesUrls = document.querySelector('#arches-urls');
+    const parsedArchesUrls = {};
+    for (let attribute of archesUrls.attributes) {
+        if (
+            attribute.specified
+            && attribute.name !== 'style'
+            && attribute.name !== 'id'
+        ) {
+            try {
+                var foo = Function("return" + attribute.value)
+                parsedArchesUrls[attribute.name] = foo()
+            } catch (error) {
+                parsedArchesUrls[attribute.name] = attribute.value;
+                // console.log(attribute, error)
+            }
+            // parsedArchesTranslations[attribute.name] = JSON.parse(attribute.value);
         }
-
-        const staticUrls = JSON.parse(removeWhitespace(archesData.getAttribute('staticUrls') || ''));
-        const dynamicUrls = JSON.parse(removeWhitespace(archesData.getAttribute('dynamicUrls') || ''));
-        const userInputUrls = JSON.parse(removeWhitespace(archesData.getAttribute('userInputUrls') || ''));
-
-        // BEGIN NON-STANDARD FORMATS
-        const mvtUrl = archesData.getAttribute('mvtUrl');
-        const resourceDataUrl = archesData.getAttribute('resourceDataUrl');
-        const apiSearchComponentDataUrl = archesData.getAttribute('apiSearchComponentDataUrl');
-        const validateJsonUrl = archesData.getAttribute('validateJsonUrl');
-        // END NON_STANDARD FORMATS
-
-        const formattedDynamicUrls = Object.keys(dynamicUrls).reduce((acc, urlName) => {
-            acc[urlName] = dynamicUrls[urlName].replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "");
-            return acc;
-        }, {});
-    
-        const formattedUserInputUrls = Object.keys(userInputUrls).reduce((acc, urlName) => {
-            acc[urlName] = acceptUserInput(userInputUrls[urlName]);
-            return acc;
-        }, {});
-    
-        const unorderedUrls = { 
-            ...staticUrls, 
-            ...formattedDynamicUrls, 
-            ...formattedUserInputUrls,
-            "mvt": function(nodeid) {
-                return decodeURI(mvtUrl).replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid);
-            },
-            "resource_data": resourceDataUrl.replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ""),
-            "api_search_component_data": apiSearchComponentDataUrl.replace('aaaa', ''),
-            "validatejson": validateJsonUrl.replace('aaaa', ''),
-        };
-    
-        const orderedUrls = Object.keys(unorderedUrls).sort().reduce((acc, key) => {         
-            acc[key] = unorderedUrls[key]; 
-            return acc;
-        }, {});
-
-        return orderedUrls;
     }
-
-    // const data = archesData.getAttribute('data');
 
 
     const archesTranslations = document.querySelector('#arches-translations');
     const parsedArchesTranslations = {};
-
-    
-
     for (let attribute of archesTranslations.attributes) {
         if (
             attribute.specified
@@ -104,7 +67,9 @@ define(['utils/set-csrf-token'], function() {
         }
     }
 
-    console.log({ ...parsedArchesTranslations, ...parsedArchesData });
+    console.log(parsedArchesUrls)
+    // console.log({ ...parsedArchesTranslations, ...parsedArchesData });
+
     // return {
     //     celeryRunning: archesData.getAttribute('celeryRunning'),
     //     conceptCollections: JSON.parse(removeTrailingCommaFromArray(archesData.getAttribute('conceptCollections'))),
