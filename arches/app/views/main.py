@@ -88,7 +88,6 @@ def language_switcher(request):
     return redirect(updated_path)
 
 
-
 def help_templates(request):
     template = request.GET.get("template")
     return render(request, "help/%s.htm" % template)
