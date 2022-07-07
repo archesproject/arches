@@ -17,7 +17,9 @@ define(['knockout', 'templates/views/components/language-switcher.htm', 'js-cook
             this.value = ko.observable(params.current_language);
             this.csrfToken = Cookies.get('csrftoken');
             this.value.subscribe(function(val){
-                document.getElementById(this.formid).submit();
+                if (val) {
+                    document.getElementById(this.formid).submit();
+                }
             }, this);
         },
         template: languageSwitcherTemplate,

@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import re
+from turtle import update
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 from arches import __version__
@@ -70,21 +72,21 @@ def templates(request, template):
 def language_switcher(request):
     requested_language = request.POST.get("language")
 
-    referrer = request.META.get("HTTP_REFERER")
-    origin = request.META.get("HTTP_ORIGIN")
-    relative_path = referrer.split(origin)[1]
-
-    path_segments = relative_path.split("/")
+    updated_path = request.META.get("HTTP_REFERER")
 
     for language_tuple in settings.LANGUAGES:
         language_code = language_tuple[0]
 
-        if path_segments[1] == language_code:
-            path_segments[1] = requested_language
+        # regex to replace the first instance of a language code surrounded by forward slashes
+        updated_path = re.sub(
+            "/{language_code}/".format(language_code=language_code), 
+            "/{requested_language}/".format(requested_language=requested_language),
+            updated_path,
+            count=1
+        )
 
-    updated_relative_path = "/".join(path_segments)
+    return redirect(updated_path)
 
-    return redirect(origin + updated_relative_path)
 
 
 def help_templates(request):
