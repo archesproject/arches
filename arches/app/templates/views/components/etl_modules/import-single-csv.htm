@@ -14,12 +14,12 @@
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
             <div style="display:flex; flex-direction: column;">
                 <div>
-                    <div class="dropzone-photo-upload" style="margin-top: 0px;">
+                    <div class="dropzone-photo-upload" style="display:flex; margin-top: 0px;">
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                        {% trans 'Select File' %}
+                            <span>{% trans "Select Files" %}</span>
                         </div>
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
-                            {% trans 'Cancel File Import' %}
+                            <span>{% trans 'Cancel File Import' %}</span>
                         </div>
                         <div style="min-height: 100%;">
                             <div id="hidden-dz-previews" style="display:none"></div>
