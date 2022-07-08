@@ -12,6 +12,8 @@ define([
         viewModel: function(params) {
             var self = this;
             params.configKeys = ['nodes'];
+            this.translations = arches.translations;
+            
             ReportViewModel.apply(this, [params]);
 
             self.imgs = ko.computed(function() {

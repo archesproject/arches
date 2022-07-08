@@ -43,10 +43,10 @@
 
     {% block body %}
     <!--ko if: hasProvisionalData() && (editorContext === false) -->
-    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span>></div>
+    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
-    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span>></div>
+    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
     <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEdits"></div>

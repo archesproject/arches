@@ -22,6 +22,7 @@ define([
             return val;
         };
 
+        this.translations = arches.translations;
         this.map = ko.observable();
         this.manifest = ko.observable(params.manifest);
         this.editManifest = ko.observable(!params.manifest);
@@ -240,7 +241,8 @@ define([
                                     'description': ko.observable(''),
                                     'graphName': feature.properties.graphName,
                                     'resourceinstanceid': feature.properties.resourceId,
-                                    'reportURL': arches.urls.resource_report
+                                    'reportURL': arches.urls.resource_report,
+                                    'translations': arches.translations
                                 };
                                 window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
                                     .then(function(response) {

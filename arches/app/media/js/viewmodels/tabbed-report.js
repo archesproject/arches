@@ -9,7 +9,7 @@ define([
 ], function($, _, ko, koMapping, arches, ReportViewModel) {
     return function(params) {
         var self = this;
-
+        self.translations = arches.translations;
         params.configKeys = ['tabs', 'activeTabIndex'];
 
         ReportViewModel.apply(this, [params]);

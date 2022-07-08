@@ -7,7 +7,7 @@
           <label class="col-xs-12 control-label widget-input-label"><span data-bind="translations.cardName"></span></label>
       </div>
       <div class="col-xs-12">
-        <select data-placeholder="translations.selectANodegroup" multiple data-bind="chosen: {width: '100%'}, selectedOptions: triggering_nodegroups, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
+        <select data-bind="attr: {data-placeholder: translations.selectANodegroup}" multiple data-bind="chosen: {width: '100%'}, selectedOptions: triggering_nodegroups, options: cards, optionsText: 'name', optionsValue: 'nodegroup_id'"></select>
       </div>
     </div>
   </div>

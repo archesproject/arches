@@ -10,9 +10,9 @@
 
 {% block header_form %}
 <div class="control-label">
-    {% trans "Included Image Nodes" %}
+    <span data-bind="text: translations.includedImageNodes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select class="design" data-placeholder="{% trans "Select image nodes to include..." %}" multiple data-bind="selectedOptions: nodes, options: nodeOptions, optionsText: 'name', optionsValue: 'nodeid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+    <select class="design" data-bind="attr: {data-placeholder: translations.selectImageNodes}" multiple data-bind="selectedOptions: nodes, options: nodeOptions, optionsText: 'name', optionsValue: 'nodeid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
 </div>
 {% endblock header_form %}

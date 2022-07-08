@@ -1,4 +1,4 @@
-define(['knockout', 'templates/views/components/icon-selector.htm'], function(ko, iconSelectorTemplate) {
+define(['knockout', 'arches', 'templates/views/components/icon-selector.htm'], function(ko, arches, iconSelectorTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -16,6 +16,7 @@ define(['knockout', 'templates/views/components/icon-selector.htm'], function(ko
     */
     return ko.components.register('views/components/icon-selector', {
         viewModel: function(params) {
+            this.translations = arches.translations;
             this.selectedIcon = params.selectedIconObservable;
             this.iconFilter = params.iconFilter;
             this.iconList = params.iconList;

@@ -22,7 +22,10 @@
 
                     <div>
                         <span class="workflow-information-box-toggle"
-                            data-bind="click: toggleInformationBox"
+                            data-bind="
+                                text: translations.dismiss,
+                                click: toggleInformationBox
+                            "
                             style="
                                 position: absolute;
                                 right: 20px;
@@ -31,7 +34,6 @@
                                 top: 20px;
                             "
                         >
-                            {% trans "dismiss" %}
                         </span>
                     </div>
                 </div>

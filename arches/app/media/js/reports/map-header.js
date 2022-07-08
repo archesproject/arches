@@ -2,13 +2,16 @@ define([
     'knockout',
     'knockout-mapping',
     'underscore',
+    'arches',
     'geojson-extent',
     'views/components/map',
     'views/components/cards/select-feature-layers',
     'templates/views/components/map.htm',
-], function(ko, koMapping, _, geojsonExtent, MapComponentViewModel, selectFeatureLayersFactory, reportHeaderMapTemplate) {
+], function(ko, koMapping, _, arches, geojsonExtent, MapComponentViewModel, selectFeatureLayersFactory, reportHeaderMapTemplate) {
     const viewModel = function(params) {
         var self = this;
+
+        self.translations = arches.translations;
         var featureCollection = ko.computed(function() {
             var features = [];
             ko.unwrap(params.tiles).forEach(function(tile) {
