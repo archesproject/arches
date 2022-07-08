@@ -1,9 +1,10 @@
 define([
     'knockout', 
     'underscore', 
+    'arches',
     'viewmodels/widget',
     'templates/views/components/widgets/sample-widget.htm',
-], function (ko, _, WidgetViewModel, sampleWidgetTemplate) {
+], function (ko, _, arches, WidgetViewModel, sampleWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -16,6 +17,7 @@ define([
     return ko.components.register('sample-widget', {
         viewModel: function(params) {
             params.configKeys = ['x_placeholder','y_placeholder'];
+            this.translations = arches.translations;
             WidgetViewModel.apply(this, [params]);
             var self = this;
             if (this.value()) {

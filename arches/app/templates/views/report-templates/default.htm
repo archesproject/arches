@@ -14,7 +14,10 @@
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools mar-no flex">
-            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+            <p class="report-print-date">
+                <span data-bind="text: translations.reportDate"></span>
+                <span data-bind="text: reportDate"></span>
+            </p>
 
             <div 
                 class="report-print-date" 
@@ -22,7 +25,7 @@
                     name: 'views/components/simple-switch', 
                     params: {
                         value: hideEmptyNodes, 
-                        config:{ label: '{% trans "Hide Null Values" %}', subtitle: ''}
+                        config:{ label: translations.hideNullValues, subtitle: ''}
                     }
                 }"
             ></div>
@@ -40,13 +43,13 @@
 
     {% block body %}
     <!--ko if: hasProvisionalData() && (editorContext === false) -->
-    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span>></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
-    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span>></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
-    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEdits"></div>
     <!--/ko-->
 
     <div class="rp-report-section relative rp-report-section-root">
@@ -76,7 +79,7 @@
     {% block related_resources %}
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
-            <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
+            <h4 class="rp-section-title"><span data-bind="text: translations.relatedResources" ></span></h4>
         </div>
         
         <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
@@ -101,19 +104,19 @@
 
             <!-- ko if: resourceData.paginator() && resourceData.paginator().has_next -->
             <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, false)">
-                {% trans "Load More" %}
+                <span data-bind="text: translations.loadMore" ></span>
                 <span data-bind="text: '(' + resourceData.remainingResources() + ')'"></span>
             </button>
 
             <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, true)">
-                {% trans "Load All" %}
+                <span data-bind="text: translations.loadAll" ></span>
                 <span data-bind="text: '(' + (resourceData.totalRelatedResources - resourceData.loadedRelatedResources().length) + ')'"></span>
             </button>
             <!-- /ko -->
                 
             <!--ko if: resourceData.totalRelatedResources === 0 -->	
             <div class="rp-report-container-tile">	
-                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>	
+                <div class="row rp-report-tile rp-no-data"><span data-bind="text: translations.noRelationshipsAdded"></span></div>	
             </div>	
             <!--/ko-->
         </div>
@@ -138,7 +141,10 @@
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools mar-no flex">
-            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+            <p class="report-print-date">
+                <span data-bind="text: reportDate"></span>
+                <span data-bind="text: reportDate"></span>
+            </p>
         </div>
     </div>
 </div>
