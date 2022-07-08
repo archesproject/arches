@@ -425,6 +425,7 @@
                 'groupingErrorTitle': {% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} '{{ groupingErrorTitle|escapejs }}',
                 'groupingErrorMessage': {% trans "The cardinality of this card can't be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} '{{ groupingErrorMessage|escapejs }}',
                 'modelDoesNotExist': {% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} '{{ modelDoesNotExist|escapejs }}',
+                'idColumnSelection': {% trans "Use as an id"  as idColumnSelection %} '{{ idColumnSelection|escapejs }}',
             },
             version: '{{ app_settings.VERSION }}'
         };
