@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         {% if show_language_swtich %}
                         {% get_current_language as LANGUAGE_CODE %}
-                            <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" 
+                            <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;"
                             data-bind='component: {
                                 name: "views/components/language-switcher",
                                 params: {
@@ -127,7 +127,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 }
                             }'></div>
                         {% endif %}
-                        
+
+                        <!-- Search Bar -->
+                        {% if nav.search %}
+                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                            <div class="d-inline" data-placement="bottom" data-toggle="tooltip" style="width: 100px;"data-original-title='{% trans "Search" %}'>
+                                <i class="ion-search"></i>
+                            </div>
+                            <h5 class="d-inline" style="margin-left: -80px;">Search</h5>
+                        </a>
+                        {% endif %}
+
                         <!-- Notifications -->
                         {% if nav.notifs %}
                         <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
@@ -141,15 +151,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </a>
                         {% endif %}
 
-                        <!-- Search Bar -->
-                        {% if nav.search %}
-                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
-                              <i class="ion-search"></i>
-
-                            </div>
-                        </a>
-                        {% endif %}
 
                         <!-- Prov edit history-->
                         {% if user_is_reviewer == False and user_can_edit %}
