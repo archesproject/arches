@@ -71,8 +71,8 @@ define(['utils/set-csrf-token'], function() {
     }
 
     return {
-        ...parsedArchesTranslations,
         ...parsedArchesData,
+        translations: parsedArchesTranslations,
         urls: parsedArchesUrls,
     };
 });

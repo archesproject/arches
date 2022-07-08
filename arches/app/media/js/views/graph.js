@@ -47,7 +47,7 @@ require([
             };
 
             this.viewModel.leaveDropdown = function(){
-                // $('.dropdown').dropdown('toggle');
+                $('.dropdown').dropdown('toggle');
             };
 
             this.viewModel.allGraphs().forEach(function(graph) {
@@ -73,42 +73,52 @@ require([
                     window.open(arches.urls.export_mapping_file(graph.graphid), '_blank');
                 };
                 graph.deleteGraph = function() {
-                    self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
-                        return;
-                    }, function(){
-                        self.viewModel.loading(true);
-                        $.ajax({
-                            type: "DELETE",
-                            url: arches.urls.delete_graph(graph.graphid),
-                            complete: function(response, status) {
-                                self.viewModel.loading(false);
-                                if (status === 'success') {
-                                    self.viewModel.allGraphs.remove(graph);
-                                } else {
-                                    self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                    self.viewModel.alert(new AlertViewModel(
+                        'ep-alert-red', 
+                        arches.translations.confirmGraphDelete.title, 
+                        arches.translations.confirmGraphDelete.text, 
+                        function() {
+                            return;
+                        }, function(){
+                            self.viewModel.loading(true);
+                            $.ajax({
+                                type: "DELETE",
+                                url: arches.urls.delete_graph(graph.graphid),
+                                complete: function(response, status) {
+                                    self.viewModel.loading(false);
+                                    if (status === 'success') {
+                                        self.viewModel.allGraphs.remove(graph);
+                                    } else {
+                                        self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                                    }
                                 }
-                            }
-                        });
-                    }));
+                            });
+                        }
+                    ));
                 };
                 graph.deleteInstances = function() {
-                    self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
-                        return;
-                    }, function(){
-                        self.viewModel.loading(true);
-                        $.ajax({
-                            type: "DELETE",
-                            url: arches.urls.delete_instances(graph.graphid),
-                            complete: function(response, status) {
-                                self.viewModel.loading(false);
-                                if (status === 'success') {
-                                    self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
-                                } else {
-                                    self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                    self.viewModel.alert(new AlertViewModel(
+                        'ep-alert-red', 
+                        arches.translations.confirmAllResourceDelete.title, 
+                        arches.translations.confirmAllResourceDelete.text, 
+                        function() {
+                            return;
+                        }, function(){
+                            self.viewModel.loading(true);
+                            $.ajax({
+                                type: "DELETE",
+                                url: arches.urls.delete_instances(graph.graphid),
+                                complete: function(response, status) {
+                                    self.viewModel.loading(false);
+                                    if (status === 'success') {
+                                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                                    } else {
+                                        self.viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                                    }
                                 }
-                            }
-                        });
-                    }));
+                            });
+                        }
+                    ));
                 };
             });
 
@@ -153,14 +163,16 @@ require([
                                 if (typeof(response[0])) {
                                     response = response[0].join('<br />');
                                 }
-                                self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                                self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.translations.graphImportFailed.title, response));
                             }
                             else {
                                 window.location.reload(true);
                             }
                         },
                         error: function(response) {
-                            self.viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
+                            self.viewModel.alert(
+                                new AlertViewModel('ep-alert-red', arches.translations.graphImportFailed.title, arches.translations.pleaseContactSystemAdministrator)
+                            );
                             self.viewModel.loading(false);
                         },
                     });

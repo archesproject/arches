@@ -165,7 +165,7 @@ define([
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseText));
                     }
                 },
                 complete: function(request, status) {

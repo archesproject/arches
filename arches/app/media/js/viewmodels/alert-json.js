@@ -28,8 +28,8 @@ define(['knockout', 'arches'], function(ko, arches) {
 
     var parseResponseJson = function(responseJSON) {
         responseJSON = initializeResponseJSON(responseJSON);
-        responseJSON.title = getPropertyOrDefaultMessage(responseJSON.title, arches.requestFailed.title);
-        responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, arches.requestFailed.text);
+        responseJSON.title = getPropertyOrDefaultMessage(responseJSON.title, arches.translations.requestFailed.title);
+        responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, arches.translations.requestFailed.text);
 
         return responseJSON;
     };

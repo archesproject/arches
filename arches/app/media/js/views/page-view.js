@@ -68,11 +68,16 @@ define([
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
-                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function() {
-                            self.viewModel.showConfirmNav(false);
-                        }, function() {
-                            self.viewModel.navigate(self.viewModel.navDestination(), true);
-                        }));
+                        self.viewModel.alert(new AlertViewModel(
+                            'ep-alert-blue', 
+                            arches.translations.confirmNav.title, 
+                            arches.translations.confirmNav.text, 
+                            function() {
+                                self.viewModel.showConfirmNav(false);
+                            }, function() {
+                                self.viewModel.navigate(self.viewModel.navDestination(), true);
+                            }
+                        ));
                         return;
                     }
                     self.viewModel.alert(null);

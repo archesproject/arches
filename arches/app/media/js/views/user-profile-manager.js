@@ -113,8 +113,8 @@ define([
                         self.viewModel.alert(
                             new AlertViewModel(
                                 'ep-alert-blue',
-                                arches.twoFactorAuthenticationEmailSuccess.title,
-                                arches.twoFactorAuthenticationEmailSuccess.text,
+                                arches.translations.twoFactorAuthenticationEmailSuccess.title,
+                                arches.translations.twoFactorAuthenticationEmailSuccess.text,
                                 null,
                                 function(){}
                             )
@@ -134,8 +134,8 @@ define([
                 self.viewModel.alert(
                     new AlertViewModel(
                         'ep-alert-blue',
-                        arches.confirmSendTwoFactorAuthenticationEmail.title,
-                        arches.confirmSendTwoFactorAuthenticationEmail.text,
+                        arches.translations.confirmSendTwoFactorAuthenticationEmail.title,
+                        arches.translations.confirmSendTwoFactorAuthenticationEmail.text,
                         function(){},
                         sendTwoFactorAuthenticationEmail,
                     )

@@ -119,31 +119,36 @@ define([
             layer.searchonly(_layer.searchonly);
         };
         layer.delete = function() {
-            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmMaplayerDelete.title, arches.confirmMaplayerDelete.text, function() {
-                return;
-            }, function(){
-                vm.loading(true);
-                $.ajax({
-                    type: "DELETE",
-                    url: window.location.pathname + '/' + layer.maplayerid,
-                    success: function(response) {
-                        mapLayers.remove(layer);
-                        arches.mapLayers = _.without(arches.mapLayers, _.findWhere(arches.mapLayers, {
-                            maplayerid: layer.maplayerid
-                        }));
-                        var selection = null;
-                        var layerList = ko.unwrap(vm.selectedList());
-                        if (layerList && layerList.length > 0) {
-                            selection = layerList[0];
+            pageView.viewModel.alert(new AlertViewModel(
+                'ep-alert-red', 
+                arches.translations.confirmMaplayerDelete.title, 
+                arches.translations.confirmMaplayerDelete.text, 
+                function() {
+                    return;
+                }, function(){
+                    vm.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: window.location.pathname + '/' + layer.maplayerid,
+                        success: function(response) {
+                            mapLayers.remove(layer);
+                            arches.mapLayers = _.without(arches.mapLayers, _.findWhere(arches.mapLayers, {
+                                maplayerid: layer.maplayerid
+                            }));
+                            var selection = null;
+                            var layerList = ko.unwrap(vm.selectedList());
+                            if (layerList && layerList.length > 0) {
+                                selection = layerList[0];
+                            }
+                            vm.selection(selection);
+                            pageView.viewModel.loading(false);
+                        },
+                        error: function(response) {
+                            pageView.viewModel.loading(false);
                         }
-                        vm.selection(selection);
-                        pageView.viewModel.loading(false);
-                    },
-                    error: function(response) {
-                        pageView.viewModel.loading(false);
-                    }
-                });
-            }));
+                    });
+                }
+            ));
         };
     });
 

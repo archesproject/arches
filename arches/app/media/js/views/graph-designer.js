@@ -149,23 +149,28 @@ define([
             };
 
             viewModel.deleteGraph = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
-                    return;
-                }, function(){
-                    viewModel.loading(true);
-                    $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.delete_graph(viewModel.graph.graphid()),
-                        complete: function(response, status) {
-                            viewModel.loading(false);
-                            if (status === 'success') {
-                                window.location = arches.urls.graph;
-                            } else {
-                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmGraphDelete.title, 
+                    arches.translations.confirmGraphDelete.text,
+                    function() {
+                        return;
+                    }, function(){
+                        viewModel.loading(true);
+                        $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                            complete: function(response, status) {
+                                viewModel.loading(false);
+                                if (status === 'success') {
+                                    window.location = arches.urls.graph;
+                                } else {
+                                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                                }
                             }
-                        }
-                    });
-                }));
+                        });
+                    }
+                ));
             };
             viewModel.cloneGraph = function() {
                 newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
@@ -189,14 +194,16 @@ define([
                             if (typeof(response[0])) {
                                 response = response[0].join('<br />');
                             }
-                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.translations.graphImportFailed.title, response));
                         } else {
                             viewModel.loading(false);
                             window.open(arches.urls.graph_designer(response[1].graph_id), '_blank');
                         }
                     },
                     error: function(response) {
-                        viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
+                        viewModel.alert(
+                            new AlertViewModel('ep-alert-red', arches.translations.graphImportFailed.title, arches.translations.pleaseContactSystemAdministrator)
+                        );
                         viewModel.loading(false);
                     },
                 });
@@ -205,23 +212,28 @@ define([
                 $("#fileupload").trigger('click');
             };
             viewModel.deleteInstances = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
-                    return;
-                }, function(){
-                    viewModel.loading(true);
-                    $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.delete_instances(viewModel.graph.graphid()),
-                        complete: function(response, status) {
-                            viewModel.loading(false);
-                            if (status === 'success') {
-                                viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
-                            } else {
-                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmAllResourceDelete.title, 
+                    arches.translations.confirmAllResourceDelete.text, 
+                    function() {
+                        return;
+                    }, function(){
+                        viewModel.loading(true);
+                        $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                            complete: function(response, status) {
+                                viewModel.loading(false);
+                                if (status === 'success') {
+                                    viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                                } else {
+                                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                                }
                             }
-                        }
-                    });
-                }));
+                        });
+                    }
+                ));
             };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
