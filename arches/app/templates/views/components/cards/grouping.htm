@@ -19,7 +19,7 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
-        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="translations.addNew"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
@@ -125,20 +125,22 @@
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
-        <span>{% trans 'Showing edits by' %}</span>
+        <span data-bind="text: translations.showingEditsBy"></span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
+            <span data-bind="text: translations.returnToApprovedEdits"></span>
+        </a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+            <span data-bind="text: translations.newProvisionalContribution"></span>
         <!-- /ko-->
     </div>
     <!-- /ko-->
 
     <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
     <div class="edit-message-container approved">
-        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+        <span data-bind="text: translations.showingMostRecentApprovedEdits"></span>
     </div>
     <!-- /ko-->
 
@@ -149,8 +151,16 @@
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
-                <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
-                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}"><span>{% trans 'Delete all edits' %}</span></div>
+                <div class='new-provisional-edits-title'>
+                    <span data-bind="text: translations.provisionalEdits"></span>
+                </div>
+                <div 
+                    class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" 
+                    style="padding: 3px;" 
+                    data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}"
+                >
+                    <span data-bind="text: translations.deleteAllEdits"></span>
+                </div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
@@ -179,7 +189,10 @@
             <!-- /ko -->
             <!-- ko if: card.model.helpenabled -->
             <span>
-                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
+                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> 
+                    <span data-bind="text: translations.help"></span>
+                    <i class="fa fa-question-circle"></i>
+                </a>
             </span>
             <!-- /ko -->
             <h5 data-bind="text: card.model.instructions"></h5>
@@ -266,18 +279,26 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: previouslySaved() && self.deleteTiles -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }"><span>{% trans 'Delete this record' %}</span></button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">
+                        <span data-bind="text: translations.deleteThisRecord"></span>
+                    </button>
                 <!-- /ko -->
                 <!-- ko if: dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: resetTiles"><span>{% trans 'Cancel edit' %}</span></button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: resetTiles">
+                            <span data-bind="text: translations.cancelEdit"></span>
+                        </button>
                     <!-- /ko -->
                     <!-- ko if: previouslySaved -->
-                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }"><span>{% trans 'Save edit' %}</span></button>
+                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
+                            <span data-bind="text: translations.saveEdit"></span>
+                        </button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !previouslySaved()-->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }"><span>{% trans 'Add'  %}</span></button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
+                        <span data-bind="text: translations.add"></span>
+                    </button>
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
@@ -319,7 +340,9 @@
                     {% block report_widgets %}
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
-                            <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                            <div class="report-card-provisional-flag">
+                                <span data-bind="text: translations.pendingProvisionalData"></span>
+                            </div>
                             <!-- /ko-->
                             <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
                                 <!-- ko if: widget.visible -->
@@ -363,10 +386,11 @@
         <!-- ko if: !hasTiles && !self.preview -->
         <div class="row rp-report-tile rp-no-data">
             <!-- ko ifnot: card.model.get('cardid') -->
-            {% trans "Sorry, you don't have access to this information" %}
+                <span data-bind="text: translations.noAccessInformation"></span>
             <!-- /ko -->
             <!-- ko if: card.model.get('cardid') -->
-            <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>
+            <span data-bind="text: translations.noDataAddedYet"></span>
+            <span data-bind="text: card.model.get('name')"></span>
             <!-- /ko -->
         </div>
         <!-- /ko -->
@@ -376,6 +400,6 @@
 
 {% block config %}
 <div>
-    <select class="resources" multiple data-placeholder="{% trans "Choose a sibling card..." %}" data-bind="selectedOptions: groupedCardIds, options: siblingCards, optionsText: 'name', optionsValue: 'id', chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}"></select>
+    <select class="resources" multiple data-placeholder="translations.chooseASiblingCard + '...'" data-bind="selectedOptions: groupedCardIds, options: siblingCards, optionsText: 'name', optionsValue: 'id', chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}"></select>
 </div>
 {% endblock config %}
