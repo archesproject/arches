@@ -18,7 +18,9 @@
                     <!-- ko if: tile.parent.model.get('widgets')().length > 0 -->
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
-                            <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                            <div class="report-card-provisional-flag">
+                                <span data-bind="text: translations.pendingProvisionalData"></span>
+                            </div>
                             <!-- /ko-->
                             <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
                                 <!-- ko foreach: { data: tile.parent.model.get('widgets'), as: 'widget' } -->
@@ -82,13 +84,13 @@
         <!-- ko if: card.tiles().length === 0 && !self.preview && !card.hideEmptyNodes -->
         <div class="row rp-report-tile rp-no-data">
             <!-- ko ifnot: card.model.get('cardid') -->
-            {% trans "Sorry, you don't have access to this information" %}
+                <span data-bind="text: translations.noAccessInformation"></span>
             <!-- /ko -->
             <!-- ko if: card.model.get('cardid') -->
             <div style="display: inline-flex; width: 100%; justify-content: space-between;" data-bind="event : { dblclick: function(){$parent.revealForm(card)}}">
             <div>
-            <span>{% trans "No data added yet for " %}</span>
-            <span data-bind="text: card.model.get('name')"></span>
+                <span data-bind="text: translations.noDataAddedYet"></span>
+                <span data-bind="text: card.model.get('name')"></span>
             </div>
             <!-- ko if: $parent.inResourceEditor -->
             <div class="rp-edit-buttons" style="justify-content: flex-end;">
