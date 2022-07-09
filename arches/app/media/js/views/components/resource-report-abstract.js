@@ -13,6 +13,7 @@ define([
         var self = this;
         var CardViewModel = require('viewmodels/card');
 
+        this.translations = arches.translations;
         this.loading = ko.observable(true);
 
         this.version = arches.version;
