@@ -1,3 +1,4 @@
+import ast
 import csv
 from datetime import datetime
 import json
@@ -276,6 +277,11 @@ class ImportSingleCsv(BaseImportModule):
                             datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                             datatype_instance = self.datatype_factory.get_instance(datatype)
                             source_value = row[key]
+                            if datatype == "string":
+                                try:
+                                    source_value = ast.literal_eval(source_value)
+                                except:
+                                    pass
                             if datatype == "file-list":
                                 config = current_node.config
                                 config["path"] = temp_dir
