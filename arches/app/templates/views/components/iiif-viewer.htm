@@ -12,7 +12,7 @@
     'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-image"></i>
-    <span class="map-sidebar-text">{% trans "Image" %}</span>
+    <span data-bind="text: translations.image" class="map-sidebar-text"></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('annotations');
@@ -21,42 +21,56 @@
     'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-list"></i>
-    <span class="map-sidebar-text">{% trans "Overlays" %}</span>
+    <span data-bind="text: translations.overlays" class="map-sidebar-text"></span>
 </div>
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'imageTools' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Image Tools" %}</h4>
+    <h4 
+        class="workbench-card-sidepanel-header" 
+        data-bind="
+            text: translations.imageTools,
+            click: hideSidePanel
+        "
+    ></h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 <div class="workbench-card-sidepanel-body">
 <div class="iiif-image-tools">
     <div data-bind="if: showModeSelector" class="layout">
-        <div>Panel Layout</div>
+        <div>
+            <span data-bind="text: translations.panelLayout"></span>
+        </div>
         <div class="mode-selector">
             <div data-bind="click: function(){ compareMode(false); return true; }, css: { selected: !compareMode() }">
                 <div class="selector-button"></div>
-                <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio"> Single Panel
+                <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio">
+                <span data-bind="text: translations.singlePanel"></span>
             </div>
             <div data-bind="click: function(){ compareMode(true); return true; }, css: { selected: compareMode() }">
                 <div>
                     <div class="selector-button"></div>
                     <div class="selector-button"></div>
                 </div>
-                <input name="panelGroup" value="double" type="radio" data-bind="checked: panelRadio"> Double Panel
+                <input name="panelGroup" value="double" type="radio" data-bind="checked: panelRadio">
+                <span data-bind="text: translations.doublePanel"></span>
             </div>
         </div>
 
         <div class="panel-selector">
-            Selected Panel Layout
+            <span data-bind="text: translations.selectedPanelLayout"></span>
             <div class="selector">
                 <div data-bind="css: { selected: selectPrimaryPanel() }">
-                    <div data-bind="click: function(){selectPrimaryPanel(true)}" class="primary" >Panel 1</div>
+                    <div data-bind="click: function(){selectPrimaryPanel(true)}" class="primary">
+                        <span data-bind="text: translations.panelOne"></span>
+                    </div>
                 </div>
                 <div data-bind="css: { selected: !selectPrimaryPanel() }, if: compareMode()">
-                    <div class="secondary" data-bind="click: function(){selectPrimaryPanel(false)}">Panel 2</div>
+                    <div class="secondary" data-bind="click: function(){selectPrimaryPanel(false)}">
+                        <span data-bind="text: translations.panelTwo"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,7 +87,7 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-lightbulb-o"></i>
-            {% trans "Brightness" %}
+            <span data-bind="text: translations.brightness"></span>
         </div>
         <div class="iiif-image-tool-slider-wrap">
             <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
@@ -85,7 +99,7 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-adjust"></i>
-            {% trans "Contrast" %}
+            <span data-bind="text: translations.contrast"></span>
         </div>
         <div class="iiif-image-tool-slider-wrap">
             <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
@@ -97,7 +111,7 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-eyedropper"></i>
-            {% trans "Saturation" %}
+            <span data-bind="text: translations.saturation"></span>
         </div>
         <div class="iiif-image-tool-slider-wrap">
             <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
@@ -109,18 +123,22 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-image"></i>
-            {% trans "Greyscale" %}
+            <span data-bind="text: translations.greyscale"></span>
         </div>
         <div class="toggle-container">
             <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
             <div style="display:flex; flex-direction:row;">
-                <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">{% trans "Display as greyscale" %}</div>
+                <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">
+                    <span data-bind="text: translations.displayAsGreyscale"></span>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="install-buttons">
-        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings"><span>{% trans 'Reset to defaults' %}</span></button>
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">
+            <span data-bind="text: translations.resetToDefaults"></span>
+        </button>
     </div>
 </div>
 </div>
@@ -128,7 +146,7 @@
 <!--ko if: activeTab() === 'annotations' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        {% trans "Annotation Overlays" %}
+        <span data-bind="text: translations.annotationOverlays"></span>
     </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
@@ -199,7 +217,7 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-lightbulb-o"></i>
-                {% trans "Brightness" %}
+                <span data-bind="text: translations.brightness"></span>
             </div>
             <div class="iiif-image-tool-slider-wrap">
                 <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
@@ -211,7 +229,7 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-adjust"></i>
-                {% trans "Contrast" %}
+                <span data-bind="text: translations.contrast"></span>
             </div>
             <div class="iiif-image-tool-slider-wrap">
                 <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
@@ -223,7 +241,7 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-eyedropper"></i>
-                {% trans "Saturation" %}
+                <span data-bind="text: translations.saturation"></span>
             </div>
             <div class="iiif-image-tool-slider-wrap">
                 <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
@@ -235,12 +253,14 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-image"></i>
-                {% trans "Greyscale" %}
+                <span data-bind="text: translations.greyscale"></span>
             </div>
             <div class="toggle-container">
                 <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
                 <div style="display:flex; flex-direction:row;">
-                    <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">{% trans "Display as greyscale" %}</div>
+                    <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">
+                        <span data-bind="text: translations.displayAsGreyscale"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -250,7 +270,9 @@
         'gallery-visible': showGallery,
         'gallery-expanded': expandGallery,
     }">
-    <h3>{% trans "Show Gallery" %}</h3>
+    <h3>
+        <span data-bind="text: translations.showGallery"></span>
+    </h3>
 </div>
 <!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: selectPrimaryPanel() ? canvas: secondaryCanvas, getAnnotationCount: getAnnotationCount} -->
 <div class="iiif-viewer-gallery" data-bind="css: {
@@ -262,10 +284,12 @@
         <!--ko if: manifestData() -->
         <div class="panel-controls">
             <div class="hide-gallery-control" data-bind="click: toggleGallery">
-                <span>{% trans "Hide Gallery" %}</span>
+                <span data-bind="text: translations.hideGallery"></span>
             </div>
             <div data-bind="if: showModeSelector"  class="mode-selector">
-                <div>Panels</div>
+                <div>
+                    <span data-bind="text: translations.panels"></span>
+                </div>
                 <div class="mode-selector-buttons" >
                     <div class="single-panel" data-bind="click: function(){compareMode(false)}, css: {selected: !compareMode()}">
                         <div></div>
@@ -276,8 +300,12 @@
                     </div>
                 </div>
                 <div class="panel-selector-buttons">
-                    <div data-bind="click: function(){selectPrimaryPanel(true)}, css: { selected: selectPrimaryPanel() }">{% trans "Panel 1" %}</div>
-                    <div data-bind="click: function(){selectPrimaryPanel(false)}, css: { selected: !selectPrimaryPanel(), hide: !compareMode() }">{% trans "Panel 2" %}</div>
+                    <div data-bind="click: function(){selectPrimaryPanel(true)}, css: { selected: selectPrimaryPanel() }">
+                        <span data-bind="text: translations.panelOne"></span>
+                    </div>
+                    <div data-bind="click: function(){selectPrimaryPanel(false)}, css: { selected: !selectPrimaryPanel(), hide: !compareMode() }">
+                        <span data-bind="text: translations.panelTwo"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -306,7 +334,7 @@
         <!--ko if: editManifest() -->
         <div class="manifest-editor">
             <div class="manifest-editor-label">
-                {% trans "Select a manifest:" %}
+                <span data-bind="text: translations.selectAManifest + ':'"></span>
             </div>
             <div class="manifest-editor-input">
                 <input class="form-control input-lg widget-input"
@@ -320,20 +348,26 @@
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
                     disabled: manifestLoading(),
                     css: { 'disabled': manifestLoading() }
-                "><span>{% trans 'Load manifest' %}</span></button>
+                ">
+                    <span data-bind="text: translations.loadManifest"></span>
+                </button>
                 <!--ko if: manifestData() -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor"><span>{% trans 'Cancel' %}</span></button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">
+                    <span data-bind="text: translations.cancel"></span>
+                </button>
                 <!--/ko -->
                 <!--ko if: manifestLoading() -->
-                <span class="manifest-editor-loading">
-                    {% trans "Loading manifest..." %}
-                </span>
+                <span 
+                    class="manifest-editor-loading"
+                    data-bind="text: translations.loadingManifest + '...'"
+                ></span>
                 <!--/ko -->
                 <!--ko if: manifestError() -->
                 <span data-bind="text: console.log(manifestError())"></span>
-                <span class="manifest-editor-error">
-                    {% trans "Error loading manifest..." %}
-                </span>
+                <span 
+                    class="manifest-editor-error"
+                    data-bind="text: translations.errorLoadingManifest + '...'"
+                ></span>
                 <!--/ko -->
             </div>
         </div>
@@ -342,9 +376,10 @@
         <!--/ko -->
         <!--ko if: !editManifest() -->
             <!--ko if: manifestLoading() -->
-            <span class="manifest-editor-loading">
-                {% trans "Loading manifest..." %}
-            </span>
+            <span 
+                class="manifest-editor-loading"
+                data-bind="text: translations.loadingManifest + '...'"
+            ></span>
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
             <div class="iiif-gallery-panel" style="overflow-x: auto;">
@@ -352,28 +387,39 @@
                     <div style="display: flex; align-items: center">
                         {% block gallery_header %}
                         <div>
-                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : {% quoted_trans "No manifest selected..." %}"></span>
+                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : translations.noManifestSelected"></span>
                         </div>
                         <div>
                             <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
                                 <!-- ko if: !expandGallery() -->
-                                {% trans "Info" %}
+                                    <span data-bind="text: translations.info"></span>
                                 <!-- /ko -->
                                 <!-- ko if: expandGallery() -->
-                                {% trans "Close" %}
+                                    <span data-bind="text: translations.close"></span>
                                 <!-- /ko -->
                             </span>
                         </div>
                         <div>
-                            <span class="iiif-gallery-sequence-label" data-bind="click: toggleManifestEditor">
-                                {% trans "Switch Image Service" %}
-                            </span>
+                            <span 
+                                class="iiif-gallery-sequence-label" 
+                                data-bind="
+                                    text: translations.switchImageService,
+                                    click: toggleManifestEditor
+                                "
+                            ></span>
                         </div>
                         <div>
-                            <span>{% trans "Filter" %}</span>
+                            <span data-bind="text: translations.filter"></span>
                             <div class="list-filter" data-bind="">
-                                <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
-
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    style="width: 100%;" 
+                                    data-bind="
+                                        textInput: filter,
+                                        attr: {placeholder: translations.filterImages + '...'}
+                                    "
+                                >
                                 <!-- Clear Search -->
                                 <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                             </div>
@@ -400,7 +446,8 @@
                                     <span data-bind="text: label"></span>
                                     <span class="annotation-count">
                                         <!--ko if: getAnnotationCount(getCanvasService($data)) -->
-                                        <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}
+                                        <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span>
+                                        <span data-bind="text: translations.annotations"></span>
                                         <!--/ko -->
                                         <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
                                         &nbsp;
