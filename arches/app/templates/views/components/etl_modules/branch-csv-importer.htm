@@ -30,12 +30,12 @@
                     </div>
                     <!-- ko if: selectedTemplate() -->
                     <button style="border-top: 1px solid #c4c4c4; margin: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: downloadTemplate" >
-                        {% trans 'Download' %}
+                        <span>{% trans 'Download' %}</span>
                     </button>
                     <!-- /ko -->
-                </div>
-                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode" role="button">
-                    {% trans 'Upload .zip File' %}
+                    <div style="border-top: 1px solid #c4c4c4; margin-top: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode" role="button">
+                        <span>{% trans 'Upload .zip File' %}</span>
+                    </div>
                 </div>
             </div>
             <div data-bind="dropzone: dropzoneOptions, visible: !downloadMode()">
@@ -100,8 +100,12 @@
         </div>
 
         <div  class="tabbed-workflow-footer, etl-module-footer">
-           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Submit" %}</button>
-           <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){ response(null); }">{% trans "Cancel" %}</button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">
+                <span>{% trans "Submit" %}</span>
+            </button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){ response(null); }">
+                <span>{% trans "Cancel" %}</span>
+            </button>
         </div>
         <!-- /ko -->
     </div>
