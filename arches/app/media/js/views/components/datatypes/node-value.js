@@ -8,6 +8,7 @@ define([
     var name = 'node-value-datatype-config';
     const viewModel = function(params) {
         var self = this;
+        this.translations = arches.translations;
         this.nodes = [{
             id: null,
             name: ko.observable('')

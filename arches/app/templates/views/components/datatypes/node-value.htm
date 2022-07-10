@@ -4,12 +4,12 @@
 <!-- ko if: !$data.search && $data.graph -->
 <div class="node-widget-label pad-btm">
     <div class="control-label">
-        {% trans "Related Node" %}
+        <span data-bind="text: translations.relatedNode"></span>
     </div>
     <div>
         <select data-bind="
             disable: isEditable === false,
-            placeholder: {% quoted_trans "Select a node" %},
+            placeholder: translations.selectANode,
             value: config.nodeid,
             options: nodes,
             optionsText: 'name',
@@ -22,12 +22,12 @@
 </div>
 <div class="node-widget-label pad-btm">
     <div class="control-label">
-        {% trans "Relationship to Node" %}
+        <span data-bind="text: translations.relationshipToNode"></span>
     </div>
     <div data-bind="if: properties().length > 0">
         <select data-bind="
             disable: isEditable === false,
-            placeholder: {% quoted_trans "Select a property" %},
+            placeholder: translations.selectAProperty,
             value: config.property,
             options: properties,
             optionsText: 'name',

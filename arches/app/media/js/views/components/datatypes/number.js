@@ -1,11 +1,13 @@
 define([
     'knockout',
+    'arches',
     'templates/views/components/datatypes/number.htm',
-], function(ko, numberDatatypeTemplate) {
+], function(ko, arches, numberDatatypeTemplate) {
     var name = 'number-datatype-config';
     const viewModel = function(params) {
         var self = this;
         this.search = params.search;
+        this.translations = arches.translations;
         if (this.search) {
             var filter = params.filterValue();
             this.op = ko.observable(filter.op || '');

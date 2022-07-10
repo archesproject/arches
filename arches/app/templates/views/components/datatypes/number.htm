@@ -7,8 +7,12 @@
         <option value="lt"> &lt; </option>
         <option value="gte"> &ge; </option>
         <option value="lte"> &le; </option>
-        <option value="null">{% trans "Has no value" %}</option>
-        <option value="not_null">{% trans "Has any value" %}</option>
+        <option value="null">
+            <span data-bind="text: translations.hasNoValue"></span>
+        </option>
+        <option value="not_null">
+            <span data-bind="text: translations.hasAnyValue"></span>
+        </option>
     </select>
 </div>
 

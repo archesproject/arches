@@ -3,15 +3,30 @@
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="~">{% trans "Like" %}</option>
-        <option value="!~">{% trans "Not like" %}</option>
-        <option value="=">{% trans "Equals" %}</option>
-        <option value="!=">{% trans "Not" %}</option>
+        <option value="~">
+            <span data-bind="text: translations.like"></span>
+        </option>
+        <option value="!~">
+            <span data-bind="text: translations.notLike"></span>
+        </option>
+        <option value="=">
+            <span data-bind="text: translations.equals"></span>
+        </option>
+        <option value="!=">
+            <span data-bind="text: translations.not"></span>
+        </option>
     </select>
 </div>
 
 <div class="col-md-8 col-lg-9">
-    <input type="text" placeholder="{% trans "Name" %}" class="form-control input-lg" style="height: 36px;"
-        data-bind="textInput: searchValue">
+    <input 
+        type="text"  
+        class="form-control input-lg" 
+        style="height: 36px;"
+        data-bind="
+            attr: {placeholder: translations.name},
+            textInput: searchValue
+        "
+    >
 </div>
 <!-- /ko -->
