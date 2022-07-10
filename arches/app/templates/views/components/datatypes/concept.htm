@@ -4,10 +4,20 @@
 <!-- ko ifnot: $data.search -->
 <div class="node-config-item">
     <div class="control-label">
-        {% trans "Concept Collection" %}
+        <span data-bind="text: translations.conceptCollection"></span>
     </div>
     <div data-bind="if: conceptCollections().length > 0">
-        <select data-bind="disable: isEditable === false, placeholder: {% quoted_trans "Select a concept collection" %}, value: topConcept, options: conceptCollections , optionsText: 'label', optionsValue: 'id', chosen: {width: '100%', allow_single_deselect: true}"></select>
+        <select 
+            data-bind="
+                disable: isEditable === false, 
+                placeholder: trans.selectAConceptCollection, 
+                value: topConcept, 
+                options: conceptCollections, 
+                optionsText: 'label', 
+                optionsValue: 'id', 
+                chosen: {width: '100%', allow_single_deselect: true}
+            "
+        ></select>
     </div>
 </div>
 <!-- /ko -->
@@ -15,10 +25,18 @@
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="">{% trans "Equals" %}</option>
-        <option value="!">{% trans "Not" %}</option>
-        <option value="null">{% trans "Has no value" %}</option>
-        <option value="not_null">{% trans "Has any value" %}</option>
+        <option value="">        
+            <span data-bind="text: translations.equals"></span>
+        </option>
+        <option value="!">
+            <span data-bind="text: translations.not"></span>
+        </option>
+        <option value="null">
+            <span data-bind="text: translations.hasNoValue"></span>
+        </option>
+        <option value="not_null">
+            <span data-bind="text: translations.hasAnyValue"></span>
+        </option>
     </select>
 </div>
 
