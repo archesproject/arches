@@ -12,6 +12,7 @@ define([
 ], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, relatedResourcesMapTemplate) {
     var viewModel = function(params) {
         var self = this;
+        this.translations = arches.translations;
 
         this.widgets = [];
         params.configKeys = [
