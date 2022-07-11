@@ -14612,7 +14612,7 @@ ul.select2-choices:after {
 
 .csv-mapping-table-container {
     overflow: auto;
-    width: inherit;
+    width: calc(100vw - 100px);
     margin-top: 10px;
     margin-bottom: 5px;
     border: 1px solid rgba(0,0,0,0.14);
