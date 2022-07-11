@@ -143,6 +143,10 @@ class ArchesFileReader(Reader):
                     new_values = {"resourceinstanceid": resourceinstanceid, "createdtime": datetime.datetime.now()}
                     new_values.update(defaults)
                     if overwrite == "overwrite":
+                        try:
+                            Resource.objects.get(resourceinstanceid=resourceinstanceid).delete()
+                        except Resource.DoesNotExist:
+                            pass
                         resourceinstance = Resource(**new_values)
                     else:
                         try:

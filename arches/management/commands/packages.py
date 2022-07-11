@@ -294,7 +294,7 @@ class Command(BaseCommand):
                 options["create_concepts"],
                 use_multiprocessing=options["use_multiprocessing"],
                 force=options["yes"],
-                prevent_indexing=prevent_indexing,
+                prevent_indexing=defer_indexing,
             )
             if defer_indexing:
                 # index concepts if new concepts created

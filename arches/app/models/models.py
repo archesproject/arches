@@ -1196,7 +1196,7 @@ class MapLayer(models.Model):
     zoom = models.FloatField(blank=True, null=True)
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
-    sortorder = models.IntegerField(null=True)
+    sortorder = models.IntegerField(blank=True, null=True)
 
     @property
     def layer_json(self):
