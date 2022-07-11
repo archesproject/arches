@@ -1,15 +1,18 @@
 define([
     'jquery',
     'underscore',
+    'arches',
     'views/components/search/base-filter',
     'knockout',
     'templates/views/components/search/sort-results.htm',
     'chosen',
-], function($, _, BaseFilter, ko, sortResultsTemplate) {
+], function($, _, arches, BaseFilter, ko, sortResultsTemplate) {
     var componentName = 'sort-results';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Sort Results';
+
+            this.translations = arches.translations;
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter = ko.observable('asc');

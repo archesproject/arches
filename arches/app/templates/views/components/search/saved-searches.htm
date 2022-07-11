@@ -11,11 +11,14 @@
             </div>
 
             <!-- Splash Title -->
-            <div class="rr-splash-title">{% trans "Saved Search" %}</div>
+            <div class="rr-splash-title">
+                <span data-bind="text: translations.savedSearch"></span>
+            </div>
 
             <!-- Splash Instructions -->
-            <div class="rr-splash-description">{% trans "The Arches site administrator" %}</div>
-            <div class="rr-splash-description">{% trans "hasn't saved any searches yet." %}</div>
+            <div class="rr-splash-description">
+                <span data-bind="text: translations.noSavedSearches"></span>
+            </div>
         </div>
     </div>
 

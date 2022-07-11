@@ -8,6 +8,8 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: async function(options) {
             options.name = 'Resource Type Filter';
+
+            this.translations = arches.translations;
             this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
             this.resourceModels = ko.observableArray();

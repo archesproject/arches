@@ -18,8 +18,8 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
-
-            this.dependenciesLoaded = ko.observable(false)
+            this.translations = arches.translations;
+            this.dependenciesLoaded = ko.observable(false);
 
             require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
                 self.mapboxgl = mapbox;

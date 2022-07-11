@@ -1,4 +1,5 @@
-define(['knockout', 
+define([
+    'knockout', 
     'arches',
     'views/resource/related-resources-manager',
     'views/components/search/base-filter',
@@ -9,6 +10,8 @@ define(['knockout',
     const viewModel = BaseFilter.extend ({
         initialize: function(options) {
             options.name = 'Related Resources Filter';
+
+            this.translations = arches.translations;
             this.requiredFilters = ['search-results'];
             BaseFilter.prototype.initialize.call(this, options);
             this.ready = ko.observable(false);

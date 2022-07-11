@@ -13,6 +13,7 @@ define([
         initialize: function(options) {
             var self = this;
             options.name = 'Advanced Search Filter';
+            this.translations = arches.translations;
             BaseFilter.prototype.initialize.call(this, options);
             this.urls = arches.urls;
             this.tagId = "Advanced Search";

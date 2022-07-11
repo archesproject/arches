@@ -26,11 +26,14 @@
                 </div>
 
                 <!-- Splash Title -->
-                <div class="rr-splash-title">{% trans "Resource Details" %}</div>
+                <div class="rr-splash-title">
+                    <span data-bind="text: translations.resourceDetails"></span>
+                </div>
 
                 <!-- Splash Instructions -->
-                <div class="rr-splash-description">{% trans "Click the 'Details' link on a search result from the list on the left" %}</div>
-                <div class="rr-splash-description">{% trans "to view more information about a resource." %}</div>
+                <div class="rr-splash-description">
+                    <span data-bind="text: translations.resourceDetailsText"></span>
+                </div>
             </div>
         </div>
         <!--/ko-->

@@ -1,12 +1,12 @@
-define(['jquery',
+define([
+    'jquery',
     'knockout',
     'arches',
     'templates/views/components/search/search-export.htm',
     'bindings/fadeVisible',
     'bindings/clipboard',
     'views/components/simple-switch',
-],
-function($, ko, arches, searchExportTemplate) {
+], function($, ko, arches, searchExportTemplate) {
     var componentName = 'search-export';
     const viewModel = function(params) {
         var self = this;

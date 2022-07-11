@@ -1,12 +1,14 @@
 define([
     'knockout',
+    'arches',
     'views/components/search/base-filter',
     'templates/views/components/search/provisional-filter.htm',
-], function(ko, BaseFilter, provisionalFilterTemplate) {
+], function(ko, arches, BaseFilter, provisionalFilterTemplate) {
     var componentName = 'provisional-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Provisional Filter';
+            this.translations = arches. translations;
             this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = ko.observableArray();
