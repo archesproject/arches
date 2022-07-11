@@ -9462,7 +9462,19 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
+    display: flex; 
+    flex-direction: column;
     z-index: 15;
+}
+
+.debug-notice {
+    padding-bottom: 4px;
+    padding-right: 2px;
+    font-size: x-small;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #navbar {
