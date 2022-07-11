@@ -26,7 +26,7 @@
         <div class="map-service-manage-buttons">
             <div class="form-group">
                 <label class="control-label text-semibold">
-                    <span data-bind="text: translations.activated"></span> 
+                    <span data-bind="text: translations.activated + ':'"></span> 
                 </label>
                 <span class="switch switch-small" data-bind="css: {
                         'on': config.layerActivated()
@@ -111,7 +111,7 @@
                                 <div class="panel-body">
                                     <div class="form-group map-service-manage-layer-name">
                                         <label class="col-sm-3 map-service-manage-control-label">
-                                            <span data-bind="text: translations.layerName"></span> 
+                                            <span data-bind="text: translations.layerName + ':'"></span> 
                                         </label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
@@ -146,7 +146,7 @@
                                     <div class="form-group">
                                         <div style="padding:15px;">
                                             <div class="row" style="padding-bottom: 10px;">
-                                                <span data-bind="text: translations.legendContent"></span> 
+                                                <span data-bind="text: translations.legendContent + ':'"></span> 
                                             </div>
                                             <div class="row">
                                                 <textarea rows="10" cols="80" data-bind="ckeditor: config.layerLegend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
@@ -162,7 +162,7 @@
                         <div class="row service-widget-container">
                             <div class="advanced-map-style-switch">
                                 <label class="control-label text-semibold">
-                                    <span data-bind="text: translations.advanced"></span> 
+                                    <span data-bind="text: translations.advanced + ':'"></span> 
                                 </label>
                                 <span class="switch switch-small" data-bind="css: {
                                         'on': config.advancedStyling()
