@@ -15,6 +15,7 @@ define([
 
     function NonTileBasedComponent() {
         var self = this;
+        this.translations = arches.translations;
 
         this.initialize = function() {
             self.loading(false);
@@ -40,6 +41,7 @@ define([
 
     function TileBasedComponent() {
         var self = this;
+        this.translations = arches.translations;
 
         this.tile = ko.observable();
         this.tiles = ko.observable();
@@ -281,6 +283,7 @@ define([
 
     function AbstractCardAdapter() {  // CURRENTLY IN DEVLEOPMENT, USE AT YOUR OWN RISK!
         var self = this;
+        this.translations = arches.translations;
 
         this.cardinality = ko.observable();
 
@@ -321,6 +324,8 @@ define([
 
     function MultipleTileBasedComponent(title) {
         var self = this;
+        this.translations = arches.translations;
+
         TileBasedComponent.apply(this);
 
         this.tileLoadedInEditor = ko.observable();
@@ -565,6 +570,7 @@ define([
 
     function WorkflowComponentAbstract(params) {
         var self = this;
+        this.translations = arches.translations;
 
         this.workflowId = params.workflowId;
         this.componentData = params.componentData;

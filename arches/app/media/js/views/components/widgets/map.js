@@ -15,6 +15,7 @@ define([
     'bindings/color-picker',
 ], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel, mapWidgetTemplate) {
     var viewModel = function(params) {
+        this.translations = arches.translations;
         this.context = params.type;
 
         this.summaryDetails = [];

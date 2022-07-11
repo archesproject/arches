@@ -18,17 +18,25 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Default Manifest URL" %}
+    <span data-bind="text: translations.defaultManifestUrl"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
-    <input type="" placeholder="{% trans "Enter manifest URL" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultManifest">
+    <input 
+        type="" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: translations.enterManifestUrl},
+            textInput: defaultManifest
+        "
+    >
 </div>
 {% endblock config_form %}
 
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko if: canvasConfigs.length === 0 -->
-<dd data-bind="text: displayValue() || {% quoted_trans "None" %}"></dd>
+<dd data-bind="text: displayValue() || translations.none"></dd>
 <!-- /ko -->
 <!-- ko if: canvasConfigs.length > 0 -->
 <div class="iiif-widget-report">
@@ -40,5 +48,6 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: displayValue()"></span> {% trans "annotation(s)" %}
+<span data-bind="text: displayValue()"></span>
+<span data-bind="text: translations.annotations"></span>
 {% endblock display_value %}

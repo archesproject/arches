@@ -10,6 +10,8 @@ define([
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
             var self = this;
+
+            this.translations = arches.translations;
             this.instancePermissions = ko.observable();
             this.resourceId = params.resourceId();
             this.alert = params.alert;

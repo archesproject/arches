@@ -31,17 +31,21 @@
 {% block config_form %}
 <div>
     <div class="control-label">
-        {% trans "Placeholder" %}
+        <span data-bind="text: translations.placeholder"></span>
     </div>
     <div class="col-xs-12 pad-no crud-widget-container">
-        <input placeholder="{% trans "Placeholder" %}"
+        <input 
             class="form-control input-md widget-input"
-            data-bind="value: placeholder, valueUpdate: 'keyup'">
+            data-bind="
+                attr: {placeholder: translations.placeholder},
+                value: placeholder, 
+                valueUpdate: 'keyup'"
+            >
     </div>
     <div class="node-widget-label">
         <div class="form-group">
             <div class="control-label">
-                {% trans "Default Value" %}
+                <span data-bind="text: translations.defaultValue"></span>
             </div>
 
             <div class="col-xs-12">
@@ -52,7 +56,7 @@
                             data: options,
                             value: defaultValue,
                             multiple: multiple,
-                            placeholder: {% quoted_trans "Select default value" %},
+                            placeholder: translations.selectDefaultValue,
                             allowClear: true
                         }
                     }">

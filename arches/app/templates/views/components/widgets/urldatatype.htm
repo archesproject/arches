@@ -8,20 +8,26 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="control-label">
-            <label class="control-label widget-input-label" for="">Link text (Optional)</label>
+            <label class="control-label widget-input-label" for="">
+                <span data-bind="text: translations.linkText"></span>
+            </label>
         </div>
         <div class="col-xs-12">
             <input type="string" data-bind="textInput: url_label, attr: {placeholder: url_label_placeholder}" class="form-control input-lg widget-input" style="margin-bottom: 5px">
         </div>
         <div class="control-label">
-            <label class="control-label widget-input-label" for="">URL for link</label>
+            <label class="control-label widget-input-label" for="">
+                <span data-bind="text: translations.urlForLink"></span>
+            </label>
         </div>
         <div class="col-xs-12">
             <input type="string" data-bind="textInput: url, attr: {placeholder: url_placeholder}" class="form-control
             input-lg widget-input" style="margin-bottom: 5px">
         </div>
         <div class="col-xs-12">
-            <label class="control-label widget-input-label" for="">Preview</label>
+            <label class="control-label widget-input-label" for="">
+                <span data-bind="text: translations.preview"></span>
+            </label>
             <div style='margin-bottom:2px'>
                 <a target="_blank" data-bind="attr: {href: url}, style: { color: link_color }">
                     <span data-bind="text: urlPreviewText()"></span>
@@ -35,21 +41,21 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "URL Placeholder" %}
+    <span data-bind="text: translations.urlPlaceholder"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input"
     data-bind="textInput: url_placeholder">
 </div>
 <div class="control-label">
-    {% trans "URL Label Placeholder" %}
+    <span data-bind="text: translations.urlLabelPlaceholder"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input"
     data-bind="textInput: url_label_placeholder">
 </div>
 <div class="control-label">
-    {% trans "URL Link color" %}
+    <span data-bind="text: translations.urlLinkColor"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input"

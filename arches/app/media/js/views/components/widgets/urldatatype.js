@@ -1,12 +1,15 @@
 define([
     'knockout', 
+    'arches',
     'viewmodels/widget',
     'templates/views/components/widgets/urldatatype.htm',
-], function(ko, WidgetViewModel, urlDatatypeWidgetTemplate) {
+], function(ko, arches, WidgetViewModel, urlDatatypeWidgetTemplate) {
     var name = 'urldatatype';
     const viewModel = function(params) {
         params.configKeys = ['url_placeholder','url_label_placeholder','link_color'];
         params.valueProperties = ['url', 'url_label'];
+
+        this.translations = arches.translations;
         WidgetViewModel.apply(this, [params]);
 
         this.urlPreviewText = ko.pureComputed(function() {

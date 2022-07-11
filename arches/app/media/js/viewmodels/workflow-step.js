@@ -11,6 +11,8 @@ define([
     STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
+        this.translations = arches.translations;
+        
         _.extend(this, config);
 
         var self = this;

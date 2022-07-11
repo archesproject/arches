@@ -1,9 +1,10 @@
 define([
     'knockout', 
     'underscore', 
+    'arches',
     'viewmodels/widget',
     'templates/views/components/widgets/switch.htm',
-], function(ko, _, WidgetViewModel, switchWidgetTemplate) {
+], function(ko, _, arches, WidgetViewModel, switchWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -24,6 +25,7 @@ define([
 
     var SwitchWidget = function(params) {
         params.configKeys = ['subtitle', 'defaultValue'];
+        this.translations = arches.translations;
         WidgetViewModel.apply(this, [params]);
         this.on = this.config().on || true;
         this.off = this.config().off || false;

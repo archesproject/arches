@@ -2,18 +2,20 @@
 
 <div class="workflows-get-tile-value padded-workflow-step">
     <div style='display:flex; justify-content: space-between;'>
-        <h4>{% trans "Workflow Complete" %}</h4>
+        <h4>
+            <span data-bind="text: translations.workflowComplete"></span>
+        </h4>
         <div>
             <a href="#" target="_self" type="button" class="btn btn-primary"
                 data-bind="attr: { href: workflowUrl}">
                 <i class="fa fa-plus"></i>
-                <span>{% trans "New" %}</span>
+                <span data-bind="text: translations.new"></span>
             </a>
             <!-- ko if: resourceid -->
             <a href="#" target="_self" type="button" class="btn btn-primary"
                 data-bind="attr: { href: resourceEditUrl}">
                 <i class="fa fa-pencil"></i>
-                <span>{% trans "Edit" %}</span>
+                <span data-bind="text: translations.edit"></span>
             </a>
             <!-- /ko -->
         </div>
