@@ -1,9 +1,10 @@
 define([
     'knockout',
+    'arches',
     'viewmodels/concept-widget',
     'templates/views/components/widgets/radio.htm',
     'plugins/knockout-select2',
-], function(ko, ConceptWidgetViewModel, conceptRadioTemplate) {
+], function(ko, arches, ConceptWidgetViewModel, conceptRadioTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -17,7 +18,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['defaultValue'];
-
+        this.translations = arches.translations;
         ConceptWidgetViewModel.apply(this, [params]);
     };
 
