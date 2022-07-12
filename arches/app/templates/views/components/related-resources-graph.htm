@@ -105,11 +105,11 @@
         </div>
         <div class="edge-relationship-details">
             <div class="edge-relationship-prefix">
-                <span data-bind="text: translations.hasRelationship"></span>
+                <span data-bind="text: $parent.translations.hasRelationship"></span>
             </div>
-            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || translations.relatedTo "></div>
+            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || $parent.translations.relatedTo "></div>
             <div class="edge-relationship-sufix">
-                <span data-bind="text: translations.with"></span>
+                <span data-bind="text: $parent.translations.with"></span>
             </div>
         </div>
     </div>
@@ -139,27 +139,27 @@
             <div class="edge-node-links">
                 <span data-bind="click: $parent.viewInformationNodeReport">
                     <i class="fa fa-info"></i>
-                    <span data-bind="text: translations.report"></span>
+                    <span data-bind="text: $parent.translations.report"></span>
                 </span>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <span data-bind="click: $parent.editInformationNode">
                     <i class="fa fa-pencil"></i>
-                    <span data-bind="text: translations.edit"></span>
+                    <span data-bind="text: $parent.translations.edit"></span>
                 </span>
             </div>
         </div>
     </div>
     <div class="relationships-list-header">
-        <span data-bind="text: translations.relationships"></span>
+        <span data-bind="text: $parent.translations.relationships"></span>
     </div>
     <div class="relationships-list-count">
         <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
-        <span data-bind="text: translations.relationshipsShown"></span>
+        <span data-bind="text: $parent.translations.relationshipsShown"></span>
         <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
         <a href="javascript:void(0);" data-bind="click: function() {
             $parent.expandNode($data);
         }">
-            <span data-bind="text: translations.loadMore"></span>
+            <span data-bind="text: $parent.translations.loadMore"></span>
         </a>
         <!--/ko -->
     </div>
@@ -232,12 +232,12 @@
             <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
             <div class="relationships-list-count shim">
                 <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
-                <span data-bind="text: translations.relationshipsShown"></span>
+                <span data-bind="text: $parent.translations.relationshipsShown"></span>
                 <!--ko if: shownRelationsCount() !== totalRelations -->
                 <a href="javascript:void(0);" data-bind="click: function() {
                     $parent.expandNode($data);
                 }">
-                    <span data-bind="text: translations.loadMore"></span>
+                    <span data-bind="text: $parent.translations.loadMore"></span>
                 </a>
                 <!--/ko -->
             </div>

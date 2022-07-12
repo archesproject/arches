@@ -21,7 +21,15 @@
             <h3 class="search-label">
                 <span data-bind="text: translations.type"></span>
             </h3>
-            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} ">
+            <select 
+                id="" class="resources" 
+                tabindex="-1" 
+                data-bind="
+                    attr: {[data-placeholder]: translations.dateType},
+                    value: filter.dateNodeId, 
+                    chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} 
+                "
+            >
                 <option value="">
                     <span data-bind="text: translations.searchAllDates"></span>
                 </option>
