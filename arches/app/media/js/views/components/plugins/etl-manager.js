@@ -9,6 +9,7 @@ define([
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
+            this.translations = arches.translations;
             this.loading = params.loading;
             this.alert = params.alert;
             this.loading(true);
