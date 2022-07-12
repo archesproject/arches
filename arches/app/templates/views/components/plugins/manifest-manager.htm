@@ -11,14 +11,15 @@
     'disabled': mainMenu() || remoteManifest()
 }">
     <i class="fa fa-tags"></i>
-    <span class="map-sidebar-text">{% trans "Service" %}</span>
+    <span ></span>
+    <span class="map-sidebar-text" data-bind="text: translations.service"></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('canvas');
 }, css: {'active': activeTab() === 'canvas', 'disabled': !canvas() || remoteManifest()
 }">
     <i class="fa fa-cloud-upload"></i>
-    <span class="map-sidebar-text">{% trans "Canvas" %}</span>
+    <span class="map-sidebar-text" data-bind="text: translations.canvas"></span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
@@ -27,34 +28,46 @@
 <!--ko foreach: { data: [$data], as: 'self' }-->
 <!--ko if: activeTab() === 'manifest'-->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Service' %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: translations.manageImageService"></span>
+    </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 <div class="workbench-card-sidepanel-body">
 <div class="iiif-image-tools">
     <div class="form-group">
         <div class="row widget-wrapper">
-        <label class="control-label">{% trans "Title" %}</label>
+        <label class="control-label">
+            <span data-bind="text: translations.title"></span>
+        </label>
         <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
             data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
         </div>  
         <div class="row widget-wrapper">  
-        <label class="control-label">{% trans "Description" %}</label>
+        <label class="control-label">
+            <span data-bind="text: translations.description"></span>
+        </label>
         <textarea rows="10" type="text" placeholder='Service Description' class="form-control input-lg"
             data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
         </div>
         <div class="row widget-wrapper">
-            <label class="control-label">{% trans "Attribution" %}</label>
+            <label class="control-label">
+                <span data-bind="text: translations.attribution"></span>
+            </label>
             <input type="text" placeholder="Attribution" class="form-control input-lg" style="height: 36px;"
                 data-bind="textInput: self.manifestAttribution, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
-            <label class="control-label">{% trans "Attribution Logo" %}</label>
+            <label class="control-label">
+                <span data-bind="text: translations.attribution-logo"></span>
+            </label>
             <input type="text" placeholder="Attribution Logo" class="form-control input-lg" style="height: 36px;"
                 data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
-        <label class="control-label">{% trans "Metadata" %}</label>
+        <label class="control-label">
+            <span data-bind="text: translations.metadata"></span>
+        </label>
         <div class="manifest-metadata" style="display: flex;">
             <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="padding: 3px">
@@ -102,11 +115,17 @@
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div style="display: flex;">
-        <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()"><span>{% trans "Save" %}</span></button>
-        <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()"><span>{% trans "Cancel" %}</span></button>
+        <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">
+            <span data-bind="text: translations.save"></span>
+        </button>
+        <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()">
+            <span data-bind="text: translations.cancel"></span>
+        </button>
         </div>
         <!--ko if: manifest-->
-        <button class="btn btn-danger btn-md btn-block btn-labeled btn-workbench fa fa-trash" style="width: auto" data-bind="click: deleteManifest"><span>{% trans "Delete" %}</span></button>
+        <button class="btn btn-danger btn-md btn-block btn-labeled btn-workbench fa fa-trash" style="width: auto" data-bind="click: deleteManifest">
+            <span data-bind="text: translations.delete"></span>
+        </button>
         <!--/ko-->
     </div>
 </div>
@@ -115,15 +134,22 @@
 
 <!--ko if: activeTab() === 'canvas'-->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans 'Manage Image Canvases' %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: translations.manageImageCanvases"></span>
+    </h4>
 </div>
 
 <div class="workbench-card-sidepanel-border"></div>
 <div class="workbench-card-sidepanel-body">
 <div class="iiif-image-tools">
     <!--ko if: canvases().length > 0-->
-    <label class="control-label">{% trans "Images" %}</label>
-    <div>{% trans "Select image to delete from the image service" %}</div>
+    <label class="control-label">
+        <span data-bind="text: translations.images"></span>
+    </label>
+    <span ></span>
+    <div>
+        <span data-bind="text: translations.imageServiceInstruction"></span>
+    </div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
         <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: (($parent.selectPrimaryPanel() && ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']) || !$parent.selectPrimaryPanel() && ko.unwrap($parent.secondaryCanvas) === $data.images[0].resource.service['@id'])}">
             <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
@@ -133,11 +159,18 @@
     </div>
 
     <div class="iiif-canvas-links-panel">
-        <a class="" data-bind="click: addAllCanvases"> {% trans 'Select All' %}</a>
-        <a class="" data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}"> {% trans 'Clear All' %}</a>
+        <a class="" data-bind="click: addAllCanvases">
+            <span data-bind="text: translations.selectAll"></span>
+        </a>
+        <a class="" data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}">
+            <span data-bind="text: translations.clearAll"></span>
+        </a>
 
         <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
-            <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases"><i class="fa fa-trash"></i> {% trans 'Delete Selected' %}</button>
+            <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases">
+                <i class="fa fa-trash"></i>
+                <span data-bind="text: translations.deleteSelected"></span>
+            </button>
         </div>
     </div>
     <!--/ko-->
@@ -145,7 +178,9 @@
     <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
         <div class="file-workbench-links">
             <a class="fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                <span>{% trans "Drag or " %}</span><span class="text-bold">{% trans "click here " %}</span><span>{% trans "to upload photos" %}</span>
+                <span data-bind="text: translations.dropzoneDragDrop1"></span>
+                <span data-bind="text: translations.dropzoneDragDrop2"></span>
+                <span data-bind="text: translations.dropzoneDragDrop3"></span>
             </a>
         </div>
         <div style="min-height: 100%;">
@@ -155,7 +190,9 @@
     
 
     <!--ko if: canvas-->
-    <label class="control-label">{% trans "Selected Image Name" %}</label>
+    <label class="control-label">
+        <span data-bind="text: translations.selectedImageName"></span>
+    </label>
     <div>
         <input type="text" placeholder='Image Caption' class="form-control input-lg" style="height: 36px;" 
         data-bind="textInput: self.canvasLabel, valueUpdate: 'keyup'">
@@ -166,8 +203,12 @@
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
-            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()"><span>{% trans "Save" %}</span></button>
-            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()"><span>{% trans "Cancel" %}</span></button>
+            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">
+                <span data-bind="text: translations.save"></span>
+            </button>
+            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">
+                <span data-bind="text: translations.cancel"></span>
+            </button>
         </div>
     </div>
 </div>
@@ -183,7 +224,7 @@
         <li data-bind="if: shouldShowCreateService">
             <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
                 <div class='tab-label'>
-                    {% trans 'Create New Service' %}
+                    <span data-bind="text: translations.createNewService"></span>
                 </div>
             </div>
         </li>
@@ -191,7 +232,7 @@
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>
-                    {% trans 'Edit a service' %}
+                    <span data-bind="text: translations.editService"></span>
                 </div>
             </div>
         </li>
@@ -213,14 +254,18 @@
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
-        <h2>{% trans 'Drag & Drop Your Images Here' %}</h2>
-        <h4>{% trans 'Import digital images and create a new image service' %}</h4>
+        <h2>
+            <span data-bind="text: translations.imageUploadCaption"></span>
+        </h2>
+        <h4>
+            <span data-bind="text: translations.imageUploadInstruction"></span>
+        </h4>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column;">
             <div>
                 <div class="dropzone-photo-upload">
                     <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                        <span>{% trans 'Select Images' %}</span>
+                        <span data-bind="text: translations.selectImages"></span>
                     </div>
                     <div style="min-height: 100%;">
                         <div id="hidden-dz-create-previews" style="display:none"></div>
@@ -228,7 +273,9 @@
                 </div>
             </div>
         </div>
-        <h5 class="rr-splash-description">{% trans 'Create a new service by uploading one or more images. Images will be uploaded and processes so that you can view, annotate, and share them with others' %}</h5>
+        <h5 class="rr-splash-description">
+            <span data-bind="text: translations.imageServiceCreateDesc"></span>
+        </h5>
         </div>
 </div>
 </div>
@@ -240,7 +287,9 @@
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-picture-o r-select-icon"></i></span>
         </div> 
-        <h2>{% trans 'Edit an existing Image Service' %}</h2>
+        <h2>
+            <span data-bind="text: translations.editExistingImageService"></span>
+        </h2>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column; width: 300px">
             <div class="manifest-editor-input">
@@ -251,7 +300,9 @@
                     }">
             </div>
         </div>
-        <h5 class="rr-splash-description">{% trans 'Update the information and images related to an existing Image Service. Or copy and paste in the URL of a IIIF Manifest to add a service from an external service' %}</h5>
+        <h5 class="rr-splash-description">
+            <span data-bind="text: translations.imageServiceEditDesc"></span>
+        </h5>
     </div>
 </div>
 </div>
@@ -261,15 +312,15 @@
 
 {% block gallery_header %}
     <div>
-        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : {% quoted_trans "No manifest selected..." %}"></span>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : translations.noManifestSelected + '...'" %}"></span>
     </div>                 
     <div>
         <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
             <!-- ko if: !expandGallery() -->
-            {% trans "Info" %}
+            <span data-bind="text: translations.info"></span>
             <!-- /ko -->
             <!-- ko if: expandGallery() -->
-            {% trans "Close" %}
+            <span data-bind="text: translations.close"></span>
             <!-- /ko -->
         </span>
     </div>
@@ -281,13 +332,13 @@
             click: toggleManifestEditor,
         "
     >
-        {% trans "Switch Image Service" %}
+        <span data-bind="text: translations.switchImageService"></span>
     </div>
     <div data-bind="if: renderContext() != 'manifest-workflow'">
         <div data-bind="dropzone: dropzoneOptions4create" >
             <div>
             <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
-                {% trans "Create Image Service" %}
+                <span data-bind="text: translations.createImageService"></span>
             </div>
             </div>
             <div style="min-height: 100%;">
@@ -296,9 +347,9 @@
         </div>
     </div>
     <div>
-        <span>{% trans "Filter" %}</span>
+        <span data-bind="text: translations.filter"></span>
         <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Filter images...' %}" data-bind="textInput: filter">
+            <input type="text" class="form-control" style="width: 100%;" data-bind="attr:{placeholder: translations.filter-images + '...'}, textInput: filter">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
