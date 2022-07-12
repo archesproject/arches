@@ -10,6 +10,8 @@ define([
     var componentName = 'search-export';
     const viewModel = function(params) {
         var self = this;
+
+        this.translations = arches.translations;
         this.total = params.total;
         this.query = params.query;
         this.downloadStarted = ko.observable(false);

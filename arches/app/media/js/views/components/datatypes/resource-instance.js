@@ -10,6 +10,8 @@ define([
     var name = 'resource-instance-datatype-config';
     const viewModel = function(params) {
         var self = this;
+
+        this.translations = arches.translations;
         this.search = params.search;
         this.resourceModels = [{
             graphid: null,

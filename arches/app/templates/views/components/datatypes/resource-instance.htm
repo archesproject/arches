@@ -6,11 +6,11 @@
 <div class="node-widget-label concept-label" style="width:540px;">
 
     <div class="control-label">
-        {% trans "Resource Model" %}
+        <span data-bind="text: translations.resourceModel"></span>
     </div>
     <div style="padding-bottom: 10px;">
         <select multiple data-bind="
-            placeholder: 'Select a resource model',
+            placeholder: translations.selectAResourceModel,
             selectedOptions: selectedResourceModel,
             options: resourceModels,
             optionsText: 'name',
@@ -37,7 +37,8 @@
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
                     <div class="row">
                         <div class="row" style="margin-bottom: 10px;">
-                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default relationship to" %}
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: translations.defaultRelationshipTo"></span>
                                 <span data-bind="text: $data.name"></span>
                             </label>
 
@@ -47,11 +48,20 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
-                                        select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass, {% quoted_trans 'Select an Ontology Property' %}, true)
-                                        }
-                                    ">
+                                    <input 
+                                        style="width:100%; display:inline-block; margin: 3px 0px;" 
+                                        data-bind="
+                                            select2Query: {
+                                                select2Config: self.getSelect2ConfigForOntologyProperties(
+                                                    $data.ontologyProperty, 
+                                                    self.rootOntologyClass, 
+                                                    $data.ontologyClass, 
+                                                    $data.translations.selectAnOntologyProperty, 
+                                                    true
+                                                )
+                                            }
+                                        "
+                                    >
                                 </span>
 
                                 <span class="col-xs-12" data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
@@ -61,7 +71,8 @@
 
 
                         <div class="row">
-                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %}
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: translations.defaultInverseRelationshipTo"></span>
                                 <span data-bind="text: $data.name"></span>
                             </label>
 
@@ -73,7 +84,13 @@
                                 <span class="col-xs-12">
                                     <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass, {% quoted_trans 'Select an Ontology Property' %}, true)
+                                            select2Config: self.getSelect2ConfigForOntologyProperties(
+                                                $data.inverseOntologyProperty, 
+                                                $data.ontologyClass, 
+                                                self.rootOntologyClass, 
+                                                $data.translations.selectAnOntologyProperty, 
+                                                true
+                                            )
                                         }
                                     ">
                                 </span>
@@ -89,14 +106,28 @@
 
     <div class="relative">
         <label class="col-xs-12 control-label widget-input-label">
-            {% trans "Search String - use to filter resources displayed" %} <i class="fa fa-eye" style="cursor: pointer;" data-bind="click: openSearch"
-                title="{% trans " View search string..." %}"></i>
+            <span data-bind="text: translations.searchStringText"></span>
+            
+            <i 
+                class="fa fa-eye" 
+                style="cursor: pointer;" 
+                data-bind="
+                    attr: {title: translations.viewSearchString},
+                    click: openSearch
+                "
+            ></i>
         </label>
     </div>
     
     <div class="col-xs-12" style="padding-bottom: 10px;">
-        <input type="text" placeholder="{% trans " Enter Search String here..." %}" class="form-control" style=""
-            data-bind="textInput: config.searchString">
+        <input 
+            type="text" 
+            class="form-control" style=""
+            data-bind="
+                attr: {placeholder: translations.enterSearchStringHere + '...'},
+                textInput: config.searchString
+            "
+        >
     </div>
 
 </div>
@@ -106,10 +137,18 @@
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="">{% trans "References" %}</option>
-        <option value="!">{% trans "Does not reference" %}</option>
-        <option value="null">{% trans "Has no value" %}</option>
-        <option value="not_null">{% trans "Has any value" %}</option>
+        <option value="">
+            <span data-bind="text: translations.references"></span>
+        </option>
+        <option value="!">
+            <span data-bind="text: translations.doesNotReference"></span>
+        </option>
+        <option value="null">
+            <span data-bind="text: translations.hasNoValue"></span>
+        </option>
+        <option value="not_null">
+            <span data-bind="text: translations.hasAnyValue"></span>
+        </option>
     </select>
 </div>
 <div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
@@ -117,7 +156,7 @@
         name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {
             config: {
-                placeholder: "{% trans "Select a resource" %}"
+                placeholder: translations.selectAResource,
             },
             label: '',
             value: searchValue,
