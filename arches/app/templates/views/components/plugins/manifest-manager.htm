@@ -40,29 +40,29 @@
         <label class="control-label">
             <span data-bind="text: translations.title"></span>
         </label>
-        <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
-            data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
+        <input type="text" class="form-control input-lg" style="height: 36px;"
+            data-bind="attr:{placeholder: translations.serviceTitle}, textInput: self.manifestName, valueUpdate: 'keyup'">
         </div>  
         <div class="row widget-wrapper">  
         <label class="control-label">
             <span data-bind="text: translations.description"></span>
         </label>
-        <textarea rows="10" type="text" placeholder='Service Description' class="form-control input-lg"
-            data-bind="textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
+        <textarea rows="10" type="text" class="form-control input-lg"
+            data-bind="attr:{placeholder: translations.serviceDescription}, textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
         </div>
         <div class="row widget-wrapper">
             <label class="control-label">
                 <span data-bind="text: translations.attribution"></span>
             </label>
-            <input type="text" placeholder="Attribution" class="form-control input-lg" style="height: 36px;"
-                data-bind="textInput: self.manifestAttribution, valueUpdate: 'keyup'">
+            <input type="text" class="form-control input-lg" style="height: 36px;"
+                data-bind="attr:{placeholder: translations.attribution}, textInput: self.manifestAttribution, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
             <label class="control-label">
                 <span data-bind="text: translations.attribution-logo"></span>
             </label>
-            <input type="text" placeholder="Attribution Logo" class="form-control input-lg" style="height: 36px;"
-                data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
+            <input type="text" class="form-control input-lg" style="height: 36px;"
+                data-bind="attr:{placeholder: translations.attributionLogo}, textInput: self.manifestLogo, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
         <label class="control-label">
@@ -71,12 +71,12 @@
         <div class="manifest-metadata" style="display: flex;">
             <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="padding: 3px">
-                <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;" 
-                data-bind="textInput: metadataLabel, valueUpdate: 'keyup'">
+                <input type="text" class="form-control input-md iiif-input" style="height: 36px;" 
+                data-bind="attr:{placeholder: translations.metadataLabel}, textInput: metadataLabel, valueUpdate: 'keyup'">
             </div>
             <div style="padding: 3px">
-                 <textarea placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;" 
-                data-bind="textInput: metadataValues, valueUpdate: 'keyup'"></textarea>
+                 <textarea class="form-control input-md iiif-input" style="height: 36px;" 
+                data-bind="attr:{placeholder: translations.metadataValue}, textInput: metadataValues, valueUpdate: 'keyup'"></textarea>
             </div>
             </div>
             <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){updateMetadata()}">
@@ -96,12 +96,12 @@
                 <div class="manifest-metadata-panel-drag"><i class="fa fa-ellipsis-v"></i></div>
                 <div style="display: flex; flex-direction: column; width: 100%;">
                 <div style="padding: 3px;">
-                    <input type="text" placeholder='Metadata Label' class="form-control input-md iiif-input" style="height: 36px;" 
-                    data-bind="textInput: $data.label, valueUpdate: 'keyup'">
+                    <input type="text" class="form-control input-md iiif-input" style="height: 36px;" 
+                    data-bind="attr:{placeholder: translations.metadataLabel}, textInput: $data.label, valueUpdate: 'keyup'">
                 </div>
                 <div style="padding: 3px">
-                    <textarea type="text" placeholder='Metadata Value' class="form-control input-md iiif-input" style="height: 36px;" 
-                    data-bind="textInput: $data.value, valueUpdate: 'keyup'"></textarea>
+                    <textarea type="text" class="form-control input-md iiif-input" style="height: 36px;" 
+                    data-bind="attr:{placeholder: translations.metadataValue}, textInput: $data.value, valueUpdate: 'keyup'"></textarea>
                 </div>
                 </div>
                 <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){self.removeMetadata($data)}">
@@ -194,8 +194,8 @@
         <span data-bind="text: translations.selectedImageName"></span>
     </label>
     <div>
-        <input type="text" placeholder='Image Caption' class="form-control input-lg" style="height: 36px;" 
-        data-bind="textInput: self.canvasLabel, valueUpdate: 'keyup'">
+        <input type="text" class="form-control input-lg" style="height: 36px;" 
+        data-bind="attr:{placeholder: translations.imageCaption}, textInput: self.canvasLabel, valueUpdate: 'keyup'">
     </div>
     <!--/ko-->
     
@@ -349,7 +349,7 @@
     <div>
         <span data-bind="text: translations.filter"></span>
         <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" data-bind="attr:{placeholder: translations.filter-images + '...'}, textInput: filter">
+            <input type="text" class="form-control" style="width: 100%;" data-bind="attr:{placeholder: translations.filterImages + '...'}, textInput: filter">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
