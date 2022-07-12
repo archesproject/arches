@@ -104,7 +104,7 @@
                     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
                 <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
-                    <span style="font-size: 13px;" class='file-workbench-filecount' data-bind='text: totalRelationships() + translations.resourceRelations'></span>
+                    <span style="font-size: 13px;" class='file-workbench-filecount' data-bind="text: totalRelationships() + ' ' + translations.resourceRelations"></span>
                 </span>
             </div>
 
@@ -148,7 +148,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype,self.rootOntologyClass, relationship.resource.root_ontology_class, translations.select-ontology-property)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, translations.select-ontology-property)
                                                 }
                                             ">
                                         </span>
