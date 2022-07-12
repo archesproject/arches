@@ -14,6 +14,8 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Time Filter';
+
+            this.translations = arches.translations;
             this.dateDropdownEleId = 'dateDropdownEleId' + _.random(2000, 3000000);
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = {
