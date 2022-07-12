@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %} 
-{% load staticfiles %} 
+{% load static %} 
 {% load template_tags %}
 {% load i18n %} 
 
@@ -391,129 +391,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </div>
                 </section>
-
-                {% comment %} <section>
-                    <div class="profile-list">
-                        <div class="profile-header">
-                            {% trans 'Arches Collector Projects' %}
-                        </div>
-                        <!--ko if: mobilesurveys.length === 0 -->
-                        <div id="default-mobile-projects" class="profile-default-message-panel">
-                            {% trans "Sorry, but you haven't been invited to a project yet..." %}
-                        </div>
-                        <!--/ko-->
-
-                        <!--ko if: mobilesurveys.length > 0 -->
-                        <!-- Survey Invitations List -->
-                        <div id="mobile-projects-list" class="profile-default-message-panel">
-                            <div class="row">
-
-                                <!-- Find a survey -->
-                                <div class="col-sm-9 col-sm-offset-3 relative">
-                                    <div class="project-search-widget">
-                                        <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                                        <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Survey List -->
-                            <div id="" class="row">
-                                <div class="col-sm-9 col-sm-offset-3 mar-top">
-                                    <div class="">
-                                        <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
-                                        <div class="project-panel">
-
-                                            <div class="project-panel-header">
-                                                <div class="user-survey">
-                                                    <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? {% quoted_trans "Active" %} : {% quoted_trans "Inactive" %}, css: {active: vm.mobilesurvey.active()}"></div>
-                                                    <ul class="project-metadata">
-                                                        <li class="project-metadata-item">
-                                                            <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
-                                                            {% trans 'to' %}
-                                                            <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? {% quoted_trans "Unnamed Survey" %} : vm.mobilesurvey.name()"></h3>
-
-                                                <div class="">
-                                                    <div class="project-details">
-                                                        <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Project Summary' %}
-                                                    </p>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-                                                            {% trans "Number of edits:" %} 0
-                                                        </li>
-                                                        <li class="">
-                                                            {% trans "Contributors:" %} 0
-                                                        </li>
-                                                        <li class="">
-                                                            {% trans "Offline Basemap:" %} {% trans "Streets-Grey" %}
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Groups/Users' %}
-                                                    </p>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-
-                                                            {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
-                                                            <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-                                                            {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
-                                                            <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Models and Data Entry Cards' %}
-                                                    </p>
-
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <!--ko foreach: {data: vm.resources, as: 'resource'} -->
-                                                        <li class="">
-                                                            <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
-                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li data-bind="text: card.name"></li>
-                                                            </ul>
-                                                            <!--/ko-->
-                                                        </li>
-                                                        <!--/ko-->
-                                                    </ul>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- /ko -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--/ko-->
-                    </div>
-                </section> {% endcomment %}
             </div>
 
         </div>
@@ -533,9 +410,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     define('profile-manager-data', [], function() {
         return {
             'error_count': {{form.errors|length}},
-            'mobilesurveys': {{user_surveys}},
-            'identities': {{identities}},
-            'resources': {{resources}},
             'two_factor_authentication_settings': {{two_factor_authentication_settings}},
         }
     });

@@ -39,17 +39,6 @@ def message(arg):
 
 
 @shared_task(bind=True)
-def sync(self, surveyid=None, userid=None, synclogid=None):
-    from arches.app.models.mobile_survey import MobileSurvey
-
-    create_user_task_record(self.request.id, self.name, userid)
-    survey = MobileSurvey.objects.get(id=surveyid)
-    survey._sync(synclogid, userid)
-    response = {"taskid": self.request.id}
-    return response
-
-
-@shared_task(bind=True)
 def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
@@ -205,19 +194,31 @@ def on_chord_error(request, exc, traceback):
 
 
 @shared_task
-def load_branch_csv(files, summary, result, temp_dir, loadid):
+def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_csv_importer
 
     BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
     BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
 
+    load_event = models.LoadEvent.objects.get(loadid=loadid)
+    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
+    msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+    user = User.objects.get(id=userid)
+    notify_completion(msg, user)
+
 
 @shared_task
-def load_single_csv(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
     from arches.app.etl_modules import import_single_csv
 
     ImportSingleCsv = import_single_csv.ImportSingleCsv()
     ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+    load_event = models.LoadEvent.objects.get(loadid=loadid)
+    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
+    msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
+    user = User.objects.get(id=userid)
+    notify_completion(msg, user)
 
 
 @shared_task

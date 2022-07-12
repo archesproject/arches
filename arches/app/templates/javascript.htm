@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load l10n %}
 {% load i18n %}
 
@@ -250,12 +250,9 @@
                 export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
                 function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                mobile_survey_resources: function(surveyid){return "{% url 'mobile_survey_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
-                collector_designer: function(surveyid){return "{% url 'collector_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', surveyid)},
                 plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
                 transaction_reverse: function(transactionid) {return "{% url 'transaction_reverse' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', transactionid)},
                 mvt: function(nodeid){return decodeURI("{% url 'mvt' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' '{z}' '{x}' '{y}' %}").replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)},
-                collector_manager: "{% url 'collector_manager' %}",
                 help_template: "{% url 'help_templates' %}",
                 graphs_api: "{% url 'graphs_api' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
                 api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
@@ -311,10 +308,6 @@
             confirmSendTwoFactorAuthenticationEmail: {
                 title: "{% trans 'Send Two-Factor Authentication email?' %}",
                 text: "{% trans 'This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?' %}"
-            },
-            confirmSurveyDelete: {
-                title: "{% trans 'Delete survey?' %}",
-                text: "{% trans 'Deleting this survey will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
             },
             graphImportFailed: {
                 title: "{% trans 'Graph import failed.'%}"
@@ -413,10 +406,6 @@
             {% endfor %}{% endautoescape %}],
             graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
             translations: {
-                'deactivateSurveyTitle': {% trans "You are deactivating an active survey" as deactivateSurveyTitle %} '{{ deactivateSurveyTitle|escapejs }}',
-                'deactivateSurveyMessage': {% trans "Users will not be able to download this survey to their device" as deactivateSurveyMessage %} '{{ deactivateSurveyMessage|escapejs }}',
-                'activateSurveyTitle': {% trans "You are activating this survey" as activateSurveyTitle %} '{{ activateSurveyTitle|escapejs }}',
-                'activateSurveyMessage': {% trans "Users will immediately be able to download this survey and begin collecting data" as activateSurveyMessage %} '{{ activateSurveyMessage|escapejs }}',
                 'mapAddPoint': {% trans "Add point" as mapAddPoint %} '{{ mapAddPoint|escapejs }}',
                 'mapAddLine': {% trans "Add line" as mapAddLine %} '{{ mapAddLine|escapejs }}',
                 'mapAddPolygon': {% trans "Add polygon" as mapAddPolygon %} '{{ mapAddPolygon|escapejs }}',
@@ -433,8 +422,6 @@
                 'cardConstraintsPlaceholder': {% trans "Select Widgets" as cardConstraintsPlaceholder %} '{{ cardConstraintsPlaceholder|escapejs }}',
                 'cardFunctionNodeDesc': {% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} '{{ cardFunctionNodeDesc|escapejs }}',
                 'cardFunctionNodeName': {% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} '{{ cardFunctionNodeName|escapejs }}',
-                'mobileSurveyNameLong': {% trans "Model Details" as mobileSurveyNameLong %} '{{ mobileSurveyNameLong|escapejs }}',
-                'mobileSurveyDesc': {% trans "Summary of how this model participates in the survey" as mobileSurveyDesc %} '{{ mobileSurveyDesc|escapejs }}',
                 'groupingErrorTitle': {% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} '{{ groupingErrorTitle|escapejs }}',
                 'groupingErrorMessage': {% trans "The cardinality of this card can't be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} '{{ groupingErrorMessage|escapejs }}',
                 'modelDoesNotExist': {% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} '{{ modelDoesNotExist|escapejs }}',

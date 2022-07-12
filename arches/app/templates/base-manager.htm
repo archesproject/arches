@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
 {% extends "base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
@@ -180,16 +180,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         </ul>
                     </li>
-
-                    <li{% if "views/mobile-survey-manager" in main_script %} class="active-sub" {% endif %}>
-                        <a href="{% url 'collector_manager' %}"
-                            data-bind="click: navigate.bind(this, '{% url 'collector_manager' %}') ">
-                            <i class="fa fa-globe"></i>
-                            <span class="menu-title">
-                                <strong>{% trans "Arches Collector Manager" %}</strong>
-                            </span>
-                        </a>
-                    </li>
                     {% endif %}
 
 
@@ -289,8 +279,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'navbar/resource-manage-menu.htm' %}
                     {% elif main_script == 'views/graph/function-manager' %}
                         {% include 'navbar/function-manage-menu.htm' %}
-                    {% elif main_script == 'views/mobile-survey-designer' %}
-                        {% include 'navbar/mobile-survey-manage-menu.htm' %}
                     {% else %}
                         {% include 'navbar/graph-designer-menu.htm' %}
                     {% endif %}

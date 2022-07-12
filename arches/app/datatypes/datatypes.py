@@ -1450,7 +1450,6 @@ class FileListDataType(BaseDataType):
             return self.compile_json(tile, node, file_details=data[str(node.pk)])
 
     def handle_request(self, current_tile, request, node):
-        # this does not get called when saving data from the mobile app
         previously_saved_tile = models.TileModel.objects.filter(pk=current_tile.tileid)
         user = request.user
         if hasattr(request.user, "userprofile") is not True:
@@ -1571,7 +1570,7 @@ class FileListDataType(BaseDataType):
         return json.loads(json.dumps(tile_data))
 
     def pre_tile_save(self, tile, nodeid):
-        # TODO If possible this method should probably replace 'handle request' and perhaps 'process mobile data'
+        # TODO If possible this method should probably replace 'handle request'
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
                 try:
@@ -1693,38 +1692,6 @@ class FileListDataType(BaseDataType):
     def from_rdf(self, json_ld_node):
         # Currently up in the air about how best to do file imports via JSON-LD
         pass
-
-    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
-        """
-        Takes a tile, couch db instance, couch record, and the node value from
-        a provisional edit. Creates a django instance, saves the corresponding
-        attachement as a file, updates the provisional edit value with the
-        file location information and returns the revised provisional edit value
-        """
-
-        try:
-            for file in node_value:
-                attachment = db.get_attachment(couch_doc["_id"], file["file_id"])
-                if attachment is not None:
-                    attachment_file = attachment.read()
-                    file_data = ContentFile(attachment_file, name=file["name"])
-                    file_model, created = models.File.objects.get_or_create(fileid=file["file_id"])
-
-                    if created:
-                        file_model.path = file_data
-
-                    file_model.tile = tile
-                    file_model.save()
-                    if file["name"] == file_data.name and "url" not in list(file.keys()):
-                        file["file_id"] = str(file_model.pk)
-                        file["url"] = str(file_model.path.url)
-                        file["status"] = "uploaded"
-                        file["accepted"] = True
-                        file["size"] = file_data.size
-
-        except KeyError as e:
-            pass
-        return node_value
 
     def collects_multiple_values(self):
         return True

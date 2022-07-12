@@ -79,16 +79,15 @@ class APITests(ArchesTestCase):
         Test that our custom header parameters get pushed on to the GET QueryDict
 
         """
-
         factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
         view = APIBase.as_view()
 
-        request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
+        request = factory.get(reverse("api_node_value", kwargs={}), {"ver": "2.0"})
         request.user = None
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.0")
 
-        request = factory.get(reverse("mobileprojects"), kwargs={})
+        request = factory.get(reverse("api_node_value"), kwargs={})
         request.user = None
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
