@@ -528,7 +528,6 @@
         grouping-error-title='{% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} "{{ groupingErrorTitle|escapejs }}"'
         grouping-error-message='{% trans "The cardinality of this card cannot be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}"'
         model-does-not-exist='{% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} "{{ modelDoesNotExist|escapejs }}"'
-
         upload-csv-zip-file='{% trans "Upload .csv or .zip File" as UploadCsvZipFile %} "{{ UploadCsvZipFile|escapejs }}"'
         dropzone-file-upload-caption='{% trans "Drag & Drop your file onto this area to upload" as dropzoneFileUploadCaption %} "{{ dropzoneFileUploadCaption|escapejs }}"'
         select-file='{% trans "Select File" as selectFile %} "{{ selectFile|escapejs }}"'
@@ -550,6 +549,20 @@
         import-single-csv='{% trans "Import Single CSV" as importSingleCsv %} "{{ importSingleCsv|escapejs }}"'
         target-resource='{% trans "Target Resource" as targetResource %} "{{ targetResource|escapejs }}"'
         target-fields='{% trans "Target Fields" as targetFields %} "{{ targetFields|escapejs }}"'
+        download-templates='{% trans "Download Templates" as downloadTemplates %} "{{ downloadTemplates|escapejs }}"'
+        select-template='{% trans "Select Template" as selectTemplate %} "{{ selectTemplate|escapejs }}"'
+        upload-zip-file='{% trans "Upload .zip File" as uploadZipFile %} "{{ uploadZipFile|escapejs }}"'
+        upload-your-zip-file='{% trans "Upload Your .zip File" as uploadYourZipFile %} "{{ uploadYourZipFile|escapejs }}"'
+        branch-excel='{% trans "Branch Excel" as branchExcel %} "{{ branchExcel|escapejs }}"'
+        file-upload-summary='{% trans "File Upload Summary" as fileUploadSummary %} "{{ fileUploadSummary|escapejs }}"'
+        file='{% trans "File" as file %} "{{ file|escapejs }}"'
+        size='{% trans "Size" as size %} "{{ size|escapejs }}"'
+        submit='{% trans "Submit" as submit %} "{{ submit|escapejs }}"'
+        file-contents='{% trans "File contents" as fileContents %} "{{ fileContents|escapejs }}"'
+        import-branch-excel-summary='{% trans "Import Branch Excel Summary" as importBranchExcelSummary %} "{{ importBranchExcelSummary|escapejs }}"'
+        excel-file='{% trans "Excel File" as excelFile %} "{{ excelFile|escapejs }}"'
+        worksheets='{% trans "Worksheets" as worksheets %} "{{ worksheets|escapejs }}"'
+        tiles='{% trans "Tiles" as tiles %} "{{ tiles|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
