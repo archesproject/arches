@@ -349,12 +349,15 @@
         new='{% trans "New" as new %} "{{ new|escapejs }}"'
         add-new='{% trans "Add New" as addNew %} "{{ addNew|escapejs }}"'
         return='{% trans "Return" as return %} "{{ return|escapejs }}"'
+<<<<<<< HEAD
         csv='{% trans "csv" as csv %} "{{ csv|escapejs }}"'
         html='{% trans "html" as html %} "{{ html|escapejs }}"'
         shapefile='{% trans "shapefile" as shapefile %} "{{ shapefile|escapejs }}"'
         geojson-url='{% trans "geojson url" as geojsonUrl %} "{{ geojsonUrl|escapejs }}"'
         tile-excel='{% trans "tile excel" as tileExcel %} "{{ tileExcel|escapejs }}"'
         copy-to-clipboard='{% trans "Copy to clipboard" as copyToClipboard %} "{{ copyToClipboard|escapejs }}"'
+=======
+>>>>>>> 726e020a1a64604bc85014cc3b0856f7b98757b0
         info='{% trans "Info" as info %} "{{ info|escapejs }}"'
         arches-export='{% trans "Arches Export" as archesExport %} "{{ archesExport|escapejs }}"'
         include-report-link-in-export='{% trans "Include the report link in the export?" as includeReportLinkInExport %} "{{ includeReportLinkInExport|escapejs }}"'
@@ -613,6 +616,30 @@
         layer-node-permission-info='{% trans "The following users and groups can view this layer. If you wish to change who can access this layer, please update the permissions on the layer node." as layerNodePermissionInfo %} "{{ layerNodePermissionInfo|escapejs }}"'
         users='{% trans "Users" as users %} "{{ users|escapejs }}"'
         groups='{% trans "Groups" as groups %} "{{ groups|escapejs }}"'
+        related-resources-editor='{% trans "Related Resources Editor" as relatedResourcesEditor %} "{{ relatedResourcesEditor|escapejs }}"'
+        add-related-resources='{% trans "Add Related Resources" as addRelatedResources %} "{{ addRelatedResources|escapejs }}"'
+        related-resources-editor-desc='{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay between physical objects, events, activities, people and documents. Relating resources lets you build a network of relationships for your data objects." as relatedResourcesEditorDesc %} "{{ relatedResourcesEditorDesc|escapejs }}"'
+        related-resource-summary='{% trans "Related Resource Summary" as relatedResourceSummary %} "{{ relatedResourceSummary|escapejs }}"'
+        table='{% trans "Table" as table %} "{{ table|escapejs }}"'
+        visualization='{% trans "Visualization" as visualization %} "{{ visualization|escapejs }}"'
+        show-me-how='{% trans "Show Me How" as showMeHow %} "{{ showMeHow|escapejs }}"'
+        add-relationship-instruction='{% trans "Select resources and relate it to this one" as addRelationshipInstruction %} "{{ addRelationshipInstruction|escapejs }}"'
+        egText='{% trans "e.g.: .txt" as egText %} "{{ egText|escapejs }}"'
+        resource-relations='{% trans "resource relations" as resourceRelations %} "{{ resourceRelations|escapejs }}"'
+        select-ontology-property='{% trans "'Select an Ontology Property'" as selectOntologyProperty %} "{{ selectOntologyProperty|escapejs }}"'
+        node-resource-relationship-text='{% trans "This is a Node to Resource Instance relationship" as nodeResourceRelationshipText %} "{{ nodeResourceRelationshipText|escapejs }}"'
+        relationship-text='{% trans "'s relationship to " as relationshipText %} "{{ relationshipText|escapejs }}"'
+        relationship-to='{% trans "Relationship to" as relationshipTo %} "{{ relationshipTo|escapejs }}"'
+        inverse-relationship-to='{% trans "Inverse Relationship to" as inverseRelationshipTo %} "{{ inverseRelationshipTo|escapejs }}"'
+        relationship-desc='{% trans "This is a Resource Instance to Resource Instance relationship" as relationshipDesc %} "{{ relationshipDesc|escapejs }}"'
+        relationship='{% trans "Relationship" as relationship %} "{{ relationship|escapejs }}"'
+        from-date='{% trans "From Date" as fromDate %} "{{ fromDate|escapejs }}"'
+        to-date='{% trans "To Date" as toDate %} "{{ toDate|escapejs }}"'
+        description='{% trans "Description" as description %} "{{ description|escapejs }}"'
+        delete-this-entry='{% trans "Delete this entry" as deleteThisEntry %} "{{ deleteThisEntry|escapejs }}"'
+        save='{% trans "Save" as save %} "{{ save|escapejs }}"'
+        noRelatedResourceText='{% trans "This resource is not related to any other resources" as noRelatedResourceText %} "{{ noRelatedResourceText|escapejs }}"'
+
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}

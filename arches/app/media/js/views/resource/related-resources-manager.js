@@ -17,6 +17,7 @@ define([
     const viewModel = Backbone.View.extend({
         initialize: function(options) {
             var self = this;
+            this.translations = arches.translations;
             this.searchResults = options.searchResultsVm;
             this.editingInstanceId = options.editing_instance_id;
             this.graph = options.graph;
