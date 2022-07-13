@@ -92,7 +92,7 @@
                             value: mapping.node,
                             options: nodes,
                             optionsText: 'label',
-                            optionsCaption: translation.select,
+                            optionsCaption: translation.select + '...',
                             optionsValue: 'alias',
                             valueAllowUnset: true,
                             chosen: {width: '100%'}"
@@ -148,7 +148,7 @@
     <!-- ko if: load_details -->
     <!-- ko ifnot: loading() -->
     <div>
-        <span class="etl-loading-metadata-key" data-bind="text: translations.targetResource"></span>
+        <span class="etl-loading-metadata-key" data-bind="text: translations.targetResource + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
     </div>
     <div>
