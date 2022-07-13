@@ -9,14 +9,14 @@ require([
     var View = BaseManagerView.extend({
         initialize: function(options){
             BaseManagerView.prototype.initialize.call(this, options);
-            
+
             if (location.search.indexOf('print') > 0) {
                 this.viewModel.loading(true);
                 setTimeout(
                     function() {
-                        self.viewModel.loading(false);
+                        this.viewModel.loading(false);
                         window.print();
-                    },
+                    }.bind(this),
                     7000 // a generous timeout here to allow maps/images to load
                 );
             }
