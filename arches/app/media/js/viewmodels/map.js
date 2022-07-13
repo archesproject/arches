@@ -9,6 +9,7 @@ define([
 ], function($, _, arches, ko, koMapping, mapPopupProvider) {
     const viewModel = function(params) {
         var self = this;
+        this.translations = arches.translations;
 
         var geojsonSourceFactory = function() {
             return {
@@ -427,22 +428,13 @@ define([
             };
         };
 
-        this.renderedPopupTemplate = null;
-        $.ajax({
-            type: 'GET',
-            url: arches.urls.root + 'templates/views/components/map-popup.htm',
-            complete: function(e) {
-                self.renderedPopupTemplate = e.responseText;
-            }
-        });
-
         this.onFeatureClick = function(features, lngLat, MapboxGl) {
             const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
             self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
-                .setHTML(self.renderedPopupTemplate)
+                .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
                 mapPopupProvider.processData(self.getPopupData(features)),

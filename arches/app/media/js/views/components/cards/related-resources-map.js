@@ -9,7 +9,8 @@ define([
     'viewmodels/map-filter',
     'views/components/cards/select-related-feature-layers',
     'templates/views/components/cards/related-resources-map.htm',
-], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, relatedResourcesMapTemplate) {
+    'templates/views/components/cards/related-resources-map-popup.htm',
+], function($, ko, koMapping, geojsonExtent, arches, CardComponentViewModel, MapEditorViewModel, MapFilterViewModel, selectFeatureLayersFactory, relatedResourcesMapTemplate, relatedResourcesMapPopupTemplate) {
     var viewModel = function(params) {
         var self = this;
         this.translations = arches.translations;
@@ -279,15 +280,6 @@ define([
 
         params.fitBounds = resourceBounds;
         MapEditorViewModel.apply(this, [params]);
-
-        this.renderedPopupTemplate = null;
-        $.ajax({
-            type: 'GET',
-            url: arches.urls.root + 'templates/views/components/cards/related-resources-map-popup.htm',
-            complete: function(e) {
-                self.renderedPopupTemplate = e.responseText;
-            }
-        });
 
         this.relateResource = function(resourceData, widget) {
             var id = widget.node_id();
