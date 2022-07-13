@@ -471,12 +471,15 @@ class JsonLdReader(Reader):
         if indent and indent > 0:
             prefix = prefix + "   " * int(indent)
         self.print_buf.append(prefix + text)
+        if self.verbosity > 2:
+            print(prefix + text)
 
     def data_walk(self, data_node, tree_node, result, tile=None, indent=0):
         my_tiles = []
+        self.printline("Walk down non-literal branches in the data", indent, newline=True)
         self.printline(f"---" * 20, indent)
-        self.printline(tree_node["name"], indent)
-        self.printline(f"tile={tile}", indent)
+        # self.printline(tree_node["name"], indent)
+        # self.printline(f"tile={tile}", indent)
 
         # pre-seed as much of the cache as we can during the data-walk
         if "@id" in data_node and "@type" in data_node:
@@ -561,9 +564,10 @@ class JsonLdReader(Reader):
                 # options is a list of potential matches in the graph tree
                 # based on property/class combination
 
+                self.printline(f"Trying to match data value:  '{value or uri}'", indent, newline=True)
+                self.printline(f"That has type:  '{k}'", indent)
                 for o in options:
-                    self.printline(f"Considering match to node: '{o['name']}'", indent + 1, newline=True)
-                    self.printline(f"Incoming value we're testing:  '{value or uri}'", indent + 1)
+                    self.printline(f"Considering match to graph node: '{o['name']}'", indent + 1, newline=True)
                     self.printline(f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1)
                     self.printline(f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
                     potential_tile = None
@@ -632,6 +636,7 @@ class JsonLdReader(Reader):
                             # self.printline("Don't really create data, so pass anonymous result dict", indent + 1)
                             if p[2] is not None:
                                 tile = p[2]
+                            self.printline("Found multiple matches!", indent)
                             self.data_walk(vi, p[0], {}, tile, indent + 1)
                             possible2.append(p)
                         except Exception as e:
@@ -749,7 +754,6 @@ class JsonLdReader(Reader):
 
                 self.printline(f"Tile.data = {tile.data}", indent + 1)
                 if not is_literal:
-                    self.printline("Walk down non-literal branches in the data", indent + 1, newline=True)
                     self.data_walk(vi, branch[0], bnode, tile, indent + 1)
 
         if self.shouldSortTiles:
