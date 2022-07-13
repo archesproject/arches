@@ -528,6 +528,28 @@
         grouping-error-title='{% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} "{{ groupingErrorTitle|escapejs }}"'
         grouping-error-message='{% trans "The cardinality of this card cannot be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}"'
         model-does-not-exist='{% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} "{{ modelDoesNotExist|escapejs }}"'
+
+        upload-csv-zip-file='{% trans "Upload .csv or .zip File" as UploadCsvZipFile %} "{{ UploadCsvZipFile|escapejs }}"'
+        dropzone-file-upload-caption='{% trans "Drag & Drop your file onto this area to upload" as dropzoneFileUploadCaption %} "{{ dropzoneFileUploadCaption|escapejs }}"'
+        select-file='{% trans "Select File" as selectFile %} "{{ selectFile|escapejs }}"'
+        cancel-file-import='{% trans "Cancel File Import" as cancelFileImport %} "{{ cancelFileImport|escapejs }}"'
+        etl-file-upload-message='{% trans "Use this workflow to upload a file with data that you want to use to create new data instances of a model." as etlFileUploadMessage %} "{{ etlFileUploadMessage|escapejs }}"'
+        etl-single-csv-title='{% trans "Import Format: Single .csv file" as etlSingleCSVTitle %} "{{ etlSingleCSVTitle|escapejs }}"'
+        file-summary='{% trans "File Summary" as fileSummary %} "{{ fileSummary|escapejs }}"'
+        file-name='{% trans "File name" as fileName %} "{{ fileName|escapejs }}"'
+        file-size='{% trans "File size" as fileSize %} "{{ fileSize|escapejs }}"'
+        number-of-rows='{% trans "Number of rows" as numberOfRows %} "{{ numberOfRows|escapejs }}"'
+        target-model='{% trans "Target Model" as targetModel %} "{{ targetModel|escapejs }}"'
+        import-details='{% trans "Import Details" as importDetails %} "{{ importDetails|escapejs }}"'
+        column-name-first-row='{% trans "Column names in the first row" as columnNameFirstRow %} "{{ columnNameFirstRow|escapejs }}"'
+        showing-first='{% trans "Showing First" as showingFirst %} "{{ showingFirst|escapejs }}"'
+        showing-all='{% trans "Showing All" as showingAll %} "{{ showingAll|escapejs }}"'
+        rows='{% trans "Rows" as rows %} "{{ rows|escapejs }}"'
+        import-data='{% trans "Import data" as importData %} "{{ importData|escapejs }}"'
+        cancel-file-import='{% trans "Cancel File Import" as cancelFileImport %} "{{ cancelFileImport|escapejs }}"'
+        import-single-csv='{% trans "Import Single CSV" as importSingleCsv %} "{{ importSingleCsv|escapejs }}"'
+        target-resource='{% trans "Target Resource" as targetResource %} "{{ targetResource|escapejs }}"'
+        target-fields='{% trans "Target Fields" as targetFields %} "{{ targetFields|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}

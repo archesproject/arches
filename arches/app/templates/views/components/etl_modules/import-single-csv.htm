@@ -9,17 +9,21 @@
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
-        <h2>{% trans 'Upload .csv or .zip File' %}</h2>
-        <h4>{% trans 'Drag & Drop your file onto this area to upload' %}</h4>
+        <h2>
+            <span data-bind="text: translations.UploadCsvZipFile"></span>
+        </h2>
+        <h4>
+            <span data-bind="text: translations.dropzoneFileUploadCaption"></span>
+        </h4>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
             <div style="display:flex; flex-direction: column;">
                 <div>
                     <div class="dropzone-photo-upload" style="margin-top: 0px;">
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                        {% trans 'Select File' %}
+                            <span data-bind="text: translations.selectFile"></span>
                         </div>
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
-                            {% trans 'Cancel File Import' %}
+                            <span data-bind="text: translations.cancelFileImport"></span>
                         </div>
                         <div style="min-height: 100%;">
                             <div id="hidden-dz-previews" style="display:none"></div>
@@ -28,7 +32,7 @@
                 </div>
             </div>
             <h5 class="rr-splash-description">
-                {% trans 'Use this workflow to upload a file with data that you want to use to create new data instances of a model.' %}
+                <span data-bind="text: translations.etlFileUploadMessage"></span>
             </h5>
         </div>
     </div>
@@ -38,37 +42,45 @@
 <!-- ko if: fileAdded() -->
 <div class="etl-module-component-container">
 <div class="etl-module-body">
-    <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">{% trans "Import Format: Single .csv file" %}</h3>
+    <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">
+        <span data-bind="text: translations.etlSingleCSVTitle"></span>
+    </h3>
     <div class="etl-module-component" style="margin-top: 0px;">
-        <h4 style="margin-top: 5px; margin-bottom: 0px;">{% trans "File Summary" %}</h4>
+        <h4 style="margin-top: 5px; margin-bottom: 0px;">
+            <span data-bind="text: translations.fileSummary"></span>
+        </h4>
         <div>
-            <span class="etl-loading-metadata-key">{% trans "File name:" %}</span>
+            <span class="etl-loading-metadata-key" data-bind="text: translations.fileName + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="text: fileInfo().name"></span>
         </div>
         <div>
-            <span class="etl-loading-metadata-key">{% trans "File size:" %}</span>
+            <span class="etl-loading-metadata-key" data-bind="text: translations.fileSize + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="html: formatSize(fileInfo().size)"></span>
         </div>
         <div>
-            <span class="etl-loading-metadata-key">{% trans "Number of rows:" %}</span>
+            <span class="etl-loading-metadata-key" data-bind="text: translations.numberOfRows + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="text: numberOfRow()"></span>
         </div>
     </div>
     <div class="etl-module-component etl-module-mapping">
-        <h4>{% trans "Target Model" %}</h4>
+        <h4>
+            <span data-bind="text: translations.targetModel"></span>
+        </h4>
         <select data-bind="
             value: selectedGraph,
             options: graphs,
             optionsText: 'name',
             optionsValue: 'graphid',
-            optionsCaption: '{% trans "Select a Resource Model..." %}',
+            optionsCaption: translation.selectAResourceModel + '...',
             valueAllowUnset: true,
             chosen: {width: '500px'}"
         ></select>
     </div>
     <div class="etl-module-component">
-        <h4>{% trans "Import Details" %}</h4>
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: '{% trans "Column names in the first row" %}', subtitle: ''}}}"></div>
+        <h4>
+            <span data-bind="text: translations.importDetails"></span>
+        </h4>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: translations.columnNameFirstRow, subtitle: ''}}}"></div>
         <div class="csv-mapping-table-container">
         <table class="table table-striped csv-mapping-table">
             <thead>
@@ -80,7 +92,7 @@
                             value: mapping.node,
                             options: nodes,
                             optionsText: 'label',
-                            optionsCaption: '{% trans "Select..." %}',
+                            optionsCaption: translation.select,
                             optionsValue: 'alias',
                             valueAllowUnset: true,
                             chosen: {width: '100%'}"
@@ -108,19 +120,19 @@
         </table>
         </div>
         <!-- ko if: csvExample().length >= 5-->
-        <div data-bind="text: '{% trans 'Showing First ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
+        <div data-bind="text: translations.showingFirst + ' ' + csvExample().length + translations.rows"></div>
         <!-- /ko -->
         <!-- ko ifnot: csvExample().length >= 5 -->
-        <div data-bind="text: '{% trans 'Showing All ' %}' + csvExample().length + '{% trans ' Rows' %}'"></div>
+        <div data-bind="text: translations.showingAll + ' ' + csvExample().length + translations.rows"></div>
         <!-- /ko -->
     </div>
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
     <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
-        <span>{% trans "Import data" %}</span>
+        <span data-bind="text: translations.importData"></span>
     </button>
     <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
-        <span>{% trans "Cancel File Import" %}</span>
+        <span data-bind="text: translations.cancelFileImport"></span>
     </button>
 </div>
 </div>
@@ -130,15 +142,17 @@
 
 {% block etl_status %}
 <div>
-    <h4>{% trans "Import Single CSV" %}</h4>
+    <h4>
+        <span data-bind="text: translations.importSingleCsv"></span>
+    </h4>
     <!-- ko if: load_details -->
     <!-- ko ifnot: loading() -->
     <div>
-        <span class="etl-loading-metadata-key">{% trans 'Target Resource:' %}</span>
+        <span class="etl-loading-metadata-key" data-bind="text: translations.targetResource"></span>
         <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
     </div>
     <div>
-        <span class="etl-loading-metadata-key">{% trans 'Target Fields:' %}</span>
+        <span class="etl-loading-metadata-key" data-bind="text: translations.targetFields + ':'"></span>
         <!-- ko foreach: load_details.mapping -->
         <!-- ko if:  $data.node -->
         <span class="etl-loading-metadata-value" data-bind="text: $data.node"></span><span>;</span>
