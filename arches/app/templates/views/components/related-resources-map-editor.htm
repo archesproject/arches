@@ -8,7 +8,7 @@
     'active': activeTab() === 'editor'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+    <span class="map-sidebar-text" data-bind="text: translations.edit"></span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
@@ -23,7 +23,9 @@
     <div class="workbench-card-sidepanel-body">
     <!-- ko if: !self.coordinateEditing() -->
     <div style="margin: 10px 10px 0px;">
-        <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
+        <div class='control-label widget-input-label'>
+            <span data-bind="text: translations.participatingLayers"></span>
+        </div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
         <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
         <div class="overlay-listing rr-map-card" style="padding: 5px; min-height: 0px" data-bind="click: function(){self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1 ? self.filterNodeIds.remove(nodeInfo.nodeid) : self.filterNodeIds.push(nodeInfo.nodeid)}">
@@ -46,20 +48,24 @@
         {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
-            <span>{% trans 'Showing edits by' %}</span>
+            <span data-bind="text: translations.showingEditsBy"></span>
             <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-            <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+            <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
+                <span data-bind="text: translations.returnToApprovedEdits"></span>
+            </a>
             <!-- /ko-->
             <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-            <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+            <span data-bind="text: translations.newProvisionalContribution"></span>
             <!-- /ko-->
         </div>
         <!-- /ko-->
 
         <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
         <div class="edit-message-container approved">
-            <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+            <div>
+                <span data-bind="text: translations.showingMostRecentApprovedEdits"></span>
+            </div>
         </div>
         <!-- /ko-->
 
@@ -68,10 +74,14 @@
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
             <div class='new-provisional-edits-list'>
                 <div class='new-provisional-edits-header'>
-                    <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                    <div class='new-provisional-edits-title'>
+                        <span data-bind="text: translations.provisionalEdits"></span>
+                    </div>
                     <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                             provisionalTileViewModel.deleteAllProvisionalEdits();
-                        }"><span>{% trans 'Delete all edits' %}</span></div>
+                        }">
+                        <span data-bind="text: translations.deleteAllEdits"></span>
+                    </div>
                 </div>
                 <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
                 <div class='new-provisional-edit-entry' data-bind="css: {
@@ -107,14 +117,18 @@
                 <div class="display-in-workflow-step install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
-                    }"><span>{% trans 'Cancel' %}</span></button>
+                    }">
+                        <span data-bind="text: translations.cancel"></span>
+                    </button>
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
-                    }, click: updateGeoJSON"><span>{% trans 'Update Features' %}</span></button>
+                    }, click: updateGeoJSON">
+                        <span data-bind="text: translations.updateFeatures"></span>
+                    </button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
                 <div class="geojson-error-list">
-                    {% trans "GeoJSON has the following errors that must be resolved:" %}
+                    <span data-bind="text: translations.geojsonErrors"></span>
                     <ul>
                         <!-- ko foreach: geoJSONErrors() -->
                         <li data-bind="text: message"></li>
@@ -133,18 +147,32 @@
                 }">
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
                     <div class="rr-map-card-intersect-panel">
-                        <div class='control-label widget-input-label'>{% trans "Buffer Intersecting Feature" %}</div>
+                        <div class='control-label widget-input-label'>
+                            <span data-bind="text: translations.bufferIntersectingFeature"></span>
+                        </div>
                         <div class="buffer-control" style="padding-left: 0px">
                             <div style="display: inline-flex; justify-content: space-between; width: 100%">
                                 <div class="form-inline">
-                                <input type="number" min=0.0 id="buffer-input" placeholder="{% trans " buffer " %}" class="form-control" style="height: 34px; width: 95px" data-bind="textInput: self.mapFilter.buffer">
+                                <input 
+                                    type="number" 
+                                    min=0.0 
+                                    id="buffer-input" 
+                                    class="form-control"
+                                    style="height: 34px; width: 95px" 
+                                    data-bind="
+                                        attr: {placeholder: translations.buffer},
+                                        textInput: self.mapFilter.buffer
+                                    "
+                                >
                                 <select class="form-control" style="vertical-align: top; height: auto" data-bind="options: self.mapFilter.bufferUnits, optionsText:'name', optionsValue:'val', value: self.mapFilter.bufferUnit"></select>
                                 </div>
                                 <div style="display: flex;">
                                     <button class="btn btn-sm btn-primary" data-bind="
                                         click: function(){self.appendBufferToTileFeatures(widget.node_id());}, 
                                         disable: !ko.unwrap(self.mapFilter.buffer) || !ko.unwrap(self.mapFilter.searchGeometries).length
-                                        ">{% trans 'Add buffer to features' %}</button>
+                                        ">
+                                        <span data-bind="text: translations.addBufferToFeatures"></span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +180,9 @@
 
                     <!--ko if: self.featureLookup[widget.node_id()].features -->
                     <div class="rr-map-card-intersect-panel">
-                        <div class='control-label widget-input-label'>{% trans "Select a feature to perform intersection" %}</div>
+                        <div class='control-label widget-input-label'>
+                            <span data-bind="text: translations.selectAFeatureToPerformIntersection"></span>
+                        </div>
                         <table class="table">
                             <tbody>
                             <!-- ko foreach: {data: self.featureLookup[widget.node_id()].features, as: 'feature'} -->
@@ -164,7 +194,7 @@
                                     <a href="javascript:void(0);" data-bind="
                                     click: function(){self.mapFilter.makeSearchFeature(feature)}">
                                         <i class="fa fa-pencil map-card-feature-edit"></i>
-                                        {% trans "Intersect" %}
+                                        <span data-bind="text: translations.intersect"></span>
                                     </a>
                                 </td>
                             </tr>
@@ -187,7 +217,7 @@
                     <a class="pull-right card-help help editable-help" data-bind="click: function () {
                         card.model.get('helpactive')(true)
                     }" style="cursor:pointer;">
-                        {% trans "Help" %}
+                        <span data-bind="text: translations.help"></span>
                         <i class="fa fa-question-circle"></i>
                     </a>
                 </span>
@@ -240,18 +270,21 @@
                                 <div class="col-xs-12">
                                     <div class="map-card-feature-list">
                                         <div class="add-new-feature">
-                                            <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
-                                                value: self.featureLookup[widget.node_id()].selectedTool,
-                                                valueAllowUnset: true,
-                                                options: widget.drawTools,
-                                                optionsText: 'text',
-                                                optionsValue: 'value',
-                                                chosen: {
-                                                    'width': '100%',
-                                                    'disable_search_threshold': 10,
-                                                    'allow_single_deselect': true
-                                                }
-                                            "></select>
+                                            <select 
+                                                data-placeholder="translations.addANewFeature + '...'" 
+                                                data-bind="
+                                                    value: self.featureLookup[widget.node_id()].selectedTool,
+                                                    valueAllowUnset: true,
+                                                    options: widget.drawTools,
+                                                    optionsText: 'text',
+                                                    optionsValue: 'value',
+                                                    chosen: {
+                                                        'width': '100%',
+                                                        'disable_search_threshold': 10,
+                                                        'allow_single_deselect': true
+                                                    }
+                                                "
+                                            ></select>
                                         </div>
                                         <table class="table">
                                             <tbody>
@@ -263,13 +296,13 @@
                                                     <td class="map-card-feature-tool">
                                                         <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false">
                                                             <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                            {% trans "Edit" %}
+                                                            <span data-bind="text: translations.edit"></span>
                                                         </a>
                                                     </td>
                                                     <td class="map-card-feature-tool">
                                                         <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false">
                                                             <i class="fa fa-trash map-card-feature-delete"></i>
-                                                            {% trans "Delete" %}
+                                                            <span data-bind="text: translations.delete"></span>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -282,7 +315,7 @@
                                                 self.showRelatedQuery(true);
                                             }">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                {% trans "Find" %}
+                                                <span data-bind="text: translations.find"></span>
                                             </a>
                                             |
                                             <!-- ko if: self.canEditCoordinates() -->
@@ -290,13 +323,13 @@
                                                     self.coordinateEditing(true);
                                                 }">
                                                     <i class="fa fa-list map-card-feature-edit"></i>
-                                                    {% trans "Edit Coordinates" %}
+                                                    <span data-bind="text: translations.editCoordinates"></span>
                                                 </a>
                                                 <!-- /ko -->
                                                 <!-- ko if: !self.canEditCoordinates() -->
                                                     <span>
                                                         <i class="fa fa-list map-card-feature-edit"></i>
-                                                        {% trans "Edit Coordinates" %}
+                                                        <span data-bind="text: translations.editCoordinates"></span>
                                                     </span>
                                                 <!-- /ko -->
                                             <!--/ko-->
@@ -304,7 +337,7 @@
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                             }">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                {% trans "Edit GeoJSON" %}
+                                                <span data-bind="text: translations.editGeoJson"></span>
                                             </a>
                                             <!-- ko if: ko.unwrap(self.featureLookup[widget.node_id()].features) && self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
@@ -312,7 +345,7 @@
                                                 self.fitFeatures(self.featureLookup[widget.node_id()].features());
                                             }">
                                                 <i class="fa fa-search map-card-feature-edit"></i>
-                                                {% trans "Zoom to all" %}
+                                                <span data-bind="text: translations.zoomToAll"></span>
                                             </a>
                                             <!-- /ko -->
                                         </div>
@@ -331,24 +364,32 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-warning': card.isWritable
-                    }"><span>{% trans 'Delete' %}</span></button>
+                    }">
+                        <span data-bind="text: translations.delete"></span>
+                    </button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset"><span>{% trans 'Cancel' %}</span></button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">
+                            <span data-bind="text: translations.cancel"></span>
+                        </button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: (!card.isWritable && !self.preview),
                             'btn-mint': card.isWritable
-                        }"><span>{% trans 'Save' %}</span></button>
+                        }">
+                            <span data-bind="text: translations.save"></span>
+                        </button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-mint': card.isWritable
-                    }"><span>{% trans 'Add'  %}</span></button>
+                    }">
+                        <span data-bind="text: translations.add"></span>
+                    </button>
                     <!-- /ko -->
                 </div>
                 {% endblock form_buttons %}
@@ -379,7 +420,9 @@
 <div class="display-in-workflow-step">
     <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function () {
         showRelatedQuery(false);
-    }">{% trans 'Done' %}</button>
+    }">
+        <span data-bind="text: translations.done"></span>
+    </button>
 </div>
 <!--/ko -->
 <!--/ko -->
