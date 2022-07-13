@@ -13,7 +13,7 @@ define([
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;
-
+            this.translations = arches.translations;
             this.canvasesForDeletion = ko.observableArray([]);
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
