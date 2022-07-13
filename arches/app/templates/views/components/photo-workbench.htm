@@ -9,7 +9,7 @@
     'active': activeTab() === 'edit'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+    <span class="map-sidebar-text" data-bind="text: translations.edit"></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('add');
@@ -17,7 +17,7 @@
     'active': activeTab() === 'add'
 }">
     <i class="fa fa-plus"></i>
-    <span class="map-sidebar-text">{% trans "Add" %}</span>
+    <span class="map-sidebar-text" data-bind="text: translations.add"></span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
@@ -34,7 +34,7 @@
 
     <div style="position: absolute; bottom: 0px; width: 100%;" data-bind="style: {display: !!self.displayContent() ? 'inherit' : 'none'}">
         <div class="thumbnail-gallery-container" data-bind="slide: showThumbnails, duration: 100, direction: {direction: 'down'}, easing: 'slide'">
-            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: {% quoted_trans "Close" %}"></div>
+            <div class='show-thumbnails-btn open' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: translations.close"></div>
             <div class="thumbnail-container" data-bind="gallery: photoGallery.pan, duration: 400, scrolldistance: 100, thumbnailclass: 'gallery-thumbnails'">
                 <div class="thumbnail-gallery-controls right" data-bind="click: function(){photoGallery.updatePan('left')}"><i class="fa fa-angle-left"></i></div>
                 <div class="gallery-thumbnails">
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: {% quoted_trans "View Gallery" %}, fadeVisible: showThumbnails, delay:400, fade: 200"></div>
+        <div class='show-thumbnails-btn closed' data-bind="click: function(){showThumbnails(!showThumbnails())}, text: translations.viewGallery, fadeVisible: showThumbnails, delay:400, fade: 200"></div>
     </div>
 
     <!--ko if: self.displayContent() === undefined -->
@@ -69,26 +69,30 @@
                 <div class="file-select-window">
                    <div class="bord-top pad-ver file-select">
                        <div class="" style="padding: 5px">
-                           <h2>{% trans 'Upload Photographs' %}</h2>
-                           <h4>{% trans 'Drag & Dop your photos onto this panel to upload' %}</h4>
+                            <h2>
+                                <span data-bind="text: translations.uploadPhotographs"></span>
+                            </h2>
+                            <h4>
+                                <span data-bind="text: translations.dragAndDropPhotosOnPanel"></span>
+                            </h4>
                        </div>
                        <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                            <i class="fa fa-file"></i>
-                           <span>{% trans "Select Photographs" %}</span>
+                           <span data-bind="text: translations.selectPhotographs"></span>
                        </button>
                        <br>
                        <div style="padding: 10px">
                             <p>
-                                {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                                <span data-bind="text: translations.addingPhotosOptional"></span>
                             </p>
                             <p>
-                                {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                                <span data-bind="text: translations.maxPhotoSizeWarning"></span>
                             </p>
                         </div>
 
                    </div>
                    <div class="file-upload-footer">
-                       <span>{% trans 'Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored.' %}</span>
+                        <span data-bind="text: translations.validImageFormats"></span>
                    </div>
                </div>
 
@@ -113,26 +117,30 @@
             <div class="file-select-window">
                <div class="bord-top pad-ver file-select">
                    <div class="" style="padding: 5px">
-                       <h2>{% trans 'Upload Photographs' %}</h2>
-                       <h4>{% trans 'Drag & Dop your photos onto this panel' %}</h4>
+                        <h2>
+                            <span data-bind="text: translations.uploadPhotographs"></span>
+                        </h2>
+                        <h4>
+                            <span data-bind="text: translations.dragAndDropPhotosOnPanel"></span>
+                        </h4>
                    </div>
                    <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                        <i class="fa fa-file"></i>
-                       <span>{% trans "Select Photographs" %}</span>
+                       <span data-bind="text: translations.selectPhotographs"></span>
                    </button>
                    <br>
                    <div style="padding: 10px">
                         <p>
-                            {% trans "Adding photos to this record is <span><strong>optional.</strong></span>" %}
+                            <span data-bind="text: translations.addingPhotosOptional"></span>
                         </p>
                         <p>
-                            {% trans "You may upload as many photos as you wish, but the maximum size of any single file is <span>8MB</span>" %}
+                            <span data-bind="text: translations.maxPhotoSizeWarning"></span>
                         </p>
                     </div>
 
                </div>
                <div class="file-upload-footer">
-                   <span>{% trans 'Accepted formats: .jpg, .png, .tiff' %}</span>
+                    <span data-bind="text: translations.acceptedImageFormats"></span>
                </div>
            </div>
 
@@ -149,7 +157,9 @@
 <div class="workbench-card-sidepanel-border"></div>
 
 <div class="workbench-card-sidepanel-body">
-<h5 class="workbench-tile-picker-label">{% trans 'Image List' %}</h5>
+<h5 class="workbench-tile-picker-label">
+    <span data-bind="text: translations.imageList"></span>
+</h5>
 <div class='photo-workbench-photos'>
 <!-- ko foreach: { data: card.tiles(), as: 'tile'} -->
     <!--ko if: $parent.getUrl(tile) -->
@@ -162,20 +172,24 @@
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
-        <span>{% trans 'Currently showing edits by' %}</span>
+        <span data-bind="text: translations.showingEditsBy"></span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
+            <span data-bind="text: translations.returnToApprovedEdits"></span>
+        </a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+        <span data-bind="text: translations.newProvisionalContribution"></span>
         <!-- /ko-->
     </div>
     <!-- /ko-->
 
     <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
     <div class="edit-message-container approved">
-        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+        <div>
+            <span data-bind="text: translations.showingMostRecentApprovedEdits"></span>
+        </div>
     </div>
     <!-- /ko-->
 
@@ -184,10 +198,14 @@
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
-                <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                <div class='new-provisional-edits-title'>
+                    <span data-bind="text: translations.provisionalEdits"></span>
+                </div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                         provisionalTileViewModel.deleteAllProvisionalEdits();
-                    }"><span>{% trans 'Delete all edits' %}</span></div>
+                    }">
+                    <span data-bind="text: translations.deleteAllEdits"></span>
+                </div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {
@@ -220,7 +238,7 @@
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {
                     card.model.get('helpactive')(true)
                 }" style="cursor:pointer;">
-                    {% trans "Help" %}
+                    <span data-bind="text: translations.help"></span>
                     <i class="fa fa-question-circle"></i>
                 </a>
             </span>
@@ -305,24 +323,32 @@
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-warning': $parent.card.isWritable
-                }"><span>{% trans 'Delete' %}</span></button>
+                }">
+                    <span data-bind="text: translations.delete"></span>
+                </button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset"><span>{% trans 'Cancel' %}</span></button>
+                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: selected().reset">
+                        <span data-bind="text: translations.cancel"></span>
+                    </button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
                         disabled: (!$parent.card.isWritable && !self.preview),
                         'btn-mint': $parent.card.isWritable
-                    }"><span>{% trans 'Save' %}</span></button>
+                    }">
+                        <span data-bind="text: translations.save"></span>
+                    </button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-mint': $parent.card.isWritable
-                }"><span>{% trans 'Add'  %}</span></button>
+                }">
+                    <span data-bind="text: translations.add"></span>
+                </button>
                 <!-- /ko -->
             </div>
                 <!--/ko-->

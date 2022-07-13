@@ -2,6 +2,7 @@ define([
     'knockout',
     'knockout-mapping',
     'underscore',
+    'arches',
     'dropzone',
     'uuid',
     'viewmodels/card-component',
@@ -12,8 +13,9 @@ define([
     'bindings/fadeVisible',
     'bindings/dropzone',
     'bindings/gallery',
-], function(ko, koMapping, _, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
+], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
     const viewModel = function(params) {
+        this.translations = arches.translations;
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
         var self = this;
         CardComponentViewModel.apply(this, [params]);
