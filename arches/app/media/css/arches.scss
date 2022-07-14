@@ -9540,6 +9540,25 @@ div.row.widget-wrapper.report-header:hover {
     z-index: 10;
 }
 
+.mainnav-container {
+    display: flex; 
+    flex-direction: column;
+    z-index: 15;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.debug-notice {
+    padding-bottom: 4px;
+    padding-right: 2px;
+    font-size: x-small;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
 #navbar {
     z-index: 16;
 }
