@@ -1,12 +1,11 @@
 define([
     'knockout',
-    'arches',
     'templates/views/components/datatypes/url.htm',
-], function(ko, arches, urlDatatypeTemplate) {
+], function(ko, urlDatatypeTemplate) {
     var name = 'url-datatype-config';
     const viewModel = function(params) {
         var self = this;
-        this.translations = arches.translations;
+         
         this.search = params.search;
         if (this.search) {
             var filter = params.filterValue();

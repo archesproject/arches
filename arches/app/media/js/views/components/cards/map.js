@@ -11,7 +11,7 @@ define([
     var viewModel = function(params) {
         var self = this;
 
-        this.translations = arches.translations;
+         
         params.configKeys = [
             'basemap',
             'overlayConfigs',

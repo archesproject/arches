@@ -17,7 +17,7 @@ define([
 
     const viewModel = function(params) {
         const self = this;
-        this.translations = arches.translations;
+         
         params.configKeys = ['placeholder', 'defaultValue'];
         this.showEDTFFormats = ko.observable(false);
         this.transformedEdtf = ko.observable();

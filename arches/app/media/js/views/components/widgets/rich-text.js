@@ -18,7 +18,7 @@ define([
     const viewModel = function(params) {
         params.configKeys = ['displayfullvalue'];
         const self = this;
-        this.translations = arches.translations;
+         
         WidgetViewModel.apply(self, [params]);
         const initialCurrent = {};
         self.showi18nOptions = ko.observable(false);

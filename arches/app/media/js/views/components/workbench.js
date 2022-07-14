@@ -2,14 +2,13 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'templates/views/components/workbench.htm',
     'bindings/sortable',
-], function($, _, ko, arches, workbenchTemplate) {
+], function($, _, ko, workbenchTemplate) {
     var viewModel = function(params) {
         var self = this;
 
-        this.translations = arches.translations;
+         
         this.activeTab = ko.observable(params.activeTab);
         this.showTabs = ko.observable(true);
         this.hideSidePanel = function() {

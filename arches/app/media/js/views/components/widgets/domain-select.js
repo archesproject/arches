@@ -1,10 +1,9 @@
 define([
     'knockout',
-    'arches',
     'viewmodels/domain-widget',
     'templates/views/components/widgets/select.htm',
     'plugins/knockout-select2',
-], function(ko, arches, DomainWidgetViewModel, selectTemplate) {
+], function(ko, DomainWidgetViewModel, selectTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -18,7 +17,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['placeholder', 'defaultValue'];
-        this.translations = arches.translations;
+         
         DomainWidgetViewModel.apply(this, [params]);
     };
 

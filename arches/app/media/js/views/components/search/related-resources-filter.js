@@ -11,7 +11,7 @@ define([
         initialize: function(options) {
             options.name = 'Related Resources Filter';
 
-            this.translations = arches.translations;
+             
             this.requiredFilters = ['search-results'];
             BaseFilter.prototype.initialize.call(this, options);
             this.ready = ko.observable(false);

@@ -2,13 +2,12 @@ define([
     'jquery',
     'knockout',
     'underscore',
-    'arches',
     'dropzone',
     'uuid',
     'viewmodels/file-widget',
     'templates/views/components/widgets/file.htm',
     'bindings/dropzone',
-], function($, ko, _, arches, Dropzone, uuid, FileWidgetViewModel, fileWidgetTemplate) {
+], function($, ko, _, Dropzone, uuid, FileWidgetViewModel, fileWidgetTemplate) {
     /**
      * registers a file-widget component for use in forms
      * @function external:"ko.components".file-widget
@@ -21,7 +20,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
-        this.translations = arches.translations;
+         
         FileWidgetViewModel.apply(this, [params]);
     };
 

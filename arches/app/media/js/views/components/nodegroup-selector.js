@@ -2,15 +2,14 @@ define([
     'jquery',
     'knockout', 
     'knockout-mapping',
-    'arches',
     'viewmodels/function', 
     'models/graph',
     'bindings/chosen',
     'templates/views/components/nodegroup-selector.htm'
-], function($, ko, koMapping, arches, FunctionViewModel, GraphModel, chosen, nodegroupSelectorTemplate) {
+], function($, ko, koMapping, FunctionViewModel, GraphModel, chosen, nodegroupSelectorTemplate) {
     return ko.components.register('views/components/nodegroup-selector', {
         viewModel: function(params) {
-            this.translations = arches.translations;
+             
             FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
             this.cards = ko.observableArray();

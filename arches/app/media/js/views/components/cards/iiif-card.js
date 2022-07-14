@@ -1,17 +1,16 @@
 define([
     'knockout',
     'knockout-mapping',
-    'arches',
     'viewmodels/card-component',
     'views/components/iiif-annotation',
     'viewmodels/alert',
     'templates/views/components/cards/iiif-card.htm',
-], function(ko, koMapping, arches, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel, iiifCardTemplate) {
+], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel, iiifCardTemplate) {
     const viewModel = function(params) {
         var self = this;
 
         params.configKeys = ['defaultManifest'];
-        this.translations = arches.translations;
+         
 
         CardComponentViewModel.apply(this, [params]);
 

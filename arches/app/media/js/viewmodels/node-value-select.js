@@ -9,7 +9,7 @@ define([
         var self = this;
         params.configKeys = ['placeholder','displayOnlySelectedNode'];
         this.multiple = params.multiple || false;
-        this.translations = arches.translations;
+         
 
         WidgetViewModel.apply(this, [params]);
         this.resourceinstanceid = params.tile ? params.tile.resourceinstance_id : '';

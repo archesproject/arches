@@ -1,10 +1,9 @@
 define([
     'knockout', 
     'underscore', 
-    'arches',
     'viewmodels/widget',
     'templates/views/components/widgets/radio-boolean.htm',
-], function(ko, _, arches, WidgetViewModel, radioBooleanWidgetTemplate) {
+], function(ko, _, WidgetViewModel, radioBooleanWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -25,7 +24,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['trueLabel', 'falseLabel', 'defaultValue'];
-        this.translations = arches.translations;
+         
         WidgetViewModel.apply(this, [params]);
         var self = this;
         this.setValue = function(val) {

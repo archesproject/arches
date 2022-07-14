@@ -1,9 +1,8 @@
 define([
     'knockout',
-    'arches',
     'viewmodels/domain-widget',
     'templates/views/components/widgets/radio.htm',
-], function(ko, arches, DomainWidgetViewModel, radioTemplate) {
+], function(ko, DomainWidgetViewModel, radioTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -16,7 +15,7 @@ define([
      */
 
     const viewModel = function(params) {
-        this.translations = arches.translations;
+         
         params.configKeys = ['defaultValue'];
         DomainWidgetViewModel.apply(this, [params]);
     };

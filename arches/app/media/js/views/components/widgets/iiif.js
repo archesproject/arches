@@ -3,17 +3,16 @@ define([
     'leaflet',
     'knockout',
     'knockout-mapping',
-    'arches',
     'viewmodels/widget',
     'views/components/iiif-annotation',
     'geojson-extent',
     'templates/views/components/widgets/iiif.htm',
     'leaflet-fullscreen',
-], function(_, L, ko, koMapping, arches, WidgetViewModel, IIIFAnnotationViewmodel, geojsonExtent, iiifWidgetTemplate) {
+], function(_, L, ko, koMapping, WidgetViewModel, IIIFAnnotationViewmodel, geojsonExtent, iiifWidgetTemplate) {
     const viewModel = function(params) {
         var self = this;
 
-        this.translations = arches.translations;
+         
         params.configKeys = ['defaultManifest'];
         WidgetViewModel.apply(this, [params]);
 

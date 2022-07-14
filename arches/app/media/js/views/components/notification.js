@@ -14,7 +14,7 @@ define([
     function NotificationViewModel(params) {
         var self = this;
 
-        this.translations = arches.translations;
+         
         this.info = ko.observable();
 
         this.displaytime = moment(params.created).format('dddd, DD MMMM YYYY | hh:mm A');

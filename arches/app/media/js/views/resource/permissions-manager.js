@@ -11,7 +11,7 @@ define([
         viewModel: function(params) {
             var self = this;
 
-            this.translations = arches.translations;
+             
             this.instancePermissions = ko.observable();
             this.resourceId = params.resourceId();
             this.alert = params.alert;

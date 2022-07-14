@@ -19,7 +19,7 @@ define([
 
         var self = this;
         this.urls = arches.urls;
-        this.translations = arches.translations;
+         
         this.fileFormatRenderers = Object.values(fileRenderers);
         this.rendererComponentName = ko.observable();
 

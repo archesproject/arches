@@ -19,7 +19,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
-        this.translations = arches.translations;
+         
         WidgetViewModel.apply(this, [params]);
         const self = this;
 

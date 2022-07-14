@@ -12,7 +12,7 @@ define([
     function viewModel(params) {
         var self = this;
 
-        this.translations = arches.translations;
+         
         this.resourceId = ko.observable(ko.unwrap(params.resourceid));
         this.resourceId.subscribe(function(id) {
             params.resourceid(id);

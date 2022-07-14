@@ -13,7 +13,7 @@ define([
         viewModel: function(params) {
             const self = this;
 
-            this.translations = arches.translations;
+             
             this.loadDetails = params.load_details || ko.observable();
             this.state = params.state;
             this.loading = params.loading || ko.observable();

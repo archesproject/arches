@@ -1,10 +1,9 @@
 define([
     'knockout',
-    'arches',
     'views/components/workflows/new-tile-step',
     'viewmodels/alert',
     'templates/views/components/workflows/new-multi-tile-step.htm'
-], function(ko, arches, NewTileStepViewModel, AlertViewModel, newMultiTileStepTemplate) {
+], function(ko, NewTileStepViewModel, AlertViewModel, newMultiTileStepTemplate) {
 
     /** 
      * A generic viewmodel for workflow steps that can add multiple tiles
@@ -12,7 +11,7 @@ define([
      **/
 
     function NewMultiTileStepViewModel(params) {
-        this.translations = arches.translations;
+         
 
         NewTileStepViewModel.apply(this, [params]);
         var self = this;

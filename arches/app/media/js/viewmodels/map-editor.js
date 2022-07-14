@@ -14,8 +14,8 @@ define([
     'views/components/datatypes/geojson-feature-collection',
 ], function($, _, ko, koMapping, arches, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory) {
     var viewModel = function(params) {
-        this.translations = arches.translations;
-        
+         
+
         var self = this;
         var padding = 40;
         var drawFeatures;

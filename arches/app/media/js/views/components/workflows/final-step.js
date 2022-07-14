@@ -4,7 +4,7 @@ define([
     'templates/views/components/workflows/final-step.htm',
 ], function(ko, arches, finalStepTemplate) {
     function viewModel(params) {
-        this.translations = arches.translations;
+         
         this.urls = arches.urls;
         this.loading = ko.observable(true);
         this.resourceid = params.resourceid;

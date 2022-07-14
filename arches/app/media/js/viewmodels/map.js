@@ -9,7 +9,7 @@ define([
 ], function($, _, arches, ko, koMapping, mapPopupProvider) {
     const viewModel = function(params) {
         var self = this;
-        this.translations = arches.translations;
+         
 
         var geojsonSourceFactory = function() {
             return {

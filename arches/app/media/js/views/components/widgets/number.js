@@ -1,11 +1,10 @@
 define([
     'knockout', 
     'underscore', 
-    'arches',
     'viewmodels/widget', 
     'templates/views/components/widgets/number.htm',
     'bindings/formattedNumber',
-], function(ko, _, arches, WidgetViewModel, numberWidgetTemplate) {
+], function(ko, _, WidgetViewModel, numberWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -20,7 +19,7 @@ define([
     var NumberWidget = function(params) {
         params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format', 'uneditable'];
 
-        this.translations = arches.translations;
+         
         WidgetViewModel.apply(this, [params]);
 
         var self = this;

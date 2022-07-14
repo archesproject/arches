@@ -1,11 +1,11 @@
-define(['knockout', 'arches', 'templates/views/components/datatypes/boolean.htm'], function(ko, arches, booleanTemplate) {
+define(['knockout', 'templates/views/components/datatypes/boolean.htm'], function(ko, booleanTemplate) {
     var name = 'boolean-datatype-config';
 
     const viewModel = function(params) {
         var self = this;
         var config = params.config ? params.config : params.node.config;
 
-        this.translations = arches.translations;
+         
         this.search = params.search;
         this.graph = params.graph;
         this.trueLabel = config.trueLabel;

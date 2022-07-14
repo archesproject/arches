@@ -9,7 +9,7 @@ define([
     const viewModel = function(params) {
         var self = this;
 
-        this.translations = arches.translations;
+         
         self.urls = arches.urls;
         self.items = ko.observableArray([]);
         $.ajax({

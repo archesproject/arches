@@ -2,7 +2,6 @@ define([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'card-components',
     'report-templates',
     'views/components/search/base-filter',
@@ -11,13 +10,13 @@ define([
     'viewmodels/card',
     'views/components/resource-report-abstract',
     'bindings/chosen',
-], function($, _, ko, arches, cardComponents, reportLookup, BaseFilter, searchResultDetailsTemplate, ReportModel, CardViewModel) {
+], function($, _, ko, cardComponents, reportLookup, BaseFilter, searchResultDetailsTemplate, ReportModel, CardViewModel) {
     var componentName = 'search-result-details';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
 
-            this.translations = arches.translations;
+             
             options.name = 'Search Result Details';
             this.requiredFilters = ['search-results'];
 

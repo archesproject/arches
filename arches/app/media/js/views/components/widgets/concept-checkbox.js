@@ -1,10 +1,9 @@
 define([
     'knockout',
-    'arches',
     'viewmodels/concept-widget',
     'templates/views/components/widgets/checkbox.htm',
     'plugins/knockout-select2',
-], function(ko, arches, ConceptWidgetViewModel, conceptCheckboxTemplate) {
+], function(ko, ConceptWidgetViewModel, conceptCheckboxTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -17,7 +16,7 @@ define([
      */
 
     const viewModel = function(params) {
-        this.translations = arches.translations;
+         
         params.configKeys = ['defaultValue'];
         ConceptWidgetViewModel.apply(this, [params]);
 

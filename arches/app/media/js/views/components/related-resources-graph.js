@@ -14,7 +14,7 @@ define([
             edgeLength: 200
         };
 
-        this.translations = arches.translations;
+         
         this.viz = ko.observable();
         this.cytoscapeConfig = ko.observable();
         this.focusResourceId = ko.isObservable(params.resourceId) ?

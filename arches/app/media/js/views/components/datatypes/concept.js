@@ -11,7 +11,7 @@ define([
             var self = this;
             var filter = params.filterValue();
             params.config = ko.observable({options:[]});
-            this.translations = arches.translations;
+             
             this.op = ko.observable(filter.op || '');
             this.placeholder = ko.observable('Select a concept');
             this.multiple = ko.observable(false);

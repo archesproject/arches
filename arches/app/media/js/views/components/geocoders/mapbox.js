@@ -8,7 +8,7 @@ define([
         viewModel: function(params) {
             BaseGeocoderViewModel.apply(this, [params]);
             var self = this;
-            this.translations = arches.translations;
+             
             this.placeholder = params.placeholder || ko.observable('Locate a Place or Address');
             this.anchorLayerId = params.anchorLayerId;
             this.apiKey = params.api_key() || arches.mapboxApiKey;

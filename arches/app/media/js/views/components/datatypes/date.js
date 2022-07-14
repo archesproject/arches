@@ -1,8 +1,8 @@
-define(['knockout', 'arches', 'templates/views/components/datatypes/date.htm'], function(ko, arches, dateDatatypeTemplate) {
+define(['knockout', 'templates/views/components/datatypes/date.htm'], function(ko, dateDatatypeTemplate) {
     var name = 'date-datatype-config';
     const viewModel = function(params) {
         var self = this;
-        this.translations = arches.translations;
+         
         this.search = params.search;
         if (!this.search) {
             this.dateFormat = params.config.dateFormat;

@@ -1,8 +1,8 @@
-define(['knockout', 'arches', 'templates/views/components/datatypes/edtf.htm'], function(ko, arches, edtfDatatypeTemplate) {
+define(['knockout', 'templates/views/components/datatypes/edtf.htm'], function(ko, edtfDatatypeTemplate) {
     var name = 'edtf-datatype-config';
     const viewModel = function(params) {
         var self = this;
-        this.translations = arches.translations;
+         
         this.config = params.config;
         this.search = params.search;
         if (this.search) {

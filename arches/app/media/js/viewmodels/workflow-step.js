@@ -2,22 +2,21 @@ define([
     'knockout',
     'underscore',
     'knockout-mapping',
-    'arches',
     'uuid',
     'views/components/workflows/workflow-component-abstract',
     'templates/views/components/plugins/workflow-step.htm'
-], function(ko, _, koMapping, arches, uuid, WorkflowComponentAbstract, workflowStepTemplate) {
+], function(ko, _, koMapping, uuid, WorkflowComponentAbstract, workflowStepTemplate) {
     STEPS_LABEL = 'workflow-steps';
     STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
-        this.translations = arches.translations;
+         
         
         _.extend(this, config);
 
         var self = this;
 
-        this.translations = arches.translations;
+         
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 

@@ -22,7 +22,7 @@ define([
             return val;
         };
 
-        this.translations = arches.translations;
+         
         this.map = ko.observable();
         this.manifest = ko.observable(params.manifest);
         this.editManifest = ko.observable(!params.manifest);

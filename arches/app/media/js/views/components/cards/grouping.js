@@ -22,7 +22,7 @@ define([
     function viewModel(params) {
         // params.form is the CardTreeViewModel
         var self = this;
-        this.translations = arches.translations;
+         
         this.saving = params.form?.saving || ko.observable(false);
         this.tiles = [];
         this.widgetInstanceDataLookup = {};

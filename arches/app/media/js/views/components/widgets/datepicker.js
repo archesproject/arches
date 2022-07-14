@@ -1,14 +1,13 @@
 define([
     'knockout',
     'underscore',
-    'arches',
     'viewmodels/widget',
     'moment',
     'templates/views/components/widgets/datepicker.htm',
     'bindings/datepicker',
     'bindings/moment-date',
     'bindings/chosen',
-], function(ko, _, arches, WidgetViewModel, moment, datePickerWidgetTemplate) {
+], function(ko, _, WidgetViewModel, moment, datePickerWidgetTemplate) {
     /**
      * registers a datepicker-widget component for use in forms
      * @function external:"ko.components".datepicker-widget
@@ -26,7 +25,7 @@ define([
         var self = this;
         params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat', 'defaultValue'];
 
-        this.translations = arches.translations;
+         
         WidgetViewModel.apply(this, [params]);
 
         if (self.node.config && ko.unwrap(self.node.config.dateFormat)) {

@@ -1,15 +1,14 @@
 define([
     'knockout', 
     'underscore',
-    'arches',
     'uuid', 
     'templates/views/components/datatypes/domain-value.htm',
-], function(ko, _, arches, uuid, domainValueDatatypeTemplate) {
+], function(ko, _, uuid, domainValueDatatypeTemplate) {
     const name = 'domain-value-datatype-config';
     const viewModel = function(params) {
         var self = this;
         this.search = params.search;
-        this.translations = arches.translations;
+         
         if (this.search) {
             this.options = params.node.config.options;
             this.options.unshift({id:"", selected:true, text:"Select an Option"});

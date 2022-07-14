@@ -12,7 +12,7 @@ define([
             params.card = ko.unwrap(params.form.card);
         }
 
-        this.translations = arches.translations;
+         
         this.inResourceEditor = location.pathname.includes(arches.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;

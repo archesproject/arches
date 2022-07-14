@@ -14,7 +14,7 @@ define([
     var name = 'geojson-feature-collection-datatype-config';
     const viewModel = function(params) {
         var self = this;
-        this.translations = arches.translations;
+         
         this.node = params;
         this.config = params.config;
         this.graph = params.graph;
