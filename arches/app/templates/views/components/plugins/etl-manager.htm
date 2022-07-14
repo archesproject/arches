@@ -97,12 +97,12 @@
                             <div class="etl-job-task-bar">
                                 <div class="task">
                                     <!-- ko if: event.status == "completed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, translations.warning, translations.etlReverseWarningMessgae)}">
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, translations.warning, translations.etlReverseWarningMessage)}">
                                         <span data-bind="text: translations.undoImport"></span>
                                     </a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, translations.warning, translations.etlReverseWarningMessgae)}">
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, translations.warning, translations.etlReverseWarningMessage)}">
                                         <span data-bind="text: translations.undoImport"></span>
                                     </a>
                                     <!-- /ko -->
