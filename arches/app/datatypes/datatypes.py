@@ -1,6 +1,8 @@
 import uuid
 import json
 import decimal
+from arches.app.utils.file_validator import FileValidator
+import filetype
 import base64
 import re
 import logging
@@ -85,7 +87,7 @@ class DataTypeFactory(object):
 
 
 class StringDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         try:
             if value is not None:
@@ -153,7 +155,7 @@ class StringDataType(BaseDataType):
 
 
 class NumberDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
 
         try:
@@ -248,7 +250,7 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         try:
             if value is not None:
@@ -329,7 +331,7 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
             valid_date_format, valid = self.get_valid_date_format(value)
@@ -496,7 +498,7 @@ class EDTFDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
@@ -592,7 +594,7 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         coord_limit = 1500
         coordinate_count = 0
@@ -1218,7 +1220,22 @@ class FileListDataType(BaseDataType):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None):
+    def validate_file_types(self, request=None, nodeid=None):
+        errors = []
+        validator = FileValidator()
+        files = request.FILES.getlist("file-list_" + nodeid, [])
+        for file in files:
+            errors = errors + validator.validate_file_type(file.file, file.name.split(".")[-1])
+        return errors
+
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, path=None, request=None, **kwargs):
+        errors = []
+        file_type_errors = []
+        if request:
+            file_type_errors = errors + self.validate_file_types(request, str(node.pk))
+
+        if len(file_type_errors) > 0:
+            errors.append({"type": "ERROR", "message": _("File type not permitted")})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1238,7 +1255,6 @@ class FileListDataType(BaseDataType):
                 n += 1
             return size, power_labels[n] + "bytes"
 
-        errors = []
         try:
             config = node.config
             limit = config["maxFiles"]
@@ -1615,8 +1631,9 @@ class BaseDomainDataType(BaseDataType):
     def is_a_literal_in_rdf(self):
         return True
 
-    def lookup_domainid_by_value(self, value, nodeid, config):
+    def lookup_domainid_by_value(self, value, nodeid):
         if nodeid not in self.value_lookup:
+            config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
                 options[val["text"]] = val["id"]
@@ -1625,7 +1642,7 @@ class BaseDomainDataType(BaseDataType):
 
 
 class DomainDataType(BaseDomainDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         key = "id"
         if value is not None:
@@ -1635,7 +1652,6 @@ class DomainDataType(BaseDomainDataType):
                 key = "text"
 
             domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
-
             if len(domain_val_node_query) != 1:
                 row_number = row_number if row_number else ""
                 if len(domain_val_node_query) == 0:
@@ -1650,8 +1666,10 @@ class DomainDataType(BaseDomainDataType):
             try:
                 uuid.UUID(value)
             except ValueError:
-                if "nodeid" in kwargs and "config" in kwargs:
-                    self.lookup_domainid_by_value(self, value, kwargs["nodeid"], kwargs["config"])
+                try:
+                    value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
+                except KeyError:
+                    value = value
         return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1746,13 +1764,16 @@ class DomainListDataType(BaseDomainDataType):
                     uuid.UUID(stripped)
                     v = stripped
                 except ValueError:
-                    if "nodeid" in kwargs and "config" in kwargs:
-                        v = self.lookup_domainid_by_value(self, v, kwargs["nodeid"], kwargs["config"])
+                    try:
+                        v = self.lookup_domainid_by_value(v, kwargs["nodeid"])
+                    except KeyError:
+                        v = v
                 result.append(v)
-        return value
+        return result
 
-    def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         domainDataType = DomainDataType()
+        domainDataType.datatype_name = "domain-value"
         errors = []
         if values is not None:
             for value in values:
@@ -1858,7 +1879,7 @@ class ResourceInstanceDataType(BaseDataType):
             nodevalue = [nodevalue]
         return nodevalue
 
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
@@ -2141,7 +2162,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
 
 class NodeValueDataType(BaseDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value:
             try:
@@ -2172,7 +2193,7 @@ class NodeValueDataType(BaseDataType):
 
 
 class AnnotationDataType(BaseDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         return errors
 

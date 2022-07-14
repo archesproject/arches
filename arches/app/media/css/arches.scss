@@ -728,6 +728,13 @@ input[type="checkbox"] {
     display: unset;
 }
 
+.etl-manager-container {
+    display: flex; 
+    flex-direction: column;
+    background-color: #fff;
+    width:100%;
+}
+
 .branch-csv-etl {
     background-color: white;
     width: 100%;
@@ -739,10 +746,9 @@ input[type="checkbox"] {
     .loader-select {
         height: calc(100% - 50px);
         text-align: center;
-        background: #f6f6f6;
-        border: 1px solid #cdcdcd;
+        background: #fff;
         justify-content: center;
-        padding-top: 45px;
+        padding-top: 90px;
         height: 100%;
         width: 100%;
         display: flex;
@@ -751,14 +757,14 @@ input[type="checkbox"] {
     .summary-header {
         padding: 5px 0px 3px;
         font-weight: 525;
-        font-size: 13px;
+        font-size: 15px;
         color: #2d5576;
     }
 
     .summary-title {
         padding: 5px 0px 3px;
         font-weight: 550;
-        font-size: 15px;
+        font-size: 16px;
         color: #2d5576;
     }
     h5 {
@@ -766,6 +772,36 @@ input[type="checkbox"] {
         color: #999;
         font-weight: 500;
     }
+
+    .dropzone-photo-upload {
+        margin-top: 0px;
+    }
+}
+
+.branch-xl-metadata-container {
+    padding: 0px 15px;
+}
+
+.branch-csv-etl-load-summmary {
+    margin-top: -10px;
+}
+
+h3.branch-xl-title {
+    margin-top: 15px; 
+    margin-bottom: 0px; 
+    font-size: 19px;
+    color: #454545;
+}
+
+h4.branch-xl-title {
+    margin-top: 0px; 
+    margin-bottom: 0px;
+    font-size: 16px;
+    color: #454545;
+}
+
+.branch-xl-file-contents-container {
+    margin-top: 25px;
 }
 
 .tabbed-workflow-footer, .etl-module-footer {
@@ -774,7 +810,6 @@ input[type="checkbox"] {
     color: #f9f9f9;
     padding: 10px 12px;
     display: flex;
-    position: fixed;
     bottom: 0;
     width: 100%;
 }
@@ -9427,7 +9462,19 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 #mainnav-container {
+    display: flex; 
+    flex-direction: column;
     z-index: 15;
+}
+
+.debug-notice {
+    padding-bottom: 4px;
+    padding-right: 2px;
+    font-size: x-small;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #navbar {
@@ -13407,12 +13454,12 @@ a.jstree-anchor.permissions-widget {
 }
 
 .iiif-gallery-content .panel-controls {
-    width: 250px; 
+    width: 230px; 
     border-right: 1px solid #ddd;
 }
 
 .iiif-gallery-content .panel-controls .hide-gallery-control {
-    width: 100%; 
+    width: 230px; 
     height: 50px; 
     border-bottom: 1px solid #ddd; 
     display: flex; 
@@ -14871,12 +14918,14 @@ a.jstree-anchor.permissions-widget {
 .etl-manager-tabs {
     background: #F7F9FB;
     height: 45px;
+    border-bottom: 1px solid #ddd;
 }
 
 .etl-manager-tab {
     min-width: 150px;
     padding: 12px 20px;
     border: 1px solid #BBD1EA;
+    border-top: none;
     background: #F7F9FB;
     font-size: 13pt;
     display: inline-block;
@@ -14889,7 +14938,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-manager-tab.disabled {
-    background-color: #fff;
+    background-color: #f2f2f2;
     color: grey;
     cursor: default;
     pointer-events: none;
@@ -14898,11 +14947,10 @@ a.jstree-anchor.permissions-widget {
 .etl-manager-tab.active {
     background-color: #fff;
     border-bottom: 1px solid #fff;
-    font-weight: 600;
 }
 
 .etl-manager-filter-container {
-    margin: 50px;
+    margin: 50px 50px 0px 50px;
 }
 
 .etl-manager-filter-button {
@@ -14927,63 +14975,131 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-manager-filter-input {
-    min-width: 300px;
+    width: 100%;
     border: 1px solid #BBD1EA;
+    border-radius: 1px;
     font-size: 12px;
-    height: 30px;
+    height: 36px;
     margin-left: 20px;
+    margin-right: 20px;
     padding-left: 20px;
 }
 
+.etl-manager-filter-input.etl-model-filter {
+    width: 350px;
+    height: 45px;
+}
+
 .etl-manager-status-filter-container {
-    margin: 20px 10px;
+    padding: 20px 10px;
     display: flex;
     justify-content: space-between;
+    border-bottom: 1px solid #ddd;
 }
 
 .etl-module-component-container {
-    height: calc(100vh - 160px);
-    width: calc(100vw - 50px);
-    padding: 25px;
-    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: initial;
+}
+
+.etl-module-body {
+    padding: 15px 25px;
+    width: 100%;
+    flex: 1 1 0px;
+    overflow: auto;
 }
 
 .etl-module-status {
     border-right: 1px solid rgba(0,0,0,0.14);
+    width: 446px;
 }
 
 .etl-module-status-container {
     height: calc(100vh - 95px);
-    overflow: scroll;
     display: flex;
     flex-direction: column;
     align-content: space-around;
     width: auto;
 }
 
-.etl-status-table {
-    height: calc(100vh - 245px);
+.etl-jobs-container {
+    background: #f9f9f9;
+    height: calc(100vh - 225px);
     overflow: scroll;
-    padding-bottom:25px;
 }
 
-.etl-status-table .selected {
-    border: 2px solid rgb(56, 110, 178);
+.etl-job {
+    margin: 10px 15px 10px 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 2px;
+    display: block; 
+    background: #fff;
 }
 
-.etl-status-table .btn-success, .btn-success:hover{
+.etl-job.selected {
+    border: 1px solid rgb(56, 110, 178);
+}
+
+.etl-job-task-bar {
+    background: #eee; 
+    display: flex;
+    justify-content: space-between;
+    height: 40px; 
+    border-top: 1px solid #ddd;
+}
+
+.etl-job-task-bar .task {
+    padding: 10px; 
+}
+
+.etl-job-task-bar .task a{
+    padding: 7px; 
+    text-decoration: none;
+    color: steelblue; 
+    cursor: pointer;
+}
+
+.etl-job-task-bar .task a:hover{
+    background: rgba(156, 195, 228, 0.35);
+    border: 1px solid #6AA0CC;
+    padding: 6px;
+    border-radius: 1px;
+}
+
+.etl-job-task-bar .status {
+    float: right;
+    padding: 3px;
+}
+
+
+.etl-job .btn-success, .btn-success:hover{
     background: #00ca4e;
     border-color: #00ca4e;
 }
 
-.etl-status-table .btn-warning, .btn-warning:hover{
+.etl-job .btn-warning, .btn-warning:hover{
     background: #ffbd44;
     border-color: #ffbd44;
 }
 
-.etl-status-table .btn-danger, .btn-danger:hover{
+.etl-job .btn-danger, .btn-danger:hover{
     background: #ff605c;
     border-color: #ff605c;
+}
+
+.etl-module-preview {
+    height: calc(100vh - 95px); 
+    width: calc(100vw - 450px); 
+    padding: 20px 25px; 
+    overflow: scroll;
+    background: #fbfbfb;
+}
+
+.etl-module-info h4 {
+    margin-bottom: 5px;
 }
 
 .etl-module-component.etl-module-status {
@@ -14991,10 +15107,67 @@ a.jstree-anchor.permissions-widget {
 }
 
 .etl-module-component {
-    margin-top: 50px;
+    margin-top: 30px;
+    padding-bottom: 5px;
 }
 
 .etl-module-footer .btn {
     border-radius: 2px;
     margin-right: 20px;
+}
+
+.etl-loading-metadata-key {
+    font-size: 15px; 
+    padding-right: 3px;
+    color: #777;
+}
+
+.etl-loading-metadata-value {
+    font-size: 15px; 
+    padding-right: 3px;
+    color: rgb(4, 4, 45);
+}
+
+.csv-mapping-table-container {
+    overflow: auto;
+    width: inherit;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border: 1px solid rgba(0,0,0,0.14);
+}
+
+.csv-mapping-table-container .chosen-drop .chosen-results {
+    max-height: 180px;
+}
+
+.csv-mapping-table {
+    margin-bottom: 0;
+}
+
+table.csv-mapping-table thead tr {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead {
+    background: #f3f3f3;
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table thead tr.column-names {
+    background: #fff;
+}
+
+table.csv-mapping-table thead th {
+    border-bottom: 1px solid #ddd;
+}
+
+table.csv-mapping-table th {
+    min-width: 200px;
+    border-right: 1px solid #ddd;
+}
+
+table.csv-mapping-table td {
+    vertical-align: text-top;
+    border-right: 1px solid #ddd;
 }

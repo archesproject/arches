@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
 {% extends "base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
@@ -449,6 +449,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         {% endblock navbar %}
                     </div>
+                    {% if app_settings.DEBUG %}
+                    <div class="debug-notice">
+                        <div>{% trans 'DEBUG' %}</div>
+                        <div>{{ app_settings.VERSION }}</div>
+                    </div>
+                    {% endif %}
                 </nav>
                 {% endblock mainnav %}
 

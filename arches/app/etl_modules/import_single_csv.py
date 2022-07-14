@@ -1,11 +1,8 @@
 import csv
 from datetime import datetime
-import io
-from importlib import import_module
 import json
 import logging
 import os
-import shutil
 import uuid
 import zipfile
 from django.core.files import File
@@ -15,21 +12,19 @@ from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, NodeGroup, ResourceInstance
-from arches.app.models.graph import Graph
-from arches.app.models.resource import Resource
-from arches.app.models.tile import Tile
+from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
-from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.etl_modules.base_import_module import BaseImportModule
 import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
 
-class ImportSingleCsv:
+class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -84,7 +79,10 @@ class ImportSingleCsv:
             pass
 
         csv_file_name = None
-        if content.content_type == "text/csv":
+        validator = FileValidator()
+        if len(validator.validate_file_type(content, content.name.split(".")[-1])) > 0:
+            pass
+        elif content.content_type == "text/csv":
             csv_file_name = content.name
             csv_file_path = os.path.join(temp_dir, csv_file_name)
             default_storage.save(csv_file_path, content)
@@ -99,7 +97,12 @@ class ImportSingleCsv:
             csv_file_path = os.path.join(temp_dir, csv_file_name)
 
         if csv_file_name is None:
-            return {"success": False, "data": "Csv file not found"}
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("No csv file found"),
+                "message": _("Upload a valid csv file"),
+            }
 
         with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)
@@ -156,18 +159,18 @@ class ImportSingleCsv:
             if task_management.check_if_celery_available():
                 logger.info(_("Delegating load to Celery task"))
                 tasks.load_single_csv.apply_async(
-                    (self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
+                    (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
                 )
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
             else:
-                err = _("Celery appears not to be running, you need to have celery running in order to immport large csv.")
+                err = _("Cannot start process. Unable to run process as a background task at this time.")
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                         ("failed", datetime.now(), self.loadid),
                     )
-                return {"success": False, "data": err}
+                return {"success": False, "data": {"title": _("Error"), "message": err}}
 
         else:
             response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)

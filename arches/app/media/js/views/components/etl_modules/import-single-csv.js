@@ -5,10 +5,12 @@ define([
     'dropzone',
     'uuid',
     'arches',
+    'viewmodels/alert-json',
+    'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches) {
+], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             const self = this;
@@ -16,7 +18,7 @@ define([
             this.load_details = params.load_details;
             this.state = params.state;
             this.loading = params.loading || ko.observable();
-
+            this.alert = params.alert;
             this.moduleId = params.etlmoduleid;
             this.loading(true);
             this.graphs = ko.observable();
@@ -163,8 +165,8 @@ define([
                     self.formData.delete('file');
                     self.fileAdded(true);
                     self.loading(false);
-                }).catch(function(err) {
-                    console.log(err);
+                }).fail(function(err) {
+                    self.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON, null, function(){}));
                     self.loading(false);
                 });
             };
@@ -183,7 +185,17 @@ define([
                     self.formData.append('async', true);
                     self.submit('write').then(data => {
                         console.log(data.result);
-                    }).fail(error => console.log(error.responseJSON.data));
+                    }).fail( function (err) {
+                        self.alert(
+                                new JsonErrorAlertViewModel(
+                                    'ep-alert-red', 
+                                    err.responseJSON["data"], 
+                                    null, 
+                                    function(){}
+                                )
+                            )                    
+                        }
+                    );
                 }).fail(error => console.log(error.responseJSON.data));
             };
 
