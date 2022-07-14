@@ -106,7 +106,7 @@
                                         <div class="">
                                             <!--ko if: $parent.displayContent().validRenderer() === false -->
                                             <h4 class="loader-error-message">
-                                                <span data-bind="text: translations.file-loader-parse-error-message + ' '"></span>
+                                                <span data-bind="text: translations.fileLoaderParseErrorMessage + ' '"></span>
                                                 <span data-bind="text:$parent.displayContent().renderer.title"></span>
                                                 <span data-bind="text: ' ' + translations.loaderLowercase"></span>
                                             </h4>
@@ -153,7 +153,7 @@
                                     <br>  
                                 </div>
                                 <div class="file-upload-footer">
-                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: translation.applySameLoaderToAll}}}"></span>
+                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: translations.applySameLoaderToAll}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
@@ -201,7 +201,7 @@
                        <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
                        <!-- /ko -->
                        <!-- ko if: !acceptedFiles() -->
-                       <span data-bind="text: translations.imageViewerDesc"></span>
+                       <span data-bind="text: translations.imageUploadFormatDesc"></span>
                        <!-- /ko -->
                    </div>
                </div>
