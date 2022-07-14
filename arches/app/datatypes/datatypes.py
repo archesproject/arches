@@ -25,7 +25,7 @@ from arches.app.utils.geo_utils import GeoUtils
 import arches.app.utils.task_management as task_management
 from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.mappings import RESOURCES_INDEX, RESOURCE_RELATIONS_INDEX
+from arches.app.search.mappings import RESOURCES_INDEX
 from django.core.cache import cache
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -1924,11 +1924,6 @@ class ResourceInstanceDataType(BaseDataType):
             cursor.execute(sql)
             ret = cursor.fetchone()
         return ret
-
-    def post_tile_delete(self, tile, nodeid, index=True):
-        if tile.data and tile.data[nodeid] and index:
-            for related in tile.data[nodeid]:
-                se.delete(index=RESOURCE_RELATIONS_INDEX, id=related["resourceXresourceId"])
 
     def get_display_value(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import

@@ -839,13 +839,7 @@ class ResourceXResource(models.Model):
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self, index=True, *args, **kwargs):
-        if index:
-            from arches.app.search.search_engine_factory import SearchEngineInstance as se
-            from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
-            se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
-
+    def delete(self, *args, **kwargs):
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
         if deletedResourceId and self.tileid and self.nodeid:
@@ -862,9 +856,6 @@ class ResourceXResource(models.Model):
         super(ResourceXResource, self).delete()
 
     def save(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineInstance as se
-        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
         # during package/csv load the ResourceInstance models are not always available
         try:
             self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
@@ -878,12 +869,8 @@ class ResourceXResource(models.Model):
 
         if not self.created:
             self.created = datetime.datetime.now()
-
         self.modified = datetime.datetime.now()
-
-        document = model_to_dict(self)
-
-        se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
+        
         super(ResourceXResource, self).save()
 
     def __init__(self, *args, **kwargs):
