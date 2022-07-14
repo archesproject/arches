@@ -257,7 +257,7 @@ def delete_search_index():
 
 
 # the RESOURCE_RELATIONS_INDEX is now deprecated
-# leaving this method here so users can still remove it 
+# leaving this method here so users can still remove it
 # during a reindex operation
 # TODO: remove in Arches v8
 def delete_resource_relations_index():

@@ -498,24 +498,31 @@ class Resource(models.ResourceInstance):
 
         def get_relations(resourceinstanceid, start, limit, resourceinstance_graphid=None):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(resourceinstanceidto_id=resourceinstanceid)
-            
+
             if resourceinstance_graphid:
-                to_graph_id_filter = Q(resourceinstancefrom_graphid_id=str(self.graph_id)) & Q(resourceinstanceto_graphid_id=resourceinstance_graphid)
-                from_graph_id_filter = Q(resourceinstancefrom_graphid_id=resourceinstance_graphid) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
+                to_graph_id_filter = Q(resourceinstancefrom_graphid_id=str(self.graph_id)) & Q(
+                    resourceinstanceto_graphid_id=resourceinstance_graphid
+                )
+                from_graph_id_filter = Q(resourceinstancefrom_graphid_id=resourceinstance_graphid) & Q(
+                    resourceinstanceto_graphid_id=str(self.graph_id)
+                )
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
-            
+
             relations = {
                 "total": models.ResourceXResource.objects.filter(final_query).count(),
-                "relations": models.ResourceXResource.objects.filter(final_query)[start:limit]
+                "relations": models.ResourceXResource.objects.filter(final_query)[start:limit],
             }
             try:
                 print(models.ResourceXResource.objects.filter(final_query)[start:limit].query)
             except:
                 pass
-            return relations       # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
+            return relations  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
+            resourceinstanceid=self.resourceinstanceid,
+            start=start,
+            limit=limit,
+            resourceinstance_graphid=resourceinstance_graphid,
         )
 
         ret["total"] = {"value": resource_relations["total"]}

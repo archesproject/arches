@@ -870,7 +870,7 @@ class ResourceXResource(models.Model):
         if not self.created:
             self.created = datetime.datetime.now()
         self.modified = datetime.datetime.now()
-        
+
         super(ResourceXResource, self).save()
 
     def __init__(self, *args, **kwargs):
