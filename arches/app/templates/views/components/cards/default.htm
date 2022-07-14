@@ -19,7 +19,7 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: self.card.model.name"></span>
         <!-- ko if: self.card.canAdd() -->
-        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': self.card.selected}, click: function(){self.card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="translations.addGnu"></i>
+        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': self.card.selected}, click: function(){self.card.showForm(true);}, clickBubble: false" data-toggle="tooltip" data-original-title="$root.translations.addGnu"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
@@ -226,15 +226,15 @@
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container provisional-editor">
-        <span data-bind="text: translations.showingEditsBy"></span>
+        <span data-bind="text: $root.translations.showingEditsBy"></span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
-            <span data-bind="text: translations.returnToApprovedEdits"></span>
+            <span data-bind="text: $root.translations.returnToApprovedEdits"></span>
         </a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-            <span data-bind="text: translations.newProvisionalContribution"></span>
+            <span data-bind="text: $root.translations.newProvisionalContribution"></span>
         <!-- /ko-->
     </div>
     <!-- /ko-->
@@ -242,7 +242,7 @@
     <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
     <div class="edit-message-container approved">
         <div>
-            <span data-bind="text: translations.showingRecentApprovedEdits"></span>
+            <span data-bind="text: $root.translations.showingRecentApprovedEdits"></span>
         </div>
     </div>
     <!-- /ko-->
@@ -255,14 +255,14 @@
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>
-                    <span data-bind="text: translations.provisionalEdits"></span>
+                    <span data-bind="text: $root.translations.provisionalEdits"></span>
                 </div>
                 <div 
                     class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" 
                     style="padding: 3px;" 
                     data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}"
                 >
-                    <span data-bind="text: translations.deleteAllEdits"></span>
+                    <span data-bind="text: $root.translations.deleteAllEdits"></span>
                 </div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
@@ -291,7 +291,7 @@
             <!-- ko if: card.model.helpenabled -->
             <span>
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> 
-                    <span data-bind="text: translations.help"></span>
+                    <span data-bind="text: $root.translations.help"></span>
                     <i class="fa fa-question-circle"></i>
                 </a>
             </span>
@@ -389,27 +389,27 @@
                     class="btn btn-shim btn-labeled btn-lg fa fa-trash" 
                     data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }"
                 >
-                    <span data-bind="text: translations.deleteThisRecord"></span>
+                    <span data-bind="text: $root.translations.deleteThisRecord"></span>
                 </button>
                 <!-- /ko -->
 
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">
-                        <span data-bind="text: translations.cancelEdit"></span>
+                        <span data-bind="text: $root.translations.cancelEdit"></span>
                     </button>
                     <!-- /ko -->
 
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
-                        <span data-bind="text: translations.saveEdit"></span>
+                        <span data-bind="text: $root.translations.saveEdit"></span>
                     </button>
                     <!-- /ko -->
                 <!-- /ko -->
                 
                 <!-- ko if: !tile.tileid && !showChildCards() -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
-                    <span data-bind="text: translations.add"></span>
+                    <span data-bind="text: $root.translations.add"></span>
                 </button>
                 <!-- /ko -->
             </div>
@@ -419,7 +419,7 @@
             {% block card_summary %}
             {% include 'views/components/cards/default-card-report.htm' %}
             <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-primary" data-bind="click: function(){card.showForm(true)}">
-                <span data-bind="text: translations.new"></span>
+                <span data-bind="text: $root.translations.new"></span>
             </button>
             {% endblock card_summary %}
             <!-- /ko -->

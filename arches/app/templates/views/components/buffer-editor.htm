@@ -4,24 +4,24 @@
 <!-- ko if: bufferNodeId() -->
 <div class="card">
     <div class="add-buffer-feature-header">
-        <span data-bind="text: translations.addBufferFeature"></span>
+        <span data-bind="text: $root.translations.addBufferFeature"></span>
     </div>
     <div class="add-buffer-feature-input">
         <div>
-            <span data-bind="text: translations.distance"></span>
+            <span data-bind="text: $root.translations.distance"></span>
         </div>
         <input type="number" step="any" class="form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: bufferDistance"></input>
     </div>
     <div class="add-buffer-feature-input">
         <div>
-            <span data-bind="text: translations.units"></span>
+            <span data-bind="text: $root.translations.units"></span>
         </div>
         <select data-bind="
             options: [{
-                text: translations.meters,
+                text: $root.translations.meters,
                 value: 'm'
             }, {
-                text: translations.feet,
+                text: $root.translations.feet,
                 value: 'ft'
             }],
             optionsText: 'text',
@@ -39,7 +39,7 @@
     <div class="add-buffer-feature-input">
         <input type="checkbox" data-bind="checked: bufferAddNew">
         <span class="add-buffer-as-new-label">
-            <span data-bind="text: translations.addAsNew"></span>
+            <span data-bind="text: $root.translations.addAsNew"></span>
             <span data-bind="text: card.model.get('name')"></span>
             <span>?</span>
         </span>
@@ -49,10 +49,10 @@
         <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: function() {
             bufferNodeId(null);
         }">
-            <span data-bind="text: translations.cancel"></span>
+            <span data-bind="text: $root.translations.cancel"></span>
         </button>
         <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: addBufferResult">
-            <span data-bind="text: translations.addFeature"></span>
+            <span data-bind="text: $root.translations.addFeature"></span>
         </button>
     </div>
 </div>

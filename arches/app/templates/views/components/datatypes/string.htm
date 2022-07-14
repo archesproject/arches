@@ -3,22 +3,22 @@
 <div class="col-md-3 col-lg-2">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="~">
-            <span data-bind="text: translations.like"></span>
+            <span data-bind="text: $root.translations.like"></span>
         </option>
         <option value="!~">
-            <span data-bind="text: translations.notLike"></span>
+            <span data-bind="text: $root.translations.notLike"></span>
         </option>
         <option value="">
-            <span data-bind="text: translations.equals"></span>
+            <span data-bind="text: $root.translations.equals"></span>
         </option>
         <option value="!">
-            <span data-bind="text: translations.isNot"></span>
+            <span data-bind="text: $root.translations.isNot"></span>
         </option>
         <option value="null">
-            <span data-bind="text: translations.hasNoValue"></span>
+            <span data-bind="text: $root.translations.hasNoValue"></span>
         </option>
         <option value="not_null">
-            <span data-bind="text: translations.hasAnyValue"></span>
+            <span data-bind="text: $root.translations.hasAnyValue"></span>
         </option>
     </select>
 </div>
@@ -31,7 +31,7 @@
         class="form-control input-lg" 
         style="height: 36px;" 
         data-bind="
-            attr: {placeholder: translations.name},
+            attr: {placeholder: $root.translations.name},
             value: searchValue, 
             valueUpdate: 'keyup'
         "

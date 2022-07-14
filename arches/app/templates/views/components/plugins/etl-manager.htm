@@ -13,12 +13,12 @@
     <div data-bind="if: activeTab() === 'start'">
         <div class="etl-manager-filter-container">
             <div class="etl-manager-filter-button" data-bind="click: function() { isImport(true); }, css: {active: isImport() }">
-                <span data-bind="text: translations.import"></span>
+                <span data-bind="text: $root.translations.import"></span>
             </div>
             <div class="etl-manager-filter-button" data-bind="click: function() { isImport(false); }, css: {active: !isImport() }">
-                <span data-bind="text: translations.export"></span>
+                <span data-bind="text: $root.translations.export"></span>
             </div>
-            <input class="etl-manager-filter-input etl-model-filter" type="text" data-bind="attr: {placeholder: translations.filterModules + '...'}, textInput: moduleSearchString">
+            <input class="etl-manager-filter-input etl-model-filter" type="text" data-bind="attr: {placeholder: $root.translations.filterModules + '...'}, textInput: moduleSearchString">
         </div>
         <!-- ko ifnot: loading() -->
         <div class="workflow-select-plugin">
@@ -73,7 +73,7 @@
             <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
                 <div class="etl-module-status">
                     <div class="etl-manager-status-filter-container">
-                        <input class="etl-manager-filter-input" type="text" data-bind="attr:{placeholder: translations.filterTasks}, textInput: taskSearchString">
+                        <input class="etl-manager-filter-input" type="text" data-bind="attr:{placeholder: $root.translations.filterTasks}, textInput: taskSearchString">
                     </div>
 
                     <div class="etl-jobs-container" data-bind="foreach: {data: loadEvents, as: 'event'}">
@@ -88,7 +88,7 @@
                                     <div>
                                         <div data-bind="text: $parent.formatUserName(event.user)"></div>
                                         <div>
-                                            <span data-bind="text: translations.start + ': '"></span>
+                                            <span data-bind="text: $root.translations.start + ': '"></span>
                                             <span data-bind="text: $parent.formatTime(event.load_start_time)"></span>
                                         </div>
                                     </div>
@@ -97,55 +97,55 @@
                             <div class="etl-job-task-bar">
                                 <div class="task">
                                     <!-- ko if: event.status == "completed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, translations.warning, translations.etlReverseWarningMessage)}">
-                                        <span data-bind="text: translations.undoImport"></span>
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
+                                        <span data-bind="text: $root.translations.undoImport"></span>
                                     </a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, translations.warning, translations.etlReverseWarningMessage)}">
-                                        <span data-bind="text: translations.undoImport"></span>
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
+                                        <span data-bind="text: $root.translations.undoImport"></span>
                                     </a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "unloaded" -->
                                     <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">
-                                        <span data-bind="text: translations.removeFromHistory"></span>
+                                        <span data-bind="text: $root.translations.removeFromHistory"></span>
                                     </a>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->
                                     <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">
-                                        <span data-bind="text: translations.removeFromHistory"></span>
+                                        <span data-bind="text: $root.translations.removeFromHistory"></span>
                                     </a>
                                     <!-- /ko -->
                                 </div>
                                 <div class="status">
                                     <!-- ko if: event.status == "completed" -->
                                     <button class="btn btn-warning" style="width:150px;">
-                                        <span data-bind="text: translations.indexing"></span>
+                                        <span data-bind="text: $root.translations.indexing"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
                                     <button class="btn btn-success" style="width:150px;">
-                                        <span data-bind="text: translations.completed"></span>
+                                        <span data-bind="text: $root.translations.completed"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->
                                     <button class="btn btn-danger" style="width:150px;">
-                                        <span data-bind="text: translations.failed"></span>
+                                        <span data-bind="text: $root.translations.failed"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "running" -->
                                     <button class="btn btn-warning" style="width:150px;">
-                                        <span data-bind="text: translations.running"></span>
+                                        <span data-bind="text: $root.translations.running"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "reversing" -->
                                     <button class="btn btn-warning" style="width:150px;">
-                                        <span data-bind="text: translations.unloading"></span>
+                                        <span data-bind="text: $root.translations.unloading"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "unloaded" -->
                                     <button class="btn btn-success" style="width:150px;">
-                                        <span data-bind="text: translations.unloading"></span>
+                                        <span data-bind="text: $root.translations.unloading"></span>
                                     </button>
                                     <!-- /ko -->
                                 </div>
@@ -190,7 +190,7 @@
                         <div class="etl-module-component">
                             <!-- ko if: validated -->
                             <h4>
-                                <span data-bind="text: translations.validationErrors"></span>
+                                <span data-bind="text: $root.translations.validationErrors"></span>
                             </h4>
                             <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                                 <thead>
@@ -221,7 +221,7 @@
                                     <tr>
                                         <span ></span>
                                         <td colspan="3">
-                                            <span data-bind="text: translations.noErrorFound"></span>
+                                            <span data-bind="text: $root.translations.noErrorFound"></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -231,36 +231,36 @@
                         </div>
                         <div data-bind="if: selectedLoadEvent()">
                             <h4>
-                                <span data-bind="text: translations.loadingData"></span>
+                                <span data-bind="text: $root.translations.loadingData"></span>
                             </h4>
                             <div>
-                                <span class="etl-loading-metadata-key" data-bind="text: translations.loadingStatus + ':'"></span>
+                                <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadingStatus + ':'"></span>
                                 <span class="etl-loading-metadata-value" data-bind="
                                     text:
-                                        selectedLoadEvent().status == 'indexed' ? translations.completed
-                                        : selectedLoadEvent().status == 'completed' ? translations.indexing
-                                        : selectedLoadEvent().status == 'failed' ? translations.failed 
-                                        : translations.running
+                                        selectedLoadEvent().status == 'indexed' ? $root.translations.completed
+                                        : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
+                                        : selectedLoadEvent().status == 'failed' ? $root.translations.failed 
+                                        : $root.translations.running
                                 "></span>  
                             </div>
                             <div>
-                                <span class="etl-loading-metadata-key" data-bind="text: translations.loadingStarted + ':'"></span>
+                                <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadingStarted + ':'"></span>
                                 <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().load_end_time">
-                                <span class="etl-loading-metadata-key" data-bind="text: translations.loadingEnded + ':'"></span>
+                                <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadingEnded + ':'"></span>
                                 <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().load_end_time">
-                                <span class="etl-loading-metadata-key" data-bind="text: translations.loadDuration + ':'"></span>
+                                <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadDuration + ':'"></span>
                                 <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().indexed_time">
-                                <span class="etl-loading-metadata-key" data-bind="text: translations.indexingEnded + ':'"></span>
+                                <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingEnded + ':'"></span>
                                 <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
                             </div>
                             <div data-bind="if: selectedLoadEvent().indexed_time">
-                                <span class="etl-loading-metadata-key" data-bind="text: translations.indexingDuration + ':'"></span>
+                                <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingDuration + ':'"></span>
                                 <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
                             </div>
                         </div>
@@ -271,7 +271,7 @@
     </div>
     <div data-bind="if: activeTab() === 'export'">
          <h1>
-            <span data-bind="text: translations.export"></span>
+            <span data-bind="text: $root.translations.export"></span>
         </h1>
     </div>
 </div>

@@ -26,13 +26,13 @@
 {% block config_form %}
 <div>
     <div class="control-label">
-        <span data-bind="text: translations.placeholder"></span>
+        <span data-bind="text: $root.translations.placeholder"></span>
     </div>
     <div class="col-xs-12 pad-no crud-widget-container">
         <input 
             class="form-control input-md widget-input"
             data-bind="
-                attr: {placeholder: translations.placeholder},
+                attr: {placeholder: $root.translations.placeholder},
                 value: placeholder, 
                 valueUpdate: 'keyup'
             "
@@ -40,7 +40,7 @@
     </div>
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.defaultValue"></span>
+    <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="row widget-wrapper">
     <div class="form-group">
@@ -65,7 +65,7 @@
 <!-- /ko -->
 <!-- ko if: valueObjects().length === 0 -->
 <dd>
-    <span data-bind="text: translations.none"></span>
+    <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 {% endblock report %}

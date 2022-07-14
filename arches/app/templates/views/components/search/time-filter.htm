@@ -2,13 +2,13 @@
 <div class="search-container time-search-container">
 
     <div class="filter-title">
-        <span data-bind="text: translations.dateInterval"></span>
+        <span data-bind="text: $root.translations.dateInterval"></span>
         
         <div class="pull-right">
             <div class="btn-group">
                 <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> 
                     <i class="fa fa-close"></i>
-                    <span data-bind="text: translations.clear"></span>
+                    <span data-bind="text: $root.translations.clear"></span>
                 </button>
             </div>
         </div>
@@ -19,19 +19,19 @@
         <!-- Date Type -->
         <div class="calendar picker">
             <h3 class="search-label">
-                <span data-bind="text: translations.type"></span>
+                <span data-bind="text: $root.translations.type"></span>
             </h3>
             <select 
                 id="" class="resources" 
                 tabindex="-1" 
                 data-bind="
-                    attr: {[data-placeholder]: translations.dateType},
+                    attr: {[data-placeholder]: $root.translations.dateType},
                     value: filter.dateNodeId, 
                     chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} 
                 "
             >
                 <option value="">
-                    <span data-bind="text: translations.searchAllDates"></span>
+                    <span data-bind="text: $root.translations.searchAllDates"></span>
                 </option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
@@ -48,40 +48,40 @@
         <!-- Date Selector -->
         <div class="calendar picker">
             <h3 class="search-label">
-                <span data-bind="text: translations.within"></span>
+                <span data-bind="text: $root.translations.within"></span>
             </h3>
             <select 
                 id="" 
                 class="resources" 
                 tabindex="-1" 
                 data-bind="
-                    attr: {placeholder: translations.select},
+                    attr: {placeholder: $root.translations.select},
                     value: dateRangeType, chosen:{ width: '100%' }
                 "
             >
                 <option value="custom">
-                    <span data-bind="text: translations.customDateRange"></span>
+                    <span data-bind="text: $root.translations.customDateRange"></span>
                 </option>
                 <option value="today">
-                    <span data-bind="text: translations.today"></span>
+                    <span data-bind="text: $root.translations.today"></span>
                 </option>
                 <option value="last-7">
-                    <span data-bind="text: translations.lastSevenDays"></span>
+                    <span data-bind="text: $root.translations.lastSevenDays"></span>
                 </option>
                 <option value="last-30">
-                    <span data-bind="text: translations.lastThirtyDays"></span>
+                    <span data-bind="text: $root.translations.lastThirtyDays"></span>
                 </option>
                 <option value="this-week">
-                    <span data-bind="text: translations.thisWeek"></span>
+                    <span data-bind="text: $root.translations.thisWeek"></span>
                 </option>
                 <option value="this-month">
-                    <span data-bind="text: translations.thisMonth"></span>
+                    <span data-bind="text: $root.translations.thisMonth"></span>
                 </option>
                 <option value="this-quarter">
-                    <span data-bind="text: translations.thisQuarter"></span>
+                    <span data-bind="text: $root.translations.thisQuarter"></span>
                 </option>
                 <option value="this-year">
-                    <span data-bind="text: translations.thisYear"></span>
+                    <span data-bind="text: $root.translations.thisYear"></span>
                 </option>
             </select>
         </div>
@@ -92,7 +92,7 @@
         <!-- From Date -->
         <div class="calendar picker">
             <h3 class="search-label">
-                <span data-bind="text: translations.from"></span>
+                <span data-bind="text: $root.translations.from"></span>
             </h3>
             <div id="search-from-c" class="hide-datepicker-time-option">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
@@ -102,7 +102,7 @@
         <!-- To Date -->
         <div class="calendar picker">
             <h3 class="search-label">
-                <span data-bind="text: translations.to"></span>
+                <span data-bind="text: $root.translations.to"></span>
             </h3>
             <div id="search-from-b" class="hide-datepicker-time-option">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
@@ -111,13 +111,13 @@
     </div>
 
     <h3 class="time-wheel-title">
-        <span data-bind="text: translations.timeWheel"></span>
+        <span data-bind="text: $root.translations.timeWheel"></span>
     </h3>
     <div class="time-wheel-instructions">
-        <span data-bind="text: '(' + translations.timeWheelText + ')'"></span>
+        <span data-bind="text: '(' + $root.translations.timeWheelText + ')'"></span>
     </div>
     <hr class="title-underline"><div class="sequence" data-bind="visible: loading">
-        <span data-bind="text: translations.loadingTimeWheel + '...'"></span>
+        <span data-bind="text: $root.translations.loadingTimeWheel + '...'"></span>
     </div>
     <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}, css:{'time-wheel-loading-mask': loading}">
         <div class="sequence" data-bind="text: breadCrumb"></div>

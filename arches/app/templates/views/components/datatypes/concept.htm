@@ -4,7 +4,7 @@
 <!-- ko ifnot: $data.search -->
 <div class="node-config-item">
     <div class="control-label">
-        <span data-bind="text: translations.conceptCollection"></span>
+        <span data-bind="text: $root.translations.conceptCollection"></span>
     </div>
     <div data-bind="if: conceptCollections().length > 0">
         <select 
@@ -26,16 +26,16 @@
 <div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">        
-            <span data-bind="text: translations.equals"></span>
+            <span data-bind="text: $root.translations.equals"></span>
         </option>
         <option value="!">
-            <span data-bind="text: translations.not"></span>
+            <span data-bind="text: $root.translations.not"></span>
         </option>
         <option value="null">
-            <span data-bind="text: translations.hasNoValue"></span>
+            <span data-bind="text: $root.translations.hasNoValue"></span>
         </option>
         <option value="not_null">
-            <span data-bind="text: translations.hasAnyValue"></span>
+            <span data-bind="text: $root.translations.hasAnyValue"></span>
         </option>
     </select>
 </div>

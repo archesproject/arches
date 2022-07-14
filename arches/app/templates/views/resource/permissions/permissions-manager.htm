@@ -17,17 +17,17 @@
 
             <!-- Splash Title -->
             <div class="rr-splash-title">
-                <span data-bind="text: translations.resourceInstancePermissions"></span>
+                <span data-bind="text: $root.translations.resourceInstancePermissions"></span>
             </div>
 
 
             <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}">
-                <span data-bind="text: translations.configureAccessToThisInstance"></span>
+                <span data-bind="text: $root.translations.configureAccessToThisInstance"></span>
             </button>
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">
-                <span data-bind="text: translations.defineInstanceAccessPrivileges"></span>
+                <span data-bind="text: $root.translations.defineInstanceAccessPrivileges"></span>
             </div>
 
             <!-- Help Hyperlink -->
@@ -38,10 +38,10 @@
         <div class="permission-grid">
             <div class="permission-header">
                 <h4>
-                    <span data-bind="text: translations.setPermissionsForThisInstance"></span>
+                    <span data-bind="text: $root.translations.setPermissionsForThisInstance"></span>
                 </h4>
                 <h5>
-                    <span data-bind="text: translations.setInstancePermissionsText"></span>
+                    <span data-bind="text: $root.translations.setInstancePermissionsText"></span>
                 </h5>
             </div>
             <div class="permission-control">
@@ -56,10 +56,10 @@
             <div class="permission-list-table">
                 <div class="permissions-list-header">
                     <div class="identities-column">
-                        <span data-bind="text: translations.personGroup"></span>
+                        <span data-bind="text: $root.translations.personGroup"></span>
                     </div>
                     <div class="permissions-column">
-                        <span data-bind="text: translations.permissions"></span>
+                        <span data-bind="text: $root.translations.permissions"></span>
                     </div>
                 </div>
                 <div class="permissions-list-table-body">
@@ -111,15 +111,15 @@
             </div>
             <div class="permissions-buttons mar-btm">
                 <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: function(){revertPermissions()}, css: {'disabled': !dirty()}">
-                    <span data-bind="text: translations.cancel"></span>
+                    <span data-bind="text: $root.translations.cancel"></span>
                 </button>
                 <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: function(){updatePermissions()}, css: {'disabled': !dirty()}">
-                    <span data-bind="text: translations.apply"></span>
+                    <span data-bind="text: $root.translations.apply"></span>
                 </button>
             </div>
             <div class="remove-permissions-btn mar-btm" style="align-self: end">
             <button id="cc-save-btn" class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-unlock" data-bind="click: function(){makeInstancePublic()}">
-                <span data-bind="text: translations.allowNormalAccess"></span>
+                <span data-bind="text: $root.translations.allowNormalAccess"></span>
             </button>
         </div>
         </div>

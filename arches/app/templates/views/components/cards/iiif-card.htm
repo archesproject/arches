@@ -7,9 +7,9 @@
 
 {% block config %}
 <div class="control-label">
-    <span data-bind="text: translations.defaultImageServiceUrl"></span>
+    <span data-bind="text: $root.translations.defaultImageServiceUrl"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
-    <input type="" id="" class="form-control input-md widget-input" data-bind="attr:{placeholder: translations.enterManifestUrl }, textInput: defaultManifest">
+    <input type="" id="" class="form-control input-md widget-input" data-bind="attr:{placeholder: $root.translations.enterManifestUrl }, textInput: defaultManifest">
 </div>
 {% endblock config %}

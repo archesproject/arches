@@ -14,35 +14,35 @@
             <!--ko if: provisional_resource == 'true' -->
             <a class="provisional-edits" href="">
                 <i class="fa fa-exclamation-circle"></i>
-                <span data-bind="text: $parent.translations.provisional"></span>
+                <span data-bind="text: $parent.$root.translations.provisional"></span>
             </a>
             <!--/ko-->
 
             <!--ko if: provisional_resource == 'partial' && $parent.userIsReviewer -->
             <a class="provisional-edits" href="">
                 <i class="fa fa-exclamation-circle"></i>
-                <span data-bind="text: $parent.translations.provisional"></span>
+                <span data-bind="text: $parent.$root.translations.provisional"></span>
             </a>
             <!--/ko-->
 
             <!-- ko if: !!$parent.details -->
             <a class="search-candidate-link" href="" data-bind="click: showDetails">
                 <i class="fa fa-info-circle"></i>
-                <span data-bind="text: $parent.translations.details"></span>
+                <span data-bind="text: $parent.$root.translations.details"></span>
             </a>
             <!-- /ko -->
 
             <!--ko if: canEdit -->
             <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)">
                 <i class="ion-ios-refresh-empty"></i>
-                <span data-bind="text: $parent.translations.edit"></span>
+                <span data-bind="text: $parent.$root.translations.edit"></span>
             </a>
             <!--/ko-->
             
             <!-- ko if: !!$parent.mapFilter -->
             <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked">
                 <i class="fa fa-map-marker"></i>
-                <span data-bind="text: $parent.translations.map"></span>
+                <span data-bind="text: $parent.$root.translations.map"></span>
             </a>
             <!-- /ko -->
 
@@ -51,7 +51,7 @@
                 <!--ko if: !!$parent.relatedResourcesManager && canRead -->
                 <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated">
                     <i class="fa fa-code-fork"></i>
-                    <span data-bind="text: $parent.translations.relatedResources"></span>
+                    <span data-bind="text: $parent.$root.translations.relatedResources"></span>
                 </a>
                 <!--/ko-->
 
@@ -59,13 +59,13 @@
                     <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
                     <a class="search-candidate-link pull-right" href="" data-bind="click: function(val){relationshipcandidacy(val); showrelated()}">
                         <i class="fa fa-code-fork"></i>
-                        <span data-bind="text: $parent.translations.relateResource"></span>
+                        <span data-bind="text: $parent.$root.translations.relateResource"></span>
                     </a>
                     <!--/ko-->
                     <!--ko if: relatable == false || $root.editingInstanceId == resourceinstanceid -->
                     <a class="search-candidate-link unrelatable-search-result pull-right" href="">
                         <i class="fa fa-code-fork"></i>
-                        <span data-bind="text: $parent.translations.cannotBeRelated"></span>
+                        <span data-bind="text: $parent.$root.translations.cannotBeRelated"></span>
                     </a>
                     <!--/ko-->
                 <!--/ko-->

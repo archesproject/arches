@@ -12,7 +12,7 @@
     'active': activeTab() === 'manage'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text" data-bind="text: translations.manage"></span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.manage"></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
     toggleTab('edit');
@@ -21,7 +21,7 @@
     'active': activeTab() === 'edit'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text" data-bind="text: translations.edit"></span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.edit"></span>
 </div>
 <!--ko foreach: fileFormatRenderers-->
         <!--ko if: ko.unwrap($parent.displayContent) && $parent.displayContent().renderer && ($parent.displayContent().renderer.id === $data.id) && $parent.rendererComponentName -->
@@ -81,22 +81,22 @@
 
                                         <!-- Splash Title -->
                                         <h2 class="rr-splash-title">
-                                            <span data-bind="text: translations.unableToDisplaySelectedFile"></span>
+                                            <span data-bind="text: $root.translations.unableToDisplaySelectedFile"></span>
                                         </h2>
 
                                         <!-- Splash Instructions -->
                                         <h3 class="rr-splash-description">
-                                            <span data-bind="text: translations.fileDisplayErrorMessage1"></span>
+                                            <span data-bind="text: $root.translations.fileDisplayErrorMessage1"></span>
                                         </h3>
 
                                         <!-- Splash Instructions -->
                                         <h3 class="rr-splash-description">
-                                            <span data-bind="text: translations.fileDisplayErrorMessage2"></span>
+                                            <span data-bind="text: $root.translations.fileDisplayErrorMessage2"></span>
                                         </h3>
 
                                         <!-- Splash Instructions -->
                                         <h3 class="rr-splash-description">
-                                            <span data-bind="text: translations.fileDisplayErrorMessage3"></span>
+                                            <span data-bind="text: $root.translations.fileDisplayErrorMessage3"></span>
                                         </h3>
                                     </div>
                                     <!--/ko-->
@@ -106,17 +106,17 @@
                                         <div class="">
                                             <!--ko if: $parent.displayContent().validRenderer() === false -->
                                             <h4 class="loader-error-message">
-                                                <span data-bind="text: translations.fileLoaderParseErrorMessage + ' '"></span>
+                                                <span data-bind="text: $root.translations.fileLoaderParseErrorMessage + ' '"></span>
                                                 <span data-bind="text:$parent.displayContent().renderer.title"></span>
-                                                <span data-bind="text: ' ' + translations.loaderLowercase"></span>
+                                                <span data-bind="text: ' ' + $root.translations.loaderLowercase"></span>
                                             </h4>
                                             <!--/ko-->
                                             
                                             <h2>
-                                                <span data-bind="text: translations.selectFileLoader"></span>
+                                                <span data-bind="text: $root.translations.selectFileLoader"></span>
                                             </h2>
                                             <h4>
-                                                <span data-bind="text: translations.selectLoaderMessage"></span>
+                                                <span data-bind="text: $root.translations.selectLoaderMessage"></span>
                                             </h4>
                                             <div style="display: flex; flex-flow: wrap; padding: 15px 25px;">
 
@@ -141,7 +141,7 @@
                                                     <div class="r-select-card-footer">
                                                         <div class="">
                                                             <div data-bind="click: function(){$parent.applyRendererToSelected($data)}" style="border-top: 1px solid #c4c4c4;" class="btn btn-primary btn-resource-select" role="button">
-                                                                <span data-bind="text: translations.select"></span>
+                                                                <span data-bind="text: $root.translations.select"></span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -153,7 +153,7 @@
                                     <br>  
                                 </div>
                                 <div class="file-upload-footer">
-                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: translations.applySameLoaderToAll}}}"></span>
+                                    <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: $root.translations.applySameLoaderToAll}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
@@ -177,22 +177,22 @@
                    <div class="bord-top pad-ver file-select">
                        <div class="" style="padding: 5px">
                             <h2>
-                                <span data-bind="text: translations.uploadFiles"></span>
+                                <span data-bind="text: $root.translations.uploadFiles"></span>
                             </h2>
                             <h4>
-                                <span data-bind="text: translations.dropzoneFileUploadCaption"></span>
+                                <span data-bind="text: $root.translations.dropzoneFileUploadCaption"></span>
                             </h4>
                         </div>
                         <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                             <i class="fa fa-file"></i>
-                            <span data-bind="text: translations.selectFiles"></span>
+                            <span data-bind="text: $root.translations.selectFiles"></span>
                         </button>
                         <br>
                         <div style="padding: 10px">
-                            <span data-bind="text: translations.fileUploadOptional + ' '"></span>
-                            <span data-bind="text: translations.optional + '.'"><strong></strong></span>
+                            <span data-bind="text: $root.translations.fileUploadOptional + ' '"></span>
+                            <span data-bind="text: $root.translations.optional + '.'"><strong></strong></span>
                             <br>
-                            <span data-bind="text: translations.fileUploadNumberSizeDesc"></span>
+                            <span data-bind="text: $root.translations.fileUploadNumberSizeDesc"></span>
                         </div>
 
                    </div>
@@ -201,7 +201,7 @@
                        <span data-bind="text: ('The following file formats may be uploaded: ' + acceptedFiles())"></span>
                        <!-- /ko -->
                        <!-- ko if: !acceptedFiles() -->
-                       <span data-bind="text: translations.imageUploadFormatDesc"></span>
+                       <span data-bind="text: $root.translations.imageUploadFormatDesc"></span>
                        <!-- /ko -->
                    </div>
                </div>
@@ -227,9 +227,9 @@
 
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">
-        <span data-bind="text: translations.fileFilter"></span>
+        <span data-bind="text: $root.translations.fileFilter"></span>
     </h2>
-    <input type="text" class="form-control" style="width: 100%; height:initial" data-bind="attr: placeholder: translations.egText, textInput: filter"></input>
+    <input type="text" class="form-control" style="width: 100%; height:initial" data-bind="attr: placeholder: $root.translations.egText, textInput: filter"></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
@@ -244,12 +244,12 @@
 </div>
 <div class='file-workbench-filecount' style="display:inline-flex; justify-content: space-between; width: 100%">
     <div style="display: inline-flex; justify-content: space-between;">
-    <div data-bind='text: card.tiles().length + " " + translations.filesUploaded'></div>
-    <div style='padding-left: 15px;' data-bind='text: card.staging().length + " " + translations.filesSelected'></div>
+    <div data-bind='text: card.tiles().length + " " + $root.translations.filesUploaded'></div>
+    <div style='padding-left: 15px;' data-bind='text: card.staging().length + " " + $root.translations.filesSelected'></div>
     </div>
     <div data-bind="dropzone: dropzoneOptions">
         <button type="button" class="btn-file-select fileinput-button dz-clickable" style='width: 65px; margin: 0;' data-bind="css: uniqueidClass">
-            <div data-bind="text: translations.addFiles"></div>
+            <div data-bind="text: $root.translations.addFiles"></div>
         </button>
     </div>
 </div>
@@ -257,28 +257,28 @@
     <div class="file-workbench-buttons">
         <button style="width: 50%; margin-right: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){stageFiltered()}"
         ><i class="fa fa-check-square"></i>
-            <span data-bind="text: translations.selectAll"></span>
+            <span data-bind="text: $root.translations.selectAll"></span>
         </button>
         <button style="width: 50%; margin-left: 2px;" class="btn btn-md btn-primary" data-bind="click: function(){clearStaging()}, css: {
             disabled: card.staging().length === 0
         }"><i class="fa fa-eraser"></i>
-            <span data-bind="text: translations.clearAll"></span>
+            <span data-bind="text: $root.translations.clearAll"></span>
         </button>
     </div>
 </div>
 
 <div class="file-workbench-selected-buttons" data-bind="visible: card.staging().length > 0">
     <button class="btn btn-lg btn-workbench btn-warning" data-bind="click: function(){removeTiles()}"><i class="fa fa-trash"></i>
-        <span data-bind="text: translations.deleteSelected"></span>
+        <span data-bind="text: $root.translations.deleteSelected"></span>
     </button>
     <button class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){downloadSelection()}"><i class="fa fa-download"></i>
-        <span data-bind="text: translations.downloadSelected"></span>
+        <span data-bind="text: $root.translations.downloadSelected"></span>
     </button>
 </div>
 
 <div class="col-xs-12 pad-no crud-widget-container">
     <h2 class="file-workbench-filter-header">
-        <span data-bind="text: translations.loader"></span>
+        <span data-bind="text: $root.translations.loader"></span>
     </h2>
     <input style="display:inline-block;"
     data-bind="select2Query: {
@@ -289,10 +289,10 @@
             value: managerRenderer,
             allowClear: false,
             multiple: false,
-            placeholder: translations.fileRenderer}}">
+            placeholder: $root.translations.fileRenderer}}">
     <div style="padding-top: 10px">
         <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i>
-            <span data-bind="text: translations.applyToSelectedFiles"></span>
+            <span data-bind="text: $root.translations.applyToSelectedFiles"></span>
         </button>
     </div>
 </div>
@@ -308,9 +308,9 @@
 <div class="workbench-card-sidepanel-body">
 <div class="file-workbench-filter">
     <h2 class="file-workbench-filter-header">
-        <span data-bind="text: translations.fileFilter"></span>
+        <span data-bind="text: $root.translations.fileFilter"></span>
     </h2>
-    <input type="text" class="form-control" style="width: 100%; height:initial" data-bind="attr: placeholder: translations.egText, textInput: filter"></input>
+    <input type="text" class="form-control" style="width: 100%; height:initial" data-bind="attr: placeholder: $root.translations.egText, textInput: filter"></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
@@ -323,27 +323,27 @@
     <!--/ko-->
 <!-- /ko -->
 </div>
-<div class='file-workbench-filecount' data-bind='text: card.tiles().length + " " + translations.filesUploaded'></div>
+<div class='file-workbench-filecount' data-bind='text: card.tiles().length + " " + $root.translations.filesUploaded'></div>
 
 <div data-bind="css: card.model.cssclass">
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
-        <span data-bind="text: translations.showingEditsBy"></span>
+        <span data-bind="text: $root.translations.showingEditsBy"></span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
-            <span data-bind="text: translations.returnToApprovedEdits"></span>
+            <span data-bind="text: $root.translations.returnToApprovedEdits"></span>
         </a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-        <span data-bind="text: translations.newProvisionalContribution"></span>
+        <span data-bind="text: $root.translations.newProvisionalContribution"></span>
         <!-- /ko-->
     </div>
     <!-- /ko-->
 
     <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
     <div class="edit-message-container approved">
-        <span data-bind="text: translations.showingMostRecentApprovedEdits"></span>
+        <span data-bind="text: $root.translations.showingMostRecentApprovedEdits"></span>
     </div>
     <!-- /ko-->
 
@@ -353,11 +353,11 @@
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
                 <div class='new-provisional-edits-title'>
-                    <span data-bind="text: translations.provisionalEdits"></span>
+                    <span data-bind="text: $root.translations.provisionalEdits"></span>
                 </div>
                 <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                         provisionalTileViewModel.deleteAllProvisionalEdits();
-                    }"><span data-bind="text: translations.deleteAllEdits"></span></div>
+                    }"><span data-bind="text: $root.translations.deleteAllEdits"></span></div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {
@@ -390,7 +390,7 @@
                 <a class="pull-right card-help help editable-help" data-bind="click: function () {
                     card.model.get('helpactive')(true)
                 }" style="cursor:pointer;">
-                    <span data-bind="text: translations.help"></span>
+                    <span data-bind="text: $root.translations.help"></span>
                     <i class="fa fa-question-circle"></i>
                 </a>
             </span>
@@ -452,26 +452,26 @@
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: $parent.removeTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-warning': $parent.card.isWritable
-                }"><span data-bind="text: translations.delete"></span></button>
+                }"><span data-bind="text: $root.translations.delete"></span></button>
                 <!-- /ko -->
                 <!-- ko if: tile.dirty() -->
                     <!-- ko if: $parent.provisionalTileViewModel && !$parent.provisionalTileViewModel.tileIsFullyProvisional() && $parent.card.isWritable -->
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function(){tile.reset()}">
-                        <span data-bind="text: translations.cancel"></span>
+                        <span data-bind="text: $root.translations.cancel"></span>
                     </button>
                     <!-- /ko -->
                     <!-- ko if: tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: tile.save, css: {
                         disabled: (!$parent.card.isWritable && !self.preview),
                         'btn-mint': $parent.card.isWritable
-                    }"><span data-bind="text: translations.save"></span></button>
+                    }"><span data-bind="text: $root.translations.save"></span></button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !tile.tileid -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                     disabled: (!$parent.card.isWritable && !self.preview),
                     'btn-mint': $parent.card.isWritable
-                }"><span data-bind="text: translations.add"></span></button>
+                }"><span data-bind="text: $root.translations.add"></span></button>
                 <!-- /ko -->
             </div>
                 <!--/ko-->

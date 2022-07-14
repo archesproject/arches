@@ -3,11 +3,11 @@
 <!-- ko if: coordinateEditing() -->
 <div class="card map-coordinate-editor .fixed">
     <div class="map-coordinate-editor-header">
-        <span data-bind="text: translations.editCoordinates"></span>
+        <span data-bind="text: $root.translations.editCoordinates"></span>
     </div>
     <div class="map-coordinate-editor-crs-selector">
         <dt>
-            <span data-bind="text: translations.coordinateReference"></span>
+            <span data-bind="text: $root.translations.coordinateReference"></span>
         </dt>
         <select data-bind="
             options: coordinateReferences,
@@ -58,12 +58,12 @@
     <!-- /ko-->
     <div class="map-coordinate-editor-button-container">
         <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: showCoordinateFeature">
-            <span data-bind="text: translations.showFeature"></span>
+            <span data-bind="text: $root.translations.showFeature"></span>
         </button>
         <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function() {
             self.coordinateEditing(false);
         }">
-            <span data-bind="text: translations.done"></span>
+            <span data-bind="text: $root.translations.done"></span>
         </button>
     </div>
 </div>

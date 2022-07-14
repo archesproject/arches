@@ -35,7 +35,7 @@
 {% block config_form %}
 <div>
     <div class="control-label">
-        <span data-bind="text: translations.defaultValue"></span>
+        <span data-bind="text: $root.translations.defaultValue"></span>
     </div>
     <div class="col-xs-12">
         <div class="pad-hor columns radio-panel option-input-config" data-bind="foreach: flatOptions">

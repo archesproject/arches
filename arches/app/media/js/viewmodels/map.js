@@ -437,7 +437,10 @@ define([
                 .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                mapPopupProvider.processData(self.getPopupData(features)),
+                {
+                    ...mapPopupProvider.processData(self.getPopupData(features)),
+                    translations: arches.translations,
+                },
                 self.popup._content
             );
             features.forEach(feature=>{

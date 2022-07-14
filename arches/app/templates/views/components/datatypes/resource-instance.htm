@@ -6,11 +6,11 @@
 <div class="node-widget-label concept-label" style="width:540px;">
 
     <div class="control-label">
-        <span data-bind="text: translations.resourceModel"></span>
+        <span data-bind="text: $root.translations.resourceModel"></span>
     </div>
     <div style="padding-bottom: 10px;">
         <select multiple data-bind="
-            placeholder: translations.selectAResourceModel,
+            placeholder: $root.translations.selectAResourceModel,
             selectedOptions: selectedResourceModel,
             options: resourceModels,
             optionsText: 'name',
@@ -38,7 +38,7 @@
                     <div class="row">
                         <div class="row" style="margin-bottom: 10px;">
                             <label class="col-xs-12" style="font-weight: bold;">
-                                <span data-bind="text: translations.defaultRelationshipTo"></span>
+                                <span data-bind="text: $root.translations.defaultRelationshipTo"></span>
                                 <span data-bind="text: $data.name"></span>
                             </label>
 
@@ -56,7 +56,7 @@
                                                     $data.ontologyProperty, 
                                                     self.rootOntologyClass, 
                                                     $data.ontologyClass, 
-                                                    $data.translations.selectAnOntologyProperty, 
+                                                    $data.$root.translations.selectAnOntologyProperty, 
                                                     true
                                                 )
                                             }
@@ -72,7 +72,7 @@
 
                         <div class="row">
                             <label class="col-xs-12" style="font-weight: bold;">
-                                <span data-bind="text: translations.defaultInverseRelationshipTo"></span>
+                                <span data-bind="text: $root.translations.defaultInverseRelationshipTo"></span>
                                 <span data-bind="text: $data.name"></span>
                             </label>
 
@@ -88,7 +88,7 @@
                                                 $data.inverseOntologyProperty, 
                                                 $data.ontologyClass, 
                                                 self.rootOntologyClass, 
-                                                $data.translations.selectAnOntologyProperty, 
+                                                $data.$root.translations.selectAnOntologyProperty, 
                                                 true
                                             )
                                         }
@@ -106,13 +106,13 @@
 
     <div class="relative">
         <label class="col-xs-12 control-label widget-input-label">
-            <span data-bind="text: translations.searchStringText"></span>
+            <span data-bind="text: $root.translations.searchStringText"></span>
             
             <i 
                 class="fa fa-eye" 
                 style="cursor: pointer;" 
                 data-bind="
-                    attr: {title: translations.viewSearchString},
+                    attr: {title: $root.translations.viewSearchString},
                     click: openSearch
                 "
             ></i>
@@ -124,7 +124,7 @@
             type="text" 
             class="form-control" style=""
             data-bind="
-                attr: {placeholder: translations.enterSearchStringHere + '...'},
+                attr: {placeholder: $root.translations.enterSearchStringHere + '...'},
                 textInput: config.searchString
             "
         >
@@ -138,16 +138,16 @@
 <div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">
-            <span data-bind="text: translations.references"></span>
+            <span data-bind="text: $root.translations.references"></span>
         </option>
         <option value="!">
-            <span data-bind="text: translations.doesNotReference"></span>
+            <span data-bind="text: $root.translations.doesNotReference"></span>
         </option>
         <option value="null">
-            <span data-bind="text: translations.hasNoValue"></span>
+            <span data-bind="text: $root.translations.hasNoValue"></span>
         </option>
         <option value="not_null">
-            <span data-bind="text: translations.hasAnyValue"></span>
+            <span data-bind="text: $root.translations.hasAnyValue"></span>
         </option>
     </select>
 </div>
@@ -156,7 +156,7 @@
         name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {
             config: {
-                placeholder: translations.selectAResource,
+                placeholder: $root.translations.selectAResource,
             },
             label: '',
             value: searchValue,

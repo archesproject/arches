@@ -20,7 +20,7 @@
 <dt data-bind="text: label"></dt>
 <!-- ko if: summaryDetails.length === 0 -->
 <dd>
-    <span data-bind="text: translations.none"></span>
+    <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 <!-- ko ifnot: summaryDetails.length === 0  -->
@@ -32,7 +32,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.availableGeometryTypes"></span>
+    <span data-bind="text: $root.translations.availableGeometryTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input style="display:inline-block;"
@@ -43,22 +43,22 @@
                 multiple: true,
                 allowClear: true,
                 minimumInputLength: 0,
-                placeholder: translations.availableGeometryTypes,
+                placeholder: $root.translations.availableGeometryTypes,
                 data: [{
-                    text: translations.point,
+                    text: $root.translations.point,
                     id: 'Point'
                 }, {
-                    text: translations.line,
+                    text: $root.translations.line,
                     id: 'Line'
                 }, {
-                    text: translations.polygon,
+                    text: $root.translations.polygon,
                     id: 'Polygon'
                 }]
             }
         }">
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.mapCenterLongitude"></span>
+    <span data-bind="text: $root.translations.mapCenterLongitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -66,14 +66,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.longitudeXCoordinate},
+            attr: {placeholder: $root.translations.longitudeXCoordinate},
             value: centerX, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.mapCenterLatitude"></span>
+    <span data-bind="text: $root.translations.mapCenterLatitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -81,14 +81,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.latitudeYCoordinate},
+            attr: {placeholder: $root.translations.latitudeYCoordinate},
             value: centerY, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.defaultZoom"></span>
+    <span data-bind="text: $root.translations.defaultZoom"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -98,7 +98,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.zoomLevel},
+            attr: {placeholder: $root.translations.zoomLevel},
             value: zoom, 
             valueUpdate: 'keyup'
         "
@@ -108,5 +108,5 @@
 
 {% block display_value %}
 <span data-bind="text: displayValue()"></span>
-<span data-bind="text: translations.features"></span>
+<span data-bind="text: $root.translations.features"></span>
 {% endblock display_value %}

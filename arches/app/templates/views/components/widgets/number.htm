@@ -36,7 +36,7 @@
     <!-- ko if: displayValue -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
-        <span data-bind="formattedNumber: displayValue(), format: format || translations.none"></span>
+        <span data-bind="formattedNumber: displayValue(), format: format || $root.translations.none"></span>
         <!-- /ko -->
         <!-- ko ifnot: format -->
         <span data-bind="text: displayValue()"></span>
@@ -44,7 +44,7 @@
     <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
     <!-- ko ifnot: displayValue -->
-    <span data-bind="text: translations.none"></span>
+    <span data-bind="text: $root.translations.none"></span>
     <!-- /ko -->
     </div>
 </dd>
@@ -52,7 +52,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.placeholder"></span>
+    <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -60,14 +60,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.placeholder},
+            attr: {placeholder: $root.translations.placeholder},
             value: placeholder, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.min"></span>
+    <span data-bind="text: $root.translations.min"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -75,14 +75,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.min},
+            attr: {placeholder: $root.translations.min},
             value: min, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.max"></span>
+    <span data-bind="text: $root.translations.max"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -90,14 +90,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.max},
+            attr: {placeholder: $root.translations.max},
             value: max, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.increment"></span>
+    <span data-bind="text: $root.translations.increment"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container" >
     <input 
@@ -105,7 +105,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.incrementSize},
+            attr: {placeholder: $root.translations.incrementSize},
             value: step, 
             valueUpdate: 'keyup', 
             disable: format
@@ -113,7 +113,7 @@
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.decimalPlaces"></span>
+    <span data-bind="text: $root.translations.decimalPlaces"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -121,14 +121,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.numberOfDecimalPlaces},
+            attr: {placeholder: $root.translations.numberOfDecimalPlaces},
             value: precision, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.prefix"></span>
+    <span data-bind="text: $root.translations.prefix"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -136,14 +136,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.fieldPrefix},
+            attr: {placeholder: $root.translations.fieldPrefix},
             value: prefix, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.suffix"></span>
+    <span data-bind="text: $root.translations.suffix"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -151,14 +151,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.fieldSuffix},
+            attr: {placeholder: $root.translations.fieldSuffix},
             value: suffix, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.defaultValue"></span>
+    <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -166,16 +166,16 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.defaultValue},
+            attr: {placeholder: $root.translations.defaultValue},
             value: defaultValue, 
             valueUpdate: 'keyup'
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.format"></span> 
+    <span data-bind="text: $root.translations.format"></span> 
     <a href="http://numeraljs.com/#format" target="_blank">
-        <span data-bind="text: '(' + translations.viewValidFormats + ')'"></span>
+        <span data-bind="text: '(' + $root.translations.viewValidFormats + ')'"></span>
     </a>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
@@ -184,7 +184,7 @@
     id="" 
     class="form-control input-md widget-input" 
     data-bind="
-        attr: {placeholder: translations.format},
+        attr: {placeholder: $root.translations.format},
         value: format, 
         valueUpdate: 'keyup'
     "
@@ -192,7 +192,7 @@
 </div>
 <div class="node-config-item">
     <div class="control-label">
-        <span data-bind="text: translations.disabled"></span>
+        <span data-bind="text: $root.translations.disabled"></span>
     </div>
     <div class="pad-no">
         <div 
@@ -202,8 +202,8 @@
                     params: {
                         value: uneditable, 
                         config:{
-                            label: translations.disableEditing, 
-                            subtitle: translations.preventUsersFromEditingValue
+                            label: $root.translations.disableEditing, 
+                            subtitle: $root.translations.preventUsersFromEditingValue
                         }
                     }
                 }

@@ -16,27 +16,27 @@
                         'fa-caret-up' : showi18nOptions(),
                     }
                 }"></i>
-                <span data-bind="text: translations.languages"></span>
+                <span data-bind="text: $root.translations.languages"></span>
             </span>
         </div>
         <div class="form-horizontal" data-bind="if: showi18nOptions">
             <div class="i18n-style-tools-panel">
                 <div style="display: flex; flex-direction: column; max-width:600px">
                     <label class="widget-input-label" for="lang_dd">
-                        <span data-bind="text: translations.language"></span>
+                        <span data-bind="text: $root.translations.language"></span>
                     </label>
                     <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
                     </select>
                     <label class="widget-input-label" for="lang_dir">
-                        <span data-bind="text: translations.direction"></span>
+                        <span data-bind="text: $root.translations.direction"></span>
                     </label>
                     <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
                         'width':'100%'}">
                         <option value="ltr">
-                            <span data-bind="text: translations.leftToRight"></span>
+                            <span data-bind="text: $root.translations.leftToRight"></span>
                         </option>
                         <option value="rtl">
-                            <span data-bind="text: translations.rightToLeft"></span>
+                            <span data-bind="text: $root.translations.rightToLeft"></span>
                         </option>
                     </select>
                 </div>
@@ -56,7 +56,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.placeholder"></span>
+    <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -64,13 +64,13 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.placeholder},
+            attr: {placeholder: $root.translations.placeholder},
             textInput: placeholder
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.maxLength"></span>
+    <span data-bind="text: $root.translations.maxLength"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -78,7 +78,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.maxLength},
+            attr: {placeholder: $root.translations.maxLength},
             textInput: maxLength
         "
     >
@@ -95,34 +95,34 @@
                     'fa-caret-up' : showi18nOptions(),
                 }
             }"></i>
-            <span data-bind="text: translations.languages"></span>
+            <span data-bind="text: $root.translations.languages"></span>
         </span>
     </div>
     <div class="form-horizontal" data-bind="if: showi18nOptions">
         <div class="i18n-style-tools-panel">
             <div style="display: flex; flex-direction: column; max-width:600px">
                 <label class="widget-input-label" for="lang_dd">
-                    <span data-bind="text: translations.language"></span>
+                    <span data-bind="text: $root.translations.language"></span>
                 </label>
                 <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentDefaultLanguage, chosen: {width:'100%'}">
                 </select>
                 <label class="widget-input-label" for="lang_dir">
-                    <span data-bind="text: translations.direction"></span>
+                    <span data-bind="text: $root.translations.direction"></span>
                 </label>
                 <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDefaultDirection, chosen: {
                     'width':'100%'}">
                     <option value="ltr">
-                        <span data-bind="text: translations.leftToRight"></span>
+                        <span data-bind="text: $root.translations.leftToRight"></span>
                     </option>
                     <option value="rtl">
-                        <span data-bind="text: translations.rightToLeft"></span>
+                        <span data-bind="text: $root.translations.rightToLeft"></span>
                     </option>
                 </select>
             </div>
         </div>
     </div>
     <label class="control-label widget-input-label" for="">
-        <span data-bind="text: translations.defaultValue"></span>
+        <span data-bind="text: $root.translations.defaultValue"></span>
     </label>
     <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
         <input type="text" style="flex:1" data-bind="textInput: currentDefaultText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection}" class="form-control input-lg widget-input">
@@ -131,7 +131,7 @@
 </div>
 <div class="node-config-item">
     <div class="control-label">
-        <span data-bind="text: translations.disabled"></span>
+        <span data-bind="text: $root.translations.disabled"></span>
     </div>
     <div class="pad-no">
         <div 
@@ -140,7 +140,7 @@
                     name: 'views/components/simple-switch', 
                     params: {
                         value: uneditable, 
-                        config:{label: translations.disableEditing, subtitle: translations.preventUsersFromEditingValue}
+                        config:{label: $root.translations.disableEditing, subtitle: $root.translations.preventUsersFromEditingValue}
                     }
                 }
             "
@@ -151,7 +151,7 @@
 
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
-<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || translations.none"></span>
+<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || $root.translations.none"></span>
 {% endblock display_value %}
 <!-- /ko -->
 
@@ -159,7 +159,7 @@
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : translations.none"></dd>
+<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : $root.translations.none"></dd>
 {% endblock report %}
 <!-- /ko -->
 <!-- /ko -->

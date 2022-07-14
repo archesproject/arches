@@ -27,7 +27,7 @@
                     style="margin-right: 8px;"
                     data-bind="click: clearEditor"
                 >
-                    <span data-bind="text: translations.clear"></span>
+                    <span data-bind="text: $root.translations.clear"></span>
                 </button>
 
                 <button 
@@ -82,12 +82,12 @@
                                     data-bind="click: function(){$parent.removeTile(tile)}"
                                 >
                                     <i class="fa fa-times-circle"></i>
-                                    <span data-bind="text: translations.remove"></span>
+                                    <span data-bind="text: $root.translations.remove"></span>
 
                                 </div>
                                 <div data-bind="click: function(){$parent.loadTileIntoEditor(tile)}">
                                     <i class="fa fa-pencil"></i>
-                                    <span data-bind="text: translations.edit"></span>
+                                    <span data-bind="text: $root.translations.edit"></span>
                                 </div>
                             </div>
                         </div>

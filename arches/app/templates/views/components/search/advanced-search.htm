@@ -15,12 +15,12 @@
 
                 <!-- Splash Title -->
                 <div class="rr-splash-title">
-                    <span data-bind="text: translations.advancedSearch"></span>
+                    <span data-bind="text: $root.translations.advancedSearch"></span>
                 </div>
 
                 <!-- Splash Instructions -->
                 <div class="rr-splash-description">
-                    <span data-bind="text: translations.advancedSearchDescription"></span>
+                    <span data-bind="text: $root.translations.advancedSearchDescription"></span>
                 </div>
             </div>
         </div>
@@ -30,10 +30,10 @@
         <!-- ko if: $index  -->
         <div class="btn-group btn-group-sm facet-btn-group">
             <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">
-                <span data-bind="text: translations.and"></span>
+                <span data-bind="text: $root.translations.and"></span>
             </button>
             <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">
-                <span data-bind="text: translations.or"></span>
+                <span data-bind="text: $root.translations.or"></span>
             </button>
         </div>
         <!-- /ko -->
@@ -61,7 +61,7 @@
 
                 <div class="facet-search-button">
                     <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">
-                        <span data-bind="text: $parent.translations.remove"></span>
+                        <span data-bind="text: $parent.$root.translations.remove"></span>
                     </button>
                 </div>
             </div>
@@ -74,14 +74,14 @@
         <div class="list-group search-facets">
             <div class="search-facet-item header">
                 <h4 class="search-facet-item-heading">
-                    <span data-bind="text: translations.searchFacets"></span>
+                    <span data-bind="text: $root.translations.searchFacets"></span>
                 </h4>
                 <div class="list-filter">
                     <input 
                         type="text" 
                         class="form-control"
                         data-bind="
-                            attr:{placeholder: translations.find + '...'},
+                            attr:{placeholder: $root.translations.find + '...'},
                             value: facetFilterText, 
                             valueUpdate: 'keyup'
                         "

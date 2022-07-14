@@ -18,7 +18,7 @@
                 }
             }"></div>
             <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">
-                <span data-bind="text: translations.continue"></span>
+                <span data-bind="text: $root.translations.continue"></span>
             </button>
         </div>
         <div class="wf-multi-tile-step-list">
@@ -57,7 +57,7 @@
                     <span
                         class="" 
                         data-bind="
-                            text: translations.remove,
+                            text: $root.translations.remove,
                             click: function(){$parent.remove(tile)}
                         "
                     ></span>
@@ -68,7 +68,7 @@
                     
                     <span 
                         data-bind="
-                            text: translations.edit, 
+                            text: $root.translations.edit, 
                             click: function(){$parent.edit(tile);}
                         "
                     ></span>

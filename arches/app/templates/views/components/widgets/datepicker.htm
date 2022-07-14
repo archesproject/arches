@@ -24,18 +24,18 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko if: value() !== null -->
-<dd data-bind="date: value(), dateFormat: dateFormat || translations.noDateEntered"></dd>
+<dd data-bind="date: value(), dateFormat: dateFormat || $root.translations.noDateEntered"></dd>
 <!-- /ko -->
 <!-- ko if: value() === null -->
 <dd>
-    <span data-bind="text: translations.none"></span>
+    <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 {% endblock report %}
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.minimumDate"></span>
+    <span data-bind="text: $root.translations.minimumDate"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -43,14 +43,14 @@
         id="datetimepickermin" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.minimumDate},
+            attr: {placeholder: $root.translations.minimumDate},
             value: minDate, 
             datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.maximumDate"></span>
+    <span data-bind="text: $root.translations.maximumDate"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -58,21 +58,21 @@
         id="datetimepickermax" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.maximumDate},
+            attr: {placeholder: $root.translations.maximumDate},
             value: maxDate, 
             datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}
         "
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.viewMode"></span>
+    <span data-bind="text: $root.translations.viewMode"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <select 
         type="" 
         id="" 
         data-bind="
-            attr: {placeholder: translations.viewMode},
+            attr: {placeholder: $root.translations.viewMode},
             options:viewModeOptions, 
             optionsText:'name', 
             optionsValue:'id', 
@@ -83,7 +83,7 @@
     ></select>
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.defaultValue"></span>
+    <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div>
     <div class="form-group col-xs-12 pad-no crud-widget-container">
@@ -96,9 +96,9 @@
     <div class="toggle-container">
         <span class="switch switch-small" data-bind="css: {'on': getdefault}, click: setdefault"><small></small></span>
             <div style="display:flex; flex-direction:row;">
-                <div class="arches-toggle-sm" data-bind="text: translations.useDateOfDataEntry"></div>
+                <div class="arches-toggle-sm" data-bind="text: $root.translations.useDateOfDataEntry"></div>
             </div>
-        <span class="arches-toggle-subtitle" data-bind="text: translations.useDateOfDataEntryForDefaultValue"></span>
+        <span class="arches-toggle-subtitle" data-bind="text: $root.translations.useDateOfDataEntryForDefaultValue"></span>
     </div>
 </div>
 {% endblock config_form %}

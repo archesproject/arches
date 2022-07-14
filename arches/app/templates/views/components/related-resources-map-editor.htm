@@ -8,7 +8,7 @@
     'active': activeTab() === 'editor'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text" data-bind="text: translations.edit"></span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.edit"></span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
@@ -24,7 +24,7 @@
     <!-- ko if: !self.coordinateEditing() -->
     <div style="margin: 10px 10px 0px;">
         <div class='control-label widget-input-label'>
-            <span data-bind="text: translations.participatingLayers"></span>
+            <span data-bind="text: $root.translations.participatingLayers"></span>
         </div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
         <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
@@ -48,15 +48,15 @@
         {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
-            <span data-bind="text: translations.showingEditsBy"></span>
+            <span data-bind="text: $root.translations.showingEditsBy"></span>
             <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
             <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
-                <span data-bind="text: translations.returnToApprovedEdits"></span>
+                <span data-bind="text: $root.translations.returnToApprovedEdits"></span>
             </a>
             <!-- /ko-->
             <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-            <span data-bind="text: translations.newProvisionalContribution"></span>
+            <span data-bind="text: $root.translations.newProvisionalContribution"></span>
             <!-- /ko-->
         </div>
         <!-- /ko-->
@@ -64,7 +64,7 @@
         <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
         <div class="edit-message-container approved">
             <div>
-                <span data-bind="text: translations.showingMostRecentApprovedEdits"></span>
+                <span data-bind="text: $root.translations.showingMostRecentApprovedEdits"></span>
             </div>
         </div>
         <!-- /ko-->
@@ -75,12 +75,12 @@
             <div class='new-provisional-edits-list'>
                 <div class='new-provisional-edits-header'>
                     <div class='new-provisional-edits-title'>
-                        <span data-bind="text: translations.provisionalEdits"></span>
+                        <span data-bind="text: $root.translations.provisionalEdits"></span>
                     </div>
                     <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                             provisionalTileViewModel.deleteAllProvisionalEdits();
                         }">
-                        <span data-bind="text: translations.deleteAllEdits"></span>
+                        <span data-bind="text: $root.translations.deleteAllEdits"></span>
                     </div>
                 </div>
                 <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
@@ -118,17 +118,17 @@
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
                     }">
-                        <span data-bind="text: translations.cancel"></span>
+                        <span data-bind="text: $root.translations.cancel"></span>
                     </button>
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
                     }, click: updateGeoJSON">
-                        <span data-bind="text: translations.updateFeatures"></span>
+                        <span data-bind="text: $root.translations.updateFeatures"></span>
                     </button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
                 <div class="geojson-error-list">
-                    <span data-bind="text: translations.geojsonErrors"></span>
+                    <span data-bind="text: $root.translations.geojsonErrors"></span>
                     <ul>
                         <!-- ko foreach: geoJSONErrors() -->
                         <li data-bind="text: message"></li>
@@ -148,7 +148,7 @@
                 <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
                     <div class="rr-map-card-intersect-panel">
                         <div class='control-label widget-input-label'>
-                            <span data-bind="text: translations.bufferIntersectingFeature"></span>
+                            <span data-bind="text: $root.translations.bufferIntersectingFeature"></span>
                         </div>
                         <div class="buffer-control" style="padding-left: 0px">
                             <div style="display: inline-flex; justify-content: space-between; width: 100%">
@@ -160,7 +160,7 @@
                                     class="form-control"
                                     style="height: 34px; width: 95px" 
                                     data-bind="
-                                        attr: {placeholder: translations.buffer},
+                                        attr: {placeholder: $root.translations.buffer},
                                         textInput: self.mapFilter.buffer
                                     "
                                 >
@@ -171,7 +171,7 @@
                                         click: function(){self.appendBufferToTileFeatures(widget.node_id());}, 
                                         disable: !ko.unwrap(self.mapFilter.buffer) || !ko.unwrap(self.mapFilter.searchGeometries).length
                                         ">
-                                        <span data-bind="text: translations.addBufferToFeatures"></span>
+                                        <span data-bind="text: $root.translations.addBufferToFeatures"></span>
                                     </button>
                                 </div>
                             </div>
@@ -181,7 +181,7 @@
                     <!--ko if: self.featureLookup[widget.node_id()].features -->
                     <div class="rr-map-card-intersect-panel">
                         <div class='control-label widget-input-label'>
-                            <span data-bind="text: translations.selectAFeatureToPerformIntersection"></span>
+                            <span data-bind="text: $root.translations.selectAFeatureToPerformIntersection"></span>
                         </div>
                         <table class="table">
                             <tbody>
@@ -194,7 +194,7 @@
                                     <a href="javascript:void(0);" data-bind="
                                     click: function(){self.mapFilter.makeSearchFeature(feature)}">
                                         <i class="fa fa-pencil map-card-feature-edit"></i>
-                                        <span data-bind="text: translations.intersect"></span>
+                                        <span data-bind="text: $root.translations.intersect"></span>
                                     </a>
                                 </td>
                             </tr>
@@ -217,7 +217,7 @@
                     <a class="pull-right card-help help editable-help" data-bind="click: function () {
                         card.model.get('helpactive')(true)
                     }" style="cursor:pointer;">
-                        <span data-bind="text: translations.help"></span>
+                        <span data-bind="text: $root.translations.help"></span>
                         <i class="fa fa-question-circle"></i>
                     </a>
                 </span>
@@ -271,7 +271,7 @@
                                     <div class="map-card-feature-list">
                                         <div class="add-new-feature">
                                             <select 
-                                                data-placeholder="translations.addANewFeature + '...'" 
+                                                data-placeholder="$root.translations.addANewFeature + '...'" 
                                                 data-bind="
                                                     value: self.featureLookup[widget.node_id()].selectedTool,
                                                     valueAllowUnset: true,
@@ -296,13 +296,13 @@
                                                     <td class="map-card-feature-tool">
                                                         <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false">
                                                             <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                            <span data-bind="text: translations.edit"></span>
+                                                            <span data-bind="text: $root.translations.edit"></span>
                                                         </a>
                                                     </td>
                                                     <td class="map-card-feature-tool">
                                                         <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false">
                                                             <i class="fa fa-trash map-card-feature-delete"></i>
-                                                            <span data-bind="text: translations.delete"></span>
+                                                            <span data-bind="text: $root.translations.delete"></span>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -315,7 +315,7 @@
                                                 self.showRelatedQuery(true);
                                             }">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                <span data-bind="text: translations.find"></span>
+                                                <span data-bind="text: $root.translations.find"></span>
                                             </a>
                                             |
                                             <!-- ko if: self.canEditCoordinates() -->
@@ -323,13 +323,13 @@
                                                     self.coordinateEditing(true);
                                                 }">
                                                     <i class="fa fa-list map-card-feature-edit"></i>
-                                                    <span data-bind="text: translations.editCoordinates"></span>
+                                                    <span data-bind="text: $root.translations.editCoordinates"></span>
                                                 </a>
                                                 <!-- /ko -->
                                                 <!-- ko if: !self.canEditCoordinates() -->
                                                     <span>
                                                         <i class="fa fa-list map-card-feature-edit"></i>
-                                                        <span data-bind="text: translations.editCoordinates"></span>
+                                                        <span data-bind="text: $root.translations.editCoordinates"></span>
                                                     </span>
                                                 <!-- /ko -->
                                             <!--/ko-->
@@ -337,7 +337,7 @@
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                             }">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                <span data-bind="text: translations.editGeoJson"></span>
+                                                <span data-bind="text: $root.translations.editGeoJson"></span>
                                             </a>
                                             <!-- ko if: ko.unwrap(self.featureLookup[widget.node_id()].features) && self.featureLookup[widget.node_id()].features().length > 0 -->
                                             |
@@ -345,7 +345,7 @@
                                                 self.fitFeatures(self.featureLookup[widget.node_id()].features());
                                             }">
                                                 <i class="fa fa-search map-card-feature-edit"></i>
-                                                <span data-bind="text: translations.zoomToAll"></span>
+                                                <span data-bind="text: $root.translations.zoomToAll"></span>
                                             </a>
                                             <!-- /ko -->
                                         </div>
@@ -365,13 +365,13 @@
                         disabled: (!card.isWritable && !self.preview),
                         'btn-warning': card.isWritable
                     }">
-                        <span data-bind="text: translations.delete"></span>
+                        <span data-bind="text: $root.translations.delete"></span>
                     </button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
                         <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">
-                            <span data-bind="text: translations.cancel"></span>
+                            <span data-bind="text: $root.translations.cancel"></span>
                         </button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
@@ -379,7 +379,7 @@
                             disabled: (!card.isWritable && !self.preview),
                             'btn-mint': card.isWritable
                         }">
-                            <span data-bind="text: translations.save"></span>
+                            <span data-bind="text: $root.translations.save"></span>
                         </button>
                         <!-- /ko -->
                     <!-- /ko -->
@@ -388,7 +388,7 @@
                         disabled: (!card.isWritable && !self.preview),
                         'btn-mint': card.isWritable
                     }">
-                        <span data-bind="text: translations.add"></span>
+                        <span data-bind="text: $root.translations.add"></span>
                     </button>
                     <!-- /ko -->
                 </div>
@@ -421,7 +421,7 @@
     <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function () {
         showRelatedQuery(false);
     }">
-        <span data-bind="text: translations.done"></span>
+        <span data-bind="text: $root.translations.done"></span>
     </button>
 </div>
 <!--/ko -->

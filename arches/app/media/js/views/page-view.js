@@ -123,6 +123,8 @@ define([
                 self.viewModel.unreadNotifs((list.length > 0));
             });
 
+            self.viewModel.translations = arches.translations;
+
             window.addEventListener('beforeunload', function() {
                 self.viewModel.loading(true);
             });

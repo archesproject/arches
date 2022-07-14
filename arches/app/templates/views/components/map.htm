@@ -9,7 +9,7 @@
             'active': activeTab() === 'basemap'
         }">
             <i class="fa fa-globe"></i>
-            <span data-bind="text: translations.basemap" class="map-sidebar-text"></span>
+            <span data-bind="text: $root.translations.basemap" class="map-sidebar-text"></span>
         </div>
         <div class="workbench-card-sidebar-tab" data-bind="click: function() {
             toggleTab('overlays');
@@ -17,7 +17,7 @@
             'active': activeTab() === 'overlays'
         }">
             <i class="fa fa-list"></i>
-            <span data-bind="text: translations.overlays" class="map-sidebar-text"></span>
+            <span data-bind="text: $root.translations.overlays" class="map-sidebar-text"></span>
         </div>
         <div class="workbench-card-sidebar-tab" data-bind="click: function() {
             toggleTab('legend');
@@ -25,7 +25,7 @@
             'active': activeTab() === 'legend'
         }">
             <i class="fa fa-list-alt"></i>
-            <span data-bind="text: translations.legend" class="map-sidebar-text"></span>
+            <span data-bind="text: $root.translations.legend" class="map-sidebar-text"></span>
         </div>
         {% endblock tabs %}
     </div>
@@ -35,7 +35,7 @@
             <!--ko if: activeTab() === 'basemap' -->
                 <div class="workbench-card-sidepanel-header-container">
                     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-                        <span data-bind="text: translations.basemaps" ></span>
+                        <span data-bind="text: $root.translations.basemaps" ></span>
                     </h4>
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>
@@ -59,7 +59,7 @@
             <!--ko if: activeTab() === 'overlays' -->
                 <div class="workbench-card-sidepanel-header-container">
                     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-                        <span data-bind="text: translations.overlays" ></span>
+                        <span data-bind="text: $root.translations.overlays" ></span>
                     </h4>
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>
@@ -91,7 +91,7 @@
             <!--ko if: activeTab() === 'legend' -->
                 <div class="workbench-card-sidepanel-header-container">
                     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-                        <span data-bind="text: translations.legend" ></span>
+                        <span data-bind="text: $root.translations.legend" ></span>
                     </h4>
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>

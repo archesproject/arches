@@ -13,7 +13,7 @@
     <i class="fa fa-info"></i>
     <span 
         class="map-sidebar-text"
-        data-bind="text: translations.info"
+        data-bind="text: $root.translations.info"
     ></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
@@ -24,7 +24,7 @@
     <i class="fa fa-search"></i>
     <span 
         class="map-sidebar-text"
-        data-bind="text: translations.search"
+        data-bind="text: $root.translations.search"
     ></span>
 </div>
 {% comment %} Uncomment this section to show additional tabs...
@@ -36,7 +36,7 @@
     <i class="fa fa-line-chart"></i>
     <span 
         class="map-sidebar-text"
-        data-bind="text: translations.analyze"
+        data-bind="text: $root.translations.analyze"
     ></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
@@ -47,7 +47,7 @@
     <i class="fa fa-cog"></i>
     <span 
         class="map-sidebar-text"
-        data-bind="text: translations.settings"
+        data-bind="text: $root.translations.settings"
     ></span>
 </div>
 {% endcomment %}
@@ -59,7 +59,7 @@
     <i class="fa fa-list"></i>
     <span 
         class="map-sidebar-text"
-        data-bind="text: translations.legend"
+        data-bind="text: $root.translations.legend"
     ></span>
 </div>
 {% endblock tabs %}
@@ -68,7 +68,7 @@
 <!--ko if: activeTab() === 'information' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.resourceInformation"></span>
+        <span data-bind="text: $root.translations.resourceInformation"></span>
     </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
@@ -105,11 +105,11 @@
         </div>
         <div class="edge-relationship-details">
             <div class="edge-relationship-prefix">
-                <span data-bind="text: $parent.translations.hasRelationship"></span>
+                <span data-bind="text: $parent.$root.translations.hasRelationship"></span>
             </div>
-            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || $parent.translations.relatedTo "></div>
+            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || $parent.$root.translations.relatedTo "></div>
             <div class="edge-relationship-sufix">
-                <span data-bind="text: $parent.translations.with"></span>
+                <span data-bind="text: $parent.$root.translations.with"></span>
             </div>
         </div>
     </div>
@@ -139,27 +139,27 @@
             <div class="edge-node-links">
                 <span data-bind="click: $parent.viewInformationNodeReport">
                     <i class="fa fa-info"></i>
-                    <span data-bind="text: $parent.translations.report"></span>
+                    <span data-bind="text: $parent.$root.translations.report"></span>
                 </span>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <span data-bind="click: $parent.editInformationNode">
                     <i class="fa fa-pencil"></i>
-                    <span data-bind="text: $parent.translations.edit"></span>
+                    <span data-bind="text: $parent.$root.translations.edit"></span>
                 </span>
             </div>
         </div>
     </div>
     <div class="relationships-list-header">
-        <span data-bind="text: $parent.translations.relationships"></span>
+        <span data-bind="text: $parent.$root.translations.relationships"></span>
     </div>
     <div class="relationships-list-count">
         <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
-        <span data-bind="text: $parent.translations.relationshipsShown"></span>
+        <span data-bind="text: $parent.$root.translations.relationshipsShown"></span>
         <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
         <a href="javascript:void(0);" data-bind="click: function() {
             $parent.expandNode($data);
         }">
-            <span data-bind="text: $parent.translations.loadMore"></span>
+            <span data-bind="text: $parent.$root.translations.loadMore"></span>
         </a>
         <!--/ko -->
     </div>
@@ -198,7 +198,7 @@
 <!--ko if: activeTab() === 'search' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.searchNetwork"></span>
+        <span data-bind="text: $root.translations.searchNetwork"></span>
     </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
@@ -208,7 +208,7 @@
         type="text" 
         class="form-control" 
         data-bind="
-            attr: {placeholder: translations.filter + '...'},
+            attr: {placeholder: $root.translations.filter + '...'},
             value: nodeSearchFilter, 
             valueUpdate: 'afterkeydown'
         "
@@ -232,12 +232,12 @@
             <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
             <div class="relationships-list-count shim">
                 <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
-                <span data-bind="text: $parent.translations.relationshipsShown"></span>
+                <span data-bind="text: $parent.$root.translations.relationshipsShown"></span>
                 <!--ko if: shownRelationsCount() !== totalRelations -->
                 <a href="javascript:void(0);" data-bind="click: function() {
                     $parent.expandNode($data);
                 }">
-                    <span data-bind="text: $parent.translations.loadMore"></span>
+                    <span data-bind="text: $parent.$root.translations.loadMore"></span>
                 </a>
                 <!--/ko -->
             </div>
@@ -249,21 +249,21 @@
 <!--ko if: activeTab() === 'analyze' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.analyzeNetwork"></span>
+        <span data-bind="text: $root.translations.analyzeNetwork"></span>
     </h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'settings' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.settings"></span>
+        <span data-bind="text: $root.translations.settings"></span>
     </h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.legend"></span>
+        <span data-bind="text: $root.translations.legend"></span>
     </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
@@ -298,16 +298,16 @@
 </div>
 <div class="related-resources-graph-controls-instructions">
 <!--ko if: selectionMode() === 'information' -->
-    <span data-bind="text: translations.clickNodeInfo"></span>
+    <span data-bind="text: $root.translations.clickNodeInfo"></span>
 <!--/ko -->
 <!--ko if: selectionMode() === 'expand' -->
-    <span data-bind="text: translations.clickNodeRelationships"></span>
+    <span data-bind="text: $root.translations.clickNodeRelationships"></span>
 <!--/ko -->
 <!--ko if: selectionMode() === 'focus' -->
-    <span data-bind="text: translations.clickNodeRefocus"></span>
+    <span data-bind="text: $root.translations.clickNodeRefocus"></span>
 <!--/ko -->
 <!--ko if: selectionMode() === 'delete' -->
-    <span data-bind="text: translations.clickNodeRemove"></span>
+    <span data-bind="text: $root.translations.clickNodeRemove"></span>
 <!--/ko -->
 </div>
 <!--ko if: cytoscapeConfig() -->

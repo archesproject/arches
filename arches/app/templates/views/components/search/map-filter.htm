@@ -9,7 +9,7 @@
 }">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">
-        <span data-bind="text: translations.filter"></span>
+        <span data-bind="text: $root.translations.filter"></span>
     </span>
 </div>
 {{ block.super }}
@@ -19,7 +19,7 @@
 <!--ko if: activeTab() === 'filter' -->
     <div class="workbench-card-sidepanel-header-container">
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-            <span data-bind="text: translations.mapSearch"></span>
+            <span data-bind="text: $root.translations.mapSearch"></span>
         </h4>
     </div>
     <div class="workbench-card-sidepanel-border"></div>
@@ -31,11 +31,11 @@
         <!-- Buffer Definition -->
         <div class="buffer-control form-control">
             <h5 class="">
-                <span data-bind="text: translations.buffer"></span>
+                <span data-bind="text: $root.translations.buffer"></span>
             </h5>
             <div class="form-inline">
                 <label for="buffer-input">
-                    <span data-bind="text: translations.distance"></span>
+                    <span data-bind="text: $root.translations.distance"></span>
                 </label>
                 <input 
                     type="number" 
@@ -43,7 +43,7 @@
                     id="buffer-input" 
                     class="buffer-input" 
                     data-bind="
-                        attr: {placeholder: translations.buffer},
+                        attr: {placeholder: $root.translations.buffer},
                         textInput: buffer
                     "
                 >
@@ -54,10 +54,10 @@
         <!-- Geometry -->
         <div class="add-new-feature buffer-control" style="">
             <h5 class="">
-                <span data-bind="text: translations.selectAFilter"></span>
+                <span data-bind="text: $root.translations.selectAFilter"></span>
             </h5>
             <select 
-                data-placeholder="translations.drawA" 
+                data-placeholder="$root.translations.drawA" 
                 data-bind="
                     value: selectedTool,
                     valueAllowUnset: true,
@@ -85,7 +85,7 @@
         }"></div>
         <!-- ko if: geoJSONErrors().length !== 0 -->
         <div class="geojson-error-list">
-            <span data-bind="text: translations.geojsonErrors"></span>
+            <span data-bind="text: $root.translations.geojsonErrors"></span>
             <ul>
                 <!-- ko foreach: geoJSONErrors() -->
                 <li data-bind="text: message"></li>
@@ -100,17 +100,17 @@
         <a href="javascript:void(0);" data-bind="click: function(){
             editGeoJSON(filter.feature_collection);}">
             <i class="fa fa-pencil map-card-feature-edit"></i>
-            <span data-bind="text: translations.editGeoJSON"></span>
+            <span data-bind="text: $root.translations.editGeoJSON"></span>
         </a>
         |
         <a href="javascript:void(0);" data-bind="click: fitToAggregationBounds">
             <i class="fa fa-search map-card-feature-edit"></i>
-            <span data-bind="text: translations.zoomToAllFeatures"></span>
+            <span data-bind="text: $root.translations.zoomToAllFeatures"></span>
         </a>
         |
         <a href="javascript:void(0);" data-bind="click: clear">
             <i class="fa fa-trash map-card-feature-edit"></i>
-            <span data-bind="text: translations.clearFilter"></span>
+            <span data-bind="text: $root.translations.clearFilter"></span>
         </a>
 
     </div>
@@ -121,12 +121,12 @@
         <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
             geoJSONString(undefined);
         }">
-            <span data-bind="text: translations.cancel"></span>
+            <span data-bind="text: $root.translations.cancel"></span>
         </button>
         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
             disabled: geoJSONErrors().length !== 0
         }, click: updateGeoJSON">
-            <span data-bind="text: translations.acceptGeoJson"></span>
+            <span data-bind="text: $root.translations.acceptGeoJson"></span>
         </button>
     </div>
     <!-- /ko -->

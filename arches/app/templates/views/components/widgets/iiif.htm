@@ -18,7 +18,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.defaultManifestUrl"></span>
+    <span data-bind="text: $root.translations.defaultManifestUrl"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input 
@@ -26,7 +26,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.enterManifestUrl},
+            attr: {placeholder: $root.translations.enterManifestUrl},
             textInput: defaultManifest
         "
     >
@@ -36,7 +36,7 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko if: canvasConfigs.length === 0 -->
-<dd data-bind="text: displayValue() || translations.none"></dd>
+<dd data-bind="text: displayValue() || $root.translations.none"></dd>
 <!-- /ko -->
 <!-- ko if: canvasConfigs.length > 0 -->
 <div class="iiif-widget-report">
@@ -49,5 +49,5 @@
 
 {% block display_value %}
 <span data-bind="text: displayValue()"></span>
-<span data-bind="text: translations.annotations"></span>
+<span data-bind="text: $root.translations.annotations"></span>
 {% endblock display_value %}

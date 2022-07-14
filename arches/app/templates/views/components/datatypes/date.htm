@@ -8,10 +8,10 @@
         <option value="gte"> &ge; </option>
         <option value="lte"> &le; </option>
         <option value="null">
-            <span data-bind="text: translations.hasNoValue"></span>
+            <span data-bind="text: $root.translations.hasNoValue"></span>
         </option>
         <option value="not_null">
-            <span data-bind="text: translations.hasAnyValue"></span>
+            <span data-bind="text: $root.translations.hasAnyValue"></span>
         </option>
     </select>
 </div>
@@ -21,7 +21,7 @@
         type="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.date},
+            attr: {placeholder: $root.translations.date},
             value: searchValue, 
             datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}
         "
@@ -32,14 +32,14 @@
 
 <!-- ko ifnot: $data.search -->
 <div class="control-label">
-    <span data-bind="text: translations.dateFormat"></span>
+    <span data-bind="text: $root.translations.dateFormat"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <select 
         type="" 
         id="" 
         data-bind="
-            attr: {placeholder: translations.dateFormat},
+            attr: {placeholder: $root.translations.dateFormat},
             options:dateFormatOptions, 
             optionsText:'name', 
             optionsValue:'id', 

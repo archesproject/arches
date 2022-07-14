@@ -12,14 +12,14 @@
 }">
     <i class="fa fa-tags"></i>
     <span ></span>
-    <span class="map-sidebar-text" data-bind="text: translations.service"></span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.service"></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('canvas');
 }, css: {'active': activeTab() === 'canvas', 'disabled': !canvas() || remoteManifest()
 }">
     <i class="fa fa-cloud-upload"></i>
-    <span class="map-sidebar-text" data-bind="text: translations.canvas"></span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.canvas"></span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
@@ -29,7 +29,7 @@
 <!--ko if: activeTab() === 'manifest'-->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.manageImageService"></span>
+        <span data-bind="text: $root.translations.manageImageService"></span>
     </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
@@ -38,45 +38,45 @@
     <div class="form-group">
         <div class="row widget-wrapper">
         <label class="control-label">
-            <span data-bind="text: translations.title"></span>
+            <span data-bind="text: $root.translations.title"></span>
         </label>
         <input type="text" class="form-control input-lg" style="height: 36px;"
-            data-bind="attr:{placeholder: translations.serviceTitle}, textInput: self.manifestName, valueUpdate: 'keyup'">
+            data-bind="attr:{placeholder: $root.translations.serviceTitle}, textInput: self.manifestName, valueUpdate: 'keyup'">
         </div>  
         <div class="row widget-wrapper">  
         <label class="control-label">
-            <span data-bind="text: translations.description"></span>
+            <span data-bind="text: $root.translations.description"></span>
         </label>
         <textarea rows="10" type="text" class="form-control input-lg"
-            data-bind="attr:{placeholder: translations.serviceDescription}, textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
+            data-bind="attr:{placeholder: $root.translations.serviceDescription}, textInput: self.manifestDescription, valueUpdate: 'keyup'"></textarea>
         </div>
         <div class="row widget-wrapper">
             <label class="control-label">
-                <span data-bind="text: translations.attribution"></span>
+                <span data-bind="text: $root.translations.attribution"></span>
             </label>
             <input type="text" class="form-control input-lg" style="height: 36px;"
-                data-bind="attr:{placeholder: translations.attribution}, textInput: self.manifestAttribution, valueUpdate: 'keyup'">
+                data-bind="attr:{placeholder: $root.translations.attribution}, textInput: self.manifestAttribution, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
             <label class="control-label">
-                <span data-bind="text: translations.attribution-logo"></span>
+                <span data-bind="text: $root.translations.attribution-logo"></span>
             </label>
             <input type="text" class="form-control input-lg" style="height: 36px;"
-                data-bind="attr:{placeholder: translations.attributionLogo}, textInput: self.manifestLogo, valueUpdate: 'keyup'">
+                data-bind="attr:{placeholder: $root.translations.attributionLogo}, textInput: self.manifestLogo, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
         <label class="control-label">
-            <span data-bind="text: translations.metadata"></span>
+            <span data-bind="text: $root.translations.metadata"></span>
         </label>
         <div class="manifest-metadata" style="display: flex;">
             <div style="display: flex; flex-direction: column; width: 100%;">
             <div style="padding: 3px">
                 <input type="text" class="form-control input-md iiif-input" style="height: 36px;" 
-                data-bind="attr:{placeholder: translations.metadataLabel}, textInput: metadataLabel, valueUpdate: 'keyup'">
+                data-bind="attr:{placeholder: $root.translations.metadataLabel}, textInput: metadataLabel, valueUpdate: 'keyup'">
             </div>
             <div style="padding: 3px">
                  <textarea class="form-control input-md iiif-input" style="height: 36px;" 
-                data-bind="attr:{placeholder: translations.metadataValue}, textInput: metadataValues, valueUpdate: 'keyup'"></textarea>
+                data-bind="attr:{placeholder: $root.translations.metadataValue}, textInput: metadataValues, valueUpdate: 'keyup'"></textarea>
             </div>
             </div>
             <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){updateMetadata()}">
@@ -97,11 +97,11 @@
                 <div style="display: flex; flex-direction: column; width: 100%;">
                 <div style="padding: 3px;">
                     <input type="text" class="form-control input-md iiif-input" style="height: 36px;" 
-                    data-bind="attr:{placeholder: translations.metadataLabel}, textInput: $data.label, valueUpdate: 'keyup'">
+                    data-bind="attr:{placeholder: $root.translations.metadataLabel}, textInput: $data.label, valueUpdate: 'keyup'">
                 </div>
                 <div style="padding: 3px">
                     <textarea type="text" class="form-control input-md iiif-input" style="height: 36px;" 
-                    data-bind="attr:{placeholder: translations.metadataValue}, textInput: $data.value, valueUpdate: 'keyup'"></textarea>
+                    data-bind="attr:{placeholder: $root.translations.metadataValue}, textInput: $data.value, valueUpdate: 'keyup'"></textarea>
                 </div>
                 </div>
                 <div style="height: fit-content; padding-top: 15px; cursor: pointer;" data-bind="click: function(){self.removeMetadata($data)}">
@@ -116,15 +116,15 @@
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div style="display: flex;">
         <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" style="width: auto; margin-right: 10px;" data-bind="click: updateManifest, clickBubble: false, disable: !isManifestDirty()">
-            <span data-bind="text: translations.save"></span>
+            <span data-bind="text: $root.translations.save"></span>
         </button>
         <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" style="width: auto; margin-right: 10px;" data-bind="click: reset, clickBubble: false, disable: !isManifestDirty()">
-            <span data-bind="text: translations.cancel"></span>
+            <span data-bind="text: $root.translations.cancel"></span>
         </button>
         </div>
         <!--ko if: manifest-->
         <button class="btn btn-danger btn-md btn-block btn-labeled btn-workbench fa fa-trash" style="width: auto" data-bind="click: deleteManifest">
-            <span data-bind="text: translations.delete"></span>
+            <span data-bind="text: $root.translations.delete"></span>
         </button>
         <!--/ko-->
     </div>
@@ -135,7 +135,7 @@
 <!--ko if: activeTab() === 'canvas'-->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.manageImageCanvases"></span>
+        <span data-bind="text: $root.translations.manageImageCanvases"></span>
     </h4>
 </div>
 
@@ -144,11 +144,11 @@
 <div class="iiif-image-tools">
     <!--ko if: canvases().length > 0-->
     <label class="control-label">
-        <span data-bind="text: translations.images"></span>
+        <span data-bind="text: $root.translations.images"></span>
     </label>
     <span ></span>
     <div>
-        <span data-bind="text: translations.imageServiceInstruction"></span>
+        <span data-bind="text: $root.translations.imageServiceInstruction"></span>
     </div>
     <div class="file-workbench-files" data-bind="foreach: canvases">
         <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: (($parent.selectPrimaryPanel() && ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']) || !$parent.selectPrimaryPanel() && ko.unwrap($parent.secondaryCanvas) === $data.images[0].resource.service['@id'])}">
@@ -160,16 +160,16 @@
 
     <div class="iiif-canvas-links-panel">
         <a class="" data-bind="click: addAllCanvases">
-            <span data-bind="text: translations.selectAll"></span>
+            <span data-bind="text: $root.translations.selectAll"></span>
         </a>
         <a class="" data-bind="click: clearCanvasSelection, css: {disabled: canvasesForDeletion().length === 0}">
-            <span data-bind="text: translations.clearAll"></span>
+            <span data-bind="text: $root.translations.clearAll"></span>
         </a>
 
         <div class="file-workbench-selected-buttons" data-bind="visible: canvasesForDeletion().length > 0">
             <button class="btn btn-lg btn-workbench btn-danger" data-bind="click: deleteCanvases">
                 <i class="fa fa-trash"></i>
-                <span data-bind="text: translations.deleteSelected"></span>
+                <span data-bind="text: $root.translations.deleteSelected"></span>
             </button>
         </div>
     </div>
@@ -178,9 +178,9 @@
     <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
         <div class="file-workbench-links">
             <a class="fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                <span data-bind="text: translations.dropzoneDragDrop1"></span>
-                <span class="text-bold" data-bind="text: translations.dropzoneDragDrop2"></span>
-                <span data-bind="text: translations.dropzoneDragDrop3"></span>
+                <span data-bind="text: $root.translations.dropzoneDragDrop1"></span>
+                <span class="text-bold" data-bind="text: $root.translations.dropzoneDragDrop2"></span>
+                <span data-bind="text: $root.translations.dropzoneDragDrop3"></span>
             </a>
         </div>
         <div style="min-height: 100%;">
@@ -191,11 +191,11 @@
 
     <!--ko if: canvas-->
     <label class="control-label">
-        <span data-bind="text: translations.selectedImageName"></span>
+        <span data-bind="text: $root.translations.selectedImageName"></span>
     </label>
     <div>
         <input type="text" class="form-control input-lg" style="height: 36px;" 
-        data-bind="attr:{placeholder: translations.imageCaption}, textInput: self.canvasLabel, valueUpdate: 'keyup'">
+        data-bind="attr:{placeholder: $root.translations.imageCaption}, textInput: self.canvasLabel, valueUpdate: 'keyup'">
     </div>
     <!--/ko-->
     
@@ -204,10 +204,10 @@
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
             <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">
-                <span data-bind="text: translations.save"></span>
+                <span data-bind="text: $root.translations.save"></span>
             </button>
             <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">
-                <span data-bind="text: translations.cancel"></span>
+                <span data-bind="text: $root.translations.cancel"></span>
             </button>
         </div>
     </div>
@@ -224,7 +224,7 @@
         <li data-bind="if: shouldShowCreateService">
             <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
                 <div class='tab-label'>
-                    <span data-bind="text: translations.createNewService"></span>
+                    <span data-bind="text: $root.translations.createNewService"></span>
                 </div>
             </div>
         </li>
@@ -232,7 +232,7 @@
             <div class='manifest-manager-nav-tab' data-bind=
                 "click: function(){createService(false); editService(true)}, css: { active: editService }">
                 <div class='tab-label'>
-                    <span data-bind="text: translations.editService"></span>
+                    <span data-bind="text: $root.translations.editService"></span>
                 </div>
             </div>
         </li>
@@ -255,17 +255,17 @@
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
         <h2>
-            <span data-bind="text: translations.imageUploadCaption"></span>
+            <span data-bind="text: $root.translations.imageUploadCaption"></span>
         </h2>
         <h4>
-            <span data-bind="text: translations.imageUploadInstruction"></span>
+            <span data-bind="text: $root.translations.imageUploadInstruction"></span>
         </h4>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column;">
             <div>
                 <div class="dropzone-photo-upload">
                     <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-rr btn-labeled btn-lg fa fa-image fileinput-create-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                        <span data-bind="text: translations.selectImages"></span>
+                        <span data-bind="text: $root.translations.selectImages"></span>
                     </div>
                     <div style="min-height: 100%;">
                         <div id="hidden-dz-create-previews" style="display:none"></div>
@@ -274,7 +274,7 @@
             </div>
         </div>
         <h5 class="rr-splash-description">
-            <span data-bind="text: translations.imageServiceCreateDesc"></span>
+            <span data-bind="text: $root.translations.imageServiceCreateDesc"></span>
         </h5>
         </div>
 </div>
@@ -288,7 +288,7 @@
             <span><i style="color: #000" class="fa fa-picture-o r-select-icon"></i></span>
         </div> 
         <h2>
-            <span data-bind="text: translations.editExistingImageService"></span>
+            <span data-bind="text: $root.translations.editExistingImageService"></span>
         </h2>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column; width: 300px">
@@ -301,7 +301,7 @@
             </div>
         </div>
         <h5 class="rr-splash-description">
-            <span data-bind="text: translations.imageServiceEditDesc"></span>
+            <span data-bind="text: $root.translations.imageServiceEditDesc"></span>
         </h5>
     </div>
 </div>
@@ -312,15 +312,15 @@
 
 {% block gallery_header %}
     <div>
-        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : translations.noManifestSelected + '...' %}"></span>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : $root.translations.noManifestSelected + '...' %}"></span>
     </div>                 
     <div>
         <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
             <!-- ko if: !expandGallery() -->
-            <span data-bind="text: translations.info"></span>
+            <span data-bind="text: $root.translations.info"></span>
             <!-- /ko -->
             <!-- ko if: expandGallery() -->
-            <span data-bind="text: translations.close"></span>
+            <span data-bind="text: $root.translations.close"></span>
             <!-- /ko -->
         </span>
     </div>
@@ -332,13 +332,13 @@
             click: toggleManifestEditor,
         "
     >
-        <span data-bind="text: translations.switchImageService"></span>
+        <span data-bind="text: $root.translations.switchImageService"></span>
     </div>
     <div data-bind="if: renderContext() != 'manifest-workflow'">
         <div data-bind="dropzone: dropzoneOptions4create" >
             <div>
             <div class="iiif-gallery-sequence-label fileinput-create-button dz-clickable" style="padding:0 5px" data-bind="css: uniqueidClass; dropzone: dropzoneOptions4create" role="button">
-                <span data-bind="text: translations.createImageService"></span>
+                <span data-bind="text: $root.translations.createImageService"></span>
             </div>
             </div>
             <div style="min-height: 100%;">
@@ -347,9 +347,9 @@
         </div>
     </div>
     <div>
-        <span data-bind="text: translations.filter"></span>
+        <span data-bind="text: $root.translations.filter"></span>
         <div class="list-filter" data-bind="">
-            <input type="text" class="form-control" style="width: 100%;" data-bind="attr:{placeholder: translations.filterImages + '...'}, textInput: filter">
+            <input type="text" class="form-control" style="width: 100%;" data-bind="attr:{placeholder: $root.translations.filterImages + '...'}, textInput: filter">
 
             <!-- Clear Search -->
             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>

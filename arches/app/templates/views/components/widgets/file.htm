@@ -14,21 +14,21 @@
                 <div class="bord-top pad-ver file-select">
                     <div style="padding: 5px">
                         <h2>
-                            <span data-bind="text: translations.uploadDocuments"></span>
+                            <span data-bind="text: $root.translations.uploadDocuments"></span>
                         </h2>
                         <h4>
-                            <span data-bind="text: translations.dragAndDropFilesOnPanel"></span>
+                            <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
                         </h4>
                     </div>
                     <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                         <i class="fa fa-file"></i>
-                        <span data-bind="text: translations.selectFiles"></span>
+                        <span data-bind="text: $root.translations.selectFiles"></span>
                     </button>
                     <br>
                     <div style="padding: 10px">
-                        <span data-bind="text: translations.addingDocumentsOptional"></span>
+                        <span data-bind="text: $root.translations.addingDocumentsOptional"></span>
                         <br>
-                        <span data-bind="text: translations.maxFileSizeWarning"></span>
+                        <span data-bind="text: $root.translations.maxFileSizeWarning"></span>
                         <span data-bind="text: maxFilesize() + 'MB.'"></span>
                     </div>
 
@@ -40,8 +40,8 @@
                 </div>
                 <div class="file-upload-footer">
                     <span>
-                        <span data-bind="text: translations.allowedDocumentFormats"></span>
-                        <span data-bind="text: (acceptedFiles() || translations.any) + '. '"></span>
+                        <span data-bind="text: $root.translations.allowedDocumentFormats"></span>
+                        <span data-bind="text: (acceptedFiles() || $root.translations.any) + '. '"></span>
                     </span>
                 </div>
             </div>
@@ -49,13 +49,13 @@
                 <!-- note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                     elements with its class name must exist at time of init -->
                 <h4>
-                    <span data-bind="text: translations.uploadedFiles"></span>
+                    <span data-bind="text: $root.translations.uploadedFiles"></span>
                 </h4>
                 <div class="file-upload-options">
                     <!--ko if: filesJSON().length > 1-->
                     <input 
                         data-bind="
-                            attr: {placeholder: translations.findAFile + '...'},
+                            attr: {placeholder: $root.translations.findAFile + '...'},
                             textInput: filter
                         " 
                         type="text" 
@@ -70,13 +70,13 @@
                     <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
                     <!-- /ko -->
                     <!-- ko if: (!filter() || filter() == "") -->
-                    <span data-bind="text: filesJSON().length + translations.filesUploaded"></span>
+                    <span data-bind="text: filesJSON().length + $root.translations.filesUploaded"></span>
                     <!-- /ko -->
                     <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
-                        <span data-bind="text: translations.deleteAllFiles"></span>
+                        <span data-bind="text: $root.translations.deleteAllFiles"></span>
                     </button>
                     <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                        <span data-bind="text: translations.addMoreFiles"></span>
+                        <span data-bind="text: $root.translations.addMoreFiles"></span>
                     </button>
                 </div>
             </div>
@@ -93,11 +93,11 @@
                                 <div class="media-left">
                                     <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: translations.error"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
                                     <!-- /ko -->
                                     <span class="text-sm">
                                         <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
-                                            <span data-bind="text: ko.unwrap(url) ? translations.download : translations.unsaved"></span>
+                                            <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
                                         </a>
                                     </span>
                                 </div>
@@ -127,11 +127,11 @@
                                 <div class="media-left">
                                     <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: translations.error"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
                                     <!-- /ko -->
                                     <span class="text-sm">
                                         <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
-                                            <span data-bind="text: ko.unwrap(url) ? translations.download : translations.unsaved"></span>
+                                            <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
                                         </a>
                                     </span>
                                 </div>
@@ -154,25 +154,25 @@
                 <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt">
                     <option value="5">
                         <span>
-                            <span data-bind="text: translations.showFirstFiveFiles"></span>
+                            <span data-bind="text: $root.translations.showFirstFiveFiles"></span>
                             <i class="fa fa-caret-down"></i>
                         </span>
                     </option>
                     <option value="10">
                         <span>
-                            <span data-bind="text: translations.showFirstTenFiles"></span> 
+                            <span data-bind="text: $root.translations.showFirstTenFiles"></span> 
                             <i class="fa fa-caret-down"></i>
                         </span>
                     </option>
                     <option value="25">
                         <span>
-                            <span data-bind="text: translations.showFirstTwentyFiveFiles"></span> 
+                            <span data-bind="text: $root.translations.showFirstTwentyFiveFiles"></span> 
                             <i class="fa fa-caret-down"></i>
                         </span>
                     </option>
                     <option value="100">
                         <span>
-                            <span data-bind="text: translations.showAllFiles"></span>
+                            <span data-bind="text: $root.translations.showAllFiles"></span>
                             <i class="fa fa-caret-down"></i>
                         </span>
                     </option>
@@ -187,7 +187,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.acceptedFileTypes"></span>
+    <span data-bind="text: $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -195,7 +195,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.exampleFileTypes},
+            attr: {placeholder: $root.translations.exampleFileTypes},
             value: acceptedFiles, 
             valueUpdate: 'keyup'
         "
@@ -203,7 +203,7 @@
 </div>
 
 <div class="control-label">
-    <span data-bind="text: translations.maxFileSize"></span>
+    <span data-bind="text: $root.translations.maxFileSize"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -211,7 +211,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.maxFileSize},
+            attr: {placeholder: $root.translations.maxFileSize},
             value: maxFilesize
         "
     >
@@ -224,7 +224,7 @@
 
 <!-- ko if: uploadedFiles().length === 0 -->
 <dd>
-    <span data-bind="text: translations.none"></span>
+    <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 
@@ -253,5 +253,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + translations.filesUploaded : displayValue()"></span>
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue()"></span>
 {% endblock display_value %}

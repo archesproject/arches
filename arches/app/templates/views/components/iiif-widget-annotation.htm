@@ -9,7 +9,7 @@
     'active': activeTab() === 'editor'
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text" data-bind="text: translations.edit"></span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.edit"></span>
 </div>
 {{ block.super }}
 {% endblock tabs %}
@@ -30,7 +30,7 @@
                             <div class="style-tools-collapser" data-bind=" click: function() {
                                 self.showStylingTools(!self.showStylingTools());
                             }">
-                                <span data-bind="text: self.showStylingTools() ? translations.hideStyleTools : translations.showStyleTools"></span>
+                                <span data-bind="text: self.showStylingTools() ? $root.translations.hideStyleTools : $root.translations.showStyleTools"></span>
                                 <i class="fa" data-bind="{
                                     css: {
                                         'fa-caret-down' : !self.showStylingTools(),
@@ -42,14 +42,14 @@
                                 <div class="style-tools-panel">
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">
-                                            <span data-bind="text: translations.lineColor"></span>
+                                            <span data-bind="text: $root.translations.lineColor"></span>
                                         </label>
                                         <div class="col-sm-8">
                                             <div class="colorpicker-component input-group">
                                                 <input 
                                                     class="form-control input-lg widget-input" 
                                                     data-bind="
-                                                        attr: {placeholder: translations.lineColor},
+                                                        attr: {placeholder: $root.translations.lineColor},
                                                         colorPicker: {color: self.lineColor, format:'hex'}
                                                     "
                                                 >
@@ -59,14 +59,14 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">
-                                            <span data-bind="text: translations.fillColor"></span>
+                                            <span data-bind="text: $root.translations.fillColor"></span>
                                         </label>
                                         <div class="col-sm-8">
                                             <div class="colorpicker-component input-group">
                                                 <input 
                                                     class="form-control input-lg widget-input" 
                                                     data-bind="
-                                                        attr: {placeholder: translations.fillColor},
+                                                        attr: {placeholder: $root.translations.fillColor},
                                                         colorPicker: {color: self.fillColor, format:'hex'}
                                                     "
                                                 >
@@ -76,7 +76,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">
-                                            <span data-bind="text: translations.lineWidth"></span>
+                                            <span data-bind="text: $root.translations.lineWidth"></span>
                                         </label>
                                         <div class="col-sm-8">
                                             <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineWidth">
@@ -84,7 +84,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">
-                                            <span data-bind="text: translations.lineOpacity"></span>
+                                            <span data-bind="text: $root.translations.lineOpacity"></span>
                                         </label>
                                         <div class="col-sm-8">
                                             <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineOpacity">
@@ -92,7 +92,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">
-                                            <span data-bind="text: translations.pointRadius"></span>
+                                            <span data-bind="text: $root.translations.pointRadius"></span>
                                         </label>
                                         <div class="col-sm-8">
                                             <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.pointRadius">
@@ -100,7 +100,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">
-                                            <span data-bind="text: translations.fillOpacity"></span>
+                                            <span data-bind="text: $root.translations.fillOpacity"></span>
                                         </label>
                                         <div class="col-sm-8">
                                             <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.fillOpacity">
@@ -111,7 +111,7 @@
                             <div class="map-card-feature-list">
                                 <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
                                     <select 
-                                        data-placeholder="translations.addANewFeature + '...'" 
+                                        data-placeholder="$root.translations.addANewFeature + '...'" 
                                         data-bind="
                                             value: self.featureLookup[widget.node_id()].selectedTool,
                                             valueAllowUnset: true,
@@ -122,15 +122,15 @@
                                                 },
                                                 {
                                                     value: 'draw_point',
-                                                    text: translations.addPoint
+                                                    text: $root.translations.addPoint
                                                 },
                                                 {
                                                     value: 'draw_line_string',
-                                                    text: translations.addLine
+                                                    text: $root.translations.addLine
                                                 },
                                                 {
                                                     value: 'draw_polygon',
-                                                    text: translations.addPolygon
+                                                    text: $root.translations.addPolygon
                                                 }
                                             ],
                                             optionsText: 'text',
@@ -145,7 +145,7 @@
                                 </div>
                                 <div class="add-new-feature" data-bind="visible: self.disableDrawing">
                                     <select 
-                                        data-placeholder="translations.addANewFeature + '...'" 
+                                        data-placeholder="$root.translations.addANewFeature + '...'" 
                                         data-bind="
                                             value: self.featureLookup[widget.node_id()].selectedTool,
                                             valueAllowUnset: true,
@@ -156,15 +156,15 @@
                                                 },
                                                 {
                                                     value: 'draw_point',
-                                                    text: translations.addPoint
+                                                    text: $root.translations.addPoint
                                                 },
                                                 {
                                                     value: 'draw_line_string',
-                                                    text: translations.addLine
+                                                    text: $root.translations.addLine
                                                 },
                                                 {
                                                     value: 'draw_polygon',
-                                                    text: translations.addPolygon
+                                                    text: $root.translations.addPolygon
                                                 }
                                             ],
                                             optionsText: 'text',
@@ -189,13 +189,13 @@
                                         <td class="map-card-feature-tool">
                                             <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature); }, clickBubble: false">
                                                 <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                <span data-bind="text: translations.edit"></span>
+                                                <span data-bind="text: $root.translations.edit"></span>
                                             </a>
                                         </td>
                                         <td class="map-card-feature-tool">
                                             <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature); }, clickBubble: false">
                                                 <i class="fa fa-trash map-card-feature-delete"></i>
-                                                <span data-bind="text: translations.delete"></span>
+                                                <span data-bind="text: $root.translations.delete"></span>
                                             </a>
                                         </td>
                                     </tr>

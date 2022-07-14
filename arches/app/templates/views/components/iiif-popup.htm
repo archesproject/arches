@@ -10,11 +10,11 @@
     <div class="hover-feature-body">
         <div class="hover-feature" data-bind="html: description"></div>
         <div class="hover-feature-metadata">
-            <span data-bind="text: translations.resourceModel + ':'" ></span>
+            <span data-bind="text: $root.translations.resourceModel + ':'" ></span>
             <span data-bind="text: graphName"></span>
         </div>
         <div class="hover-feature-metadata">
-            <span data-bind="text: translations.idString"></span>
+            <span data-bind="text: $root.translations.idString"></span>
             <span data-bind="text: resourceinstanceid"></span>
         </div>
     </div>
@@ -23,7 +23,7 @@
             window.open(reportURL + resourceinstanceid);
         }" href="javascript:void(0)">
             <i class="ion-document-text"></i>
-            <span data-bind="text: translations.report"></span>
+            <span data-bind="text: $root.translations.report"></span>
         </a>
     </div>
 </div>

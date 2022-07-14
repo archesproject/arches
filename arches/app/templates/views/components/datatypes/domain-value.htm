@@ -2,7 +2,7 @@
 <!-- ko ifnot: $data.search -->
 <div class="node-widget-label new-option-field">
     <div class="control-label">
-        <span data-bind="text: translations.domainOptions"></span>
+        <span data-bind="text: $root.translations.domainOptions"></span>
     </div>
     <div class="domain-container">
         <div data-bind="text: $data.search"></div>
@@ -11,7 +11,7 @@
             type="text" 
             class="form-control library-search" 
             data-bind="
-                attr: {placeholder: translations.addNewOption + '...'},
+                attr: {placeholder: $root.translations.addNewOption + '...'},
                 disable: !isEditable, 
                 value: newOptionLabel, valueUpdate: 'keyup'
             "
@@ -38,16 +38,16 @@
 <div class="col-md-4 col-lg-3">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
         <option value="">
-            <span data-bind="text: translations.equals"></span>
+            <span data-bind="text: $root.translations.equals"></span>
         </option>
         <option value="!">
-            <span data-bind="text: translations.not"></span>
+            <span data-bind="text: $root.translations.not"></span>
         </option>
         <option value="null">
-            <span data-bind="text: translations.hasNoValue"></span>
+            <span data-bind="text: $root.translations.hasNoValue"></span>
         </option>
         <option value="not_null">
-            <span data-bind="text: translations.hasAnyValue"></span>
+            <span data-bind="text: $root.translations.hasAnyValue"></span>
         </option>
     </select>
 </div>
@@ -56,7 +56,7 @@
         type="" 
         class="form-control library-search" 
         data-bind="
-            attr: {placeholder: translations.value},
+            attr: {placeholder: $root.translations.value},
             options: options, 
             optionsText: 'text', 
             optionsValue: 'id', 

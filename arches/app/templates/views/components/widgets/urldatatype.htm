@@ -9,7 +9,7 @@
         <!-- /ko -->
         <div class="control-label">
             <label class="control-label widget-input-label" for="">
-                <span data-bind="text: translations.linkText"></span>
+                <span data-bind="text: $root.translations.linkText"></span>
             </label>
         </div>
         <div class="col-xs-12">
@@ -17,7 +17,7 @@
         </div>
         <div class="control-label">
             <label class="control-label widget-input-label" for="">
-                <span data-bind="text: translations.urlForLink"></span>
+                <span data-bind="text: $root.translations.urlForLink"></span>
             </label>
         </div>
         <div class="col-xs-12">
@@ -26,7 +26,7 @@
         </div>
         <div class="col-xs-12">
             <label class="control-label widget-input-label" for="">
-                <span data-bind="text: translations.preview"></span>
+                <span data-bind="text: $root.translations.preview"></span>
             </label>
             <div style='margin-bottom:2px'>
                 <a target="_blank" data-bind="attr: {href: url}, style: { color: link_color }">
@@ -41,21 +41,21 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.urlPlaceholder"></span>
+    <span data-bind="text: $root.translations.urlPlaceholder"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input"
     data-bind="textInput: url_placeholder">
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.urlLabelPlaceholder"></span>
+    <span data-bind="text: $root.translations.urlLabelPlaceholder"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input"
     data-bind="textInput: url_label_placeholder">
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.urlLinkColor"></span>
+    <span data-bind="text: $root.translations.urlLinkColor"></span>
 </div>
 <div class="col-xs-12 crud-widget-container">
     <input type="" id="" class="form-control input-md widget-input"

@@ -7,9 +7,9 @@
     data-bind="
         value: filter, 
         options: [
-            {'id':'', 'name':translations.unsorted}, 
-            {'id':'asc', 'name':translations.ascending}, 
-            {'id':'desc', 'name':translations.descending}
+            {'id':'', 'name':$root.translations.unsorted}, 
+            {'id':'asc', 'name':$root.translations.ascending}, 
+            {'id':'desc', 'name':$root.translations.descending}
         ], 
         chosen: { width: '100%', disable_search: true}, 
         optionsText: 'name', 

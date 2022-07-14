@@ -12,7 +12,7 @@
     'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-image"></i>
-    <span data-bind="text: translations.image" class="map-sidebar-text"></span>
+    <span data-bind="text: $root.translations.image" class="map-sidebar-text"></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('annotations');
@@ -21,7 +21,7 @@
     'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-list"></i>
-    <span data-bind="text: translations.overlays" class="map-sidebar-text"></span>
+    <span data-bind="text: $root.translations.overlays" class="map-sidebar-text"></span>
 </div>
 {% endblock tabs %}
 
@@ -31,7 +31,7 @@
     <h4 
         class="workbench-card-sidepanel-header" 
         data-bind="
-            text: translations.imageTools,
+            text: $root.translations.imageTools,
             click: hideSidePanel
         "
     ></h4>
@@ -41,13 +41,13 @@
 <div class="iiif-image-tools">
     <div data-bind="if: showModeSelector" class="layout">
         <div>
-            <span data-bind="text: translations.panelLayout"></span>
+            <span data-bind="text: $root.translations.panelLayout"></span>
         </div>
         <div class="mode-selector">
             <div data-bind="click: function(){ compareMode(false); return true; }, css: { selected: !compareMode() }">
                 <div class="selector-button"></div>
                 <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio">
-                <span data-bind="text: translations.singlePanel"></span>
+                <span data-bind="text: $root.translations.singlePanel"></span>
             </div>
             <div data-bind="click: function(){ compareMode(true); return true; }, css: { selected: compareMode() }">
                 <div>
@@ -55,21 +55,21 @@
                     <div class="selector-button"></div>
                 </div>
                 <input name="panelGroup" value="double" type="radio" data-bind="checked: panelRadio">
-                <span data-bind="text: translations.doublePanel"></span>
+                <span data-bind="text: $root.translations.doublePanel"></span>
             </div>
         </div>
 
         <div class="panel-selector">
-            <span data-bind="text: translations.selectedPanelLayout"></span>
+            <span data-bind="text: $root.translations.selectedPanelLayout"></span>
             <div class="selector">
                 <div data-bind="css: { selected: selectPrimaryPanel() }">
                     <div data-bind="click: function(){selectPrimaryPanel(true)}" class="primary">
-                        <span data-bind="text: translations.panelOne"></span>
+                        <span data-bind="text: $root.translations.panelOne"></span>
                     </div>
                 </div>
                 <div data-bind="css: { selected: !selectPrimaryPanel() }, if: compareMode()">
                     <div class="secondary" data-bind="click: function(){selectPrimaryPanel(false)}">
-                        <span data-bind="text: translations.panelTwo"></span>
+                        <span data-bind="text: $root.translations.panelTwo"></span>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-lightbulb-o"></i>
-            <span data-bind="text: translations.brightness"></span>
+            <span data-bind="text: $root.translations.brightness"></span>
         </div>
         <div class="iiif-image-tool-slider-wrap">
             <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
@@ -99,7 +99,7 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-adjust"></i>
-            <span data-bind="text: translations.contrast"></span>
+            <span data-bind="text: $root.translations.contrast"></span>
         </div>
         <div class="iiif-image-tool-slider-wrap">
             <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
@@ -111,7 +111,7 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-eyedropper"></i>
-            <span data-bind="text: translations.saturation"></span>
+            <span data-bind="text: $root.translations.saturation"></span>
         </div>
         <div class="iiif-image-tool-slider-wrap">
             <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
@@ -123,13 +123,13 @@
     <div class="iiif-image-tool-slider">
         <div class="iiif-image-tool-label">
             <i class="fa fa-image"></i>
-            <span data-bind="text: translations.greyscale"></span>
+            <span data-bind="text: $root.translations.greyscale"></span>
         </div>
         <div class="toggle-container">
             <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
             <div style="display:flex; flex-direction:row;">
                 <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">
-                    <span data-bind="text: translations.displayAsGreyscale"></span>
+                    <span data-bind="text: $root.translations.displayAsGreyscale"></span>
                 </div>
             </div>
         </div>
@@ -137,7 +137,7 @@
 
     <div class="install-buttons">
         <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">
-            <span data-bind="text: translations.resetToDefaults"></span>
+            <span data-bind="text: $root.translations.resetToDefaults"></span>
         </button>
     </div>
 </div>
@@ -146,7 +146,7 @@
 <!--ko if: activeTab() === 'annotations' -->
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
-        <span data-bind="text: translations.annotationOverlays"></span>
+        <span data-bind="text: $root.translations.annotationOverlays"></span>
     </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
@@ -217,7 +217,7 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-lightbulb-o"></i>
-                <span data-bind="text: translations.brightness"></span>
+                <span data-bind="text: $root.translations.brightness"></span>
             </div>
             <div class="iiif-image-tool-slider-wrap">
                 <input type="range" min="0" max="200" step="1" data-bind="value: brightness, valueUpdate: 'input'">
@@ -229,7 +229,7 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-adjust"></i>
-                <span data-bind="text: translations.contrast"></span>
+                <span data-bind="text: $root.translations.contrast"></span>
             </div>
             <div class="iiif-image-tool-slider-wrap">
                 <input type="range" min="0" max="200" step="1" data-bind="value: contrast, valueUpdate: 'input'">
@@ -241,7 +241,7 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-eyedropper"></i>
-                <span data-bind="text: translations.saturation"></span>
+                <span data-bind="text: $root.translations.saturation"></span>
             </div>
             <div class="iiif-image-tool-slider-wrap">
                 <input type="range" min="0" max="200" step="1" data-bind="value: saturation, valueUpdate: 'input'">
@@ -253,13 +253,13 @@
         <div class="iiif-image-tool-slider">
             <div class="iiif-image-tool-label">
                 <i class="fa fa-image"></i>
-                <span data-bind="text: translations.greyscale"></span>
+                <span data-bind="text: $root.translations.greyscale"></span>
             </div>
             <div class="toggle-container">
                 <span class="switch switch-small switch-widget" data-bind="css: {'on': greyscale()}, click: function() { greyscale(!greyscale()); }"><small></small></span>
                 <div style="display:flex; flex-direction:row;">
                     <div class="arches-toggle-sm" data-bind="click: function() { greyscale(!greyscale()); }">
-                        <span data-bind="text: translations.displayAsGreyscale"></span>
+                        <span data-bind="text: $root.translations.displayAsGreyscale"></span>
                     </div>
                 </div>
             </div>
@@ -271,7 +271,7 @@
         'gallery-expanded': expandGallery,
     }">
     <h3>
-        <span data-bind="text: translations.showGallery"></span>
+        <span data-bind="text: $root.translations.showGallery"></span>
     </h3>
 </div>
 <!--ko let: {canvasClick: canvasClick, getCanvasService: getCanvasService, selectedCanvas: selectPrimaryPanel() ? canvas: secondaryCanvas, getAnnotationCount: getAnnotationCount} -->
@@ -284,11 +284,11 @@
         <!--ko if: manifestData() -->
         <div class="panel-controls">
             <div class="hide-gallery-control" data-bind="click: toggleGallery">
-                <span data-bind="text: translations.hideGallery"></span>
+                <span data-bind="text: $root.translations.hideGallery"></span>
             </div>
             <div data-bind="if: showModeSelector"  class="mode-selector">
                 <div>
-                    <span data-bind="text: translations.panels"></span>
+                    <span data-bind="text: $root.translations.panels"></span>
                 </div>
                 <div class="mode-selector-buttons" >
                     <div class="single-panel" data-bind="click: function(){compareMode(false)}, css: {selected: !compareMode()}">
@@ -301,10 +301,10 @@
                 </div>
                 <div class="panel-selector-buttons">
                     <div data-bind="click: function(){selectPrimaryPanel(true)}, css: { selected: selectPrimaryPanel() }">
-                        <span data-bind="text: translations.panelOne"></span>
+                        <span data-bind="text: $root.translations.panelOne"></span>
                     </div>
                     <div data-bind="click: function(){selectPrimaryPanel(false)}, css: { selected: !selectPrimaryPanel(), hide: !compareMode() }">
-                        <span data-bind="text: translations.panelTwo"></span>
+                        <span data-bind="text: $root.translations.panelTwo"></span>
                     </div>
                 </div>
             </div>
@@ -334,7 +334,7 @@
         <!--ko if: editManifest() -->
         <div class="manifest-editor">
             <div class="manifest-editor-label">
-                <span data-bind="text: translations.selectAManifest + ':'"></span>
+                <span data-bind="text: $root.translations.selectAManifest + ':'"></span>
             </div>
             <div class="manifest-editor-input">
                 <input class="form-control input-lg widget-input"
@@ -349,24 +349,24 @@
                     disabled: manifestLoading(),
                     css: { 'disabled': manifestLoading() }
                 ">
-                    <span data-bind="text: translations.loadManifest"></span>
+                    <span data-bind="text: $root.translations.loadManifest"></span>
                 </button>
                 <!--ko if: manifestData() -->
                 <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">
-                    <span data-bind="text: translations.cancel"></span>
+                    <span data-bind="text: $root.translations.cancel"></span>
                 </button>
                 <!--/ko -->
                 <!--ko if: manifestLoading() -->
                 <span 
                     class="manifest-editor-loading"
-                    data-bind="text: translations.loadingManifest + '...'"
+                    data-bind="text: $root.translations.loadingManifest + '...'"
                 ></span>
                 <!--/ko -->
                 <!--ko if: manifestError() -->
                 <span data-bind="text: console.log(manifestError())"></span>
                 <span 
                     class="manifest-editor-error"
-                    data-bind="text: translations.errorLoadingManifest + '...'"
+                    data-bind="text: $root.translations.errorLoadingManifest + '...'"
                 ></span>
                 <!--/ko -->
             </div>
@@ -378,7 +378,7 @@
             <!--ko if: manifestLoading() -->
             <span 
                 class="manifest-editor-loading"
-                data-bind="text: translations.loadingManifest + '...'"
+                data-bind="text: $root.translations.loadingManifest + '...'"
             ></span>
             <!--/ko -->
             <!--ko if: !manifestLoading() -->
@@ -387,15 +387,15 @@
                     <div style="display: flex; align-items: center">
                         {% block gallery_header %}
                         <div>
-                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : translations.noManifestSelected"></span>
+                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : $root.translations.noManifestSelected"></span>
                         </div>
                         <div>
                             <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
                                 <!-- ko if: !expandGallery() -->
-                                    <span data-bind="text: translations.info"></span>
+                                    <span data-bind="text: $root.translations.info"></span>
                                 <!-- /ko -->
                                 <!-- ko if: expandGallery() -->
-                                    <span data-bind="text: translations.close"></span>
+                                    <span data-bind="text: $root.translations.close"></span>
                                 <!-- /ko -->
                             </span>
                         </div>
@@ -403,13 +403,13 @@
                             <span 
                                 class="iiif-gallery-sequence-label" 
                                 data-bind="
-                                    text: translations.switchImageService,
+                                    text: $root.translations.switchImageService,
                                     click: toggleManifestEditor
                                 "
                             ></span>
                         </div>
                         <div>
-                            <span data-bind="text: translations.filter"></span>
+                            <span data-bind="text: $root.translations.filter"></span>
                             <div class="list-filter" data-bind="">
                                 <input 
                                     type="text" 
@@ -417,7 +417,7 @@
                                     style="width: 100%;" 
                                     data-bind="
                                         textInput: filter,
-                                        attr: {placeholder: translations.filterImages + '...'}
+                                        attr: {placeholder: $root.translations.filterImages + '...'}
                                     "
                                 >
                                 <!-- Clear Search -->
@@ -447,7 +447,7 @@
                                     <span class="annotation-count">
                                         <!--ko if: getAnnotationCount(getCanvasService($data)) -->
                                         <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span>
-                                        <span data-bind="text: translations.annotations"></span>
+                                        <span data-bind="text: $root.translations.annotations"></span>
                                         <!--/ko -->
                                         <!--ko if: !getAnnotationCount(getCanvasService($data)) -->
                                         &nbsp;

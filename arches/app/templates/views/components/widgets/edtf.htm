@@ -18,87 +18,87 @@
                       'fa-caret-up' : showEDTFFormats(),
                   }
               }"></i>
-              <span data-bind="text: translations.edtfFormats"></span>
+              <span data-bind="text: $root.translations.edtfFormats"></span>
           </div>
           <div class="form-horizontal" data-bind="if: showEDTFFormats">
               <div class="edtf-style-tools-panel">
                   <div class="widget-help-panel">
                     <h2 class="">
-                        <span data-bind="text: translations.edtfFormatsExpanded"></span>
+                        <span data-bind="text: $root.translations.edtfFormatsExpanded"></span>
                     </h2>
                     <h3 class="">
-                        <span data-bind="text: translations.edtfFormatDescription"></span>
+                        <span data-bind="text: $root.translations.edtfFormatDescription"></span>
                         <a class="" target="_blank" data-bind="attr: { href: 'https://www.loc.gov/standards/datetime'}, click: function() { return true;}, clickBubble: false">
-                            <span data-bind="text: translations.edtfDateSpecification"></span>
+                            <span data-bind="text: $root.translations.edtfDateSpecification"></span>
                         </a>
                     </h3>
                     <h3 class="">
-                        <span data-bind="text: translations.someCommonEncodings"></span>
+                        <span data-bind="text: $root.translations.someCommonEncodings"></span>
                     </h3>
 
                     <dl class="">
                         <dt class="">
                             2021-04-12 
-                            <span class="text-thin" data-bind="text: translations.dayPrecisionEncoding"></span>
+                            <span class="text-thin" data-bind="text: $root.translations.dayPrecisionEncoding"></span>
                         </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.dayPrecisionEncodingExplanation"></span>
+                            <span data-bind="text: $root.translations.dayPrecisionEncodingExplanation"></span>
                         </dd>
 
                         <dt class="">
                             2021-04 
-                            <span class="text-thin" data-bind="text: translations.monthPrecisionEncoding"></span>
+                            <span class="text-thin" data-bind="text: $root.translations.monthPrecisionEncoding"></span>
                         </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.monthPrecisionEncodingExplanation"></span>
+                            <span data-bind="text: $root.translations.monthPrecisionEncodingExplanation"></span>
                         </dd>
 
                         <dt class="">
                             2021 
-                            <span class="text-thin" data-bind="text: translations.yearPrecisionEncoding"></span>
+                            <span class="text-thin" data-bind="text: $root.translations.yearPrecisionEncoding"></span>
                         </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.yearPrecisionEncodingExplanation"></span>
+                            <span data-bind="text: $root.translations.yearPrecisionEncodingExplanation"></span>
                         </dd>
 
                         <dt class="">1964/2008 </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.timeIntervalYearPrecision"></span>
+                            <span data-bind="text: $root.translations.timeIntervalYearPrecision"></span>
                         </dd>
 
                         <dt class="">2004-06/2006-08 </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.timeIntervalMonthPrecision"></span>
+                            <span data-bind="text: $root.translations.timeIntervalMonthPrecision"></span>
                         </dd>
 
                         <dt class="">2004-02-01/2005 </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.timeIntervalYearPrecision"></span>
+                            <span data-bind="text: $root.translations.timeIntervalYearPrecision"></span>
                         </dd>
 
                         <dt class="">Y-100000 </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.negativeYearExplanation"></span>
+                            <span data-bind="text: $root.translations.negativeYearExplanation"></span>
                         </dd>
 
                         <dt class="">2001-21 </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.seasonFormatExplanation"></span>
+                            <span data-bind="text: $root.translations.seasonFormatExplanation"></span>
                         </dd>
 
                         <dt class="">1984? </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.yearUncertain"></span>
+                            <span data-bind="text: $root.translations.yearUncertain"></span>
                         </dd>
 
                         <dt class="">2004-06~ </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.yearMonthApproximatea"></span>
+                            <span data-bind="text: $root.translations.yearMonthApproximatea"></span>
                         </dd>
 
                         <dt class="">2004-06-11% </dt>
                         <dd class="mar-btm">
-                            <span data-bind="text: translations.entireDateApproximate"></span>
+                            <span data-bind="text: $root.translations.entireDateApproximate"></span>
                         </dd>
                     </dl>
 
@@ -110,9 +110,9 @@
         </div>
         <div class="col-xs-12" data-bind="if: value">
             <label class="control-label widget-input-label" for="">\
-                <span data-bind="text: translations.preview"></span>
+                <span data-bind="text: $root.translations.preview"></span>
             </label>
-            <div data-bind="text: transformedEdtf() ? transformedEdtf : translations.notAValidEdtfFormat" style='margin-bottom:2px'>
+            <div data-bind="text: transformedEdtf() ? transformedEdtf : $root.translations.notAValidEdtfFormat" style='margin-bottom:2px'>
             </div>
         </div>
     </div>
@@ -121,7 +121,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: translations.placeholder"></span>
+    <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -129,14 +129,14 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.placeholder},
+            attr: {placeholder: $root.translations.placeholder},
             textInput: placeholder
         "
     >
 </div>
 
 <div class="control-label">
-    <span data-bind="text: translations.defaultValue"></span>
+    <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -144,7 +144,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: translations.defaultValue},
+            attr: {placeholder: $root.translations.defaultValue},
             textInput: defaultValue
         "
     >

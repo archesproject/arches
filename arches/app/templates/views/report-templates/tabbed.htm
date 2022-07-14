@@ -17,10 +17,10 @@
     <div style="display: flex; flex-direction: row">
         <span><i data-bind="class: report.get('iconclass') || 'fa fa-file-o'"></i></span>
         <!--ko if: report.get('displayname')-->
-        <span style="padding: 0 5px;" data-bind="text: report.get('displayname') || '(' + translations.resourceInstanceName + ')'"></span>
+        <span style="padding: 0 5px;" data-bind="text: report.get('displayname') || '(' + $root.translations.resourceInstanceName + ')'"></span>
         <!--/ko-->
         <!--ko ifnot: report.get('displayname')-->
-        <span data-bind="text: '(' + translations.resourceInstanceName + ')'" style="padding: 0 5px"></span>
+        <span data-bind="text: '(' + $root.translations.resourceInstanceName + ')'" style="padding: 0 5px"></span>
         <!--/ko-->
     </div>
     <div><span data-bind="text: tabs()[activeTabIndex()].name"></span></div>
@@ -38,7 +38,7 @@
 {% block header_form %}
 <div style="display: flex; flex-direction: row">
 <div id="card-save-tile-btn" class="install-buttons">
-    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab"><span data-bind="text: translations.addTab" ></span></button>
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab"><span data-bind="text: $root.translations.addTab" ></span></button>
 </div>
 </div>
 <div data-bind="sortable: {
@@ -54,14 +54,14 @@
         </div>
         <div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
-                <input type=""  data-bind="attr: {placeholder: translations.tabName}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
+                <input type=""  data-bind="attr: {placeholder: $root.translations.tabName}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
             </div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
                 <!--ko if: $parent.icons().length > 0 -->
                 <select 
                     class="design" 
                     data-bind="
-                        data-placeholder: translations.selectTabIcon,
+                        data-placeholder: $root.translations.selectTabIcon,
                         value: tab.icon, 
                         options: $parent.icons(), 
                         optionsText: 'name', 
@@ -89,7 +89,7 @@
                     class="design" 
                     multiple 
                     data-bind="
-                        data-placeholder: translations.selectCardsInTab,
+                        data-placeholder: $root.translations.selectCardsInTab,
                         selectedOptions: tab.nodegroup_ids, 
                         options: $parent.topcards, 
                         optionsText: 'name', 
@@ -108,13 +108,13 @@
 {% block body %}
 
     <!--ko if: hasProvisionalData() && (editorContext === false) -->
-    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span></div>
+    <div class="report-provisional-flag"><span data-bind="text: $root.translations.pendingProvisionalEditsNotDisplayed"></span></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
-    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEditsNotDisplayed"></span></div>
+    <div class="report-provisional-flag"><span data-bind="text: $root.translations.pendingProvisionalEditsNotDisplayed"></span></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
-    <div class="report-provisional-flag"><span data-bind="text: translations.pendingProvisionalEdits"></div>
+    <div class="report-provisional-flag"><span data-bind="text: $root.translations.pendingProvisionalEdits"></div>
     <!--/ko-->
 
 

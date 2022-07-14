@@ -10,20 +10,20 @@
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
         <h2>
-            <span data-bind="text: translations.UploadCsvZipFile"></span>
+            <span data-bind="text: $root.translations.UploadCsvZipFile"></span>
         </h2>
         <h4>
-            <span data-bind="text: translations.dropzoneFileUploadCaption"></span>
+            <span data-bind="text: $root.translations.dropzoneFileUploadCaption"></span>
         </h4>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
             <div style="display:flex; flex-direction: column;">
                 <div>
                     <div class="dropzone-photo-upload" style="margin-top: 0px;">
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
-                            <span data-bind="text: translations.selectFile"></span>
+                            <span data-bind="text: $root.translations.selectFile"></span>
                         </div>
                         <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
-                            <span data-bind="text: translations.cancelFileImport"></span>
+                            <span data-bind="text: $root.translations.cancelFileImport"></span>
                         </div>
                         <div style="min-height: 100%;">
                             <div id="hidden-dz-previews" style="display:none"></div>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <h5 class="rr-splash-description">
-                <span data-bind="text: translations.etlFileUploadMessage"></span>
+                <span data-bind="text: $root.translations.etlFileUploadMessage"></span>
             </h5>
         </div>
     </div>
@@ -43,28 +43,28 @@
 <div class="etl-module-component-container">
 <div class="etl-module-body">
     <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">
-        <span data-bind="text: translations.etlSingleCSVTitle"></span>
+        <span data-bind="text: $root.translations.etlSingleCSVTitle"></span>
     </h3>
     <div class="etl-module-component" style="margin-top: 0px;">
         <h4 style="margin-top: 5px; margin-bottom: 0px;">
-            <span data-bind="text: translations.fileSummary"></span>
+            <span data-bind="text: $root.translations.fileSummary"></span>
         </h4>
         <div>
-            <span class="etl-loading-metadata-key" data-bind="text: translations.fileName + ':'"></span>
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fileName + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="text: fileInfo().name"></span>
         </div>
         <div>
-            <span class="etl-loading-metadata-key" data-bind="text: translations.fileSize + ':'"></span>
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fileSize + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="html: formatSize(fileInfo().size)"></span>
         </div>
         <div>
-            <span class="etl-loading-metadata-key" data-bind="text: translations.numberOfRows + ':'"></span>
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRows + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="text: numberOfRow()"></span>
         </div>
     </div>
     <div class="etl-module-component etl-module-mapping">
         <h4>
-            <span data-bind="text: translations.targetModel"></span>
+            <span data-bind="text: $root.translations.targetModel"></span>
         </h4>
         <select data-bind="
             value: selectedGraph,
@@ -78,9 +78,9 @@
     </div>
     <div class="etl-module-component">
         <h4>
-            <span data-bind="text: translations.importDetails"></span>
+            <span data-bind="text: $root.translations.importDetails"></span>
         </h4>
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: translations.columnNameFirstRow, subtitle: ''}}}"></div>
+        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: $root.translations.columnNameFirstRow, subtitle: ''}}}"></div>
         <div class="csv-mapping-table-container">
         <table class="table table-striped csv-mapping-table">
             <thead>
@@ -120,19 +120,19 @@
         </table>
         </div>
         <!-- ko if: csvExample().length >= 5-->
-        <div data-bind="text: translations.showingFirst + ' ' + csvExample().length + translations.rows"></div>
+        <div data-bind="text: $root.translations.showingFirst + ' ' + csvExample().length + $root.translations.rows"></div>
         <!-- /ko -->
         <!-- ko ifnot: csvExample().length >= 5 -->
-        <div data-bind="text: translations.showingAll + ' ' + csvExample().length + translations.rows"></div>
+        <div data-bind="text: $root.translations.showingAll + ' ' + csvExample().length + $root.translations.rows"></div>
         <!-- /ko -->
     </div>
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
     <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
-        <span data-bind="text: translations.importData"></span>
+        <span data-bind="text: $root.translations.importData"></span>
     </button>
     <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
-        <span data-bind="text: translations.cancelFileImport"></span>
+        <span data-bind="text: $root.translations.cancelFileImport"></span>
     </button>
 </div>
 </div>
@@ -143,16 +143,16 @@
 {% block etl_status %}
 <div>
     <h4>
-        <span data-bind="text: translations.importSingleCsv"></span>
+        <span data-bind="text: $root.translations.importSingleCsv"></span>
     </h4>
     <!-- ko if: load_details -->
     <!-- ko ifnot: loading() -->
     <div>
-        <span class="etl-loading-metadata-key" data-bind="text: translations.targetResource + ':'"></span>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetResource + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
     </div>
     <div>
-        <span class="etl-loading-metadata-key" data-bind="text: translations.targetFields + ':'"></span>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetFields + ':'"></span>
         <!-- ko foreach: load_details.mapping -->
         <!-- ko if:  $data.node -->
         <span class="etl-loading-metadata-value" data-bind="text: $data.node"></span><span>;</span>

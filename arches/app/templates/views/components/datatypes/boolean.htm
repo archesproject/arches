@@ -8,11 +8,11 @@
         width: '100%',
         disable_search_threshold: 15
     }, options: [
-        {id: '', name: translations.selectAnOption},
+        {id: '', name: $root.translations.selectAnOption},
         {id: 't', name: trueLabel},
         {id: 'f', name: falseLabel},
-        {id: 'null', name: translations.hasNoValue},
-        {id: 'not_null', name: translations.hasAnyValue}
+        {id: 'null', name: $root.translations.hasNoValue},
+        {id: 'not_null', name: $root.translations.hasAnyValue}
     ], optionsText: 'name', optionsValue: 'id'"></select>
 </div>
 {% endblock search %}
@@ -20,13 +20,13 @@
 
 <!-- ko if: $data.graph -->
 <div class="control-label">
-    <span data-bind="text: translations.labelTrue"></span>
+    <span data-bind="text: $root.translations.labelTrue"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input class="form-control input-md widget-input" data-bind="textInput: trueLabel">
 </div>
 <div class="control-label">
-    <span data-bind="text: translations.labelFalse"></span>
+    <span data-bind="text: $root.translations.labelFalse"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input class="form-control input-md widget-input" data-bind="textInput: falseLabel">
