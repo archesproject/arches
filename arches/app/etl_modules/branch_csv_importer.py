@@ -117,11 +117,6 @@ class BranchCsvImporter(BaseImportModule):
                     config["nodeid"] = nodeid
                 except TypeError:
                     config = {}
-                if datatype == "string":
-                    try:
-                        source_value = ast.literal_eval(source_value)
-                    except:
-                        pass
                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
                 if datatype == "file-list":
                     validation_errors = datatype_instance.validate(value, nodeid=nodeid, path=self.temp_dir)

@@ -217,6 +217,12 @@ class StringDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         language = kwargs.pop("language", None)
+
+        try:
+            value = ast.literal_eval(value)
+        except:
+            pass
+
         if type(value) is str:
             if language is not None:
                 language_objects = list(models.Language.objects.filter(code=language))
