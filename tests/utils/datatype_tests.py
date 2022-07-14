@@ -37,7 +37,7 @@ class StringDataTypeTests(ArchesTestCase):
         string = DataTypeFactory().get_instance("string")
         new_language = Language(code="fa", name="Fake", default_direction="ltr", scope="system")
         new_language.save()
-        tile_value = string.transform_value_for_tile("hello", language="fa")
+        tile_value = string.transform_value_for_tile("hello|fa")
         self.assertEqual(type(tile_value), dict)
         self.assertTrue("fa" in tile_value.keys())
         new_language.delete()

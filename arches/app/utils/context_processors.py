@@ -99,5 +99,6 @@ def app_settings(request=None):
             "ACTIVE_LANGUAGE_DIR": "rtl" if get_language_bidi() else "ltr",
             "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
+            "DEBUG": settings.DEBUG,
         }
     }
