@@ -3,7 +3,7 @@ import copy
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.utils.translation import get_language
 
