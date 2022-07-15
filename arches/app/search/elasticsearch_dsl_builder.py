@@ -54,7 +54,7 @@ class Query(Dsl):
         self.limit = kwargs.pop("limit", 10)
         self.scroll = None
 
-        self.dsl = {"query": {"match_all": {}}, "_source": {"includes": [], "excludes": []}}
+        self.dsl = {"query": {"match_all": {}}, "source_includes": [], "source_excludes": []}
 
         for key, value in kwargs.items():
             self.dsl[key] = value
@@ -76,10 +76,10 @@ class Query(Dsl):
             self.dsl["aggs"][agg.name] = agg.agg[agg.name]
 
     def include(self, include):
-        self.dsl["_source"]["includes"].append(include)
+        self.dsl["source_includes"].append(include)
 
     def exclude(self, exclude):
-        self.dsl["_source"]["excludes"].append(exclude)
+        self.dsl["source_excludes"].append(exclude)
 
     def sort(self, field, dsl):
         self.dsl["sort"] = [{field: dsl}]
@@ -93,9 +93,9 @@ class Query(Dsl):
         self.scroll = kwargs.pop("scroll", None)
         self.prepare()
         if self.scroll is None:
-            return self.se.search(index=index, body=self.dsl, id=kwargs.get("id", None))
+            return self.se.search(index=index, id=kwargs.get("id", None) **self.dsl)
         else:
-            return self.se.search(index=index, body=self.dsl, scroll=self.scroll)
+            return self.se.search(index=index, scroll=self.scroll, **self.dsl)
 
     def count(self, index="", **kwargs):
         return self.se.count(index=index, body=self.dsl)
