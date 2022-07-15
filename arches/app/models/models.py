@@ -562,6 +562,7 @@ class Node(models.Model):
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
+    hascustomalias = models.BooleanField(default=False)
 
     def get_child_nodes_and_edges(self):
         """
