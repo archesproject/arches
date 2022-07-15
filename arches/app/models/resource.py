@@ -75,13 +75,20 @@ class Resource(models.ResourceInstance):
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
+
+        if self.descriptors is None:
+            self.descriptors = {}
+
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
+
+            self.descriptors[descriptor] = module.get_primary_descriptor_from_nodes(
                 self, graph_function[0].config["descriptor_types"][descriptor], context
             )
         else:
-            return "undefined"
+            self.descriptors[descriptor] = "undefined"
+
+        return self.descriptors[descriptor]
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -90,7 +97,9 @@ class Resource(models.ResourceInstance):
         return self.get_descriptor("map_popup", context)
 
     def displayname(self, context=None):
-        return self.get_descriptor("name", context)
+        descriptor = self.get_descriptor("name", context)
+        self.name = descriptor
+        return descriptor
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
@@ -255,6 +264,8 @@ class Resource(models.ResourceInstance):
                     es_index = import_class_from_string(index["module"])(index["name"])
                     doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                     es_index.index_document(document=doc, id=doc_id)
+
+            super(Resource, self).save()
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """

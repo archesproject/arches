@@ -34,9 +34,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </div>
             <p class="ep-form-alert-text" data-bind="html: alert().text"></p>
-    
 
-    
+
+
             <div class="ep-form-alert-buttons">
                 <!-- ko if: alert().cancel -->
                 <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel"><span>{% trans "Cancel" %}</span></button>
@@ -274,7 +274,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="header">
             {% block header %}
             <div class="ep-toolbar">
-            
+
                 <!-- Tools Menu -->
                 {% if nav.menu %}
                     <a id="menu-control" href="" class="ep-tools ep-tool-title"
@@ -291,8 +291,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% include 'navbar/graph-designer-menu.htm' %}
                     {% endif %}
                 {% endif %}
-            
-            
+
+
                 {% block graph_title %}
                 <!-- Page Title and Icon -->
                 <div class="ep-tools-title">
@@ -302,17 +302,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </h1>
                 </div>
                 {% endblock graph_title %}
-            
+
                 <!-- Login -->
                 {% if nav.login %}
-                <a 
-                    href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ home }}{% endif %}" 
+                <a
+                    href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ home }}{% endif %}"
                     class="ep-tools ep-tools-login"
                 >
-                    <div 
-                        class="" 
-                        data-placement="bottom" 
-                        data-toggle="tooltip" 
+                    <div
+                        class=""
+                        data-placement="bottom"
+                        data-toggle="tooltip"
                         data-original-title="{% if user.username != 'anonymous' %}{% trans 'Profile' %}{% else %}{% trans 'Login' %}{% endif %}"
                     >
                         {% if user.username == 'anonymous' %}
@@ -324,7 +324,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </a>
                 {% endif %}
-            
+
                 {% if show_language_swtich %}
                 {% get_current_language as LANGUAGE_CODE %}
                 <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" data-bind='component: {
@@ -334,7 +334,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             }
                                         }'></div>
                 {% endif %}
-            
+
                 <!-- Notifications -->
                 {% if nav.notifs %}
                 <a href="" class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}">
@@ -348,18 +348,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </a>
                 {% endif %}
-            
+
                 <!-- Search Bar -->
                 {% if nav.search %}
                 <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right"
                     data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                     <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Search" %}">
                         <i class="ion-search"></i>
-            
+
                     </div>
                 </a>
                 {% endif %}
-            
+
                 <!-- Prov edit history-->
                 {% if user_is_reviewer == False and user_can_edit %}
                 <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right"
@@ -369,7 +369,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </a>
                 {% endif %}
-            
+
                 {% if nav.res_edit and user_can_edit %}
                 <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right"
                     data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
@@ -378,7 +378,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </a>
                 {% endif %}
-            
+
                 {% if nav.print %}
                 <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
                     <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Print" %}">
@@ -386,7 +386,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </a>
                 {% endif %}
-            
+
                 {% if nav.help %}
                 <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
                     data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
@@ -397,8 +397,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 {% endif %}
 
                 {% if user.username != 'anonymous' %}
-                    <a 
-                        href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}" 
+                    <a
+                        href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
                         class="ep-help-toggle ep-tools ep-tools-right"
                     >
                         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Logout" %}'>
@@ -407,7 +407,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </a>
                 {% endif %}
             </div>
-            
+
             <!-- Notifications Panel -->
             <div id="ep-notifs-panel" class="ep-notifs" style="display:none;">
                 <div class="ep-edits-header">
@@ -421,7 +421,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </a>
                 </div>
-            
+
                 <div class="ep-edits-body provisional-edit-history" style="float:left"
                     data-bind="css: {'loading-mask': helploading()}">
                     <div class="ep-edits-content">
@@ -429,7 +429,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
-            
+
             <!-- Edits Panel -->
             <div id="ep-edits-panel" class="ep-edits" style="display:none;">
                 <div class="ep-edits-header">
@@ -443,7 +443,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </a>
                 </div>
-            
+
                 <div class="ep-edits-body provisional-edit-history" style="float:left"
                     data-bind="css: {'loading-mask': helploading()}">
                     <div class="ep-edits-content">
@@ -451,7 +451,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
             </div>
-            
+
             <!-- Help Panel -->
             <div id="ep-help-panel" class="ep-help" style="display: none"
                 data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
@@ -466,7 +466,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </a>
                 </div>
-            
+
                 <!-- help content loaded from contextually referenced template -->
                 <div class="ep-help-body" data-bind="css: {'loading-mask': helploading()}">
                     <!-- content gets inserted into this div -->

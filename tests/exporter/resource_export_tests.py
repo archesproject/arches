@@ -39,10 +39,8 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        cls.loadOntology()
-
-    def setUp(self):
+    def setUpClass(self):
+        self.loadOntology()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -103,11 +101,9 @@ class BusinessDataExportTests(ArchesTestCase):
             return _sorted
 
         BusinessDataImporter("tests/fixtures/data/json/resource_export_business_data_truth.json").import_business_data()
-
         export = BusinessDataExporter("json").export("ab74af76-fa0e-11e6-9e3e-026d961c88e6")
 
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
-
         json_truth = deep_sort(json.load(open("tests/fixtures/data/json/resource_export_business_data_truth.json")))
 
         # removes generated graph_publication_id

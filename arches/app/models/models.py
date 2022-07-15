@@ -44,6 +44,15 @@ from guardian.shortcuts import assign_perm
 from django.conf import settings
 
 
+class BulkIndexQueue(models.Model):
+    resourceinstanceid = models.UUIDField(primary_key=True, unique=True)
+    createddate = models.DateTimeField(auto_now_add=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = "bulk_index_queue"
+
+
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True)
     name = I18n_TextField(blank=True, null=True)
@@ -894,6 +903,8 @@ class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
+    name = models.TextField(blank=True, null=True)
+    descriptors = JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
