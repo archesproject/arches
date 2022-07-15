@@ -207,7 +207,7 @@ class Graph(models.GraphModel):
 
         node.graph = self
 
-        if self.ontology is None:
+        if self.ontology_id is None:
             node.ontologyclass = None
         if node.pk is None:
             node.pk = uuid.uuid1()
