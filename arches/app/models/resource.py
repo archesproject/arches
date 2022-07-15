@@ -502,7 +502,6 @@ class Resource(models.ResourceInstance):
 
         ret = {"resource_instance": self, "resource_relationships": [], "related_resources": [], "node_config_lookup": graph_lookup}
 
-        # limit = 20
         if page > 0:
             limit = settings.RELATED_RESOURCES_PER_PAGE
             start = limit * int(page - 1)
@@ -523,10 +522,7 @@ class Resource(models.ResourceInstance):
                 "total": models.ResourceXResource.objects.filter(final_query).count(),
                 "relations": models.ResourceXResource.objects.filter(final_query)[start:limit],
             }
-            try:
-                print(models.ResourceXResource.objects.filter(final_query)[start:limit].query)
-            except:
-                pass
+
             return relations  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
 
         resource_relations = get_relations(
