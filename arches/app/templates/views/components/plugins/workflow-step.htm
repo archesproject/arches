@@ -2,7 +2,7 @@
 
 
 <div class='tabbed-workflow-step-body'>
-    <!-- ko with: step -->
+    <!-- ko with: $data.step -->
         <div 
             class='workflow-step-loading-mask loading-mask' 
             data-bind="visible: $data.loading() || $data.saving()"
