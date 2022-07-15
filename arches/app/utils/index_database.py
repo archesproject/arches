@@ -1,3 +1,4 @@
+from typing import Iterable
 import uuid
 import django
 
@@ -83,7 +84,9 @@ def index_resources(
     )
 
 
-def index_resources_using_multiprocessing(resourceids, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, max_subprocesses=0):
+def index_resources_using_multiprocessing(
+    resourceids, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, max_subprocesses=0, callback=None
+):
     try:
         multiprocessing.set_start_method("spawn")
     except:
@@ -111,6 +114,8 @@ def index_resources_using_multiprocessing(resourceids, batch_size=settings.BULK_
     def process_complete_callback(result):
         if quiet is False and bar is not None:
             bar.update(item_id=result)
+        if callback is not None:
+            callback()
 
     def process_error_callback(err):
         import traceback
@@ -147,7 +152,9 @@ def index_resources_using_multiprocessing(resourceids, batch_size=settings.BULK_
         pool.join()
 
 
-def index_resources_using_singleprocessing(resources, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None):
+def index_resources_using_singleprocessing(
+    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None
+):
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
@@ -160,9 +167,12 @@ def index_resources_using_singleprocessing(resources, batch_size=settings.BULK_I
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
+                resource.save(index=False)
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+
+    return os.getpid()
 
 def index_resources_by_type(
     resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
@@ -219,6 +229,8 @@ def index_resources_by_type(
             )
 
         else:
+            from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
             resources = Resource.objects.filter(graph_id=str(resource_type))
             index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title=graph_name)
 
@@ -240,20 +252,7 @@ def _index_resource_batch(resourceids):
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    datatype_factory = DataTypeFactory()
-    node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-
-    with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as doc_indexer:
-        with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
-            for resource in resources:
-                document, terms = resource.get_documents_to_index(
-                    fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                )
-                doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
-                for term in terms:
-                    term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
-
-    return os.getpid()
+    return index_resources_using_singleprocessing(resources, batch_size, quiet=True, se=_se)
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):

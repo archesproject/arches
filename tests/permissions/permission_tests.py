@@ -52,7 +52,7 @@ class PermissionTests(ArchesTestCase):
         self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
         self.user = User.objects.get(username="ben")
         self.group = Group.objects.get(pk=2)
-        resource = Resource(pk=self.resource_instance_id)
+        resource = Resource.objects.get(pk=self.resource_instance_id)
         resource.graph_id = self.data_type_graphid
         resource.remove_resource_instance_permissions()
 
