@@ -3,7 +3,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "8140_django_upgrade"),
+        ("models", "8220_node_hascustomalias"),
     ]
 
     forward_sql = """
