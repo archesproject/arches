@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8140_django_upgrade"),
+        ("models", "8301_descriptors"),
     ]
 
     operations = [
