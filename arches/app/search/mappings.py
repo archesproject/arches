@@ -47,9 +47,9 @@ def prepare_terms_index(create=False):
                     "analyzer": "standard",
                     "type": "text",
                     "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
-                }
+                },
             }
-        }
+        },
     }
 
     if create:
@@ -80,9 +80,9 @@ def prepare_concepts_index(create=False):
                     "analyzer": "standard",
                     "type": "text",
                     "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
-                }
+                },
             }
-        }
+        },
     }
 
     if create:
@@ -232,8 +232,8 @@ def prepare_search_index(create=False):
                         "provisional": {"type": "boolean"},
                     },
                 },
-            }
-        }
+            },
+        },
     }
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory
