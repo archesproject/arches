@@ -99,15 +99,13 @@ define([
         });
         return !nodegroup || !nodegroup.parentnodegroup_id;
     }).sort((firstEl, secondEl) => {
-        if(firstEl.sortorder >= secondEl.sortorder) {
-            if(firstEl.sortorder === secondEl.sortorder) {
-                return 0;
-            } else {
-                return 1;
-            }
-        } else {
+        if(firstEl.sortorder < secondEl.sortorder) {
             return -1;
-        } 
+        }
+        if(firstEl.sortorder === secondEl.sortorder) {
+            return 0;
+        }
+        return 1;
     }).map(function(card) {
         return new CardViewModel({
             card: card,
