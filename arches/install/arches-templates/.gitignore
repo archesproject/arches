@@ -5,7 +5,9 @@
 {{project_name}}/cantaloupe/*
 {{project_name}}/media/packages
 {{project_name}}/media/node_modules
+{{project_name}}/media/build
 {{project_name}}/uploadedfiles/*
 {{project_name}}/settings_local.py
+{{project_name}}/webpack/webpack-stats.json
 .vscode/
 CACHE
