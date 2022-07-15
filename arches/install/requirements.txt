@@ -5,7 +5,7 @@ rdflib==4.2.2
 django-guardian==2.3.0
 python-memcached==1.59
 celery==5.2.7
-django-celery-results==2.3.1
+django-celery-results==2.4.0
 mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.5
 django-recaptcha==2.0.6
