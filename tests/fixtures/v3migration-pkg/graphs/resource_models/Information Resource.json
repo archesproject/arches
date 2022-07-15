@@ -10918,17 +10918,21 @@
             "functions_x_graphs": [
                 {
                     "config": {
-                        "description": {
-                            "nodegroup_id": "68ef8150-943e-11e8-a5ee-94659cf754d0",
-                            "string_template": "<Description>"
-                        },
-                        "map_popup": {
-                            "nodegroup_id": "6337e1d0-943e-11e8-a7e4-94659cf754d0",
-                            "string_template": "<Title>"
-                        },
-                        "name": {
-                            "nodegroup_id": "6337e1d0-943e-11e8-a7e4-94659cf754d0",
-                            "string_template": "<Title>"
+                        "module": "arches.app.functions.primary_descriptors",
+                        "class_name": "PrimaryDescriptorsFunction",
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "68ef8150-943e-11e8-a5ee-94659cf754d0",
+                                "string_template": "<Description>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "6337e1d0-943e-11e8-a7e4-94659cf754d0",
+                                "string_template": "<Title>"
+                            },
+                            "name": {
+                                "nodegroup_id": "6337e1d0-943e-11e8-a7e4-94659cf754d0",
+                                "string_template": "<Title>"
+                            }
                         },
                         "triggering_nodegroups": []
                     },
@@ -10938,6 +10942,13 @@
                 }
             ],
             "graphid": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
+            "publication": {
+                "graph_id": "3caf329f-b8f7-11e6-84a5-026d961c88e6",
+                "notes": "Initial migration.",
+                "publicationid": "41a35d2a-b051-4710-a7fd-4470b9d3109d",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "fa fa-file-text-o",
             "is_editable": false,
             "isresource": true,
@@ -11668,7 +11679,7 @@
                     "config": {
                         "addToMap": true,
                         "advancedStyle": "",
-                        "advancedStyling": false, 
+                        "advancedStyling": false,
                         "clusterDistance": 20,
                         "clusterMaxZoom": 5,
                         "clusterMinPoints": 3,

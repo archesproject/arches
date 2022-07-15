@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "6.0.1",
+    "version": "6.1.0",
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
         "type": "git"
@@ -22,7 +22,7 @@
         "cytoscape": "^3.18.2",
         "cytoscape-cola": "^2.4.0",
         "d3": "^6.1.1",
-        "datatables.net": "~1.10.12",
+        "datatables.net": "~1.10.22",
         "datatables.net-bs": "~1.10.12",
         "datatables.net-buttons": "^1.5.4",
         "datatables.net-buttons-bs": "^1.5.4",

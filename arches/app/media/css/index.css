@@ -678,10 +678,6 @@ footer .footer-links {
     margin: auto;
 }
 
-.mobile-description-container {
-    padding: 140px 10px;
-}
-
 .wide-box {
     padding: 30px 0px 10px 20px;
     margin-left: 45px;
@@ -699,11 +695,6 @@ footer .footer-links {
 }
 
 .wide-box .box-highlight p {
-    color: #555;
-}
-
-.mobile-description-container p {
-    font-size: 17px;
     color: #555;
 }
 
@@ -788,9 +779,6 @@ footer .footer-links {
     .app-info-block {
         padding: 80px 10px 60px 10px;
     }
-    .mobile-description-container {
-        padding: 80px 10px;
-    }
 }
 
 @media (max-width: 320px) { 
@@ -808,9 +796,6 @@ footer .footer-links {
          margin-left: 5px; 
          margin-right: 10px; 
          margin-top: 10px;
-    }
-    .mobile-description-container {
-        padding: 140px 10px 40px 10px;
     }
     .v5-splash-caption {
         left: 0!important;
@@ -850,9 +835,6 @@ footer .footer-links {
          margin-left: 5px; 
          margin-right: 10px; 
          margin-top: 10px;
-    }
-    .mobile-description-container {
-        padding: 140px 10px 40px 10px;
     }
     .vertical-nav-container-background,
     #cd-vertical-nav {

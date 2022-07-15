@@ -63,6 +63,7 @@ define([
             this.graphSettings = options.graphSettings;
             this.cardTree = options.cardTree;
             this.appliedFunctions = options.appliedFunctions;
+            this.primaryDescriptorFunction = options.primaryDescriptorFunction;
             this.permissionTree = options.permissionTree;
             this.items = this.graphModel.get('nodes');
             this.branchListVisible = ko.observable(false);
@@ -72,6 +73,8 @@ define([
             this.toggleIds = function() {
                 self.showIds(!self.showIds());
             };
+            this.showGrid = ko.observable(false);
+            this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -93,35 +96,27 @@ define([
 
         /**
          * Returns a boolean to indicate whether this node participates in descriptor function
-         * @param {object} node - a node in the tree 
+         * @param {object} node - a node in the tree
          */
         isFuncNode: function(node) {
-            var appFuncs = null, appFuncDesc = false, appFuncName = false;
-            if(this.appliedFunctions()) {
-                appFuncs = this.appliedFunctions();
-                for(var i = 0; i < appFuncs.length; i++) {
-                    if(appFuncs[i]['function_id'] == "60000000-0000-0000-0000-000000000001") {
-                        if(appFuncs[i]['config']['description']['nodegroup_id']) {
-                            appFuncDesc = appFuncs[i]['config']['description']['nodegroup_id'];
-                        }
-                        if(appFuncs[i]['config']['name']['nodegroup_id']) {
-                            appFuncName = appFuncs[i]['config']['name']['nodegroup_id'];
-                        }
-                        if(node['id'] === appFuncDesc || node['id'] === appFuncName) {
-                            return true;
-                        } else {
-                            if(node['children']) {
-                                node['children'].forEach( function(child) {
-                                    if(child['id'] === appFuncDesc || child['id'] === appFuncName) {
-                                        return true;
-                                    }
-                                }); 
-                            }
-                        }
-                    }
+            var primaryDescriptorNodes = {}, descriptorType, pdFunction = this.primaryDescriptorFunction;
+
+            if(!this.primaryDescriptorFunction())
+                return null;
+
+            ['name', 'description'].forEach(function(descriptor) {
+                try {
+                    primaryDescriptorNodes[pdFunction()['config']['descriptor_types'][descriptor]['nodegroup_id']] = descriptor;
+                } catch (e) {
+                    // Descriptor doesn't exist so ignore the exception
+                    console.log("No descriptor configuration for "+descriptor);
                 }
-            }
-            return false;
+            });
+
+            [node].concat(!!node['childNodes']() ? node['childNodes']() : [])
+                .find(nodeToCheck => !!(descriptorType = primaryDescriptorNodes[nodeToCheck['id']]));
+
+            return !!descriptorType;
         },
 
         /**
@@ -250,6 +245,9 @@ define([
                     item.expanded(false);
                 }
             }, this);
+        },
+        toggleGrid: function(){
+            this.showGrid(!this.showGrid());
         }
     });
     return GraphTree;

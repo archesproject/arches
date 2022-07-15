@@ -41,7 +41,13 @@ define([
         $.get(
             arches.urls.resource_descriptors + resourceId(),
             function(descriptors) {
-                displayname(descriptors.displayname);
+                if(typeof descriptors.displayname == "string"){
+                    displayname(descriptors.displayname);
+                } else {
+                    const defaultLanguageValue = descriptors.displayname.find(displayname => displayname.language == arches.activeLanguage)?.value;
+                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")"
+                    displayname(displayNameValue);
+                }
             }
         );
     };
@@ -68,9 +74,20 @@ define([
             koMapping.toJSON(params.tile.data)
         );
 
-        this.data = koMapping.fromJS(params.tile.data);
-        this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
+
+        this.data = {};
+
+        for(const key of Object.keys(params.tile.data)){
+            const datatype = this.datatypeLookup[key];
+            if(datatype == 'string'){
+                this.data[key] = ko.observable(params.tile.data[key]);
+            } else {
+                this.data[key] = koMapping.fromJS(params.tile.data[key]);
+            }
+        }
+
+        this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.transactionId = params.transactionId;
 
         _.extend(this, {
@@ -203,7 +220,17 @@ define([
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
-                        self.data = koMapping.fromJS(tileData.data);
+                        
+                        self.data = {};
+                        for(const key of Object.keys(tileData.data)){
+                            const datatype = self.datatypeLookup[key];
+                            if(datatype == 'string'){
+                                self.data[key] = ko.observable(tileData.data[key]);
+                            } else {
+                                self.data[key] = koMapping.fromJS(tileData.data[key]);
+                            }
+                        }
+                        
                         self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
                         self._tileData(koMapping.toJSON(self.data));
                         self.dirty = ko.pureComputed(function() {

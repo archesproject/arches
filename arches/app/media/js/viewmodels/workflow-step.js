@@ -39,6 +39,7 @@ define([
 
 
         this.required = ko.observable(ko.unwrap(config.required));
+        this.saveWithoutProgressing = ko.observable(ko.unwrap(config.saveWithoutProgressing));
         this.loading = ko.observable(false);
         this.saving = ko.observable(false);
 

@@ -16,13 +16,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import uuid
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.core.cache import cache
 
 
 class Card(models.CardModel):
@@ -155,6 +155,7 @@ class Card(models.CardModel):
                         widget_model.visible = widget.get("visible", None)
                         widget_model.sortorder = widget.get("sortorder", None)
                         if widget_model.pk is None:
+                            widget_model.pk = uuid.uuid4()
                             widget_model.save()
                         self.widgets.append(widget_model)
 
@@ -234,13 +235,13 @@ class Card(models.CardModel):
                 return None
         return self
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         serialize to a different form than used by the internal class structure
 
         """
         exclude = [] if exclude is None else exclude
-        ret = JSONSerializer().handle_model(self, fields, exclude)
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude)
 
         ret["cardinality"] = self.cardinality if "cardinality" not in exclude else ret.pop("cardinality", None)
         ret["cards"] = self.cards if "cards" not in exclude else ret.pop("cards", None)

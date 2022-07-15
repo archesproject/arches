@@ -37,7 +37,6 @@ YARN_MODULES_FOLDER=${PACKAGE_JSON_FOLDER}/$(awk \
 	| sed -e "s/^\.\///g")
 
 export DJANGO_PORT=${DJANGO_PORT:-8000}
-COUCHDB_URL="http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT"
 STATIC_ROOT=${STATIC_ROOT:-/static_root}
 
 
@@ -98,10 +97,6 @@ setup_arches() {
 	echo "Running: python manage.py setup_db --force"
 	python manage.py setup_db --force
 
-    echo "Running: Creating couchdb system databases"
-    curl -X PUT ${COUCHDB_URL}/_users
-    curl -X PUT ${COUCHDB_URL}/_global_changes
-    curl -X PUT ${COUCHDB_URL}/_replicator
 
 	if [[ "${INSTALL_DEFAULT_GRAPHS}" == "True" ]]; then
 		# Import graphs

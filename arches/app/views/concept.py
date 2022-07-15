@@ -17,13 +17,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
-from django.db import transaction
+from django.db import transaction, connection
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
@@ -42,7 +43,7 @@ class RDMView(BaseManagerView):
     def get(self, request, conceptid):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
 
-        languages = sort_languages(models.DLanguage.objects.all(), lang)
+        languages = sort_languages(models.Language.objects.all(), lang)
 
         concept_schemes = []
         for concept in models.Concept.objects.filter(nodetype="ConceptScheme"):
@@ -72,7 +73,8 @@ class RDMView(BaseManagerView):
 def get_sparql_providers(endpoint=None):
     sparql_providers = {}
     for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-        Provider = import_string(provider["SPARQL_ENDPOINT_PROVIDER"])()
+        provider_class = provider["SPARQL_ENDPOINT_PROVIDER"][settings.LANGUAGE_CODE]["value"]
+        Provider = import_string(provider_class)()
         sparql_providers[Provider.endpoint] = Provider
 
     if endpoint:
@@ -89,12 +91,12 @@ def sort_languages(languages, lang):
 
     if len([l for l in languages if l.isdefault == True]) != 1:
         for l in languages:
-            if l.languageid == lang:
+            if l.code == lang:
                 l.isdefault = True
             else:
                 l.isdefault = False
 
-    return sorted(languages, key=lambda x: x.languagename)
+    return sorted(languages, key=lambda x: x.name)
 
 
 @group_required("RDM Administrator")
@@ -139,7 +141,7 @@ def concept(request, conceptid):
             semantic=(mode == "semantic" or mode == ""),
         )
 
-        languages = sort_languages(models.DLanguage.objects.all(), lang)
+        languages = sort_languages(models.Language.objects.all(), lang)
 
         valuetypes = models.DValueType.objects.all()
         relationtypes = models.DRelationType.objects.all()
@@ -391,6 +393,44 @@ def paged_dropdown(request):
         dict(list(zip(["id", "text", "conceptid", "language", "type"], d["valueto"].values())), depth=d["depth"], collector=d["collector"])
         for d in data
     ]
+
+    # This try/except block trys to find an exact match to the concept the user is searching and if found
+    # it will insert it into the results as the first item so that users don't have to scroll to find it.
+    # See: https://github.com/archesproject/arches/issues/8355
+    try:
+        if page == 1:
+            found = False
+            for i, d in enumerate(data):
+                if i <= 7 and d["text"].lower() == query.lower():
+                    found = True
+                    break
+            if not found:
+                sql = """
+                    SELECT value, valueid
+                    FROM 
+                    (
+                        SELECT *, CASE WHEN LOWER(languageid) = '{languageid}' THEN 10
+                        WHEN LOWER(languageid) like '{short_languageid}%' THEN 5
+                        ELSE 0
+                        END score
+                        FROM values
+                    ) as vals
+                    WHERE LOWER(value)='{query}' AND score > 0
+                    AND valuetype in ('prefLabel')
+                    ORDER BY score desc limit 1
+                """
+
+                languageid = get_language().lower()
+                sql = sql.format(query=query.lower(), languageid=languageid, short_languageid=languageid.split("-")[0])
+                cursor = connection.cursor()
+                cursor.execute(sql)
+                rows = cursor.fetchall()
+
+                if len(rows) == 1:
+                    data.insert(0, {"id": str(rows[0][1]), "text": rows[0][0], "depth": 1, "collector": False})
+    except:
+        pass
+
     return JSONResponse({"results": data, "more": offset + limit < total_count})
 
 

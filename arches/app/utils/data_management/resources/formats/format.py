@@ -67,7 +67,7 @@ class ResourceImportReporter:
 
 
 class Reader(object):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.errors = []
         self.datatype_factory = DataTypeFactory()
 
@@ -75,6 +75,9 @@ class Reader(object):
         pass
 
     def import_business_data(self):
+        pass
+
+    def scan_for_new_languages(self, business_data=None):
         pass
 
     def import_relations(self, relations=None):

@@ -1,0 +1,170 @@
+{% extends "base.htm" %}
+{% load static %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block body %}
+<!-- redirects page after 5 minutes -->
+<meta http-equiv="refresh" content="300;url={% url 'home' %}">
+
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	<div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="">
+			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
+				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication Settings" %}</h3>
+                
+                <hr style="border-color: #eee;">
+
+				<p 
+                    class="login-panel-header arches-signin" 
+                    style="
+                        color: red;
+                        font-size: 16px;
+                    "
+                >
+                    {% trans "This page will expire in 5 minutes." %}
+                </p>
+                
+                <hr style="border-color: #eee;">
+
+                <div
+                    style="
+                        display: flex;
+                        padding: 0 20px;
+                        justify-content: space-between;
+                        align-items: center;
+                    "
+                >
+                    <h4>{% trans "Two-Factor Authentication:" %}</h4>
+
+                    {% if user_has_enabled_two_factor_authentication %}
+                        <h4 style="color: green;">{% trans "ENABLED"%}</h4>
+                    {% else %}
+                        <h4 style="color: red;">{% trans "DISABLED"%}</h4>
+                    {% endif %}
+                </div>
+
+                <hr style="border-color: #eee;">
+                
+                <form action="{% url 'two-factor-authentication-settings' %}" method="post">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="user-id" value="{{ user_id }}" />
+                    
+                    {% if not new_mfa_hash_qr_code and not new_mfa_hash_manual_entry_data %}
+                        <button 
+                            type="submit" 
+                            name='generate-qr-code-button' 
+                            value='generate_qr_code' 
+                            class="btn btn-success" 
+                            style="width: fit-content; min-width: 250px; font-weight: bold;"
+                        >
+                            {% if user_has_enabled_two_factor_authentication %}
+                                {% trans "Generate a new shared secret key" %}
+                            {% else %}
+                                {% trans "Enable two-factor authentication" %}
+                            {% endif %}
+                        </button>
+
+                    {% endif %}
+
+                    {% if new_mfa_hash_qr_code %}
+                        <p class="login-panel-header arches-signin" style="font-size: 16px;">{% trans 'Scan the QR code below with your external authentication application.' %}</p>
+
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <img style="width: 300px;" src="data:image/png;base64, {{new_mfa_hash_qr_code}} "/>
+                            <button 
+                                class="btn btn-link" 
+                                style="color: #579ddb;"
+                                type="submit" 
+                                name='generate-manual-key-button' 
+                                value='generate_manual_key'
+                            >
+                                {% trans 'Click here to generate data for manual entry.' %}
+                            </button>
+                        </div>
+                    {% endif %}
+
+                    {% if new_mfa_hash_manual_entry_data %}
+                        <p class="login-panel-header arches-signin" style="font-size: 16px;">{% trans 'Enter the data below into your external authentication application.' %}</p>
+
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; text-align: left;"
+                        >
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><p>{% trans 'Issuer Name:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.issuer_name }}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>{% trans 'Account Name:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.name }}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>{% trans 'Secret Key:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{{ new_mfa_hash_manual_entry_data.new_mfa_hash }}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p>{% trans 'Algorithm Type:' %}</p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><p style="font-weight: bold;">{% trans 'Time based' %}</p></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <button 
+                                class="btn btn-link" 
+                                style="color: #579ddb;"
+                                type="submit" 
+                                name='generate-qr-code-button' 
+                                value='generate_qr_code' 
+                            >
+                                {% trans 'Click here to generate QR code.' %}
+                            </button>
+                        </div>
+                    {% endif %}
+
+                    <hr style="border-color: #eee;">
+
+                    {% if FORCE_TWO_FACTOR_AUTHENTICATION %}
+                        <div 
+                            class="login-panel-header arches-signin" 
+                            style="
+                                font-size: 14px;
+                            "
+                        >
+                            {% trans "To disable two-factor authentication, please contact your administrator." %}
+                        </div>
+                        <hr style="border-color: #eee;">
+                    {% elif user_has_enabled_two_factor_authentication %}
+                        <button type="submit" name='delete-mfa-hash-button' value='delete' class="btn btn-danger" style="width: fit-content; min-width: 250px;">{% trans "Disable two-factor authentication" %}</button>
+                        <hr style="border-color: #eee;">
+                    {% endif %}
+                </form>
+
+                <a href="{% url 'auth' %}" class="btn btn-link" style="width: fit-content; min-width: 250px; color: #579ddb">{% trans "Click here to return to login page" %}</a>
+                
+                <hr style="border-color: #eee;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

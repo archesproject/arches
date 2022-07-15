@@ -1,3 +1,5 @@
+const {map} = require("jquery");
+
 define([
     'arches',
     'jquery',
@@ -39,6 +41,8 @@ define([
         this.annotationNodes = ko.observableArray();
         this.compareMode = ko.observable(false);
         this.primaryCanvas = ko.observable();
+        this.canvasObject = ko.observable();
+        this.secondaryCanvasObject = ko.observable();
         this.secondaryCanvas = ko.observable();
         this.compareInstruction = ko.observable();
         this.primaryTilesLoaded = ko.observable(false);
@@ -48,8 +52,15 @@ define([
         this.imageToolSelector = ko.observable(this.canvas());
         this.floatingLocation = ko.observable("left");
         this.showImageModifiers = ko.observable(false);
+        this.renderContext = ko.observable(params.renderContext);
+        this.showModeSelector = ko.observable(true);
+        this.primaryLayerLoaded = true;
+        this.secondaryLayerLoaded = true;
         let primaryPanelFilters
         let secondaryPanelFilters;
+        const layers = [];
+        const secondaryLayers = [];
+        const cachedAnnotations = {};
 
         this.selectPrimaryPanel.subscribe((value) => {
             // if true, primary panel is being selected
@@ -93,16 +104,27 @@ define([
         this.compareMode.subscribe((mode) => {
             if(!mode){
                 const map = self.map();
-                if(sideBySideControl){
+
+                if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)){
+                    try {
+                        map.removeLayer(secondaryCanvasLayer)
+                    } catch(e){
+                        ; // ignore/smother if remove layer fails
+                    }
+                }
+
+                if(sideBySideControl && sideBySideControl?._map){
                     map.removeControl(sideBySideControl);
                 }
     
-                if(secondaryCanvasLayer){
-                    map.removeLayer(secondaryCanvasLayer)
-                }
                 self.secondaryCanvas(undefined);
                 self.secondaryLabel(undefined);
                 self.showImageModifiers(false);
+                self.selectPrimaryPanel(true);
+            } else {
+                self.selectPrimaryPanel(false);
+                self.canvasClick(self.canvasObject());
+                self.selectPrimaryPanel(true);
             }
         });
 
@@ -116,21 +138,25 @@ define([
 
         this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
             self.annotationNodes(
-                json.map(function(node) {
-                    var annotations = ko.observableArray();
-                    var updateAnnotations = function() {
+                json.map((node) => {
+                    const annotations = ko.observableArray();
+                    const updateAnnotations = async function() {
                         var canvas = self.canvas();
                         if (canvas) {
-                            window.fetch(arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid)
-                                .then(function(response) {
-                                    return response.json();
-                                })
-                                .then(function(json) {
-                                    json.features.forEach(function(feature) {
-                                        feature.properties.graphName = node['graph_name'];
-                                    });
-                                    annotations(json.features);
-                                });
+                            const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid;
+                            if(!cachedAnnotations[annotationsUrl]){
+                                const response = await window.fetch(annotationsUrl);
+
+                                const jsonResponse = await response.json();
+                                cachedAnnotations[annotationsUrl] = jsonResponse;
+                            }
+                            const annotation = cachedAnnotations[annotationsUrl];
+
+                            annotation.features.forEach(function(feature) {
+                                feature.properties.graphName = node['graph_name'];
+                            });
+                            annotations(annotation.features);
+
                         }
                     };
                     self.canvas.subscribe(updateAnnotations);
@@ -340,7 +366,7 @@ define([
                 return `<div class="image"><img src="${item.thumbnail}"/></div><div class="title">${item.label}</div>`; 
             },
             formatSelection: function(item) {
-                return item.label;
+                return item?.label;
             },
             clear: function(abc) {
                 self.canvases('');
@@ -349,8 +375,8 @@ define([
                 return self.canvases() === '' || !self.canvases();
             }, this),
             initSelection: function(element, callback) {
-                const canvasObject = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
-                callback(canvasObject);
+                const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
+                callback(canvasObj);
             }
         }
 
@@ -499,60 +525,127 @@ define([
             self.greyscale(false);
         };
 
-        var addCanvasLayer = function() {
-            var map = self.map();
-            var canvas = self.canvas();
+        const zoomToBounds = (map, layer) => {
+            var initialZoom = layer._getInitialZoom(map.getSize());
+            var imageSize = layer._imageSizes[initialZoom];
+            var sw = map.options.crs.pointToLatLng(L.point(0, imageSize.y), initialZoom);
+            var ne = map.options.crs.pointToLatLng(L.point(imageSize.x, 0), initialZoom);
+            var bounds = L.latLngBounds(sw, ne);
+            map.fitBounds(bounds);
+        }
 
-            if(canvas && canvas != self.imageToolSelector()){
+        const loadComparison = () => {
+            const map = self.map();
+            if(map && canvasLayer.getContainer() && secondaryCanvasLayer?.getContainer() /*self.primaryLayerLoaded && self.secondaryLayerLoaded*/){
+                // remove the control if it's been added to the map already  
+                if(self.zoomToCanvas){
+                    zoomToBounds(map, canvasLayer);
+                    //map.fitBounds(canvasLayer.getBounds())
+                    self.zoomToCanvas = false;
+                }
+                // add the control back, comparing the appropriate layers
+                if(!sideBySideControl){
+                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer);
+                } else {
+                    sideBySideControl.setLeftLayers(canvasLayer);
+                    sideBySideControl.setRightLayers(secondaryCanvasLayer);
+                }
+
+                if(!sideBySideControl?._map) {
+                    sideBySideControl.addTo(map);
+                }
+            }
+        };
+
+        var updatePrimaryCanvasLayer = function() {
+            const map = self.map();
+            const canvas = self.canvas();
+
+            if(self.selectPrimaryPanel() && canvas && canvas != self.imageToolSelector()){
                 self.imageToolSelector(canvas);
             }
 
             if (map && canvas) {
-                if (canvasLayer) {
-                    map.removeLayer(canvasLayer);
+                if (canvasLayer && map.hasLayer(canvasLayer)) {
+                    try {
+                        map.removeLayer(canvasLayer);
+                    } catch(e){
+                        ; // ignore/smother if remove layer fails
+                    }
                     canvasLayer = undefined;
                 }
                 if (canvas) {
-                    canvasLayer = L.tileLayer.iiif(canvas + '/info.json', {
-                        fitBounds: self.zoomToCanvas,
-                        className: "iiif-layer-primary"
-                    });
+                    const layerInfoUrl = canvas + '/info.json'
+                    canvasLayer = getLayer(layerInfoUrl, layers);
+    
+                    if(!canvasLayer){
+                        canvasLayer = L.tileLayer.iiif(layerInfoUrl, {
+                            fitBounds: false,
+                            className: "iiif-layer-primary"
+                        });
+
+                        canvasLayer.on('load', () => {
+                            if(self.compareMode()){
+                                loadComparison();
+                            } else if (!self.compareMode() && self.zoomToCanvas && canvasLayer){
+                                zoomToBounds(map, canvasLayer);
+                                self.zoomToCanvas = false;
+                            }
+                        });
+
+                        layers.push(canvasLayer);
+                    }
                     canvasLayer.addTo(map);
                     updateCanvasLayerFilter();
+
                 }
             }
-            self.zoomToCanvas = false;
         };
 
-        const compareCanvasLayers = (value) => {
+        const getLayer = (url, layers) => {
+            const match = layers.filter(layer => layer._infoUrl == url);
+            if(match.length > 0){
+                return match[0];
+            }
+        }
+
+        const updateSecondaryCanvasLayer = () => {
             const map = self.map();
             const primaryCanvas = self.canvas();
             const secondaryCanvas = self.secondaryCanvas();
             if(secondaryCanvas && secondaryCanvas != self.imageToolSelector()){
+                self.selectPrimaryPanel(false);
                 self.imageToolSelector(secondaryCanvas);
             }
 
             if (map && primaryCanvas && secondaryCanvas) {
-                if(secondaryCanvasLayer) {
-                    map.removeLayer(secondaryCanvasLayer);
+                if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)) {
+                    try {
+                        map.removeLayer(secondaryCanvasLayer);
+                    } catch(e){
+                        ; // ignore/smother if remove layer fails
+                    }
                     secondaryCanvasLayer = undefined;
                 }
 
-                secondaryCanvasLayer = L.tileLayer.iiif(secondaryCanvas + '/info.json', {
-                    fitBounds: false,
-                    className: "iiif-layer-secondary"
-                }).addTo(map);
+                const layerInfoUrl = secondaryCanvas + '/info.json'
+                secondaryCanvasLayer = getLayer(layerInfoUrl, secondaryLayers);
 
-                const loadComparison = () => {
-                    if(sideBySideControl){
-                        map.removeControl(sideBySideControl);
-                    }
-                    sideBySideControl = L.control.sideBySide(canvasLayer, secondaryCanvasLayer)
-                    sideBySideControl.addTo(map);
-                    map.fitBounds(map.getBounds())
+                if(!secondaryCanvasLayer){
+                    secondaryCanvasLayer = L.tileLayer.iiif(layerInfoUrl, {
+                        fitBounds: false,
+                        className: "iiif-layer-secondary"
+                    });
+
+                    secondaryCanvasLayer.on('load', () => {
+                        if(self.compareMode()){
+                            loadComparison();
+                        }
+                    });
+
+                    secondaryLayers.push(secondaryCanvasLayer);
                 }
-
-                secondaryCanvasLayer.on('tileload', loadComparison)
+                secondaryCanvasLayer.addTo(map);
                 
                 updateCanvasLayerFilter();
             }
@@ -562,11 +655,11 @@ define([
             L.control.fullscreen({
                 fullscreenElement: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
             }).addTo(map);
-            addCanvasLayer();
+            updatePrimaryCanvasLayer();
             map.addLayer(annotationFeatureGroup);
         });
-        this.canvas.subscribe(addCanvasLayer);
-        this.secondaryCanvas.subscribe(compareCanvasLayers)
+        this.canvas.subscribe(updatePrimaryCanvasLayer);
+        this.secondaryCanvas.subscribe(updateSecondaryCanvasLayer);
 
         this.setSecondaryCanvas = (canvas) => {
             const service = self.getCanvasService(canvas);
@@ -576,17 +669,17 @@ define([
         }
 
         this.selectCanvas = function(canvas) {
-            self.zoomToCanvas = true;
             
             const service = self.getCanvasService(canvas);
 
             if (service && self.selectPrimaryPanel()) {
                 self.canvas(service);
-                self.origCanvasLabel = self.getManifestDataValue(canvas, 'label', true);
-                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
+                self.canvasObject(canvas);
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true))
             } else {
                 self.secondaryCanvas(service);
-                self.secondaryLabel(self.getManifestDataValue(canvas, 'label', true));
+                self.secondaryCanvasObject(canvas);
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true))
             }
         };
 
@@ -610,7 +703,18 @@ define([
                             canvasIndex = sequence.canvases.findIndex(function(c){return c.images[0].resource.service['@id'] === self.canvas();});
                         }
                         var canvas = sequence.canvases[canvasIndex];
-                        self.selectCanvas(canvas);
+
+                        self.secondaryCanvasLayer = undefined;
+                        self.canvasLayer = undefined;
+                        const service = self.getCanvasService(canvas);
+                        self.zoomToCanvas = true;
+                        self.canvas(service);
+                        self.canvasObject(canvas);
+
+                        if(self.compareMode()){
+                            self.secondaryCanvas(service);
+                            self.secondaryCanvasObject(canvas);
+                        }
                     }    
                 }
                 self.updateCanvas = true;

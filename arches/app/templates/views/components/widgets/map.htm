@@ -21,9 +21,11 @@
 <!-- ko if: summaryDetails.length === 0 -->
 <dd>{% trans "None" %}</dd>
 <!-- /ko -->
+<!-- ko ifnot: summaryDetails.length === 0  -->
 <dd data-bind="foreach: summaryDetails">
-  <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
+    <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
 </dd>
+<!-- /ko -->
 {% endblock report %}
 
 {% block config_form %}
@@ -39,15 +41,15 @@
                 multiple: true,
                 allowClear: true,
                 minimumInputLength: 0,
-                placeholder: '{% trans "Available Geometry Types" %}',
+                placeholder: {% quoted_trans "Available Geometry Types" %},
                 data: [{
-                    text: '{% trans "Point" %}',
+                    text: {% quoted_trans "Point" %},
                     id: 'Point'
                 }, {
-                    text: '{% trans "Line" %}',
+                    text: {% quoted_trans "Line" %},
                     id: 'Line'
                 }, {
-                    text: '{% trans "Polygon" %}',
+                    text: {% quoted_trans "Polygon" %},
                     id: 'Polygon'
                 }]
             }

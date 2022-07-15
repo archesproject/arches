@@ -6,11 +6,12 @@ import uuid
 import csv
 import zipfile
 from io import StringIO
+from io import BytesIO
 
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
-from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value
+from arches.app.models.models import CardXNodeXWidget, Node, Resource2ResourceConstraint, FunctionXGraph, Value, GraphXPublishedGraph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
 from operator import itemgetter
@@ -137,8 +138,12 @@ def get_graphs_for_export(graphids=None):
             print('"{0}" contains/is not a valid graphid or option for this command.'.format(",".join(graphids)))
             print("*" * 80)
             sys.exit()
+    for resource_graph in resource_graphs:
+        resource_graph.refresh_from_database()
 
-    resource_graph_query = JSONSerializer().serializeToPython(resource_graphs, exclude=["widgets"])
+    resource_graph_query = JSONSerializer().serializeToPython(
+        resource_graphs, exclude=["widgets"], force_recalculation=True, use_raw_i18n_json=True
+    )
 
     for resource_graph in resource_graph_query:
         function_ids = []
@@ -150,9 +155,19 @@ def get_graphs_for_export(graphids=None):
         del resource_graph["functions"]
         del resource_graph["domain_connections"]
         resource_graph["cards_x_nodes_x_widgets"] = JSONSerializer().serializeToPython(
-            get_card_x_node_x_widget_data_for_export(resource_graph)
+            get_card_x_node_x_widget_data_for_export(resource_graph), use_raw_i18n_json=True
         )
         resource_graph["resource_2_resource_constraints"] = JSONSerializer().serializeToPython(r2r_constraints_for_export(resource_graph))
+
+        publication_id = resource_graph.get("publication_id")
+        publication = None
+
+        if publication_id:
+            publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphXPublishedGraph.objects.get(pk=publication_id)))
+
+        resource_graph["publication"] = publication
+        del resource_graph["publication_id"]
+
         graphs["graph"].append(resource_graph)
     return sort(graphs)
 
@@ -221,7 +236,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
                             for concept in node.config["options"]:
                                 concepts[concept["id"]] = concept["text"]
 
-                        values[node.name] = OrderedDict(sorted(list(concepts.items()), key=itemgetter(1)))
+                        values[node.name] = concepts.items()
 
         if include_concepts == True:
             try:
@@ -253,11 +268,8 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     files_for_export.append({"name": file_name, "outputfile": dest})
 
     if data_dir is not None:
-        with open(os.path.join(data_dir), "w") as config_file:
-            json.dump(export_json, config_file, indent=4)
-
         file_name = Graph.objects.get(graphid=graphid).name
-        buffer = StringIO()
+        buffer = BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
             for f in files_for_export:
                 f["outputfile"].seek(0)
@@ -267,7 +279,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
-        with open(os.path.join(data_dir), "w") as archive:
+        with open(os.path.join(data_dir, file_name + ".zip"), "wb") as archive:
             archive.write(zip_stream)
     else:
         return files_for_export

@@ -119,7 +119,10 @@ class SearchTests(ArchesTestCase):
         cls.date_resource.tiles.append(tile)
         tile = Tile(data={cls.search_model_destruction_date_nodeid: "1948-01-01"}, nodegroup_id=cls.search_model_destruction_date_nodeid)
         cls.date_resource.tiles.append(tile)
-        tile = Tile(data={cls.search_model_name_nodeid: "testing 123"}, nodegroup_id=cls.search_model_name_nodeid)
+        tile = Tile(
+            data={cls.search_model_name_nodeid: {"en": {"value": "testing 123", "direction": "ltr"}}},
+            nodegroup_id=cls.search_model_name_nodeid,
+        )
         cls.date_resource.tiles.append(tile)
         cls.date_resource.save()
 
@@ -133,7 +136,10 @@ class SearchTests(ArchesTestCase):
 
         # add resource instance with with no dates or periods defined
         cls.name_resource = Resource(graph_id=cls.search_model_graphid)
-        tile = Tile(data={cls.search_model_name_nodeid: "some test name"}, nodegroup_id=cls.search_model_name_nodeid)
+        tile = Tile(
+            data={cls.search_model_name_nodeid: {"en": {"value": "some test name", "direction": "ltr"}}},
+            nodegroup_id=cls.search_model_name_nodeid,
+        )
         cls.name_resource.tiles.append(tile)
         geom = {
             "type": "FeatureCollection",
@@ -149,6 +155,7 @@ class SearchTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
+        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
 
     def test_temporal_only_search_1(self):

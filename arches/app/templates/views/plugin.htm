@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-manager.htm" %}
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 
 {% block title %} {{ block.super }} {{ plugin.name }} {% endblock title %}
 
@@ -30,8 +30,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     }"></div>
 </div>
 {% endblock main_content %}
-
-{% block tabs %}{% endblock tabs %}
 
 {% block pre_require_js %}
 {{block.super}}

@@ -37,6 +37,7 @@ define([
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
+            viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
@@ -64,6 +65,7 @@ define([
                 
                 return shouldShowGraphPublishButtons;
             });
+            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -286,6 +288,7 @@ define([
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 graphModel: viewModel.graphModel
             });
 
@@ -293,6 +296,7 @@ define([
                 graph: viewModel.graph,
                 graphModel: viewModel.graphModel,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 multiselect: true
             });
 
@@ -326,6 +330,7 @@ define([
                 loading: viewModel.loading,
                 node: viewModel.selectedNode,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 
@@ -394,6 +399,7 @@ define([
                 cardTree: viewModel.cardTree,
                 permissionTree: viewModel.permissionTree,
                 appliedFunctions: viewModel.appliedFunctions,
+                primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 restrictedNodegroups: data.restrictedNodegroups
             });
 

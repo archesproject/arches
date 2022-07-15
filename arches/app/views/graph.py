@@ -37,8 +37,9 @@ from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.concept import Concept
+from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.system_settings import settings
-from arches.app.models.resource import PublishedModelError
+from arches.app.models.resource import PublishedModelError, UnpublishedModelError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
@@ -120,6 +121,8 @@ class GraphSettingsView(GraphBaseView):
         node.ontologyclass = data.get("ontology_class") if data.get("graph").get("ontology_id") is not None else None
         node.name = graph.name
         graph.root.name = node.name
+        if node.ontologyclass:
+            graph.root.ontologyclass = node.ontologyclass
 
         if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
@@ -174,9 +177,15 @@ class GraphDesignerView(GraphBaseView):
 
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
-        serialized_graph = self.graph.serialize()  # calling `serialize` directly returns a dict
+        serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
         datatypes = models.DDataType.objects.all()
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
+            function__functiontype="primarydescriptors"
+        )
+        primary_descriptor_function = JSONSerializer().serialize(
+            primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
+        )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         graph_models = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
@@ -214,6 +223,7 @@ class GraphDesignerView(GraphBaseView):
             map_markers=models.MapMarker.objects.all(),
             map_sources=models.MapSource.objects.all(),
             applied_functions=JSONSerializer().serialize(serialized_graph["functions"]),
+            primary_descriptor_function=primary_descriptor_function,
             geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
             restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
@@ -239,6 +249,7 @@ class GraphDesignerView(GraphBaseView):
             serialized_graph["_nodegroups_to_delete"] = None
         if serialized_graph.get("_functions"):
             serialized_graph["_functions"] = None
+
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
         context["nav"]["title"] = self.graph.name
@@ -259,9 +270,8 @@ class GraphDataView(View):
         if self.action == "export_graph":
             graph = get_graphs_for_export([graphid])
             graph["metadata"] = system_metadata()
+            graph_name = I18n_String(graph["graph"][0]["name"])
             f = JSONSerializer().serialize(graph, indent=4)
-            graph_name = JSONDeserializer().deserialize(f)["graph"][0]["name"]
-
             response = HttpResponse(f, content_type="json/plain")
             response["Content-Disposition"] = 'attachment; filename="%s.json"' % (graph_name)
             return response
@@ -282,7 +292,7 @@ class GraphDataView(View):
             buffer.close()
 
             response = HttpResponse()
-            response["Content-Disposition"] = "attachment; filename=" + file_name + ".zip"
+            response["Content-Disposition"] = "attachment; filename=" + str(file_name) + ".zip"
             response["Content-length"] = str(len(zip_stream))
             response["Content-Type"] = "application/zip"
             response.write(zip_stream)
@@ -406,7 +416,7 @@ class GraphDataView(View):
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
                 _(
-                    """If you want to change the datatype of an existing node.  
+                    """If you want to change the datatype of an existing node.
                     Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
                 ),
             )
@@ -464,7 +474,10 @@ class GraphPublicationView(View):
                 notes = data.get("notes")
 
             if self.action == "publish":
-                graph.publish(notes)
+                try:
+                    graph.publish(notes=notes, user=request.user)
+                except UnpublishedModelError as e:
+                    return JSONErrorResponse(e.title, e.message)
             elif self.action == "unpublish":
                 graph.unpublish()
         except Exception as e:

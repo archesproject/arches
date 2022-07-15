@@ -136,6 +136,10 @@ def search_terms(request):
     for index in ["terms", "concepts"]:
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
+
+        if lang != "*":
+            boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
+
         boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(
@@ -305,7 +309,7 @@ def search_results(request, returnDsl=False):
     search_results_object = {"query": Query(se)}
 
     try:
-        for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
+        for filter_type, querystring in list(request.GET.items()) + list(request.POST.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)

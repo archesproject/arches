@@ -16,12 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from arches.app.views.language import LanguageView
 from django.views.decorators.cache import cache_page
 from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
+from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -54,7 +56,6 @@ from arches.app.views.tile import TileData
 from arches.app.views.transaction import ReverseTransaction
 from arches.app.views.notifications import NotificationView
 from arches.app.views.map import MapLayerManagerView, TileserverProxyView
-from arches.app.views.mobile_survey import MobileSurveyManagerView, MobileSurveyResources, MobileSurveyDesignerView
 from arches.app.views.manifest_manager import ManifestManagerView
 from arches.app.views.manifest_manager import IIIFServerProxyView
 from arches.app.views.auth import (
@@ -68,6 +69,9 @@ from arches.app.views.auth import (
     PasswordResetView,
     PasswordResetConfirmView,
     Token,
+    TwoFactorAuthenticationLoginView,
+    TwoFactorAuthenticationSettingsView,
+    TwoFactorAuthenticationResetView,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
@@ -76,6 +80,7 @@ from django.views.decorators.cache import cache_page
 from django.contrib import admin
 
 admin.autodiscover()
+admin.site.login = LoginView.as_view()
 
 uuid_regex = settings.UUID_REGEX
 
@@ -203,6 +208,7 @@ urlpatterns = [
     url(r"^reorder_cards/", CardView.as_view(action="reorder_cards"), name="reorder_cards"),
     url(r"^node/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node"), name="node"),
     url(r"^nodegroup/", NodegroupView.as_view(action="exportable"), name="nodegroup"),
+    url(r"^language/", LanguageView.as_view(), name="language"),
     url(r"^node_layer/(?P<graphid>%s)$" % uuid_regex, GraphDataView.as_view(action="update_node_layer"), name="node_layer"),
     url(r"^widgets/(?P<template>[a-zA-Z_-]*)", main.widget, name="widgets"),
     url(r"^report-templates/(?P<template>[a-zA-Z_-]*)", main.report_templates, name="report-templates"),
@@ -223,24 +229,15 @@ urlpatterns = [
     url(r"^notifications/dismiss$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
     url(r"^notifications/get_types$", NotificationView.as_view(action="get_types"), name="get_notification_types"),
     url(r"^notifications/update_types$", NotificationView.as_view(action="update_types"), name="update_notification_types"),
-    url(r"^collector_manager/*", MobileSurveyManagerView.as_view(), name="collector_manager"),
-    url(r"^collector_designer/(?P<surveyid>%s)$" % uuid_regex, MobileSurveyDesignerView.as_view(), name="collector_designer"),
-    url(
-        r"^mobile_survey_resources/(?P<surveyid>%s)/resources$" % uuid_regex,
-        MobileSurveyResources.as_view(),
-        name="mobile_survey_resources",
-    ),
-    url(r"^couchdb/(?P<path>.*)$", api.CouchdbProxy.as_view()),
     url(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
-    url(r"^mobileprojects/(?:(?P<surveyid>%s))?$" % uuid_regex, api.Surveys.as_view(), name="mobileprojects"),
-    url(r"^sync/(?P<surveyid>%s|())$" % uuid_regex, api.Sync.as_view(), name="sync"),
-    url(r"^checksyncstatus/(?P<synclogid>%s|())$" % uuid_regex, api.CheckSyncStatus.as_view(), name="checksyncstatus"),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
+    url(r"^graphs", api.Graphs.as_view(action="get_graph_models"), name="get_graph_models_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     url(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
     url(r"^api/nodes/(?P<nodeid>%s|())$" % (uuid_regex), api.Node.as_view(), name="api_nodes"),
+    url(r"^api/nodegroup/(?P<nodegroupid>%s|())$" % (uuid_regex), api.NodeGroup.as_view(), name="api_nodegroup"),
     url(r"^api/instance_permissions/$", api.InstancePermission.as_view(), name="api_instance_permissions"),
     url(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     url(r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex), api.ResourceReport.as_view(), name="api_resource_report"),
@@ -294,13 +291,16 @@ urlpatterns = [
     url(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     url(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     url(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
+    url(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
+    url(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
+    url(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
+    url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
+    url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
 ]
 
 if settings.DEBUG:
     try:
-        import debug_toolbar
-
-        urlpatterns = [url(r"^__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns += [url("silk/", include("silk.urls", namespace="silk"))]
     except:
         pass

@@ -233,7 +233,7 @@ def get_createable_resource_types(user):
 
 def get_resource_types_by_perm(user, perms):
     """
-    returns a list of graphs for which a user has specific node permissions
+    returns a list of graphs for which a user has specific nodegroup permissions
 
     Arguments:
     user -- the user to check

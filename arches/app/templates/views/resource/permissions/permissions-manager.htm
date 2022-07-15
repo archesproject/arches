@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 {% load template_tags %}
 <div id="related-resources-drag-panel" style="height: calc(100vh - 102px);" class="search-container related-resources-container">
@@ -19,7 +19,7 @@
             <div class="rr-splash-title">{% trans "Resource Instance Permissions" %}</div>
 
 
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}">{% trans 'Configure Access to this Instance' %}</button>
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}"><span>{% trans 'Configure Access to this Instance' %}</span></button>
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">{% trans "Define access privileges for this instance.  You may limit access to yourself, or select which user accounts and groups have permission to this resource." %}</div>
@@ -35,9 +35,9 @@
                 <h5>{% trans 'By default only you have access to this record. You can set permissions for specific people or groups by selecting to whom you will grant access' %}</h5>
             </div>
             <div class="permission-control">
-                <div class="permission-filter">
-                <input type="text" class="form-control" style="display:inline-block;" placeholder="filter table" data-bind="textInput: filter">
-                <div class="clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></div>
+                <div class="list-filter">
+                    <input type="text" class="form-control" style="width: 250px;" placeholder="filter table" data-bind="textInput: filter">
+                    <div class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></div>
                 </div>
             </div>
             <div class="permission-list">
@@ -95,12 +95,12 @@
             </div>
             </div>
             <div class="permissions-buttons mar-btm">
-                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: function(){revertPermissions()}, css: {'disabled': !dirty()}">{% trans 'Cancel' %}
+                <button id="cc-delete-btn" class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times mar-rgt" data-bind="click: function(){revertPermissions()}, css: {'disabled': !dirty()}"><span>{% trans 'Cancel' %}</span>
                 </button>
-                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: function(){updatePermissions()}, css: {'disabled': !dirty()}">{% trans 'Apply' %}</button>
+                <button id="cc-save-btn" class="btn btn-shim btn-primary btn-labeled btn-lg fa fa-check" data-bind="click: function(){updatePermissions()}, css: {'disabled': !dirty()}"><span>{% trans 'Apply' %}</span></button>
             </div>
             <div class="remove-permissions-btn mar-btm" style="align-self: end">
-            <button id="cc-save-btn" class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-unlock" data-bind="click: function(){makeInstancePublic()}">{% trans 'Allow Normal Access' %}</button>
+            <button id="cc-save-btn" class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-unlock" data-bind="click: function(){makeInstancePublic()}"><span>{% trans 'Allow Normal Access' %}</span></button>
         </div>
         </div>
 

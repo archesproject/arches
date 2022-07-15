@@ -1,3 +1,5 @@
+from typing import Iterable
+import uuid
 import django
 
 django.setup()
@@ -82,6 +84,96 @@ def index_resources(
     )
 
 
+def index_resources_using_multiprocessing(
+    resourceids, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, max_subprocesses=0, callback=None
+):
+    try:
+        multiprocessing.set_start_method("spawn")
+    except:
+        pass
+
+    logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
+    resource_batches = []
+    resource_count = 0
+    batch_number = 0
+    resource_batches.append([])
+
+    for resource in resourceids:
+        resource_count += 1
+        resource_batches[batch_number].append(resource)
+        if resource_count == batch_size:
+            resource_batches.append([])
+            batch_number += 1
+            resource_count = 0
+
+    connections.close_all()
+
+    if quiet is False:
+        bar = pyprind.ProgBar(len(resource_batches), bar_char="█", stream=sys.stdout) if len(resource_batches) > 1 else None
+
+    def process_complete_callback(result):
+        if quiet is False and bar is not None:
+            bar.update(item_id=result)
+        if callback is not None:
+            callback()
+
+    def process_error_callback(err):
+        import traceback
+
+        if quiet is False and bar is not None:
+            bar.update()
+        try:
+            raise err
+        except:
+            tb = traceback.format_exc()
+        finally:
+            logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
+
+    default_process_count = math.ceil(multiprocessing.cpu_count() / 2)
+    if max_subprocesses == 0:
+        process_count = default_process_count
+    elif max_subprocesses > multiprocessing.cpu_count():
+        process_count = multiprocessing.cpu_count()
+        logger.debug(f"... max_subprocess count exceeds CPU count. Limiting to {process_count}")
+    else:
+        process_count = max_subprocesses
+
+    logger.debug(f"... multiprocessing process count: {process_count}")
+    logger.debug(f"... resource type batch count (batch size={batch_size}): {len(resource_batches)}")
+    with multiprocessing.Pool(processes=process_count) as pool:
+        for resource_batch in resource_batches:
+            pool.apply_async(
+                _index_resource_batch,
+                args=(resource_batch,),
+                callback=process_complete_callback,
+                error_callback=process_error_callback,
+            )
+        pool.close()
+        pool.join()
+
+
+def index_resources_using_singleprocessing(
+    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None
+):
+    datatype_factory = DataTypeFactory()
+    node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+    with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
+        with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
+            if quiet is False:
+                bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
+            for resource in resources:
+                if quiet is False and bar is not None:
+                    bar.update(item_id=resource)
+                document, terms = resource.get_documents_to_index(
+                    fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+                )
+                resource.save(index=False)
+                doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
+                for term in terms:
+                    term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+
+    return os.getpid()
+
 def index_resources_by_type(
     resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
 ):
@@ -129,88 +221,18 @@ def index_resources_by_type(
             rq.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
-            try:
-                multiprocessing.set_start_method("spawn")
-            except:
-                pass
-
-            logger.debug(f"... multiprocessing method: {multiprocessing.get_start_method()}")
             resources = [
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
             ]
-            resource_batches = []
-            resource_count = 0
-            batch_number = 0
-            resource_batches.append([])
-
-            for resource in resources:
-                resource_count += 1
-                resource_batches[batch_number].append(resource)
-                if resource_count == batch_size:
-                    resource_batches.append([])
-                    batch_number += 1
-                    resource_count = 0
-
-            connections.close_all()
-
-            if quiet is False:
-                bar = pyprind.ProgBar(len(resource_batches), bar_char="█", stream=sys.stdout) if len(resource_batches) > 1 else None
-
-            def process_complete_callback(result):
-                if quiet is False and bar is not None:
-                    bar.update(item_id=result)
-
-            def process_error_callback(err):
-                import traceback
-
-                if quiet is False and bar is not None:
-                    bar.update()
-                try:
-                    raise err
-                except:
-                    tb = traceback.format_exc()
-                finally:
-                    logger.error(f"Error indexing resource batch, type {type(err)}, message: {err}, \n>>>>>>>>>>>>>> TRACEBACK: {tb}")
-
-            default_process_count = math.ceil(multiprocessing.cpu_count() / 2)
-            if max_subprocesses == 0:
-                process_count = default_process_count
-            elif max_subprocesses > multiprocessing.cpu_count():
-                process_count = multiprocessing.cpu_count()
-                logger.debug(f"... max_subprocess count exceeds CPU count. Limiting to {process_count}")
-            else:
-                process_count = max_subprocesses
-
-            logger.debug(f"... multiprocessing process count: {process_count}")
-            logger.debug(f"... resource type batch count (batch size={batch_size}): {len(resource_batches)}")
-            with multiprocessing.Pool(processes=process_count) as pool:
-                for resource_batch in resource_batches:
-                    pool.apply_async(
-                        _index_resource_batch,
-                        args=(resource_batch,),
-                        callback=process_complete_callback,
-                        error_callback=process_error_callback,
-                    )
-                pool.close()
-                pool.join()
+            index_resources_using_multiprocessing(
+                resourceids=resources, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses
+            )
 
         else:
+            from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+
             resources = Resource.objects.filter(graph_id=str(resource_type))
-            datatype_factory = DataTypeFactory()
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-            with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-                with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
-                    if quiet is False:
-                        bar = pyprind.ProgBar(len(resources), bar_char="█", title=graph_name) if len(resources) > 1 else None
-                    for resource in resources:
-                        if quiet is False and bar is not None:
-                            bar.update(item_id=resource)
-                        document, terms = resource.get_documents_to_index(
-                            fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                        )
-                        doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
-                        for term in terms:
-                            term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title=graph_name)
 
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
@@ -230,20 +252,7 @@ def _index_resource_batch(resourceids):
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    datatype_factory = DataTypeFactory()
-    node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
-
-    with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as doc_indexer:
-        with _se.BulkIndexer(batch_size=batch_size, refresh=True, timeout=30, max_retries=10, retry_on_timeout=True) as term_indexer:
-            for resource in resources:
-                document, terms = resource.get_documents_to_index(
-                    fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
-                )
-                doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
-                for term in terms:
-                    term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
-
-    return os.getpid()
+    return index_resources_using_singleprocessing(resources, batch_size, quiet=True, se=_se)
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
@@ -420,4 +429,46 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
         "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
             "Passed" if concept_count_in_db == index_count else "Failed", concept_count_in_db, index_count, (datetime.now() - start).seconds
         )
+    )
+
+
+def index_resources_by_transaction(
+    transaction_id, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
+):
+    """
+    Indexes all the resources with a transaction id
+
+    Keyword Arguments:
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
+
+    """
+    start = datetime.now()
+
+    try:
+        uuid.UUID(transaction_id)
+    except ValueError:
+        logger.error("A transaction id must be a valid uuid")
+        return
+
+    logger.info("Indexing transaction '{0}'".format(transaction_id))
+
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT resourceinstanceid FROM edit_log WHERE transactionid = %s AND edittype = 'create';""", [transaction_id])
+        rows = cursor.fetchall()
+    resourceids = [id for (id,) in rows]
+
+    if use_multiprocessing:
+        index_resources_using_multiprocessing(
+            resourceids=resourceids, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses
+        )
+    else:
+        index_resources_using_singleprocessing(
+            resources=Resource.objects.filter(pk__in=resourceids),
+            batch_size=batch_size,
+            quiet=quiet,
+            title="transaction {}".format(transaction_id),
+        )
+
+    logger.info(
+        "Transaction: {0}, In Database: {1}, Took: {2} seconds".format(transaction_id, len(resourceids), (datetime.now() - start).seconds)
     )

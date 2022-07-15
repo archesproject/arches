@@ -14,6 +14,7 @@ from os.path import isfile, join
 from django.core import management
 from multiprocessing import Pool, TimeoutError, cpu_count
 import django
+from django.db.models.expressions import F
 
 # django.setup() must be called here to prepare for multiprocessing. specifically,
 # it must be called before any models are imported, otherwise things will crash
@@ -23,7 +24,7 @@ django.setup()
 from django.db import connection, connections
 from django.contrib.gis.gdal import DataSource
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import DDataType, ResourceXResource, ResourceInstance
+from arches.app.models.models import DDataType, Language, ResourceXResource, ResourceInstance
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.setup import unzip_file
@@ -151,6 +152,28 @@ class BusinessDataImporter(object):
             else:
                 print(path + " is not a valid path")
 
+    def scan_for_new_languages(self, business_data=None, reader=None):
+        file_reader = reader
+        data = business_data
+        if file_reader is None:
+            file_reader = self.get_reader()
+        if data is None:
+            data = self.business_data
+        if file_reader is not None and data is not None:
+            language_list = file_reader.scan_for_new_languages(business_data=data)
+            if language_list is not None:
+                return list(set(language_list))
+
+        return []
+
+    def get_reader(self, file_format=None):
+        if file_format is None:
+            file_format = self.file_format
+        if file_format == "json" or file_format == "jsonl":
+            return ArchesFileReader()
+        elif file_format == "csv" or file_format == "shp" or file_format == "zip":
+            return CsvReader()
+
     def import_business_data(
         self,
         file_format=None,
@@ -164,7 +187,6 @@ class BusinessDataImporter(object):
         prevent_indexing=False,
         transaction_id=None,
     ):
-        reader = None
         start = time()
         cursor = connection.cursor()
 
@@ -175,8 +197,10 @@ class BusinessDataImporter(object):
                 business_data = self.business_data
             if mapping is None:
                 mapping = self.mapping
+
+            reader = self.get_reader(file_format)
+
             if file_format == "json":
-                reader = ArchesFileReader()
                 reader.import_business_data(
                     business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id
                 )
@@ -187,9 +211,7 @@ class BusinessDataImporter(object):
                         pool = Pool(cpu_count())
                         pool.map(import_one_resource, lines, prevent_indexing=prevent_indexing)
                         connections.close_all()
-                        reader = ArchesFileReader()
                     else:
-                        reader = ArchesFileReader()
                         for line in lines:
                             archesresource = JSONDeserializer().deserialize(line)
                             reader.import_business_data(
@@ -200,7 +222,6 @@ class BusinessDataImporter(object):
                             )
             elif file_format == "csv" or file_format == "shp" or file_format == "zip":
                 if mapping is not None:
-                    reader = CsvReader()
                     reader.import_business_data(
                         business_data=business_data,
                         mapping=mapping,

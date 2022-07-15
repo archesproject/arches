@@ -156,10 +156,6 @@ class GraphTests(ArchesTestCase):
         }
         models.Edge.objects.create(**edges_dict).save()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
-
     def setUp(self):
         graph = Graph.new()
         graph.name = "TEST GRAPH"
@@ -170,11 +166,11 @@ class GraphTests(ArchesTestCase):
         graph.version = "v1.0.0"
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
+        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.save()
 
         graph.root.name = "ROOT NODE"
         graph.root.description = "Test Root Node"
-        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.root.datatype = "semantic"
         graph.root.save()
 

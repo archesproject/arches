@@ -1,5 +1,6 @@
 {% extends "views/components/workbench.htm" %}
-{% load staticfiles %}
+{% load static %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -28,15 +29,17 @@
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Image Tools" %}</h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
 <div class="iiif-image-tools">
-    <div class="layout">
+    <div data-bind="if: showModeSelector" class="layout">
         <div>Panel Layout</div>
         <div class="mode-selector">
-            <div data-bind="click: function(){ compareMode(false) }, css: { selected: !compareMode() }">
+            <div data-bind="click: function(){ compareMode(false); return true; }, css: { selected: !compareMode() }">
                 <div class="selector-button"></div>
                 <input name="panelGroup" value="single" type="radio" data-bind="checked: panelRadio"> Single Panel
             </div>
-            <div data-bind="click: function(){ compareMode(true) }, css: { selected: compareMode() }">
+            <div data-bind="click: function(){ compareMode(true); return true; }, css: { selected: compareMode() }">
                 <div>
                     <div class="selector-button"></div>
                     <div class="selector-button"></div>
@@ -58,7 +61,7 @@
         </div>
     </div>
 
-    <div style="width: 96%; margin: 20px 0px;">
+    <div data-bind="if: showModeSelector" style="width: 96%; margin: 20px 0px;">
         <input class="form-control input-lg widget-input"
             data-bind="value: imageToolSelector,
             select2Query: {
@@ -116,8 +119,9 @@
     </div>
 
     <div class="install-buttons">
-        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings">{% trans 'Reset to defaults' %}</button>
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: resetImageSettings"><span>{% trans 'Reset to defaults' %}</span></button>
     </div>
+</div>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'annotations' -->
@@ -126,6 +130,8 @@
         {% trans "Annotation Overlays" %}
     </h4>
 </div>
+<div class="workbench-card-sidepanel-border"></div>
+<div class="workbench-card-sidepanel-body">
 <div class="overlays-listing-container" data-bind="sortable: {
     data: annotationNodes
 }">
@@ -145,6 +151,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <!--/ko -->
 {% endblock sidepanel %}
@@ -250,11 +257,13 @@
     }">
     <!--ko if: showGallery() -->
     <div class="iiif-gallery-content">
+
+        <!--ko if: manifestData() -->
         <div class="panel-controls">
             <div class="hide-gallery-control" data-bind="click: toggleGallery">
                 <span>{% trans "Hide Gallery" %}</span>
             </div>
-            <div class="mode-selector">
+            <div data-bind="if: showModeSelector"  class="mode-selector">
                 <div>Panels</div>
                 <div class="mode-selector-buttons" >
                     <div class="single-panel" data-bind="click: function(){compareMode(false)}, css: {selected: !compareMode()}">
@@ -271,6 +280,7 @@
                 </div>
             </div>
         </div>
+        <!--/ko -->
         <!--ko if: expandGallery() && manifestData() -->
         <div class="manifest-details">
             <h3>
@@ -309,9 +319,9 @@
                 <button class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-pencil" data-bind="click: getManifestData,
                     disabled: manifestLoading(),
                     css: { 'disabled': manifestLoading() }
-                ">{% trans 'Load manifest' %}</button>
+                "><span>{% trans 'Load manifest' %}</span></button>
                 <!--ko if: manifestData() -->
-                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor">{% trans 'Cancel' %}</button>
+                <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-refresh" data-bind="click: toggleManifestEditor"><span>{% trans 'Cancel' %}</span></button>
                 <!--/ko -->
                 <!--ko if: manifestLoading() -->
                 <span class="manifest-editor-loading">
@@ -319,6 +329,7 @@
                 </span>
                 <!--/ko -->
                 <!--ko if: manifestError() -->
+                <span data-bind="text: console.log(manifestError())"></span>
                 <span class="manifest-editor-error">
                     {% trans "Error loading manifest..." %}
                 </span>
@@ -340,7 +351,7 @@
                     <div style="display: flex; align-items: center">
                         {% block gallery_header %}
                         <div>
-                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : '{% trans "No manifest selected..." %}'"></span>
+                            <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : {% quoted_trans "No manifest selected..." %}"></span>
                         </div>
                         <div>
                             <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
@@ -385,15 +396,7 @@
                                     <img data-bind="attr: { src: $data.thumbnail || '{% static 'img/photo_missing.png' %}', title: $data.label}">
                                 </div>
                                 <div style="text-align:center;" class="iiif-gallery-canvas-label">
-                                    <!--ko if: getCanvasService($data) === selectedCanvas() && $parent.selectPrimaryPanel()  -->
-                                    <span data-bind="text: $parent.canvasLabel"></span>
-                                    <!--/ko -->
-                                    <!--ko if: getCanvasService($data) === selectedCanvas() && !$parent.selectPrimaryPanel() -->
-                                    <span data-bind="text: $parent.secondaryLabel"></span>
-                                    <!--/ko -->   
-                                    <!--ko ifnot: getCanvasService($data) === selectedCanvas() -->
                                     <span data-bind="text: label"></span>
-                                    <!--/ko -->                                
                                     <span class="annotation-count">
                                         <!--ko if: getAnnotationCount(getCanvasService($data)) -->
                                         <span data-bind="text: getAnnotationCount(getCanvasService($data))"></span> {% trans "Annotation(s)" %}

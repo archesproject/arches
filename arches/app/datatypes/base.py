@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
+        self.datatype_name = model.datatype if model else None
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         """
         Used to validate data in a node of given datatype
 
@@ -35,7 +36,7 @@ class BaseDataType(object):
         source_info = "{0} {1}".format(source, row_number) if row_number else ""
         error_message = {
             "type": "ERROR",
-            "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_model.datatype, value, source_info, message),
+            "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_name, value, source_info, message),
         }
         return error_message
 
@@ -79,12 +80,6 @@ class BaseDataType(object):
     def get_bounds(self, tile, node):
         """
         Gets the bounds of a geometry if the datatype is spatial
-        """
-        return None
-
-    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
-        """
-        Transforms data from a mobile device to an Arches friendly format
         """
         return None
 
@@ -222,7 +217,7 @@ class BaseDataType(object):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
-        Returns a nodevalue if it qualifies as a search term
+        Returns an array of arches.app.search_term.SearchTerm objects
         """
         return []
 
@@ -295,6 +290,12 @@ class BaseDataType(object):
         """
         pass
 
+    def get_first_language_value_from_node(self, tile, nodeid):
+        """
+        If value is internationalized, return only the first value in the i18n object
+        """
+        return tile.data[str(nodeid)]
+
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
@@ -308,6 +309,12 @@ class BaseDataType(object):
 
         """
         pass
+
+    def is_multilingual_rdf(self, rdf):
+        """
+        Determines if the rdf snippet contains multiple languages that can be processed by a given datatype
+        """
+        return False
 
     def is_a_literal_in_rdf(self):
         """
@@ -434,3 +441,16 @@ class BaseDataType(object):
         ret = {"@display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
+
+    def has_multicolumn_data(self):
+        """
+        Used primarily for csv exports - true if data
+        for a node can span multiple columns
+        """
+        return False
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        return node["file_field_name"]

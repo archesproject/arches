@@ -4,11 +4,10 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'mapbox-gl',
-    'mapbox-gl-geocoder',
-    'text!templates/views/components/map-popup.htm'
-], function($, _, arches, ko, koMapping, mapboxgl, MapboxGeocoder, popupTemplate) {
-    var viewModel = function(params) {
+    'utils/map-popup-provider'
+], function($, _, arches, ko, koMapping, mapPopupProvider) {
+    const viewModel = function(params) {
+
         var self = this;
 
         var geojsonSourceFactory = function() {
@@ -42,13 +41,13 @@ define([
 
             if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
                 var center = map.getCenter();
-            
+
                 lng = parseFloat(params.x());
                 lat = parseFloat(params.y());
-                
+
                 if (lng) { center.lng = lng; }
                 if (lat) { center.lat = lat; }
-    
+
                 map.setCenter(center);
             }
 
@@ -78,7 +77,7 @@ define([
             if (lng && self.map()) {
                 var center = self.map().getCenter();
                 center.lng = lng;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.x) && params.x() !== lng) {
@@ -91,14 +90,14 @@ define([
             if (lat && self.map()) {
                 var center = self.map().getCenter();
                 center.lat = lat;
-            
+
                 self.map().setCenter(center);
             }
             if (ko.isObservable(params.y) && params.y() !== lat) {
                 params.y(lat);
             }
         });
-        
+
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
             if (level && self.map()) { self.map().setZoom(level) };
@@ -114,7 +113,7 @@ define([
                 params.overlayConfigs(overlayConfigs)
             }
         })
-        
+
         this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
@@ -128,10 +127,10 @@ define([
             "search-results-hashes": geojsonSourceFactory(),
             "search-results-points": geojsonSourceFactory()
         }, arches.mapSources, params.sources);
-        
+
         this.basemaps = params.basemaps || [];
         this.overlays = params.overlaysObservable || ko.observableArray();
-        
+
         var mapLayers = params.mapLayers || arches.mapLayers;
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -146,7 +145,7 @@ define([
                         layer.opacity(value ? 100 : 0);
                     }
                 });
-                
+
                 layer.updateParent = function(parent) {
                     if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
                         self.overlayConfigs.push(layer.maplayerid)
@@ -155,7 +154,7 @@ define([
                         self.overlayConfigs.remove(layer.maplayerid);
                         layer.opacity(0)
                     }
-                    
+
                     if (parent !== self) {
                         parent.overlayConfigs(self.overlayConfigs())
 
@@ -172,7 +171,7 @@ define([
                 self.overlays.push(layer);
             }
         });
-        
+
         if (!self.activeBasemap()) {
             var basemap = ko.unwrap(self.basemaps).find(function(basemap) {
                 return ko.unwrap(params.basemap) === basemap.name;
@@ -328,10 +327,6 @@ define([
             }
         };
 
-        this.isFeatureClickable = function(feature) {
-            return feature.properties.resourceinstanceid;
-        };
-
         this.expandSidePanel = function() {
             return false;
         };
@@ -432,24 +427,28 @@ define([
             };
         };
 
-        this.popupTemplate = popupTemplate;
-        this.onFeatureClick = function(features, lngLat) {
+        this.onFeatureClick = function(features, lngLat, MapboxGl) {
+            const popupTemplate = this.popupTemplate ? this.popupTemplate : mapPopupProvider.getPopupTemplate(features);
             const map = self.map();
             const mapStyle = map.getStyle();
-            self.popup = new mapboxgl.Popup()
+            self.popup = new MapboxGl.Popup()
                 .setLngLat(lngLat)
-                .setHTML(self.popupTemplate)
+                .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                self.getPopupData(features),
+                mapPopupProvider.processData(self.getPopupData(features)),
                 self.popup._content
             );
             features.forEach(feature=>{
                 if (mapStyle && feature.id) map.setFeatureState(feature, { selected: true });
                 self.popup.on('close', function() {
                     if (mapStyle && feature.id) {
-                        map.setFeatureState(feature, { selected: false });
-                        map.setFeatureState(feature, { hover: false });
+                        try {
+                            map.setFeatureState(feature, { selected: false });
+                            map.setFeatureState(feature, { hover: false });
+                        } catch(e){
+                            // catch TypeError which occurs when map is destroyed while popup open.
+                        }
                     }
                     self.popup = undefined;
                 });
@@ -458,67 +457,71 @@ define([
 
         this.setupMap = function(map) {
             map.on('load', function() {
-                map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-                map.addControl(new mapboxgl.FullscreenControl({
-                    container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
-                }), 'top-left');
-                map.addControl(new MapboxGeocoder({
-                    accessToken: mapboxgl.accessToken,
-                    mapboxgl: mapboxgl,
-                    placeholder: arches.geocoderPlaceHolder,
-                    bbox: arches.hexBinBounds
-                }), 'top-right');
+                require(['mapbox-gl', 'mapbox-gl-geocoder'], function(MapboxGl, MapboxGeocoder) {
+                    map.addControl(new MapboxGl.NavigationControl(), 'top-left');
+                    map.addControl(new MapboxGl.FullscreenControl({
+                        container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
+                    }), 'top-left');
+                    map.addControl(new MapboxGeocoder({
+                        accessToken: MapboxGl.accessToken,
+                        mapboxgl: MapboxGl,
+                        placeholder: arches.geocoderPlaceHolder,
+                        bbox: arches.hexBinBounds
+                    }), 'top-right');
 
-                self.layers.subscribe(self.updateLayers);
+                    self.layers.subscribe(self.updateLayers);
 
-                var hoverFeature;
+                    var hoverFeature;
 
-                map.on('mousemove', function(e) {
-                    var style = map.getStyle();
-                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
-                    hoverFeature = _.find(
-                        map.queryRenderedFeatures(e.point),
-                        self.isFeatureClickable
-                    );
-                    if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
+                    map.on('mousemove', function(e) {
+                        var style = map.getStyle();
+                        if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: false });
+                        hoverFeature = _.find(
+                            map.queryRenderedFeatures(e.point),
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
+                        );
+                        if (hoverFeature && hoverFeature.id && style) map.setFeatureState(hoverFeature, { hover: true });
 
-                    map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
-                    if (self.map().draw_mode) {
-                        var crosshairModes = [
-                            "draw_point",
-                            "draw_line_string",
-                            "draw_polygon",
-                        ];
-                        map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
-                    }
+                        map.getCanvas().style.cursor = hoverFeature ? 'pointer' : '';
+                        if (self.map().draw_mode) {
+                            var crosshairModes = [
+                                "draw_point",
+                                "draw_line_string",
+                                "draw_polygon",
+                            ];
+                            map.getCanvas().style.cursor = crosshairModes.includes(self.map().draw_mode) ? "crosshair" : "";
+                        }
+                    });
+
+                    map.draw_mode = null;
+
+
+                    map.on('click', function(e) {
+                        const popupFeatures = _.filter(
+                            map.queryRenderedFeatures(e.point),
+                            feature => mapPopupProvider.isFeatureClickable(feature, self)
+                        );
+                        if (popupFeatures.length) {
+                            self.onFeatureClick(popupFeatures, e.lngLat, MapboxGl);
+                        }
+                    });
+
+
+                    map.on('zoomend', function() {
+                        self.zoom(
+                            parseFloat(map.getZoom())
+                        );
+                    });
+
+                    map.on('dragend', function() {
+                        var center = map.getCenter();
+
+                        self.centerX(parseFloat(center.lng));
+                        self.centerY(parseFloat(center.lat));
+                    });
+
+                    self.map(map);
                 });
-
-                map.draw_mode = null;
-
-                map.on('click', function(e) {
-                    const popupFeatures = _.filter(
-                        map.queryRenderedFeatures(e.point),
-                        self.isFeatureClickable
-                    );
-                    if (popupFeatures.length) {
-                        self.onFeatureClick(popupFeatures, e.lngLat);
-                    }
-                });
-
-                map.on('zoomend', function() {
-                    self.zoom(
-                        parseFloat(map.getZoom())
-                    );
-                });
-
-                map.on('dragend', function() {
-                    var center = map.getCenter();
-                    
-                    self.centerX(parseFloat(center.lng));
-                    self.centerY(parseFloat(center.lat));
-                });
-
-                self.map(map);
             });
         };
     };

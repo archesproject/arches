@@ -1,6 +1,6 @@
-from __future__ import absolute_import, unicode_literals
 import os
 import logging
+import shutil
 from celery import shared_task
 from datetime import datetime
 from datetime import timedelta
@@ -22,7 +22,6 @@ def delete_file():
     settings.update_from_db()
 
     logger = logging.getLogger(__name__)
-    now = datetime.timestamp(datetime.now())
     file_list = []
     range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
@@ -37,17 +36,6 @@ def delete_file():
 @shared_task
 def message(arg):
     return arg
-
-
-@shared_task(bind=True)
-def sync(self, surveyid=None, userid=None, synclogid=None):
-    from arches.app.models.mobile_survey import MobileSurvey
-
-    create_user_task_record(self.request.id, self.name, userid)
-    survey = MobileSurvey.objects.get(id=surveyid)
-    survey._sync(synclogid, userid)
-    response = {"taskid": self.request.id}
-    return response
 
 
 @shared_task(bind=True)
@@ -203,6 +191,42 @@ def on_chord_error(request, exc, traceback):
     msg = f"Package Load erred on import_business_data. Exception: {exc}. See logs for details."
     user = User.objects.get(id=1)
     notify_completion(msg, user)
+
+
+@shared_task
+def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_csv_importer
+
+    BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+
+    load_event = models.LoadEvent.objects.get(loadid=loadid)
+    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
+    msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+    user = User.objects.get(id=userid)
+    notify_completion(msg, user)
+
+
+@shared_task
+def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    from arches.app.etl_modules import import_single_csv
+
+    ImportSingleCsv = import_single_csv.ImportSingleCsv()
+    ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+    load_event = models.LoadEvent.objects.get(loadid=loadid)
+    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
+    msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
+    user = User.objects.get(id=userid)
+    notify_completion(msg, user)
+
+
+@shared_task
+def reverse_etl_load(loadid):
+    from arches.app.etl_modules import base_import_module
+
+    module = base_import_module.BaseImportModule()
+    module.reverse_load(loadid)
 
 
 def create_user_task_record(taskid, taskname, userid):

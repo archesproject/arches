@@ -18,9 +18,11 @@
     <div class="workbench-card-sidepanel-header-container">
         <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: card.model.name"></h4>
     </div>
+    <div class="workbench-card-sidepanel-border"></div>
 
-
-    <div style="margin: 70px 10px 0px;">
+    <div class="workbench-card-sidepanel-body">
+    <!-- ko if: !self.coordinateEditing() -->
+    <div style="margin: 10px 10px 0px;">
         <div class='control-label widget-input-label'>{% trans "Participating Layers" %}</div>
         <!-- ko foreach: {data: self.nodeDetails, as: 'nodeInfo'} -->
         <div data-bind="css: {'active-overlay': self.filterNodeIds.indexOf(nodeInfo.nodeid) > -1}">
@@ -37,8 +39,9 @@
         </div>
         <!-- /ko -->
     </div>
+    <!-- /ko -->
 
-    <div data-bind="css: card.model.cssclass" style="height: calc(100% - 80px)">
+    <div data-bind="css: card.model.cssclass">
         {% block additional_content %}
         {% endblock additional_content %}
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
@@ -68,7 +71,7 @@
                     <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
                     <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                             provisionalTileViewModel.deleteAllProvisionalEdits();
-                        }">{% trans 'Delete all edits' %}</div>
+                        }"><span>{% trans 'Delete all edits' %}</span></div>
                 </div>
                 <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
                 <div class='new-provisional-edit-entry' data-bind="css: {
@@ -104,10 +107,10 @@
                 <div class="display-in-workflow-step install-buttons">
                     <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
                         geoJSONString(undefined);
-                    }">{% trans 'Cancel' %}</button>
+                    }"><span>{% trans 'Cancel' %}</span></button>
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
-                    }, click: updateGeoJSON">{% trans 'Update Features' %}</button>
+                    }, click: updateGeoJSON"><span>{% trans 'Update Features' %}</span></button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
                 <div class="geojson-error-list">
@@ -172,14 +175,10 @@
                         <!-- /ko -->
                     <!-- /ko -->
                 </div>
-
-                <div class="display-in-workflow-step install-buttons">
-                    <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-                        showRelatedQuery(false);
-                    }">{% trans 'Close' %}</button>
-                </div>
             </div>
             <!-- /ko-->
+            
+            {% include 'views/components/coordinate-editor.htm' %}
 
             <div class="card" style="padding-top: 45px;" data-bind="visible: geoJSONString() === undefined && showRelatedQuery() === false">
                 {% block form_header %}
@@ -286,6 +285,20 @@
                                                 {% trans "Find" %}
                                             </a>
                                             |
+                                            <!-- ko if: self.canEditCoordinates() -->
+                                                <a href="javascript:void(0);" data-bind="click: function() {
+                                                    self.coordinateEditing(true);
+                                                }">
+                                                    <i class="fa fa-list map-card-feature-edit"></i>
+                                                    {% trans "Edit Coordinates" %}
+                                                </a>
+                                                <!-- /ko -->
+                                                <!-- ko if: !self.canEditCoordinates() -->
+                                                    <span>
+                                                        <i class="fa fa-list map-card-feature-edit"></i>
+                                                        {% trans "Edit Coordinates" %}
+                                                    </span>
+                                                <!-- /ko -->
                                             <!--/ko-->
                                             <a href="javascript:void(0);" data-bind="click: function() {
                                                 self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
@@ -318,24 +331,24 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-warning': card.isWritable
-                    }">{% trans 'Delete' %}</button>
+                    }"><span>{% trans 'Delete' %}</span></button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset"><span>{% trans 'Cancel' %}</span></button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: (!card.isWritable && !self.preview),
                             'btn-mint': card.isWritable
-                        }">{% trans 'Save' %}</button>
+                        }"><span>{% trans 'Save' %}</span></button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                         disabled: (!card.isWritable && !self.preview),
                         'btn-mint': card.isWritable
-                    }">{% trans 'Add'  %}</button>
+                    }"><span>{% trans 'Add'  %}</span></button>
                     <!-- /ko -->
                 </div>
                 {% endblock form_buttons %}
@@ -361,6 +374,14 @@
             </div>
         </div>
     </div>
+</div>
+<!-- ko if: showRelatedQuery() -->
+<div class="display-in-workflow-step">
+    <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: function () {
+        showRelatedQuery(false);
+    }">{% trans 'Done' %}</button>
+</div>
+<!--/ko -->
 <!--/ko -->
 {{ block.super }}
 {% endblock sidepanel %}
