@@ -844,9 +844,6 @@ class Command(BaseCommand):
         def load_etl_modules(package_dir):
             load_extensions(package_dir, "etl_modules", "etl_module")
 
-        def cache_graphs():
-            management.call_command("cache", operation="graphs")
-
         def update_resource_geojson_geometries():
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM refresh_geojson_geometries();")

@@ -1632,8 +1632,9 @@ class BaseDomainDataType(BaseDataType):
     def is_a_literal_in_rdf(self):
         return True
 
-    def lookup_domainid_by_value(self, value, nodeid, config):
+    def lookup_domainid_by_value(self, value, nodeid):
         if nodeid not in self.value_lookup:
+            config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
                 options[val["text"]] = val["id"]
@@ -1652,7 +1653,6 @@ class DomainDataType(BaseDomainDataType):
                 key = "text"
 
             domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
-
             if len(domain_val_node_query) != 1:
                 row_number = row_number if row_number else ""
                 if len(domain_val_node_query) == 0:
@@ -1667,8 +1667,10 @@ class DomainDataType(BaseDomainDataType):
             try:
                 uuid.UUID(value)
             except ValueError:
-                if "nodeid" in kwargs and "config" in kwargs:
-                    self.lookup_domainid_by_value(self, value, kwargs["nodeid"], kwargs["config"])
+                try:
+                    value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
+                except KeyError:
+                    value = value
         return value
 
     def get_search_terms(self, nodevalue, nodeid=None):
@@ -1763,13 +1765,16 @@ class DomainListDataType(BaseDomainDataType):
                     uuid.UUID(stripped)
                     v = stripped
                 except ValueError:
-                    if "nodeid" in kwargs and "config" in kwargs:
-                        v = self.lookup_domainid_by_value(self, v, kwargs["nodeid"], kwargs["config"])
+                    try:
+                        v = self.lookup_domainid_by_value(v, kwargs["nodeid"])
+                    except KeyError:
+                        v = v
                 result.append(v)
-        return value
+        return result
 
     def validate(self, values, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         domainDataType = DomainDataType()
+        domainDataType.datatype_name = "domain-value"
         errors = []
         if values is not None:
             for value in values:

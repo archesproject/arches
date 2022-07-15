@@ -40,6 +40,15 @@ from guardian.shortcuts import assign_perm
 from django.conf import settings
 
 
+class BulkIndexQueue(models.Model):
+    resourceinstanceid = models.UUIDField(primary_key=True, unique=True)
+    createddate = models.DateTimeField(auto_now_add=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = "bulk_index_queue"
+
+
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True, null=True)
@@ -553,6 +562,7 @@ class Node(models.Model):
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
+    hascustomalias = models.BooleanField(default=False)
 
     def get_child_nodes_and_edges(self):
         """
@@ -886,6 +896,8 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    name = models.TextField(blank=True, null=True)
+    descriptors = JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 

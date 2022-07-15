@@ -55,7 +55,8 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <input type="text" disabled placeholder="{% trans 'Unique alias generated from this node\'s name' %}"class="form-control" data-bind="textInput: node().alias">
+                                <input type="text" placeholder="{% trans 'Unique alias generated from this node\'s name' %}" data-bind="textInput: node().alias, attr: {disabled: !node().hasCustomAlias()}" class="form-control input-lg widget-input">
+                                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: node().hasCustomAlias, config:{ label: '{% trans "Use a custom node alias" %}', subtitle: ''}}}"></div>
                             </div>
                         </div>
                     </div>
