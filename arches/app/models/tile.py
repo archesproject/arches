@@ -342,18 +342,24 @@ class Tile(models.TileModel):
 
         return data
 
-    def datatype_post_save_actions(self, request=None):
-        userid = None
-        if request is not None:
-            userid = str(request.user.id)
+    def ensure_userprofile_exists(self, request):
+        try:
             if hasattr(request.user, "userprofile") is not True:
                 models.UserProfile.objects.create(user=request.user)
+        except:
+            pass
+
+    def datatype_post_save_actions(self, request=None):
+        try:
+            userid = str(request.user.id)
+        except:
+            userid = None
+
         tile_data = self.get_tile_data(userid)
-        for nodeid, value in list(tile_data.items()):
+        for nodeid in tile_data.keys():
             node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            if request is not None:
-                datatype.handle_request(self, request, node)
+            datatype.post_tile_save(self, nodeid, request)
 
     def save(self, *args, **kwargs):
         request = kwargs.pop("request", None)
@@ -424,6 +430,7 @@ class Tile(models.TileModel):
             # We have to save the edit log record after calling save so that the
             # resource's displayname changes are avaliable
             user = {} if user is None else user
+            self.ensure_userprofile_exists(request)
             self.datatype_post_save_actions(request)
             self.__postSave(request, context=context)
             if creating_new_tile is True:

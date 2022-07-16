@@ -22,7 +22,8 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-
+from uuid import UUID
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.db import connection
@@ -30,7 +31,10 @@ from django.core import management
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
-from arches.app.models.tile import Tile, TileCardinalityError
+from arches.app.models.tile import Tile
+from arches.app.models.resource import Resource
+from arches.app.models.models import ResourceXResource
+
 
 
 # these tests can be run from the command line via
@@ -417,6 +421,125 @@ class TileTests(ArchesTestCase):
         tile.delete(request=provisional_request)
 
         self.assertEqual(len(Tile.objects.all()), 1)
+
+    def test_related_resources_managed(self):
+        """
+        Test that related resource data is managed correctly and that the accompanying table is
+        managed correctly.  Test that default ontology and inverse ontology infomation is applied properly.
+
+        """
+
+        json = {
+            "data": {
+                "551a7785-e222-11e8-9baa-a4d18cec433a": None,
+                "6d75ab63-e222-11e8-82a6-a4d18cec433a": None,
+                "a4157df0-e222-11e8-9acb-a4d18cec433a": None,
+                "eb115780-e222-11e8-aaed-a4d18cec433a": [
+                    {
+                        "inverseOntologyProperty": "",
+                        "ontologyProperty": "",
+                        "resourceId": "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8",
+                        "resourceXresourceId": "",
+                    },
+                    {
+                        "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
+                        "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                        "resourceId": "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22",
+                        "resourceXresourceId": "5f418480-534a-4dba-87d9-67eb27f0cc6a",
+                    },
+                ],
+            },
+            "nodegroup_id": "487154e3-e222-11e8-be46-a4d18cec433a",
+            "parenttile_id": None,
+            "provisionaledits": None,
+            "resourceinstance_id": "654bb228-37e7-4beb-b0f9-b59b61b53577",
+            "sortorder": 0,
+            "tileid": "edbdef07-77fd-4bb6-9fef-641d4a65abce",
+        }
+
+        main_resource = Resource(pk=json["resourceinstance_id"], graph_id="c35fe0a1-df30-11e8-b280-a4d18cec433a")
+        main_resource.save(index=False)
+        related_resource = Resource(pk="e72844fc-7bc0-4851-89ca-5bb1c6b3ba22", graph_id="c35fe0a1-df30-11e8-b280-a4d18cec433a")
+        related_resource.save(index=False)
+        related_resource2 = Resource(pk="92b2db6a-d13f-4cc7-aec7-e4caf91b45f8", graph_id="c35fe0a1-df30-11e8-b280-a4d18cec433a")
+        related_resource2.save(index=False)
+
+        t = Tile(json)
+        t.save(index=False)
+
+        resource_instances = ResourceXResource.objects.filter(tileid=t.tileid)
+        self.assertEqual(2, len(resource_instances))
+
+        for ri in resource_instances:
+            ri_dict = JSONSerializer().serializeToPython(ri)
+            if str(ri.relationshiptype) == "http://www.cidoc-crm.org/cidoc-crm/P62_depicts":
+                expected = {
+                    "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
+                    "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+                    "notes": "",
+                    "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                    "resourceinstancefrom_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+                    "resourceinstanceidfrom_id": UUID("654bb228-37e7-4beb-b0f9-b59b61b53577"),
+                    "resourceinstanceidto_id": UUID("e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"),
+                    "resourceinstanceto_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+                }
+                self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
+            else:
+                expected = {
+                    "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
+                    "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+                    "notes": "",
+                    "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within",
+                    "resourceinstancefrom_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+                    "resourceinstanceidto_id": UUID("92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"),
+                    "resourceinstanceto_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+                }
+                self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
+
+        # now test that when we delete a related resource it
+        json = {
+            "data": {
+                "551a7785-e222-11e8-9baa-a4d18cec433a": None,
+                "6d75ab63-e222-11e8-82a6-a4d18cec433a": None,
+                "a4157df0-e222-11e8-9acb-a4d18cec433a": None,
+                "eb115780-e222-11e8-aaed-a4d18cec433a": [
+                    {
+                        "inverseOntologyProperty": "",
+                        "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+                        "resourceId": "85b2db6a-d13f-4cc7-aec7-e4caf91b45f7",
+                        "resourceXresourceId": "",
+                    }
+                ],
+            },
+            "nodegroup_id": "487154e3-e222-11e8-be46-a4d18cec433a",
+            "parenttile_id": None,
+            "provisionaledits": None,
+            "resourceinstance_id": "654bb228-37e7-4beb-b0f9-b59b61b53577",
+            "sortorder": 0,
+            "tileid": "edbdef07-77fd-4bb6-9fef-641d4a65abce",
+        }
+
+        related_resource3 = Resource(pk="85b2db6a-d13f-4cc7-aec7-e4caf91b45f7", graph_id="c35fe0a1-df30-11e8-b280-a4d18cec433a")
+        related_resource3.save(index=False)
+
+        t = Tile(json)
+        t.save(index=False)
+
+        resource_instance = ResourceXResource.objects.get(tileid=t.tileid)
+        ri_dict = JSONSerializer().serializeToPython(resource_instance)
+        expected = {
+            "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
+            "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+            "notes": "",
+            "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
+            "resourceinstancefrom_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "resourceinstanceidto_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
+            "resourceinstanceto_graphid_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+        }
+        self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
 
         # def test_validation(self):
         #     """
