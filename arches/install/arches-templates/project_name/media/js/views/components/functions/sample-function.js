@@ -10,7 +10,7 @@ define([
              
             FunctionViewModel.apply(this, arguments);
             var nodegroups = {};
-            this.triggering_nodegroups = params.config.triggering_nodegroups;
+            this.triggeringNodegroups = params.config.triggering_nodegroups;
             this.cards = ko.observableArray();
             this.graph.cards.forEach(function(card){
                 this.cards.push(card);
