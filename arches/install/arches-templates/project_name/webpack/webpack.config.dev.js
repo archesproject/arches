@@ -31,10 +31,10 @@ module.exports = merge(commonWebpackConfig, {
         port: 9000,
     },
     plugins: [
-        // new ESLintPlugin({
-        //     extensions: [`js`, `jsx`],
-        //     fix: true,
-        // }),
+        new ESLintPlugin({
+            extensions: [`js`, `jsx`],
+            fix: true,
+        }),
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),
         }),
