@@ -137,7 +137,7 @@ define([
                     self.loading(true);
                     self.formData.append('graphid', graph);
                     self.submit('get_nodes').then(function(response){
-                        const nodes = response.result.map(node => ({ ...node, label: node.alias }))
+                        const nodes = response.result.map(node => ({ ...node, label: node.alias }));
                         nodes.unshift({
                             alias: "resourceid",
                             label: arches.translations.idColumnSelection,
@@ -159,7 +159,7 @@ define([
                 //     }
                 // }).then(function(response){
                     self.csvArray(response.result.csv);
-                    self.csvFileName(response.result.csv_file)
+                    self.csvFileName(response.result.csv_file);
                     if (response.result.config) {
                         self.fieldMapping(response.result.config.mapping);
                         self.selectedGraph(response.result.config.graph);
@@ -187,16 +187,16 @@ define([
                     self.formData.append('async', true);
                     self.submit('write').then(data => {
                         console.log(data.result);
-                    }).fail( function (err) {
+                    }).fail( function(err) {
                         self.alert(
-                                new JsonErrorAlertViewModel(
-                                    'ep-alert-red', 
-                                    err.responseJSON["data"], 
-                                    null, 
-                                    function(){}
-                                )
-                            )                    
-                        }
+                            new JsonErrorAlertViewModel(
+                                'ep-alert-red', 
+                                err.responseJSON["data"], 
+                                null, 
+                                function(){}
+                            )
+                        );                    
+                    }
                     );
                 }).fail(error => console.log(error.responseJSON.data));
             };

@@ -15,14 +15,14 @@ define([
             var filter = params.filterValue();
             this.op = ko.observable(filter.op || '');
             this.searchValue = ko.observable(filter.val || '');
-            this.filterValue = ko.computed(function () {
+            this.filterValue = ko.computed(function() {
                 return {
                     op: self.op(),
                     val: self.searchValue()
                 };
             });
             params.filterValue(this.filterValue());
-            this.filterValue.subscribe(function (val) {
+            this.filterValue.subscribe(function(val) {
                 params.filterValue(val);
             });
 
@@ -30,12 +30,12 @@ define([
             this.isEditable = true;
 
             if (params.graph) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId()})
+                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
                 if (cards.length) {
-                    this.isEditable = cards[0].is_editable
+                    this.isEditable = cards[0].is_editable;
                 }
             } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable')
+                this.isEditable = params.widget.card.get('is_editable');
             }
 
             this.options = params.config.options;

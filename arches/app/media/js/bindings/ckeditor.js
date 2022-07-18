@@ -14,7 +14,7 @@ define([
     * @name ckeditor
     */
 
-    const initialize = function (element, valueAccessor, allBindings) {
+    const initialize = function(element, valueAccessor, allBindings) {
         var modelValue = valueAccessor();
         var value = ko.utils.unwrapObservable(valueAccessor());
         const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
@@ -24,7 +24,7 @@ define([
         const languageList = [];
         
         for(const lang of Object.keys(arches.languages)){
-            languageList.push(`${lang}:${arches.languages[lang]}`)
+            languageList.push(`${lang}:${arches.languages[lang]}`);
         }
 
         CKEDITOR.config.language_list = languageList;
@@ -43,7 +43,7 @@ define([
         if (allBindings.has('ckeditorOptions')){
             var opts = allBindings.get('ckeditorOptions');
             options = (typeof opts === 'object') ? opts : {};
-        };
+        }
 
         // Set initial value and create the CKEditor
         $element.html(value);
@@ -56,7 +56,7 @@ define([
         });
 
         // bind to change events and link it to the observable
-        var onChange = function (e) {
+        var onChange = function(e) {
             var self = this;
 
             if (ko.isWriteableObservable(self)) {
@@ -88,7 +88,7 @@ define([
         }, this);
 
         // Handle disposal if KO removes an editor through template binding
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             editor.updateElement();
             editor.destroy();
         });

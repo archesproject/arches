@@ -95,7 +95,7 @@ define([
                 try{
                     return JSON.parse(responseJson.displayname)?.[arches.activeLanguage]?.value;
                 } catch (e){
-                    return responseJson.displayname
+                    return responseJson.displayname;
                 }
             })();
 

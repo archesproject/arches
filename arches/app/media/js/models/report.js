@@ -97,7 +97,7 @@ define(['jquery',
                         write: function(value) {
                             var key;
                             var configKeys = [];
-                            console.log("#(#(#", reportLookup, value)
+                            console.log("#(#(#", reportLookup, value);
                             var defaultConfig = reportLookup[value].defaultconfig;
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);

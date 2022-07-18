@@ -365,20 +365,20 @@ define([
                                         clearNewInstance();
                                     } else {
                                         window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                        .then(function(response){
-                                            if(response.ok) {
-                                                return response.json();
-                                            }
-                                            throw("error");
-                                        })
-                                        .then(function(json) {
-                                            var item = json.results.hits.hits[0];
-                                            var ret = self.makeObject(params.resourceid(), item._source);
-                                            self.setValue(ret);
-                                        })
-                                        .finally(function(){
-                                            clearNewInstance();
-                                        });
+                                            .then(function(response){
+                                                if(response.ok) {
+                                                    return response.json();
+                                                }
+                                                throw("error");
+                                            })
+                                            .then(function(json) {
+                                                var item = json.results.hits.hits[0];
+                                                var ret = self.makeObject(params.resourceid(), item._source);
+                                                self.setValue(ret);
+                                            })
+                                            .finally(function(){
+                                                clearNewInstance();
+                                            });
                                     }
                                 } else {
                                     clearNewInstance();

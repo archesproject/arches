@@ -28,7 +28,7 @@ define([
     let parsedDisplayName = undefined;
     try { 
         if(typeof data.displayname == 'string') {
-            parsedDisplayName = JSON.parse(data.displayname)
+            parsedDisplayName = JSON.parse(data.displayname);
         }
     } catch(e){}
 

@@ -125,7 +125,7 @@ define([
                     }).then(function() {
                         //pass
                     });
-                    }
+                }
                 ));
             };
 
@@ -195,7 +195,7 @@ define([
                 this.activeTab("start");
             };
             this.init();
-            setInterval(this.fetchLoadEvent, 5000)
+            setInterval(this.fetchLoadEvent, 5000);
         },
         template: ETLManagerTemplate,
     });
