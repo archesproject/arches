@@ -28,13 +28,12 @@ module.exports = merge(commonWebpackConfig, {
             publicPath: '/static',
             writeToDisk: true,
         },
-        port: 9000,
+        port: 9001,
     },
     plugins: [
-        // new ESLintPlugin({
-        //     extensions: [`js`, `jsx`],
-        //     fix: true,
-        // }),
+        new ESLintPlugin({
+            extensions: [`js`, `jsx`],
+        }),
         new Webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('development'),
         }),
