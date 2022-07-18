@@ -4,6 +4,7 @@ define([
     'backbone',
     'knockout',
     'arches',
+    'views/components/simple-switch',
     'bindings/chosen'
 ], function($, _, Backbone, ko, arches) {
     var NodeFormView = Backbone.View.extend({
