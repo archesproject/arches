@@ -11,12 +11,12 @@ require([
             BaseManagerView.prototype.initialize.call(this, options);
 
             if (location.search.indexOf('print') > 0) {
-                this.viewModel.loading(true);
+                self.viewModel.loading(true);
                 setTimeout(
                     function() {
-                        this.viewModel.loading(false);
+                        self.viewModel.loading(false);
                         window.print();
-                    }.bind(this),
+                    },
                     7000 // a generous timeout here to allow maps/images to load
                 );
             }
