@@ -3,6 +3,7 @@ const Path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
@@ -88,6 +89,7 @@ module.exports = {
             jQuery:  Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/jquery/dist/jquery.min`),
             $:  Path.resolve(__dirname, `${PROJECT_PATH}/media/node_modules/jquery/dist/jquery.min`),
         }),
+        new MiniCssExtractPlugin(),
         new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
     ],
     resolveLoader: {
@@ -168,6 +170,32 @@ module.exports = {
                 test: /\.mjs$/,
                 include: /node_modules/,
                 type: 'javascript/auto',
+            },
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: `${PROJECT_PATH}/media/node_modules/babel-loader`,
+                options: {
+                    presets: ['@babel/preset-env'],
+                    cacheDirectory: `${PROJECT_PATH}/media/node_modules/.cache/babel-loader`,
+                }
+            },
+            {
+                test: /\.s?css$/i,
+                use: [
+                    {
+                        'loader': MiniCssExtractPlugin.loader,
+                    },
+                    {
+                        'loader': `${PROJECT_PATH}/media/node_modules/css-loader`,
+                    },
+                    {
+                        'loader': `${PROJECT_PATH}/media/node_modules/postcss-loader`,
+                    },
+                    {
+                        'loader': `${PROJECT_PATH}/media/node_modules/sass-loader`,
+                    }
+                ],
             },
             {
                 test: /\.html?$/i,
