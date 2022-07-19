@@ -15,7 +15,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.base_index import get_index
-from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
+from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from datetime import datetime
@@ -51,7 +51,6 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
         max_subprocesses=max_subprocesses,
     )
     index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
-    index_resource_relations(clear_index=clear_index, batch_size=batch_size)
 
 
 def index_resources(
@@ -274,59 +273,6 @@ def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.
     else:
         es_index = get_index(index_name)
         es_index.reindex(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
-
-
-def index_resource_relations(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
-    """
-    Indexes all resource to resource relation records
-
-    Keyword Arguments:
-    clear_index -- set to True to remove all the resources from the index before the reindexing operation
-    batch_size -- the number of records to index as a group, the larger the number to more memory required
-
-    """
-
-    start = datetime.now()
-    logger.info("Indexing resource to resource relations")
-
-    cursor = connection.cursor()
-    if clear_index:
-        q = Query(se=se)
-        q.delete(index=RESOURCE_RELATIONS_INDEX)
-
-    with se.BulkIndexer(batch_size=batch_size, refresh=True) as resource_relations_indexer:
-        sql = """
-            SELECT resourcexid, notes, datestarted, dateended, relationshiptype, resourceinstanceidfrom, resourceinstancefrom_graphid,
-            resourceinstanceidto, resourceinstanceto_graphid, modified, created, inverserelationshiptype, tileid, nodeid
-            FROM public.resource_x_resource
-        """
-
-        cursor.execute(sql)
-        for resource_relation in cursor.fetchall():
-            doc = {
-                "resourcexid": resource_relation[0],
-                "notes": resource_relation[1],
-                "datestarted": resource_relation[2],
-                "dateended": resource_relation[3],
-                "relationshiptype": resource_relation[4],
-                "resourceinstanceidfrom": resource_relation[5],
-                "resourceinstancefrom_graphid": resource_relation[6],
-                "resourceinstanceidto": resource_relation[7],
-                "resourceinstanceto_graphid": resource_relation[8],
-                "modified": resource_relation[9],
-                "created": resource_relation[10],
-                "inverserelationshiptype": resource_relation[11],
-                "tileid": resource_relation[12],
-                "nodeid": resource_relation[13],
-            }
-            resource_relations_indexer.add(index=RESOURCE_RELATIONS_INDEX, id=doc["resourcexid"], data=doc)
-
-    index_count = se.count(index=RESOURCE_RELATIONS_INDEX)
-    logger.info(
-        "Status: {0}, In Database: {1}, Indexed: {2}, Took: {3} seconds".format(
-            "Passed" if cursor.rowcount == index_count else "Failed", cursor.rowcount, index_count, (datetime.now() - start).seconds
-        )
-    )
 
 
 def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE):
