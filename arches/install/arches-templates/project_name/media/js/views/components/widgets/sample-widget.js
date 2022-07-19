@@ -3,7 +3,7 @@ define([
     'underscore', 
     'viewmodels/widget',
     'templates/views/components/widgets/sample-widget.htm',
-], function (ko, _, WidgetViewModel, sampleWidgetTemplate) {
+], function(ko, _, WidgetViewModel, sampleWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -21,8 +21,8 @@ define([
             WidgetViewModel.apply(this, [params]);
             var self = this;
             if (this.value()) {
-                var coords = this.value().split('POINT(')[1].replace(')','').split(' ')
-                var srid = this.value().split(';')[0].split('=')[1]
+                var coords = this.value().split('POINT(')[1].replace(')','').split(' ');
+                var srid = this.value().split(';')[0].split('=')[1];
                 this.xValue = ko.observable(coords[0]);
                 this.yValue = ko.observable(coords[1]);
                 this.srid = ko.observable('4326');
@@ -30,10 +30,10 @@ define([
                 this.xValue = ko.observable();
                 this.yValue = ko.observable();
                 this.srid = ko.observable('4326');
-            };
+            }
 
             this.preview = ko.pureComputed(function() {
-                var res = "SRID=" + this.srid() + ";POINT(" + this.xValue() + " " + this.yValue() + ")"
+                var res = "SRID=" + this.srid() + ";POINT(" + this.xValue() + " " + this.yValue() + ")";
                 this.value(res);
                 return res;
             }, this);
