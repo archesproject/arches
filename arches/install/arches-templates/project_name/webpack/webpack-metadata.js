@@ -4,7 +4,7 @@ const Path = require('path');
 const projectPath =  Path.parse(__dirname)['dir'];
 
 module.exports = {
-    ARCHES_CORE_PATH: Path.resolve(projectPath, '../../arches/arches/app'),
+    ARCHES_CORE_DIRECTORY: Path.resolve(projectPath, '../../arches/arches'),
     PROJECT_PATH: projectPath,
-    APPLICATION_SERVER_ADDRESS: "http://localhost:8000/",
+    DJANGO_SERVER_ADDRESS: "http://localhost:8000/",
 }
