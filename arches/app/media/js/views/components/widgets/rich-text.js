@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'knockout', 
     'underscore', 
     'viewmodels/widget', 
@@ -6,7 +7,7 @@ define([
     'templates/views/components/widgets/rich-text.htm',
     'bindings/ckeditor', 
     'bindings/chosen'
-], function(ko, _, WidgetViewModel, arches, richTextWidgetTemplate) {
+], function($, ko, _, WidgetViewModel, arches, richTextWidgetTemplate) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget

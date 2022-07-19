@@ -61,7 +61,7 @@ define([
 
         var sources = [];
         for (var sourceName in arches.mapSources) {
-            if (arches.mapSources.hasOwnProperty(sourceName)) {
+            if (Object.prototype.hasOwnProperty.call(arches.mapSources, sourceName)) {
                 sources.push(sourceName);
             }
         }

@@ -163,10 +163,11 @@ define([
                         });
                     }
                     var feature = geoJSON.features[0];
+                    let bufferWidth;
                     if (!!feature.properties && !!feature.properties.buffer){
                         var buffer = feature.properties.buffer;
                         try{
-                            var bufferWidth = parseInt(buffer.width, 10);
+                            bufferWidth = parseInt(buffer.width, 10);
                             if(bufferWidth < 0 || bufferWidth > this.maxBuffer){
                                 throw new Error('Whoops!');
                             }
@@ -195,7 +196,7 @@ define([
                     if (!!feature.properties && !!feature.properties.inverted){
                         var inverted = feature.properties.inverted;
                         try{
-                            var bufferWidth = parseInt(buffer.width, 10);
+                            bufferWidth = parseInt(buffer.width, 10);
                             if(inverted !== true && inverted !== false){
                                 throw new Error('Whoops!');
                             }
@@ -213,7 +214,7 @@ define([
                             errors.push(item);
                         }
                     });
-                    return errors;
+                    return errors; // eslint-disable-line no-unsafe-finally
                 }
             };
 
@@ -424,7 +425,7 @@ define([
         },
 
         useMaxBuffer: function(unit, buffer, maxBuffer) {
-            res = false;
+            let res = false;
             if (unit === 'ft') {
                 res = (buffer * 0.3048) > maxBuffer;
             } else {
@@ -439,9 +440,8 @@ define([
             }
 
             var useMaxBuffer = this.useMaxBuffer(this.bufferUnit(), this.buffer(), this.maxBuffer);
-            var buffer = this.buffer();
             if (useMaxBuffer) {
-                max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
+                const max = this.bufferUnit() === 'ft' ? 328084 : this.maxBuffer;
                 this.buffer(max);
             }
 
@@ -477,7 +477,7 @@ define([
                         this.buffer(parseInt(feature.properties.buffer.width, 10));
                         this.bufferUnit(feature.properties.buffer.unit);
                     }
-                    if(!!feature.properties && feature.properties.hasOwnProperty('inverted')){
+                    if(!!feature.properties && Object.prototype.hasOwnProperty.call(feature.properties, 'inverted')){
                         this.filter.inverted(feature.properties.inverted);
                     }
                 }, this);

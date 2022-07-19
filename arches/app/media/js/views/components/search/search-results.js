@@ -39,7 +39,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
 
-                this.searchResults.timestamp.subscribe(function(timestamp) {
+                this.searchResults.timestamp.subscribe(function() {
                     this.updateResults();
                 }, this);
 

@@ -98,7 +98,6 @@ define([
 
             this.csvArray.subscribe(function(val){
                 self.numberOfCol(val[0].length);
-                let i = 1;
                 if (self.hasHeaders()) {
                     self.headers(val[0]);
                     self.csvBody(val.slice(1));

@@ -354,7 +354,7 @@ define([
             closeOnSelect: true,
             allowClear: true,
             data: () => {
-                results = this.canvases();
+                const results = this.canvases();
                 return { results };
             },
             id: function(item) {

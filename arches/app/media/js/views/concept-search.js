@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'backbone', 'select2', 'arches'], function($, _,
 
         initialize: function(options) {
             $.extend(this, options);
-        	this.render();
+            this.render();
         },
 
         render: function(){

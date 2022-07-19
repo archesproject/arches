@@ -43,8 +43,8 @@ define([
             if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
                 var center = map.getCenter();
 
-                lng = parseFloat(params.x());
-                lat = parseFloat(params.y());
+                const lng = parseFloat(params.x());
+                const lat = parseFloat(params.y());
 
                 if (lng) { center.lng = lng; }
                 if (lat) { center.lat = lat; }

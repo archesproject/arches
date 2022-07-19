@@ -1,6 +1,6 @@
 define([], function() {
     return function loadComponentDependencies(componentPaths){
-        for (componentPath of componentPaths) {
+        for (const componentPath of componentPaths) {
             try {  // first try to load project path
                 require(`${PROJECT_PATH}/media/js/${componentPath}`);
             }

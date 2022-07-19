@@ -6,8 +6,8 @@ define([
     'views/components/workflows/workflow-component-abstract',
     'templates/views/components/plugins/workflow-step.htm'
 ], function(ko, _, koMapping, uuid, WorkflowComponentAbstract, workflowStepTemplate) {
-    STEPS_LABEL = 'workflow-steps';
-    STEP_ID_LABEL = 'workflow-step-id';
+    const STEPS_LABEL = 'workflow-steps';
+    const STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
          

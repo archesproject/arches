@@ -11,7 +11,7 @@ define([
     'uuid',
     'templates/views/components/workflows/workflow-component-abstract.htm',
 ], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, workflowComponentAbstractTemplate) {
-    WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
+    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     function NonTileBasedComponent() {
         var self = this;
@@ -50,11 +50,12 @@ define([
         this.topCards = ko.observable();
 
         this.loadData = function(loadedData) {
+            let data;
             if (!Array.isArray(loadedData)) {
-                var data = [loadedData];
+                data = [loadedData];
             }
             else {
-                var data = loadedData;
+                data = loadedData;
             }
             
             /* a flat object of the previously saved data for all tiles */ 

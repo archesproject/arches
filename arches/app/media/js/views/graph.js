@@ -195,5 +195,4 @@ require([
     });
     return new GraphView();
 
-    $('.dropdown').dropdown();
 });

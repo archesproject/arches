@@ -9,7 +9,7 @@ define([
             var childclass = options.childclass;
             function update_grid() {
                 var content_width = $(element).width()+20;
-                images_per_row = Math.floor(content_width / 300);
+                const images_per_row = Math.floor(content_width / 300);
                 var width = Math.round(content_width / images_per_row);
                 var height = Math.round(width/3*1.8);
                 $(element).find(childclass).each(function(id){

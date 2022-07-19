@@ -234,7 +234,6 @@ define([
                 source: node,
                 datatypelookup: datatypelookup,
                 icons: data.icons,
-                graph: undefined,
                 layer: _.find(data.resource_map_layers, function(layer) {
                     return layer.nodeid === node.nodeid;
                 }),
@@ -380,7 +379,7 @@ define([
 
         searchAggregations.subscribe(updateSearchResultsLayer);
         if (ko.isObservable(bins)) {
-        	bins.subscribe(updateSearchResultsLayer);
+            bins.subscribe(updateSearchResultsLayer);
         }
         updateSearchResultsLayer();
     };

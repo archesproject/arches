@@ -528,7 +528,7 @@ define([
                                 }
                             });
 
-                            var links = _.uniq(links, function(item, key, source) {
+                            links = _.uniq(links, function(item, key, source) {
                                 return item.source.id + '_' + item.target.id;
                             });
 

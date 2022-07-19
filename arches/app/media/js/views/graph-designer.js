@@ -444,7 +444,7 @@ define([
             var correspondingCard = function(item, cardTree){
                 var cardList = cardTree.cachedFlatTree;
                 if (cardList === undefined) {
-                    var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                    cardList = cardTree.flattenTree(cardTree.topCards(), []);
                     cardTree.cachedFlatTree = cardList;
                 }
                 var res;

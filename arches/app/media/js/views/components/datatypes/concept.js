@@ -1,14 +1,16 @@
 define([
+    'jquery',
+    'underscore',
     'knockout', 
     'arches', 
     'viewmodels/concept-select', 
     'templates/views/components/datatypes/concept.htm', 
-], function(ko, arches, ConceptSelectViewModel, conceptDatatypeTemplate) {
+], function($, _, ko, arches, ConceptSelectViewModel, conceptDatatypeTemplate) {
     var name = 'concept-datatype-config';
     const viewModel = function(params) {
+        const self = this;
         this.search = params.search;
         if (this.search) {
-            var self = this;
             var filter = params.filterValue();
             params.config = ko.observable({options:[]});
              
@@ -46,7 +48,6 @@ define([
             this.topConcept = params.config.rdmCollection;
             this.initialTopConcept = this.topConcept();
             if (arches.conceptCollections.length === 0) {
-                var self = this;
                 $.ajax({
                     url: arches.urls.get_concept_collections,
                     type: 'json'

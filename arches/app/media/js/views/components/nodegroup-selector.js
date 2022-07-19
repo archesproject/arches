@@ -1,12 +1,13 @@
 define([
     'jquery',
+    'underscore',
     'knockout', 
     'knockout-mapping',
     'viewmodels/function', 
     'models/graph',
     'bindings/chosen',
     'templates/views/components/nodegroup-selector.htm'
-], function($, ko, koMapping, FunctionViewModel, GraphModel, chosen, nodegroupSelectorTemplate) {
+], function($, _, ko, koMapping, FunctionViewModel, GraphModel, chosen, nodegroupSelectorTemplate) {
     return ko.components.register('views/components/nodegroup-selector', {
         viewModel: function(params) {
              

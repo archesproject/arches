@@ -30,7 +30,9 @@ define([
         if(typeof data.displayname == 'string') {
             parsedDisplayName = JSON.parse(data.displayname);
         }
-    } catch(e){}
+    } catch(e){
+        // empty
+    }
 
     let displayNameValue = undefined;
     if(parsedDisplayName){

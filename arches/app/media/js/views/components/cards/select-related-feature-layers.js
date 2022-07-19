@@ -3,7 +3,6 @@ define([], function() {
 
         var layerConfig = selectedLayerConfig;
         color = color || layerConfig.defaultcolor;
-        hoverId = hoverId;
         var selectionColor = layerConfig.selectioncolor;
         var hoverColor = layerConfig.hovercolor;
         var colorPalette = layerConfig.colorpalette;
@@ -28,7 +27,7 @@ define([], function() {
         color = createColorExpressions(color, colorPalette);
         var nodeFilter = ["!=", "resourceinstanceid", "x"]; // just a placeholder if there are no filterNodeids
         if (filteredNodeids && nodeids.length > 0) {
-            var nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id]);
+            nodeFilter = filteredNodeids.map(id => ["==", "nodeid", id]);
             nodeFilter.splice(0, 0, 'any');
         }
         if (selectedResourceIds && selectedResourceIds.length > 0) {

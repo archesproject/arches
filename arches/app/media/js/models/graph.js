@@ -1,10 +1,11 @@
 define([
+    'jquery',
     'arches',
     'models/abstract',
     'models/node',
     'knockout',
     'underscore'
-], function(arches, AbstractModel, NodeModel, ko, _) {
+], function($, arches, AbstractModel, NodeModel, ko, _) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage graph data
@@ -286,7 +287,7 @@ define([
                         return false;
                     });
                     this.get('nodes')().forEach(function(node) {
-                        found_node = response.responseJSON.nodes.find(function(response_node){
+                        const found_node = response.responseJSON.nodes.find(function(response_node){
                             return response_node.nodeid === node.nodeid;
                         });
                         if (found_node){
@@ -515,9 +516,9 @@ define([
          */
         constructTree: function(root, nodes, edges, append){
             var nodeMap = {};
-            var root = !!root ? root : this.get('root');
-            var nodes = !!nodes ? nodes : this.get('nodes')();
-            var edges = !!edges ? edges : this.get('edges')();
+            root = !!root ? root : this.get('root');
+            nodes = !!nodes ? nodes : this.get('nodes')();
+            edges = !!edges ? edges : this.get('edges')();
             nodes.forEach(function(node){
                 nodeMap[node.id] = node;
                 if(!ko.isObservable(node.childNodes)){
