@@ -634,8 +634,8 @@
                     "config": {
                         "graphs": [{
                             "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": ""
+                            "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
+                            "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"
                         }]
                     },
                     "datatype": "resource-instance",
@@ -870,8 +870,8 @@
                     "config": {
                         "graphs": [{
                             "graphid": "c35fe0a1-df30-11e8-b280-a4d18cec433a",
-                            "ontologyProperty": "",
-                            "inverseOntologyProperty": ""
+                            "inverseOntologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
+                            "ontologyProperty": "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within"
                         }]
                     },
                     "datatype": "resource-instance-list",
