@@ -160,6 +160,7 @@ require([
                         contentType: false,
                         success: function(response) {
                             if (response[0].length != 0) {
+                                // eslint-disable-next-line no-constant-condition
                                 if (typeof(response[0])) {
                                     response = response[0].join('<br />');
                                 }

@@ -2,6 +2,7 @@ define([
     'jquery',
     'knockout'
 ], function($, ko) {
+    // eslint-disable-next-line no-undef
     (function(e,t){var n=function(e,t,n){var r;return function(){function u(){if(!n)e.apply(s,o);r=null;}var s=this,o=arguments;if(r)clearTimeout(r);else if(n)e.apply(s,o);r=setTimeout(u,t||100);};};jQuery.fn[t]=function(e){return e?this.bind("resize",n(e)):this.trigger(t);};})(jQuery,"smartresize");
     ko.bindingHandlers.smartresize = {
         init: function(element, valueAccessor, allBindings, viewModel) {

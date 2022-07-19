@@ -19,6 +19,7 @@
         define(["knockout", "moment"], factory);
     } else {
         // <script> tag: use the global `ko` object, attaching a `mapping` property
+        // eslint-disable-next-line no-undef
         factory(ko, moment);
     }
 }(function(ko, moment) {

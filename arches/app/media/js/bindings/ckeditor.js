@@ -26,7 +26,7 @@ define([
         for(const lang of Object.keys(arches.languages)){
             languageList.push(`${lang}:${arches.languages[lang]}`);
         }
-
+        /* eslint-disable no-undef */
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
@@ -74,7 +74,7 @@ define([
             }
         }), modelValue, element);
 
-        modelValue.subscribe(function(newValue){
+        modelValue.subscribe(function(value){
             var self = this;
             var $element = $(element);
             var newValue = ko.utils.unwrapObservable(valueAccessor());

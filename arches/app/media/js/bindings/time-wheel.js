@@ -73,8 +73,7 @@ define([
                     });
                 depth = root.height + 1;
                 return d3.partition()
-                    .size([2 * Math.PI, root.height + 1])
-                    (root);
+                    .size([2 * Math.PI, root.height + 1])(root);
             };
 
             var d3ClickManager = function() {
