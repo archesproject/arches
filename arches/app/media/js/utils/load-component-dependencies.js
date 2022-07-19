@@ -7,7 +7,7 @@ define([], function() {
             }
             catch(e) {  // if project path fails, load arches-core path
                 // eslint-disable-next-line no-undef
-                require(`${ARCHES_CORE_PATH}/media/js/${componentPath}`);
+                require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
             }
         }
     };

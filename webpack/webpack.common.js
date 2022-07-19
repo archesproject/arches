@@ -7,14 +7,32 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { ARCHES_CORE_PATH, PROJECT_PATH, APPLICATION_SERVER_ADDRESS } = require('./webpack-metadata');
+const { ARCHES_CORE_DIRECTORY, PROJECT_PATH, DJANGO_SERVER_ADDRESS } = require('./webpack-metadata');
 
 
-const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/js`), {});
+let archesCoreDirectory = ARCHES_CORE_DIRECTORY;
+let djangoServerAddress = DJANGO_SERVER_ADDRESS;
+let isTestEnvironment = false;
+
+for (let arg of process.argv) {
+    const keyValuePair = arg.split('=');
+
+    if (keyValuePair[0] === 'arches_core_directory') {
+        archesCoreDirectory = keyValuePair[1];
+    }
+    if (keyValuePair[0] === 'django_server_address') {
+        djangoServerAddress = keyValuePair[1];
+    }
+    if (keyValuePair[0] === 'test') {
+        isTestEnvironment = keyValuePair[1];
+    }
+}
+
+const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js`), {});
 const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${PROJECT_PATH}/media/js`), {});
 
 const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys(archesCoreEntryPointConfiguration).reduce((acc, path) => {
-    acc[path + '$'] = Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/js/${path}.js`);
+    acc[path + '$'] = Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js/${path}.js`);
     return acc;
 }, {});
 
@@ -29,23 +47,9 @@ const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
 };
 
 const templateFilepathLookup = buildTemplateFilePathLookup(
-    Path.resolve(__dirname, `${ARCHES_CORE_PATH}/templates`),
+    Path.resolve(__dirname, `${archesCoreDirectory}/app/templates`),
     Path.resolve(__dirname, `${PROJECT_PATH}/templates`)
 );
-
-let applicationServerAddress = APPLICATION_SERVER_ADDRESS;
-let isTestEnvironment = false;
-
-for (let arg of process.argv) {
-    const keyValuePair = arg.split('=');
-
-    if (keyValuePair[0] === 'application_server_address') {
-        applicationServerAddress = keyValuePair[1];
-    }
-    if (keyValuePair[0] === 'test') {
-        isTestEnvironment = keyValuePair[1];
-    }
-}
 
 module.exports = {
     entry: { 
@@ -63,7 +67,7 @@ module.exports = {
         new CopyWebpackPlugin({ 
             patterns: [
                 {
-                    from: Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/img`), 
+                    from: Path.resolve(__dirname, `${archesCoreDirectory}/app/media/img`), 
                     to: 'img',
                     priority: 5,
                 }, 
@@ -76,7 +80,7 @@ module.exports = {
             ] 
         }),
         new webpack.DefinePlugin({
-            ARCHES_CORE_PATH: `'${ARCHES_CORE_PATH}'`,
+            ARCHES_CORE_DIRECTORY: `'${archesCoreDirectory}'`,
             PROJECT_PATH: `'${PROJECT_PATH}'`
         }),
         new webpack.ProvidePlugin({
@@ -96,9 +100,9 @@ module.exports = {
         alias: {
             ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...templateFilepathLookup,
-            'plugins/knockout-select2': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'knockout-select2.js'),
-            'nifty': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'nifty'),
-            'leaflet-side-by-side': Path.resolve(__dirname, `${ARCHES_CORE_PATH}/media/plugins`, 'leaflet-side-by-side/index'),
+            'plugins/knockout-select2': Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'knockout-select2.js'),
+            'nifty': Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'nifty'),
+            'leaflet-side-by-side': Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'leaflet-side-by-side/index'),
             'themepunch-tools': Path.resolve(__dirname, `${PROJECT_PATH}/media/plugins`, 'revolution-slider/rs-plugin/js/jquery.themepunch.tools.min'),
             'revolution-slider': Path.resolve(__dirname, `${PROJECT_PATH}/media/plugins`, 'revolution-slider'),
             
@@ -176,7 +180,7 @@ module.exports = {
                     preprocessor: async (content, loaderContext) => {
                         const resourcePath = loaderContext['resourcePath'];
                         const projectResourcePathData = resourcePath.split(`${PROJECT_PATH}/`);
-                        const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${ARCHES_CORE_PATH}/`)[1]; 
+                        const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${archesCoreDirectory}/app/`)[1]; 
 
                         let resp;
 
@@ -187,7 +191,7 @@ module.exports = {
                             */ 
                             if (failureCount < 5) {
                                 try {
-                                    resp = await fetch(applicationServerAddress + templatePath);
+                                    resp = await fetch(djangoServerAddress + templatePath);
                                 }
                                 catch(e) { 
                                     failureCount += 1;
