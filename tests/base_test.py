@@ -36,8 +36,6 @@ from arches.app.search.mappings import (
     delete_concepts_index,
     prepare_search_index,
     delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
 )
 
 # these tests can be run from the command line via
@@ -78,7 +76,6 @@ def setUpTestPackage():
     prepare_terms_index(create=True)
     prepare_concepts_index(create=True)
     prepare_search_index(create=True)
-    prepare_resource_relations_index(create=True)
 
 
 def tearDownTestPackage():
@@ -90,7 +87,6 @@ def tearDownTestPackage():
     delete_terms_index()
     delete_concepts_index()
     delete_search_index()
-    delete_resource_relations_index()
 
 
 def setUpModule():

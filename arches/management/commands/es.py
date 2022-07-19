@@ -30,7 +30,6 @@ from arches.app.search.mappings import (
     delete_concepts_index,
     prepare_search_index,
     delete_search_index,
-    prepare_resource_relations_index,
     delete_resource_relations_index,
 )
 import arches.app.utils.index_database as index_database_util
@@ -57,7 +56,6 @@ class Command(BaseCommand):
                 "index_resources",
                 "index_resources_by_type",
                 "index_resources_by_transaction",
-                "index_resource_relations",
                 "add_index",
                 "delete_index",
             ],
@@ -70,7 +68,6 @@ class Command(BaseCommand):
             + "'index_resources'=Indexes all resources from the database"
             + "'index_resources_by_type'=Indexes only resources of a given resource_model/graph"
             + "'index_resources_by_transaction'=Indexes only resources of a given transaction"
-            + "'index_resource_relations'=Indexes all resource to resource relation records"
             + "'add_index'=Register a new index in Elasticsearch"
             + "'delete_index'=Deletes a named index from Elasticsearch",
         )
@@ -217,9 +214,6 @@ class Command(BaseCommand):
                 max_subprocesses=options["max_subprocesses"],
             )
 
-        if options["operation"] == "index_resource_relations":
-            index_database_util.index_resource_relations(clear_index=options["clear_index"], batch_size=options["batch_size"])
-
     def register_index(self, name):
         es_index = get_index(name)
         es_index.prepare_index()
@@ -270,7 +264,6 @@ class Command(BaseCommand):
         if name is None:
             prepare_terms_index(create=True)
             prepare_concepts_index(create=True)
-            prepare_resource_relations_index(create=True)
             prepare_search_index(create=True)
 
             # add custom indexes
