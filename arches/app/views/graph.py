@@ -261,6 +261,7 @@ class GraphDesignerView(GraphBaseView):
             help_title = _("Designing a Branch")
 
         context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+
         return render(request, "views/graph-designer.htm", context)
 
 class GraphDataView(View):
