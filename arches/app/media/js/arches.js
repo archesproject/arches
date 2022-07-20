@@ -1,6 +1,6 @@
 define(['utils/set-csrf-token'], function() {
     function removeTrailingCommaFromArray(string) {
-        return string.replace(/,*]*$/, "]");
+        return string.replace(/, *]*$/, "]");
     }
     function removeTrailingCommaFromObject(string) {
         return string.replace(/,\s*}*$/, "}");
