@@ -5,7 +5,7 @@ const StylelintPlugin = require('stylelint-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const commonWebpackConfig = require('./webpack.common.js');
-const { WEBPACK_DEVELOPMENT_SERVER_PORT } = require('./webpack-metadata.js');
+const { WEBPACK_DEVELOPMENT_SERVER_PORT } = require('./webpack-meta-config.js');
 
 
 module.exports = merge(commonWebpackConfig, {

@@ -8,7 +8,7 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { ARCHES_CORE_DIRECTORY, PROJECT_ROOT_DIRECTORY, DJANGO_SERVER_ADDRESS, ARCHES_CORE_NODE_MODULES_ALIASES } = require('./webpack-metadata');
+const { ARCHES_CORE_DIRECTORY, PROJECT_ROOT_DIRECTORY, DJANGO_SERVER_ADDRESS, ARCHES_CORE_NODE_MODULES_ALIASES } = require('./webpack-meta-config');
 
 
 let archesCoreDirectory = ARCHES_CORE_DIRECTORY;

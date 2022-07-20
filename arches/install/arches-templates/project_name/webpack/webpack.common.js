@@ -8,7 +8,7 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { ARCHES_CORE_DIRECTORY, PROJECT_ROOT_DIRECTORY, DJANGO_SERVER_ADDRESS, PROJECT_NODE_MODULES_ALIASES } = require('./webpack-metadata');
+const { ARCHES_CORE_DIRECTORY, PROJECT_ROOT_DIRECTORY, DJANGO_SERVER_ADDRESS, PROJECT_NODE_MODULES_ALIASES } = require('./webpack-meta-config');
 
 
 let archesCoreDirectory = ARCHES_CORE_DIRECTORY;
@@ -47,7 +47,7 @@ const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
     ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup 
 };
 
-const { ARCHES_CORE_NODE_MODULES_ALIASES } = require(`${archesCoreDirectory}/../webpack/webpack-metadata.js`);
+const { ARCHES_CORE_NODE_MODULES_ALIASES } = require(`${archesCoreDirectory}/../webpack/webpack-meta-config.js`);
 const archesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
     // eval() should be safe here, it's running developer-defined code during build
     acc[alias] = eval(executeableString);
