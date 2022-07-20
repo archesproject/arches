@@ -235,7 +235,9 @@ class GraphDesignerView(GraphBaseView):
             ),
         )
 
-        context["graphs"] = JSONSerializer().serialize(graph_models, exclude=["functions"]) # returns empty array when called in 'get_context_data'
+        context["graphs"] = JSONSerializer().serialize(
+            graph_models, exclude=["functions"]
+        )  # returns empty array when called in 'get_context_data'
 
         # reduces load sent to frontend
         if serialized_graph.get("functions"):
