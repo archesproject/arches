@@ -395,6 +395,15 @@ define([
                 return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
             });
             return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+        }).sort((firstEl, secondEl) => {
+            if(firstEl.sortorder < secondEl.sortorder) {
+                return -1;
+            }
+            if(firstEl.sortorder === secondEl.sortorder) {
+                return 0;
+            }
+            return 1;
+
         });
         this.topCards(tc.map(function(card) {
             var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});

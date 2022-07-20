@@ -294,6 +294,10 @@ def prepare_resource_relations_index(create=False):
     return index_settings
 
 
+# the RESOURCE_RELATIONS_INDEX is now deprecated
+# leaving this method here so users can still remove it
+# during a reindex operation
+# TODO: remove in Arches v8
 def delete_resource_relations_index():
     se = SearchEngineFactory().create()
     se.delete_index(index=RESOURCE_RELATIONS_INDEX)
