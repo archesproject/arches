@@ -145,7 +145,7 @@ def import_graph(graphs, overwrite_graphs=True):
 
                 with transaction.atomic():
                     # saves graph publication with serialized graph
-                    graph = Graph.objects.get(pk=graph.graphid) # must retrieve graph using to ensure strings are of type I18n_String
+                    graph = Graph.objects.get(pk=graph.graphid) # retrieve graph using the ORM to ensure strings are I18n_Strings
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
                             publicationid=publication_data["publicationid"],
