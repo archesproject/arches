@@ -154,6 +154,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     }'
 ></div>
 <script>
-    require(['underscore']);
+    require(['underscore'], (_) => { window._ = _; });
 </script>
 {% endblock pre_require_js %}
