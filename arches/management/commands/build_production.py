@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 os.chdir(yarn_path)
 
                 subprocess.call(
-                    "yarn build_development --env django_server_address={django_server_address} arches_core_directory={arches_core_directory}".format(
+                    "yarn build_production --env django_server_address={django_server_address} arches_core_directory={arches_core_directory}".format(
                         django_server_address=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
                         arches_core_directory=settings.ROOT_DIR
                     ), 
