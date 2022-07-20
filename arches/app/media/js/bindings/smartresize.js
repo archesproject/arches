@@ -2,6 +2,7 @@ define([
     'jquery',
     'knockout'
 ], function($, ko) {
+    // eslint-disable-next-line no-undef
     (function(e,t){var n=function(e,t,n){var r;return function(){function u(){if(!n)e.apply(s,o);r=null;}var s=this,o=arguments;if(r)clearTimeout(r);else if(n)e.apply(s,o);r=setTimeout(u,t||100);};};jQuery.fn[t]=function(e){return e?this.bind("resize",n(e)):this.trigger(t);};})(jQuery,"smartresize");
     ko.bindingHandlers.smartresize = {
         init: function(element, valueAccessor, allBindings, viewModel) {
@@ -9,7 +10,7 @@ define([
             var childclass = options.childclass;
             function update_grid() {
                 var content_width = $(element).width()+20;
-                images_per_row = Math.floor(content_width / 300);
+                const images_per_row = Math.floor(content_width / 300);
                 var width = Math.round(content_width / images_per_row);
                 var height = Math.round(width/3*1.8);
                 $(element).find(childclass).each(function(id){

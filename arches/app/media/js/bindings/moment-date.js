@@ -19,6 +19,7 @@
         define(["knockout", "moment"], factory);
     } else {
         // <script> tag: use the global `ko` object, attaching a `mapping` property
+        // eslint-disable-next-line no-undef
         factory(ko, moment);
     }
 }(function(ko, moment) {
@@ -95,7 +96,7 @@
             var value = valueAccessor();
             var valueUnwrapped = ko.utils.unwrapObservable(value);
             if (valueUnwrapped) {
-
+                // eslint-disable-next-line
                 function updateTimeValue(){
                     //                        element.value = moment(valueUnwrapped).format('L');
                     var dateFormat = allBindingsAccessor().dateFormat

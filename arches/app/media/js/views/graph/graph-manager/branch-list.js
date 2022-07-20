@@ -1,9 +1,11 @@
 define([
+    'jquery',
+    'underscore',
     'views/list',
     'views/graph/graph-manager/graph-base',
     'models/graph',
     'knockout',
-], function(ListView, GraphBase, GraphModel, ko) {
+], function($, _, ListView, GraphBase, GraphModel, ko) {
     var BranchList = ListView.extend({
         /**
         * A backbone view to manage a list of branch graphs

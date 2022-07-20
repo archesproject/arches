@@ -6,7 +6,7 @@ define(['utils/set-csrf-token'], function() {
         return string.replace(/,\s*}*$/, "}");
     }
     function convertToCamelCase(string) {
-        return string.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        return string.replace(/-([a-z])/g, function(g) { return g[1].toUpperCase(); });
     }
 
     const archesUrlHTMLObjects = document.querySelectorAll('.arches-urls');

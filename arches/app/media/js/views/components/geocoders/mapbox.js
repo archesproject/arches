@@ -1,9 +1,11 @@
 define([
+    'jquery',
+    'underscore',
     'knockout', 
     'arches', 
     'views/components/geocoders/base-geocoder',
     'templates/views/components/geocoders/geocoder.htm'
-], function(ko, arches, BaseGeocoderViewModel, geocoderTemplate) {
+], function($, _, ko, arches, BaseGeocoderViewModel, geocoderTemplate) {
     return ko.components.register('views/components/geocoders/mapbox', {
         viewModel: function(params) {
             BaseGeocoderViewModel.apply(this, [params]);

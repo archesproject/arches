@@ -64,7 +64,6 @@ define([
                 var sourceUrl = new window.URL(arches.mapSources[self.selectRelatedSource()].data, window.location.origin);
                 var nodes = sourceUrl.searchParams.get('nodeids');
                 var node = sourceUrl.searchParams.get('nodeid');
-                var nodeids = [];
                 if (node) {
                     nodeids.push(node);
                 }
@@ -245,7 +244,7 @@ define([
         var selectFeatureLayers = selectFeatureLayersFactory(selectRelatedSource, selectRelatedSourceLayer, selectedResourceIds(), true, null, this.nodeids, this.filterNodeIds(), self.hoverId(), selectLayerConfig);
         var sources = [];
         for (var sourceName in arches.mapSources) {
-            if (arches.mapSources.hasOwnProperty(sourceName)) {
+            if (Object.prototype.hasOwnProperty.call(arches.mapSources, sourceName)) {
                 sources.push(sourceName);
             }
         }

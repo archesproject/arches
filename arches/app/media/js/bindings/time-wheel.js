@@ -73,8 +73,7 @@ define([
                     });
                 depth = root.height + 1;
                 return d3.partition()
-                    .size([2 * Math.PI, root.height + 1])
-                    (root);
+                    .size([2 * Math.PI, root.height + 1])(root);
             };
 
             var d3ClickManager = function() {
@@ -134,11 +133,11 @@ define([
                 selectedPeriod(d);
             })
                 .on("dblclick", function(event, d) {
-                    dblclick(d);
+                    dblclick(d); // eslint-disable-line no-undef
                 });
 
             function highlightPeriod(event, d) {
-                count = d.data.size;
+                let count = d.data.size;
                 if (d.data.size < 1) {
                     count = "< 1";
                 }
@@ -231,7 +230,7 @@ define([
                     .attr("fill", "none")
                     .attr("pointer-events", "all")
                     .call(clickmanager);
-    
+                /* eslint-disable no-inner-declarations */
                 function dblclick(p) {
                     parent.datum(p.parent || root);
     
@@ -261,7 +260,6 @@ define([
                 }
                 
                 function arcVisible(d) {
-                    return true;
                     return d.y1 <= depth && d.y0 >= 1 && d.x1 > d.x0;
                 }
 

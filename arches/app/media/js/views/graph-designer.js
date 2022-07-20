@@ -191,6 +191,7 @@ define([
                     contentType: false,
                     success: function(response) {
                         if (response[0].length != 0) {
+                            // eslint-disable-next-line no-constant-condition
                             if (typeof(response[0])) {
                                 response = response[0].join('<br />');
                             }
@@ -444,7 +445,7 @@ define([
             var correspondingCard = function(item, cardTree){
                 var cardList = cardTree.cachedFlatTree;
                 if (cardList === undefined) {
-                    var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                    cardList = cardTree.flattenTree(cardTree.topCards(), []);
                     cardTree.cachedFlatTree = cardList;
                 }
                 var res;

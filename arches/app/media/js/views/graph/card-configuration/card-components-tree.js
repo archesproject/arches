@@ -1,8 +1,9 @@
 define([
     'backbone',
+    'underscore',
     'knockout',
     'bindings/sortable'
-], function(Backbone, ko) {
+], function(Backbone, _, ko) {
     var CardComponentsTree = Backbone.View.extend({
         /**
         * A backbone view representing a card components tree

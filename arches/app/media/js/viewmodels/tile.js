@@ -46,7 +46,7 @@ define([
                     displayname(descriptors.displayname);
                 } else {
                     const defaultLanguageValue = descriptors.displayname.find(displayname => displayname.language == arches.activeLanguage)?.value;
-                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")"
+                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")";
                     displayname(displayNameValue);
                 }
             }

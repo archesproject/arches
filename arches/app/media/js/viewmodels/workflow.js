@@ -10,12 +10,12 @@ define([
     'bindings/gallery',
     'bindings/scrollTo'
 ], function($, _, ko, koMapping, arches, uuid, AlertViewModel, WorkflowStep) {
-    WORKFLOW_LABEL = 'workflow';
-    WORKFLOW_ID_LABEL = 'workflow-id';
-    STEPS_LABEL = 'workflow-steps';
-    STEP_ID_LABEL = 'workflow-step-id';
-    STEP_IDS_LABEL = 'workflow-step-ids';
-    WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
+    const WORKFLOW_LABEL = 'workflow';
+    const WORKFLOW_ID_LABEL = 'workflow-id';
+    const STEPS_LABEL = 'workflow-steps';
+    const STEP_ID_LABEL = 'workflow-step-id';
+    const STEP_IDS_LABEL = 'workflow-step-ids';
+    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     var Workflow = function(config) {
         var self = this;

@@ -5,7 +5,7 @@ define([
     'arches', 
     'templates/views/components/widgets/text.htm',
     'bindings/chosen'
-], function (ko, _, WidgetViewModel, arches, textWidgetTemplate) {
+], function(ko, _, WidgetViewModel, arches, textWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -32,7 +32,7 @@ define([
 
         self.currentDefaultText = ko.observable();
         self.currentDefaultDirection = ko.observable();
-        self.currentDefaultLanguage = ko.observable({code: arches.activeLanguage})
+        self.currentDefaultLanguage = ko.observable({code: arches.activeLanguage});
 
         const initialCurrent = {};
         const initialDefault = {};
@@ -66,7 +66,7 @@ define([
             } else {
                 self.currentText('');
                 self.currentDirection('ltr');
-                currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
+                currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
             }
 
             if(currentLanguage?.code && currentDefaultValue?.[currentLanguage.code]){
@@ -78,9 +78,9 @@ define([
             } else {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
-                currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'}
+                currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
             }
-        }
+        };
 
         init();
 
@@ -92,7 +92,7 @@ define([
             const currentLanguage = self.currentDefaultLanguage();
             if(!currentLanguage) { return; }
             currentDefaultValue[currentLanguage.code].value = newValue;
-            self.defaultValue(currentDefaultValue)
+            self.defaultValue(currentDefaultValue);
             self.card._card.valueHasMutated();
         });
 
@@ -100,7 +100,7 @@ define([
             const currentLanguage = self.currentDefaultLanguage();
             if(!currentLanguage) { return; }
             if(!currentDefaultValue?.[currentLanguage.code]){
-                currentDefaultValue[currentLanguage.code] = {}
+                currentDefaultValue[currentLanguage.code] = {};
             }
             currentDefaultValue[currentLanguage.code].direction = newValue;
             self.defaultValue(currentDefaultValue);
@@ -136,11 +136,11 @@ define([
             if(!currentLanguage) { return; }
 
             if(!currentValue?.[currentLanguage.code]){
-                currentValue[currentLanguage.code] = {}
+                currentValue[currentLanguage.code] = {};
             }
             currentValue[currentLanguage.code].direction = newValue;
             self.value(currentValue);
-        })
+        });
 
         self.currentLanguage.subscribe(() => {
             if(!self.currentLanguage()){ return; }
@@ -149,7 +149,7 @@ define([
                 currentValue[currentLanguage.code] = {
                     value: '',
                     direction: currentLanguage?.default_direction
-                }
+                };
                 self.value(currentValue);
             }
 

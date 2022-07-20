@@ -109,26 +109,26 @@ define([
                             email: userEmail
                         }
                     })
-                    .done(function() {
-                        self.viewModel.alert(
-                            new AlertViewModel(
-                                'ep-alert-blue',
-                                arches.translations.twoFactorAuthenticationEmailSuccess.title,
-                                arches.translations.twoFactorAuthenticationEmailSuccess.text,
-                                null,
-                                function(){}
-                            )
-                        );
-                    })
-                    .error(function(e) {
-                        self.viewModel.alert(
-                            new AlertViewModel(
-                                'ep-alert-red',
-                                e.statusText,
-                                e.responseText,
-                            )
-                        );
-                    });
+                        .done(function() {
+                            self.viewModel.alert(
+                                new AlertViewModel(
+                                    'ep-alert-blue',
+                                    arches.translations.twoFactorAuthenticationEmailSuccess.title,
+                                    arches.translations.twoFactorAuthenticationEmailSuccess.text,
+                                    null,
+                                    function(){}
+                                )
+                            );
+                        })
+                        .error(function(e) {
+                            self.viewModel.alert(
+                                new AlertViewModel(
+                                    'ep-alert-red',
+                                    e.statusText,
+                                    e.responseText,
+                                )
+                            );
+                        });
                 };
 
                 self.viewModel.alert(

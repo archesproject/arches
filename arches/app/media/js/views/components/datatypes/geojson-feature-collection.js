@@ -169,6 +169,7 @@ define([
                         layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
                         if (!(self.config.haloRadius() > 0)) { layer.paint["circle-radius"] = 1; }
                         self.config.haloRadius(layer.paint["circle-radius"]);
+                        break;
                     case "resources-cluster-point-halo-" + params.nodeid:
                         layer.paint["circle-color"] = self.config.pointHaloColor();
                         break;
@@ -176,6 +177,7 @@ define([
                         layer.paint["circle-radius"] = parseInt(self.config.radius());
                         if (!(self.config.radius() > 0)) { layer.paint["circle-radius"] = 1; }
                         self.config.radius(layer.paint["circle-radius"]);
+                        break;
                     case "resources-cluster-point-" + params.nodeid:
                         layer.paint["circle-color"] = self.config.pointColor();
                         break;

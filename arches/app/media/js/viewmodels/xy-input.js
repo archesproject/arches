@@ -1,4 +1,4 @@
-define(['knockout', 'arches', 'proj4', 'turf'], function(ko, arches, proj4, turf) {
+define(['knockout', 'underscore', 'arches', 'proj4', 'turf'], function(ko, _, arches, proj4, turf) {
     /**
     * A base viewmodel for maptools
     *
@@ -83,7 +83,7 @@ define(['knockout', 'arches', 'proj4', 'turf'], function(ko, arches, proj4, turf
         this.updateSelectedPoint = function(){
             var projected;
             if (mapWidget.draw.getSelected() && mapWidget.draw.getSelected().features) {
-                points = _.filter(mapWidget.draw.getSelected().features, function(item) {return _.some([item.geometry], {type:'Point'});});
+                const points = _.filter(mapWidget.draw.getSelected().features, function(item) {return _.some([item.geometry], {type:'Point'});});
                 if (points.length > 0) {
                     self.selectedPoint(points[0]);
                     var x = points[0].geometry.coordinates[0];

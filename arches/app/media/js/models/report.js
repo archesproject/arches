@@ -45,7 +45,7 @@ define(['jquery',
                     self.configState = {};
                     config = self.get('config');
                     _.each(val, function(key) {
-                        if (self.defaultConfig.hasOwnProperty(key)) {
+                        if (Object.prototype.hasOwnProperty.call(self.defaultConfig, key)) {
                             self.configState[key] = ko.unwrap(config[key]);
                         }
                     });
@@ -55,7 +55,7 @@ define(['jquery',
 
             this.resetConfigs = function(previousConfigs) {
                 this.configKeys().forEach(function(key){
-                    if (self.defaultConfig.hasOwnProperty(key)) {
+                    if (Object.prototype.hasOwnProperty.call(self.defaultConfig, key)) {
                         if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
                             koMapping.fromJS(previousConfigs, self.configState);
                         }
@@ -97,7 +97,7 @@ define(['jquery',
                         write: function(value) {
                             var key;
                             var configKeys = [];
-                            console.log("#(#(#", reportLookup, value)
+                            console.log("#(#(#", reportLookup, value);
                             var defaultConfig = reportLookup[value].defaultconfig;
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);

@@ -285,7 +285,7 @@ define([
             if (datatypeRecord && datatypeRecord.defaultconfig && config) {
                 var defaultConfig = datatypeRecord.defaultconfig;
                 _.each(defaultConfig, function(value, key) {
-                    if (!config.hasOwnProperty(key)) {
+                    if (!Object.prototype.hasOwnProperty.call(config, key)) {
                         config[key] = value;
                     }
                 });

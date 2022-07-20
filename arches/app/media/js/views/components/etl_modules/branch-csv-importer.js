@@ -47,12 +47,12 @@ define([
                 return decodeURIComponent(xsrfCookies[0].split('=')[1]);
             }
 
-            this.downloadTemplate = async () => {
+            this.downloadTemplate = async() => {
                 const url = `/etl-manager`;
                 const formData = new window.FormData();
                 formData.append("id", ko.unwrap(this.selectedTemplate));
                 formData.append("format", "xls");
-                formData.append("module", ko.unwrap(self.moduleId));;
+                formData.append("module", ko.unwrap(self.moduleId));
                 formData.append("action", "download");
                 
                 const response = await window.fetch(url, {

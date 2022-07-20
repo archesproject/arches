@@ -1,9 +1,11 @@
 define([
     'backbone',
+    'jquery',
+    'underscore',
     'knockout',
     'regenerator-runtime',  // d3 dependency must be loaded first
     'd3',
-], function(Backbone, ko, regeneratorRuntime, d3) {
+], function(Backbone, $, _, ko, regeneratorRuntime, d3) {
     var GraphBase = Backbone.View.extend({
         /**
         * A backbone view to for rendering D3 graphs comprised of nodes and edges as svg

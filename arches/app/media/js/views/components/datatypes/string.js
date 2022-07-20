@@ -20,7 +20,7 @@ define([
                     op: self.op(),
                     lang: self.language()?.code,
                     val: self.searchValue()
-                }
+                };
             }).extend({ throttle: 750 });
             params.filterValue(this.filterValue());
             this.filterValue.subscribe(function(val) {

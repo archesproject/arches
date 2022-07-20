@@ -3,6 +3,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'knockout', 'module'], factory);
     } else {
+        // eslint-disable-next-line no-undef
         factory(jQuery, ko);
     }
 })(function($, ko, module) {

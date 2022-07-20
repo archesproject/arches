@@ -52,9 +52,9 @@
         }
 
         ko.utils.arrayForEach(["afterAdd", "afterRender", "as", "beforeRemove", "includeDestroyed", "templateEngine", "templateOptions", "nodes"], function(option) {
-            if (options.hasOwnProperty(option)) {
+            if (Object.prototype.hasOwnProperty.call(options, option)) {
                 result[option] = options[option];
-            } else if (ko.bindingHandlers.sortable.hasOwnProperty(option)) {
+            } else if (Object.prototype.hasOwnProperty.call(ko.bindingHandlers.sortable, option)) {
                 result[option] = ko.bindingHandlers.sortable[option];
             }
         });
@@ -261,7 +261,7 @@
                             }
 
                             //if the strategy option is unset or false, employ the order strategy involving removal and insertion of items
-                            if (!sortable.hasOwnProperty("strategyMove") || sortable.strategyMove === false) {
+                            if (!Object.prototype.hasOwnProperty.call(sortable, "strategyMove") || sortable.strategyMove === false) {
                                 //do the actual move
                                 if (targetIndex >= 0) {
                                     if (sourceParent) {

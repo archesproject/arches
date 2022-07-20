@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'knockout', 
     'underscore', 
     'viewmodels/widget', 
@@ -6,7 +7,7 @@ define([
     'templates/views/components/widgets/rich-text.htm',
     'bindings/ckeditor', 
     'bindings/chosen'
-], function (ko, _, WidgetViewModel, arches, richTextWidgetTemplate) {
+], function($, ko, _, WidgetViewModel, arches, richTextWidgetTemplate) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget
@@ -41,7 +42,7 @@ define([
         if(!currentValue?.[currentLanguage.code]){
             self.currentText = ko.observable('');
             self.currentDirection = ko.observable('ltr');
-            currentValue[currentLanguage.code] = {value: '', direction: 'ltr'}
+            currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
         } else {
             self.currentText = ko.observable(currentValue?.[currentLanguage.code]?.value);
             self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
@@ -63,12 +64,12 @@ define([
             if(!currentLanguage) { return; }
             currentValue[currentLanguage.code].direction = newValue;
             self.value(currentValue);
-        })
+        });
 
         self.currentLanguage.subscribe(() => {
             if(!self.currentLanguage()){ return; }
 
-            const currentLanguage = self.currentLanguage()
+            const currentLanguage = self.currentLanguage();
             if(!currentValue?.[currentLanguage.code]) {
                 currentValue[currentLanguage.code] = {
                     value: '',
