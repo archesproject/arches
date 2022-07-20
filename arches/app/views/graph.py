@@ -230,11 +230,12 @@ class GraphDesignerView(GraphBaseView):
             ontologies=JSONSerializer().serialize(models.Ontology.objects.filter(parentontology=None), exclude=["version", "path"]),
             ontology_classes=JSONSerializer().serialize(models.OntologyClass.objects.values("source", "ontology_id")),
             graph_models=graph_models,
-            graphs=JSONSerializer().serialize(graph_models, exclude=["functions"]),
             constraints=JSONSerializer().serialize(
                 models.ConstraintModel.objects.filter(card__pk__in=[card_dict["cardid"] for card_dict in serialized_graph["cards"]])
             ),
         )
+
+        context["graphs"] = JSONSerializer().serialize(graph_models, exclude=["functions"]) # returns empty array when called in 'get_context_data'
 
         # reduces load sent to frontend
         if serialized_graph.get("functions"):
@@ -260,7 +261,6 @@ class GraphDesignerView(GraphBaseView):
             help_title = _("Designing a Branch")
 
         context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
-
         return render(request, "views/graph-designer.htm", context)
 
 class GraphDataView(View):
