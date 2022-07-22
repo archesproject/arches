@@ -284,6 +284,7 @@ class JsonLdReader(Reader):
         self.graphtree = None
         self.print_buf = []
         self.verbosity = kwargs.get("verbosity", 1)
+        self.ignore_errors = kwargs.get("ignore_errors", False)
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
@@ -423,12 +424,20 @@ class JsonLdReader(Reader):
             self.root_json_document = jsonld_document
             try:
                 self.data_walk(jsonld_document, self.graphtree, result)
-            except:
+            except Exception as e:
+                err_msg_fail = f"FAILED to completely load resource with id: {self.resource.pk}\n"
+                self.logger.debug(err_msg_fail)
+                print(err_msg_fail)
                 if self.verbosity > 1:
                     for line in self.print_buf:
                         # print(line) # uncomment this line to print errors directly to the screen
                         self.logger.debug(line)
-                raise
+                    err_msg_fail_detail = f"DETAILED ERROR MESSAGE\n{str(e)}"
+                    self.logger.debug(err_msg_fail_detail)
+                    print(err_msg_fail_detail)
+                if not self.ignore_errors:
+                    raise
+
 
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None

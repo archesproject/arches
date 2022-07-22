@@ -41,7 +41,7 @@ jobs:
 
       - uses: ankane/setup-elasticsearch@v1
         with:
-          elasticsearch-version: 7
+          elasticsearch-version: 8
 
       - name: Webpack frontend files
         run: |
