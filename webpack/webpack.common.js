@@ -2,35 +2,51 @@ const fetch = require('cross-fetch');
 const Path = require('path');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { ARCHES_CORE_DIRECTORY, PROJECT_ROOT_DIRECTORY, DJANGO_SERVER_ADDRESS, ARCHES_CORE_NODE_MODULES_ALIASES } = require('./webpack-meta-config');
+const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
+const { 
+    ARCHES_CORE_DIRECTORY, 
+    PROJECT_ROOT_DIRECTORY,
+    DJANGO_SERVER_ADDRESS, 
+    ARCHES_CORE_NODE_MODULES_ALIASES,
+    PUBLIC_PATH,
+} = require('./webpack-meta-config');
 
 
 let archesCoreDirectory = ARCHES_CORE_DIRECTORY;
+let projectRootDirectory = PROJECT_ROOT_DIRECTORY;
 let djangoServerAddress = DJANGO_SERVER_ADDRESS;
+let publicPath = PUBLIC_PATH;
 let isTestEnvironment = false;
 
 for (let arg of process.argv) {
     const keyValuePair = arg.split('=');
+    const key = keyValuePair[0].toLowerCase();
+    const value = keyValuePair[1];
 
-    if (keyValuePair[0] === 'arches_core_directory') {
-        archesCoreDirectory = keyValuePair[1];
+    if (key === 'arches_core_directory') {
+        archesCoreDirectory = value;
     }
-    if (keyValuePair[0] === 'django_server_address') {
-        djangoServerAddress = keyValuePair[1];
+    if (key === 'project_root_directory') {
+        projectRootDirectory = value;
     }
-    if (keyValuePair[0] === 'test') {
-        isTestEnvironment = keyValuePair[1];
+    if (key === 'django_server_address') {
+        djangoServerAddress = value;
+    }
+    if (key === 'public_path') {
+        publicPath = value;
+    }
+    if (key === 'test') {
+        isTestEnvironment = value;
     }
 }
 
 const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js`), {});
-const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/js`), {});
+const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${projectRootDirectory}/media/js`), {});
 
 const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys(archesCoreEntryPointConfiguration).reduce((acc, path) => {
     acc[path + '$'] = Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js/${path}.js`);
@@ -38,7 +54,7 @@ const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys
 }, {});
 
 const projectJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys(projectEntryPointConfiguration).reduce((acc, path) => {
-    acc[path + '$'] = Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/js/${path}.js`);
+    acc[path + '$'] = Path.resolve(__dirname, `${projectRootDirectory}/media/js/${path}.js`);
     return acc;
 }, {});
 
@@ -55,7 +71,13 @@ const archesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE_NODE_
 
 const templateFilepathLookup = buildTemplateFilePathLookup(
     Path.resolve(__dirname, `${archesCoreDirectory}/app/templates`),
-    Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/templates`)
+    Path.resolve(__dirname, `${projectRootDirectory}/templates`)
+);
+
+const imageFilepathLookup = buildImageFilePathLookup(
+    publicPath,
+    Path.resolve(__dirname, `${archesCoreDirectory}/app/media/img`),
+    Path.resolve(__dirname, `${projectRootDirectory}/media/img`)
 );
 
 module.exports = {
@@ -64,36 +86,21 @@ module.exports = {
         ...projectEntryPointConfiguration 
     },
     output: {
-        path: Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/build`),
-        publicPath: '/static/',
+        path: Path.resolve(__dirname, `${projectRootDirectory}/media/build`),
+        publicPath: publicPath,
         libraryTarget: 'amd-require',
         clean: true,
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin({ 
-            patterns: [
-                {
-                    from: Path.resolve(__dirname, `${archesCoreDirectory}/app/media/img`), 
-                    to: 'img',
-                    priority: 5,
-                }, 
-                {
-                    from: Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/img`), 
-                    to: 'img',
-                    priority: 10,
-                    force: true
-                } 
-            ] 
-        }),
         new webpack.DefinePlugin({
             ARCHES_CORE_DIRECTORY: `'${archesCoreDirectory}'`,
-            PROJECT_ROOT_DIRECTORY: `'${PROJECT_ROOT_DIRECTORY}'`
+            PROJECT_ROOT_DIRECTORY: `'${projectRootDirectory}'`
         }),
         new webpack.ProvidePlugin({
-            jquery:  Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/node_modules/jquery/dist/jquery.min`),
-            jQuery:  Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/node_modules/jquery/dist/jquery.min`),
-            $:  Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/node_modules/jquery/dist/jquery.min`),
+            jquery:  Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
+            jQuery:  Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
+            $:  Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
         }),
         new MiniCssExtractPlugin(),
         new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
@@ -104,10 +111,11 @@ module.exports = {
         }
     },
     resolve: {
-        modules: [Path.resolve(__dirname, `${PROJECT_ROOT_DIRECTORY}/media/node_modules`)],
+        modules: [Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules`)],
         alias: {
             ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...templateFilepathLookup,
+            ...imageFilepathLookup,
             ...archesCoreNodeModulesAliases,
         },
     },
@@ -121,10 +129,10 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader: `${PROJECT_ROOT_DIRECTORY}/media/node_modules/babel-loader`,
+                loader: `${projectRootDirectory}/media/node_modules/babel-loader`,
                 options: {
                     presets: ['@babel/preset-env'],
-                    cacheDirectory: `${PROJECT_ROOT_DIRECTORY}/media/node_modules/.cache/babel-loader`,
+                    cacheDirectory: `${projectRootDirectory}/media/node_modules/.cache/babel-loader`,
                 }
             },
             {
@@ -134,19 +142,19 @@ module.exports = {
                         'loader': MiniCssExtractPlugin.loader,
                     },
                     {
-                        'loader': `${PROJECT_ROOT_DIRECTORY}/media/node_modules/css-loader`,
+                        'loader': `${projectRootDirectory}/media/node_modules/css-loader`,
                     },
                     {
-                        'loader': `${PROJECT_ROOT_DIRECTORY}/media/node_modules/postcss-loader`,
+                        'loader': `${projectRootDirectory}/media/node_modules/postcss-loader`,
                     },
                     {
-                        'loader': `${PROJECT_ROOT_DIRECTORY}/media/node_modules/sass-loader`,
+                        'loader': `${projectRootDirectory}/media/node_modules/sass-loader`,
                     }
                 ],
             },
             {
                 test: /\.html?$/i,
-                loader: `${PROJECT_ROOT_DIRECTORY}/media/node_modules/html-loader`,
+                loader: `${projectRootDirectory}/media/node_modules/html-loader`,
                 options: {
                     esModule: false,
                     minimize: {
@@ -154,7 +162,7 @@ module.exports = {
                     },
                     preprocessor: async (content, loaderContext) => {
                         const resourcePath = loaderContext['resourcePath'];
-                        const projectResourcePathData = resourcePath.split(`${PROJECT_ROOT_DIRECTORY}/`);
+                        const projectResourcePathData = resourcePath.split(`${projectRootDirectory}/`);
                         const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${archesCoreDirectory}/app/`)[1]; 
 
                         let resp;
@@ -202,7 +210,7 @@ module.exports = {
             },
             {
                 test: /\.txt$/i,
-                use: `${PROJECT_ROOT_DIRECTORY}/media/node_modules/raw-loader`,
+                use: `${projectRootDirectory}/media/node_modules/raw-loader`,
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,

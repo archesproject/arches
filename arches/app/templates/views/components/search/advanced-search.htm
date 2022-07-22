@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load webpack_static from webpack_loader %}
 
 <!--ko let: { self: $data }-->
 <div class="flex">
@@ -10,7 +11,7 @@
             <div id="rr-splash" class="rr-splash">
                 <!-- Image -->
                 <div class="img-lg img-circle rr-splash-img-container">
-                    <img class="rr-splash-img" data-bind="attr: {'src': urls.media + 'img/inspection.png'}"  alt="Advanced Search">
+                    <img class="rr-splash-img" src="{% webpack_static 'img/inspection.png' %}" alt="Advanced Search">
                 </div>
 
                 <!-- Splash Title -->

@@ -8,6 +8,7 @@ module.exports = {
     PROJECT_ROOT_DIRECTORY: projectPath + '/app',
     DJANGO_SERVER_ADDRESS: "http://localhost:8000/",
     WEBPACK_DEVELOPMENT_SERVER_PORT: 9000,
+    PUBLIC_PATH: "/static/",
     ARCHES_CORE_NODE_MODULES_ALIASES: JSON.stringify({
         "plugins/knockout-select2": "Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'knockout-select2.js')",
         "nifty": "Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'nifty')",
