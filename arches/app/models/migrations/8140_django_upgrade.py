@@ -9,7 +9,7 @@ import re
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8528_bulk_load_performance_functions"),
+        ("models", "8689_card_violation_message"),
     ]
 
     operations = [
