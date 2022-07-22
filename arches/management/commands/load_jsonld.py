@@ -137,7 +137,7 @@ class Command(BaseCommand):
 
     def load_resources(self, options):
 
-        self.reader = JsonLdReader(verbosity=options["verbosity"])
+        self.reader = JsonLdReader(verbosity=options["verbosity"], ignore_errors=options["ignore_errors"])
         self.jss = JSONSerializer()
         source = options["source"]
         if options["model"]:
