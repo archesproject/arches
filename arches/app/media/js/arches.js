@@ -20,9 +20,14 @@ define(['utils/set-csrf-token'], function() {
             ) {
                 try {
                     var functionFromString = Function("return" + attribute.value);
-                    parsedArchesUrls[attribute.name] = functionFromString();
+                    let result = functionFromString();
+
+                    if (typeof result === 'object') {
+                        result = String(result);
+                    }
+                    parsedArchesUrls[attribute.name] = result;
                 } catch (error) {
-                    parsedArchesUrls[attribute.name] = attribute.value;
+                    parsedArchesUrls[attribute.name] = String(attribute.value);
                 }
             }
         }
