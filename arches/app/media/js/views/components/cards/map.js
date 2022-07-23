@@ -48,64 +48,66 @@ define([
             params.activeBasemap = this.card.activeBasemap;
         }
 
-        if (this.centerX() == 0 && this.centerY() == 0 && this.zoom() == 0) {
-            this.centerX(arches.mapDefaultX);
-            this.centerY(arches.mapDefaultY);
-            this.zoom(arches.mapDefaultZoom);
+        if (ko.isObservable(self.basemap)) {  // if basemap has loaded
+            if (self.centerX() == 0 && self.centerY() == 0 && self.zoom() == 0) {
+                self.centerX(arches.mapDefaultX);
+                self.centerY(arches.mapDefaultY);
+                self.zoom(arches.mapDefaultZoom);
+            }
+    
+            // subscriptions need to stay explicit! DRY-ing will break
+            this.basemap.subscribe(function(basemap) {
+                if (self.config.basemap() !== basemap) {
+                    self.config.basemap(basemap);
+                }
+    
+                for (var widget of widgets) {
+                    widget.config.basemap(basemap);
+                }
+            });
+            this.overlayConfigs.subscribe(function(overlayConfigs) {
+                if (self.config.overlayConfigs() !== overlayConfigs) {
+                    self.config.overlayConfigs(overlayConfigs);
+                }
+    
+                for (var widget of widgets) {
+                    widget.config.overlayConfigs(overlayConfigs);
+                }
+            });
+            this.centerX.subscribe(function(x) {
+                if (self.config.centerX() !== x) {
+                    self.config.centerX(x);
+                }
+    
+                self.centerX(x); /* forces card-control update */
+                
+                for (var widget of widgets) {
+                    widget.config.centerX(x);
+                }
+            });
+            this.centerY.subscribe(function(y) {
+                if (self.config.centerY() !== y) {
+                    self.config.centerY(y);
+                }
+    
+                self.centerY(y); /* forces card-control update */
+    
+                for (var widget of widgets) {
+                    widget.config.centerY(y);
+                }
+            });
+            this.zoom.subscribe(function(zoom) {
+                if (self.config.zoom() !== zoom) {
+                    self.config.zoom(zoom);
+                }
+                
+                self.zoom(zoom); /* forces card-control update */
+    
+                for (var widget of widgets) {
+                    widget.config.zoom(zoom);
+                }
+            });
         }
-
-        // subscriptions need to stay explicit! DRY-ing will break
-        this.basemap.subscribe(function(basemap) {
-            if (self.config.basemap() !== basemap) {
-                self.config.basemap(basemap);
-            }
-
-            for (var widget of widgets) {
-                widget.config.basemap(basemap);
-            }
-        });
-        this.overlayConfigs.subscribe(function(overlayConfigs) {
-            if (self.config.overlayConfigs() !== overlayConfigs) {
-                self.config.overlayConfigs(overlayConfigs);
-            }
-
-            for (var widget of widgets) {
-                widget.config.overlayConfigs(overlayConfigs);
-            }
-        });
-        this.centerX.subscribe(function(x) {
-            if (self.config.centerX() !== x) {
-                self.config.centerX(x);
-            }
-
-            self.centerX(x); /* forces card-control update */
-            
-            for (var widget of widgets) {
-                widget.config.centerX(x);
-            }
-        });
-        this.centerY.subscribe(function(y) {
-            if (self.config.centerY() !== y) {
-                self.config.centerY(y);
-            }
-
-            self.centerY(y); /* forces card-control update */
-
-            for (var widget of widgets) {
-                widget.config.centerY(y);
-            }
-        });
-        this.zoom.subscribe(function(zoom) {
-            if (self.config.zoom() !== zoom) {
-                self.config.zoom(zoom);
-            }
-            
-            self.zoom(zoom); /* forces card-control update */
-
-            for (var widget of widgets) {
-                widget.config.zoom(zoom);
-            }
-        });
 
         params.defaultConfig = self.card.model.get('defaultConfig');
         params.overlayConfigs = this.overlayConfigs;
