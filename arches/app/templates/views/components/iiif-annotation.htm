@@ -198,8 +198,8 @@
                                     <div class="map-card-feature-list">
                                         <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
                                             <select 
-                                                data-placeholder="$root.translations.addANewFeature + '...'" 
                                                 data-bind="
+                                                    placeholder: $root.translations.addANewFeature + '...',
                                                     value: self.featureLookup[widget.node_id()].selectedTool,
                                                     valueAllowUnset: true,
                                                     options: [
@@ -232,8 +232,8 @@
                                         </div>
                                         <div class="add-new-feature" data-bind="visible: self.disableDrawing">
                                             <select 
-                                                data-placeholder="$root.translations.addANewFeature + '...'" 
                                                 data-bind="
+                                                    placeholder: $root.translations.addANewFeature + '...',
                                                     value: self.featureLookup[widget.node_id()].selectedTool,
                                                     valueAllowUnset: true,
                                                     options: [

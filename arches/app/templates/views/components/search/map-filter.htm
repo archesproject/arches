@@ -57,8 +57,8 @@
                 <span data-bind="text: $root.translations.selectAFilter"></span>
             </h5>
             <select 
-                data-placeholder="$root.translations.drawA" 
                 data-bind="
+                    placeholder: $root.translations.drawA,
                     value: selectedTool,
                     valueAllowUnset: true,
                     options: spatialFilterTypes,

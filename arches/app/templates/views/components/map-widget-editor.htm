@@ -66,8 +66,8 @@
                             <div class="map-card-feature-list">
                                 <div class="add-new-feature">
                                     <select 
-                                        data-placeholder="$root.translations.addANewFeature + '...'" 
                                         data-bind="
+                                            placeholder: $root.translations.addANewFeature + '...',
                                             value: self.featureLookup[widget.node_id()].selectedTool,
                                             valueAllowUnset: true,
                                             options: widget.drawTools,

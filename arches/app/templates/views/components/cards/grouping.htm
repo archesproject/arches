@@ -400,6 +400,17 @@
 
 {% block config %}
 <div>
-    <select class="resources" multiple data-placeholder="$root.translations.chooseASiblingCard + '...'" data-bind="selectedOptions: groupedCardIds, options: siblingCards, optionsText: 'name', optionsValue: 'id', chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}"></select>
+    <select 
+        class="resources" 
+        multiple 
+        data-bind="
+            placeholder: $root.translations.chooseASiblingCard + '...',
+            selectedOptions: groupedCardIds, 
+            options: siblingCards, 
+            optionsText: 'name', 
+            optionsValue: 'id', 
+            chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}
+        "
+    ></select>
 </div>
 {% endblock config %}
