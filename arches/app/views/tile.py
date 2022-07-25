@@ -231,7 +231,7 @@ class TileData(View):
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
                     resource_instance = tile.resourceinstance
-                    is_active = resource_instance.graph.publication
+                    is_active = resource_instance.graph.publication_id is not None
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
                 user_is_reviewer = user_is_resource_reviewer(request.user)
