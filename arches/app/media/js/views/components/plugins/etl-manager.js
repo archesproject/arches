@@ -4,8 +4,9 @@ define([
     'js-cookie',
     'arches',
     'viewmodels/alert',
-    'templates/views/components/plugins/etl-manager.htm'
-], function($, ko, Cookies, arches, AlertViewModel, ETLManagerTemplate) {
+    'templates/views/components/plugins/etl-manager.htm',
+    'utils/load-component-dependencies'
+], function($, ko, Cookies, arches, AlertViewModel, ETLManagerTemplate, loadComponentDependencies) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
@@ -187,7 +188,7 @@ define([
                     }
                 }).then(function(data){
                     self.etlModules = data.map(function(etl){
-                        require([`${etl.component}`]);
+                        loadComponentDependencies([`${etl.component}`]);
                         return etl;
                     });
                     self.loading(false);
