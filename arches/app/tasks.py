@@ -208,29 +208,44 @@ def on_chord_error(request, exc, traceback):
 def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_csv_importer
 
-    BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
-    BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+    logger = logging.getLogger(__name__)
 
-    load_event = models.LoadEvent.objects.get(loadid=loadid)
-    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
-    msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
-    user = User.objects.get(id=userid)
-    notify_completion(msg, user)
+    try:
+        BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+        BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = _("Failed")
+        load_event.save()
 
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
     from arches.app.etl_modules import import_single_csv
 
-    ImportSingleCsv = import_single_csv.ImportSingleCsv()
-    ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+    logger = logging.getLogger(__name__)
 
-    load_event = models.LoadEvent.objects.get(loadid=loadid)
-    status = _("Compeleted") if load_event.status == "indexed" else _("Failed")
-    msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
-    user = User.objects.get(id=userid)
-    notify_completion(msg, user)
+    try:
+        ImportSingleCsv = import_single_csv.ImportSingleCsv()
+        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
 
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = _("Failed")
+        load_event.save()
 
 @shared_task
 def reverse_etl_load(loadid):
