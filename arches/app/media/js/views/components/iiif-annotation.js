@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
@@ -7,7 +8,7 @@ define([
     'geojson-extent',
     'views/components/iiif-viewer',
     'leaflet-draw'
-], function(_, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
+], function($, _, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
     var viewModel = function(params) {
         var self = this;
 
@@ -359,7 +360,7 @@ define([
                     featureClick = false;
                 });
 
-                if (self.form) self.form.on('tile-reset', function() {
+                if (self.form) $(self.form).on('tile-reset', function() {
                     disableEditing();
                     updateDrawFeatures();
                     _.each(self.featureLookup, function(value) {

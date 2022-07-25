@@ -30,7 +30,7 @@ define([
 
         if(self.form){
             const originalValue = JSON.parse(JSON.stringify(self.value()));
-            self.form.on('tile-reset', (x) => {
+            $(self.form).on('tile-reset', (x) => {
                 self.value(originalValue);
             });
         }

@@ -148,7 +148,7 @@ require([
                     el: $('#add-scheme-form')
                 });
                 form.modal.modal('show');
-                form.on({
+                $(form).on({
                     'conceptSchemeAdded': function(newScheme){
                         conceptTree.render();
                         concept.set('id', newScheme.id);
@@ -171,7 +171,7 @@ require([
                     viewModel: this.viewModel
                 });
                 form.modal.modal('show');
-                form.on({
+                $(form).on({
                     'conceptSchemeDeleted': function(){
                         window.location = arches.urls.rdm;
                     }
@@ -186,7 +186,7 @@ require([
                     viewModel: this.viewModel
                 });
                 form.modal.modal('show');
-                form.on({
+                $(form).on({
                     'conceptSchemeAdded': function(response, status){
                         if (status === 'success'){
                             conceptTree.render();
@@ -205,7 +205,7 @@ require([
                     el: $('#add-collection-form')
                 });
                 form.modal.modal('show');
-                form.on({
+                $(form).on({
                     'collectionAdded': function(newCollection){
                         dropdownTree.render();
                         concept.set('id', newCollection.id);
@@ -220,7 +220,7 @@ require([
                     model: null
                 });
                 form.modal.modal('show');
-                form.on({
+                $(form).on({
                     'collectionDeleted': function(){
                         dropdownTree.render();
                     }

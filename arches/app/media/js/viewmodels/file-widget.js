@@ -29,7 +29,7 @@ define([
 
 
         if (this.form) {
-            this.form.on('after-update', function(req, tile) {
+            $(this.form).on('after-update', function(req, tile) {
                 var hasdata = _.filter(tile.data, function(val, key) {
                     val = ko.unwrap(val);
                     if (val) {
@@ -54,7 +54,7 @@ define([
                     self.formData.delete('file-list_' + self.node.nodeid);
                 }
             });
-            this.form.on('tile-reset', function(tile) {
+            $(this.form).on('tile-reset', function(tile) {
                 if ((self.tile === tile || _.contains(tile.tiles, self.tile))) {
                     if (self.filesForUpload().length > 0) {
                         self.filesForUpload.removeAll();

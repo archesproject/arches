@@ -207,7 +207,7 @@ define([
                 model: this.model
             });
 
-            form.on('dataChanged', function() {
+            $(form).on('dataChanged', function() {
                 self.render();
             });
         },
