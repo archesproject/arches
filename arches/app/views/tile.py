@@ -225,7 +225,6 @@ class TileData(View):
     def delete(self, request):
         json = request.body
         if json is not None:
-            ret = []
             data = JSONDeserializer().deserialize(json)
             with transaction.atomic():
                 try:
@@ -237,7 +236,6 @@ class TileData(View):
                 user_is_reviewer = user_is_resource_reviewer(request.user)
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):
-                        nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         if tile.is_provisional() is True and len(list(tile.provisionaledits.keys())) == 1:
                             provisional_editor_id = list(tile.provisionaledits.keys())[0]
                             edit = tile.provisionaledits[provisional_editor_id]
