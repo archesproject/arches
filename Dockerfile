@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base 
+FROM ubuntu:18.04 as base
 USER root
 
 ## Setting default environment variables
@@ -52,7 +52,7 @@ COPY docker/entrypoint.sh ${WHEELS}/entrypoint.sh
 RUN chmod -R 700 ${WHEELS} &&\
   dos2unix ${WHEELS}/*.sh
 
-FROM base 
+FROM base
 
 # Get the pre-built python wheels from the build environment
 RUN mkdir ${WEB_ROOT}
@@ -74,6 +74,7 @@ RUN set -ex \
         python3.8-distutils \
         python3.8-venv \
     " \
+    && apt-get update -y \
     && apt-get install -y --no-install-recommends curl \
     && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
     && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
