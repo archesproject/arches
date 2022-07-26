@@ -27,7 +27,7 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
@@ -363,6 +363,22 @@ def search_results(request, returnDsl=False):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
+
+        current_language = get_language()
+
+        for resource in results['hits']['hits']:
+            # manually updates output to current language for `displaydescription` and `displayname`
+            current_language_display_description = [
+                description_object['value'] for description_object in resource["_source"]["displaydescription"] if description_object.get('language') == current_language
+            ]
+            current_language_display_name = [
+                name_object['value'] for name_object in resource["_source"]["displayname"] if name_object.get('language') == current_language
+            ]
+
+            if len(current_language_display_description):
+                resource["_source"]["displaydescription"] = current_language_display_description[0]
+            if len(current_language_display_name):
+                resource["_source"]["displayname"] = current_language_display_name[0]
 
         ret["results"] = results
 
