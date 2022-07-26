@@ -76,6 +76,7 @@ define([
                     datatypes: data.datatypes
                 });
 
+                data.cards.sort((a, b) => a.sortorder - b.sortorder);
                 var topCards = _.filter(data.cards, function(card) {
                     var selectedNodegroup = _.find(data.nodegroups, function(nodegroup) {
                         return nodegroup.nodegroupid === card.nodegroup_id;

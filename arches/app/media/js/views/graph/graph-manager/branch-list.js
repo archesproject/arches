@@ -2,6 +2,7 @@ define([
     'jquery',
     'underscore',
     'views/list',
+    'underscore',
     'views/graph/graph-manager/graph-base',
     'models/graph',
     'knockout',
