@@ -105,9 +105,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!--Menu list item-->
                         {% if user_can_edit %}
-                        <li{% if "views/resource" in main_script and is_system_settings is None %}
-                            class="active-sub" {% endif %}
-                            data-bind="click: navigate.bind(self, '{% url 'resource' %}')">
+                        <li
+                            {% if "views/resource" in main_script and is_system_settings is None %}
+                                class="active-sub" 
+                            {% endif %}
+                        >
                             <a href="{% url 'resource' %}">
                                 <i class="fa fa-building-o"></i>
                                 <span class="menu-title">
@@ -117,14 +119,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <ul class="collapse" data-bind="css:{'in': navExpanded()}">
                                 <!-- ko foreach: createableResources -->
                                 <li class="link-submenu-item">
-                                    <a class="link-submenu" href="#" data-bind="
-                                    css: { 'arches-menu-item-disabled': disable_instance_creation },
-                                    attr: {
-                                        href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
-                                    }">
-                                        <i class="fa arches-menu-icon"
-                                            data-bind="css: iconclass || 'fa fa-question'"></i> <span
-                                            data-bind="text:name"></span>
+                                    <a 
+                                        class="link-submenu" 
+                                        data-bind="
+                                            css: { 'arches-menu-item-disabled': disable_instance_creation },
+                                            attr: {
+                                                href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
+                                            }"
+                                    >
+                                        <i 
+                                            class="fa arches-menu-icon"
+                                            data-bind="css: iconclass || 'fa fa-question'"
+                                        ></i> 
+                                        <span data-bind="text:name"></span>
                                     </a>
                                 </li>
                                 <!-- /ko -->
