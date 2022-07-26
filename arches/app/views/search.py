@@ -366,13 +366,17 @@ def search_results(request, returnDsl=False):
 
         current_language = get_language()
 
-        for resource in results['hits']['hits']:
+        for resource in results["hits"]["hits"]:
             # manually updates output to current language for `displaydescription` and `displayname`
             current_language_display_description = [
-                description_object['value'] for description_object in resource["_source"]["displaydescription"] if description_object.get('language') == current_language
+                description_object["value"]
+                for description_object in resource["_source"]["displaydescription"]
+                if description_object.get("language") == current_language
             ]
             current_language_display_name = [
-                name_object['value'] for name_object in resource["_source"]["displayname"] if name_object.get('language') == current_language
+                name_object["value"]
+                for name_object in resource["_source"]["displayname"]
+                if name_object.get("language") == current_language
             ]
 
             if len(current_language_display_description):
