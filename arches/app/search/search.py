@@ -129,9 +129,9 @@ class SearchEngine(object):
 
         if id:
             kwargs = {  # removes bad kwargs for get methods
-                "index": kwargs["index"],
-                "source_includes": kwargs["source_includes"],
-                "source_excludes": kwargs["source_excludes"],
+                "index": kwargs.get("index"),
+                "source_includes": kwargs.get("source_includes"),
+                "source_excludes": kwargs.get("source_excludes"),
             }
             if isinstance(id, str):
                 id = id.split(",")
