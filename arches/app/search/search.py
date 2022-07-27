@@ -128,7 +128,7 @@ class SearchEngine(object):
         id = kwargs.pop("id", None)
 
         if id:
-            kwargs = { # removes bad kwargs for get methods
+            kwargs = {  # removes bad kwargs for get methods
                 "index": kwargs["index"],
                 "source_includes": kwargs["source_includes"],
                 "source_excludes": kwargs["source_excludes"],
