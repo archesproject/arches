@@ -39,6 +39,7 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
+from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
@@ -578,6 +579,9 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+
+                current_language = get_language()
+
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
@@ -586,6 +590,24 @@ class Resource(models.ResourceInstance):
                     )
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["total"]
+
+                        # manually updates output to current language for `displaydescription` and `displayname`
+                        current_language_display_description = [
+                            description_object["value"]
+                            for description_object in resource["_source"]["displaydescription"]
+                            if description_object.get("language") == current_language
+                        ]
+                        current_language_display_name = [
+                            name_object["value"]
+                            for name_object in resource["_source"]["displayname"]
+                            if name_object.get("language") == current_language
+                        ]
+
+                        if len(current_language_display_description):
+                            resource["_source"]["displaydescription"] = current_language_display_description[0]
+                        if len(current_language_display_name):
+                            resource["_source"]["displayname"] = current_language_display_name[0]
+
                         ret["related_resources"].append(resource["_source"])
 
         return ret

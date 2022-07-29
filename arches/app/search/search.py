@@ -128,7 +128,11 @@ class SearchEngine(object):
         id = kwargs.pop("id", None)
 
         if id:
-            kwargs.pop("query", None)  # remove query param
+            kwargs = {  # removes bad kwargs for get methods
+                "index": kwargs.get("index"),
+                "source_includes": kwargs.get("source_includes"),
+                "source_excludes": kwargs.get("source_excludes"),
+            }
             if isinstance(id, str):
                 id = id.split(",")
                 if len(id) == 1:
