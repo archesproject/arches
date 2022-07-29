@@ -1342,7 +1342,7 @@ class FileListDataType(BaseDataType):
                             except models.File.DoesNotExist:
                                 logger.exception(_("File does not exist"))
 
-            files = request.FILES.getlist("file-list_" + nodeid, [])
+            files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, []) 
 
             for file_data in files:
                 file_model = models.File()
