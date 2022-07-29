@@ -1,14 +1,27 @@
 const Path = require('path');
+const { 
+    USER_DEFINED_ARCHES_CORE_DIRECTORY, 
+    USER_DEFINED_PROJECT_ROOT_DIRECTORY,
+    USER_DEFINED_DJANGO_SERVER_ADDRESS, 
+    USER_DEFINED_WEBPACK_DEVELOPMENT_SERVER_PORT,
+    USER_DEFINED_PUBLIC_PATH,
+} = require('./webpack-user-config');
 
 
 const projectPath = Path.resolve(Path.parse(__dirname)['dir'], './arches');
 
+const archesCoreDirectory = USER_DEFINED_ARCHES_CORE_DIRECTORY || projectPath;
+const projectRootDirectory = USER_DEFINED_PROJECT_ROOT_DIRECTORY || projectPath + '/app';
+const djangoServerAddress = USER_DEFINED_DJANGO_SERVER_ADDRESS || "http://localhost:8000/";
+const webpackDevelopmentServerPort = USER_DEFINED_WEBPACK_DEVELOPMENT_SERVER_PORT || 9000;
+const publicPath = USER_DEFINED_PUBLIC_PATH || "/static/";
+
 module.exports = {
-    ARCHES_CORE_DIRECTORY: projectPath,
-    PROJECT_ROOT_DIRECTORY: projectPath + '/app',
-    DJANGO_SERVER_ADDRESS: "http://localhost:8000/",
-    WEBPACK_DEVELOPMENT_SERVER_PORT: 9000,
-    PUBLIC_PATH: "/static/",
+    ARCHES_CORE_DIRECTORY: archesCoreDirectory,
+    PROJECT_ROOT_DIRECTORY: projectRootDirectory,
+    DJANGO_SERVER_ADDRESS: djangoServerAddress,
+    WEBPACK_DEVELOPMENT_SERVER_PORT: webpackDevelopmentServerPort,
+    PUBLIC_PATH: publicPath,
     ARCHES_CORE_NODE_MODULES_ALIASES: JSON.stringify({
         "plugins/knockout-select2": "Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'knockout-select2.js')",
         "nifty": "Path.resolve(__dirname, `${archesCoreDirectory}/app/media/plugins`, 'nifty')",
