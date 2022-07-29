@@ -234,19 +234,21 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             },
 
             getLocalizedText: function(data){
-                const d = data.find((element) => {
-                    return arches.activeLanguage == element.language;
-                });
-                if(!!d && d["value"] !== "") {
-                    return { displayText: d["value"], alternative: false };
-                } else {
-                    const allValues = data.filter((entry) => {
-                        return !!entry["value"];
-                    }).map((entry) => {
-                        return entry["value"];
+                if (data && data.find) {
+                    const d = data.find((element) => {
+                        return arches.activeLanguage == element.language;
                     });
-
-                    return { displayText: allValues.join(","), alternative: true };
+                    if(!!d && d["value"] !== "") {
+                        return { displayText: d["value"], alternative: false };
+                    } else {
+                        const allValues = data.filter((entry) => {
+                            return !!entry["value"];
+                        }).map((entry) => {
+                            return entry["value"];
+                        });
+    
+                        return { displayText: allValues.join(","), alternative: true };
+                    }
                 }
             }
         }),
