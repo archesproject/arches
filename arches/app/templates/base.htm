@@ -80,7 +80,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     {% include 'javascript.htm' %}
     
-    <script src="{% webpack_static '' %}/build/js/{{main_script}}.js"></script>
+    {% if main_script %}
+        <script src="{% webpack_static '' %}/build/js/{{main_script}}.js"></script>
+    {% endif %}
 
     {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
 
