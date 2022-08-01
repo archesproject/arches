@@ -21,7 +21,8 @@ define([
     'viewmodels/card',
     'bindings/resizable-sidepanel',
     'views/components/simple-switch',
-    'utils/set-csrf-token'
+    'utils/set-csrf-token',
+    'datatype-config-components'
 ], function($, _, ko, koMapping, arches, reportLookup, viewData, data, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel) {
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
