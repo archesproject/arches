@@ -6,8 +6,15 @@ define(['utils/load-component-dependencies'], function(loadComponentDependencies
     const functionTemplateDataHTML = document.querySelector('#functionTemplateData');
     const functionTemplateData = functionTemplateDataHTML.getAttribute('functionTemplates');
     const functionTemplates = JSON.parse(removeTrailingCommaFromObject(functionTemplateData));
-    
-    loadComponentDependencies(Object.values(functionTemplates).map(value => value['component']));
+
+    loadComponentDependencies(
+        Object.values(functionTemplates).reduce((acc, value) => {
+            if (value['component']) {
+                acc.push(value['component']);
+            }
+            return acc;
+        }, [])
+    );
 
     return functionTemplates;
 });
