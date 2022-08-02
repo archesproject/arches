@@ -1,0 +1,262 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-02 21:11+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: install/arches-templates/project_name/templates/index.htm:69
+#, python-format
+msgid "Arches | %(version)s"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:77
+msgid "Arches Features"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:80
+msgid "Search Arches"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:84
+msgid "Manage"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:89
+msgid "Sign in"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:94
+msgid "Welcome, "
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:98
+msgid "Log off"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:130
+msgid "Home"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:135
+#: install/arches-templates/project_name/templates/index.htm:193
+msgid "Fast"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:140
+#: install/arches-templates/project_name/templates/index.htm:247
+msgid "Workflows"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:145
+msgid "Search Tools"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:162
+#, python-format
+msgid "Arches %(version)s"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:163
+msgid "A web and mobile platform for"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:164
+msgid "managing your most important resource information"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:172
+msgid ""
+"Glarus thrust, Tectonic Area Sardona, Switzerland | Jonas Wagner https://www."
+"flickr.com/photos/80225884@N06/ | Attribution 2.0 Generic (CC BY 2.0)"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:194
+msgid "Deploy Applications Rapidly"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:196
+msgid ""
+"Design custom information management applications in hours.  Build your "
+"databases with Arches Designer, then configure your interface all without "
+"having to write any code."
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:213
+msgid "Interface Manager"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:215
+msgid ""
+"Arches automatically creates data entry forms based on your data models.  "
+"Use Arches' Card Manager to configure the look and feel of your data entry "
+"UI."
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:224
+msgid "Data Security"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:226
+msgid ""
+"Use Arches' Permissions Manager to set up data access rules for all your "
+"user groups and individual accounts.  You can define read/write/delete and "
+"no-access permissions."
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:248
+msgid "Orchestrate your data entry"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:250
+msgid ""
+"Design step-wise data management interfaces that simplify complex editing "
+"tasks.  Ensure that everyone enters data completely and consistently"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:273
+msgid "Arches Search Tools"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:274
+msgid "Find what you're looking for"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:276
+msgid ""
+"Arches comes with powerful built-in search tools.  Quickly filter large "
+"databases with term, geospatial, and time-based search components"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:289
+msgid "Search Options"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:291
+msgid ""
+"Arches gives you many ways to find precisely the information you need, even "
+"if your Arches application contains 10's of millions of records.  In "
+"addition to term, thesaurus, geospatial, and temporal filters, Arches "
+"provides you with advanced filtering options that support boolean logic, "
+"inverses, and many other filtering options."
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:295
+msgid ""
+"Arches' search capabilities also provide for sophisticated data "
+"visualizations, including interactive displays of the connections between "
+"your data objects using a Force Directed Graph."
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:299
+msgid ""
+"If you're a software developer, you can build on Arches modular search "
+"services and create your own filters, reports, and visualizations to best "
+"show off your particular dataset."
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:321
+msgid "Sample Institution Name"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:324
+msgid "Sample Address"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:325
+msgid "Getty Conservation Institute"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:326
+msgid "1200 Getty Center Drive"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:327
+msgid "Los Angeles, CA  90049"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:333
+msgid "Guides and Documentation"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:341
+msgid "What is Arches"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:344
+msgid "Implementation Considerations"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:347
+msgid "Information For Developers"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:357
+msgid "FAQ"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:360
+msgid "Standards and Interoperability"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:363
+msgid "Installation Guide"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:371
+msgid "Arches Project Background"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:374
+msgid "Arches Webinars/Presentations"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:377
+msgid "Resource Models"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:393
+msgid "Terms & Conditions"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:394
+msgid "Privacy Policy"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/index.htm:397
+msgid "Powered by Arches"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/views/components/functions/sample-function.htm:7
+msgid "Card Name"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/views/components/functions/sample-function.htm:10
+msgid "Select a nodegroup"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/views/components/widgets/sample-widget.htm:27
+msgid "X Coordinate Placeholder"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/views/components/widgets/sample-widget.htm:30
+#: install/arches-templates/project_name/templates/views/components/widgets/sample-widget.htm:36
+msgid "Placeholder"
+msgstr ""
+
+#: install/arches-templates/project_name/templates/views/components/widgets/sample-widget.htm:33
+msgid "Y Coordinate Placeholder"
+msgstr ""
