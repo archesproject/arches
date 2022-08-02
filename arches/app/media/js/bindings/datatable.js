@@ -27,20 +27,28 @@ define([
         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var options = ko.unwrap(valueAccessor());
             ko.unwrap(options.data);
-            if (options.dataTableOptions.paging) {
-                valueAccessor().data.subscribe(function(changes) {
-                    var table = $(element).closest('table').DataTable();
-                    ko.bindingHandlers.dataTablesForEach.page = table.page();
-                    table.destroy();
-                }, null, 'arrayChange');
-            }
-            var nodes = Array.prototype.slice.call(element.childNodes, 0);
-            ko.utils.arrayForEach(nodes, function(node) {
-                if (node && node.nodeType !== 1) {
-                    node.parentNode.removeChild(node);
+            if (valueAccessor().serverSide == false) {
+                if (options.dataTableOptions.paging) {
+                    valueAccessor().data.subscribe(function(changes) {
+                        var table = $(element).closest('table').DataTable();
+                        ko.bindingHandlers.dataTablesForEach.page = table.page();
+                        table.destroy();
+                    }, null, 'arrayChange');
                 }
-            });
-            return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+                var nodes = Array.prototype.slice.call(element.childNodes, 0);
+                ko.utils.arrayForEach(nodes, function(node) {
+                    if (node && node.nodeType !== 1) {
+                        node.parentNode.removeChild(node);
+                    }
+                });
+                return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+            }
+            else {
+                var table = $(element).closest('table').DataTable(valueAccessor().dataTableOptions);
+                table.destroy();
+
+                return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
+            }
         },
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             var options = ko.unwrap(valueAccessor()),
