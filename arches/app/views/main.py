@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import re
-from turtle import update
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 from arches import __version__
