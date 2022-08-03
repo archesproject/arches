@@ -22,9 +22,9 @@ define([
                 searchImageUrl = searchImageUrl.replace('//', '/');
                 self.items.push({
                     image: searchImageUrl,
-                    title: search.SEARCH_NAME,
-                    subtitle: search.SEARCH_DESCRIPTION,
-                    searchUrl: search.SEARCH_URL
+                    title: search.SEARCH_NAME[arches.activeLanguage].value,
+                    subtitle: search.SEARCH_DESCRIPTION[arches.activeLanguage].value,
+                    searchUrl: search.SEARCH_URL[arches.activeLanguage].value
                 });
             });
         });
