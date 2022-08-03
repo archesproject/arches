@@ -18,7 +18,7 @@ define([
             context: this
         }).done(function(response) {
             response.saved_searches.forEach(function(search) {
-                var searchImageUrl = arches.urls.url_subpath + ((search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '');
+                let searchImageUrl = arches.urls.url_subpath || '' + ((search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '');
                 searchImageUrl = searchImageUrl.replace('//', '/');
                 self.items.push({
                     image: searchImageUrl,

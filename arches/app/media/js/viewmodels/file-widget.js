@@ -139,7 +139,7 @@ define([
         });
 
         this.getFileUrl = function(url){
-            return (arches.urls.url_subpath + ko.unwrap(url)).replace('//', '/');
+            return (arches.urls.url_subpath || '' + ko.unwrap(url)).replace('//', '/');
         };
 
         if (Array.isArray(self.value())) {
