@@ -22,6 +22,9 @@ define(['utils/set-csrf-token'], function() {
                     var functionFromString = Function("return" + attribute.value);
                     let result = functionFromString();
 
+                    if (!result) {
+                        result = "";
+                    }
                     if (typeof result === 'object') {
                         result = String(result);
                     }
