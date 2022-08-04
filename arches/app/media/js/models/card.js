@@ -162,7 +162,7 @@ define([
             });
 
             var nodes = ko.computed(function() {
-                return attributes.data.nodes();
+                return ko.unwrap(attributes.data.nodes);
             }, this).extend({ throttle: 100 });
 
             var nodesSubscription = nodes.subscribe(function(){
