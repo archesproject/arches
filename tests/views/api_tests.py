@@ -311,8 +311,10 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
         data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
+
+        tile = next(x for x in data_put_get_confirm["tiles"] if x["tileid"] == "39cd6433-370c-471d-85a7-64de182fce6b")
         self.assertEqual(
-            data_put_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )  # Success, we got the right one.
         # ==================================================================================================
@@ -356,8 +358,10 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
+
+        tile = next(x for x in data_put_get_confirm["tiles"] if x["tileid"] == "39cd6433-370c-471d-85a7-64de182fce6b")
         self.assertEqual(
-            data_get_confirm_mod["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )
         # ==================================================================================================

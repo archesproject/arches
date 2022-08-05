@@ -1,6 +1,6 @@
-from __future__ import absolute_import, unicode_literals
 import os
 import logging
+import shutil
 from celery import shared_task
 from datetime import datetime
 from datetime import timedelta
@@ -11,6 +11,7 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from arches.app.models import models
+from arches.app.utils import import_class_from_string
 from tempfile import NamedTemporaryFile
 
 
@@ -21,7 +22,6 @@ def delete_file():
     settings.update_from_db()
 
     logger = logging.getLogger(__name__)
-    now = datetime.timestamp(datetime.now())
     file_list = []
     range = datetime.now() - timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     exports = models.SearchExportHistory.objects.filter(exporttime__lt=range).exclude(downloadfile="")
@@ -75,11 +75,11 @@ def export_search_results(self, userid, request_values, format, report_link):
             tmp.seek(0)
             stream = tmp.read()
             export_files[0]["outputfile"] = tmp
-            exportid = exporter.write_export_zipfile(export_files, export_info)
+            exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
     else:
         exporter = SearchResultsExporter(search_request=new_request)
         files, export_info = exporter.export(format, report_link)
-        exportid = exporter.write_export_zipfile(files, export_info)
+        exportid = exporter.write_export_zipfile(files, export_info, export_name)
 
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
@@ -123,6 +123,19 @@ def import_business_data(
         overwrite=overwrite,
         prevent_indexing=prevent_indexing,
     )
+
+
+@shared_task(bind=True)
+def index_resource(self, module, index_name, resource_id, tile_ids):
+    from arches.app.models.resource import Resource  # avoids circular import
+
+    resource = Resource.objects.get(pk=resource_id)
+    tiles = [models.TileModel.objects.get(pk=tile_id) for tile_id in tile_ids]
+
+    es_index = import_class_from_string(module)(index_name)
+    document, document_id = es_index.get_documents_to_index(resource, tiles)
+
+    return es_index.index_document(document=document, id=document_id)
 
 
 @shared_task
@@ -189,6 +202,57 @@ def on_chord_error(request, exc, traceback):
     msg = f"Package Load erred on import_business_data. Exception: {exc}. See logs for details."
     user = User.objects.get(id=1)
     notify_completion(msg, user)
+
+
+@shared_task
+def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_csv_importer
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+        BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = _("Failed")
+        load_event.save()
+
+
+@shared_task
+def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    from arches.app.etl_modules import import_single_csv
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        ImportSingleCsv = import_single_csv.ImportSingleCsv()
+        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = _("Failed")
+        load_event.save()
+
+@shared_task
+def reverse_etl_load(loadid):
+    from arches.app.etl_modules import base_import_module
+
+    module = base_import_module.BaseImportModule()
+    module.reverse_load(loadid)
 
 
 def create_user_task_record(taskid, taskname, userid):

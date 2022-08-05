@@ -67,7 +67,7 @@ class ResourceImportReporter:
 
 
 class Reader(object):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.errors = []
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}

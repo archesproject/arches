@@ -44,7 +44,15 @@ BUSISNESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-CACHES = {"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache",}}
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+    },
+    "user_permission": {
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "LOCATION": "user_permission_cache",
+    },
+}
 
 ELASTICSEARCH_PREFIX = "test"
 
@@ -57,6 +65,9 @@ LOCAL_BROWSERS = []  # ['Firefox']
 # these are set in Travis CI
 SAUCE_USERNAME = os.environ.get("SAUCE_USERNAME")
 SAUCE_ACCESS_KEY = os.environ.get("SAUCE_ACCESS_KEY")
+
+ENABLE_USER_SIGNUP = True
+FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
 
 RUN_LOCAL = True
 if SAUCE_USERNAME and SAUCE_ACCESS_KEY:
@@ -75,12 +86,11 @@ REMOTE_BROWSERS = [
     #  "version": "45"}
 ]
 
-BYPASS_CARDINALITY_TILE_VALIDATION = False
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
-NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase"]
+NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 

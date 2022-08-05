@@ -303,9 +303,6 @@ class Command(BaseCommand):
                 # index concepts if new concepts created
                 if concept_count != models.Value.objects.count():
                     management.call_command("es", "index_concepts")
-                # index relations if new relations created via new r-i tiles created
-                if relation_count != models.ResourceXResource.objects.count():
-                    management.call_command("es", "index_resource_relations")
                 # index resources of this model only
                 path = utils.get_valid_path(options["config_file"])
                 mapping = json.load(open(path, "r"))
@@ -486,6 +483,7 @@ class Command(BaseCommand):
                 "extensions/datatypes",
                 "extensions/functions",
                 "extensions/widgets",
+                "extensions/etl_modules",
                 "extensions/css",
                 "extensions/bindings",
                 "extensions/card_components",
@@ -827,6 +825,9 @@ class Command(BaseCommand):
         def load_card_components(package_dir):
             load_extensions(package_dir, "card_components", "card_component")
 
+        def load_card_components(package_dir):
+            load_extensions(package_dir, "cards", "card_component")
+
         def load_search_components(package_dir):
             load_extensions(package_dir, "search", "search")
 
@@ -839,8 +840,8 @@ class Command(BaseCommand):
         def load_functions(package_dir):
             load_extensions(package_dir, "functions", "fn")
 
-        def cache_graphs():
-            management.call_command("cache", operation="graphs")
+        def load_etl_modules(package_dir):
+            load_extensions(package_dir, "etl_modules", "etl_module")
 
         def update_resource_geojson_geometries():
             with connection.cursor() as cursor:
@@ -918,6 +919,8 @@ class Command(BaseCommand):
         load_functions(package_location)
         print("loading datatypes")
         load_datatypes(package_location)
+        print("loading etl modules")
+        load_etl_modules(package_location)
         print("loading concepts")
         load_concepts(package_location, overwrite_concepts, stage_concepts, defer_indexing)
         print("loading resource models and branches")

@@ -45,45 +45,6 @@ class MissingConfigException(Exception):
     def __str__(self):
         return repr(self.value)
 
-
-class ConceptLookup:
-    def __init__(self, create=False):
-        self.lookups = {}
-        self.create = create
-        self.add_domain_values_to_lookups()
-
-    def lookup_label(self, label, collectionid):
-        ret = label
-        collection_values = self.lookups[collectionid]
-        for concept in collection_values:
-            if label == concept[1]:
-                ret = concept[2]
-        return ret
-
-    def lookup_labelid_from_label(self, value, collectionid):
-        ret = []
-        for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
-                v = v.strip()
-                try:
-                    ret.append(self.lookup_label(v, collectionid))
-                except:
-                    self.lookups[collectionid] = Concept().get_child_collections(collectionid)
-                    ret.append(self.lookup_label(v, collectionid))
-        output = StringIO()
-        writer = csv.writer(output)
-        writer.writerow(ret)
-        for v in [output.getvalue()]:
-            return v.strip("\r\n")
-
-    def add_domain_values_to_lookups(self):
-        for node in Node.objects.filter(Q(datatype="domain-value") | Q(datatype="domain-value-list")):
-            domain_collection_id = str(node.nodeid)
-            self.lookups[domain_collection_id] = []
-            for val in node.config["options"]:
-                self.lookups[domain_collection_id].append(("0", val["text"], val["id"]))
-
-
 class CsvWriter(Writer):
     def __init__(self, **kwargs):
         super(CsvWriter, self).__init__(**kwargs)
@@ -166,7 +127,12 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
+                                value = self.transform_value_for_export(
+                                    self.node_datatypes[k],
+                                    tile.data[k],
+                                    concept_export_value_type,
+                                    k,
+                                )
                                 other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
@@ -439,12 +405,9 @@ class CsvReader(Reader):
                     save_count = save_count - 1
 
         else:
-            errors.append(
-                {
-                    "type": "WARNING",
-                    "message": f"No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
-                    for this resource and it is mapped properly in your mapping file.",
-                }
+            logger.warn(
+                "No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
+                    for this resource and it is mapped properly in your mapping file."
             )
 
         if len(errors) > 0:
@@ -501,23 +464,27 @@ class CsvReader(Reader):
 
         def get_display_nodes(graphid):
             display_nodeids = []
-            functions = FunctionXGraph.objects.filter(function_id="60000000-0000-0000-0000-000000000001", graph_id=graphid)
+            functions = FunctionXGraph.objects.filter(function__functiontype="primarydescriptors", graph_id=graphid)
             for function in functions:
                 f = function.config
                 del f["triggering_nodegroups"]
 
-                for k, v in f.items():
+                for k, v in f["descriptor_types"].items():
                     v["node_ids"] = []
-                    v["string_template"] = v["string_template"].replace("<", "").replace(">", "").split(", ")
+                    v["string_template"] = (
+                        v["string_template"].replace("<", "").replace(">", "").split(", ")
+                        if "string_template" in v
+                        else ""
+                    )
                     if "nodegroup_id" in v and v["nodegroup_id"] != "":
                         nodes = Node.objects.filter(nodegroup_id=v["nodegroup_id"])
                         for node in nodes:
                             if node.name in v["string_template"]:
                                 display_nodeids.append(str(node.nodeid))
 
-                for k, v in f.items():
+                for k, v in f["descriptor_types"].items():
                     if "string_template" in v and v["string_template"] != [""]:
-                        print(
+                        logger.warn(
                             "The {0} {1} in the {2} display function.".format(
                                 ", ".join(v["string_template"]),
                                 "nodes participate" if len(v["string_template"]) > 1 else "node participates",
@@ -525,7 +492,7 @@ class CsvReader(Reader):
                             )
                         )
                     else:
-                        print("No nodes participate in the {0} display function.".format(k))
+                        logger.warn("No nodes participate in the {0} display function.".format(k))
 
             return display_nodeids
 
@@ -571,8 +538,8 @@ class CsvReader(Reader):
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], legacyid, overwrite)
                 except KeyError:
                     print("*" * 80)
-                    print(
-                        "ERROR: No column 'ResourceID' found in business data file. \
+                    logger.error(
+                        "No column 'ResourceID' found in business data file. \
                         Please add a 'ResourceID' column with a unique resource identifier."
                     )
                     print("*" * 80)
@@ -643,8 +610,8 @@ class CsvReader(Reader):
                 if len(non_contiguous_resource_ids) > 0:
                     print("*" * 80)
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
-                        print("ResourceID: " + non_contiguous_resource_id)
-                    print(
+                        logger.error("ResourceID: " + non_contiguous_resource_id)
+                    logger.error(
                         "ERROR: The preceding ResourceIDs are non-contiguous in your csv file. \
                         Please sort your csv file by ResourceID and try import again."
                     )
@@ -667,12 +634,9 @@ class CsvReader(Reader):
                                 collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
                                 # check to see that there is not already a collection for this node
                                 if node.config["rdmCollection"] is not None:
-                                    errors.append(
-                                        {
-                                            "type": "WARNING",
-                                            "message": f"A collection already exists for the {node.name} node. \
-                                            Use the add option to add concepts to this collection.",
-                                        }
+                                    logger.warn(
+                                        "A collection already exists for the {node.name} node. \
+                                            Use the add option to add concepts to this collection."
                                     )
                                     if len(errors) > 0:
                                         self.errors += errors
@@ -682,16 +646,6 @@ class CsvReader(Reader):
                                     try:
                                         # check to see that a collection with this legacyid does not already exist
                                         collection = Concept().get(legacyoid=collection_legacyoid)
-                                        errors.append(
-                                            {
-                                                "type": "WARNING",
-                                                "message": "A collection with the legacyid {0} already exists.".format(
-                                                    node.name + "_" + str(node.graph_id) + "_import"
-                                                ),
-                                            }
-                                        )
-                                        if len(errors) > 0:
-                                            self.errors += errors
                                     except:
                                         collection = Concept(
                                             {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection"}
@@ -784,8 +738,6 @@ class CsvReader(Reader):
 
                 if create_concepts == True:
                     create_reference_data(concepts_to_create, create_collections)
-                # if concepts are created on import concept_lookup must be instatiated afterward
-                concept_lookup = ConceptLookup()
 
                 def cache(blank_tile):
                     if blank_tile.data != {}:
@@ -801,13 +753,10 @@ class CsvReader(Reader):
                 def column_names_to_targetids(row, mapping, row_number):
                     errors = []
                     if "ADDITIONAL" in row or "MISSING" in row:
-                        errors.append(
-                            {
-                                "type": "WARNING",
-                                "message": "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
-                                    row["ResourceID"], str(int(row_number.split("on line ")[1]))
-                                ),
-                            }
+                        logger.warn(
+                            "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
+                                row["ResourceID"], str(int(row_number.split("on line ")[1]))
+                            )
                         )
                         if len(errors) > 0:
                             self.errors += errors
@@ -825,31 +774,15 @@ class CsvReader(Reader):
                     request = ""
                     if datatype != "":
                         errors = []
-                        datatype_instance = self.datatype_factory.get_instance(datatype)
-                        if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
-                            try:
-                                uuid.UUID(value)
-                            except:
-                                if datatype in ["domain-value", "domain-value-list"]:
-                                    collection_id = nodeid
-                                else:
-                                    collection_id = self.lookup_node(nodeid).config["rdmCollection"]
-                                if collection_id is not None:
-                                    value = concept_lookup.lookup_labelid_from_label(value, collection_id)
+                        datatype_instance = datatype_factory.get_instance(datatype)
                         try:
-                            value = datatype_instance.transform_value_for_tile(value)
+                            value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
-                            errors.append(
-                                {
-                                    "type": "ERROR",
-                                    "message": "datatype: {0} value: {1} {2} - {3}".format(
-                                        datatype_instance.datatype_model.classname,
-                                        value,
-                                        source,
-                                        str(e) + " or is not a prefLabel in the given collection.",
-                                    ),
-                                }
+                            logger.warn(
+                                "The following value could not be interpreted as a {0} value: {1}".format(
+                                    datatype_instance.datatype_model.classname, value
+                                )
                             )
                         if len(errors) > 0:
                             error_types = [error["type"] for error in errors]
@@ -857,7 +790,7 @@ class CsvReader(Reader):
                                 value = None
                             self.errors += errors
                     else:
-                        print(_("No datatype detected for {0}".format(value)))
+                        logger.error(_("No datatype detected for {0}".format(value)))
 
                     return {"value": value, "request": request}
 
@@ -1338,7 +1271,7 @@ class CsvReader(Reader):
                                 target_resource_model = self.lookup_node(nodeid).graph_id
                             except ObjectDoesNotExist as e:
                                 print("*" * 80)
-                                print(
+                                logger.error(
                                     "ERROR: No resource model found. Please make sure the resource model \
                                     this business data is mapped to has been imported into Arches."
                                 )
@@ -1631,17 +1564,6 @@ class CsvReader(Reader):
 
                 # check for missing display value nodes.
                 errors = []
-                for k, v in missing_display_values.items():
-                    if len(v) > 0:
-                        errors.append(
-                            {
-                                "type": "INFO",
-                                "message": "{0} is null or not mapped on rows {1} and \
-                                participates in a display value function.".format(
-                                    k, ",".join(v)
-                                ),
-                            }
-                        )
                 if len(errors) > 0:
                     self.errors += errors
 

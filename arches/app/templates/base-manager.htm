@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
 {% extends "base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
@@ -112,6 +112,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <h5 class="hidden-xs">{% trans "Login" %}</h5>
                                 {% else %}
                                 <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
+                                <i class="fa fa-sign-out"></i>
                                 {% endif %}
                             </div>
                         </a>
@@ -143,7 +144,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- Search Bar -->
                         {% if nav.search %}
-                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right ep-tools-search" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
                               <i class="ion-search"></i>
 
@@ -448,6 +449,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         {% endblock navbar %}
                     </div>
+                    {% if app_settings.DEBUG %}
+                    <div class="debug-notice">
+                        <div>{% trans 'DEBUG' %}</div>
+                        <div>{{ app_settings.VERSION }}</div>
+                    </div>
+                    {% endif %}
                 </nav>
                 {% endblock mainnav %}
 

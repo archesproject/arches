@@ -34,7 +34,7 @@ define([
         };
 
         this.initialize();
-    };
+    }
 
 
     function TileBasedComponent() {
@@ -236,7 +236,7 @@ define([
                     resourceInstanceId: savedDatum.resourceinstance_id,
                 };
             }));
-
+            
             self.saving(false);
             self.complete(true);
         };
@@ -276,7 +276,46 @@ define([
         };
 
         this.initialize();
-    };
+    }
+
+    function AbstractCardAdapter() {  // CURRENTLY IN DEVLEOPMENT, USE AT YOUR OWN RISK!
+        var self = this;
+
+        this.cardinality = ko.observable();
+
+        this.initialize = function() {
+            self.loading(true);
+
+            $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
+                self.cardinality(nodegroupData.cardinality);
+
+                $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                    if (self.cardinality() === '1') {
+                        if (data['tiles'].length) {
+                            self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
+                            self.complete(true);
+                        }
+                        TileBasedComponent.apply(self);
+                    }
+                    else if (self.cardinality() === 'n') {
+                        MultipleTileBasedComponent.apply(self);
+                        if (data['tiles'].length) {
+                            self.complete(true);
+                        }
+                        
+                        self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
+                            self.componentData.parameters.dirty(false);
+                            self.dirty(false);
+                            self.saving(false);
+                            self.complete(true);
+                        };
+                    }
+                });
+            });
+        };
+
+        this.initialize();
+    }
 
 
     function MultipleTileBasedComponent(title) {
@@ -295,7 +334,7 @@ define([
                 hasDirtyTiles = true; 
             }
             else if (self.savedData() ) {
-                if (self.savedData() !== tiles.length) {
+                if (self.savedData().length !== tiles.length) {
                     hasDirtyTiles = true;
                 }
 
@@ -333,14 +372,8 @@ define([
                     }
                 });
             }
-            // else if (self.dirty()) {
-            //     hasDirtyTiles = true;
-            // }
-
+            self.multiTileUpdated(hasDirtyTiles);
             return hasDirtyTiles;
-        });
-        self.hasDirtyTiles.subscribe(function(hasDirtyTiles) {
-            self.hasUnsavedData(hasDirtyTiles);
         });
         
         this.initialize = function() {
@@ -457,10 +490,9 @@ define([
             self.tiles(filteredTiles);
         };
 
-        this.save = function() {
+        this.saveMultiTiles = function() {
             self.complete(false);
             self.saving(true);
-            self.savedData.removeAll();
             self.previouslyPersistedComponentData = [];
             
             var unorderedSavedData = ko.observableArray();
@@ -503,8 +535,8 @@ define([
                     self.saving(false);
 
                     var orderedSavedData = self.tiles().map(function(tile) {
-                        return savedData.find(function(zzz) {
-                            return zzz.tileid === tile.tileid;
+                        return savedData.find(function(datum) {
+                            return datum.tileid === tile.tileid;
                         });
                     });
 
@@ -527,7 +559,7 @@ define([
         };
 
         this.initialize();
-    };
+    }
 
 
     function WorkflowComponentAbstract(params) {
@@ -570,16 +602,22 @@ define([
             self.setToLocalStorage('value', savedData);
         });
 
+        this.multiTileUpdated = ko.observable();
         this.hasUnsavedData = ko.computed(function() {
             var hasUnsavedData = false;
 
-            if (!_.isEqual(self.savedData(), self.value())) {
-                hasUnsavedData = true;
+            if (self.componentData.tilesManaged === "many") {
+                if (self.multiTileUpdated()) {
+                    hasUnsavedData = true;
+                }
+            } else {
+                if (!_.isEqual(self.savedData(), self.value())) {
+                    hasUnsavedData = true;
+                }
+                else if (self.dirty()) {
+                    hasUnsavedData = true;
+                }
             }
-            else if (self.dirty()) {
-                hasUnsavedData = true;
-            }
-
             return hasUnsavedData;
         });
 
@@ -629,14 +667,21 @@ define([
                 self.componentData['parameters']['renderContext'] = 'workflow';
             }
 
-            if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
+
+
+            if (self.componentData.componentType === 'card') {
+                AbstractCardAdapter.apply(self);
+            }
+
+
+            else if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
             }
             else if (self.componentData.tilesManaged === "one") {
                 TileBasedComponent.apply(self);
             }
             else if (self.componentData.tilesManaged === "many") {
-                MultipleTileBasedComponent.apply(self, [title] );
+                MultipleTileBasedComponent.apply(self, [params.title] );
             }
         }
 
@@ -669,7 +714,8 @@ define([
 
         this.save = function(){};  /* overwritten by inherited components */
 
-        this._saveComponent = function(componentBasedStepResolve) {
+        this._saveComponent = function(componentBasedStepResolve, componentBasedStepReject) {
+            self.complete(false);
             var completeSubscription = self.complete.subscribe(function(complete) {
                 if (complete) {
 
@@ -686,16 +732,20 @@ define([
             var errorSubscription = self.error.subscribe(function(error) {
                 if (error) {
 
-                    if (componentBasedStepResolve) {
-                        componentBasedStepResolve();
-                        self.error(false);
+                    if (componentBasedStepReject) {
+                        componentBasedStepReject(error);
+                        self.error(null);
                     }
                     completeSubscription.dispose();  /* disposes after save */
                     errorSubscription.dispose();  /* disposes after save */
                 }
             });
 
-            self.save();
+            if (self.componentData.tilesManaged === "many"){
+                self.saveMultiTiles();
+            } else {
+                self.save();
+            }
         };
 
         this._resetComponent = function(componentBasedStepResolve) {

@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 class BaseDataType(object):
     def __init__(self, model=None):
         self.datatype_model = model
+        self.datatype_name = model.datatype if model else None
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         """
         Used to validate data in a node of given datatype
         Arguments:
@@ -33,7 +34,7 @@ class BaseDataType(object):
         source_info = "{0} {1}".format(source, row_number) if row_number else ""
         error_message = {
             "type": "ERROR",
-            "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_model.datatype, value, source_info, message),
+            "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_name, value, source_info, message),
         }
         return error_message
 
@@ -287,15 +288,17 @@ class BaseDataType(object):
             base_query.must(null_query)
         query.must(base_query)
 
-    def handle_request(self, current_tile, request, node):
-        """
-        Updates files
-        """
-        pass
-
     def pre_tile_save(self, tile, nodeid):
         """
         Called during tile.save operation but before the tile is actually saved to the database
+
+        """
+        pass
+
+    def post_tile_save(self, tile, nodeid, request):
+        """
+        Called after the tile is saved to the database
+
         """
         pass
 

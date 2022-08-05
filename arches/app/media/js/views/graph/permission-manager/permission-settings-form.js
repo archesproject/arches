@@ -115,6 +115,7 @@ define([
                 data: JSON.stringify(postData),
                 success: function(res) {
                     self.trigger('save');
+                    self.clearUserPermissionCache();
                 }
             });
         },
@@ -131,8 +132,16 @@ define([
                 url: arches.urls.permission_data,
                 data: JSON.stringify(postData),
                 success: function(res) {
+                    self.clearUserPermissionCache();
                     self.trigger('revert');
                 }
+            });
+        },
+
+        clearUserPermissionCache: function() {
+            return $.ajax({
+                type: 'POST',
+                url: arches.urls.clear_user_permission_cache,
             });
         }
     });

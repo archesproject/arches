@@ -1,6 +1,8 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
+from arches.app.models.models import Node
+from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 details = {
     "searchcomponentid": "",
@@ -16,24 +18,41 @@ details = {
 }
 
 
+def get_permitted_graphids(permitted_nodegroups):
+    permitted_graphids = set()
+    for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
+        permitted_graphids.add(str(node.graph_id))
+    return permitted_graphids
+
+
 class ResourceTypeFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         parcel_graphid = '7d24462d-d32b-11eb-b1b2-ed35bfac87bc'
         parcel_included = False
         search_query = Bool()
         querystring_params = self.request.GET.get(details["componentname"], "")
-
         graph_ids = []
-        for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
-            if str(resourceTypeFilter["graphid"]) == parcel_graphid:
-                parcel_included = True
-            graph_ids.append(str(resourceTypeFilter["graphid"]))
+        permitted_graphids = get_permitted_graphids(permitted_nodegroups)
 
-        terms = Terms(field="graph_id", terms=graph_ids)
+        for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
+            graphid = str(resourceTypeFilter["graphid"])
+            if graphid == parcel_graphid:
+                parcel_included = True
+            if resourceTypeFilter["inverted"] is True:
+                try:
+                    permitted_graphids.remove(graphid)
+                except KeyError:
+                    pass
+            else:
+                if graphid in permitted_graphids:
+                    graph_ids.append(graphid)
+
         if resourceTypeFilter["inverted"] is True:
-            search_query.must_not(terms)
+            terms = Terms(field="graph_id", terms=list(permitted_graphids))
         else:
-            search_query.filter(terms)
+            terms = Terms(field="graph_id", terms=graph_ids)
+
+        search_query.filter(terms)
 
 
         if not parcel_included:
@@ -41,3 +60,6 @@ class ResourceTypeFilter(BaseSearchFilter):
             search_query.must_not(terms)
 
         search_results_object["query"].add_query(search_query)
+
+    def view_data(self):
+        return {"resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")}
