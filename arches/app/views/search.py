@@ -222,25 +222,41 @@ def export_results(request):
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     report_link = request.GET.get("reportlink", False)
-    download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+    app_name = settings.APP_NAME
+    if format == "html":
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT
+    else:
+        download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
+
     if total > download_limit and format != "geojson":
-        celery_worker_running = task_management.check_if_celery_available()
-        if celery_worker_running is True:
-            request_values = dict(request.GET)
-            request_values["path"] = request.get_full_path()
-            result = tasks.export_search_results.apply_async(
-                (request.user.id, request_values, format, report_link),
-                link=tasks.update_user_task_record.s(),
-                link_error=tasks.log_error.s(),
-            )
+        if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
             message = _(
-                "{total} instances have been submitted for export. \
-                Click the Bell icon to check for a link to download your data"
+                "Your search exceeds the {download_limit} instance download limit.  \
+                Anonymous users cannot run an export exceeding this limit.  \
+                Please sign in with your {app_name} account or refine your search"
             ).format(**locals())
-            return JSONResponse({"success": True, "message": message})
-        else:
-            message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(**locals())
             return JSONResponse({"success": False, "message": message})
+        else:
+            celery_worker_running = task_management.check_if_celery_available()
+            if celery_worker_running is True:
+                request_values = dict(request.GET)
+                request_values["path"] = request.get_full_path()
+                result = tasks.export_search_results.apply_async(
+                    (request.user.id, request_values, format, report_link),
+                    link=tasks.update_user_task_record.s(),
+                    link_error=tasks.log_error.s(),
+                )
+                message = _(
+                    "{total} instances have been submitted for export. \
+                    Click the Bell icon to check for a link to download your data"
+                ).format(**locals())
+                return JSONResponse({"success": True, "message": message})
+            else:
+                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
+                    **locals()
+                )
+                return JSONResponse({"success": False, "message": message})
+
     elif format == "tilexl":
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
@@ -282,16 +298,7 @@ def get_dsl_from_search_string(request):
 
 
 def search_results(request, returnDsl=False):
-    from datetime import timedelta
-    from time import time
-
-    start = time()
-    for_export = request.GET.get("export", False)
-    if for_export:
-        try:
-            for_export = json.loads(for_export)
-        except TypeError:
-            pass
+    for_export = request.GET.get("export")
     pages = request.GET.get("pages", None)
     total = int(request.GET.get("total", "0"))
     resourceinstanceid = request.GET.get("id", None)
@@ -301,9 +308,6 @@ def search_results(request, returnDsl=False):
             load_tiles = json.loads(load_tiles)
         except TypeError:
             pass
-    lite_query = request.GET.get("lite_query", False)
-    if lite_query:
-        lite_query = json.loads(lite_query)
     se = SearchEngineFactory().create()
     permitted_nodegroups = get_permitted_nodegroups(request.user)
     include_provisional = get_provisional_type(request)
@@ -323,21 +327,17 @@ def search_results(request, returnDsl=False):
     dsl = search_results_object.pop("query", None)
     if returnDsl:
         return dsl
+    dsl.include("graph_id")
+    dsl.include("root_ontology_class")
+    dsl.include("resourceinstanceid")
+    dsl.include("points")
+    dsl.include("permissions.users_without_read_perm")
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_read_perm")
     dsl.include("displayname")
     dsl.include("displaydescription")
-    if for_export or not lite_query:
-        dsl.include("graph_id")
-    if not lite_query:
-        dsl.include("points")
-        dsl.include("root_ontology_class")
-        dsl.include("permissions.users_without_delete_perm")
-        dsl.include("geometries")
-        dsl.include("provisional_resource")
-        dsl.include("permissions.users_with_no_access")
-        dsl.include("map_popup")
-        dsl.include("resourceinstanceid")  # this is the same as the document _id
+    dsl.include("map_popup")
+    dsl.include("provisional_resource")
     if load_tiles:
         dsl.include("tiles")
     if resourceinstanceid is None:
@@ -353,8 +353,6 @@ def search_results(request, returnDsl=False):
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
     ret = {}
-    elapsed = time() - start
-    print("_______Time to finish search = {0}".format(timedelta(seconds=elapsed)))
     if results is not None:
         if "hits" not in results:
             if "docs" in results:

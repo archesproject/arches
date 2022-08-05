@@ -289,7 +289,7 @@ define([
                     this.disposables.push(nodeDatatypeSubscription);
     
                     if (datatype.defaultwidget_id) {
-                        var cardWidgetData = _.find(attributes.data.widgets, function(widget) {
+                        var cardWidgetData = _.find(ko.unwrap(attributes.data.widgets), function(widget) {
                             return widget.node_id === node.nodeid;
                         });
                         var widget = new CardWidgetModel(cardWidgetData, {
@@ -386,7 +386,7 @@ define([
         },
 
         save: function(callback) {
-            AbstractModel.prototype.save.call(this, function(request, status, self) {
+            return AbstractModel.prototype.save.call(this, function(request, status, self) {
                 if (status === 'success') {
                     this._card(JSON.stringify(this.toJSON()));
                 }

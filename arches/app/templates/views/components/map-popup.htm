@@ -46,7 +46,6 @@
         {% trans "Report" %}
     </a>
     <!--/ko-->
-    {% if request.user|can_edit_resource_instance %}
     <!-- ko if: showEditButton -->
     <a data-bind="click: function () {
         window.open(editURL + resourceinstanceid());
@@ -55,7 +54,6 @@
         {% trans "Edit" %}
     </a>
     <!--/ko-->
-    {% endif %}
     {% endblock footer %}
 </div>
 <!--/ko-->

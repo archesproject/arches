@@ -1,6 +1,7 @@
 define(['knockout',
     'views/resource/related-resources-manager',
-    'views/components/search/base-filter'
+    'views/components/search/base-filter',
+    'views/components/related-resources-graph'
 ], function(ko, RelatedResourcesManager, BaseFilter) {
     var componentName = 'related-resources-filter';
     return ko.components.register(componentName, {
@@ -15,7 +16,7 @@ define(['knockout',
                 // this component is just a light weight wrapper around the relatd resources manager
                 // need to wait for the search-resutls filter to be ready
                 // before we can load the realated-resources-filter
-                // because we need to pass the entire rsearch results filter into the 
+                // because we need to pass the entire rsearch results filter into the
                 // related resources filter
                 var setSearchResults = function(){
                     options.searchResultsVm = self.getFilter('search-results');

@@ -263,7 +263,8 @@ define([
                     var agg = ko.unwrap(self.searchAggregations);
                     var features = [];
                     var mouseoverInstanceId = self.mouseoverInstanceId();
-                    if (agg && agg.results) {
+                    
+                    if (agg) {
                         _.each(agg.results, function(result) {
                             _.each(result._source.points, function(point) {
                                 var feature = turf.point([point.point.lon, point.point.lat], _.extend(result._source, {

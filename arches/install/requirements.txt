@@ -25,5 +25,5 @@ python-slugify==4.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
 openpyxl==3.0.7
-django_compressor>=2.4
+django_compressor==2.2
 django-libsass==0.7
