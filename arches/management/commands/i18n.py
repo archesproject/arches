@@ -17,11 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-from arches.app.models.models import GraphModel, Language, PublishedGraph
 from arches.app.utils.i18n import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter, LanguageSynchronizer
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand
-from django.utils.translation import get_language, get_language_info, get_language_bidi
 
 logger = logging.getLogger(__name__)
 
