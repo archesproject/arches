@@ -229,6 +229,7 @@ class ArchesPOLoader:
         except KeyError:
             pass
 
+
 class LanguageSynchronizer:
     def synchronize_settings_with_db():
         if settings.LANGUAGES:
@@ -247,17 +248,21 @@ class LanguageSynchronizer:
                     scope="system",
                     isdefault=False,
                 )
-            
+
             for lang in settings.LANGUAGES:
                 for graph in GraphModel.objects.all():
                     if graph.publication:
-                        existing_language = PublishedGraph.objects.filter(publication__publicationid=graph.publication.publicationid).first()
-                        found_language = PublishedGraph.objects.filter(publication__publicationid=graph.publication.publicationid, language=lang[0]).first()
-                        
+                        existing_language = PublishedGraph.objects.filter(
+                            publication__publicationid=graph.publication.publicationid
+                        ).first()
+                        found_language = PublishedGraph.objects.filter(
+                            publication__publicationid=graph.publication.publicationid, language=lang[0]
+                        ).first()
+
                         # no need to add the language if it already exists
                         if found_language:
                             continue
-                        
+
                         publication_language = Language.objects.filter(code=lang[0]).first()
                         PublishedGraph.objects.create(
                             language=publication_language,

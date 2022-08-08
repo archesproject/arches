@@ -40,7 +40,7 @@ class Command(BaseCommand):
             help="Operation Type; "
             + "'makemessages'=Creates PO file messages from database "
             + "'loadmessages'=Reads PO file messages to the database "
-            + "'synclanguages'=Synchronizes languages in settings with the user languages and publications "
+            + "'synclanguages'=Synchronizes languages in settings with the user languages and publications ",
         )
         parser.add_argument("-l", "--lang", action="store", dest="lang", default=None, help="")
 
@@ -68,4 +68,4 @@ class Command(BaseCommand):
         """
         Syncs languages in the settings file with languages in the database
         """
-        LanguageSynchronizer.synchronize_settings_with_db() 
+        LanguageSynchronizer.synchronize_settings_with_db()
