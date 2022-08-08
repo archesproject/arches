@@ -24,6 +24,7 @@ from distutils.util import strtobool
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
+from django.db.models import Model
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
@@ -49,6 +50,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
@@ -217,7 +219,12 @@ class ResourceEditorView(MapBaseManagerView):
         serialized_graph = None
         if graph.publication:
             user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+            try:
+                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+            except models.PublishedGraph.DoesNotExist:
+                LanguageSynchronizer.synchronize_settings_with_db()
+                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+
             serialized_graph = published_graph.serialized_graph
 
         if serialized_graph:
