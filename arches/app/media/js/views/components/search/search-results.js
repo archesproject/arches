@@ -56,7 +56,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var self = this;
                     if (tab === 'map-filter') {
                         if (ko.unwrap(this.mapFilter.map)) {
-                            setTimeout(function() { self.mapFilter.map().resize(); }, 1);
+                            self.mapFilter.map().resize();
                         }
                     }
                 }, this);
