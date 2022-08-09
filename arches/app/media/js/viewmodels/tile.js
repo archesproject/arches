@@ -99,7 +99,10 @@ define([
                 var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
-                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(self.nodegroup_id);
+
+                if (nodegroup) {
+                    return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(self.nodegroup_id);
+                }
             }).map(function(card) {
                 return new CardViewModel({
                     card: _.clone(card),

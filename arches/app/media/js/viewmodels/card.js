@@ -65,6 +65,7 @@ define([
 
 
     var CardViewModel = function(params) {
+        console.log(this, params, arches)
         var TileViewModel = require('viewmodels/tile');
         var self = this;
         var hover = params.hover || ko.observable();
@@ -224,7 +225,13 @@ define([
                 var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
-                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+
+                // console.log(card, nodegroup)
+
+                if (nodegroup) {
+
+                    return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+                }
             }).map(function(card) {
                 return new CardViewModel({
                     card: _.clone(card),
