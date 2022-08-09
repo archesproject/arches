@@ -124,7 +124,13 @@
             </h2>
         </div>
         <div class="tabbed-workflow-step-container">
-            <workflow-step params='step: activeStep()'></workflow-step>
+            <!-- ko component: {
+                name: 'workflow-step',
+                params: {
+                    ...$data,
+                    step: $data.activeStep(),
+                }
+            } --><!-- /ko -->
         </div>
 
         <div class="tabbed-workflow-footer">
@@ -248,7 +254,7 @@
                         style="padding-right: 2px;"
                         data-bind="text:activeStep()['_index'] + 1"
                     ></span>
-                    <span data-bind="text:`/ ${steps().length}`"></span>
+                    <span data-bind="text:'/ ' + steps().length"></span>
                     
                 </div>
     

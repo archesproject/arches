@@ -1,6 +1,15 @@
 {
     "name": "{{ project_name }}",
+    "scripts": {
+        "build_production": "NODE_PATH=./media/node_modules NODE_ENV=production ./media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
+        "build_development": "NODE_PATH=./media/node_modules ./media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
+        "build_test": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js --env test=true",
+        "start": "NODE_PATH=./media/node_modules ./media/node_modules/.bin/webpack serve --config webpack/webpack.config.dev.js"
+    },
+    "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
+    },
     "dependencies": {
-        "arches": "archesproject/arches#{{ arches_version }}"
+        "arches": "archesproject/arches#8090-cbyrd-adds-frontend-compiler"
     }
 }

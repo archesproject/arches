@@ -17,7 +17,9 @@
                     pageVm: $root
                 }
             }"></div>
-            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}"><span>{% trans "Continue" %}</span></button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-caret-right btn-mint wf-multi-tile-btn-complete" data-bind="click: function(){complete(true)}">
+                <span data-bind="text: $root.translations.continue"></span>
+            </button>
         </div>
         <div class="wf-multi-tile-step-list">
             <div class="wf-multi-tile-step-list-container">
@@ -48,8 +50,28 @@
                     </div>
                 </div>
                 <div class="wf-multi-tile-step-card-controls">
-                    <span><i class="fa fa-times-circle"></i></span><span class="" data-bind="click: function(){$parent.remove(tile)}">{% trans "Remove" %}</span>
-                    <span><i class="fa fa-pencil"></i></span><span data-bind="click: function(){$parent.edit(tile);}">{% trans "Edit" %}</span>
+                    <span>
+                        <i class="fa fa-times-circle"></i>
+                    </span>
+
+                    <span
+                        class="" 
+                        data-bind="
+                            text: $root.translations.remove,
+                            click: function(){$parent.remove(tile)}
+                        "
+                    ></span>
+
+                    <span>
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                    
+                    <span 
+                        data-bind="
+                            text: $root.translations.edit, 
+                            click: function(){$parent.edit(tile);}
+                        "
+                    ></span>
                 </div>
             </div>
             <!-- /ko -->

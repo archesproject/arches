@@ -1,10 +1,10 @@
-define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Backbone, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'models/concept', 'models/value'], function($, Backbone, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(e){
             var self = this;
             this.modal = this.$el.find('.modal');
-            this.modal.on('hidden.bs.modal', function () {
+            this.modal.on('hidden.bs.modal', function() {
                 self.$el.find('input[type=text], textarea').val('');
             });
 
@@ -33,11 +33,11 @@ define(['jquery', 'backbone', 'models/concept', 'models/value'], function ($, Ba
                         nodetype: 'Collection'
                     });
 
-                    self.modal.on('hidden.bs.modal', function (e) {
+                    self.modal.on('hidden.bs.modal', function(e) {
                         collection.save(function(response, status) {
                             self.trigger('collectionAdded', response.responseJSON);
                         }, self);
-                    })
+                    });
                     self.modal.modal('hide');
 
                     return false;

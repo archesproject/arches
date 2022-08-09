@@ -3,9 +3,7 @@ define([
     'underscore',
     'knockout',
     'arches',
-    'ckeditor-jquery',
-    'ckeditor',
-], function ($, _, ko, arches) {
+], function($, _, ko, arches) {
     /**
     * A knockout.js binding for the "ckeditor" rich text editor widget
     * - pass options to ckeditor using the following syntax in the knockout
@@ -16,7 +14,7 @@ define([
     * @name ckeditor
     */
 
-    const initialize = function (element, valueAccessor, allBindings) {
+    const initialize = function(element, valueAccessor, allBindings) {
         var modelValue = valueAccessor();
         var value = ko.utils.unwrapObservable(valueAccessor());
         const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
@@ -26,9 +24,9 @@ define([
         const languageList = [];
         
         for(const lang of Object.keys(arches.languages)){
-            languageList.push(`${lang}:${arches.languages[lang]}`)
+            languageList.push(`${lang}:${arches.languages[lang]}`);
         }
-
+        /* eslint-disable no-undef */
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
@@ -45,7 +43,7 @@ define([
         if (allBindings.has('ckeditorOptions')){
             var opts = allBindings.get('ckeditorOptions');
             options = (typeof opts === 'object') ? opts : {};
-        };
+        }
 
         // Set initial value and create the CKEditor
         $element.html(value);
@@ -58,7 +56,7 @@ define([
         });
 
         // bind to change events and link it to the observable
-        var onChange = function (e) {
+        var onChange = function(e) {
             var self = this;
 
             if (ko.isWriteableObservable(self)) {
@@ -76,7 +74,7 @@ define([
             }
         }), modelValue, element);
 
-        modelValue.subscribe(function(newValue){
+        modelValue.subscribe(function(value){
             var self = this;
             var $element = $(element);
             var newValue = ko.utils.unwrapObservable(valueAccessor());
@@ -87,10 +85,10 @@ define([
                 editor.setData(newValue);
                 editor.on('change', onChange, modelValue, element);
             }
-        }, this)
+        }, this);
 
         // Handle disposal if KO removes an editor through template binding
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             editor.updateElement();
             editor.destroy();
         });
@@ -98,9 +96,10 @@ define([
 
     ko.bindingHandlers.ckeditor = {
         init: (element, valueAccessor, allBindings) => {
-            require(['ckeditor-jquery', 'ckeditor'], () => {
+            window.jQuery = $;
+            require(['ckeditor', 'ckeditor-jquery'], () => {
                 initialize(element, valueAccessor, allBindings);
-            })
+            });
         }
     };
 

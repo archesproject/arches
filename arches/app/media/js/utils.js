@@ -1,4 +1,4 @@
-define([], function () {
+define([], function() {
     return {
         colorLuminance: function(hex, lum) {
             hex = String(hex).replace(/[^0-9a-f]/gi, '');
@@ -16,7 +16,7 @@ define([], function () {
 
             return rgb;
         },
-        hexToRgb: function (hex) {
+        hexToRgb: function(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
                 r: parseInt(result[1], 16),

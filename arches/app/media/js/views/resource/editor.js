@@ -2,6 +2,8 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
+    'report-templates',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -9,15 +11,11 @@ define([
     'models/report',
     'viewmodels/card',
     'viewmodels/provisional-tile',
-    'arches',
-    'resource-editor-data',
-    'report-templates',
+    'views/resource/resource-editor-data',
     'bindings/resizable-sidepanel',
     'bindings/sortable',
-    'widgets',
-    'card-components',
     'moment',
-], function($, _, ko, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, arches, data, reportLookup) {
+], function($, _, ko, arches, reportLookup, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, CardViewModel, ProvisionalTileViewModel, data) {
     var handlers = {
         'after-update': [],
         'tile-reset': []
@@ -30,9 +28,11 @@ define([
     let parsedDisplayName = undefined;
     try { 
         if(typeof data.displayname == 'string') {
-            parsedDisplayName = JSON.parse(data.displayname)
+            parsedDisplayName = JSON.parse(data.displayname);
         }
-    } catch(e){}
+    } catch(e){
+        // empty
+    }
 
     let displayNameValue = undefined;
     if(parsedDisplayName){
@@ -214,7 +214,13 @@ define([
         reportLookup: reportLookup,
         copyResource: function() {
             if (data.graph && !data.graph.publication_id) {
-                vm.alert(new AlertViewModel('ep-alert-red', arches.resourceHasUnpublishedGraph.title, arches.resourceHasUnpublishedGraph.text, null, function(){}));
+                vm.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.resourceHasUnpublishedGraph.title, 
+                    arches.translations.resourceHasUnpublishedGraph.text, 
+                    null, 
+                    function(){}
+                ));
             }
             else if (resourceId()) {
                 vm.menuActive(false);
@@ -223,10 +229,16 @@ define([
                     type: "GET",
                     url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
                     success: function(data) {
-                        vm.alert(new AlertViewModel('ep-alert-blue', arches.resourceCopySuccess.title, "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.resourceCopySuccess.text + "</a>", null, function(){}));
+                        vm.alert(new AlertViewModel(
+                            'ep-alert-blue', 
+                            arches.translations.resourceCopySuccess.title, 
+                            "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.translations.resourceCopySuccess.text + "</a>", 
+                            null, 
+                            function(){}
+                        ));
                     },
                     error: function() {
-                        vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
+                        vm.alert(new AlertViewModel('ep-alert-red', arches.translations.resourceCopyFailed.title, arches.translations.resourceCopyFailed.text, null, function(){}));
                     },
                     complete: function() {
                         loading(false);
@@ -234,30 +246,41 @@ define([
                 });
             }
             else {
-                vm.alert(new AlertViewModel('ep-alert-red', arches.resourceCopyFailed.title, arches.resourceCopyFailed.text, null, function(){}));
+                vm.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.resourceCopyFailed.title, 
+                    arches.translations.resourceCopyFailed.text, 
+                    null, 
+                    function(){}
+                ));
             }
         },
         deleteResource: function() {
             if (resourceId()) {
                 vm.menuActive(false);
-                vm.alert(new AlertViewModel('ep-alert-red', arches.confirmResourceDelete.title, arches.confirmResourceDelete.text, function() {
-                    return;
-                }, function(){
-                    loading(true);
-                    $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.resource_editor + resourceId(),
-                        error: function(err) {
-                            vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
-                        },
-                        complete: function(request, status) {
-                            loading(false);
-                            if (status === 'success') {
-                                vm.navigate(arches.urls.resource);
-                            }
-                        },
-                    });
-                }));
+                vm.alert(new AlertViewModel('ep-alert-red', 
+                    arches.translations.confirmResourceDelete.title, 
+                    arches.translations.confirmResourceDelete.text, 
+                    function() {
+                        return;
+                    }, 
+                    function(){
+                        loading(true);
+                        $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.resource_editor + resourceId(),
+                            error: function(err) {
+                                vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
+                            },
+                            complete: function(request, status) {
+                                loading(false);
+                                if (status === 'success') {
+                                    vm.navigate(arches.urls.resource);
+                                }
+                            },
+                        });
+                    }
+                ));
             }
         },
         viewEditHistory: function() {

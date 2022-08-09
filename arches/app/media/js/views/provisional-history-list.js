@@ -8,7 +8,7 @@ define([
     'bindings/datepicker',
     'bindings/chosen',
     'views/components/simple-switch'
-], function($, _, moment, ko, arches, ListView) {
+], function($, _, moment, ko, arches, ListView, dp, ch,ss) {
     var ProvisionalHistoryList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes

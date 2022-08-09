@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block graph_header_title %}
 {% trans "Resource Editor" %}
@@ -115,7 +116,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div>
                  <div data-bind="component: {
                     name: 'related-resources-manager',
-                    params: relatedResourcesManagerObj
+                    params: $data.relatedResourcesManagerObj
                 }"></div>
             </div>
             <!--/ko -->
@@ -158,7 +159,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Image -->
                     <div class="img-lg img-circle rr-splash-img-container">
-                        <img class="rr-splash-img" src="{% static "img/inspection.png" %}" alt="Resource Editor">
+                        <img class="rr-splash-img" src="{% webpack_static "img/inspection.png" %}" alt="Resource Editor">
                     </div>
 
                     <!-- Splash Title -->
@@ -290,33 +291,32 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-    <script>
-        {% autoescape off %}define('resource-editor-data', [], function() {
-            return {
-                resourceid: '{{resourceid}}',
-                graphid: '{{graphid}}',
-                graphiconclass: '{{graphiconclass}}',
-                graphname: '{{graphname | escapejs}}',
-                displayname: '{{displayname | escapejs}}',
-                tiles: {{tiles}},
-                cards: {{cards}},
-                nodes: {{nodes}},
-                cardwidgets: {{cardwidgets}},
-                widgets: {{widgets_json}},
-                ontologyclass: '{{ontologyclass}}',
-                relationship_types: {{ relationship_types }},
-                datatypes: {{datatypes_json}},
-                appliedFunctions: {{applied_functions}},
-                primaryDescriptorFunction: {{ primary_descriptor_function }},
-                cardComponents: {{card_components_json}},
-                nodegroups: {{nodegroups}},
-                userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
-                creator:  JSON.parse('{{ creator }}'.toLowerCase()),
-                useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
-                templates: {{templates_json}},
-                graph: {{graph_json}},
-                issystemsettings: {{is_system_settings|yesno:"true,false"}}
-            };ƒ
-        });{% endautoescape %}
-    </script>
+<div 
+    id="resourceEditorData"
+    style="display: none;"
+    resourceEditorData='{
+        "resourceid": "{{resourceid}}",
+        "graphid": "{{graphid}}",
+        "graphiconclass": "{{graphiconclass}}",
+        "graphname": "{{graphname | escapejs}}",
+        "displayname": "{{displayname | escapejs}}",
+        "tiles": {{tiles}},
+        "cards": {{cards}},
+        "nodes": {{nodes}},
+        "cardwidgets": {{cardwidgets}},
+        "widgets": {{widgets_json}},
+        "ontologyclass": "{{ontologyclass}}",
+        "relationship_types": "{{ relationship_types }}",
+        "datatypes": {{datatypes_json}},
+        "appliedFunctions": {{applied_functions}},
+        "cardComponents": {{card_components_json}},
+        "nodegroups": {{nodegroups}},
+        "userisreviewer": "{{ user_is_reviewer }}",
+        "creator": {{ creator }},
+        "useriscreator": "{{ user_created_instance }}",
+        "templates": {{templates_json}},
+        "graph": {{graph_json}},
+        "issystemsettings": {{is_system_settings|yesno:"true,false"}}
+    }'
+></div>
 {% endblock pre_require_js %}

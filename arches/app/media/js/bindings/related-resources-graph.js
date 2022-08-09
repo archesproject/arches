@@ -2,9 +2,9 @@ define([
     'knockout',
     'jquery',
     'underscore',
-    'arches',
-    'd3'
-], function(ko, $, _, arches, d3) {
+    'd3',
+    'arches'
+], function(ko, $, _, d3, arches) {
     ko.bindingHandlers.relatedResourcesGraph = {
         init: function(element, valueAccessor) {
             var modelMap = arches.resources.reduce(function(a, v) {
@@ -528,7 +528,7 @@ define([
                                 }
                             });
 
-                            var links = _.uniq(links, function(item, key, source) {
+                            links = _.uniq(links, function(item, key, source) {
                                 return item.source.id + '_' + item.target.id;
                             });
 

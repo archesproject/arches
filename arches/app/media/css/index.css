@@ -1,4 +1,4 @@
-@import url(../packages/chosen-js/chosen.css);
+@import url(../node_modules/chosen-js/chosen.css);
 
 html, body {
     overflow-x: hidden;
@@ -731,6 +731,7 @@ footer .footer-links {
 }
 
 .tp-caption {
+    position: absolute;
     top: auto !important;
     bottom: 20vh;
 }

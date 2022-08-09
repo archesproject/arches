@@ -2,40 +2,52 @@
 {% load i18n %}
 
 <div class="search-container time-search-container relative" style="overflow-y: scroll;">
-    <div class="filter-title">{% trans "Export Search Results" %}
+    <div class="filter-title">
+        <span data-bind="text: $root.translations.exportSearchResults"></span>
     </div>
     <hr class="title-underline">
 
     <div class="search-export">
         <div class="instruction">
-            <h2 class=""> {% trans "1. Format" %} </h2>
-            <h4 class=""> {% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" %} </h4>
+            <h2 class="">
+                <span data-bind="text: $root.translations.listItemOneFormat"></span>
+            </h2>
+            <h4 class="">
+                <span data-bind="text: $root.translations.listItemOneFormatText"></span>
+            </h4>
         </div>
         <div class="parameter">
             <div>
                 <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
-                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true"> {% trans "csv" %}
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true">
+                    <span data-bind="text: $root.translations.csv"></span>
                 </label>
                 <!-- ko if: hasExportHtmlTemplates() -->
                 <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
-                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false"> {% trans "html" %}
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false">
+                    <span data-bind="text: $root.translations.html"></span>
                 </label>
                 <!-- /ko -->
                 <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
-                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false"> {% trans "shapefile" %}
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false">
+                    <span data-bind="text: $root.translations.shapefile"></span>
                 </label>
 
                 <label data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
-                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false"> {% trans "tile excel" %}
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false">
+                    <span data-bind="text: $root.translations.tileExcel"></span>
                 </label>
                 <!-- ko if: total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} -->
                 <label data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
-                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false"> {% trans "geojson url" %}
+                    <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false">
+                    <span data-bind="text: $root.translations.geojsonUrl"></span>
                 </label>
                 <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
                 <div data-bind="clipboard: geojsonUrl">
                     <div style="padding: 5px 0px"><textarea style="width: 300px;" data-bind="value: geojsonUrl"></textarea></div>
-                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary"><span>{% trans "Copy to clipboard" %}</span></button>
+                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary">
+                        <span data-bind="text: $root.translations.copyToClipboard"></span>
+                    </button>
                 </div>
                 <!-- /ko -->
                 <!-- /ko -->
@@ -43,36 +55,77 @@
         </div>
 
         <div class="instruction">
-                <h2 class=""> {% trans "2. Coordinate Precision" %} </h2>
-                <h4 class=""> {% trans "Tell us how many decimal places of precision you'd like for geo-data results" %} </h4>
+                <h2 class="">
+                    <span data-bind="text: $root.translations.listItemTwoCoordinatePrecision"></span>
+                </h2>
+                <h4 class="">
+                    <span data-bind="text: $root.translations.listItemTwoCoordinatePrecisionText"></span>
+                </h4>
         </div>
         <div class="parameter">
             <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
         </div>
         
         <div class="instruction">
-            <h2 class=""> {% trans "3. Report Link" %} </h2>
-            <h4 class=""> {% trans "Only applicable to CSV and shapefile exports" %} </h4>
+            <h2 class="">
+                <span data-bind="text: $root.translations.listItemThreeReportLink"></span>
+            </h2>
+            <h4 class="">
+                <span data-bind="text: $root.translations.listItemThreeReportLinkText"></span>
+            </h4>
         </div>
         <div class="parameter">
-            <div data-bind="component: { name: 'views/components/simple-switch', params: {value: reportlink, config:{ label: {% quoted_trans "Include the report link in the export?" %}, subtitle: ''}}}"></div>
+            <div 
+                data-bind="
+                    component: { 
+                        name: 'views/components/simple-switch', 
+                        params: {
+                                value: reportlink, 
+                                config:{ 
+                                    label: $root.translations.includeReportLinkInExport,
+                                    subtitle: ''
+                                }
+                            }
+                        }
+                    "
+            ></div>
         </div>
         <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>
             <div class="instruction">
-                <h2>{% trans "4. Name this export" %}</h2>
+                <h2>
+                    <span data-bind="text: $root.translations.listItemFourNameThisExport"></span>
+                </h2>
             </div>
             <div class="parameter">
-                <input type="" class="form-control input-md widget-input" data-bind="textInput: exportName" placeholder="Arches Export"></input>
+                <input 
+                    type="" 
+                    class="form-control input-md widget-input" 
+                    data-bind="
+                        attr: {placeholder: $root.translations.archesExport},
+                        textInput: exportName
+                    " 
+                ></input>
             </div>
         </div>
         <div class="">
             <div class="instruction">
-                    <h2 class=""> {% trans "5. Email Address" %} </h2>
-                    <h4 class=""> {% trans "This download may take some time.  Tell us where to email a download link to your results" %} </h4>
+                    <h2 class="">
+                        <span data-bind="text: $root.translations.listItemFiveEmailAddress"></span>
+                    </h2>
+                    <h4 class="">
+                        <span data-bind="text: $root.translations.listItemFiveEmailAddressText"></span>
+                    </h4>
             </div>
             <div class="parameter">
-                <input type="" class="form-control input-md widget-input" data-bind="textInput: emailInput" placeholder="No Email saved for User"></input>
+                <input 
+                    type="" 
+                    class="form-control input-md widget-input" 
+                    data-bind="
+                        attr: {placeholder: $root.translations.noEmailSavedForUser},
+                        textInput: emailInput
+                    "
+                ></input>
             </div>
         </div>
         <!-- /ko -->
@@ -84,7 +137,7 @@
             type="button"
             aria-expanded="true"
             data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }}"> 
-            <span>{% trans "Download" %}</span>
+            <span data-bind="text: $root.translations.download"></span>
             <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
         </button>
     </div>

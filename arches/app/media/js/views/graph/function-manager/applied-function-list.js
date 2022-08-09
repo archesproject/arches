@@ -18,7 +18,7 @@ define([
         */
         initialize: function(options) {
             this.items = options.functions;
-            this.items.sort(function (left, right) {
+            this.items.sort(function(left, right) {
                 return left.function.name().toLowerCase() == right.function.name().toLowerCase() ? 0 : (left.function.name().toLowerCase() < right.function.name().toLowerCase() ? -1 : 1);
             });
             ListView.prototype.initialize.apply(this, arguments);

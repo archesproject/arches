@@ -17,6 +17,7 @@ define([
 ], function($, Backbone, arches, ConceptModel, ValueModel, ConceptParentModel, ValueEditor,
     RelatedConcept, RelatedMember, ManageParentForm, ImportConcept, AddChildForm,
     AddImageForm, AlertViewModel, JsonErrorAlertViewModel) {
+
     return Backbone.View.extend({
         events: {
             'click .concept-report-content *[data-action="viewconcept"]': 'conceptSelected',
@@ -198,7 +199,7 @@ define([
             });
         },
 
-        addImageClicked: function (e) {
+        addImageClicked: function(e) {
             this.model.reset();
             var self = this;
             var form = new AddImageForm({
@@ -206,7 +207,7 @@ define([
                 model: this.model
             });
 
-            form.on('dataChanged', function() {
+            $(form).on('dataChanged', function() {
                 self.render();
             });
         },
@@ -249,7 +250,7 @@ define([
                     }
                 }, self);
             }else{
-                modal.on('hidden.bs.modal', function () {
+                modal.on('hidden.bs.modal', function() {
                     var model;
 
                     if (data.action === 'delete-value') {

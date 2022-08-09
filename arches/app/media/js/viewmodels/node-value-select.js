@@ -2,14 +2,14 @@ define([
     'underscore',
     'knockout',
     'jquery',
-    'viewmodels/widget',
     'arches',
-], function(_, ko, $, WidgetViewModel, arches) {
-
+    'viewmodels/widget',
+], function(_, ko, $, arches, WidgetViewModel) {
     var NodeValueSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder','displayOnlySelectedNode'];
         this.multiple = params.multiple || false;
+         
 
         WidgetViewModel.apply(this, [params]);
         this.resourceinstanceid = params.tile ? params.tile.resourceinstance_id : '';

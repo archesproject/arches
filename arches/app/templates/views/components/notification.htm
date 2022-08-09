@@ -22,7 +22,9 @@
 
         <!-- ko if: link -->
         <div class='entry'>
-            <button data-bind="click: getExportFile" class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{% trans 'Download File' %}</span></button>
+            <button data-bind="click: getExportFile" class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>
+                <span data-bind="text: $root.translations.downloadFile"></span>
+            </button>
             <div style="padding-left: 10px;" data-bind="text: info"></div>
         </div>
         <!-- /ko -->
@@ -30,7 +32,7 @@
 
     <div class='entry relative'>
         <a href="javascript:void(0);" data-bind="click: function() { dismiss($parents[1]) }" class="ep-notifs-toggle ep-notifs-close">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Dismiss" %}">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="$root.translations.dismiss">
                 <i class="fa fa-times-circle fa-sm"></i>
             </div>
         </a>

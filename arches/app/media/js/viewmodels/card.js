@@ -3,14 +3,15 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/card',
     'models/card-widget',
-    'arches',
     'require',
     'uuid',
     'utils/dispose',
-    'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, uuid, dispose) {
+    'viewmodels/tile',
+    'utils/set-csrf-token'
+], function($, _, ko, koMapping, arches,  CardModel, CardWidgetModel, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *

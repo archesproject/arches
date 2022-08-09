@@ -12,8 +12,15 @@
             </div>
     
             <div>
-                <input type="text" class="form-control" style="width: 366px; height: 36px;" 
-                    placeholder="{% trans "Find an icon" %}" data-bind="textInput:iconFilter">
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    style="width: 366px; height: 36px;" 
+                    data-bind="
+                        attr: {placeholder: $root.translations.findAnIcon},
+                        textInput:iconFilter
+                    "
+                >
             </div>
     
             <!-- ko if: iconFilter() !== '' -->

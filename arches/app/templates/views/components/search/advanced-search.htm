@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load webpack_static from webpack_loader %}
 
 <!--ko let: { self: $data }-->
 <div class="flex">
@@ -10,16 +11,18 @@
             <div id="rr-splash" class="rr-splash">
                 <!-- Image -->
                 <div class="img-lg img-circle rr-splash-img-container">
-                    <img class="rr-splash-img" src="{% static 'img/inspection.png' %}" alt="Advanced Search">
+                    <img class="rr-splash-img" src="{% webpack_static 'img/inspection.png' %}" alt="Advanced Search">
                 </div>
 
                 <!-- Splash Title -->
-                <div class="rr-splash-title">{% trans "Advanced Search" %}</div>
+                <div class="rr-splash-title">
+                    <span data-bind="text: $root.translations.advancedSearch"></span>
+                </div>
 
                 <!-- Splash Instructions -->
-                <div class="rr-splash-description">{% trans "With Advanced Search you can build more sophisticated search queries." %}</div>
-                <div class="rr-splash-description">{% trans "Select the search facets you wish to query from the list on the right.  Then enter your" %}</div>
-                <div class="rr-splash-description">{% trans "criteria to customize your search filters" %}</div>
+                <div class="rr-splash-description">
+                    <span data-bind="text: $root.translations.advancedSearchDescription"></span>
+                </div>
             </div>
         </div>
 
@@ -27,8 +30,12 @@
 
         <!-- ko if: $index  -->
         <div class="btn-group btn-group-sm facet-btn-group">
-            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">{% trans "And" %}</button>
-            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">{% trans "Or" %}</button>
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">
+                <span data-bind="text: $root.translations.and"></span>
+            </button>
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">
+                <span data-bind="text: $root.translations.or"></span>
+            </button>
         </div>
         <!-- /ko -->
 
@@ -54,7 +61,9 @@
                 <!-- /ko -->
 
                 <div class="facet-search-button">
-                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">{% trans "Remove" %}</button>
+                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">
+                        <span data-bind="text: $root.translations.remove"></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -65,9 +74,19 @@
     <div class="facets-container" style="">
         <div class="list-group search-facets">
             <div class="search-facet-item header">
-                <h4 class="search-facet-item-heading">{% trans "Search Facets" %}</h4>
+                <h4 class="search-facet-item-heading">
+                    <span data-bind="text: $root.translations.searchFacets"></span>
+                </h4>
                 <div class="list-filter">
-                    <input type="text" class="form-control" placeholder="{% trans "Find ..." %}" data-bind="value: facetFilterText, valueUpdate: 'keyup'">
+                    <input 
+                        type="text" 
+                        class="form-control"
+                        data-bind="
+                            attr:{placeholder: $root.translations.find + '...'},
+                            value: facetFilterText, 
+                            valueUpdate: 'keyup'
+                        "
+                    >
                     <!-- Clear Filter -->
                     <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>

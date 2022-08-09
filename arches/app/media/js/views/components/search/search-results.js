@@ -1,4 +1,5 @@
-define(['jquery',
+define([
+    'jquery',
     'underscore',
     'views/components/search/base-filter',
     'bootstrap',
@@ -8,9 +9,10 @@ define(['jquery',
     'knockout-mapping',
     'models/graph',
     'view-data',
+    'templates/views/components/search/search-results.htm',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -24,6 +26,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
             initialize: function(options) {
                 options.name = 'Search Results';
+
+                 
                 this.requiredFilters = ['map-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
@@ -35,7 +39,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
 
-                this.searchResults.timestamp.subscribe(function(timestamp) {
+                this.searchResults.timestamp.subscribe(function() {
                     this.updateResults();
                 }, this);
 
@@ -52,7 +56,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var self = this;
                     if (tab === 'map-filter') {
                         if (ko.unwrap(this.mapFilter.map)) {
-                            setTimeout(function() { self.mapFilter.map().resize(); }, 1);
+                            self.mapFilter.map().resize();
                         }
                     }
                 }, this);
@@ -230,22 +234,24 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             },
 
             getLocalizedText: function(data){
-                const d = data.find((element) => {
-                    return arches.activeLanguage == element.language;
-                });
-                if(!!d && d["value"] !== "") {
-                    return { displayText: d["value"], alternative: false };
-                } else {
-                    const allValues = data.filter((entry) => {
-                        return !!entry["value"];
-                    }).map((entry) => {
-                        return entry["value"];
+                if (data && data.find) {
+                    const d = data.find((element) => {
+                        return arches.activeLanguage == element.language;
                     });
-
-                    return { displayText: allValues.join(","), alternative: true };
+                    if(!!d && d["value"] !== "") {
+                        return { displayText: d["value"], alternative: false };
+                    } else {
+                        const allValues = data.filter((entry) => {
+                            return !!entry["value"];
+                        }).map((entry) => {
+                            return entry["value"];
+                        });
+    
+                        return { displayText: allValues.join(","), alternative: true };
+                    }
                 }
             }
         }),
-        template: { require: 'text!templates/views/components/search/search-results.htm' }
+        template: searchResultsTemplate
     });
 });

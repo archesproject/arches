@@ -74,7 +74,6 @@ strong {
 }
 
 .left nav dl dt.active a {
-    background: url("../images/arrow.png") no-repeat scroll right center transparent;
     color: #2576B8;
     font-weight: bold;
 }

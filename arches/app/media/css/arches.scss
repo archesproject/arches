@@ -1,26 +1,26 @@
 @import url(fonts/openSans.css);
-@import url(../packages/bootstrap/dist/css/bootstrap.min.css);
-@import url(../packages/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
-@import url(../packages/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
+@import url(../node_modules/bootstrap/dist/css/bootstrap.min.css);
+@import url(../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
+@import url(../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
 @import url(nifty.min.css);
-@import url(../packages/font-awesome/css/font-awesome.min.css);
-@import url(../packages/ionicons/css/ionicons.min.css);
-@import url(../packages/lt-themify-icons/themify-icons.css);
-@import url(../packages/chosen-js/chosen.css);
-@import url(../packages/select2/select2.css);
-@import url(../packages/select2/select2-bootstrap.css);
-@import url(../packages/mapbox-gl/dist/mapbox-gl.css);
-@import url(../packages/nouislider/distribute/nouislider.min.css);
-@import url(../packages/codemirror/lib/codemirror.css);
-@import url(../packages/codemirror/theme/monokai.css);
-@import url(../packages/datatables.net-bs/css/dataTables.bootstrap.css);
-@import url(../packages/datatables.net-responsive-bs/css/responsive.bootstrap.css);
-@import url(../packages/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
-@import url(../packages/leaflet/dist/leaflet.css);
-@import url(../packages/leaflet-draw/dist/leaflet.draw.css);
+@import url(../node_modules/font-awesome/css/font-awesome.min.css);
+@import url(../node_modules/ionicons/css/ionicons.min.css);
+@import url(../node_modules/lt-themify-icons/themify-icons.css);
+@import url(../node_modules/chosen-js/chosen.css);
+@import url(../node_modules/select2/select2.css);
+@import url(../node_modules/select2/select2-bootstrap.css);
+@import url(../node_modules/mapbox-gl/dist/mapbox-gl.css);
+@import url(../node_modules/nouislider/distribute/nouislider.min.css);
+@import url(../node_modules/codemirror/lib/codemirror.css);
+@import url(../node_modules/codemirror/theme/monokai.css);
+@import url(../node_modules/datatables.net-bs/css/dataTables.bootstrap.css);
+@import url(../node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.css);
+@import url(../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
+@import url(../node_modules/leaflet/dist/leaflet.css);
+@import url(../node_modules/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
-@import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
-@import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
+@import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
 @import "sidenav.scss";
 @import "edit-history.scss";
@@ -6131,8 +6131,8 @@ div.card-grid-item.selected {
 }
 
 .profile-sections {
-    padding: 0px 0px;
-    min-height: 650px;
+    padding: 60px 30px;
+    min-height: 450px;
 }
 
 div.profile-notif-settings {
@@ -7005,6 +7005,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-indent a {
     padding-left: 30px;
+}
+
+.arches-translations,
+.arches-data,
+.arches-urls {
+    display: none;
 }
 
 .expando {

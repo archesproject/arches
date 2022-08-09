@@ -1,16 +1,18 @@
 define([
     'underscore',
     'jquery',
-    'arches',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/graph',
     'viewmodels/card',
-    'viewmodels/provisional-tile'
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel) {
+    'viewmodels/provisional-tile',
+    'templates/views/components/related-instance-creator.htm'
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, relatedInstanceCreatorTemplate) {
     function viewModel(params) {
         var self = this;
 
+         
         this.resourceId = ko.observable(ko.unwrap(params.resourceid));
         this.resourceId.subscribe(function(id) {
             params.resourceid(id);
@@ -195,9 +197,7 @@ define([
 
     ko.components.register('related-instance-creator', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/related-instance-creator.htm'
-        }
+        template: relatedInstanceCreatorTemplate,
     });
     return viewModel;
 });

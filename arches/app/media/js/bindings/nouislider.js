@@ -17,7 +17,7 @@ define([
             };
 
             var keys = ['start', 'end'];
-            keys.forEach(function (key) {
+            keys.forEach(function(key) {
                 var value = options[key];
                 if (ko.isObservable(value)) {
                     value.subscribe(updateValues);
@@ -30,7 +30,7 @@ define([
 
             element.noUiSlider.on('slide', function(newValues) {
                 sliding = true;
-                values.forEach(function (value, i) {
+                values.forEach(function(value, i) {
                     value(newValues[i]);
                 });
                 sliding = false;

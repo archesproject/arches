@@ -33,9 +33,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-    <script>
-        define('plugin-data', ['{{ plugin.component }}'], function() {
-            return {% autoescape off %}{{plugin_json}}{% endautoescape %};
-        });
-    </script>
+    <div
+        id="pluginData"
+        style="display: none;"
+        pluginData='{{ plugin_json }}'
+    ></div>
 {% endblock pre_require_js %}

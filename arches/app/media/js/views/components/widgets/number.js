@@ -1,4 +1,10 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget', 
+    'templates/views/components/widgets/number.htm',
+    'bindings/formattedNumber',
+], function(ko, _, WidgetViewModel, numberWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -10,10 +16,10 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
     * @param {string} params.config().uneditable - disables widget
     */
 
-
     var NumberWidget = function(params) {
         params.configKeys = ['placeholder', 'width', 'min', 'max', 'step', 'precision', 'prefix', 'suffix', 'defaultValue', 'format', 'uneditable'];
 
+         
         WidgetViewModel.apply(this, [params]);
 
         var self = this;
@@ -62,6 +68,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/formattedNumber
 
     return ko.components.register('number-widget', {
         viewModel: NumberWidget,
-        template: { require: 'text!widget-templates/number' }
+        template: numberWidgetTemplate,
     });
 });

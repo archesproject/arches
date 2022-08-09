@@ -2,18 +2,39 @@
 <!-- ko if: $data.search -->
 <div class="col-md-3 col-lg-2">
     <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="~">{% trans "Like" %}</option>
-        <option value="!~">{% trans "Not like" %}</option>
-        <option value="">{% trans "Equals" %}</option>
-        <option value="!">{% trans "Is Not" %}</option>
-        <option value="null">{% trans "Has no value" %}</option>
-        <option value="not_null">{% trans "Has any value" %}</option>
+        <option value="~">
+            <span data-bind="text: $root.translations.like"></span>
+        </option>
+        <option value="!~">
+            <span data-bind="text: $root.translations.notLike"></span>
+        </option>
+        <option value="">
+            <span data-bind="text: $root.translations.equals"></span>
+        </option>
+        <option value="!">
+            <span data-bind="text: $root.translations.isNot"></span>
+        </option>
+        <option value="null">
+            <span data-bind="text: $root.translations.hasNoValue"></span>
+        </option>
+        <option value="not_null">
+            <span data-bind="text: $root.translations.hasAnyValue"></span>
+        </option>
     </select>
 </div>
 <div class="col-md-3 col-lg-2" data-bind="css: {'chosen-hide': op() == 'null' || op() == 'not_null'}">
     <select data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: language, chosen:{width:'100%'}"></select>
 </div>
 <div class="col-md-9 col-lg-8" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input type="text" placeholder="{% trans "Name" %}" class="form-control input-lg" style="height: 36px;" data-bind="value: searchValue, valueUpdate: 'keyup'">
+    <input 
+        type="text" 
+        class="form-control input-lg" 
+        style="height: 36px;" 
+        data-bind="
+            attr: {placeholder: $root.translations.name},
+            value: searchValue, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
 <!-- /ko -->

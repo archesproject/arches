@@ -1,8 +1,9 @@
 define([
     'backbone',
+    'underscore',
     'knockout',
     'bindings/sortable'
-], function(Backbone, ko) {
+], function(Backbone, _, ko) {
     var CardComponentsTree = Backbone.View.extend({
         /**
         * A backbone view representing a card components tree
@@ -27,7 +28,7 @@ define([
         * @memberof CardComponentsTree.prototype
         * @param  {object} e - the ko.sortable event object
         */
-        beforeMove: function (e) {
+        beforeMove: function(e) {
             e.cancelDrop = (e.sourceParent!==e.targetParent);
         }
     });

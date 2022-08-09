@@ -14,22 +14,26 @@
                     'fa-caret-up' : showi18nOptions(),
                 }
             }"></i>
-            <span data-bind="text: {% quoted_trans "Languages" %}"></span>
+            <span data-bind="text: $root.translations.languages"></span>
         </div>
         <div class="form-horizontal" data-bind="if: showi18nOptions">
             <div class="i18n-style-tools-panel">
                 <div style="display: flex; flex-direction: column; max-width:600px">
-                    <label class="widget-input-label i18n-style-tools-label" for="lang_dd">{% trans "Language" %}</label>
+                    <label class="widget-input-label i18n-style-tools-label" for="lang_dd">
+                        <span data-bind="text: $root.translations.language"></span>
+                    </label>
                     <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
                     </select>
-                    <label class="widget-input-label i18n-style-tools-label" for="lang_dir">{% trans "Direction" %}</label>
+                    <label class="widget-input-label i18n-style-tools-label" for="lang_dir">
+                        <span data-bind="text: $root.translations.direction"></span>
+                    </label>
                     <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
                         'width':'100%'}">
                         <option value="ltr">
-                            Left-to-Right
+                            <span data-bind="text: $root.translations.leftToRight"></span>
                         </option>
                         <option value="rtl">
-                            Right-to-Left
+                            <span data-bind="text: $root.translations.rightToLeft"></span>
                         </option>
                     </select>
                 </div>
@@ -48,17 +52,19 @@
 
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="html: strippedValue || {% quoted_trans "None" %}"></dd>
+<dd data-bind="html: strippedValue || $root.translations.none"></dd>
 {% endblock report %}
 
 {% block display_value %}
 <!-- ko if: value() && currentLanguage() && value()[currentLanguage().code] &&  value()[currentLanguage().code]['value'] && !ko.unwrap(displayfullvalue) -->
-<em>[{% trans "rich text" %}]</em>
+<em>
+    <span data-bind="text: '[' + $root.translations.richText + ']'"></span>
+</em>
 <!-- /ko -->
 <!-- ko if: value() && value()[currentLanguage().code] &&  value()[currentLanguage().code]['value'] && ko.unwrap(displayfullvalue) === true -->
-<div data-bind="html: value() && value()[currentLanguage()] &&  value()[currentLanguage()]['value'] ? strippedValue : {% quoted_trans "None" %}"></div>
+<div data-bind="html: value() && value()[currentLanguage()] &&  value()[currentLanguage()]['value'] ? strippedValue : $root.translations.none"></div>
 <!-- /ko -->
 <!-- ko if: !value() || !value()[currentLanguage().code] || !value()[currentLanguage().code]['value'] -->
-{% trans "None" %}
+<span data-bind="text: $root.translations.none"></span>
 <!-- /ko -->
 {% endblock display_value %}
