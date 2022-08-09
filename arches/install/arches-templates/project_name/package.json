@@ -10,6 +10,6 @@
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
     },
     "dependencies": {
-        "arches": "archesproject/arches#8090-cbyrd-adds-frontend-compiler"
+        "arches": "archesproject/arches#dev/7.0.x"
     }
 }
