@@ -28,8 +28,17 @@ class Migration(migrations.Migration):
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
 
         UPDATE public.widgets
-        SET defaultconfig = defaultconfig ||
-        '{{"i18n_properties": ["placeholder"]}}'
+        SET defaultconfig = '{{
+            "width": "100%",
+            "maxLength": null,
+            "uneditable": false,
+            "placeholder": {{
+                "{0}": "Enter text"
+            }},
+            "defaultValue":  {{
+                "{0}": {{"value": "", "direction":"{1}"}}
+            }},
+            "i18n_properties": ["placeholder"]}}'
         WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE, "ltr" if not get_language_info(settings.LANGUAGE_CODE)["bidi"] else "rtl"
@@ -43,7 +52,13 @@ class Migration(migrations.Migration):
         WHERE nodeid in (SELECT nodeid FROM nodes WHERE datatype = 'string');
 
         UPDATE public.widgets
-        SET defaultconfig = defaultconfig - 'i18n_properties'
+        SET defaultconfig = '{{
+            "width": "100%",
+            "maxLength": null,
+            "uneditable": false,
+            "placeholder": "Enter text",
+            "defaultValue": ""
+        }}'
         WHERE datatype = 'string';
     """.format(
         settings.LANGUAGE_CODE
