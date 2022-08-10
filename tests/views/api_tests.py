@@ -24,6 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import os
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
@@ -73,6 +74,7 @@ class APITests(ArchesTestCase):
         # Load the test package to provide resources graph.
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+        LanguageSynchronizer.synchronize_settings_with_db()
 
     def test_api_base_view(self):
         """
