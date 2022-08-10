@@ -97,10 +97,12 @@ def quoted_trans_tag(parser, token):
     transnode = do_translate(parser, token)
     return QuotedTranslateNode(transnode.filter_expression, transnode.noop, transnode.asvar, transnode.message_context)
 
+
 class JsTranslatedNode(TranslateNode):
     def render(self, context):
         value = super().render(context)
         return escapejs(value)
+
 
 @register.tag("jsescaped_trans")
 def jsescaped_trans(parser, token):
