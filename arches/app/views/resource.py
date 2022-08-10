@@ -24,7 +24,6 @@ from distutils.util import strtobool
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
-from django.db.models import Model
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
