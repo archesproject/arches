@@ -68,25 +68,6 @@ def templates(request, template):
         print(e)
 
 
-def language_switcher(request):
-    requested_language = request.POST.get("language")
-
-    updated_path = request.META.get("HTTP_REFERER")
-
-    for language_tuple in settings.LANGUAGES:
-        language_code = language_tuple[0]
-
-        # regex to replace the first instance of a language code surrounded by forward slashes
-        updated_path = re.sub(
-            "/{language_code}/".format(language_code=language_code),
-            "/{requested_language}/".format(requested_language=requested_language),
-            updated_path,
-            count=1,
-        )
-
-    return redirect(updated_path)
-
-
 def help_templates(request):
     template = request.GET.get("template")
     return render(request, "help/%s.htm" % template)
