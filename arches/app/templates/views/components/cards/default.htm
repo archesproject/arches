@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-<!-- ko if: state === 'editor-tree' && self.card.model.visible() -->
+<!-- ko if: state === 'editor-tree' -->
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0, 'hide-background': !self.showGrid()}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
