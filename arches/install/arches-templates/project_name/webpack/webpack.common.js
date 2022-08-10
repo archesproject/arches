@@ -8,6 +8,23 @@ const BundleTracker = require('webpack-bundle-tracker');
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
+
+var USER_DEFINED_ARCHES_CORE_DIRECTORY;
+var USER_DEFINED_PROJECT_ROOT_DIRECTORY;
+var USER_DEFINED_DJANGO_SERVER_ADDRESS;
+var USER_DEFINED_PUBLIC_PATH;
+var USER_DEFINED_PROJECT_NODE_MODULES_ALIASES;
+
+try {
+    var { 
+        USER_DEFINED_ARCHES_CORE_DIRECTORY, 
+        USER_DEFINED_PROJECT_ROOT_DIRECTORY,
+        USER_DEFINED_DJANGO_SERVER_ADDRESS, 
+        USER_DEFINED_PUBLIC_PATH,
+        USER_DEFINED_PROJECT_NODE_MODULES_ALIASES,
+    } = require('./webpack-user-config');
+} catch (e) {}
+
 const { 
     ARCHES_CORE_DIRECTORY, 
     PROJECT_ROOT_DIRECTORY,
@@ -17,10 +34,11 @@ const {
 } = require('./webpack-meta-config');
 
 
-let archesCoreDirectory = ARCHES_CORE_DIRECTORY;
-let projectRootDirectory = PROJECT_ROOT_DIRECTORY;
-let djangoServerAddress = DJANGO_SERVER_ADDRESS;
-let publicPath = PUBLIC_PATH;
+let archesCoreDirectory = USER_DEFINED_ARCHES_CORE_DIRECTORY || ARCHES_CORE_DIRECTORY;
+let projectRootDirectory = USER_DEFINED_PROJECT_ROOT_DIRECTORY || PROJECT_ROOT_DIRECTORY;
+let projectNodeModulesAliases = USER_DEFINED_PROJECT_NODE_MODULES_ALIASES || PROJECT_NODE_MODULES_ALIASES;
+let djangoServerAddress = USER_DEFINED_DJANGO_SERVER_ADDRESS || DJANGO_SERVER_ADDRESS;
+let publicPath = USER_DEFINED_PUBLIC_PATH || PUBLIC_PATH;
 let isTestEnvironment = false;
 
 for (let arg of process.argv) {
@@ -64,21 +82,21 @@ const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
 };
 
 const { ARCHES_CORE_NODE_MODULES_ALIASES } = require(`${archesCoreDirectory}/../webpack/webpack-meta-config.js`);
-const archesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
+const parsedArchesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
     // eval() should be safe here, it's running developer-defined code during build
     acc[alias] = eval(executeableString);
     return acc;
 }, {});
 
-const projectNodeModulesAliases = Object.entries(JSON.parse(PROJECT_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
+const parsedProjectNodeModulesAliases = Object.entries(JSON.parse(projectNodeModulesAliases)).reduce((acc, [alias, executeableString]) => {
     // eval() should be safe here, it's running developer-defined code during build
     acc[alias] = eval(executeableString);
     return acc;
 }, {});
 
 const nodeModulesAliases = {
-    ...archesCoreNodeModulesAliases,
-    ...projectNodeModulesAliases
+    ...parsedArchesCoreNodeModulesAliases,
+    ...parsedProjectNodeModulesAliases
 };
 
 const templateFilepathLookup = buildTemplateFilePathLookup(
