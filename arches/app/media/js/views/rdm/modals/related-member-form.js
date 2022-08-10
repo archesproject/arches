@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
+define(['jquery', 'backbone', 'views/concept-search', 'models/concept'], function($, Backbone, ConceptSearch, ConceptModel) {
     return ConceptSearch.extend({
 
         events: {
@@ -23,9 +23,9 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                 });
                 this.model.set('relatedconcepts', [relatedConcept]);
 
-                this.modal.on('hidden.bs.modal', function (e) {
+                this.modal.on('hidden.bs.modal', function(e) {
                     self.model.save();
-                })
+                });
                 this.modal.modal('hide');
             }
         }

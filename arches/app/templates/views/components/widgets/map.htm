@@ -19,7 +19,9 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <!-- ko if: summaryDetails.length === 0 -->
-<dd>{% trans "None" %}</dd>
+<dd>
+    <span data-bind="text: $root.translations.none"></span>
+</dd>
 <!-- /ko -->
 <!-- ko ifnot: summaryDetails.length === 0  -->
 <dd data-bind="foreach: summaryDetails">
@@ -30,7 +32,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Available Geometry Types" %}
+    <span data-bind="text: $root.translations.availableGeometryTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input style="display:inline-block;"
@@ -41,40 +43,70 @@
                 multiple: true,
                 allowClear: true,
                 minimumInputLength: 0,
-                placeholder: {% quoted_trans "Available Geometry Types" %},
+                placeholder: $root.translations.availableGeometryTypes,
                 data: [{
-                    text: {% quoted_trans "Point" %},
+                    text: $root.translations.point,
                     id: 'Point'
                 }, {
-                    text: {% quoted_trans "Line" %},
+                    text: $root.translations.line,
                     id: 'Line'
                 }, {
-                    text: {% quoted_trans "Polygon" %},
+                    text: $root.translations.polygon,
                     id: 'Polygon'
                 }]
             }
         }">
 </div>
 <div class="control-label">
-    {% trans "Map Center Longitude" %}
+    <span data-bind="text: $root.translations.mapCenterLongitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" id="" placeholder="{% trans " Longitude (x coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerX, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.longitudeXCoordinate},
+            value: centerX, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
 <div class="control-label">
-    {% trans "Map Center Latitude" %}
+    <span data-bind="text: $root.translations.mapCenterLatitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" id="" placeholder="{% trans " Latitude (y coordinate) " %}" class="form-control input-md widget-input" data-bind="value: centerY, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.latitudeYCoordinate},
+            value: centerY, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
 <div class="control-label">
-    {% trans "Default Zoom" %}
+    <span data-bind="text: $root.translations.defaultZoom"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" min=1 max=20 id="" placeholder="{% trans " Zoom Level " %}" class="form-control input-md widget-input" data-bind="value: zoom, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        min=1 
+        max=20 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.zoomLevel},
+            value: zoom, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
 {% endblock config_form %}
 
 {% block display_value %}
-<span data-bind="text: displayValue()"></span> {% trans "feature(s)" %}
+<span data-bind="text: displayValue()"></span>
+<span data-bind="text: $root.translations.features"></span>
 {% endblock display_value %}

@@ -18,13 +18,13 @@
 
 {% block config_form %}
 <div class="control-label">
-  {% trans "Subtitle" %}
+  <span data-bind="text: $root.translations.subtitle"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
   <input type="" id="" class="form-control input-md widget-input" data-bind="value: subtitle, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
-  {% trans "Default Value" %}
+  <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="toggle-container">
     <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, click: setdefault"><small></small></span>

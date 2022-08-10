@@ -3,10 +3,11 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'arches',
     'require',
-    'viewmodels/card'
-], function($, _, ko, koMapping, arches, require) {
+    'arches',
+    'viewmodels/card',
+    'utils/set-csrf-token'
+], function($, _, ko, koMapping, require, arches) {
     /**
     * A viewmodel used for generic cards
     *
@@ -45,7 +46,7 @@ define([
                     displayname(descriptors.displayname);
                 } else {
                     const defaultLanguageValue = descriptors.displayname.find(displayname => displayname.language == arches.activeLanguage)?.value;
-                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")"
+                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")";
                     displayname(displayNameValue);
                 }
             }

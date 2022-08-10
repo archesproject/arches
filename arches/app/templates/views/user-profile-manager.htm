@@ -406,13 +406,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}
-<script>{% autoescape off %}
-    define('profile-manager-data', [], function() {
-        return {
-            'error_count': {{form.errors|length}},
-            'two_factor_authentication_settings': {{two_factor_authentication_settings}},
-        }
-    });
-{% endautoescape %}</script>
-
+<div 
+    id="profileManagerData"
+    style="display: none;"
+    profileManagerData='{
+        "error_count": {{form.errors|length}},
+        "two_factor_authentication_settings": {{two_factor_authentication_settings}},
+    }'
+></div>
 {% endblock pre_require_js %}

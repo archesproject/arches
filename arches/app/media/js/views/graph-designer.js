@@ -3,6 +3,10 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
+    'report-templates',
+    'view-data',
+    'views/graph-designer-data',
     'views/base-manager',
     'viewmodels/alert',
     'viewmodels/alert-json',
@@ -13,16 +17,13 @@ define([
     'views/graph/graph-manager/branch-list',
     'views/graph/graph-designer/card-tree',
     'views/graph/permission-designer',
-    'graph-designer-data',
-    'arches',
     'viewmodels/graph-settings',
     'viewmodels/card',
-    'view-data',
-    'report-templates',
     'bindings/resizable-sidepanel',
-    'datatype-config-components',
-    'views/components/simple-switch'
-], function($, _, ko, koMapping, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, data, arches, GraphSettingsViewModel, CardViewModel, viewData, reportLookup) {
+    'views/components/simple-switch',
+    'utils/set-csrf-token',
+    'datatype-config-components'
+], function($, _, ko, koMapping, arches, reportLookup, viewData, data, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel) {
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
@@ -149,23 +150,28 @@ define([
             };
 
             viewModel.deleteGraph = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmGraphDelete.title, arches.confirmGraphDelete.text, function() {
-                    return;
-                }, function(){
-                    viewModel.loading(true);
-                    $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.delete_graph(viewModel.graph.graphid()),
-                        complete: function(response, status) {
-                            viewModel.loading(false);
-                            if (status === 'success') {
-                                window.location = arches.urls.graph;
-                            } else {
-                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmGraphDelete.title, 
+                    arches.translations.confirmGraphDelete.text,
+                    function() {
+                        return;
+                    }, function(){
+                        viewModel.loading(true);
+                        $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                            complete: function(response, status) {
+                                viewModel.loading(false);
+                                if (status === 'success') {
+                                    window.location = arches.urls.graph;
+                                } else {
+                                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                                }
                             }
-                        }
-                    });
-                }));
+                        });
+                    }
+                ));
             };
             viewModel.cloneGraph = function() {
                 newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
@@ -186,17 +192,20 @@ define([
                     contentType: false,
                     success: function(response) {
                         if (response[0].length != 0) {
+                            // eslint-disable-next-line no-constant-condition
                             if (typeof(response[0])) {
                                 response = response[0].join('<br />');
                             }
-                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, response));
+                            viewModel.alert(new AlertViewModel('ep-alert-red', arches.translations.graphImportFailed.title, response));
                         } else {
                             viewModel.loading(false);
                             window.open(arches.urls.graph_designer(response[1].graph_id), '_blank');
                         }
                     },
                     error: function(response) {
-                        viewModel.alert(new AlertViewModel('ep-alert-red', arches.graphImportFailed.title, 'Please contact your system administrator for more details.'));
+                        viewModel.alert(
+                            new AlertViewModel('ep-alert-red', arches.translations.graphImportFailed.title, arches.translations.pleaseContactSystemAdministrator)
+                        );
                         viewModel.loading(false);
                     },
                 });
@@ -205,23 +214,28 @@ define([
                 $("#fileupload").trigger('click');
             };
             viewModel.deleteInstances = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmAllResourceDelete.title, arches.confirmAllResourceDelete.text, function() {
-                    return;
-                }, function(){
-                    viewModel.loading(true);
-                    $.ajax({
-                        type: "DELETE",
-                        url: arches.urls.delete_instances(viewModel.graph.graphid()),
-                        complete: function(response, status) {
-                            viewModel.loading(false);
-                            if (status === 'success') {
-                                viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
-                            } else {
-                                viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmAllResourceDelete.title, 
+                    arches.translations.confirmAllResourceDelete.text, 
+                    function() {
+                        return;
+                    }, function(){
+                        viewModel.loading(true);
+                        $.ajax({
+                            type: "DELETE",
+                            url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                            complete: function(response, status) {
+                                viewModel.loading(false);
+                                if (status === 'success') {
+                                    viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                                } else {
+                                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                                }
                             }
-                        }
-                    });
-                }));
+                        });
+                    }
+                ));
             };
             viewModel.graph.ontology = ko.computed(function() {
                 return viewModel.ontologies().find(function(obj) {
@@ -432,7 +446,7 @@ define([
             var correspondingCard = function(item, cardTree){
                 var cardList = cardTree.cachedFlatTree;
                 if (cardList === undefined) {
-                    var cardList = cardTree.flattenTree(cardTree.topCards(), []);
+                    cardList = cardTree.flattenTree(cardTree.topCards(), []);
                     cardTree.cachedFlatTree = cardList;
                 }
                 var res;

@@ -518,9 +518,6 @@
   background-image: none;
   background-position: 0 0;
 }
-.jstree-default > .jstree-container-ul .jstree-loading > .jstree-ocl {
-  background: url("throbber.gif") center center no-repeat;
-}
 .jstree-default .jstree-file {
   background: url("32px.png") -100px -68px no-repeat;
 }

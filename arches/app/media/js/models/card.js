@@ -1,15 +1,16 @@
 define([
     'underscore',
     'arches',
+    'card-components',
     'models/abstract',
     'models/node',
     'models/card-widget',
     'knockout',
     'knockout-mapping',
-    'card-components',
     'viewmodels/card-constraints',
-    'utils/dispose'
-], function(_, arches, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, cardComponentLookup, CardConstraintsViewModel, dispose) {
+    'utils/dispose',
+    'regenerator-runtime',
+], function(_, arches, cardComponentLookup, AbstractModel, NodeModel, CardWidgetModel, ko, koMapping, CardConstraintsViewModel, dispose) {
     var CardModel = AbstractModel.extend({
         /**
         * A backbone model to manage card data
@@ -103,7 +104,7 @@ define([
 
             var componentIdSubscription = this.get('component_id').subscribe(function(value) {
                 var key;
-                var defaultConfig = JSON.parse(self.cardComponentLookup[value].defaultconfig);
+                var defaultConfig = self.cardComponentLookup[value].defaultconfig;
                 for (key in defaultConfig) {
                     defaultConfig[key] = ko.observable(defaultConfig[key]);
                 }
@@ -161,7 +162,7 @@ define([
             });
 
             var nodes = ko.computed(function() {
-                return attributes.data.nodes();
+                return ko.unwrap(attributes.data.nodes);
             }, this).extend({ throttle: 100 });
 
             var nodesSubscription = nodes.subscribe(function(){

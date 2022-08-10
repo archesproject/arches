@@ -1,4 +1,6 @@
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
+
 <!-- ko foreach: { data: [$data], as: 'graphTree' } -->
 <div style="height: 100%;" class="jstree jstree-default">
     <div class="header" >
@@ -76,3 +78,6 @@
         <!-- /ko -->
     </li>
 </template>
+
+<script src="{% webpack_static 'node_modules/underscore/underscore-min.js' %}"></script>
+

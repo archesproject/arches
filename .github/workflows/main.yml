@@ -43,6 +43,10 @@ jobs:
         with:
           elasticsearch-version: 8
 
+      - name: Webpack frontend files
+        run: |
+          yarn && yarn build_test
+
       - name: Run Arches unit tests
         run: |
           python manage.py test tests --pattern="*.py" --settings="tests.test_settings"

@@ -1,8 +1,9 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel) {
+    'templates/views/components/widgets/checkbox.htm',
+    'plugins/knockout-select2',
+], function(ko, DomainWidgetViewModel, checkboxTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -13,15 +14,18 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('domain-checkbox-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['defaultValue'];
-            DomainWidgetViewModel.apply(this, [params]);
+    
+    const viewModel = function(params) {
+        params.configKeys = ['defaultValue'];
 
-            this.multiple = true;
-        },
-        template: {
-            require: 'text!widget-templates/checkbox'
-        }
+         
+        DomainWidgetViewModel.apply(this, [params]);
+
+        this.multiple = true;
+    };
+
+    return ko.components.register('domain-checkbox-widget', {
+        viewModel: viewModel,
+        template: checkboxTemplate,
     });
 });

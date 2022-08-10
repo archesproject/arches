@@ -1,8 +1,9 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel) {
+    'templates/views/components/widgets/select.htm',
+    'plugins/knockout-select2',
+], function(ko, DomainWidgetViewModel, selectTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -13,13 +14,15 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
+
+    const viewModel = function(params) {
+        params.configKeys = ['placeholder', 'defaultValue'];
+         
+        DomainWidgetViewModel.apply(this, [params]);
+    };
+
     return ko.components.register('domain-select-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['placeholder', 'defaultValue'];
-            DomainWidgetViewModel.apply(this, [params]);
-        },
-        template: {
-            require: 'text!widget-templates/select'
-        }
+        viewModel: viewModel,
+        template: selectTemplate,
     });
 });

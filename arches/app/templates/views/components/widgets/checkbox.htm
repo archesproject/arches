@@ -30,7 +30,7 @@
 <div>
     <div class="form-group">
         <div class="control-label">
-            {% trans "Default Value" %}
+            <span data-bind="text: $root.translations.defaultValue"></span>
         </div>
         <div class="col-xs-12">
             <div class="pad-hor columns checkbox-panel option-input-config" data-bind="foreach: flatOptions">

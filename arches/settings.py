@@ -256,11 +256,11 @@ MEDIA_URL = "/files/"
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ""
+STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = "/media/"
+STATIC_URL = "/static/"
 
 # when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
 FORCE_SCRIPT_NAME = None
@@ -275,6 +275,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(ROOT_DIR, "app", "media", "build"),
     os.path.join(ROOT_DIR, "app", "media"),
 )
 
@@ -339,6 +340,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 INSTALLED_APPS = (
+    "webpack_loader",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -373,6 +375,12 @@ MIDDLEWARE = [
     # "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
+
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "STATS_FILE": os.path.join(ROOT_DIR[:-7], "webpack/webpack-stats.json"),  # removes superflous `/arches` from filepath
+    },
+}
 
 ROOT_URLCONF = "arches.urls"
 

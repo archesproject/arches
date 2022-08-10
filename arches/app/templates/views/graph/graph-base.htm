@@ -69,14 +69,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
     {{block.super}}
-    <script>
-        {% autoescape off %}
-        define('graph-base-data', [], function () {
-            return {
-                graphid: '{{graphid}}',
-                graph: {{graph_json}}
-            };
-        });
-        {% endautoescape %}
-    </script>
+
+    <!-- consumed by media/js/function-templates.js -->
+    <div 
+        id="graphBaseData"
+        style="display: none;"
+        graphBaseData='{
+            "graphid": "{{graphid}}",
+            "graph": {{graph_json}}
+        }'
+    ></div>
 {% endblock pre_require_js %}

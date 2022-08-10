@@ -6,15 +6,17 @@ define([
     'uuid',
     'arches',
     'viewmodels/alert-json',
+    'templates/views/components/etl_modules/import-single-csv.htm',
     'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel) {
+], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     return ko.components.register('import-single-csv', {
         viewModel: function(params) {
             const self = this;
 
+             
             this.load_details = params.load_details;
             this.state = params.state;
             this.loading = params.loading || ko.observable();
@@ -96,7 +98,6 @@ define([
 
             this.csvArray.subscribe(function(val){
                 self.numberOfCol(val[0].length);
-                let i = 1;
                 if (self.hasHeaders()) {
                     self.headers(val[0]);
                     self.csvBody(val.slice(1));
@@ -135,7 +136,7 @@ define([
                     self.loading(true);
                     self.formData.append('graphid', graph);
                     self.submit('get_nodes').then(function(response){
-                        const nodes = response.result.map(node => ({ ...node, label: node.alias }))
+                        const nodes = response.result.map(node => ({ ...node, label: node.alias }));
                         nodes.unshift({
                             alias: "resourceid",
                             label: arches.translations.idColumnSelection,
@@ -157,7 +158,7 @@ define([
                 //     }
                 // }).then(function(response){
                     self.csvArray(response.result.csv);
-                    self.csvFileName(response.result.csv_file)
+                    self.csvFileName(response.result.csv_file);
                     if (response.result.config) {
                         self.fieldMapping(response.result.config.mapping);
                         self.selectedGraph(response.result.config.graph);
@@ -185,16 +186,16 @@ define([
                     self.formData.append('async', true);
                     self.submit('write').then(data => {
                         console.log(data.result);
-                    }).fail( function (err) {
+                    }).fail( function(err) {
                         self.alert(
-                                new JsonErrorAlertViewModel(
-                                    'ep-alert-red', 
-                                    err.responseJSON["data"], 
-                                    null, 
-                                    function(){}
-                                )
-                            )                    
-                        }
+                            new JsonErrorAlertViewModel(
+                                'ep-alert-red', 
+                                err.responseJSON["data"], 
+                                null, 
+                                function(){}
+                            )
+                        );                    
+                    }
                     );
                 }).fail(error => console.log(error.responseJSON.data));
             };
@@ -258,6 +259,6 @@ define([
 
             this.init();
         },
-        template: { require: 'text!templates/views/components/etl_modules/import-single-csv.htm' }
+        template: importSingleCSVTemplate,
     });
 });

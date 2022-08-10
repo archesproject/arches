@@ -10,14 +10,14 @@
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: displayValue() || {% quoted_trans "None" %}"></dd>
+<dd data-bind="text: displayValue() || $root.translations.none"></dd>
 {% endblock report %}
 <!-- /ko -->
 <!-- /ko -->
 
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
-<span data-bind="text: displayValue() || {% quoted_trans "None" %}"></span>
+<span data-bind="text: displayValue() || $root.translations.none"></span>
 {% endblock display_value %}
 <!-- /ko -->
 

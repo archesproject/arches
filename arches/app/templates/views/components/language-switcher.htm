@@ -1,7 +1,7 @@
 {% load i18n %}
 
-<form action="{% url 'set_language' %}" method="post" data-bind="attr:{id: formid}">{% csrf_token %}
-    <input name="next" type="hidden" value="{{ redirect_to }}">
+<form action="{% url 'language_switcher' %}" method="post" data-bind="attr:{id: formid}">
+    <input type="hidden" name="csrfmiddlewaretoken" data-bind="value: $data.csrfToken" />
     <select id="lang_dd" name="language" data-bind="value: value, chosen: {
         width:'100%'}">
         {% get_current_language as LANGUAGE_CODE %}

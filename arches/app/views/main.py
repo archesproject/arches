@@ -16,12 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import re
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 from arches import __version__
 from arches.app.models.system_settings import settings
-from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponseNotFound, HttpResponse, HttpResponseRedirect
+from django.utils import translation
 
 
 def index(request):
@@ -57,10 +59,32 @@ def function_templates(request, template):
 
 
 def templates(request, template):
+    if not template:
+        template = request.GET.get("template")
+
     try:
         return render(request, template)
     except Exception as e:
         print(e)
+
+
+def language_switcher(request):
+    requested_language = request.POST.get("language")
+
+    updated_path = request.META.get("HTTP_REFERER")
+
+    for language_tuple in settings.LANGUAGES:
+        language_code = language_tuple[0]
+
+        # regex to replace the first instance of a language code surrounded by forward slashes
+        updated_path = re.sub(
+            "/{language_code}/".format(language_code=language_code),
+            "/{requested_language}/".format(requested_language=requested_language),
+            updated_path,
+            count=1,
+        )
+
+    return redirect(updated_path)
 
 
 def help_templates(request):

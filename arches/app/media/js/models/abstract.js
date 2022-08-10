@@ -1,4 +1,4 @@
-define(['backbone', 'jquery'], function (Backbone, $) {
+define(['backbone', 'jquery'], function(Backbone, $) {
     return Backbone.Model.extend({
         /**
          * A backbone model to manage RESTful requests on a per model basis
@@ -13,7 +13,7 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {object} scope - (optional) the scope used for the callback
          * @return  {jqXHR} - a Proimise compatible asynchronous request
         */
-        read: function (callback, scope) {
+        read: function(callback, scope) {
             var method = "GET";
             return this._doRequest({
                 type: method,
@@ -31,7 +31,7 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {object} scope - (optional) the scope used for the callback
          * @return  {jqXHR} - a Proimise compatible asynchronous request
         */
-        save: function (callback, scope) {
+        save: function(callback, scope) {
             var method = "POST";
             return this._doRequest({
                 type: method,
@@ -47,7 +47,7 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {object} scope - (optional) the scope used for the callback
          * @return  {jqXHR} - a Proimise compatible asynchronous request
         */
-        delete: function (callback, scope) {
+        delete: function(callback, scope) {
             var method = "DELETE";
             return this._doRequest({
                 type: method,
@@ -83,13 +83,13 @@ define(['backbone', 'jquery'], function (Backbone, $) {
          * @param  {string} eventname - (optional) the event to trigger upon successfull return of the request
          * @return  {jqXHR} - a Proimise compatible asynchronous request
          */
-        _doRequest: function (config, callback, scope, eventname) {
+        _doRequest: function(config, callback, scope, eventname) {
             var self = this;
             if (! scope){
                 scope = self;
             }
             return $.ajax($.extend({
-                complete: function (request, status) {
+                complete: function(request, status) {
                     if (typeof callback === 'function') {
                         callback.call(scope, request, status, self);
                     }

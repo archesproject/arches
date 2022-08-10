@@ -7,12 +7,13 @@ define([
     'arches',
     'viewmodels/alert-json',
     'views/components/iiif-viewer',
+    'templates/views/components/plugins/manifest-manager.htm',
     'bindings/dropzone'
-], function(ko, koMapping, $, Dropzone, uuid, arches, JsonErrorAlertViewModel, IIIFViewerViewmodel) {
+], function(ko, koMapping, $, Dropzone, uuid, arches, JsonErrorAlertViewModel, IIIFViewerViewmodel, manifestManagerTemplate) {
     return ko.components.register('manifest-manager', {
         viewModel: function(params) {
             var self = this;
-
+             
             this.canvasesForDeletion = ko.observableArray([]);
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
@@ -43,7 +44,7 @@ define([
             });
 
             if(this.renderContext() == "manifest-workflow"){
-                this.showModeSelector(false)
+                this.showModeSelector(false);
             }
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
@@ -276,6 +277,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/plugins/manifest-manager.htm' }
+        template: manifestManagerTemplate,
     });
 });

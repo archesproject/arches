@@ -17,11 +17,11 @@ define([
                 searchbox.select2('data', val); //.trigger('change');
             };
 
-            terms.subscribe(function (value) {
+            terms.subscribe(function(value) {
                 notifyValueChange(value);
             });
 
-            tags.subscribe(function (value) {
+            tags.subscribe(function(value) {
                 notifyValueChange(value);
             });
 

@@ -1,4 +1,9 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget',
+    'templates/views/components/widgets/switch.htm',
+], function(ko, _, WidgetViewModel, switchWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -19,6 +24,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
 
     var SwitchWidget = function(params) {
         params.configKeys = ['subtitle', 'defaultValue'];
+         
         WidgetViewModel.apply(this, [params]);
         this.on = this.config().on || true;
         this.off = this.config().off || false;
@@ -78,6 +84,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
 
     return ko.components.register('switch-widget', {
         viewModel: SwitchWidget,
-        template: { require: 'text!widget-templates/switch' }
+        template: switchWidgetTemplate,
     });
 });
