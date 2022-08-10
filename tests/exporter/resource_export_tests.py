@@ -19,15 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import json
 import csv
-from io import BytesIO
 from arches.app.utils.data_management.resources.formats.csvfile import CsvWriter, MissingConfigException
-from tests import test_settings
+from arches.app.utils.i18n import LanguageSynchronizer
 from operator import itemgetter
-from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.models import TileModel, ResourceInstance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter as BusinessDataExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -51,6 +48,7 @@ class BusinessDataExportTests(ArchesTestCase):
 
         with open(os.path.join("tests/fixtures/resource_graphs/resource_export_test.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
+        LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
 
     @classmethod
