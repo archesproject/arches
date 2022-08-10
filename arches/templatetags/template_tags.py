@@ -2,6 +2,7 @@ from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 from django import template
+from django.utils.html import escapejs
 from django.templatetags.i18n import do_translate, TranslateNode
 import json
 
@@ -95,3 +96,19 @@ def quoted_trans_tag(parser, token):
     """
     transnode = do_translate(parser, token)
     return QuotedTranslateNode(transnode.filter_expression, transnode.noop, transnode.asvar, transnode.message_context)
+
+class JsTranslatedNode(TranslateNode):
+    def render(self, context):
+        value = super().render(context)
+        return escapejs(value)
+
+@register.tag("jsescaped_trans")
+def jsescaped_trans(parser, token):
+    """
+    Returns a translated string wrapped in HTML &quot; characters
+    primarily for use in JSON strings embedded in HTML templates
+    where using single quotes breaks when the string itself contains a single quote
+    which is often found in other languages
+    """
+    transnode = do_translate(parser, token)
+    return JsTranslatedNode(transnode.filter_expression, transnode.noop, transnode.asvar, transnode.message_context)
