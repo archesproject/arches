@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
@@ -187,6 +188,7 @@ class GraphManagerViewTests(ArchesTestCase):
         self.NODE_COUNT = 5
 
         self.client = Client()
+        LanguageSynchronizer.synchronize_settings_with_db()
 
     def tearDown(self):
         try:
