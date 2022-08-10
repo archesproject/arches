@@ -10,14 +10,14 @@ const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascr
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
 
 var USER_DEFINED_ARCHES_CORE_DIRECTORY;
-var USER_DEFINED_PROJECT_ROOT_DIRECTORY;
+var USER_DEFINED_APP_ROOT_DIRECTORY;
 var USER_DEFINED_DJANGO_SERVER_ADDRESS;
 var USER_DEFINED_PUBLIC_PATH;
 
 try {
     var { 
         USER_DEFINED_ARCHES_CORE_DIRECTORY, 
-        USER_DEFINED_PROJECT_ROOT_DIRECTORY,
+        USER_DEFINED_APP_ROOT_DIRECTORY,
         USER_DEFINED_DJANGO_SERVER_ADDRESS, 
         USER_DEFINED_PUBLIC_PATH,
     } = require('./webpack-user-config');
@@ -25,7 +25,7 @@ try {
 
 const { 
     ARCHES_CORE_DIRECTORY, 
-    PROJECT_ROOT_DIRECTORY,
+    APP_ROOT_DIRECTORY,
     DJANGO_SERVER_ADDRESS, 
     ARCHES_CORE_NODE_MODULES_ALIASES,
     PUBLIC_PATH,
@@ -33,7 +33,7 @@ const {
 
 
 let archesCoreDirectory = USER_DEFINED_ARCHES_CORE_DIRECTORY || ARCHES_CORE_DIRECTORY;
-let projectRootDirectory = USER_DEFINED_PROJECT_ROOT_DIRECTORY || PROJECT_ROOT_DIRECTORY;
+let appRootDirectory = USER_DEFINED_APP_ROOT_DIRECTORY || APP_ROOT_DIRECTORY;
 let djangoServerAddress = USER_DEFINED_DJANGO_SERVER_ADDRESS || DJANGO_SERVER_ADDRESS;
 let publicPath = USER_DEFINED_PUBLIC_PATH || PUBLIC_PATH;
 let isTestEnvironment = false;
@@ -46,8 +46,8 @@ for (let arg of process.argv) {
     if (key === 'arches_core_directory') {
         archesCoreDirectory = value;
     }
-    if (key === 'project_root_directory') {
-        projectRootDirectory = value;
+    if (key === 'app_root_directory') {
+        appRootDirectory = value;
     }
     if (key === 'django_server_address') {
         djangoServerAddress = value;
@@ -61,7 +61,7 @@ for (let arg of process.argv) {
 }
 
 const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js`), {});
-const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${projectRootDirectory}/media/js`), {});
+const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${appRootDirectory}/media/js`), {});
 
 const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys(archesCoreEntryPointConfiguration).reduce((acc, path) => {
     acc[path + '$'] = Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js/${path}.js`);
@@ -69,7 +69,7 @@ const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys
 }, {});
 
 const projectJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.keys(projectEntryPointConfiguration).reduce((acc, path) => {
-    acc[path + '$'] = Path.resolve(__dirname, `${projectRootDirectory}/media/js/${path}.js`);
+    acc[path + '$'] = Path.resolve(__dirname, `${appRootDirectory}/media/js/${path}.js`);
     return acc;
 }, {});
 
@@ -86,13 +86,13 @@ const parsedArchesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE
 
 const templateFilepathLookup = buildTemplateFilePathLookup(
     Path.resolve(__dirname, `${archesCoreDirectory}/app/templates`),
-    Path.resolve(__dirname, `${projectRootDirectory}/templates`)
+    Path.resolve(__dirname, `${appRootDirectory}/templates`)
 );
 
 const imageFilepathLookup = buildImageFilePathLookup(
     publicPath,
     Path.resolve(__dirname, `${archesCoreDirectory}/app/media/img`),
-    Path.resolve(__dirname, `${projectRootDirectory}/media/img`)
+    Path.resolve(__dirname, `${appRootDirectory}/media/img`)
 );
 
 module.exports = {
@@ -101,7 +101,7 @@ module.exports = {
         ...projectEntryPointConfiguration 
     },
     output: {
-        path: Path.resolve(__dirname, `${projectRootDirectory}/media/build`),
+        path: Path.resolve(__dirname, `${appRootDirectory}/media/build`),
         publicPath: publicPath,
         libraryTarget: 'amd-require',
         clean: true,
@@ -110,12 +110,12 @@ module.exports = {
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             ARCHES_CORE_DIRECTORY: `'${archesCoreDirectory}'`,
-            PROJECT_ROOT_DIRECTORY: `'${projectRootDirectory}'`
+            APP_ROOT_DIRECTORY: `'${appRootDirectory}'`
         }),
         new webpack.ProvidePlugin({
-            jquery:  Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
-            jQuery:  Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
-            $:  Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
+            jquery:  Path.resolve(__dirname, `${appRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
+            jQuery:  Path.resolve(__dirname, `${appRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
+            $:  Path.resolve(__dirname, `${appRootDirectory}/media/node_modules/jquery/dist/jquery.min`),
         }),
         new MiniCssExtractPlugin(),
         new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
@@ -126,7 +126,7 @@ module.exports = {
         }
     },
     resolve: {
-        modules: [Path.resolve(__dirname, `${projectRootDirectory}/media/node_modules`)],
+        modules: [Path.resolve(__dirname, `${appRootDirectory}/media/node_modules`)],
         alias: {
             ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...templateFilepathLookup,
@@ -144,10 +144,10 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader: `${projectRootDirectory}/media/node_modules/babel-loader`,
+                loader: `${appRootDirectory}/media/node_modules/babel-loader`,
                 options: {
                     presets: ['@babel/preset-env'],
-                    cacheDirectory: `${projectRootDirectory}/media/node_modules/.cache/babel-loader`,
+                    cacheDirectory: `${appRootDirectory}/media/node_modules/.cache/babel-loader`,
                 }
             },
             {
@@ -157,19 +157,19 @@ module.exports = {
                         'loader': MiniCssExtractPlugin.loader,
                     },
                     {
-                        'loader': `${projectRootDirectory}/media/node_modules/css-loader`,
+                        'loader': `${appRootDirectory}/media/node_modules/css-loader`,
                     },
                     {
-                        'loader': `${projectRootDirectory}/media/node_modules/postcss-loader`,
+                        'loader': `${appRootDirectory}/media/node_modules/postcss-loader`,
                     },
                     {
-                        'loader': `${projectRootDirectory}/media/node_modules/sass-loader`,
+                        'loader': `${appRootDirectory}/media/node_modules/sass-loader`,
                     }
                 ],
             },
             {
                 test: /\.html?$/i,
-                loader: `${projectRootDirectory}/media/node_modules/html-loader`,
+                loader: `${appRootDirectory}/media/node_modules/html-loader`,
                 options: {
                     esModule: false,
                     minimize: {
@@ -177,7 +177,7 @@ module.exports = {
                     },
                     preprocessor: async (content, loaderContext) => {
                         const resourcePath = loaderContext['resourcePath'];
-                        const projectResourcePathData = resourcePath.split(`${projectRootDirectory}/`);
+                        const projectResourcePathData = resourcePath.split(`${appRootDirectory}/`);
                         const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${archesCoreDirectory}/app/`)[1]; 
 
                         let resp;
@@ -225,7 +225,7 @@ module.exports = {
             },
             {
                 test: /\.txt$/i,
-                use: `${projectRootDirectory}/media/node_modules/raw-loader`,
+                use: `${appRootDirectory}/media/node_modules/raw-loader`,
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
