@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const fetch = require('cross-fetch');
 const Path = require('path');
 const webpack = require('webpack');

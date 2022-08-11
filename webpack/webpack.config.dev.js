@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const Path = require('path');
 const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
