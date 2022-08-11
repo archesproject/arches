@@ -273,7 +273,6 @@ urlpatterns = [
     # Uncomment the next line to enable the admin:
     url(r"^admin/", admin.site.urls),
     url("i18n/", include("django.conf.urls.i18n")),
-    url(r"^language_switcher$", main.language_switcher, name="language_switcher"),
     url(
         r"^password_reset/$",
         PasswordResetView.as_view(),
