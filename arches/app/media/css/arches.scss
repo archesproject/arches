@@ -12305,10 +12305,10 @@ ul.select2-choices:after {
 
 .left-panel-overflow {
     background: #ecf0f5;
-    height: calc(100% - 75px);
-    /* 75px is height of .jstree .header */
+    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    padding-bottom: 20px;
 }
 
 .left-panel-overflow>* {

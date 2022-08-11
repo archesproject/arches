@@ -1,6 +1,9 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'graphTree' } -->
-<div style="height: 100%" class="jstree jstree-default">
+<div 
+    style="height: 100%; display: flex; flex-direction: column;"
+    class="jstree jstree-default"
+>
     <div class="header">
         <div class="list-filter" data-bind="" style="text-align: center;">
             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
