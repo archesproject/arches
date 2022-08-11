@@ -691,8 +691,7 @@ class JsonLdReader(Reader):
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
 
- 
-                    if(parenttile_id == None and branch[0]["parent_nodegroup"] != 'None'):
+                    if parenttile_id == None and branch[0]["parent_nodegroup"] != "None":
                         continue
                     tile = Tile(
                         tileid=uuid.uuid4(),
