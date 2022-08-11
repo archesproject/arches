@@ -121,7 +121,9 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """.format(settings.LANGUAGE_CODE)
+            """.format(
+                        settings.LANGUAGE_CODE
+                    )
                 )
             ],
             reverse_sql=[
@@ -155,7 +157,9 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """.format(settings.LANGUAGE_CODE)
+            """.format(
+                        settings.LANGUAGE_CODE
+                    )
                 )
             ],
         ),
