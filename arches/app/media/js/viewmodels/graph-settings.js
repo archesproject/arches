@@ -121,6 +121,11 @@ define([
             }
         };
 
+        self.extendNode = function(node, parameters)
+        {
+            return _.extend(node, parameters)
+        }
+
     };
     return GraphSettingsViewModel;
 });
