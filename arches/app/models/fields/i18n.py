@@ -94,7 +94,7 @@ class I18n_String(object):
                 except:
                     # if there are no languages available return an empty string
                     ret = ""
-        return json.dumps(ret) if ret is None else ret
+        return "" if ret is None else ret
 
     def __eq__(self, other):
         # this is here so you can compare a string against an instance of this class
