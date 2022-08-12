@@ -1,7 +1,11 @@
 import arches
+import os
+import shutil
+
 from django.core.management.base import BaseCommand
 from django.core import management
 from django.db import connection
+from arches.app.models.system_settings import settings
 
 
 class Command(BaseCommand):
@@ -15,6 +19,13 @@ class Command(BaseCommand):
             self.update_to_v7()
 
     def update_to_v7(self):
+        # copy webpack config files to project
+        project_webpack_path = os.path.join(settings.APP_ROOT, "webpack")
+
+        if not os.path.isdir(project_webpack_path):
+            shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "webpack"), project_webpack_path)
+
+        # publish graphs that were previously active
         with connection.cursor() as cursor:
             cursor.execute("select * from temp_graph_status;")
             rows = cursor.fetchall()
