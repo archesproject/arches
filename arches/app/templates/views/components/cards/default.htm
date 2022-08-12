@@ -1,7 +1,7 @@
 {% load i18n %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 
-<!-- ko if: state === 'editor-tree' -->
+<!-- ko if: state === 'editor-tree' && self.card.model.visible() -->
 {% block editor_tree %}
 <li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0, 'hide-background': !self.showGrid()}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
     <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
@@ -37,6 +37,7 @@
                     <i class="fa " role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits(),'fa-pencil':$data.dirty()===true,'fa-file':!$data.dirty()}"></i>
                     <strong style="margin-right: 10px;">
                         {% block editor_tree_node_content %}
+                        <!-- ko if: self.card.widgets().length > 0 && self.card.widgets()[0].visible -->
                         <span data-bind="text: self.card.widgets()[0].label || self.card.model.name"></span>:
                         <div style="display: inline;" data-bind="component: {
                             name: self.form.widgetLookup[self.card.widgets()[0].widget_id()].name,
@@ -52,6 +53,10 @@
                                 disabled: !self.card.isWritable && !self.preview
                             }
                         }"></div>
+                        <!-- /ko -->
+                        <!-- ko if: self.card.widgets().length === 0 || !self.card.widgets()[0].visible -->
+                        <span data-bind="text: self.card.model.name"></span>
+                        <!-- /ko -->
                         {% endblock editor_tree_node_content %}
                     </strong>
                 </a>
