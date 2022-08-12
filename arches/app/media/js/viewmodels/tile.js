@@ -211,17 +211,7 @@ define([
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
-                        
-                        self.data = {};
-                        for(const key of Object.keys(tileData.data)){
-                            const datatype = self.datatypeLookup[key];
-                            if(datatype == 'string'){
-                                self.data[key] = ko.observable(tileData.data[key]);
-                            } else {
-                                self.data[key] = koMapping.fromJS(tileData.data[key]);
-                            }
-                        }
-                        
+                        self.data = koMapping.fromJS(tileData.data);                        
                         self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
                         self._tileData(koMapping.toJSON(self.data));
                         self.dirty = ko.pureComputed(function() {
