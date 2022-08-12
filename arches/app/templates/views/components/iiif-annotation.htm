@@ -196,6 +196,7 @@
                                         </div>
                                     </div>
                                     <div class="map-card-feature-list">
+                                        <div data-bind="text: console.log('!!!!')" style="display: none;"></div>
                                         <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
                                             <select 
                                                 data-bind="
@@ -209,15 +210,15 @@
                                                         },
                                                         {
                                                             value: 'draw_point',
-                                                            text: $root.translations.addPoint
+                                                            text: $root.translations.mapAddPoint
                                                         },
                                                         {
                                                             value: 'draw_line_string',
-                                                            text: $root.translations.addLine
+                                                            text: $root.translations.mapAddLine
                                                         },
                                                         {
                                                             value: 'draw_polygon',
-                                                            text: $root.translations.addPolygon
+                                                            text: $root.translations.mapAddPolygon
                                                         }
                                                     ],
                                                     optionsText: 'text',
@@ -243,15 +244,15 @@
                                                         },
                                                         {
                                                             value: 'draw_point',
-                                                            text: $root.translations.addPoint
+                                                            text: $root.translations.mapAddPoint
                                                         },
                                                         {
                                                             value: 'draw_line_string',
-                                                            text: $root.translations.addLine
+                                                            text: $root.translations.mapAddLine
                                                         },
                                                         {
                                                             value: 'draw_polygon',
-                                                            text: $root.translations.addPolygon
+                                                            text: $root.translations.mapAddPolygon
                                                         }
                                                     ],
                                                     optionsText: 'text',
