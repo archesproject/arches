@@ -180,7 +180,7 @@ define([
         
         this.pageCt = ko.observable(5);
         this.pageCtReached = ko.computed(function() {
-            return true;
+            return (self.filesJSON().length > self.pageCt() ? 'visible' : 'hidden');
         });
 
         this.pagedList = function(list) {
