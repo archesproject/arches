@@ -12,7 +12,7 @@
                 <!-- /ko -->
                 </div>
             </div>
-    <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
+    <span class="arches-toggle-subtitle" data-bind="text: localizedSubtitle"></span>
 </div>
 {% endblock form %}
 
@@ -21,7 +21,7 @@
   <span data-bind="text: $root.translations.subtitle"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-  <input type="" id="" class="form-control input-md widget-input" data-bind="value: subtitle, valueUpdate: 'keyup'">
+  <input type="" id="" class="form-control input-md widget-input" data-bind="value: localizedSubtitle, valueUpdate: 'keyup'">
 </div>
 <div class="control-label">
   <span data-bind="text: $root.translations.defaultValue"></span>
@@ -31,6 +31,6 @@
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
             </div>
-    <span class="arches-toggle-subtitle" data-bind="text: subtitle"></span>
+    <span class="arches-toggle-subtitle" data-bind="text: localizedSubtitle"></span>
 </div>
 {% endblock config_form %}
