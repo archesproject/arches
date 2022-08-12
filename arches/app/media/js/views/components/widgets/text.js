@@ -42,7 +42,7 @@ define([
         let currentValue = ko.unwrap(self.value) || initialCurrent;
         let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
 
-        const originalValue = JSON.stringify(ko.unwrap(self.value));
+        const originalValue = JSON.stringify(self.value());
 
         if(self.form){
             $(self.form).on('tile-reset', (x) => {
