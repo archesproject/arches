@@ -59,7 +59,7 @@
             </div>  
         <div class="row widget-wrapper">
             <label class="control-label">
-                <span data-bind="text: $root.translations.attribution-logo"></span>
+                <span data-bind="text: $root.translations.attributionLogo"></span>
             </label>
             <input type="text" class="form-control input-lg" style="height: 36px;"
                 data-bind="attr:{placeholder: $root.translations.attributionLogo}, textInput: self.manifestLogo, valueUpdate: 'keyup'">
@@ -312,7 +312,7 @@
 
 {% block gallery_header %}
     <div>
-        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : $root.translations.noManifestSelected + '...' %}"></span>
+        <span class="iiif-gallery-manifest-label" data-bind="text: manifestData() ? manifestName() : $root.translations.noManifestSelected + '...'"></span>
     </div>                 
     <div>
         <span class="iiif-gallery-sequence-label" data-bind="click: function(){expandGallery(!expandGallery())}">
