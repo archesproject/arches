@@ -44,7 +44,7 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                     var self = this;
                     $.ajax({
                         url: arches.urls.get_concept_collections,
-                        type: 'json'
+                        dataType: 'json'
                     }).done(function(data){
                         arches.conceptCollections = data;
                         self.conceptCollections(data);
