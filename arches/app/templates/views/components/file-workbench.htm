@@ -229,7 +229,15 @@
     <h2 class="file-workbench-filter-header">
         <span data-bind="text: $root.translations.fileFilter"></span>
     </h2>
-    <input type="text" class="form-control" style="width: 100%; height:initial" data-bind="attr: placeholder: $root.translations.egText, textInput: filter"></input>
+    <input 
+        type="text" 
+        class="form-control" 
+        style="width: 100%; height:initial" 
+        data-bind="
+            attr: { placeholder: $root.translations.egText }, 
+            textInput: filter
+        "
+    ></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
@@ -310,7 +318,15 @@
     <h2 class="file-workbench-filter-header">
         <span data-bind="text: $root.translations.fileFilter"></span>
     </h2>
-    <input type="text" class="form-control" style="width: 100%; height:initial" data-bind="attr: placeholder: $root.translations.egText, textInput: filter"></input>
+    <input 
+        type="text" 
+        class="form-control" 
+        style="width: 100%; height:initial" 
+        data-bind="
+            attr: { placeholder: $root.translations.egText }, 
+            textInput: filter
+        "
+    ></input>
     <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class='file-workbench-files'>
