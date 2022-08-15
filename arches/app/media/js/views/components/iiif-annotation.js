@@ -360,7 +360,7 @@ define([
                     featureClick = false;
                 });
 
-                if (self.form) $(self.form).on('tile-reset', function() {
+                if (self.form) self.form.on('tile-reset', function() {
                     disableEditing();
                     updateDrawFeatures();
                     _.each(self.featureLookup, function(value) {

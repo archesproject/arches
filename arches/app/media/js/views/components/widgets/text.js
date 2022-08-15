@@ -1,12 +1,11 @@
 define([
-    'jquery',
     'knockout', 
     'underscore', 
     'viewmodels/widget', 
     'arches', 
     'templates/views/components/widgets/text.htm',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, textWidgetTemplate) {
+], function(ko, _, WidgetViewModel, arches, textWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -45,7 +44,7 @@ define([
         const originalValue = JSON.stringify(self.value());
 
         if(self.form){
-            $(self.form).on('tile-reset', (x) => {
+            self.form.on('tile-reset', (x) => {
                 self.value(JSON.parse(originalValue));
                 currentValue = self.value();
             });
