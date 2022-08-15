@@ -42,15 +42,9 @@ define([
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
         let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
         let currentValue = koMapping.toJS(self.value);
-        let originalValue = koMapping.toJS(self.value);
 
         if(self.form){
-            $(self.form).on('tile-reset', (x) => {
-                if (ko.isObservable(self.value)) {
-                    self.value(originalValue);                   
-                } else {
-                    koMapping.fromJS(originalValue, self.value);
-                }
+            self.form.on('tile-reset', (x) => {
                 currentValue = koMapping.toJS(self.value);
                 self.currentText(currentValue[self.currentLanguage().code]?.value);
                 self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
