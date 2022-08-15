@@ -296,7 +296,7 @@ define([
             });
 
             if (hasDefaultValue) {
-                self._tileData(JSON.stringify(_tileDataTemp));
+                self._tileData(koMapping.toJSON(_tileDataTemp));
             }
         }
 
