@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-        """
+            """
             create or replace function __arches_get_node_value_sql(
                 node public.nodes
             ) returns text as $$
@@ -289,7 +289,6 @@ class Migration(migrations.Migration):
                 return format('schema "%s" created for resource model.', schema_name);
             end
             $$ language plpgsql volatile;
-            """
-
+            """,
         )
     ]
