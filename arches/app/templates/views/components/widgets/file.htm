@@ -152,30 +152,10 @@
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
                 <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt">
-                    <option value="5">
-                        <span>
-                            <span data-bind="text: $root.translations.showFirstFiveFiles"></span>
-                            <i class="fa fa-caret-down"></i>
-                        </span>
-                    </option>
-                    <option value="10">
-                        <span>
-                            <span data-bind="text: $root.translations.showFirstTenFiles"></span> 
-                            <i class="fa fa-caret-down"></i>
-                        </span>
-                    </option>
-                    <option value="25">
-                        <span>
-                            <span data-bind="text: $root.translations.showFirstTwentyFiveFiles"></span> 
-                            <i class="fa fa-caret-down"></i>
-                        </span>
-                    </option>
-                    <option value="100">
-                        <span>
-                            <span data-bind="text: $root.translations.showAllFiles"></span>
-                            <i class="fa fa-caret-down"></i>
-                        </span>
-                    </option>
+                    <option value="5" data-bind="text: $root.translations.showFirstFiveFiles"></option>
+                    <option value="10" data-bind="text: $root.translations.showFirstTenFiles"></option>
+                    <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles"></option>
+                    <option value="100" data-bind="text: $root.translations.showAllFiles"></option>
                 </select>
             </div>
         </div>

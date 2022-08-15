@@ -1,19 +1,26 @@
 {% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" tabindex="-1" style="display: none;" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="eq"> = </option>
-        <option value="gt"> &gt; </option>
-        <option value="lt"> &lt; </option>
-        <option value="gte"> &ge; </option>
-        <option value="lte"> &le; </option>
-        <option value="null">
-            <span data-bind="text: $root.translations.hasNoValue"></span>
-        </option>
-        <option value="not_null">
-            <span data-bind="text: $root.translations.hasAnyValue"></span>
-        </option>
-    </select>
+    <select 
+        class="resources" 
+        tabindex="-1" 
+        style="display: none;" 
+        data-bind="
+            value: op, 
+            chosen: {width: '100%', disable_search_threshold: 15},
+            optionsText: 'text',
+            optionsValue: 'value',
+            options: [
+                { text: '=', value: 'eq' },
+                { text: '&gt;', value: 'gt' },
+                { text: '&lt;', value: 'lt' },
+                { text: '&ge;', value: 'gte' },
+                { text: '&le;', value: 'lte' },
+                { text: $root.translations.hasNoValue, value: 'null' },
+                { text: $root.translations.hasAnyValue, value: 'not_null' },
+            ],
+        "
+    ></select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
