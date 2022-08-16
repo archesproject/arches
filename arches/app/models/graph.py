@@ -779,6 +779,7 @@ class Graph(models.GraphModel):
             copy_of_self.subtitle = ""
             copy_of_self.description = ""
             copy_of_self.author = ""
+            copy_of_self.serialized_graph = ""
 
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
