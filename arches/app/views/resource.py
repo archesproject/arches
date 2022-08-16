@@ -257,7 +257,7 @@ class ResourceEditorView(MapBaseManagerView):
                     if default_value is None or default_value == "":
                         existing_languages = []
                     else:
-                        if type(default_value) == "string":
+                        if type(default_value) is str:
                             cardwidget["config"]["defaultValue"][settings.LANGUAGE_CODE] = {
                                 "value": default_value,
                                 "direction": language[settings.LANGUAGE_CODE].default_direction,
