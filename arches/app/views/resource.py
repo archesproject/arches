@@ -225,7 +225,6 @@ class ResourceEditorView(MapBaseManagerView):
             for tile in tiles:
                 self.prepare_tiledata(tile, nodes)
 
-
         serialized_graph = None
         if graph.publication:
             user_language = translation.get_language()
