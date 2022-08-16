@@ -7,7 +7,7 @@
     <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
         <h3 
             class="search-listing-title" 
-            data-bind="css: {'i18n-alt':$parent.getLocalizedText(displayname)?.alternative}"
+            data-bind="css: {'i18n-alt':$parent.alternativelanguage}"
         >
             <a class="search-candidate-title" href="" data-bind="click: $parent.viewReport.bind($parent)">
                 <i class="search-listing-icon" data-bind="css: iconclass"></i> 

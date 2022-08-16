@@ -181,10 +181,12 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         if (result._source.points.length > 0) {
                             point = result._source.points[0].point;
                         }
+                        const displayNameLocalized = self.getLocalizedText(result._source.displayname)
                         this.results.push({
-                            displayname: result._source.displayname,
+                            displayname: displayNameLocalized.value,
+                            alternativelanguage: displayNameLocalized.isAlternateLanguage,
                             resourceinstanceid: result._source.resourceinstanceid,
-                            displaydescription: result._source.displaydescription,
+                            displaydescription: self.getLocalizedText(result._source.displaydescription).value,
                             "map_popup": result._source.map_popup,
                             "provisional_resource": result._source.provisional_resource,
                             geometries: ko.observableArray(result._source.geometries),
@@ -233,23 +235,26 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.trigger('find_on_map', data.resourceid, data);
             },
 
-            getLocalizedText: function(data){
-                if (data && data.find) {
-                    const d = data.find((element) => {
-                        return arches.activeLanguage == element.language;
+            /**
+             * getLocalizedText - identifies the most suitable descriptor by language in order of priority: active, default, first available
+             * @param  {object} descriptors - array of descriptors in resource instance search result
+             */
+
+            getLocalizedText: function(descriptors){
+                const languageCodes = [arches.activeLanguage, arches.defaultLanguage];
+                let isActiveLanguage = false;
+                let result = descriptors[0];
+                for (const code in languageCodes) {
+                    const bestDescriptor = descriptors.find((descriptor) => {
+                        return code == descriptor.language && descriptor.value !== "";
                     });
-                    if(!!d && d["value"] !== "") {
-                        return { displayText: d["value"], alternative: false };
-                    } else {
-                        const allValues = data.filter((entry) => {
-                            return !!entry["value"];
-                        }).map((entry) => {
-                            return entry["value"];
-                        });
-    
-                        return { displayText: allValues.join(","), alternative: true };
+                    if (bestDescriptor) {
+                        result = bestDescriptor;
+                        isActiveLanguage = bestDescriptor.language == arches.activeLanguage;
+                        break;
                     }
-                }
+                    }
+                return {value: result.value, isAlternateLanguage: !isActiveLanguage};
             }
         }),
         template: searchResultsTemplate
