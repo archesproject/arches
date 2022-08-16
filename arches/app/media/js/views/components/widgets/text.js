@@ -6,7 +6,7 @@ define([
     'arches', 
     'templates/views/components/widgets/text.htm',
     'bindings/chosen'
-], function($, ko, koMapping, _, WidgetViewModel, arches, textWidgetTemplate) {
+], function(ko, koMapping, _, WidgetViewModel, arches, textWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
