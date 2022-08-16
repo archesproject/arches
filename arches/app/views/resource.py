@@ -133,7 +133,6 @@ class ResourceEditorView(MapBaseManagerView):
             datatype = datatype_lookup[nodeid]
             datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
 
-
     @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
         self,
