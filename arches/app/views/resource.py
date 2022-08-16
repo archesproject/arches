@@ -124,7 +124,7 @@ def get_instance_creator(resource_instance, user=None):
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
- 
+
     def prepare_tiledata(self, tile, nodes):
         datatype_factory = DataTypeFactory()
         languages = models.Language.objects.all()
@@ -255,15 +255,15 @@ class ResourceEditorView(MapBaseManagerView):
             languages = models.Language.objects.all()
 
             for widget in serialized_widgets:
-                if widget['datatype'] == 'string':
+                if widget["datatype"] == "string":
                     try:
-                        existing_languages = list(widget['defaultconfig']['defaultValue'].keys())
+                        existing_languages = list(widget["defaultconfig"]["defaultValue"].keys())
                         for language in languages:
                             if language.code not in existing_languages:
                                 print(language.code, existing_languages)
-                                widget['defaultconfig']['defaultValue'][language.code] = {
-                                    'value': '',
-                                    'direction': language.default_direction
+                                widget["defaultconfig"]["defaultValue"][language.code] = {
+                                    "value": "",
+                                    "direction": language.default_direction,
                                 }
                     except (KeyError, AttributeError):
                         pass

@@ -298,7 +298,7 @@ class StringDataType(BaseDataType):
         direction_lookup = {lang.code: lang.default_direction for lang in kwargs["languages"]}
         tile_language_codes = set(tile.data[nodeid].keys())
         for code in all_language_codes - tile_language_codes:
-            tile.data[nodeid][code] = {"value":"", "direction": direction_lookup[code]}
+            tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
 
 
 class NumberDataType(BaseDataType):
