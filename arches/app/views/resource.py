@@ -254,11 +254,14 @@ class ResourceEditorView(MapBaseManagerView):
                 if cardwidget["widget_id"] in ["10000000-0000-0000-0000-000000000005", "10000000-0000-0000-0000-000000000001"]:
                     existing_languages = []
                     default_value = cardwidget["config"]["defaultValue"]
-                    if default_value is None or default_value == '':
+                    if default_value is None or default_value == "":
                         existing_languages = []
                     else:
-                        if type(default_value) == 'string':
-                            cardwidget["config"]["defaultValue"][settings.LANGUAGE_CODE] = {"value": default_value, "direction": language[settings.LANGUAGE_CODE].default_direction}
+                        if type(default_value) == "string":
+                            cardwidget["config"]["defaultValue"][settings.LANGUAGE_CODE] = {
+                                "value": default_value,
+                                "direction": language[settings.LANGUAGE_CODE].default_direction,
+                            }
                             existing_languages = [settings.LANGUAGE_CODE]
                         else:
                             existing_languages = list(default_value.keys())
