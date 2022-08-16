@@ -1,5 +1,4 @@
 define([
-    'jquery',
     'knockout', 
     'knockout-mapping',
     'underscore', 

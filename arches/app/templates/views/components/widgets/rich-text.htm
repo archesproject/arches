@@ -27,15 +27,21 @@
                     <label class="widget-input-label i18n-style-tools-label" for="lang_dir">
                         <span data-bind="text: $root.translations.direction"></span>
                     </label>
-                    <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
-                        'width':'100%'}">
-                        <option value="ltr">
-                            <span data-bind="text: $root.translations.leftToRight"></span>
-                        </option>
-                        <option value="rtl">
-                            <span data-bind="text: $root.translations.rightToLeft"></span>
-                        </option>
-                    </select>
+                    <select 
+                        id="lang_dir" 
+                        style="flex:1" 
+                        name="language" 
+                        data-bind="
+                            value: currentDirection, 
+                            chosen: {'width':'100%'},
+                            optionsText: 'text',
+                            optionsValue: 'value',
+                            options: [
+                                { text: $root.translations.leftToRight, value: 'ltr' },
+                                { text: $root.translations.rightToLeft, value: 'rtl' },
+                            ],
+                        "
+                    ></select>
                 </div>
             </div>
         </div>

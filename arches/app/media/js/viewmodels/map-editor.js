@@ -438,7 +438,7 @@ define([
                     self.setSelectLayersVisibility(false);
                 });
 
-                if (self.form) $(self.form).on('tile-reset', function() {
+                if (self.form) self.form.on('tile-reset', function() {
                     var style = self.map().getStyle();
                     if (style) {
                         self.draw.set({
