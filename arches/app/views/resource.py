@@ -252,18 +252,43 @@ class ResourceEditorView(MapBaseManagerView):
 
             for cardwidget in serialized_cardwidgets:
                 if cardwidget['widget_id'] in ['10000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000001']:
-                    existing_languages = list(cardwidget['config']['defaultValue'].keys())
-                    for language in languages:
-                        if language.code not in existing_languages:
-                            cardwidget['config']['defaultValue'][language.code] = {
-                                'value': '',
-                                'direction': language.default_direction
-                            }
+                    existing_languages = []
+                    default_value = cardwidget['config']['defaultValue']
+                    if default_value != '' and default_value is not None:
+                        default_value = list(default_value.keys())
+                        for language in languages:
+                            if language.code not in existing_languages:
+                                cardwidget['config']['defaultValue'][language.code] = {
+                                    'value': '',
+                                    'direction': language.default_direction
+                                }
             return serialized_cardwidgets
 
         updated_cardwidgets = update_default_for_string(cardwidgets)
 
         widgets = models.Widget.objects.all()
+
+        def update_widgets_default_for_string(widgets):
+            serialized_widgets = JSONSerializer().serializeToPython(widgets)
+            languages = models.Language.objects.all()
+
+            for widget in serialized_widgets:
+                if widget['datatype'] == 'string':
+                    existing_languages = []
+                    default_value = widget['defaultconfig']['defaultValue']
+                    if default_value != '' and default_value is not None:
+                        existing_languages = list(default_value.keys())
+                        for language in languages:
+                            if language.code not in existing_languages:
+                                print(language.code, existing_languages)
+                                widget['defaultconfig']['defaultValue'][language.code] = {
+                                    'value': '',
+                                    'direction': language.default_direction
+                                }
+            return serialized_widgets
+
+        widgets_data = update_widgets_default_for_string(widgets)
+
         card_components = models.CardComponent.objects.all()
         templates = models.ReportTemplate.objects.all()
 
@@ -288,7 +313,7 @@ class ResourceEditorView(MapBaseManagerView):
             ),
             relationship_types=get_resource_relationship_types(),
             widgets=widgets,
-            widgets_json=JSONSerializer().serialize(widgets),
+            widgets_json=JSONSerializer().serialize(widgets_data),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
