@@ -285,7 +285,6 @@ define([
                 Object.keys(self.data).forEach(function(nodeId) {
                     if (nodeId === widget.node_id()) {
                         var defaultValue = ko.unwrap(widget.config.defaultValue);
-                        console.log(defaultValue);
                         if (defaultValue) {
                             self.data[nodeId](defaultValue);
                             _tileDataTemp[nodeId] = defaultValue;

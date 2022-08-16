@@ -124,10 +124,10 @@ def get_instance_creator(resource_instance, user=None):
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
+    languages = models.Language.objects.all()
 
-    def prepare_tiledata(self, tile, nodes):
+    def prepare_tiledata(self, tile, nodes, languages):
         datatype_factory = DataTypeFactory()
-        languages = models.Language.objects.all()
         datatype_lookup = {str(node.nodeid): datatype_factory.get_instance(node.datatype) for node in nodes}
         for nodeid in tile.data.keys():
             datatype = datatype_lookup[nodeid]
@@ -142,6 +142,7 @@ class ResourceEditorView(MapBaseManagerView):
         view_template="views/resource/editor.htm",
         main_script="views/resource/editor",
         nav_menu=True,
+        languages=languages,
     ):
         if self.action == "copy":
             return self.copy(request, resourceid)
@@ -248,7 +249,6 @@ class ResourceEditorView(MapBaseManagerView):
 
         def update_default_for_string(cardwidgets):
             serialized_cardwidgets = JSONSerializer().serializeToPython(cardwidgets)
-            languages = models.Language.objects.all()
 
             for cardwidget in serialized_cardwidgets:
                 if cardwidget["widget_id"] in ["10000000-0000-0000-0000-000000000005", "10000000-0000-0000-0000-000000000001"]:
@@ -267,7 +267,6 @@ class ResourceEditorView(MapBaseManagerView):
 
         def update_widgets_default_for_string(widgets):
             serialized_widgets = JSONSerializer().serializeToPython(widgets)
-            languages = models.Language.objects.all()
 
             for widget in serialized_widgets:
                 if widget["datatype"] == "string":
@@ -277,7 +276,6 @@ class ResourceEditorView(MapBaseManagerView):
                         existing_languages = list(default_value.keys())
                         for language in languages:
                             if language.code not in existing_languages:
-                                print(language.code, existing_languages)
                                 widget["defaultconfig"]["defaultValue"][language.code] = {
                                     "value": "",
                                     "direction": language.default_direction,
