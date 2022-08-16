@@ -252,20 +252,18 @@ class ResourceEditorView(MapBaseManagerView):
 
             for cardwidget in serialized_cardwidgets:
                 if cardwidget["widget_id"] in ["10000000-0000-0000-0000-000000000005", "10000000-0000-0000-0000-000000000001"]:
-                    existing_languages = []
                     default_value = cardwidget["config"]["defaultValue"]
-                    if default_value is None or default_value == "":
+                    if default_value is None:
                         existing_languages = []
+                    elif type(default_value) is str:
+                        default_language = languages.get(code=settings.LANGUAGE_CODE)
+                        cardwidget["config"]["defaultValue"][settings.LANGUAGE_CODE] = {
+                            "value": default_value,
+                            "direction": default_language.default_direction,
+                        }
+                        existing_languages = [settings.LANGUAGE_CODE]
                     else:
-                        if type(default_value) is str:
-                            default_language = languages.get(code=settings.LANGUAGE_CODE)
-                            cardwidget["config"]["defaultValue"][settings.LANGUAGE_CODE] = {
-                                "value": default_value,
-                                "direction": default_language.default_direction,
-                            }
-                            existing_languages = [settings.LANGUAGE_CODE]
-                        else:
-                            existing_languages = list(default_value.keys())
+                        existing_languages = list(default_value.keys())
                     for language in languages:
                         if language.code not in existing_languages:
                             cardwidget["config"]["defaultValue"][language.code] = {"value": "", "direction": language.default_direction}
