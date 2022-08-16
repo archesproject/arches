@@ -124,14 +124,6 @@ def get_instance_creator(resource_instance, user=None):
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
-    languages = models.Language.objects.all()
-
-    def prepare_tiledata(self, tile, nodes, languages):
-        datatype_factory = DataTypeFactory()
-        datatype_lookup = {str(node.nodeid): datatype_factory.get_instance(node.datatype) for node in nodes}
-        for nodeid in tile.data.keys():
-            datatype = datatype_lookup[nodeid]
-            datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
 
     @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
@@ -142,13 +134,21 @@ class ResourceEditorView(MapBaseManagerView):
         view_template="views/resource/editor.htm",
         main_script="views/resource/editor",
         nav_menu=True,
-        languages=languages,
     ):
         if self.action == "copy":
             return self.copy(request, resourceid)
 
         creator = None
         user_created_instance = None
+
+        languages = models.Language.objects.all()
+
+        def prepare_tiledata(tile, nodes):
+            datatype_factory = DataTypeFactory()
+            datatype_lookup = {str(node.nodeid): datatype_factory.get_instance(node.datatype) for node in nodes}
+            for nodeid in tile.data.keys():
+                datatype = datatype_lookup[nodeid]
+                datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
 
         if resourceid is None:
             resource_instance = None
@@ -224,7 +224,7 @@ class ResourceEditorView(MapBaseManagerView):
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
             for tile in tiles:
-                self.prepare_tiledata(tile, nodes)
+                prepare_tiledata(tile, nodes)
 
         serialized_graph = None
         if graph.publication:
