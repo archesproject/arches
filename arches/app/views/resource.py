@@ -124,6 +124,15 @@ def get_instance_creator(resource_instance, user=None):
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
+ 
+    def prepare_tiledata(self, tile, nodes):
+        datatype_factory = DataTypeFactory()
+        languages = models.Language.objects.all()
+        datatype_lookup = {str(node.nodeid): datatype_factory.get_instance(node.datatype) for node in nodes}
+        for nodeid in tile.data.keys():
+            datatype = datatype_lookup[nodeid]
+            datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
+
 
     @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
@@ -214,6 +223,9 @@ class ResourceEditorView(MapBaseManagerView):
                 if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
+            for tile in tiles:
+                self.prepare_tiledata(tile, nodes)
+
 
         serialized_graph = None
         if graph.publication:
@@ -244,14 +256,17 @@ class ResourceEditorView(MapBaseManagerView):
 
             for widget in serialized_widgets:
                 if widget['datatype'] == 'string':
-                    existing_languages = list(widget['defaultconfig']['defaultValue'].keys())
-                    for language in languages:
-                        if language.code not in existing_languages:
-                            print(language.code, existing_languages)
-                            widget['defaultconfig']['defaultValue'][language.code] = {
-                                'value': '',
-                                'direction': language.default_direction
-                            }
+                    try:
+                        existing_languages = list(widget['defaultconfig']['defaultValue'].keys())
+                        for language in languages:
+                            if language.code not in existing_languages:
+                                print(language.code, existing_languages)
+                                widget['defaultconfig']['defaultValue'][language.code] = {
+                                    'value': '',
+                                    'direction': language.default_direction
+                                }
+                    except (KeyError, AttributeError):
+                        pass
             return serialized_widgets
 
         widgets_data = update_default_for_string(widgets)

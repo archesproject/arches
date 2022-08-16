@@ -293,6 +293,14 @@ class StringDataType(BaseDataType):
         if data:
             return self.compile_json(tile, node, **data.get(str(node.nodeid)))
 
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        all_language_codes = {lang.code for lang in kwargs["languages"]}
+        direction_lookup = {lang.code: lang.default_direction for lang in kwargs["languages"]}
+        tile_language_codes = set(tile.data[nodeid].keys())
+        for code in all_language_codes - tile_language_codes:
+            tile.data[nodeid][code] = {"value":"", "direction": direction_lookup[code]}
+
+
 class NumberDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []

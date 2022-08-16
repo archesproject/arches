@@ -455,3 +455,9 @@ class BaseDataType(object):
         Returns a CSV column header or headers for a given node ID of this type
         """
         return node["file_field_name"]
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        """
+        Adds properties to a tile necessary for some clients, but not essential to the tile
+        """
+        pass
