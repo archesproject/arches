@@ -258,9 +258,10 @@ class ResourceEditorView(MapBaseManagerView):
                         existing_languages = []
                     else:
                         if type(default_value) is str:
+                            default_language = languages.get(code=settings.LANGUAGE_CODE)
                             cardwidget["config"]["defaultValue"][settings.LANGUAGE_CODE] = {
                                 "value": default_value,
-                                "direction": language[settings.LANGUAGE_CODE].default_direction,
+                                "direction": default_language.default_direction,
                             }
                             existing_languages = [settings.LANGUAGE_CODE]
                         else:
