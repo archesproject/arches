@@ -125,6 +125,14 @@ def get_instance_creator(resource_instance, user=None):
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
+    def prepare_tiledata(self, tile, nodes):
+        datatype_factory = DataTypeFactory()
+        languages = models.Language.objects.all()
+        datatype_lookup = {str(node.nodeid): datatype_factory.get_instance(node.datatype) for node in nodes}
+        for nodeid in tile.data.keys():
+            datatype = datatype_lookup[nodeid]
+            datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
+
     @method_decorator(can_edit_resource_instance, name="dispatch")
     def get(
         self,
@@ -214,6 +222,8 @@ class ResourceEditorView(MapBaseManagerView):
                 if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
+            for tile in tiles:
+                self.prepare_tiledata(tile, nodes)
 
         serialized_graph = None
         if graph.publication:
