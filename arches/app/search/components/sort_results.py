@@ -21,4 +21,7 @@ class SortResults(BaseSearchFilter):
         sort_param = self.request.GET.get(details["componentname"], None)
 
         if sort_param is not None and sort_param is not "":
-            search_results_object["query"].sort(field="displayname.value", dsl={"order": sort_param, "nested": {"path": "displayname", "filter": {"term": {"displayname.language": get_language()}}}}) 
+            search_results_object["query"].sort(
+                field="displayname.value",
+                dsl={"order": sort_param, "nested": {"path": "displayname", "filter": {"term": {"displayname.language": get_language()}}}},
+            )
