@@ -34,7 +34,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-                this.language = arches.activeLanguage;
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
@@ -162,16 +161,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             self.bulkResourceReportCache(bulkResourceReportCache);
                         });
                     }
-
-                    var resourceIdsToFetch = this.searchResults.results.hits.hits.reduce(function(acc, hit) {
-                        var resourceId = hit['_source']['resourceinstanceid'];
-                        
-                        if (!ko.unwrap(self.bulkDisambiguatedResourceInstanceCache)[resourceId]) {
-                            acc.push(resourceId);
-                        }
-
-                        return acc;
-                    }, []);
 
                     this.searchResults.results.hits.hits.forEach(function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
