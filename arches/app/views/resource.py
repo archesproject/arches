@@ -254,17 +254,14 @@ class ResourceEditorView(MapBaseManagerView):
 
             for widget in serialized_widgets:
                 if widget["datatype"] == "string":
-                    try:
-                        existing_languages = list(widget["defaultconfig"]["defaultValue"].keys())
-                        for language in languages:
-                            if language.code not in existing_languages:
-                                print(language.code, existing_languages)
-                                widget["defaultconfig"]["defaultValue"][language.code] = {
-                                    "value": "",
-                                    "direction": language.default_direction,
-                                }
-                    except (KeyError, AttributeError):
-                        pass
+                    existing_languages = list(widget["defaultconfig"]["defaultValue"].keys())
+                    for language in languages:
+                        if language.code not in existing_languages:
+                            print(language.code, existing_languages)
+                            widget["defaultconfig"]["defaultValue"][language.code] = {
+                                "value": "",
+                                "direction": language.default_direction,
+                            }
             return serialized_widgets
 
         updated_cardwidgets = update_default_for_string(cardwidgets)
