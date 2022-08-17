@@ -1,12 +1,12 @@
 define([
-    'jquery',
     'knockout', 
+    'knockout-mapping',
     'underscore', 
     'viewmodels/widget', 
     'arches', 
     'templates/views/components/widgets/text.htm',
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, textWidgetTemplate) {
+], function(ko, koMapping, _, WidgetViewModel, arches, textWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -39,15 +39,14 @@ define([
         const initialDefault = {};
         initialDefault[arches.activeLanguage] = {value: '', direction: 'ltr'};
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
-        let currentValue = ko.unwrap(self.value) || initialCurrent;
         let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
-
-        const originalValue = JSON.stringify(self.value());
+        let currentValue = koMapping.toJS(self.value);
 
         if(self.form){
-            $(self.form).on('tile-reset', (x) => {
-                self.value(JSON.parse(originalValue));
-                currentValue = self.value();
+            self.form.on('tile-reset', (x) => {
+                currentValue = koMapping.toJS(self.value);
+                self.currentText(currentValue[self.currentLanguage().code]?.value);
+                self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
             });
         }
 
@@ -129,7 +128,11 @@ define([
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
             currentValue[currentLanguage.code].value = newValue;       
-            self.value(currentValue);
+            if (ko.isObservable(self.value)) {
+                self.value(currentValue);
+            } else {
+                self.value[currentLanguage.code].value(newValue);
+            }
         });
 
         self.currentDirection.subscribe(newValue => {
@@ -140,23 +143,20 @@ define([
                 currentValue[currentLanguage.code] = {};
             }
             currentValue[currentLanguage.code].direction = newValue;
-            self.value(currentValue);
+            if (ko.isObservable(self.value)) {
+                self.value(currentValue);
+            } else {
+                self.value[currentLanguage.code].direction(newValue);
+            }
         });
 
         self.currentLanguage.subscribe(() => {
             if(!self.currentLanguage()){ return; }
             const currentLanguage = self.currentLanguage();
-            if(!currentValue?.[currentLanguage.code]) {
-                currentValue[currentLanguage.code] = {
-                    value: '',
-                    direction: currentLanguage?.default_direction
-                };
-                self.value(currentValue);
-            }
 
-            self.currentText(self.value()?.[currentLanguage.code]?.value);
-            self.currentDirection(self.value()?.[currentLanguage.code]?.direction);
-            
+            self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
+            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
+        
         });
 
     };

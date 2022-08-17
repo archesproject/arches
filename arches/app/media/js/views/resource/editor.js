@@ -97,7 +97,7 @@ define([
         var nodegroup = _.find(data.nodegroups, function(group) {
             return group.nodegroupid === card.nodegroup_id;
         });
-        return !nodegroup || !nodegroup.parentnodegroup_id;
+        return nodegroup && !nodegroup.parentnodegroup_id;
     }).sort((firstEl, secondEl) => {
         if(firstEl.sortorder < secondEl.sortorder) {
             return -1;

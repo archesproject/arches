@@ -85,7 +85,7 @@ class ArchesPOFileFetcher:
         files = []
 
         if lang:
-            files.append((lang, self.get_po_file(lang), overwrite))
+            files.append(ArchesPOFile(lang, self.get_po_file(lang, overwrite)))
         else:
             for language in settings.LANGUAGES:
                 files.append(ArchesPOFile(language[0], self.get_po_file(language[0], overwrite)))

@@ -141,6 +141,55 @@ class ResourceEditorView(MapBaseManagerView):
         creator = None
         user_created_instance = None
 
+        languages = models.Language.objects.all()
+
+        def prepare_tiledata(tile, nodes):
+            datatype_factory = DataTypeFactory()
+            datatype_lookup = {str(node.nodeid): datatype_factory.get_instance(node.datatype) for node in nodes}
+            for nodeid in tile.data.keys():
+                datatype = datatype_lookup[nodeid]
+                datatype.pre_structure_tile_data(tile, nodeid, languages=languages)
+
+        def add_i18n_to_cardwidget_defaults(cardwidgets):
+            serialized_cardwidgets = JSONSerializer().serializeToPython(cardwidgets)
+
+            for cardwidget in serialized_cardwidgets:
+                if cardwidget["widget_id"] in ["10000000-0000-0000-0000-000000000005", "10000000-0000-0000-0000-000000000001"]:
+                    try:
+                        default_value = cardwidget["config"]["defaultValue"]
+                    except KeyError:
+                        default_value = None
+                    if default_value is None:
+                        existing_languages = []
+                        cardwidget["config"]["defaultValue"] = {}
+                    elif type(default_value) is str:
+                        default_language = languages.get(code=settings.LANGUAGE_CODE)
+                        cardwidget["config"]["defaultValue"] = {
+                            settings.LANGUAGE_CODE: {"value": default_value, "direction": default_language.default_direction}
+                        }
+                        existing_languages = [settings.LANGUAGE_CODE]
+                    else:
+                        existing_languages = list(default_value.keys())
+                    for language in languages:
+                        if language.code not in existing_languages:
+                            cardwidget["config"]["defaultValue"][language.code] = {"value": "", "direction": language.default_direction}
+            return serialized_cardwidgets
+
+        def add_i18n_to_widget_defaults(widgets):
+            for widget in widgets:
+                if widget.datatype == "string":
+                    existing_languages = []
+                    default_value = widget.defaultconfig["defaultValue"]
+                    if default_value != "" and default_value is not None:
+                        existing_languages = list(default_value.keys())
+                        for language in languages:
+                            if language.code not in existing_languages:
+                                widget.defaultconfig["defaultValue"][language.code] = {
+                                    "value": "",
+                                    "direction": language.default_direction,
+                                }
+            return widgets
+
         if resourceid is None:
             resource_instance = None
             graph = models.GraphModel.objects.get(pk=graphid)
@@ -214,6 +263,8 @@ class ResourceEditorView(MapBaseManagerView):
                 if append_tile is True:
                     provisionaltiles.append(tile)
             tiles = provisionaltiles
+            for tile in tiles:
+                prepare_tiledata(tile, nodes)
 
         serialized_graph = None
         if graph.publication:
@@ -236,7 +287,11 @@ class ResourceEditorView(MapBaseManagerView):
             serialized_cards = JSONSerializer().serializeToPython(cards)
             cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
 
-        widgets = models.Widget.objects.all()
+        updated_cardwidgets = add_i18n_to_cardwidget_defaults(cardwidgets)
+
+        widgets = list(models.Widget.objects.all())
+        updated_widgets = add_i18n_to_widget_defaults(widgets)
+
         card_components = models.CardComponent.objects.all()
         templates = models.ReportTemplate.objects.all()
 
@@ -260,8 +315,8 @@ class ResourceEditorView(MapBaseManagerView):
                 .exclude(publication=None)
             ),
             relationship_types=get_resource_relationship_types(),
-            widgets=widgets,
-            widgets_json=JSONSerializer().serialize(widgets),
+            widgets=updated_widgets,
+            widgets_json=JSONSerializer().serialize(updated_widgets),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
             tiles=JSONSerializer().serialize(tiles),
@@ -270,7 +325,7 @@ class ResourceEditorView(MapBaseManagerView):
             applied_functions=JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=graph)),
             nodegroups=JSONSerializer().serialize(nodegroups),
             nodes=JSONSerializer().serialize(nodes.filter(nodegroup__in=nodegroups)),
-            cardwidgets=JSONSerializer().serialize(cardwidgets),
+            cardwidgets=JSONSerializer().serialize(updated_cardwidgets),
             datatypes_json=JSONSerializer().serialize(models.DDataType.objects.all(), exclude=["iconclass", "modulename", "classname"]),
             map_layers=models.MapLayer.objects.all(),
             map_markers=models.MapMarker.objects.all(),

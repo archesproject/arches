@@ -1261,7 +1261,11 @@ class Graph(models.GraphModel):
 
         """
         if self.serialized_graph:
-            return [models.NodeGroup(**nodegroup_dict) for nodegroup_dict in self.serialized_graph["nodegroups"]]
+            nodegroups = self.serialized_graph["nodegroups"]
+            for nodegroup in nodegroups:
+                if isinstance(nodegroup["nodegroupid"], str):
+                    nodegroup["nodegroupid"] = uuid.UUID(nodegroup["nodegroupid"])
+            return [models.NodeGroup(**nodegroup_dict) for nodegroup_dict in nodegroups]
         else:
             nodegroups = set()
             for node in self.nodes.values():

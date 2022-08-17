@@ -30,9 +30,7 @@
                     chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} 
                 "
             >
-                <option value="">
-                    <span data-bind="text: $root.translations.searchAllDates"></span>
-                </option>
+                <option value="" data-bind="text: $root.translations.searchAllDates"></option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
                         <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
@@ -56,34 +54,22 @@
                 tabindex="-1" 
                 data-bind="
                     attr: {placeholder: $root.translations.select},
-                    value: dateRangeType, chosen:{ width: '100%' }
+                    value: dateRangeType, 
+                    chosen:{ width: '100%' },
+                    optionsText: 'text',
+                    optionsValue: 'value',
+                    options: [
+                        { text: $root.translations.customDateRange, value: 'custom' },
+                        { text: $root.translations.today, value: 'today' },
+                        { text: $root.translations.lastSevenDays, value: 'last-7' },
+                        { text: $root.translations.lastThirtyDays, value: 'last-30' },
+                        { text: $root.translations.thisWeek, value: 'this-week' },
+                        { text: $root.translations.thisMonth, value: 'this-month' },
+                        { text: $root.translations.thisQuarter, value: 'this-quarter' },
+                        { text: $root.translations.thisYear, value: 'this-year' },
+                    ],
                 "
-            >
-                <option value="custom">
-                    <span data-bind="text: $root.translations.customDateRange"></span>
-                </option>
-                <option value="today">
-                    <span data-bind="text: $root.translations.today"></span>
-                </option>
-                <option value="last-7">
-                    <span data-bind="text: $root.translations.lastSevenDays"></span>
-                </option>
-                <option value="last-30">
-                    <span data-bind="text: $root.translations.lastThirtyDays"></span>
-                </option>
-                <option value="this-week">
-                    <span data-bind="text: $root.translations.thisWeek"></span>
-                </option>
-                <option value="this-month">
-                    <span data-bind="text: $root.translations.thisMonth"></span>
-                </option>
-                <option value="this-quarter">
-                    <span data-bind="text: $root.translations.thisQuarter"></span>
-                </option>
-                <option value="this-year">
-                    <span data-bind="text: $root.translations.thisYear"></span>
-                </option>
-            </select>
+            ></select>
         </div>
 
     </div>

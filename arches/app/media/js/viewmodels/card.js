@@ -220,34 +220,39 @@ define([
                     });
                 })
             ),
-            cards: ko.observableArray(_.filter(params.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
-                    return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
-                });
-                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
-            }).map(function(card) {
-                return new CardViewModel({
-                    card: _.clone(card),
-                    graphModel: params.graphModel,
-                    tile: null,
-                    resourceId: params.resourceId,
-                    displayname: params.displayname,
-                    handlers: params.handlers,
-                    cards: params.cards,
-                    tiles: params.tiles,
-                    selection: selection,
-                    multiselect: multiselect,
-                    scrollTo: scrollTo,
-                    loading: loading,
-                    filter: filter,
-                    provisionalTileViewModel: params.provisionalTileViewModel,
-                    cardwidgets: params.cardwidgets,
-                    perms: perms,
-                    permsLiteral: permsLiteral,
-                    parentCard: self,
-                    topCards: params.topCards
-                });
-            })),
+            cards: ko.observableArray(
+                _.filter(params.cards, function(card) {
+                    var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
+                        return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
+                    });
+
+                    if (nodegroup) {
+                        return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+                    }
+                }).map(function(card) {
+                    return new CardViewModel({
+                        card: _.clone(card),
+                        graphModel: params.graphModel,
+                        tile: null,
+                        resourceId: params.resourceId,
+                        displayname: params.displayname,
+                        handlers: params.handlers,
+                        cards: params.cards,
+                        tiles: params.tiles,
+                        selection: selection,
+                        multiselect: multiselect,
+                        scrollTo: scrollTo,
+                        loading: loading,
+                        filter: filter,
+                        provisionalTileViewModel: params.provisionalTileViewModel,
+                        cardwidgets: params.cardwidgets,
+                        perms: perms,
+                        permsLiteral: permsLiteral,
+                        parentCard: self,
+                        topCards: params.topCards
+                    });
+                })
+            ),
             hasprovisionaledits: ko.computed(function() {
                 return _.filter(params.tiles, function(tile) {
                     return (params.tile ? (tile.parenttile_id === params.tile.tileid) : true)
