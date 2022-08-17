@@ -252,7 +252,10 @@ class ResourceEditorView(MapBaseManagerView):
 
             for cardwidget in serialized_cardwidgets:
                 if cardwidget["widget_id"] in ["10000000-0000-0000-0000-000000000005", "10000000-0000-0000-0000-000000000001"]:
-                    default_value = cardwidget["config"]["defaultValue"]
+                    try:
+                        default_value = cardwidget["config"]["defaultValue"]
+                    except KeyError:
+                        default_value = None
                     if default_value is None:
                         existing_languages = []
                         cardwidget["config"]["defaultValue"] = {}
