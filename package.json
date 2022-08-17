@@ -2,10 +2,10 @@
     "name": "arches",
     "version": "6.1.0",
     "scripts": {
-        "build_production": "NODE_PATH=./arches/app/media/node_modules NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
-        "build_development": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
-        "build_test": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js --env test=true",
-        "start": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/webpack serve --config webpack/webpack.config.dev.js"
+        "build_production": "NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
+        "build_development": "NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
+        "build_test": "NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js --env test=true",
+        "start": "NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./arches/app/media/node_modules/.bin/webpack serve --config webpack/webpack.config.dev.js"
     },
     "repository": {
         "url": "git@github.com:archesproject/arches.git",

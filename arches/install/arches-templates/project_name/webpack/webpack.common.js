@@ -198,6 +198,8 @@ module.exports = {
                         const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(`${archesCoreDirectory}/app/`)[1]; 
 
                         let resp;
+                        
+                        console.log(`Loading "${templatePath}" from Django server...`)
 
                         const renderTemplate = async(failureCount=0) => {
                             /*
@@ -211,13 +213,17 @@ module.exports = {
                                 catch(e) { 
                                     failureCount += 1;
                                     console.warn(
+                                        '\x1b[33m%s\x1b[0m',  // yellow
                                         `"${templatePath}" has failed to load. Retrying (${failureCount} / 5)...`
                                     );
                                     return await renderTemplate(failureCount=failureCount);
                                 }
                             }
                             else {
-                                console.error(`"${templatePath}" has failed to load! Falling back to un-rendered file.`);
+                                console.error(
+                                    '\x1b[31m%s\x1b[0m',  // yellow
+                                    `"${templatePath}" has failed to load! Falling back to un-rendered file.`
+                                );
                                 resp = {
                                    text: () => (
                                         new Promise((resolve, _reject) => {
@@ -241,7 +247,7 @@ module.exports = {
                 }
             },
             {
-                test: /\.txt$/i,
+                test: /\.(txt|DS_Store)$/i,
                 use: `${appRootDirectory}/media/node_modules/raw-loader`,
             },
             {
