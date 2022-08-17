@@ -70,7 +70,7 @@ define([
 
             self.jsonNotifTypes = ko.computed(function() {
                 return ko.mapping.toJS(self.viewModel.notifTypeObservables);
-            });
+            }).extend({ throttle: 100 });
             self.jsonNotifTypes.subscribe(function(val) {
                 if(val && !self.viewModel.loading() && self.viewModel.notifTypeObservables().length > 0) {
                     self.viewModel.updateNotifTypes();
