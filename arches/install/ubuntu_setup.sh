@@ -57,6 +57,8 @@ function install_elasticsearch {
   sudo /bin/systemctl enable elasticsearch.service
   sudo systemctl enable elasticsearch.service
   sudo systemctl start elasticsearch.service
+
+  printf "y\nE1asticSearchforArche5\nE1asticSearchforArche5" | sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -i -u elastic
 }
 
 function main {
