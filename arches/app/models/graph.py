@@ -779,7 +779,7 @@ class Graph(models.GraphModel):
             copy_of_self.subtitle = ""
             copy_of_self.description = ""
             copy_of_self.author = ""
-            copy_of_self.serialized_graph = ""
+        copy_of_self.serialized_graph = ""
 
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
@@ -798,7 +798,7 @@ class Graph(models.GraphModel):
             node.graph = copy_of_self
             is_collector = node.is_collector
             node.pk = uuid.uuid1()
-            node_map[node_id] = node.pk
+            node_map[node_id] = str(node.pk)
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
