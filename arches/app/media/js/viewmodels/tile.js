@@ -285,7 +285,6 @@ define([
                 Object.keys(self.data).forEach(function(nodeId) {
                     if (nodeId === widget.node_id()) {
                         var defaultValue = ko.unwrap(widget.config.defaultValue);
-
                         if (defaultValue) {
                             self.data[nodeId](defaultValue);
                             _tileDataTemp[nodeId] = defaultValue;
@@ -296,7 +295,7 @@ define([
             });
 
             if (hasDefaultValue) {
-                self._tileData(JSON.stringify(_tileDataTemp));
+                self._tileData(koMapping.toJSON(_tileDataTemp));
             }
         }
 
