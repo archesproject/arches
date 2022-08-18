@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import uuid
-import re
 
 from distutils.util import strtobool
 
@@ -34,7 +33,7 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language, get_supported_language_variant, ugettext as _
+from django.utils.translation import ugettext as _
 from django.views.generic import View
 from django.utils import translation
 
@@ -50,7 +49,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
-from arches.app.utils.i18n import LanguageSynchronizer
+from arches.app.utils.i18n import LanguageSynchronizer, localize_serialized_object
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
@@ -591,74 +590,7 @@ class ResourceEditLogView(BaseManagerView):
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
             graph_name = resource_instance.graph.name
 
-
-            def recursive_update_foo(input):
-                '''
-                    Recursively updates a dictionary's i18n children to strings
-                '''
-                if type(input) is dict:
-                    for key in input.keys():
-                        if qqq(input[key]):  # if valid i18n dict
-                            input[key] = foo(input[key])
-                        else:
-                            recursive_update_foo(input[key])
-
-
-
-            def qqq(input):
-                '''
-                    Checks whether an input is a dict of i18n k/v pairs
-                '''
-                if type(input) is dict:
-                    for key in input.keys():
-                        is_language_format = re.search('^[a-z]{2,4}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?$', key)
-
-                        if is_language_format:
-                            return True
-
-                return False
-
-
-            def foo(input):
-                if type(input) is dict:
-                    def is_value_valid(value):
-                        return not (
-                            value == None or
-                            type(value) is dict and 'value' in value.keys() and not value['value']
-                        )
-
-                    value = None
-                    active_language = get_language()
-
-                    # first attempt uses active_language
-                    value = input.get(active_language)
-                    if not is_value_valid(value):
-                        # second attempt un-localizes the active language
-                        unlocalized_active_language = active_language[0:2]
-                        value = input.get(unlocalized_active_language)
-
-                        if not is_value_valid(value):
-                            # third attempt uses other localizations of the un-localized language
-                            for key in input.keys():
-                                if key[0:2] == unlocalized_active_language:
-                                    if type(input[key]) is dict and 'value' in input[key].keys() and input[key]['value']:
-                                        value = input[key]
-                                        break
-
-                            if not is_value_valid(value):
-                                # fourth attempt falls back to the first truthy value
-                                for key in input.keys():
-                                    if type(input[key]) is dict and 'value' in input[key].keys() and input[key]['value']:
-                                        value = input[key]
-                                        break
-                                
-                    return value['value'] if value else None
-
-
-            deserialized_edits = JSONDeserializer().deserialize(JSONSerializer().serialize(permitted_edits))
-
-            for deserialized_edit in deserialized_edits:
-                recursive_update_foo(deserialized_edit)
+            localized_serialized_edits = localize_serialized_object(JSONSerializer().serialize(permitted_edits))
 
             context = self.get_context_data(
                 main_script="views/resource/edit-log",
@@ -666,7 +598,7 @@ class ResourceEditLogView(BaseManagerView):
                 resource_type=graph_name,
                 resource_description=resource.displaydescription(),
                 iconclass=resource_instance.graph.iconclass,
-                edits=JSONSerializer().serialize(deserialized_edits),
+                edits=localized_serialized_edits,
                 resourceid=resourceid,
                 displayname=_("Unnamed Resource") if displayname == "undefined" else displayname,
             )

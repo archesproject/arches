@@ -10,7 +10,42 @@ from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
 from django.utils.translation import get_language, get_language_info
 
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
+
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
+
+
+def localize_serialized_object(json):
+    '''
+    This method accepts a a serialized object or objects, eg the output of JSONSerializer().serialize(),
+    and recursively updates the serialized objects' key/value pairs to return only the localized
+    version of i18n data
+        
+    Arguments:
+    json -- (required) a serialized object or objects
+
+    Returns:
+    A JSON string representing the input json object/objects, with any values that `get_localized_value` returned truthy for updated to
+    its localized version
+    '''
+    deserialized_json = JSONDeserializer().deserialize(json)
+
+    def recursive_localize(deserialized_json):
+        if isinstance(deserialized_json, list):
+            for obj in deserialized_json:
+                recursive_localize(obj)
+        if isinstance(deserialized_json, dict):
+            for key in deserialized_json.keys():
+                try:
+                    localized_value = get_localized_value(deserialized_json[key])
+                    deserialized_json[key] = localized_value['value'] if isinstance(localized_value, dict) else localized_value
+                except:
+                    recursive_localize(deserialized_json[key])
+        return deserialized_json
+                
+    recursive_localize(deserialized_json)
+
+    return JSONSerializer().serialize(deserialized_json)
 
 
 def get_localized_value(obj, lang=None, return_lang=False):
@@ -58,8 +93,11 @@ def get_localized_value(obj, lang=None, return_lang=False):
 
             if settings.LANGUAGE_CODE in obj:
                 found_lang = settings.LANGUAGE_CODE
-            else:
-                found_lang = langcode
+            # else:
+            #     found_lang = langcode
+
+        if not found_lang in obj:
+            raise Exception()
 
         return {found_lang: obj[found_lang]} if return_lang else obj[found_lang]
 
