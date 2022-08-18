@@ -632,12 +632,12 @@ class ResourceEditLogView(BaseManagerView):
 
                     # first attempt uses active_language
                     value = input.get(active_language)
-                    if is_value_valid(value):
+                    if not is_value_valid(value):
                         # second attempt un-localizes the active language
                         unlocalized_active_language = active_language[0:2]
                         value = input.get(unlocalized_active_language)
 
-                        if is_value_valid(value):
+                        if not is_value_valid(value):
                             # third attempt uses other localizations of the un-localized language
                             for key in input.keys():
                                 if key[0:2] == unlocalized_active_language:
@@ -645,7 +645,7 @@ class ResourceEditLogView(BaseManagerView):
                                         value = input[key]
                                         break
 
-                            if is_value_valid(value):
+                            if not is_value_valid(value):
                                 # fourth attempt falls back to the first truthy value
                                 for key in input.keys():
                                     if type(input[key]) is dict and 'value' in input[key].keys() and input[key]['value']:
