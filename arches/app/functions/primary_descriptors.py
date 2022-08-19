@@ -35,6 +35,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
         """
 
         datatype_factory = None
+        language = None
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
                 tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
@@ -56,7 +57,9 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                             if not datatype_factory:
                                 datatype_factory = DataTypeFactory()
                             datatype = datatype_factory.get_instance(node.datatype)
-                            value = datatype.get_display_value(tile, node)
+                            if context is not None and 'language' in context:
+                                language = context['language']
+                            value = datatype.get_display_value(tile, node, language=language)
                             if value is None:
                                 value = ""
                             config["string_template"] = config["string_template"].replace("<%s>" % node.name, str(value))

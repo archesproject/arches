@@ -175,7 +175,7 @@ class ConceptDataType(BaseConceptDataType):
     def get_pref_label(self, nodevalue, lang="en-US"):
         return get_preflabel_from_valueid(nodevalue, lang)["value"]
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data[str(node.nodeid)] is None or data[str(node.nodeid)].strip() == "":
             return ""
@@ -311,7 +311,7 @@ class ConceptListDataType(BaseConceptDataType):
             new_values.append(new_val)
         return ",".join(new_values)
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         new_values = []
         data = self.get_tile_data(tile)
         if data[str(node.nodeid)]:
