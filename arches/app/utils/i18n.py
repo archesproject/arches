@@ -17,16 +17,16 @@ ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
 def localize_serialized_object(json):
     '''
-    This method accepts a a serialized object or objects, eg the output of JSONSerializer().serialize(),
+    This method accepts a a serialized object or objects ( eg. the output of JSONSerializer().serialize() )
     and recursively updates the serialized objects' key/value pairs to return only the localized
-    version of i18n data
+    version of any i18n data
         
     Arguments:
-    json -- (required) a serialized object or objects
+    json -- (required) A JSON string representing a serialized object or objects
 
     Returns:
-    A JSON string representing the input json object/objects, with any values that `get_localized_value` returned truthy for updated to
-    its localized version
+    A JSON string representing the input json object/objects, with any internationalized string/text dictionaries
+    localized to a string in the requested language, with the application language as a fallback.
     '''
     deserialized_json = JSONDeserializer().deserialize(json)
 

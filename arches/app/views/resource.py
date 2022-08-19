@@ -590,15 +590,13 @@ class ResourceEditLogView(BaseManagerView):
             cards = Card.objects.filter(nodegroup__parentnodegroup=None, graph=resource_instance.graph)
             graph_name = resource_instance.graph.name
 
-            localized_serialized_edits = localize_serialized_object(JSONSerializer().serialize(permitted_edits))
-
             context = self.get_context_data(
                 main_script="views/resource/edit-log",
                 cards=JSONSerializer().serialize(cards),
                 resource_type=graph_name,
                 resource_description=resource.displaydescription(),
                 iconclass=resource_instance.graph.iconclass,
-                edits=localized_serialized_edits,
+                edits=localize_serialized_object(JSONSerializer().serialize(permitted_edits)),
                 resourceid=resourceid,
                 displayname=_("Unnamed Resource") if displayname == "undefined" else displayname,
             )
