@@ -93,8 +93,6 @@ def get_localized_value(obj, lang=None, return_lang=False):
 
             if settings.LANGUAGE_CODE in obj:
                 found_lang = settings.LANGUAGE_CODE
-            # else:
-            #     found_lang = langcode
 
         if not found_lang in obj:
             raise Exception()
