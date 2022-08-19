@@ -327,7 +327,7 @@ class Resource(models.ResourceInstance):
                 except:
                     display_description = {"value": displaydescription, "language": lang[0]}
                     document["displaydescription"].append(display_description)
-            
+
             mappopup = self.map_popup(context)
             if mappopup is not None and mappopup != "Undefined":
                 try:
