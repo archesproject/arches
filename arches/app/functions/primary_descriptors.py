@@ -57,8 +57,8 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                             if not datatype_factory:
                                 datatype_factory = DataTypeFactory()
                             datatype = datatype_factory.get_instance(node.datatype)
-                            if context is not None and 'language' in context:
-                                language = context['language']
+                            if context is not None and "language" in context:
+                                language = context["language"]
                             value = datatype.get_display_value(tile, node, language=language)
                             if value is None:
                                 value = ""

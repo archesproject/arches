@@ -83,14 +83,14 @@ class Resource(models.ResourceInstance):
 
         if self.name is None:
             self.name = {}
-        
+
         requested_language = None
-        if context is not None and 'language' in context:
-            requested_language = context['language']
+        if context is not None and "language" in context:
+            requested_language = context["language"]
         language = requested_language or get_language()
 
         if language not in self.descriptors:
-            self.descriptors[language] = {} 
+            self.descriptors[language] = {}
 
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
@@ -304,9 +304,9 @@ class Resource(models.ResourceInstance):
 
         document["displayname"] = []
         for lang in settings.LANGUAGES:
-            if context is None: 
+            if context is None:
                 context = {}
-            context['language'] = lang[0]
+            context["language"] = lang[0]
             displayname = self.displayname(context)
             if displayname is not None and displayname != "Undefined":
                 try:

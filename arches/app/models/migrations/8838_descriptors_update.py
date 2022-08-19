@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                     )
                 ),
             ],
-            reverse_sql=[("update resource_instances set name = replace(name, '\"', '')")]
+            reverse_sql=[("update resource_instances set name = replace(name, '\"', '')")],
         ),
         migrations.AlterField(
             model_name="resourceinstance",
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             field=I18n_TextField(blank=True, null=True),
         ),
         migrations.RunSQL(
-            sql = [("select * from resource_instances limit 1")],
+            sql=[("select * from resource_instances limit 1")],
             reverse_sql=[
                 (
                     """
@@ -63,5 +63,5 @@ class Migration(migrations.Migration):
                     )
                 )
             ],
-        )
+        ),
     ]
