@@ -38,11 +38,11 @@ def localize_serialized_object(json):
             for key in deserialized_json.keys():
                 try:
                     localized_value = get_localized_value(deserialized_json[key])
-                    deserialized_json[key] = localized_value['value'] if isinstance(localized_value, dict) else localized_value
+                    deserialized_json[key] = localized_value["value"] if isinstance(localized_value, dict) else localized_value
                 except:
                     recursive_localize(deserialized_json[key])
         return deserialized_json
-                
+
     recursive_localize(deserialized_json)
 
     return JSONSerializer().serialize(deserialized_json)
