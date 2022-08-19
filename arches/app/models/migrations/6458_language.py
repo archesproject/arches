@@ -92,13 +92,13 @@ class Migration(migrations.Migration):
                     l record;
                     updated_count integer default -1;
                 begin
-                    select * into l from languages limit 1;
+                    select * into l from languages where code='{}' limit 1;
                     while updated_count != 0 loop
                         update tiles c
                             set tiledata =
                                 jsonb_set(
                                     tiledata,
-                                    ('{' || b.nodeid || '}')::text[],
+                                    ('{{' || b.nodeid || '}}')::text[],
                                     jsonb_build_object(
                                         l.code,
                                         jsonb_build_object(
@@ -121,7 +121,9 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """
+            """.format(
+                        settings.LANGUAGE_CODE
+                    )
                 )
             ],
             reverse_sql=[
@@ -133,13 +135,13 @@ class Migration(migrations.Migration):
                     l record;
                     updated_count integer default -1;
                 begin
-                    select * into l from languages limit 1;
+                    select * into l from languages where code='{}' limit 1;
                     while updated_count != 0 loop
                         update tiles c
                         set tiledata =
                             jsonb_set(
                                 tiledata,
-                                ('{' || b.nodeid || '}')::text[],
+                                ('{{' || b.nodeid || '}}')::text[],
                                 to_jsonb(((((tiledata->>b.nodeid)::jsonb)->>l.code)::jsonb)->>'value'),
                                 false
                             )
@@ -155,7 +157,9 @@ class Migration(migrations.Migration):
                     return;
                 end;
                 $$
-            """
+            """.format(
+                        settings.LANGUAGE_CODE
+                    )
                 )
             ],
         ),
