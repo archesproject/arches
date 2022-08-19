@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                                 '{{}}',
                                 ('{{' || l.code || '}}')::text[],
                                 
-                                    replace(c.name, '"', ''),
+                                to_jsonb(replace(c.name, '"', '')),
                                 true)::text;
                 end;
                 $$
