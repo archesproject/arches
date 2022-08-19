@@ -247,7 +247,7 @@ class StringDataType(BaseDataType):
 
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
-        requested_language = kwargs.pop("language")
+        requested_language = kwargs.pop("language", None)
         current_language = requested_language or get_language()
         if not current_language:
             current_language = settings.LANGUAGE_CODE

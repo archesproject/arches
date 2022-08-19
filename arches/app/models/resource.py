@@ -100,7 +100,7 @@ class Resource(models.ResourceInstance):
             if descriptor == "name" and self.descriptors[language][descriptor] is not None:
                 self.name[language] = self.descriptors[language][descriptor]
         else:
-            self.descriptors[language][descriptor] = "undefined"
+            self.descriptors[language][descriptor] = None
 
         return self.descriptors[language][descriptor]
 

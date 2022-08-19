@@ -25,7 +25,6 @@ class Migration(migrations.Migration):
                             jsonb_set(
                                 '{{}}',
                                 ('{{' || l.code || '}}')::text[],
-                                
                                 to_jsonb(replace(c.name, '"', '')),
                                 true)::text;
                 end;
@@ -54,8 +53,7 @@ class Migration(migrations.Migration):
                 begin
                     select * into l from languages where code='{}' limit 1;
                     update resource_instances 
-                        set name =
-                            name->l.code;
+                        set name = name->l.code;
                 end;
                 $$
             """.format(
