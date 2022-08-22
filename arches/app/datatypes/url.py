@@ -112,7 +112,7 @@ class URLDataType(BaseDataType):
 
         return ret
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
             display_value = data.get(str(node.nodeid))
