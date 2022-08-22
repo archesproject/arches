@@ -44,6 +44,15 @@ from guardian.shortcuts import assign_perm
 from django.conf import settings
 
 
+class BulkIndexQueue(models.Model):
+    resourceinstanceid = models.UUIDField(primary_key=True, unique=True)
+    createddate = models.DateTimeField(auto_now_add=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = "bulk_index_queue"
+
+
 class CardModel(models.Model):
     cardid = models.UUIDField(primary_key=True)
     name = I18n_TextField(blank=True, null=True)
@@ -537,6 +546,7 @@ class Node(models.Model):
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
+    hascustomalias = models.BooleanField(default=False)
 
     def get_child_nodes_and_edges(self):
         """
@@ -833,13 +843,7 @@ class ResourceXResource(models.Model):
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
-    def delete(self, index=True, *args, **kwargs):
-        if index:
-            from arches.app.search.search_engine_factory import SearchEngineInstance as se
-            from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
-            se.delete(index=RESOURCE_RELATIONS_INDEX, id=self.resourcexid)
-
+    def delete(self, *args, **kwargs):
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
         if deletedResourceId and self.tileid and self.nodeid:
@@ -856,9 +860,6 @@ class ResourceXResource(models.Model):
         super(ResourceXResource, self).delete()
 
     def save(self, *args, **kwargs):
-        from arches.app.search.search_engine_factory import SearchEngineInstance as se
-        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
-
         # during package/csv load the ResourceInstance models are not always available
         try:
             self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
@@ -872,12 +873,8 @@ class ResourceXResource(models.Model):
 
         if not self.created:
             self.created = datetime.datetime.now()
-
         self.modified = datetime.datetime.now()
 
-        document = model_to_dict(self)
-
-        se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 
     def __init__(self, *args, **kwargs):
@@ -894,6 +891,8 @@ class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
+    name = models.TextField(blank=True, null=True)
+    descriptors = JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 

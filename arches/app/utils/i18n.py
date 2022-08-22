@@ -7,8 +7,8 @@ from datetime import datetime
 from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
-from arches.app.models.models import CardModel, CardXNodeXWidget
-from django.utils.translation import get_language
+from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
+from django.utils.translation import get_language, get_language_info
 
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
@@ -85,7 +85,7 @@ class ArchesPOFileFetcher:
         files = []
 
         if lang:
-            files.append((lang, self.get_po_file(lang), overwrite))
+            files.append(ArchesPOFile(lang, self.get_po_file(lang, overwrite)))
         else:
             for language in settings.LANGUAGES:
                 files.append(ArchesPOFile(language[0], self.get_po_file(language[0], overwrite)))
@@ -228,3 +228,44 @@ class ArchesPOLoader:
                 cell.pop(self.target_language, None)
         except KeyError:
             pass
+
+
+class LanguageSynchronizer:
+    def synchronize_settings_with_db():
+        if settings.LANGUAGES:
+            for lang in settings.LANGUAGES:
+                found_language = Language.objects.filter(code=lang[0]).first()
+
+                # no need to add the language if it already exists
+                if found_language:
+                    continue
+
+                language_info = get_language_info(lang[0])
+                Language.objects.create(
+                    code=lang[0],
+                    name=language_info["name"],
+                    default_direction="rtl" if language_info["bidi"] else "ltr",
+                    scope="system",
+                    isdefault=False,
+                )
+
+            for lang in settings.LANGUAGES:
+                for graph in GraphModel.objects.all():
+                    if graph.publication:
+                        existing_language = PublishedGraph.objects.filter(
+                            publication__publicationid=graph.publication.publicationid
+                        ).first()
+                        found_language = PublishedGraph.objects.filter(
+                            publication__publicationid=graph.publication.publicationid, language=lang[0]
+                        ).first()
+
+                        # no need to add the language if it already exists
+                        if found_language:
+                            continue
+
+                        publication_language = Language.objects.filter(code=lang[0]).first()
+                        PublishedGraph.objects.create(
+                            language=publication_language,
+                            serialized_graph=existing_language.serialized_graph,
+                            publication=existing_language.publication,
+                        )

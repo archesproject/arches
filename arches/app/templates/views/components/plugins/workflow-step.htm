@@ -2,7 +2,7 @@
 
 
 <div class='tabbed-workflow-step-body'>
-    <!-- ko with: step -->
+    <!-- ko with: $data.step -->
         <div 
             class='workflow-step-loading-mask loading-mask' 
             data-bind="visible: $data.loading() || $data.saving()"
@@ -22,7 +22,10 @@
 
                     <div>
                         <span class="workflow-information-box-toggle"
-                            data-bind="click: toggleInformationBox"
+                            data-bind="
+                                text: $root.translations.dismiss,
+                                click: toggleInformationBox
+                            "
                             style="
                                 position: absolute;
                                 right: 20px;
@@ -31,7 +34,6 @@
                                 top: 20px;
                             "
                         >
-                            {% trans "dismiss" %}
                         </span>
                     </div>
                 </div>
@@ -55,9 +57,13 @@
 
                 <!-- ko if: !$parent.loading() && !$parent.saving() -->
                     <!-- ko foreach: { data: layoutSection[1], as: 'uniqueInstanceName'} -->
-                        <workflow-component-abstract 
-                            params='workflowComponentAbstract: ko.unwrap($parents[1].workflowComponentAbstractLookup()[uniqueInstanceName])'
-                        ></workflow-component-abstract>
+                        <!-- ko component: {
+                            name: 'workflow-component-abstract',
+                            params: {
+                                component: $parents[1].workflowComponentAbstractLookup()[uniqueInstanceName],
+                                plugin: $parents[2].plugin,
+                            }
+                        } --><!-- /ko -->
                     <!-- /ko -->
                 <!-- /ko -->
             </div>

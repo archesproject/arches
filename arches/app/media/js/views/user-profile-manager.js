@@ -6,7 +6,8 @@ define([
     'arches',
     'viewmodels/alert',
     'views/base-manager',
-    'profile-manager-data'
+    'views/profile-manager-data',
+    'utils/set-csrf-token'
 ], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
@@ -69,7 +70,7 @@ define([
 
             self.jsonNotifTypes = ko.computed(function() {
                 return ko.mapping.toJS(self.viewModel.notifTypeObservables);
-            });
+            }).extend({ throttle: 100 });
             self.jsonNotifTypes.subscribe(function(val) {
                 if(val && !self.viewModel.loading() && self.viewModel.notifTypeObservables().length > 0) {
                     self.viewModel.updateNotifTypes();
@@ -108,33 +109,33 @@ define([
                             email: userEmail
                         }
                     })
-                    .done(function() {
-                        self.viewModel.alert(
-                            new AlertViewModel(
-                                'ep-alert-blue',
-                                arches.twoFactorAuthenticationEmailSuccess.title,
-                                arches.twoFactorAuthenticationEmailSuccess.text,
-                                null,
-                                function(){}
-                            )
-                        );
-                    })
-                    .error(function(e) {
-                        self.viewModel.alert(
-                            new AlertViewModel(
-                                'ep-alert-red',
-                                e.statusText,
-                                e.responseText,
-                            )
-                        );
-                    });
+                        .done(function() {
+                            self.viewModel.alert(
+                                new AlertViewModel(
+                                    'ep-alert-blue',
+                                    arches.translations.twoFactorAuthenticationEmailSuccess.title,
+                                    arches.translations.twoFactorAuthenticationEmailSuccess.text,
+                                    null,
+                                    function(){}
+                                )
+                            );
+                        })
+                        .error(function(e) {
+                            self.viewModel.alert(
+                                new AlertViewModel(
+                                    'ep-alert-red',
+                                    e.statusText,
+                                    e.responseText,
+                                )
+                            );
+                        });
                 };
 
                 self.viewModel.alert(
                     new AlertViewModel(
                         'ep-alert-blue',
-                        arches.confirmSendTwoFactorAuthenticationEmail.title,
-                        arches.confirmSendTwoFactorAuthenticationEmail.text,
+                        arches.translations.confirmSendTwoFactorAuthenticationEmail.title,
+                        arches.translations.confirmSendTwoFactorAuthenticationEmail.text,
                         function(){},
                         sendTwoFactorAuthenticationEmail,
                     )

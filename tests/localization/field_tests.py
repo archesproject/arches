@@ -101,7 +101,7 @@ class Customi18nTextFieldTests(ArchesTestCase):
         m = self.LocalizationTestModelWNulls()
         m.id = 3
         m.save()
-        self.assertEqual(str(m.name), "null")
+        self.assertEqual(str(m.name), "")
         self.assertEqual(m.name.raw_value, {"en": None})
 
     def test_i18n_text_field_return_default_language(self):
@@ -164,7 +164,7 @@ class Customi18nTextFieldTests(ArchesTestCase):
         m.name = None
         m.save()
         m = self.LocalizationTestModelWNulls.objects.get(pk=9)
-        self.assertEqual(str(m.name), "null")
+        self.assertEqual(str(m.name), "")
         self.assertEqual(m.name.raw_value, {"en": "one", "es": None})
 
     def test_i18n_text_field_data_consistency_before_and_after_save(self):

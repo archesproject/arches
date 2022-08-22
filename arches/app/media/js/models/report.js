@@ -1,11 +1,11 @@
 define(['jquery',
     'arches',
+    'report-templates',
     'models/abstract',
     'knockout',
     'knockout-mapping',
     'underscore',
-    'report-templates'
-], function($, arches, AbstractModel, ko, koMapping, _, reportLookup) {
+], function($, arches, reportLookup, AbstractModel, ko, koMapping, _,) {
     var ReportModel = AbstractModel.extend({
         /**
          * A backbone model to manage report data
@@ -35,7 +35,7 @@ define(['jquery',
                 var config;
 
                 if (reportLookup[self.templateId()]) {
-                    self.defaultConfig = JSON.parse(reportLookup[self.templateId()].defaultconfig);
+                    self.defaultConfig = reportLookup[self.templateId()].defaultconfig;
                 }
                 else {
                     self.defaultConfig = {};
@@ -45,7 +45,7 @@ define(['jquery',
                     self.configState = {};
                     config = self.get('config');
                     _.each(val, function(key) {
-                        if (self.defaultConfig.hasOwnProperty(key)) {
+                        if (Object.prototype.hasOwnProperty.call(self.defaultConfig, key)) {
                             self.configState[key] = ko.unwrap(config[key]);
                         }
                     });
@@ -55,7 +55,7 @@ define(['jquery',
 
             this.resetConfigs = function(previousConfigs) {
                 this.configKeys().forEach(function(key){
-                    if (self.defaultConfig.hasOwnProperty(key)) {
+                    if (Object.prototype.hasOwnProperty.call(self.defaultConfig, key)) {
                         if (JSON.stringify(self.configState[key]()) !== JSON.stringify(previousConfigs[key])) {
                             koMapping.fromJS(previousConfigs, self.configState);
                         }
@@ -97,7 +97,7 @@ define(['jquery',
                         write: function(value) {
                             var key;
                             var configKeys = [];
-                            var defaultConfig = JSON.parse(reportLookup[value].defaultconfig);
+                            var defaultConfig = reportLookup[value].defaultconfig;
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
                             }

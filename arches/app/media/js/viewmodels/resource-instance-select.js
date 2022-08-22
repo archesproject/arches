@@ -1,13 +1,14 @@
 define([
     'knockout',
     'underscore',
-    'viewmodels/widget',
     'arches',
+    'viewmodels/widget',
     'utils/ontology',
     'views/components/resource-report-abstract',
-], function(ko, _, WidgetViewModel, arches, ontologyUtils) {
+], function(ko, _, arches, WidgetViewModel, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
+
     require(['views/components/related-instance-creator']);
     
     /**
@@ -210,8 +211,10 @@ define([
                         }
                     })
                     .then(function(json) {
-                        resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
-                        return resourceLookup[resourceid];
+                        if (json) {
+                            resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
+                            return resourceLookup[resourceid];
+                        }
                     });
             }
         };
@@ -237,11 +240,13 @@ define([
                             }
                             self.lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
-                                    names.push(resourceInstance["_source"].displayname);
-                                    self.displayValue(names.join(', '));
-                                    val.resourceName(resourceInstance["_source"].displayname)
-                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
-                                    val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                                    if (resourceInstance) {
+                                        names.push(resourceInstance["_source"].displayname);
+                                        self.displayValue(names.join(', '));
+                                        val.resourceName(resourceInstance["_source"].displayname);
+                                        val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question');
+                                        val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                                    }
                                 });
                         }
                     });
@@ -360,20 +365,20 @@ define([
                                         clearNewInstance();
                                     } else {
                                         window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                        .then(function(response){
-                                            if(response.ok) {
-                                                return response.json();
-                                            }
-                                            throw("error");
-                                        })
-                                        .then(function(json) {
-                                            var item = json.results.hits.hits[0];
-                                            var ret = self.makeObject(params.resourceid(), item._source);
-                                            self.setValue(ret);
-                                        })
-                                        .finally(function(){
-                                            clearNewInstance();
-                                        });
+                                            .then(function(response){
+                                                if(response.ok) {
+                                                    return response.json();
+                                                }
+                                                throw("error");
+                                            })
+                                            .then(function(json) {
+                                                var item = json.results.hits.hits[0];
+                                                var ret = self.makeObject(params.resourceid(), item._source);
+                                                self.setValue(ret);
+                                            })
+                                            .finally(function(){
+                                                clearNewInstance();
+                                            });
                                     }
                                 } else {
                                     clearNewInstance();
@@ -467,7 +472,7 @@ define([
             },
             formatResult: function(item) {
                 if (item._source) {
-                    iconClass = self.graphLookup[item._source.graph_id]?.iconclass
+                    const iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
                     return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
                 } else {
                     if (self.allowInstanceCreation) {

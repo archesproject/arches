@@ -17,10 +17,10 @@
     <div style="display: flex; flex-direction: row">
         <span><i data-bind="class: report.get('iconclass') || 'fa fa-file-o'"></i></span>
         <!--ko if: report.get('displayname')-->
-        <span style="padding: 0 5px;" data-bind="text: report.get('displayname') || '(Resource Instance Name)'"></span>
+        <span style="padding: 0 5px;" data-bind="text: report.get('displayname') || '(' + $root.translations.resourceInstanceName + ')'"></span>
         <!--/ko-->
         <!--ko ifnot: report.get('displayname')-->
-        <span style="padding: 0 5px">{% trans "(Resource Instance Name)" %}</span>
+        <span data-bind="text: '(' + $root.translations.resourceInstanceName + ')'" style="padding: 0 5px"></span>
         <!--/ko-->
     </div>
     <div><span data-bind="text: tabs()[activeTabIndex()].name"></span></div>
@@ -38,7 +38,7 @@
 {% block header_form %}
 <div style="display: flex; flex-direction: row">
 <div id="card-save-tile-btn" class="install-buttons">
-    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab"><span>{% trans "Add Tab" %}</span></button>
+    <button id="" class="btn btn-shim btn-mint btn-labeled btn-md fa fa-plus" data-bind="click: addTab"><span data-bind="text: $root.translations.addTab" ></span></button>
 </div>
 </div>
 <div data-bind="sortable: {
@@ -54,11 +54,21 @@
         </div>
         <div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
-                <input type="" placeholder="{% trans "Tab Name" %}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
+                <input type=""  data-bind="attr: {placeholder: $root.translations.tabName}" id="" class="form-control input-md widget-input" data-bind="textInput: tab.name" />
             </div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
                 <!--ko if: $parent.icons().length > 0 -->
-                <select class="design" data-placeholder="{% trans "Select tab icon" %}" data-bind="value: tab.icon, options: $parent.icons(), optionsText: 'name', optionsValue: 'cssclass', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select 
+                    class="design" 
+                    data-bind="
+                        placeholder: $root.translations.selectTabIcon,
+                        value: tab.icon, 
+                        options: $parent.icons(), 
+                        optionsText: 'name', 
+                        optionsValue: 'cssclass', 
+                        chosen: {disable_search_threshold: 10, width: '100%'}
+                    "
+                    ></select>
                 <!-- <div class="design">
                     <input class=""
                     data-bind="select2Query: {
@@ -75,7 +85,18 @@
                 <!--/ko-->
             </div>
             <div class="col-xs-12 pad-nor" style="padding: 5px">
-                <select class="design" data-placeholder="{% trans "Select cards in this tab" %}" multiple data-bind="selectedOptions: tab.nodegroup_ids, options: $parent.topcards, optionsText: 'name', optionsValue: 'nodegroupid', chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select 
+                    class="design" 
+                    multiple 
+                    data-bind="
+                        placeholder: $root.translations.selectCardsInTab,
+                        selectedOptions: tab.nodegroup_ids, 
+                        options: $parent.topcards, 
+                        optionsText: 'name', 
+                        optionsValue: 'nodegroupid', 
+                        chosen: {disable_search_threshold: 10, width: '100%'}
+                    "
+                ></select>
             </div>
         </div>
     </div>
@@ -87,13 +108,13 @@
 {% block body %}
 
     <!--ko if: hasProvisionalData() && (editorContext === false) -->
-    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <div class="report-provisional-flag"><span data-bind="text: $root.translations.pendingProvisionalEditsNotDisplayed"></span></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
-    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <div class="report-provisional-flag"><span data-bind="text: $root.translations.pendingProvisionalEditsNotDisplayed"></span></div>
     <!--/ko-->
     <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
-    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <div class="report-provisional-flag"><span data-bind="text: $root.translations.pendingProvisionalEdits"></div>
     <!--/ko-->
 
 

@@ -284,17 +284,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-    <script>
-        {% autoescape off %}define('map-layer-manager-data', [], function() {
-            return {
-                "geom_nodes": {{geom_nodes_json}},
-                "resource_map_layers": {{resource_map_layers_json}},
-                "resource_map_sources": {{resource_map_sources_json}},
-                "datatypes": {{ datatypes_json }},
-                "graphs": {{ graphs }},
-                "icons": {{icons}},
-                "node_permissions": {{node_permissions}}
-            };
-        });{% endautoescape %}
-    </script>
+<div 
+    id="mapLayerManagerData"
+    style="display: none;"
+    mapLayerManagerData='{
+        "geom_nodes": {{geom_nodes_json}},
+        "resource_map_layers": {{resource_map_layers_json}},
+        "resource_map_sources": {{resource_map_sources_json}},
+        "datatypes": {{ datatypes_json }},
+        "graphs": {{ graphs }},
+        "icons": {{icons}},
+        "node_permissions": {{node_permissions}}
+    }'
+></div>
 {% endblock pre_require_js %}

@@ -41,7 +41,11 @@ jobs:
 
       - uses: ankane/setup-elasticsearch@v1
         with:
-          elasticsearch-version: 7
+          elasticsearch-version: 8
+
+      - name: Webpack frontend files
+        run: |
+          yarn && yarn build_test
 
       - name: Run Arches unit tests
         run: |

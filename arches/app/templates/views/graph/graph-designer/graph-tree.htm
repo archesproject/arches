@@ -1,6 +1,11 @@
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
+
 <!-- ko foreach: { data: [$data], as: 'graphTree' } -->
-<div style="height: 100%;" class="jstree jstree-default">
+<div 
+    style="height: 100%; display: flex; flex-direction: column;"
+    class="jstree jstree-default"
+>
     <div class="header" >
         <!-- Layer Filter -->
         <div class="list-filter" data-bind="">
@@ -50,14 +55,14 @@
             <span style="font-weight:bold;" data-bind="text: ': ' + node.nodeid"></span>
             <!-- /ko -->
             <span class="spacer"></span>
-            <!--ko if: _.contains(graphTree.restrictedNodegroups, node.nodeGroupId()) === false -->
+            <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
             <i class="jstree-node-action-icon fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Add Child Node" %}"></i>
             <i class="jstree-node-action-icon ion-merge" role="presentation" data-bind="click: graphTree.toggleBranchList.bind(graphTree)" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Add Branch" %}"></i>
             <!-- /ko -->
             <!-- ko if: !node.istopnode -->
             <i class="jstree-node-action-icon fa" role="presentation" data-bind="{click: graphTree.exportBranch.bind(graphTree), css: {'fa-arrow-right': graphTree.activeLanguageDir() != 'rtl', 'fa-arrow-left': graphTree.activeLanguageDir() == 'rtl'}}" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Export Branch" %}"></i>
             <!-- /ko -->
-            <!-- ko if: !node.istopnode && _.contains(graphTree.restrictedNodegroups, node.nodeGroupId()) === false -->
+            <!-- ko if: !node.istopnode && graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
                 <i class="jstree-node-action-icon fa fa-trash" role="presentation" data-bind="click: graphTree.deleteNode.bind(graphTree)" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Delete Node" %}"></i>
             <!-- /ko -->
             
@@ -76,3 +81,6 @@
         <!-- /ko -->
     </li>
 </template>
+
+<script src="{% webpack_static 'node_modules/underscore/underscore-min.js' %}"></script>
+

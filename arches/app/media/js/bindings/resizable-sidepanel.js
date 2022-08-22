@@ -13,7 +13,7 @@ define([
             for (var i = 0; i < 3; i++) {
                 handle.append(
                     $(document.createElement('i')).addClass('fa fa-circle')
-                )
+                );
             }
 
             $el.after(
@@ -52,7 +52,7 @@ define([
                 }
             }, false);
         }
-    }
+    };
 
     return ko.bindingHandlers.resizableSidepanel;
 });

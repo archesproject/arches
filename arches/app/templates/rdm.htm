@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% load static %}
+{% load webpack_static from webpack_loader %}
 
 {% block title %}
 {{ block.super }}
@@ -9,9 +10,9 @@
 {% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% webpack_static 'css/main.css' %}">
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'packages/jqtree/jqtree.css' %}">
+    <link rel="stylesheet" href="{% webpack_static 'node_modules/jqtree/jqtree.css' %}">
 {% endblock css %}
 
 {% block main_content %}

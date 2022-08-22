@@ -1,26 +1,26 @@
 @import url(fonts/openSans.css);
-@import url(../packages/bootstrap/dist/css/bootstrap.min.css);
-@import url(../packages/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
-@import url(../packages/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
+@import url(../node_modules/bootstrap/dist/css/bootstrap.min.css);
+@import url(../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
+@import url(../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
 @import url(nifty.min.css);
-@import url(../packages/font-awesome/css/font-awesome.min.css);
-@import url(../packages/ionicons/css/ionicons.min.css);
-@import url(../packages/lt-themify-icons/themify-icons.css);
-@import url(../packages/chosen-js/chosen.css);
-@import url(../packages/select2/select2.css);
-@import url(../packages/select2/select2-bootstrap.css);
-@import url(../packages/mapbox-gl/dist/mapbox-gl.css);
-@import url(../packages/nouislider/distribute/nouislider.min.css);
-@import url(../packages/codemirror/lib/codemirror.css);
-@import url(../packages/codemirror/theme/monokai.css);
-@import url(../packages/datatables.net-bs/css/dataTables.bootstrap.css);
-@import url(../packages/datatables.net-responsive-bs/css/responsive.bootstrap.css);
-@import url(../packages/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
-@import url(../packages/leaflet/dist/leaflet.css);
-@import url(../packages/leaflet-draw/dist/leaflet.draw.css);
+@import url(../node_modules/font-awesome/css/font-awesome.min.css);
+@import url(../node_modules/ionicons/css/ionicons.min.css);
+@import url(../node_modules/lt-themify-icons/themify-icons.css);
+@import url(../node_modules/chosen-js/chosen.css);
+@import url(../node_modules/select2/select2.css);
+@import url(../node_modules/select2/select2-bootstrap.css);
+@import url(../node_modules/mapbox-gl/dist/mapbox-gl.css);
+@import url(../node_modules/nouislider/distribute/nouislider.min.css);
+@import url(../node_modules/codemirror/lib/codemirror.css);
+@import url(../node_modules/codemirror/theme/monokai.css);
+@import url(../node_modules/datatables.net-bs/css/dataTables.bootstrap.css);
+@import url(../node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.css);
+@import url(../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
+@import url(../node_modules/leaflet/dist/leaflet.css);
+@import url(../node_modules/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
-@import url(../packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
-@import url(../packages/leaflet.fullscreen/Control.FullScreen.css);
+@import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
 @import "sidenav.scss";
 @import "edit-history.scss";
@@ -709,7 +709,7 @@ dl.inline-flex dd {
 }
 
 .etl-manager-container {
-    display: flex; 
+    display: flex;
     flex-direction: column;
     background-color: #fff;
     width:100%;
@@ -767,14 +767,14 @@ dl.inline-flex dd {
 }
 
 h3.branch-xl-title {
-    margin-top: 15px; 
-    margin-bottom: 0px; 
+    margin-top: 15px;
+    margin-bottom: 0px;
     font-size: 19px;
     color: #454545;
 }
 
 h4.branch-xl-title {
-    margin-top: 0px; 
+    margin-top: 0px;
     margin-bottom: 0px;
     font-size: 16px;
     color: #454545;
@@ -2757,7 +2757,7 @@ label.form-checkbox.form-normal{
             content: '';
             position: absolute;
             height: 6px;
-            width: 11px;    
+            width: 11px;
             left: 8px;
             top: 50%;
             margin-top: -5px;
@@ -3171,7 +3171,7 @@ a.select2-search-choice-close {
         font-size: 17px;
         margin: 7px -30px;
     }
-    
+
     .clear-search:hover {
         cursor: pointer;
         color: rgba(0, 0, 0, 0.95);
@@ -3235,8 +3235,8 @@ a.select2-search-choice-close {
     font-weight: 600;
 }
 
-.side-column-crud-container 
-{    
+.side-column-crud-container
+{
     flex: 0 0 275px;
     margin-top: -1px;
     margin-bottom: 0px;
@@ -3338,11 +3338,11 @@ a.select2-search-choice-close {
                     text-overflow: ellipsis;
                     font-size: 13px;
                 }
-                
+
                 .crud-card-main a {
                     color: #1E6FB7;
                 }
-                
+
                 .crud-card-subtitle {
                     color: #888;
                     font-size: 11px;
@@ -3376,7 +3376,7 @@ a.select2-search-choice-close {
                     }
                 }
             }
-        
+
             .library-card-main {
                 width: 255px;
                 position: absolute;
@@ -3386,7 +3386,7 @@ a.select2-search-choice-close {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 font-size: 12px;
-                
+
                 a {
                     color: #1E6FB7;
                 }
@@ -4658,7 +4658,7 @@ div.dropdown-menu.open {
     background: #fefefe;
 }
 
-.btn-notifs-download {
+.notifications-container .btn.btn-notifs-download {
     color: #6494cc;
     background-color: transparent;
     border: 1px solid #ddd;
@@ -5923,7 +5923,7 @@ span.editable-card i.fa.fa-align-justify:hover {
         text-decoration: none;
         outline: 0;
     }
-    
+
     &.btn-primary {
         background-color: #579ddb;
         border-color: #5fa2dd;
@@ -6131,8 +6131,8 @@ div.card-grid-item.selected {
 }
 
 .profile-sections {
-    padding: 0px 0px;
-    min-height: 650px;
+    padding: 60px 30px;
+    min-height: 450px;
 }
 
 div.profile-notif-settings {
@@ -6444,7 +6444,7 @@ th.notif-type {
     .tabbed-workflow-step-container{
         margin-bottom: 108px;
     }
-    
+
     #content-container {
         .ep-tools .fa-sign-out {
             font-size: 17px;
@@ -6580,7 +6580,7 @@ th.notif-type {
             align-items: center;
             justify-content: center;
         }
-        
+
         i {
             font-size: 17px;
         }
@@ -6590,7 +6590,7 @@ th.notif-type {
         display: flex;
         flex-direction: row;
     }
-    
+
     .tabbed-workflow-title-bar .workflow-top-control {
         display: flex;
         flex: 1;
@@ -6607,8 +6607,8 @@ th.notif-type {
             justify-content: center;
             align-items: center;
         }
-    }        
-    
+    }
+
     .workflow-name-container {
         display: inherit;
         flex-direction: initial;
@@ -6627,13 +6627,13 @@ th.notif-type {
 
         h2 {
             margin-top: 10px;
-            font-weight: initial; 
+            font-weight: initial;
             font-size:17px
         }
     }
 
-    .ep-notifs-toggle, 
-    .ep-tools-search, 
+    .ep-notifs-toggle,
+    .ep-tools-search,
     .tabbed-workflow-step-information-box-container.seen,
     .workflow-nav-tab-container,
     .workflow-plugin .btn .verbose,
@@ -6719,8 +6719,8 @@ th.notif-type {
 .ep-graph-title {
     font-size: 1.6em;
     padding-top: 5px;
-    flex-wrap: wrap; 
-    align-items: center; 
+    flex-wrap: wrap;
+    align-items: center;
     margin: 0 15px;
 }
 
@@ -6807,7 +6807,7 @@ th.notif-type {
         &:not(.active) {
             cursor: pointer;
         }
-    } 
+    }
 
     .graph-find {
         margin-top: 0px;
@@ -7005,6 +7005,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
 
 .node-indent a {
     padding-left: 30px;
+}
+
+.arches-translations,
+.arches-data,
+.arches-urls {
+    display: none;
 }
 
 .expando {
@@ -8872,7 +8878,7 @@ a.mega-dropdown-toggle.disabled {
     padding: 0px 0px 35px 0px;
     background: #fff;
     border-bottom: solid 1px lightgray;
-    
+
     &.rp-report-section-root {
         padding-top: 30px;
         background-color: #fff;
@@ -8956,35 +8962,35 @@ a.mega-dropdown-toggle.disabled {
     justify-content: space-between;
 }
 
-.rp-card-section {        
-    
+.rp-card-section {
+
     padding-bottom: 10px;
     padding-top: 0px;
     position: relative;
     margin: 10px 20px;
-    
+
     .rp-report-container-tile{
         padding: 0;
     }
-    
+
     .rp-report-tile{
         &.provisional-edit-cards {
             padding-left: 0px;
             padding-bottom: 0px;
         }
-        
+
         .dl-horizontal {
             margin-bottom: 0px;
             display: grid;
             grid-template-columns: 260px 1fr;
             align-items: start;
-            
+
             dt {
                 grid-column: 1;
                 font-weight: 600;
                 text-align: end;
                 width: auto;
-                
+
             }
             dd {
                 grid-column: 2;
@@ -9010,7 +9016,7 @@ a.mega-dropdown-toggle.disabled {
         display: inline-flex;
         justify-content: space-between;
         color: #597DBF;
-    
+
         i {
             padding: 10px 12px;
             border: 1px solid #ddd;
@@ -9018,7 +9024,7 @@ a.mega-dropdown-toggle.disabled {
             width: 36px;
             margin-right: 0 2px;
             background: #D8FAF6;
-            
+
             &:hover{
                 cursor: pointer;
                 background: #fff;
@@ -9026,7 +9032,7 @@ a.mega-dropdown-toggle.disabled {
             }
         }
     }
-    
+
 }
 
 .report-print-date {
@@ -9535,7 +9541,7 @@ div.row.widget-wrapper.report-header:hover {
 }
 
 .mainnav-container {
-    display: flex; 
+    display: flex;
     flex-direction: column;
     z-index: 15;
     height: 100%;
@@ -9551,6 +9557,16 @@ div.row.widget-wrapper.report-header:hover {
     flex-direction: column;
     align-items: center;
     margin-bottom: 50px;
+}
+
+.debug-notice {
+    padding-bottom: 4px;
+    padding-right: 2px;
+    font-size: x-small;
+    color: #999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #navbar {
@@ -10070,7 +10086,7 @@ a.clear-geojson-button:hover {
             color: #fff;
             background: #1266AB;
         }
-        
+
         &:focus {
             color: #fff;
             background: #1266AB;
@@ -12289,10 +12305,10 @@ ul.select2-choices:after {
 
 .left-panel-overflow {
     background: #ecf0f5;
-    height: calc(100% - 75px);
-    /* 75px is height of .jstree .header */
+    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    padding-bottom: 20px;
 }
 
 .left-panel-overflow>* {
@@ -12818,25 +12834,25 @@ ul.select2-choices:after {
 }
 
 .iiif-gallery-content .panel-controls {
-    width: 230px; 
+    width: 230px;
     border-right: 1px solid #ddd;
 }
 
 .iiif-gallery-content .panel-controls .hide-gallery-control {
-    width: 230px; 
-    height: 50px; 
-    border-bottom: 1px solid #ddd; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    font-weight: 650; 
-    color: #5b9bd7; 
+    width: 230px;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 650;
+    color: #5b9bd7;
     cursor: pointer;
 }
 
 .iiif-gallery-content .panel-controls .mode-selector {
-    width: 100%; 
-    height: 108px; 
+    width: 100%;
+    height: 108px;
     padding: 5px;
 }
 
@@ -12866,7 +12882,7 @@ ul.select2-choices:after {
 
 .iiif-gallery-content .panel-controls .panel-selector-buttons > div.selected {
     background-color: #add8e6;
-    border: 1px solid #5b9bd7; 
+    border: 1px solid #5b9bd7;
 }
 
 .iiif-gallery-content .panel-controls .panel-selector-buttons > div.hide {
@@ -12874,8 +12890,8 @@ ul.select2-choices:after {
 }
 
 .iiif-gallery-content .panel-controls .mode-selector-buttons > div > div {
-    background-color: #ddd; 
-    width: 40px; 
+    background-color: #ddd;
+    width: 40px;
     height: 20px;
 }
 
@@ -13037,9 +13053,9 @@ ul.select2-choices:after {
 }
 
 .iiif-leaflet .split-controls {
-    display: flex; 
-    position: absolute; 
-    z-index: 2500; 
+    display: flex;
+    position: absolute;
+    z-index: 2500;
     top: 9px;
 }
 
@@ -13167,13 +13183,13 @@ ul.select2-choices:after {
 }
 
 .iiif-leaflet .split-controls .button {
-    width: 38px; 
-    height: 38px; 
-    background-color: #fff; 
-    border: 2px solid #ddd; 
-    border-left: none; 
-    display: flex; 
-    justify-content: center; 
+    width: 38px;
+    height: 38px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-left: none;
+    display: flex;
+    justify-content: center;
     align-items: center;
     cursor: pointer;
     font-size: 27px;
@@ -13235,6 +13251,10 @@ ul.select2-choices:after {
 }
 
 .tabbed-workflow-step-container .iiif-gallery-sequence-labels {
+    display: none;
+}
+
+.tabbed-workflow-step-container .install-buttons {
     display: none;
 }
 
@@ -14143,13 +14163,13 @@ ul.select2-choices:after {
         color: #888;
     }
 
-    .report-related-resources .rp-card-section{ 
+    .report-related-resources .rp-card-section{
         margin-left: 50px;
-        div div .dl-horizontal { 
+        div div .dl-horizontal {
             dt {
                 width: 500px;
             }
-            
+
             dd {
                 padding-right: 20px;
                 margin-left: 520px;
@@ -14169,7 +14189,7 @@ ul.select2-choices:after {
 }
 
 @media screen and (max-width: 767px) {
-    .rp-card-section 
+    .rp-card-section
     {
         .rp-card-section {
             margin: 0;
@@ -14306,7 +14326,7 @@ ul.select2-choices:after {
             padding: 5px 0px;
             text-align: start;
         }
-        
+
         dd {
             margin: 0px 20px;
             padding: 0px;
@@ -14327,7 +14347,7 @@ ul.select2-choices:after {
     }
     .report-print-date {
         margin: 0;
-        
+
         .toggle-container {
             flex-direction: row;
             margin: 0;
@@ -14349,12 +14369,12 @@ ul.select2-choices:after {
             }
         }
     }
-    
+
 }
 
 #user-profile {
     .account-wrapper
-    { 
+    {
         flex: 1;
         > .row {
             display: flex;
@@ -14371,7 +14391,7 @@ ul.select2-choices:after {
 
     .notif-table {
         width: 100%;
-        
+
     }
     .widget-input-label-notif {
         padding: 0 20px;
@@ -14380,7 +14400,7 @@ ul.select2-choices:after {
         font-weight: 500;
         color: #666;
     }
-    
+
     .widget-input-label-notif .arches-switch {
         margin: 0 5px;
     }
@@ -14402,7 +14422,7 @@ ul.select2-choices:after {
         padding: 40px 100px;
         min-height: 170px;
         border-bottom: 1px solid #ccc;
-        
+
         .profile-notif-settings{
             margin: 0 20px;
             padding: 0;
@@ -14533,10 +14553,10 @@ ul.select2-choices:after {
 }
 
 .etl-job {
-    margin: 10px 15px 10px 10px; 
-    border: 1px solid #ddd; 
+    margin: 10px 15px 10px 10px;
+    border: 1px solid #ddd;
     border-radius: 2px;
-    display: block; 
+    display: block;
     background: #fff;
 }
 
@@ -14545,21 +14565,21 @@ ul.select2-choices:after {
 }
 
 .etl-job-task-bar {
-    background: #eee; 
+    background: #eee;
     display: flex;
     justify-content: space-between;
-    height: 40px; 
+    height: 40px;
     border-top: 1px solid #ddd;
 }
 
 .etl-job-task-bar .task {
-    padding: 10px; 
+    padding: 10px;
 }
 
 .etl-job-task-bar .task a{
-    padding: 7px; 
+    padding: 7px;
     text-decoration: none;
-    color: steelblue; 
+    color: steelblue;
     cursor: pointer;
 }
 
@@ -14618,13 +14638,13 @@ ul.select2-choices:after {
 }
 
 .etl-loading-metadata-key {
-    font-size: 15px; 
+    font-size: 15px;
     padding-right: 3px;
     color: #777;
 }
 
 .etl-loading-metadata-value {
-    font-size: 15px; 
+    font-size: 15px;
     padding-right: 3px;
     color: rgb(4, 4, 45);
 }

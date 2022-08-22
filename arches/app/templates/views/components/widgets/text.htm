@@ -9,29 +9,42 @@
         <div class="i18n-style-tools-collapser" data-bind=" click: function() {
             showi18nOptions(!showi18nOptions());
         }">
-            <span><i class="fa" data-bind="{
-                css: {
-                    'fa-caret-down' : !showi18nOptions(),
-                    'fa-caret-up' : showi18nOptions(),
-                }
-            }"></i> {% trans "Languages" %}</span>
+            <span>
+                <i class="fa" data-bind="{
+                    css: {
+                        'fa-caret-down' : !showi18nOptions(),
+                        'fa-caret-up' : showi18nOptions(),
+                    }
+                }"></i>
+                <span data-bind="text: $root.translations.languages"></span>
+            </span>
         </div>
         <div class="form-horizontal" data-bind="if: showi18nOptions">
             <div class="i18n-style-tools-panel">
                 <div style="display: flex; flex-direction: column; max-width:600px">
-                    <label class="widget-input-label" for="lang_dd">{% trans "Language" %}</label>
+                    <label class="widget-input-label" for="lang_dd">
+                        <span data-bind="text: $root.translations.language"></span>
+                    </label>
                     <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
                     </select>
-                    <label class="widget-input-label" for="lang_dir">{% trans "Direction" %}</label>
-                    <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDirection, chosen: {
-                        'width':'100%'}">
-                        <option value="ltr">
-                            Left-to-Right
-                        </option>
-                        <option value="rtl">
-                            Right-to-Left
-                        </option>
-                    </select>
+                    <label class="widget-input-label" for="lang_dir">
+                        <span data-bind="text: $root.translations.direction"></span>
+                    </label>
+                    <select 
+                        id="lang_dir" 
+                        style="flex:1" 
+                        name="language" 
+                        data-bind="
+                            value: currentDirection, 
+                            chosen: {'width':'100%'},
+                            optionsText: 'text',
+                            optionsValue: 'value',
+                            options: [
+                                { text: $root.translations.leftToRight, value: 'ltr' },
+                                { text: $root.translations.rightToLeft, value: 'rtl' },
+                            ],
+                        "
+                    ></select>
                 </div>
             </div>
         </div>
@@ -49,49 +62,80 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Placeholder" %}
+    <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="textInput: placeholder">
+    <input 
+        type="" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.placeholder},
+            textInput: placeholder
+        "
+    >
 </div>
 <div class="control-label">
-    {% trans "Max Length" %}
+    <span data-bind="text: $root.translations.maxLength"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Max Length" %}" id="" class="form-control input-md widget-input" data-bind="textInput: maxLength">
+    <input 
+        type="" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.maxLength},
+            textInput: maxLength
+        "
+    >
 </div>
 <div class="form-group" style="position: relative; z-index: 0">
     <div style="max-width: 600px; position: relative">
     <div class="i18n-style-tools-collapser" data-bind=" click: function() {
         showi18nOptions(!showi18nOptions());
     }">
-        <span><i class="fa" data-bind="{
-            css: {
-                'fa-caret-down' : !showi18nOptions(),
-                'fa-caret-up' : showi18nOptions(),
-            }
-        }"></i> {% trans "Languages" %}</span>
+        <span>
+            <i class="fa" data-bind="{
+                css: {
+                    'fa-caret-down' : !showi18nOptions(),
+                    'fa-caret-up' : showi18nOptions(),
+                }
+            }"></i>
+            <span data-bind="text: $root.translations.languages"></span>
+        </span>
     </div>
     <div class="form-horizontal" data-bind="if: showi18nOptions">
         <div class="i18n-style-tools-panel">
             <div style="display: flex; flex-direction: column; max-width:600px">
-                <label class="widget-input-label" for="lang_dd">{% trans "Language" %}</label>
+                <label class="widget-input-label" for="lang_dd">
+                    <span data-bind="text: $root.translations.language"></span>
+                </label>
                 <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentDefaultLanguage, chosen: {width:'100%'}">
                 </select>
-                <label class="widget-input-label" for="lang_dir">{% trans "Direction" %}</label>
-                <select id="lang_dir" style="flex:1" name="language" data-bind="value: currentDefaultDirection, chosen: {
-                    'width':'100%'}">
-                    <option value="ltr">
-                        Left-to-Right
-                    </option>
-                    <option value="rtl">
-                        Right-to-Left
-                    </option>
-                </select>
+                <label class="widget-input-label" for="lang_dir">
+                    <span data-bind="text: $root.translations.direction"></span>
+                </label>
+                <select 
+                    id="lang_dir" 
+                    style="flex:1" 
+                    name="language" 
+                    data-bind="
+                        value: currentDefaultDirection, 
+                        chosen: {'width':'100%'},
+                        optionsText: 'text',
+                        optionsValue: 'value',
+                        options: [
+                            { text: $root.translations.leftToRight, value: 'ltr' },
+                            { text: $root.translations.rightToLeft, value: 'rtl' },
+                        ],
+                    "
+                ></select>
             </div>
         </div>
     </div>
-    <label class="control-label widget-input-label" for="">{% trans "Default Value" %}</label>
+    <label class="control-label widget-input-label" for="">
+        <span data-bind="text: $root.translations.defaultValue"></span>
+    </label>
     <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
         <input type="text" style="flex:1" data-bind="textInput: currentDefaultText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection}" class="form-control input-lg widget-input">
     </div>
@@ -99,17 +143,27 @@
 </div>
 <div class="node-config-item">
     <div class="control-label">
-        {% trans "Disabled" %}
+        <span data-bind="text: $root.translations.disabled"></span>
     </div>
     <div class="pad-no">
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: {% quoted_trans "Disable Editing" %}, subtitle: {% quoted_trans "Prevent users from editing value" %}}}}"></div>
+        <div 
+            data-bind="
+                component: { 
+                    name: 'views/components/simple-switch', 
+                    params: {
+                        value: uneditable, 
+                        config:{label: $root.translations.disableEditing, subtitle: $root.translations.preventUsersFromEditingValue}
+                    }
+                }
+            "
+        ></div>
     </div>
 </div>
 {% endblock config_form %}
 
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
-<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || {% quoted_trans "None" %}"></span>
+<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || $root.translations.none"></span>
 {% endblock display_value %}
 <!-- /ko -->
 
@@ -117,7 +171,7 @@
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
 <dt data-bind="text: label"></dt>
-<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : {% quoted_trans "None" %}"></dd>
+<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : $root.translations.none"></dd>
 {% endblock report %}
 <!-- /ko -->
 <!-- /ko -->

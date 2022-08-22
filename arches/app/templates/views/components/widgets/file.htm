@@ -13,18 +13,22 @@
             <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
                 <div class="bord-top pad-ver file-select">
                     <div style="padding: 5px">
-                        <h2>{% trans "Upload Documents" %}</h2>
-                        <h4>{% trans "Drag & Drop your files onto this panel" %}</h4>
+                        <h2>
+                            <span data-bind="text: $root.translations.uploadDocuments"></span>
+                        </h2>
+                        <h4>
+                            <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
+                        </h4>
                     </div>
                     <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                         <i class="fa fa-file"></i>
-                        <span>{% trans "Select Files" %}</span>
+                        <span data-bind="text: $root.translations.selectFiles"></span>
                     </button>
                     <br>
-                    <div style="padding: 10px">{% trans "Adding documents to this record is " %}
-                        <span><strong>{% trans "optional." %}</strong></span>
+                    <div style="padding: 10px">
+                        <span data-bind="text: $root.translations.addingDocumentsOptional"></span>
                         <br>
-                        {% trans "You may upload as many documents as you wish, but the maximum size of any single file is " %}
+                        <span data-bind="text: $root.translations.maxFileSizeWarning"></span>
                         <span data-bind="text: maxFilesize() + 'MB.'"></span>
                     </div>
 
@@ -35,16 +39,28 @@
                     </div> -->
                 </div>
                 <div class="file-upload-footer">
-                    <span>{% trans "Allowed document formats:" %} <span data-bind="text: (acceptedFiles() || 'Any') + '. '"></span>
+                    <span>
+                        <span data-bind="text: $root.translations.allowedDocumentFormats"></span>
+                        <span data-bind="text: (acceptedFiles() || $root.translations.any) + '. '"></span>
+                    </span>
                 </div>
             </div>
             <div data-bind="visible: filesJSON().length > 0">
                 <!-- note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                     elements with its class name must exist at time of init -->
-                <h4>{% trans "Uploaded Files" %}</h4>
+                <h4>
+                    <span data-bind="text: $root.translations.uploadedFiles"></span>
+                </h4>
                 <div class="file-upload-options">
                     <!--ko if: filesJSON().length > 1-->
-                    <input data-bind="textInput: filter" type="text" placeholder="{% trans 'find a file...' %}" class="file-upload-filter">
+                    <input 
+                        data-bind="
+                            attr: {placeholder: $root.translations.findAFile + '...'},
+                            textInput: filter
+                        " 
+                        type="text" 
+                        class="file-upload-filter"
+                    >
                     <!-- /ko -->
 
                     <!-- Clear Search -->
@@ -54,13 +70,13 @@
                     <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
                     <!-- /ko -->
                     <!-- ko if: (!filter() || filter() == "") -->
-                    <span data-bind="text: filesJSON().length + {% quoted_trans " file(s) uploaded" %}"></span>
+                    <span data-bind="text: filesJSON().length + $root.translations.filesUploaded"></span>
                     <!-- /ko -->
                     <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
-                        <span>{% trans "delete all files" %}</span>
+                        <span data-bind="text: $root.translations.deleteAllFiles"></span>
                     </button>
                     <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                        <span>{% trans "add more files" %}</span>
+                        <span data-bind="text: $root.translations.addMoreFiles"></span>
                     </button>
                 </div>
             </div>
@@ -77,9 +93,13 @@
                                 <div class="media-left">
                                     <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: {% quoted_trans "error" %}"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? {% quoted_trans "Download" %} : {% quoted_trans "Unsaved" %}"></span></a></span>
+                                    <span class="text-sm">
+                                        <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
+                                            <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
+                                        </a>
+                                    </span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
@@ -107,9 +127,13 @@
                                 <div class="media-left">
                                     <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
                                     <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: {% quoted_trans "error" %}"></span>
+                                    <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
                                     <!-- /ko -->
-                                    <span class="text-sm"><a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false"><span data-bind="text: ko.unwrap(url) ? {% quoted_trans "Download" %} : {% quoted_trans "Unsaved" %}"></span></a></span>
+                                    <span class="text-sm">
+                                        <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
+                                            <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
+                                        </a>
+                                    </span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
@@ -128,10 +152,10 @@
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
                 <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt">
-                    <option value="5"><span>{% trans "Show first 5 files" %} <i class="fa fa-caret-down"></i></span></option>
-                    <option value="10"><span>{% trans "Show first 10 files" %} <i class="fa fa-caret-down"></i></span></option>
-                    <option value="25"><span>{% trans "Show first 25 files" %} <i class="fa fa-caret-down"></i></span></option>
-                    <option value="100"><span>{% trans "Show all files" %} <i class="fa fa-caret-down"></i></span></option>
+                    <option value="5" data-bind="text: $root.translations.showFirstFiveFiles"></option>
+                    <option value="10" data-bind="text: $root.translations.showFirstTenFiles"></option>
+                    <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles"></option>
+                    <option value="100" data-bind="text: $root.translations.showAllFiles"></option>
                 </select>
             </div>
         </div>
@@ -143,17 +167,34 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Accepted File Types" %}
+    <span data-bind="text: $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "example: .jpg, .png, .txt" %}" id="" class="form-control input-md widget-input" data-bind="value: acceptedFiles, valueUpdate: 'keyup'">
+    <input 
+        type="" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.exampleFileTypes},
+            value: acceptedFiles, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
 
 <div class="control-label">
-    {% trans "Max File Size (mb)" %}
+    <span data-bind="text: $root.translations.maxFileSize"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Max File Size (mb)" %}" id="" class="form-control input-md widget-input" data-bind="value: maxFilesize">
+    <input 
+        type="number" 
+        id="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.maxFileSize},
+            value: maxFilesize
+        "
+    >
 </div>
 
 {% endblock config_form %}
@@ -162,7 +203,9 @@
 <dt data-bind="text: label"></dt>
 
 <!-- ko if: uploadedFiles().length === 0 -->
-<dd>{% trans "None" %}</dd>
+<dd>
+    <span data-bind="text: $root.translations.none"></span>
+</dd>
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
@@ -190,5 +233,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + {% quoted_trans "files uploaded" %} : displayValue()"></span>
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue()"></span>
 {% endblock display_value %}

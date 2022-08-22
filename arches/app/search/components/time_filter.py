@@ -125,7 +125,7 @@ class TimeFilter(BaseSearchFilter):
         for cnw in date_cardxnodesxwidgets:
             node_obj = {}
             node_obj["nodeid"] = str(cnw.node_id)
-            node_obj["label"] = card_name_dict[str(cnw.card_id)] + " - " + cnw.label
+            node_obj["label"] = f"{card_name_dict[str(cnw.card_id)]} - {cnw.label}"
             node_obj["graph_id"] = node_graph_dict[node_obj["nodeid"]]
             node_obj_list.append(node_obj)
 

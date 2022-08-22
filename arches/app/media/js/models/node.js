@@ -1,9 +1,9 @@
 define([
     'underscore',
     'knockout',
+    'arches',
     'models/abstract',
-    'arches'
-], function(_, ko, AbstractModel, arches) {
+], function(_, ko, arches, AbstractModel) {
     return AbstractModel.extend({
         /**
          * A backbone model representing a single node in a graph
@@ -46,6 +46,7 @@ define([
             self.description = ko.observable(null);
             self.slug = ko.observable(null);
             self.alias = ko.observable(null);
+            self.hasCustomAlias = ko.observable(false);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -186,6 +187,7 @@ define([
                     fieldname: self.fieldname,
                     exportable: self.exportable,
                     alias: self.alias,
+                    hascustomalias: self.hasCustomAlias,
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
@@ -263,6 +265,7 @@ define([
             self.fieldname(source.fieldname);
             self.exportable(source.exportable);
             self.alias(source.alias);
+            self.hasCustomAlias(source.hascustomalias);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -282,7 +285,7 @@ define([
             if (datatypeRecord && datatypeRecord.defaultconfig && config) {
                 var defaultConfig = datatypeRecord.defaultconfig;
                 _.each(defaultConfig, function(value, key) {
-                    if (!config.hasOwnProperty(key)) {
+                    if (!Object.prototype.hasOwnProperty.call(config, key)) {
                         config[key] = value;
                     }
                 });

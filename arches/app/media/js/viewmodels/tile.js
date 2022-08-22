@@ -3,10 +3,11 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'arches',
     'require',
-    'viewmodels/card'
-], function($, _, ko, koMapping, arches, require) {
+    'arches',
+    'viewmodels/card',
+    'utils/set-csrf-token'
+], function($, _, ko, koMapping, require, arches) {
     /**
     * A viewmodel used for generic cards
     *
@@ -45,7 +46,7 @@ define([
                     displayname(descriptors.displayname);
                 } else {
                     const defaultLanguageValue = descriptors.displayname.find(displayname => displayname.language == arches.activeLanguage)?.value;
-                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")"
+                    const displayNameValue = defaultLanguageValue ? defaultLanguageValue : "(" + descriptors.displayname.filter(descriptor => descriptor.language != arches.activeLanguage)?.[0]?.value + ")";
                     displayname(displayNameValue);
                 }
             }
@@ -74,20 +75,10 @@ define([
             koMapping.toJSON(params.tile.data)
         );
 
+        this.data = koMapping.fromJS(params.tile.data);
+        this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.datatypeLookup = getDatatypeLookup(params);
 
-        this.data = {};
-
-        for(const key of Object.keys(params.tile.data)){
-            const datatype = this.datatypeLookup[key];
-            if(datatype == 'string'){
-                this.data[key] = ko.observable(params.tile.data[key]);
-            } else {
-                this.data[key] = koMapping.fromJS(params.tile.data[key]);
-            }
-        }
-
-        this.provisionaledits = ko.observable(params.tile.provisionaledits);
         this.transactionId = params.transactionId;
 
         _.extend(this, {
@@ -98,7 +89,10 @@ define([
                 var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                     return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
                 });
-                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(self.nodegroup_id);
+
+                if (nodegroup) {
+                    return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(self.nodegroup_id);
+                }
             }).map(function(card) {
                 return new CardViewModel({
                     card: _.clone(card),
@@ -220,17 +214,7 @@ define([
                     self._tileData(koMapping.toJSON(self.data));
                     if (!self.tileid) {
                         self.tileid = tileData.tileid;
-                        
-                        self.data = {};
-                        for(const key of Object.keys(tileData.data)){
-                            const datatype = self.datatypeLookup[key];
-                            if(datatype == 'string'){
-                                self.data[key] = ko.observable(tileData.data[key]);
-                            } else {
-                                self.data[key] = koMapping.fromJS(tileData.data[key]);
-                            }
-                        }
-                        
+                        self.data = koMapping.fromJS(tileData.data);                        
                         self.provisionaledits = koMapping.fromJS(tileData.provisionaledits);
                         self._tileData(koMapping.toJSON(self.data));
                         self.dirty = ko.pureComputed(function() {
@@ -301,7 +285,6 @@ define([
                 Object.keys(self.data).forEach(function(nodeId) {
                     if (nodeId === widget.node_id()) {
                         var defaultValue = ko.unwrap(widget.config.defaultValue);
-
                         if (defaultValue) {
                             self.data[nodeId](defaultValue);
                             _tileDataTemp[nodeId] = defaultValue;
@@ -312,7 +295,7 @@ define([
             });
 
             if (hasDefaultValue) {
-                self._tileData(JSON.stringify(_tileDataTemp));
+                self._tileData(koMapping.toJSON(_tileDataTemp));
             }
         }
 

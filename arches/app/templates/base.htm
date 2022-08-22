@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load static %}
 {% load i18n %}
 {% load compress %}
+{% load webpack_static from webpack_loader %}
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -37,20 +38,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+    <link rel="shortcut icon" href="{% webpack_static 'img/favicon.png' %}" />
 
     {% block css %}
         {% compress css %}
-        <link type="text/x-scss" href="{% static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
+        <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
             {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
-            <link type="text/x-scss" href="{% static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
+            <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
             {% endif %}
     	{% endcompress %}
         {% if app_settings.ACCESSIBILITY_MODE %}
-        <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+        <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
         {% endif %}
-        <link href="{% static 'css/package.css' %}" rel="stylesheet">
-        <link href="{% static 'css/project.css' %}" rel="stylesheet">
+        <link href="{% webpack_static 'css/package.css' %}" rel="stylesheet">
+        <link href="{% webpack_static 'css/project.css' %}" rel="stylesheet">
     {% endblock css%}
 
 </head>
@@ -72,16 +73,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </body>
 
 {% block javascript %}
-    <script src="{{ STATIC_URL }}packages/requirejs/require.js"></script>
+    <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
 
     {% block pre_require_js %}
     {% endblock pre_require_js %}
 
     {% include 'javascript.htm' %}
-
-    <script>
-        require(["nifty"{% if main_script %},"{{ main_script }}"{% endif %}]);
-    </script>
+    
+    {% if main_script %}
+        <script src="{% webpack_static '' %}/build/js/{{main_script}}.js"></script>
+    {% endif %}
 
     {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
 

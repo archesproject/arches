@@ -3,12 +3,14 @@ define([
     'knockout-mapping',
     'viewmodels/card-component',
     'views/components/iiif-annotation',
-    'viewmodels/alert'
-], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel) {
-    var ViewModel = function(params) {
+    'viewmodels/alert',
+    'templates/views/components/cards/iiif-card.htm',
+], function(ko, koMapping, CardComponentViewModel, IIIFAnnotationViewmodel, AlertViewModel, iiifCardTemplate) {
+    const viewModel = function(params) {
         var self = this;
 
         params.configKeys = ['defaultManifest'];
+         
 
         CardComponentViewModel.apply(this, [params]);
 
@@ -109,11 +111,10 @@ define([
             self.card.showGallery = showGallery;
         });
     };
+
     ko.components.register('iiif-card', {
-        viewModel: ViewModel,
-        template: {
-            require: 'text!templates/views/components/cards/iiif-card.htm'
-        }
+        viewModel: viewModel,
+        template: iiifCardTemplate,
     });
-    return ViewModel;
+    return viewModel;
 });

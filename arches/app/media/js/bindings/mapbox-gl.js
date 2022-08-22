@@ -6,7 +6,6 @@ define([
     'bindings/nouislider',
     'bindings/sortable'
 ], function($, _, ko, arches) {
-
     const initialize = function(element, valueAccessor, mapboxgl) {
         var defaults = {
             container: element

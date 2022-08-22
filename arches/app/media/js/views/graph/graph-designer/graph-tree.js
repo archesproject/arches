@@ -2,9 +2,9 @@ define([
     'jquery',
     'knockout',
     'underscore',
+    'arches',
     'views/tree-view',
-    'arches'
-], function($, ko, _, TreeView, arches) {
+], function($, ko, _, arches, TreeView) {
     var loading = ko.observable(false);
 
     var GraphTree = TreeView.extend({

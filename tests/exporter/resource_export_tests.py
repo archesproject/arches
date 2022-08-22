@@ -19,15 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import json
 import csv
-from io import BytesIO
 from arches.app.utils.data_management.resources.formats.csvfile import CsvWriter, MissingConfigException
-from tests import test_settings
+from arches.app.utils.i18n import LanguageSynchronizer
 from operator import itemgetter
-from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.models import TileModel, ResourceInstance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter as BusinessDataExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -39,10 +36,8 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        cls.loadOntology()
-
-    def setUp(self):
+    def setUpClass(self):
+        self.loadOntology()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -53,6 +48,7 @@ class BusinessDataExportTests(ArchesTestCase):
 
         with open(os.path.join("tests/fixtures/resource_graphs/resource_export_test.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
+        LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
 
     @classmethod
@@ -103,11 +99,9 @@ class BusinessDataExportTests(ArchesTestCase):
             return _sorted
 
         BusinessDataImporter("tests/fixtures/data/json/resource_export_business_data_truth.json").import_business_data()
-
         export = BusinessDataExporter("json").export("ab74af76-fa0e-11e6-9e3e-026d961c88e6")
 
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
-
         json_truth = deep_sort(json.load(open("tests/fixtures/data/json/resource_export_business_data_truth.json")))
 
         # removes generated graph_publication_id

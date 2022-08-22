@@ -119,32 +119,36 @@ class SearchEngine(object):
         """
         Search for an item in the index.
         Pass an index and id (or list of ids) to get a specific document(s)
-        Pass a body with a query dsl to perform a search
+        Pass a query with a query dsl to perform a search
 
         """
 
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.get("body", None)
+        query = kwargs.get("query", None)
         id = kwargs.pop("id", None)
 
         if id:
+            kwargs = {  # removes bad kwargs for get methods
+                "index": kwargs.get("index"),
+                "source_includes": kwargs.get("source_includes"),
+                "source_excludes": kwargs.get("source_excludes"),
+            }
             if isinstance(id, str):
                 id = id.split(",")
                 if len(id) == 1:
                     id = id[0]
             if isinstance(id, list):
-                kwargs["body"] = {"ids": id}
-                return self.es.mget(**kwargs)
+                kwargs["ids"] = id
+                return self.es.mget(**kwargs).body
             else:
-                kwargs.pop("body", None)  # remove body param
                 kwargs["id"] = id
-                return self.es.get(**kwargs)
+                return self.es.get(**kwargs).body
 
         ret = None
         try:
-            ret = self.es.search(**kwargs)
+            ret = self.es.search(**kwargs).body
         except RequestError as detail:
-            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), body, detail))
+            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
 
         return ret
 
@@ -156,11 +160,10 @@ class SearchEngine(object):
 
         index = self._add_prefix(index)
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, doc_type="_doc", body=body, include_type_name=True)
+        self.es.indices.put_mapping(index=index, body=body)
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        kwargs["include_type_name"] = True
         self.es.indices.create(ignore=400, **kwargs)
         print("creating index : %s" % kwargs.get("index", ""))
 
@@ -187,7 +190,7 @@ class SearchEngine(object):
                     id = getattr(document, idfield)
 
             try:
-                self.es.index(index=index, doc_type="_doc", body=document, id=id)
+                self.es.index(index=index, body=document, id=id)
             except Exception as detail:
                 self.logger.warning(
                     "%s: WARNING: failed to index document: %s \nException detail: %s\n" % (datetime.now(), document, detail)
@@ -201,11 +204,10 @@ class SearchEngine(object):
             self.logger.warning("%s: WARNING: failed to bulk index documents, \nException detail: %s\n" % (datetime.now(), detail))
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
-        return {"_op_type": op_type, "_index": self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}
+        return {"_op_type": op_type, "_index": self._add_prefix(index), "_id": id, "_source": data}
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        kwargs["doc_type"] = kwargs.pop("doc_type", "_doc")
         body = kwargs.pop("body", None)
 
         # need to only pass in the query key as other keys (eg: _source) are not allowed
@@ -236,7 +238,7 @@ class SearchEngine(object):
                 self.kwargs = kwargs
 
             def add(self, op_type="index", index=None, id=None, data=None):
-                doc = {"_op_type": op_type, "_index": outer_self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}
+                doc = {"_op_type": op_type, "_index": outer_self._add_prefix(index), "_id": id, "_source": data}
                 self.queue.append(doc)
 
                 if len(self.queue) >= self.batch_size:

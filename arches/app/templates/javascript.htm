@@ -1,86 +1,31 @@
 {% load static %}
 {% load l10n %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
+{% load template_tags %}
+
 
 {% block require_config %}
 <script>
-    var CKEDITOR_BASEPATH = '{{ STATIC_URL }}packages/ckeditor/';
+    var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor/' %}";
+    window.CKEDITOR_BASEPATH = CKEDITOR_BASEPATH;
     require.config({
-        baseUrl: '{{ STATIC_URL }}js',
+        baseUrl: "{% webpack_static 'build/js' %}",
         urlArgs: '_dc={{ app_settings.VERSION }}',
         paths: {
-            'plugins': '{{ STATIC_URL }}plugins',
-            'widget-templates': '{% url "widgets" ""%}'.replace(/\/$/, ""),
-            'report-templates': '{% url "report-templates" ""%}'.replace(/\/$/, ""),
-            'function-templates': '{% url "function-templates" ""%}'.replace(/\/$/, ""),
-            'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
-            'datatype-config-templates': '{% url "datatype_template" ""%}'.replace(/\/$/, ""),
-            'nifty': '{{ STATIC_URL }}plugins/nifty',
-            'async': '{{ STATIC_URL }}packages/requirejs-plugins/src/async',
-            'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
-            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
-            'js-cookie': '{{ STATIC_URL }}packages/js-cookie/src/js.cookie',
-            'select2': '{{ STATIC_URL }}packages/select2/select2',
-            'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
-            'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
-            'backbone': '{{ STATIC_URL }}packages/backbone/backbone-min',
-            'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
-            'jquery-validate': '{{ STATIC_URL }}packages/jquery-validation/dist/jquery.validate.min',
-            'd3': '{{ STATIC_URL }}packages/d3/dist/d3.min',
-            'dropzone': '{{ STATIC_URL }}packages/dropzone/dist/min/dropzone-amd-module.min',
-            'ckeditor': '{{ STATIC_URL }}packages/ckeditor/ckeditor',
-            'ckeditor-jquery': '{{ STATIC_URL }}packages/ckeditor/adapters/jquery',
-            'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
-            'knockout-mapping': '{{ STATIC_URL }}packages/knockout-mapping/dist/knockout.mapping.min',
-            'moment': '{{ STATIC_URL }}packages/moment/min/moment.min',
-            'bootstrap-datetimepicker': '{{ STATIC_URL }}packages/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min',
-            'blueimp-gallery': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-gallery.min',
-            'blueimp-jquery': '{{ STATIC_URL }}packages/blueimp-gallery/js/jquery.blueimp-gallery.min',
-            'blueimp-helper': '{{ STATIC_URL }}packages/blueimp-gallery/js/blueimp-helper.min',
-            'datatables.net': '{{ STATIC_URL }}packages/datatables.net/js/jquery.dataTables.min',
-            'datatables.net-bs': '{{ STATIC_URL }}packages/datatables.net-bs/js/dataTables.bootstrap.min',
-            'datatables.net-buttons': '{{ STATIC_URL }}packages/datatables.net-buttons/js/dataTables.buttons.min',
-            'datatables.net-buttons-print': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.print.min',
-            'datatables.net-buttons-html5': '{{ STATIC_URL }}packages/datatables.net-buttons/js/buttons.html5.min',
-            'datatables.net-buttons-bs': '{{ STATIC_URL }}packages/datatables.net-buttons-bs/js/buttons.bootstrap.min',
-            'datatables.net-responsive': '{{ STATIC_URL }}packages/datatables.net-responsive/js/dataTables.responsive',
-            'datatables.net-responsive-bs': '{{ STATIC_URL }}packages/datatables.net-responsive-bs/js/responsive.bootstrap',
-            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
-            'mapbox-gl': '{{ STATIC_URL }}packages/mapbox-gl/dist/mapbox-gl',
-            'mapbox-gl-draw': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw',
-            'mapbox-gl-geocoder': '{{ STATIC_URL }}packages/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.min',
-            'proj4': '{{ STATIC_URL }}packages/proj4/dist/proj4',
-            'noUiSlider': '{{ STATIC_URL }}packages/nouislider/distribute/nouislider.min',
-            'geojson-extent': '{{ STATIC_URL }}packages/@mapbox/geojson-extent/geojson-extent',
-            'geojsonhint': '{{ STATIC_URL }}packages/@mapbox/geojsonhint/geojsonhint',
-            'bootstrap-colorpicker': '{{ STATIC_URL }}packages/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min',
-            'uuid': '{{ STATIC_URL }}packages/uuidjs/dist/uuid.core',
-            'turf': '{{ STATIC_URL }}packages/@turf/turf/turf.min',
-            'geohash': '{{ STATIC_URL }}packages/latlon-geohash/latlon-geohash',
-            'leaflet': '{{ STATIC_URL }}packages/leaflet/dist/leaflet',
-            'leaflet-iiif': '{{ STATIC_URL }}packages/leaflet-iiif/leaflet-iiif',
-            'leaflet-draw': '{{ STATIC_URL }}packages/leaflet-draw/dist/leaflet.draw',
-            'leaflet-fullscreen': '{{ STATIC_URL }}packages/leaflet.fullscreen/Control.FullScreen',
-            'leaflet-side-by-side': '{{ STATIC_URL }}plugins/leaflet-side-by-side/index',
-            'metismenu': '{{ STATIC_URL }}packages/metismenu/dist/metisMenu.min',
-            'knockstrap': '{{ STATIC_URL }}packages/knockstrap/build/knockstrap.min',
-            'jqtree': '{{ STATIC_URL }}packages/jqtree/tree.jquery',
-            'core-js':'{{ STATIC_URL }}packages/core-js/client/shim.min',
-            'dom-4': '{{ STATIC_URL }}packages/dom4/build/dom4',
-            'numeral': '{{ STATIC_URL }}packages/numeral/numeral',
-            'togeojson': '{{ STATIC_URL }}packages/@tmcw/togeojson/dist/togeojson.umd',
-            'cytoscape': '{{ STATIC_URL }}packages/cytoscape/dist/cytoscape.min',
-            'cytoscape-cola': '{{ STATIC_URL }}packages/cytoscape-cola/cytoscape-cola',
-            'webcola': '{{ STATIC_URL }}packages/webcola/WebCola/cola.min',
-            {% block paths %}{% endblock paths %}
+            'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}" ,
         },
         packages: [{
             name: "codemirror",
-            location: '{{ STATIC_URL }}packages/codemirror',
+            location: "{% webpack_static 'node_modules/codemirror' %}",
             main: "lib/codemirror"
         }],
         shim: {
+            'backbone': {
+                deps: ['jquery', 'jquery-lib', 'underscore'],
+                exports: 'Backbone'
+            },
             'nifty': {
                 exports: 'nifty',
                 deps: ['bootstrap', 'jquery', 'jquery-ui', 'metismenu']
@@ -151,7 +96,7 @@
                 deps: ['jquery']
             },
             'ckeditor-jquery': {
-                deps: ['ckeditor']
+                deps: ['jquery', 'ckeditor']
             },
             {% block shim %}{% endblock shim %}
         }
@@ -160,434 +105,1025 @@
 {% endblock require_config %}
 
 {% block arches_modules %}
-<script>
-    require(['utils/set-csrf-token']);
 
-    // put values here that should be accessible application wide
-    define('arches', [], function () {
-        return {
-            urls: {
-                root: "{% url 'root' %}",
-                home: "{% url 'home' %}",
-                media: "{{ STATIC_URL }}",
-                rdm: "{% url 'rdm' ''%}",
-                uploadedfiles: "{{ MEDIA_URL }}",
-                url_subpath: "{{app_settings.FORCE_SCRIPT_NAME}}",
-                concept_tree: "{% url 'concept_tree' '' %}",
-                concept: "{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                concept_search: "{% url 'concept_search' %}",
-                concept_value: "{% url 'concept_value' %}",
-                concept_manage_parents: "{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                concept_make_collection: "{% url 'make_collection' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                change_password: "{% url 'change_password' %}",
-                export_concept: "{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                export_concept_collections: "{% url 'export_concept_collections' %}",
-                get_concept_collections: "{% url 'get_concept_collections' %}",
-                dropdown: "{% url 'dropdown' %}",
-                paged_dropdown: "{% url 'paged_dropdown' %}",
-                get_pref_label: "{% url 'get_pref_label' %}",
-                from_sparql_endpoint: "{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                search_sparql_endpoint: "{% url 'search_sparql_endpoint' %}",
-                confirm_delete: "{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                search_home: "{% url 'search_home' %}",
-                search_terms: "{% url 'search_terms' %}",
-                search_results: "{% url 'search_results' %}",
-                export_results: "{% url 'export_results' %}",
-                get_export_file: "{% url 'get_export_file' %}",
-                buffer: "{% url 'buffer'%}",
-                config: "{% url 'config' %}",
-                node: "{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                graph_nodes: function(graphid){return "{% url 'graph_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                nodegroup: "{% url 'nodegroup' %}",
-                node_layer: "{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                graph: "{% url 'graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                graph_designer: function(graphid){return "{% url 'graph_designer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                graph_settings: function(graphid){return "{% url 'graph_settings' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                get_notifications: "{% url 'get_notifications' %}",
-                dismiss_notifications: "{% url 'dismiss_notifications' %}",
-                get_notification_types: "{% url 'get_notification_types' %}",
-                update_notification_types: "{% url 'update_notification_types' %}",
-                card: "{% url 'card' '' %}",
-                reorder_cards: "{% url 'reorder_cards'%}",
-                resource: "{% url 'resource' %}",
-                resource_editor: "{% url 'resource_editor' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                resource_copy: "{% url 'resource_copy' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                resource_report: "{% url 'resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                resource_edit_log: "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                get_resource_edit_log: function(graphid){return "{% url 'resource_edit_log' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                resource_data: "{% url 'resource_data' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, ''),
-                resource_cards: "{% url 'resource_cards' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                related_resources: "{% url 'related_resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                resource_descriptors: "{% url 'resource_descriptors' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                resource_tiles: "{% url 'resource_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}",
-                tile: "{% url 'tile' %}",
-                reorder_tiles: "{% url 'reorder_tiles' %}",
-                reorder_nodes: "{% url 'reorder_nodes' %}",
-                delete_provisional_tile: "{% url 'delete_provisional_tile' %}",
-                tile_history: "{% url 'tile_history' %}",
-                download_files: "{% url 'download_files' %}",
-                apply_functions: "{% url 'apply_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                remove_functions: "{% url 'remove_functions' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                time_wheel_config: "{% url 'time_wheel_config' %}",
-                two_factor_authentication_reset:"{% url 'two-factor-authentication-reset' %}",
-                reindex: "{% url 'reindex' %}",
-                permission_data: "{% url 'permission_data' %}",
-                resource_permission_data: "{% url 'resource_permission_data' %}",
-                permission_manager_data: "{% url 'permission_manager_data' %}",
-                clear_user_permission_cache: "{% url 'clear_user_permission_cache' %}",
-                get_user_names: "{% url 'get_user_names' %}",
-                feature_popup_content: "{% url 'feature_popup_content' %}",
-                related_resource_candidates: "{% url 'related_resource_candidates' %}",
-                relatable_resources: "{% url 'relatable_resources' %}",
-                languages: "{% url 'language' %}",
-                get_domain_connections: function(graphid){return "{% url 'get_domain_connections' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                clone_graph: function(graphid){return "{% url 'clone_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                export_graph: function(graphid){return "{% url 'export_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                publish_graph: function(graphid){return "{% url 'publish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                unpublish_graph: function(graphid){return "{% url 'unpublish_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                delete_graph: function(graphid){return "{% url 'delete_graph' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                delete_instances: function(graphid){return "{% url 'delete_instances' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                export_mapping_file: function(graphid){return "{% url 'export_mapping_file' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                add_resource: function(graphid){return "{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                function_manager: function(graphid){return "{% url 'function_manager' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)},
-                plugin: function(pluginid){return "{% url 'plugins' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', pluginid)},
-                transaction_reverse: function(transactionid) {return "{% url 'transaction_reverse' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', transactionid)},
-                mvt: function(nodeid){return decodeURI("{% url 'mvt' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' '{z}' '{x}' '{y}' %}").replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)},
-                help_template: "{% url 'help_templates' %}",
-                graphs_api: "{% url 'graphs_api' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                api_card: "{% url 'api_card' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', ''),
-                api_tiles: function (tileid) {
-                    return "{% url 'api_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', tileid)
-                },
-                api_nodegroup: function (nodegroupid) {
-                    return "{% url 'api_nodegroup' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodegroupid)
-                },
-                api_nodes: function (nodeid) {
-                    return "{% url 'api_nodes' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', nodeid)
-                },
-                api_node_value: "{% url 'api_node_value' %}",
-                api_resource_report: function(resourceid){return "{% url 'api_resource_report' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
-                api_bulk_resource_report: "{% url 'api_bulk_resource_report' %}",
-                api_bulk_disambiguated_resource_instance: "{% url 'api_bulk_disambiguated_resource_instance' %}",
-                api_resources: function(resourceid){return "{% url 'resources' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}".replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceid)},
-                api_search_component_data: "{% url 'api_search_component_data' 'aaaa'%}".replace('aaaa', ''),
-                geojson: "{% url 'geojson' %}",
-                icons: "{% url 'icons' %}",
-                ontology_properties: "{% url 'ontology_properties' %}",
-                iiifmanifest: "{% url 'iiifmanifest' %}",
-                manifest_manager: "{% url 'manifest_manager' %}",
-                etl_manager: "{% url 'etl_manager' %}",
-                iiifannotations: "{% url 'iiifannotations' %}",
-                iiifannotationnodes: "{% url 'iiifannotationnodes' %}",
-                validatejson: "{% url 'validatejson' 'aaaa'%}".replace('aaaa', ''),
-                get_dsl: "{% url 'get_dsl' %}",
-                transform_edtf_for_tile: "{% url 'transform_edtf_for_tile' %}",
-                {% block urls %}{% endblock urls %}
-            },
-            geocoderPlaceHolder: "{% trans 'Find an address...' %}",
-            confirmNav: {
-                title: "{% trans 'Edits pending...' %}",
-                text: "{% trans 'You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?' %}"
-            },
-            confirmGraphDelete: {
-                title: "{% trans 'Delete Branch/Resource Model?' %}",
-                text: "{% trans 'Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
-            },
-            confirmAllResourceDelete: {
-                title: "{% trans 'Delete All Resources Associated with this Graph?' %}",
-                text: "{% trans 'Deleting All Resources removes all associated data with this graph entirely.  Are you sure you would like to proceed?' %}"
-            },
-            confirmResourceDelete: {
-                title: "{% trans 'Delete Resource?' %}",
-                text: "{% trans 'Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?' %}"
-            },
-            confirmMaplayerDelete: {
-                title: "{% trans 'Delete map layer?' %}",
-                text: "{% trans 'Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?' %}"
-            },
-            confirmSendTwoFactorAuthenticationEmail: {
-                title: "{% trans 'Send Two-Factor Authentication email?' %}",
-                text: "{% trans 'This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?' %}"
-            },
-            graphImportFailed: {
-                title: "{% trans 'Graph import failed.'%}"
-            },
-            requestFailed: {
-                title: "{% trans 'Request Failed...' %}",
-                text: "{% trans 'Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
-            },
-            resourceCopySuccess: {
-                title: "{% trans 'Resource Successfully Copied.'%}",
-                text: "{% trans 'Click here to edit copy' %}"
-            },
-            resourceCopyFailed: {
-                title: "{% trans 'Resource Copy Failed...'%}",
-                text: "{% trans 'Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists.' %}"
-            },
-            twoFactorAuthenticationEmailSuccess: {
-                title: "{% trans 'Success!' %}",
-                text: "{% trans 'An email with instructions to change two-factor authentication settings has been sent to your registered email address.' %}"
-            },
-            resourceHasUnpublishedGraph: {
-                title: "{% trans 'This resource is based on an unpublished graph.' %}",
-                text: "{% trans 'To continue, please ensure the graph is published.' %}"
-            },
-            mapboxApiKey: '{{ map_info.mapbox_api_key }}',
-            activeLanguage: '{{ app_settings.ACTIVE_LANGUAGE }}',
-            activeLanguageDir: '{{ app_settings.ACTIVE_LANGUAGE_DIR }}',
-            languages: {% autoescape off %}{{ app_settings.LANGUAGES }}{% endautoescape %},
-            hexBinSize: {{ map_info.hex_bin_size | unlocalize }},
-            mapboxSprites: '{{ map_info.mapbox_sprites }}',
-            mapboxGlyphs: '{{ map_info.mapbox_glyphs }}',
-            hexBinBounds: {{ map_info.hex_bin_bounds }},
-            mapDefaultX: {{ map_info.x|unlocalize }},
-            mapDefaultY: {{ map_info.y|unlocalize }},
-            mapDefaultZoom: {{ map_info.zoom | unlocalize }},
-            mapDefaultMinZoom: {{ map_info.map_min_zoom | unlocalize }},
-            mapDefaultMaxZoom: {{ map_info.map_max_zoom | unlocalize }},
-            preferredCoordinateSystems: {% autoescape off %}{{ map_info.preferred_coordinate_systems }}{% endautoescape %},
-            useSemanticRelationships: {{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }},
-            geocoderDefault: '{{ map_info.geocoder_default }}',
-            mapMarkers: [{% autoescape off %}{% for map_marker in map_markers %}{
-                'name': '{{ map_marker.name | escapejs }}',
-                'url': '{{ map_marker.url | escapejs }}',
-            },{% endfor %}{% endautoescape %}],
-            mapSources: {{% autoescape off %}{% for map_source in map_sources %}
-                '{{ map_source.name | escapejs }}': {{ map_source.source_json }},
-            {% endfor %}{% for resource_map_source in resource_map_sources %}
-                '{{ resource_map_source.name | escapejs }}': {{ resource_map_source.source }},
-            {% endfor %}{% endautoescape %}},
-            mapLayers: [{% autoescape off %}{% for map_layer in map_layers %}{
-                'maplayerid': '{{ map_layer.maplayerid }}',
-                'name': '{{ map_layer.name | escapejs}}',
-                'layer_definitions': {{ map_layer.layer_json }},
-                'isoverlay': {{ map_layer.isoverlay|lower }},
-                'icon': '{{ map_layer.icon | escapejs }}',
-                'legend': '{{ map_layer.legend | default_if_none:"" | escapejs  }}',
-                'searchonly': {{ map_layer.searchonly|lower }},
-                'activated': {{ map_layer.activated|lower }},
-                'addtomap': {{ map_layer.addtomap|lower }},
-                'is_resource_layer': false,
-                'centerx': {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
-                'centery': {{ map_layer.centery|default_if_none:"null"|unlocalize }},
-                'zoom': {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
-            },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
-                'maplayerid': '{{ resource_map_layer.nodeid }}',
-                'name': '{{ resource_map_layer.name | escapejs }}',
-                'layer_definitions': {{ resource_map_layer.layer_definitions }},
-                'searchonly': false,
-                'isoverlay': true,
-                'icon': '{{ resource_map_layer.icon | escapejs }}',
-                'legend': '{{ resource_map_layer.legend | escapejs  }}',
-                'activated': true,
-                'addtomap': {{ resource_map_layer.addtomap|lower }},
-                'is_resource_layer': true
-            },{% endfor %}{% endautoescape %}],
-            conceptCollections: [{% autoescape off %}{% for concept_collection in concept_collections %}{
-                'label': '{{ concept_collection.label | escapejs }}',
-                'id': '{{ concept_collection.id }}',
-            },{% endfor %}{% endautoescape %}],
-            geocodingProviders: [{% autoescape off %}{% for provider in geocoding_providers %}{
-                'name': '{{ provider.name | escapejs }}',
-                'geocoderid': '{{ provider.geocoderid }}',
-                'api_key': {% if provider.api_key != None %} '{{ provider.api_key }}' {% elif provider.api_key == None %} null {% endif %},
-                'component': '{{ provider.component | escapejs }}'
-            },{% endfor %}{% endautoescape %}],
-            resources: [{% autoescape off %}{% for resource in resource_graphs %}{
-              'maplayerid': '{{resource.graphid}}',
-              'graphid': '{{resource.graphid}}',
-              'name': '{{ resource.name | escapejs }}',
-              'icon': '{{ resource.iconclass }}',
-            },{% endfor %}{% endautoescape %}],
-            userEmail: '{{ user.email }}',
-            celeryRunning: '{{celery_running}}',
-            exportHtmlTemplates: [{% autoescape off %}{% for template in export_html_templates %}
-                '{{ template }}',
-            {% endfor %}{% endautoescape %}],
-            graphs: {% autoescape off %}{{graphs|default:"[]"}}{% endautoescape %},
-            translations: {
-                'mapAddPoint': {% trans "Add point" as mapAddPoint %} '{{ mapAddPoint|escapejs }}',
-                'mapAddLine': {% trans "Add line" as mapAddLine %} '{{ mapAddLine|escapejs }}',
-                'mapAddPolygon': {% trans "Add polygon" as mapAddPolygon %} '{{ mapAddPolygon|escapejs }}',
-                'mapSelectDrawing': {% trans "Select drawing" as mapSelectDrawing %} '{{ mapSelectDrawing|escapejs }}',
-                'riSelectCreateNew': {% trans "Create a new ${graphName}" as riSelectCreateNew %} '{{ riSelectCreateNew|escapejs }}',
-                'riSelectPlaceholder': {% trans "Add new Relationship" as riSelectPlaceholder %} '{{ riSelectPlaceholder|escapejs }}',
-                'reNetworkReponseError': {% trans "Network response was not ok" as reNetworkReponseError %} '{{ reNetworkReponseError|escapejs }}',
-                'workflowWastbinWarning': {% trans "You are about to delete ${val}." as workflowWastbinWarning %} '{{ workflowWastbinWarning|escapejs }}',
-                'workflowWastbinWarning2': {% trans "Are you sure you want to continue?" as workflowWastbinWarning2 %} '{{ workflowWastbinWarning2|escapejs }}',
-                'workflowWastbinWarning3': {% trans "You are about to quit the workflow." as workflowWastbinWarning3 %} '{{ workflowWastbinWarning3|escapejs }}',
-                'termSearchConcept': {% trans "Concepts" as termSearchConcept %} '{{ termSearchConcept|escapejs }}',
-                'termSearchTerm': {% trans "Term Matches" as termSearchTerm %} '{{ termSearchTerm|escapejs }}',
-                'timeWheelDateMatches': {% trans "${total} date values" as timeWheelDateMatches %} '{{ timeWheelDateMatches|escapejs }}',
-                'cardConstraintsPlaceholder': {% trans "Select Widgets" as cardConstraintsPlaceholder %} '{{ cardConstraintsPlaceholder|escapejs }}',
-                'cardFunctionNodeDesc': {% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} '{{ cardFunctionNodeDesc|escapejs }}',
-                'cardFunctionNodeName': {% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} '{{ cardFunctionNodeName|escapejs }}',
-                'groupingErrorTitle': {% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} '{{ groupingErrorTitle|escapejs }}',
-                'groupingErrorMessage': {% trans "The cardinality of this card can't be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} '{{ groupingErrorMessage|escapejs }}',
-                'modelDoesNotExist': {% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} '{{ modelDoesNotExist|escapejs }}',
-                'idColumnSelection': {% trans "Use as an id"  as idColumnSelection %} '{{ idColumnSelection|escapejs }}',
-            },
-            version: '{{ app_settings.VERSION }}'
-        };
-    });
+    <!-- consumed by media/js/arches.js -->
+    {% block arches_translations %}
+    <div 
+        class='arches-translations'
+        confirm-all-resource-delete='{
+            "title": "{% trans "Delete All Resources Associated with this Graph?" %}",
+            "text": "{% trans "Deleting All Resources removes all associated data with this graph entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        confirm-graph-delete='{
+            "title": "{% trans "Delete Branch/Resource Model?" %}",
+            "text": "{% trans "Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        confirm-maplayer-delete='{
+            "title": "{% jsescaped_trans "Delete map layer?" %}",
+            "text": "{% jsescaped_trans "Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?" %}"
+        }'
+        confirm-nav='{
+            "title": "{% jsescaped_trans "Edits pending..." %}",
+            "text": "{% jsescaped_trans "You currently have edits pending, are you sure you would like to proceed (and discard any pending edits)?" %}"
+        }'
+        confirm-resource-delete='{
+            "title": "{% jsescaped_trans "Delete Resource?" %}",
+            "text": "{% jsescaped_trans "Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-import-failed='{
+            "title": "{% jsescaped_trans "Graph import failed." %}" 
+        }'
+        request-failed='{
+            "title": "{% jsescaped_trans "Request Failed..." as requestfailed %} {{requestfailed|escapejs}}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again.  Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-send-two-factor-authentication-email='{
+            "title": "{% jsescaped_trans "Send Two-Factor Authentication email?" %}",
+            "text": "{% jsescaped_trans "This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?" %}"
+        }'
+        two-factor-authentication-email-success='{
+            "title": "{% jsescaped_trans "Success!" %}",
+            "text": "{% jsescaped_trans "An email with instructions to change two-factor authentication settings has been sent to your registered email address." %}"
+        }'
+        resource-copy-failed='{
+            "title": "{% jsescaped_trans "Resource Copy Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The copy request failed. Please try again.  Contact your system administrator if the problem persists." %}"
+        }'
+        resource-copy-success='{
+            "title": "{% jsescaped_trans "Resource Successfully Copied."%}"
+        }'
+        resource-has-unpublished-graph='{
+            "title": "{% jsescaped_trans "This resource is based on an unpublished graph." %}",
+            "text": "{% jsescaped_trans "To continue, please ensure the graph is published." %}"
+        }'
+        please-contact-system-administrator='{% trans "Please contact your system administrator for more details." as pleaseContactSystemAdministrator %}  "{{ pleaseContactSystemAdministrator|escapejs }}"'
+        hide-null-values='{% trans "Hide Null Values" as hideNullValues %} "{{ hideNullValues|escapejs }}"'
+        load-more='{% trans "Load More" as loadMore %} "{{ loadMore|escapejs }}"'
+        load-all='{% trans "Load All" as loadAll %} "{{ loadAll|escapejs }}"'
+        display-name='{% trans "Display Name" as displayName %} "{{ displayName|escapejs }}"'
+        display-description='{% trans "Display Description" as displayDescription %} "{{ displayDescription|escapejs }}"'
+        map-popup='{% trans "Map Popup" as mapPopup %} "{{ mapPopup|escapejs }}"'
+        map-popup-template='{% trans "Map Popup Template" as mapPopupTemplate %} "{{ mapPopupTemplate|escapejs }}"'
+        id-string='{% trans "ID:" as idString %} "{{ idString|escapejs }}"'
+        add-buffer='{% trans "Add Buffer" as addBuffer %} "{{ addBuffer|escapejs }}"'
+        buffer-intersecting-feature='{% trans "Buffer Intersecting Feature" as bufferIntersectingFeature %} "{{ bufferIntersectingFeature|escapejs }}"'
+        add-buffer-to-features='{% trans "Add buffer to features" as addBufferToFeatures %} "{{ addBufferToFeatures|escapejs }}"'
+        add-buffer-feature='{% trans "Add Buffer Feature" as addBufferFeature %} "{{ addBufferFeature|escapejs }}"'
+        select-a-feature-to-perform-intersection='{% trans "Select a feature to perform intersection" as selectAFeatureToPerformIntersection %} "{{ selectAFeatureToPerformIntersection|escapejs }}"'
+        intersect='{% trans "Intersect" as intersect %} "{{ intersect|escapejs }}"'
+        reindex='{% trans "Re-index" as reindex %} "{{ reindex|escapejs }}"'
+        reindexing='{% trans "Re-indexing" as reindexing %} "{{ reindexing|escapejs }}"'
+        reindex-resources-now='{% trans "Re-index Resources Now" as reindexResourcesNow %} "{{ reindexResourcesNow|escapejs }}"'
+        function-reindex-message='{% trans "If you've made any changes to this function and there are resources already in the system, then you will need to reindex the resources to reflect your changes.  This process can take some time (potentially several minuetes or more).  Please be patient." as functionReindexMessage %} "{{ functionReindexMessage|escapejs }}"'
+        use-bracketed-node-names='{% trans "Use bracketed node names like this: <node name>" as useBracketedNodeNames %} "{{ useBracketedNodeNames|escapejs }}"'
+        primary-name-template='{% trans "Primary Name Template" as primaryNameTemplate %} "{{ primaryNameTemplate|escapejs }}"'
+        primary-description-template='{% trans "Primary Description Template" as primaryDescriptionTemplate %} "{{ primaryDescriptionTemplate|escapejs }}"'
+        select-primary-name-identifier-card='{% trans "Select a card from which to choose nodes to power your primary name identifier." as selectPrimaryNameIdentifierCard %} "{{ selectPrimaryNameIdentifierCard|escapejs }}"'
+        select-primary-description-identifier-card='{% trans "Select a card from which to choose nodes to power your primary description identifier." as selectPrimaryDescriptionIdentifierCard %} "{{ selectPrimaryDescriptionIdentifierCard|escapejs }}"'
+        add-as-new='{% trans "Add as new" as addAsNew %} "{{ addAsNew|escapejs }}"'
+        add-feature='{% trans "Add Feature" as addFeature %} "{{ addFeature|escapejs }}"'
+        distance='{% trans "Distance:" as distance %} "{{ distance|escapejs }}"'
+        units='{% trans "Units:" as units %} "{{ units|escapejs }}"'
+        meters='{% trans "meters:" as meters %} "{{ meters|escapejs }}"'
+        feet='{% trans "feet:" as feet %} "{{ feet|escapejs }}"'
+        download='{% trans "Download" as download %} "{{ download|escapejs }}"'
+        download-file='{% trans "Download File" as downloadFile %} "{{ downloadFile|escapejs }}"'
+        triggering-nodegroups='{% trans "Triggering Nodegroups" as triggeringNodegroups %} "{{ triggeringNodegroups|escapejs }}"'
+        select-a-nodegroup='{% trans "Select a Nodegroup" as selectANodegroup %} "{{ selectANodegroup|escapejs }}"'
+        no-relationships-added='{% trans "No Relationships Added" as noRelationshipsAdded %} "{{ noRelationshipsAdded|escapejs }}"'
+        relate-resource='{% trans "Relate Resource" as relateResource %} "{{ relateResource|escapejs }}"'
+        cannot-be-related='{% trans "Cannot Be Related" as cannotBeRelated %} "{{ cannotBeRelated|escapejs }}"'
+        related-resources='{% trans "Related Resources" as relatedResources %} "{{ relatedResources|escapejs }}"'
+        related-resources-filter-text='{% trans "Arches keeps track of how resources are related. Click the 'related resources' link on a search result from the list on the left to see its relatives displayed in an interactive graph" as relatedResourcesFilterText %} "{{ relatedResourcesFilterText|escapejs }}"'
+        report-date='{% trans "Report Date:" as reportDate %} "{{ reportDate|escapejs }}"'
+        placeholder='{% trans "Placeholder" as placeholder %} "{{ placeholder|escapejs }}"'
+        x-coordinate-place-holder='{% trans "X Coordinate Placeholder" as xCoordinatePlaceHolder %} "{{ xCoordinatePlaceHolder|escapejs }}"'
+        y-coordinate-place-holder='{% trans "Y Coordinate Placeholder" as yCoordinatePlaceHolder %} "{{ yCoordinatePlaceHolder|escapejs }}"'
+        display-as-greyscale='{% trans "Display as Greyscale" as displayAsGreyscale %} "{{ displayAsGreyscale|escapejs }}"'
+        annotation-overlays='{% trans "Annotation Overlays" as annotationOverlays %} "{{ annotationOverlays|escapejs }}"'
+        reset-to-defaults='{% trans "Reset to defaults" as resetToDefaults %} "{{ resetToDefaults|escapejs }}"'
+        data-themes='{% trans "Data Themes" as dataThemes %} "{{ dataThemes|escapejs }}"'
+        arches='{% trans "Arches" as arches %} "{{ arches|escapejs }}"'
+        permissions='{% trans "Permissions" as permissions %} "{{ permissions|escapejs }}"'
+        allow-normal-access='{% trans "Allow Normal Access" as allowNormalAccess %} "{{ allowNormalAccess|escapejs }}"'
+        person-group='{% trans "Person/Group" as personGroup %} "{{ personGroup|escapejs }}"'
+        set-permissions-for-this-instance='{% trans "Set Permissions for this instance" as setPermissionsForThisInstance %} "{{ setPermissionsForThisInstance|escapejs }}"'
+        set-instance-permissions-text='{% trans "By default only you have access to this record. You can set permissions for specific people or groups by selecting to whom you will grant access" as setInstancePermissionsText %} "{{ setInstancePermissionsText|escapejs }}"'
+        define-instance-access-privileges='{% trans "Define access privileges for this instance. You may limit access to yourself, or select which user accounts and groups have permission to this resource." as defineInstanceAccessPrivileges %} "{{ defineInstanceAccessPrivileges|escapejs }}"'
+        configure-access-to-this-instance='{% trans "Configure Access to this Instance" as configureAccessToThisInstance %} "{{ configureAccessToThisInstance|escapejs }}"'
+        resource-instance-permissions='{% trans "Resource Instance Permissions" as resourceInstancePermissions %} "{{ resourceInstancePermissions|escapejs }}"'
+        unsorted='{% trans "Unsorted" as unsorted %} "{{ unsorted|escapejs }}"'
+        ascending='{% trans "Ascending" as ascending %} "{{ ascending|escapejs }}"'
+        descending='{% trans "Descending" as descending %} "{{ descending|escapejs }}"'
+        fuzzy-year-padding='{% trans "Fuzzy Year Padding" as fuzzyYearPadding %} "{{ fuzzyYearPadding|escapejs }}"'
+        fuzzy-month-padding='{% trans "Fuzzy Month Padding" as fuzzyMonthPadding %} "{{ fuzzyMonthPadding|escapejs }}"'
+        fuzzy-day-padding='{% trans "Fuzzy Day Padding" as fuzzyDayPadding %} "{{ fuzzyDayPadding|escapejs }}"'
+        fuzzy-season-padding='{% trans "Fuzzy Season Padding (weeks)" as fuzzySeasonPadding %} "{{ fuzzySeasonPadding|escapejs }}"'
+        multiplier-if-date-is-uncertain='{% trans "Multiplier if Date is Uncertain (?)" as multiplierIfDateIsUncertain %} "{{ multiplierIfDateIsUncertain|escapejs }}"'
+        multiplier-if-date-is-approximate='{% trans "Multiplier if Date is Approximate (~)" as multiplierIfDateIsApproximate %} "{{ multiplierIfDateIsApproximate|escapejs }}"'
+        multiplier-if-both='{% trans "Multiplier if Both (? and ~)" as multiplierIfBoth %} "{{ multiplierIfBoth|escapejs }}"'
+        maximum-number-of-files='{% trans "Maximum Number of Files" as maximumNumberOfFiles %} "{{ maximumNumberOfFiles|escapejs }}"'
+        related-node='{% trans "Related Node" as relatedNode %} "{{ relatedNode|escapejs }}"'
+        relationship-to-node='{% trans "Relationship to Node" as relationshipToNode %} "{{ relationshipToNode|escapejs }}"'
+        subtitle='{% trans "Subtitle" as subtitle %} "{{ subtitle|escapejs }}"'
+        continue='{% trans "Continue" as continue %} "{{ continue|escapejs }}"'
+        value='{% trans "Value" as value %} "{{ value|escapejs }}"'
+        disabled='{% trans "Disabled" as disabled %} "{{ disabled|escapejs }}"'
+        disable-editing='{% trans "Disable Editing" as disableEditing %} "{{ disableEditing|escapejs }}"'
+        prevent-user-from-editing-value='{% trans "Prevent users from editing value" as preventUsersFromEditingValue %} "{{ preventUsersFromEditingValue|escapejs }}"'
+        domain-options='{% trans "Domain options" as domainOptions %} "{{ domainOptions|escapejs }}"'
+        add-new-option='{% trans "Add new option" as addNewOption %} "{{ addNewOption|escapejs }}"'
+        default-value='{% trans "Default Value" as defaultValue %} "{{ defaultValue|escapejs }}"'
+        add-gnu='{% trans "Add GNU" as addGnu %} "{{ addGnu|escapejs }}"'
+        showing-edits-by='{% trans "Showing edits by" as showingEditsBy %} "{{ showingEditsBy|escapejs }}"'
+        return-to-approved-edits='{% trans "Return to approved edits" as returnToApprovedEdits %} "{{ returnToApprovedEdits|escapejs }}"'
+        new-provisional-contribution='{% trans "This is a new contribution by a provisional editor." as newProvisionalContribution %} "{{ newProvisionalContribution|escapejs }}"'
+        showing-recent-approved-edits='{% trans "Currently showing the most recent approved edits" as showingRecentApprovedEdits %} "{{ showingRecentApprovedEdits|escapejs }}"'
+        provisional-edits='{% trans "Provisional Edits" as provisionalEdits %} "{{ provisionalEdits|escapejs }}"'
+        qa-type='{% trans "QA Type" as qaType %} "{{ qaType|escapejs }}"'
+        all-resources='{% trans "All Resources" as allResources %} "{{ allResources|escapejs }}"'
+        all-edits='{% trans "All Edits" as allEdits %} "{{ allEdits|escapejs }}"'
+        delete-all-edits='{% trans "Delete all edits" as deleteAllEdits %} "{{ deleteAllEdits|escapejs }}"'
+        delete-this-record='{% trans "Delete this record" as deleteThisRecord %} "{{ deleteThisRecord|escapejs }}"'
+        cancel-edit='{% trans "Cancel edit" as cancelEdit %} "{{ cancelEdit|escapejs }}"'
+        save-edit='{% trans "Save edit" as saveEdit %} "{{ saveEdit|escapejs }}"'
+        no-access-information='{% trans "Sorry, you do not have access to this information" as noAccessInformation %} "{{ noAccessInformation|escapejs }}"'
+        no-data-added-yet='{% trans "No data added yet for" as noDataAddedYet %} "{{ noDataAddedYet|escapejs }}"'
+        pending-provisional-data='{% trans "These data are provisional and pending review" as pendingProvisionalData %} "{{ pendingProvisionalData|escapejs }}"'
+        label-true='{% trans "Label 'True'" as labelTrue %} "{{ labelTrue|escapejs }}"'
+        label-false='{% trans "Label 'False'" as labelFalse %} "{{ labelFalse|escapejs }}"'
+        select-an-option='{% trans "Select an Option" as selectAnOption %} "{{ selectAnOption|escapejs }}"'
+        concept-collection='{% trans "Concept Collection" as conceptCollection %} "{{ conceptCollection|escapejs }}"'
+        select-a-concept-collection='{% trans "Select a concept collection" as selectAConceptCollection %} "{{ selectAConceptCollection|escapejs }}"'
+        select-a-node='{% trans "Select a Node" as selectANode %} "{{ selectANode|escapejs }}"'
+        select-a-property='{% trans "Select a Property" as selectAProperty %} "{{ selectAProperty|escapejs }}"'
+        no-date-entered='{% trans "No Date Entered" as noDateEntered %} "{{ noDateEntered|escapejs }}"'
+        use-date-of-data-entry='{% trans "Use date of data entry" as useDateOfDataEntry %} "{{ useDateOfDataEntry|escapejs }}"'
+        use-date-of-data-entry-for-default-value='{% trans "Check this to use the date of data entry as the default value." as useDateOfDataEntryForDefaultValue %} "{{ useDateOfDataEntryForDefaultValue|escapejs }}"'
+        date='{% trans "Date" as date %} "{{ date|escapejs }}"'
+        rich-text='{% trans "rich text" as richText %} "{{ richText|escapejs }}"'
+        direction='{% trans "Direction" as direction %} "{{ direction|escapejs }}"'
+        left-to-right='{% trans "Left-to-Right" as leftToRight %} "{{ leftToRight|escapejs }}"'
+        right-to-left='{% trans "Right-to-Left" as rightToLeft %} "{{ rightToLeft|escapejs }}"'
+        max-length='{% trans "Max Length" as maxLength %} "{{ maxLength|escapejs }}"'
+        disable-editing='{% trans "Disable Editing" as disableEditing %} "{{ disableEditing|escapejs }}"'
+        prevent-users-from-editing-value='{% trans "Prevent users from editing value" as preventUsersFromEditingValue %} "{{ preventUsersFromEditingValue|escapejs }}"'
+        language='{% trans "Language" as language %} "{{ language|escapejs }}"'
+        languages='{% trans "Languages" as languages %} "{{ languages|escapejs }}"'
+        type='{% trans "Type" as type %} "{{ type|escapejs }}"'
+        not-a-valid-edtf-format='{% trans "not a valid EDTF format" as notAValidEdtfFormat %} "{{ notAValidEdtfFormat|escapejs }}"'
+        year-month-approximate='{% trans "Year-month approximate" as yearMonthApproximate %} "{{ yearMonthApproximate|escapejs }}"'
+        entire-date-approximate='{% trans "Entire date (year-month-day) uncertain and approximate" as entireDateApproximate %} "{{ entireDateApproximate|escapejs }}"'
+        year-uncertain='{% trans "Year uncertain (possibly the year 1984, but not definitely)" as yearUncertain %} "{{ yearUncertain|escapejs }}"'
+        season-format-explanation='{% trans "Spring, 2001. The values 21, 22, 23, 24 may be used used to signify ' Spring', 'Summer', 'Autumn', 'Winter', respectively, in place of a month value (01 through 12) for a year-and-month format string" as seasonFormatExplanation %} "{{ seasonFormatExplanation|escapejs }}"'
+        negative-year-explanation='{% trans "The year -100000.  'Y' may be used at the beginning of the date string to signify that the date is a year, when (and only when) the year exceeds four digits, i.e. for years later than 9999 or earlier than -9999." as negativeYearExplanation %} "{{ negativeYearExplanation|escapejs }}"'
+        time-interval-year-precision='{% trans "A time interval with calendar year precision, beginning sometime in 1964 and ending sometime in 2008" as timeIntervalYearPrecision %} "{{ timeIntervalYearPrecision|escapejs }}"'
+        time-interval-month-precision='{% trans "A time interval with calendar month precision, beginning sometime in June 2004 and ending sometime in August of 2006" as timeIntervalMonthPrecision %} "{{ timeIntervalMonthPrecision|escapejs }}"'
+        time-interval-mixed-precision='{% trans "A time interval beginning sometime on February 1, 2004 and ending sometime in 2005. The start endpoint has calendar day precision and the end endpoint has calendar year precision" as timeIntervalMixedPrecision %} "{{ timeIntervalMixedPrecision|escapejs }}"'
+        day-precision-encoding='{% trans "[year][“-”][month][“-”][day]" as dayPrecisionEncoding %} "{{ dayPrecisionEncoding|escapejs }}"'
+        day-precision-encoding-explanation='{% trans "Refers to the calendar date 2021 April 12th with day precision" as dayPrecisionEncodingExplanation %} "{{ dayPrecisionEncodingExplanation|escapejs }}"'
+        month-precision-encoding='{% trans "[year][“-”][month]" as monthPrecisionEncoding %} "{{ monthPrecisionEncoding|escapejs }}"'
+        month-precision-encoding-explanation='{% trans "Refers to the calendar month April 2021 with month precision" as monthPrecisionEncodingExplanation %} "{{ monthPrecisionEncodingExplanation|escapejs }}"'
+        year-precision-encoding='{% trans " [year]" as yearPrecisionEncoding %} "{{ yearPrecisionEncoding|escapejs }}"'
+        year-precision-encoding-explanation='{% trans "Refers to the year 2021 with year precision" as yearPrecisionEncodingExplanation %} "{{ yearPrecisionEncodingExplanation|escapejs }}"'
+        some-common-encodings='{% trans "Some common encodings:" as someCommonEncodings %} "{{ someCommonEncodings|escapejs }}"'
+        edtf-date-specification='{% trans "EDTF Date Specfication (Library of Congress)" as edtfDateSpecification %} "{{ edtfDateSpecification|escapejs }}"'
+        edtf-format-description='{% trans "The EDTF datatype allows you to describe dates (even uncertain dates).  You can find a summary of the standard here:" as edtfFormatDescription %} "{{ edtfFormatDescription|escapejs }}"'
+        edtf-formats-expanded='{% trans "Extended Date/Time Formats (EDTF)" as edtfFormatsExpanded %} "{{ edtfFormatsExpanded|escapejs }}"'
+        edtf-formats='{% trans "EDTF Formats" as edtfFormats %} "{{ edtfFormats|escapejs }}"'
+        loading-time-wheel='{% trans "Loading Time Wheel" as loadingTimeWheel %} "{{ loadingTimeWheel|escapejs }}"'
+        time-wheel='{% trans "Time Wheel" as timeWheel %} "{{ timeWheel|escapejs }}"'
+        time-wheel-text='{% trans "Click on a block to set a filter, double-click to zoom in, double-click center to zoom out" as timeWheelText %} "{{ timeWheelText|escapejs }}"'
+        last-seven-days='{% trans "Last 7 Days" as lastSevenDays %} "{{ lastSevenDays|escapejs }}"'
+        last-thirty-days='{% trans "Last 30 Days" as lastThirtyDays %} "{{ lastThirtyDays|escapejs }}"'
+        this-week='{% trans "This week" as thisWeek %} "{{ thisWeek|escapejs }}"'
+        this-month='{% trans "This month" as thisMonth %} "{{ thisMonth|escapejs }}"'
+        this-quarter='{% trans "This quarter" as thisQuarter %} "{{ thisQuarter|escapejs }}"'
+        this-year='{% trans "This year" as thisYear %} "{{ thisYear|escapejs }}"'
+        today='{% trans "Today" as today %} "{{ today|escapejs }}"'
+        custom-date-range='{% trans "Custom date range" as customDateRange %} "{{ customDateRange|escapejs }}"'
+        search-all-dates='{% trans "Search all dates" as searchAllDates %} "{{ searchAllDates|escapejs }}"'
+        date-type='{% trans "Date Type" as dateType %} "{{ dateType|escapejs }}"'
+        date-interval='{% trans "Date Interval" as dateInterval %} "{{ dateInterval|escapejs }}"'
+        minimum-date='{% trans "Minimum Date" as minimumDate %} "{{ minimumDate|escapejs }}"'
+        maximum-date='{% trans "Maximum Date" as maximumDate %} "{{ maximumDate|escapejs }}"'
+        date-format='{% trans "Date Format" as dateFormat %} "{{ dateFormat|escapejs }}"'
+        has-no-value='{% trans "Has no value" as hasNoValue %} "{{ hasNoValue|escapejs }}"'
+        has-any-value='{% trans "Has any value" as hasAnyValue %} "{{ hasAnyValue|escapejs }}"'
+        default-value='{% trans "Default Value" as defaultValue %} "{{ defaultValue|escapejs }}"'
+        format='{% trans "Format" as format %} "{{ format|escapejs }}"'
+        view-valid-formats='{% trans "view valid formats" as viewValidFormats %} "{{ viewValidFormats|escapejs }}"'
+        max='{% trans "Max" as max %} "{{ max|escapejs }}"'
+        min='{% trans "Min" as min %} "{{ min|escapejs }}"'
+        increment='{% trans "Increment" as increment %} "{{ increment|escapejs }}"'
+        increment-size='{% trans "Increment Size" as incrementSize %} "{{ incrementSize|escapejs }}"'
+        decimal-places='{% trans "Decimal Places" as decimalPlaces %} "{{ decimalPlaces|escapejs }}"'
+        number-of-decimal-places='{% trans "Number of decimal places" as numberOfDecimalPlaces %} "{{ numberOfDecimalPlaces|escapejs }}"'
+        prefix='{% trans "Prefix" as prefix %} "{{ prefix|escapejs }}"'
+        field-prefix='{% trans "Field Prefix" as fieldPrefix %} "{{ fieldPrefix|escapejs }}"'
+        suffix='{% trans "suffix" as suffix %} "{{ suffix|escapejs }}"'
+        field-suffix='{% trans "Field Suffix" as fieldSuffix %} "{{ fieldSuffix|escapejs }}"'
+        from='{% trans "From" as from %} "{{ from|escapejs }}"'
+        to='{% trans "To" as to %} "{{ to|escapejs }}"'
+        select='{% trans "Select" as select %} "{{ select|escapejs }}"'
+        within='{% trans "Within" as within %} "{{ within|escapejs }}"'
+        overlaps='{% trans "overlaps" as overlaps %} "{{ overlaps|escapejs }}"'
+        equals='{% trans "equals" as equals %} "{{ equals|escapejs }}"'
+        is-not='{% trans "is not" as isNot %} "{{ isNot|escapejs }}"'
+        not='{% trans "not" as not %} "{{ not|escapejs }}"'
+        like='{% trans "like" as like %} "{{ like|escapejs }}"'
+        not-like='{% trans "not like" as notLike %} "{{ notLike|escapejs }}"'
+        and='{% trans "and" as and %} "{{ and|escapejs }}"'
+        or='{% trans "or" as or %} "{{ or|escapejs }}"'
+        of='{% trans "of" as of %} "{{ of|escapejs }}"'
+        name='{% trans "Name" as name %} "{{ name|escapejs }}"'
+        help='{% trans "Help" as help %} "{{ help|escapejs }}"'
+        none='{% trans "None" as none %} "{{ none|escapejs }}"'
+        add='{% trans "Add" as add %} "{{ add|escapejs }}"'
+        remove='{% trans "Remove" as remove %} "{{ remove|escapejs }}"'
+        find='{% trans "Find" as find %} "{{ find|escapejs }}"'
+        filter='{% trans "Filter" as filter %} "{{ filter|escapejs }}"'
+        clear='{% trans "Clear" as clear %} "{{ clear|escapejs }}"'
+        clear-filter='{% trans "Clear Filter" as clearFilter %} "{{ clearFilter|escapejs }}"'
+        buffer='{% trans "Buffer" as buffer %} "{{ buffer|escapejs }}"'
+        distance='{% trans "Distance" as distance %} "{{ distance|escapejs }}"'
+        new='{% trans "New" as new %} "{{ new|escapejs }}"'
+        add-new='{% trans "Add New" as addNew %} "{{ addNew|escapejs }}"'
+        return='{% trans "Return" as return %} "{{ return|escapejs }}"'
+        csv='{% trans "csv" as csv %} "{{ csv|escapejs }}"'
+        html='{% trans "html" as html %} "{{ html|escapejs }}"'
+        shapefile='{% trans "shapefile" as shapefile %} "{{ shapefile|escapejs }}"'
+        geojson-url='{% trans "geojson url" as geojsonUrl %} "{{ geojsonUrl|escapejs }}"'
+        tile-excel='{% trans "tile excel" as tileExcel %} "{{ tileExcel|escapejs }}"'
+        copy-to-clipboard='{% trans "Copy to clipboard" as copyToClipboard %} "{{ copyToClipboard|escapejs }}"'
+        info='{% trans "Info" as info %} "{{ info|escapejs }}"'
+        arches-export='{% trans "Arches Export" as archesExport %} "{{ archesExport|escapejs }}"'
+        include-report-link-in-export='{% trans "Include the report link in the export?" as includeReportLinkInExport %} "{{ includeReportLinkInExport|escapejs }}"'
+        list-item-one-format='{% trans "1. Format" as listItemOneFormat %} "{{ listItemOneFormat|escapejs }}"'
+        list-item-one-format-text='{% trans "Select the format you'd like for your export data. (tile excel and geojson formats require a resource type filter)" as listItemOneFormatText %} "{{ listItemOneFormatText|escapejs }}"'
+        list-item-two-coordinate-precision='{% trans "2. Coordinate Precision" as listItemTwoCoordinatePrecision %} "{{ listItemTwoCoordinatePrecision|escapejs }}"'
+        list-item-two-coordinate-precision-text='{% trans "Tell us how many decimal places of precision you'd like for geo-data results" as listItemTwoCoordinatePrecisionText %} "{{ listItemTwoCoordinatePrecisionText|escapejs }}"'
+        list-item-three-report-link='{% trans "3. Report Link" as listItemThreeReportLink %} "{{ listItemThreeReportLink|escapejs }}"'
+        list-item-three-report-link-text='{% trans "Only applicable to CSV and shapefile exports" as listItemThreeReportLinkText %} "{{ listItemThreeReportLinkText|escapejs }}"'
+        list-item-four-name-this-export='{% trans "4. Name this export" as listItemFourNameThisExport %} "{{ listItemFourNameThisExport|escapejs }}"'
+        list-item-five-email-address='{% trans "5. Email Address" as listItemFiveEmailAddress %} "{{ listItemFiveEmailAddress|escapejs }}"'
+        list-item-five-email-address-text='{% trans "This download may take some time.  Tell us where to email a download link to your results" as listItemFiveEmailAddressText %} "{{ listItemFiveEmailAddressText|escapejs }}"'
+        export-search-results='{% trans "Export Search Results" as exportSearchResults %} "{{ exportSearchResults|escapejs }}"'
+        advanced-search='{% trans "Advanced Search" as advancedSearch %} "{{ advancedSearch|escapejs }}"'
+        advanced-search-description='{% trans "With Advanced Search you can build more sophisticated search queries. Select the search facets you wish to query from the list on the right. Then enter your criteria to customize your search filters" as advancedSearchDescription %} "{{ advancedSearchDescription|escapejs }}"'
+        map-search='{% trans "Map Search" as mapSearch %} "{{ mapSearch|escapejs }}"'
+        accept-geo-json='{% trans "Accept GeoJSON" as acceptGeoJson %} "{{ acceptGeoJson|escapejs }}"'
+        geojson-errors='{% trans "GeoJSON has the following errors that must be resolved:" as geojsonErrors %} "{{ geojsonErrors|escapejs }}"'
+        edit-geo-json='{% trans "Edit GeoJSON" as editGeoJson %} "{{ editGeoJson|escapejs }}"'
+        edit-coordinates='{% trans "Edit Coordinates" as editCoordinates %} "{{ editCoordinates|escapejs }}"'
+        show-feature='{% trans "Show Feature" as showFeature %} "{{ showFeature|escapejs }}"'
+        coordinate-reference='{% trans "Coordinate Reference:" as coordinateReference %} "{{ coordinateReference|escapejs }}"'
+        zoom-to-all='{% trans "Zoom to all" as zoomToAll %} "{{ zoomToAll|escapejs }}"'
+        zoom-to-all-features='{% trans "Zoom to all features" as zoomToAllFeatures %} "{{ zoomToAllFeatures|escapejs }}"'
+        no-email-saved-for-user='{% trans "No Email saved for User" as noEmailSavedForUser %} "{{ noEmailSavedForUser|escapejs }}"'
+        drag-geo-json-kml='{% trans "Drag GeoJSON or KML files here to add" as dragGeoJsonKml %} "{{ dragGeoJsonKml|escapejs }}"'
+        following-errors-occurred='{% trans "The following errors occurred:" as followingErrorsOccurred %} "{{ followingErrorsOccurred|escapejs }}"'
+        search='{% trans "Search" as search %} "{{ search|escapejs }}"'
+        enter-search-string-here='{% trans "Enter Search String here" as enterSearchStringHere %} "{{ enterSearchStringHere|escapejs }}"'
+        view-search-string='{% trans "View search string" as viewSearchString %} "{{ viewSearchString|escapejs }}"'
+        search-string-text='{% trans "Search String - use to filter resources displayed" as searchStringText %} "{{ searchStringText|escapejs }}"'
+        saved-search='{% trans "Saved Search" as savedSearch %} "{{ savedSearch|escapejs }}"'
+        no-saved-searches='{% trans "The Arches site administrator hasn't saved any searches yet." as noSavedSearches %} "{{ noSavedSearches|escapejs }}"'
+        searching='{% trans "searching" as searching %} "{{ searching|escapejs }}"'
+        search-facets='{% trans "Search Facets" as searchFacets %} "{{ searchFacets|escapejs }}"'
+        analyze='{% trans "Analyze" as analyze %} "{{ analyze|escapejs }}"'
+        settings='{% trans "Settings" as settings %} "{{ settings|escapejs }}"'
+        legend='{% trans "Legend" as legend %} "{{ legend|escapejs }}"'
+        close='{% trans "close" as close %} "{{ close|escapejs }}"'
+        edit='{% trans "Edit" as edit %} "{{ edit|escapejs }}"'
+        map='{% trans "Map" as map %} "{{ map|escapejs }}"'
+        details='{% trans "Details" as details %} "{{ details|escapejs }}"'
+        report='{% trans "Report" as report %} "{{ report|escapejs }}"'
+        done='{% trans "Done" as done %} "{{ done|escapejs }}"'
+        apply='{% trans "Apply" as apply %} "{{ apply|escapejs }}"'
+        cancel='{% trans "Cancel" as cancel %} "{{ cancel|escapejs }}"'
+        panels='{% trans "Panels" as panels %} "{{ panels|escapejs }}"'
+        single-panel='{% trans "Single Panel" as singlePanel %} "{{ singlePanel|escapejs }}"'
+        double-panel='{% trans "Double Panel" as doublePanel %} "{{ doublePanel|escapejs }}"'
+        panel-one='{% trans "Panel 1" as panelOne %} "{{ panelOne|escapejs }}"'
+        panel-two='{% trans "Panel 2" as panelTwo %} "{{ panelTwo|escapejs }}"'
+        panel-layout='{% trans "Panel Layout" as panelLayout %} "{{ panelLayout|escapejs }}"'
+        selected-panel-layout='{% trans "Selected Panel Layout" as selectedPanelLayout %} "{{ selectedPanelLayout|escapejs }}"'
+        annotations='{% trans "Annotation(s)" as annotations %} "{{ annotations|escapejs }}"'
+        brightness='{% trans "Brightness" as brightness %} "{{ brightness|escapejs }}"'
+        contrast='{% trans "Contrast" as contrast %} "{{ contrast|escapejs }}"'
+        saturation='{% trans "Saturation" as saturation %} "{{ saturation|escapejs }}"'
+        greyscale='{% trans "Greyscale" as greyscale %} "{{ greyscale|escapejs }}"'
+        default-color='{% trans "Default Color" as defaultColor %} "{{ defaultColor|escapejs }}"'
+        selected-feature-color='{% trans "Selected Feature Color" as selectedFeatureColor %} "{{ selectedFeatureColor|escapejs }}"'
+        hovered-feature-color='{% trans "Hovered Feature Color" as hoveredFeatureColor %} "{{ hoveredFeatureColor|escapejs }}"'
+        default-color='{% trans "Default Color" as defaultColor %} "{{ defaultColor|escapejs }}"'
+        layer-color-palette='{% trans "Layer Color Palette" as layerColorPalette %} "{{ layerColorPalette|escapejs }}"'
+        fill-opacity='{% trans "Fill Opacity" as fillOpacity %} "{{ fillOpacity|escapejs }}"'
+        fill-color='{% trans "Fill Color" as fillColor %} "{{ fillColor|escapejs }}"'
+        overview-zoom='{% trans "Overview Zoom" as overviewZoom %} "{{ overviewZoom|escapejs }}"'
+        min-zoom='{% trans "Min Zoom" as minZoom %} "{{ minZoom|escapejs }}"'
+        point-radius='{% trans "Point Radius" as pointRadius %} "{{ pointRadius|escapejs }}"'
+        line-opacity='{% trans "Line Opacity" as lineOpacity %} "{{ lineOpacity|escapejs }}"'
+        line-width='{% trans "Line Width" as lineWidth %} "{{ lineWidth|escapejs }}"'
+        line-color='{% trans "Line Color" as lineColor %} "{{ lineColor|escapejs }}"'
+        stroke-color='{% trans "Stroke Color" as strokeColor %} "{{ strokeColor|escapejs }}"'
+        stroke-width='{% trans "Stroke Width" as strokeWidth %} "{{ strokeWidth|escapejs }}"'
+        point-stroke-width='{% trans "Point Stroke Width" as pointStrokeWidth %} "{{ pointStrokeWidth|escapejs }}"'
+        point-stroke-opacity='{% trans "Point Stroke Opacity" as pointStrokeOpacity %} "{{ pointStrokeOpacity|escapejs }}"'
+        show-style-tools='{% trans "Show Style Tools" as showStyleTools %} "{{ showStyleTools|escapejs }}"'
+        hide-style-tools='{% trans "Hide Style Tools" as hideStyleTools %} "{{ hideStyleTools|escapejs }}"'
+        dismiss='{% trans "dismiss" as dismiss %} "{{ dismiss|escapejs }}"'
+        preview='{% trans "Preview" as preview %} "{{ preview|escapejs }}"'
+        basemap='{% trans "Basemap" as basemap %} "{{ basemap|escapejs }}"'
+        basemaps='{% trans "Basemaps" as basemaps %} "{{ basemaps|escapejs }}"'
+        overlays='{% trans "Overlays" as overlays %} "{{ overlays|escapejs }}"'
+        participating-layers='{% trans "Participating Layers" as participatingLayers %} "{{ participatingLayers|escapejs }}"'
+        add-a-new-feature='{% trans "Add a new feature" as addANewFeature %} "{{ addANewFeature|escapejs }}"'
+        files-uploaded='{% trans "files uploaded" as filesUploaded %} "{{ filesUploaded|escapejs }}"'
+        max-file-size='{% trans "Max File Size (mb)" as maxFileSize %} "{{ maxFileSize|escapejs }}"'
+        example-file-types='{% trans "example: .jpg, .png, .txt" as exampleFileTypes %} "{{ exampleFileTypes|escapejs }}"'
+        valid-image-formats='{% trans "Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored" as validImageFormats %} "{{ validImageFormats|escapejs }}"'
+        accepted-image-formats='{% trans "Accepted formats: .jpg, .png, .tiff" as acceptedImageFormats %} "{{ acceptedImageFormats|escapejs }}"'
+        accepted-file-types='{% trans "Accepted Files Types" as acceptedFileTypes %} "{{ acceptedFileTypes|escapejs }}"'
+        show-all-files='{% trans "Show all files" as showAllFiles %} "{{ showAllFiles|escapejs }}"'
+        show-first-five-files='{% trans "Show first 5 files" as showFirstFiveFiles %} "{{ showFirstFiveFiles|escapejs }}"'
+        show-first-ten-files='{% trans "Show first 10 files" as showFirstTenFiles %} "{{ showFirstTenFiles|escapejs }}"'
+        show-first-twenty-five-files='{% trans "Show first 25 files" as showFirstTwentyFiveFiles %} "{{ showFirstTwentyFiveFiles|escapejs }}"'
+        error='{% trans "error" as error %} "{{ error|escapejs }}"'
+        unsaved='{% trans "Unsaved" as unsaved %} "{{ unsaved|escapejs }}"'
+        delete-all-files='{% trans "delete all files" as deleteAllFiles %} "{{ deleteAllFiles|escapejs }}"'
+        add-more-files='{% trans "add more files" as addMoreFiles %} "{{ addMoreFiles|escapejs }}"'
+        files-uploaded='{% trans "file(s) uploaded" as filesUploaded %} "{{ filesUploaded|escapejs }}"'
+        find-a-file='{% trans "find a file" as findAFile %} "{{ findAFile|escapejs }}"'
+        uploaded-files='{% trans "Uploaded Files" as uploadedFiles %} "{{ uploadedFiles|escapejs }}"'
+        allowed-document-formats='{% trans "Allowed document formats:" as allowedDocumentFormats %} "{{ allowedDocumentFormats|escapejs }}"'
+        max-file-size-warning='{% trans "You may upload as many documents as you wish, but the maximum size of any single file is" as maxFileSizeWarning %} "{{ maxFileSizeWarning|escapejs }}"'
+        max-photo-size-warning='{% trans "You may upload as many photos as you wish, but the maximum size of any single file is 8MB." as maxPhotoSizeWarning %} "{{ maxPhotoSizeWarning|escapejs }}"'
+        adding-documents-optional='{% trans "Adding documents to this record is optional." as addingDocumentsOptional %} "{{ addingDocumentsOptional|escapejs }}"'
+        adding-photos-optional='{% trans "Adding photos to this record is optional." as addingPhotosOptional %} "{{ addingPhotosOptional|escapejs }}"'
+        select-files='{% trans "Select Files" as selectFiles %} "{{ selectFiles|escapejs }}"'
+        select-photographs='{% trans "Select Photographs" as selectPhotographs %} "{{ selectPhotographs|escapejs }}"'
+        drag-and-drop-files-on-panel='{% trans "Drag & Drop your files onto this panel" as dragAndDropFilesOnPanel %} "{{ dragAndDropFilesOnPanel|escapejs }}"'
+        drag-and-drop-photos-on-panel='{% trans "Drag & Drop your photos onto this panel" as dragAndDropPhotosOnPanel %} "{{ dragAndDropPhotosOnPanel|escapejs }}"'
+        upload-photographs='{% trans "Upload Photographs" as uploadPhotographs %} "{{ uploadPhotographs|escapejs }}"'
+        upload-documents='{% trans "Upload Documents" as uploadDocuments %} "{{ uploadDocuments|escapejs }}"'
+        show-gallery='{% trans "Show Gallery" as showGallery %} "{{ showGallery|escapejs }}"'
+        hide-gallery='{% trans "Hide Gallery" as hideGallery %} "{{ hideGallery|escapejs }}"'
+        select-default-value='{% trans "Select default value" as selectDefaultValue %} "{{ selectDefaultValue|escapejs }}"'
+        select-a-filter='{% trans "Select a filter" as selectAFilter %} "{{ selectAFilter|escapejs }}"'
+        default-manifest-url='{% trans "Default Manifest URL" as defaultManifestUrl %} "{{ defaultManifestUrl|escapejs }}"'
+        enter-manifest-url='{% trans "Enter Manifest URL" as enterManifestUrl %} "{{ enterManifestUrl|escapejs }}"'
+        select-a-manifest='{% trans "Select a manifest" as selectAManifest %} "{{ selectAManifest|escapejs }}"'
+        no-manifest-selected='{% trans "No manifest selected" as noManifestSelected %} "{{ noManifestSelected|escapejs }}"'
+        load-manifest='{% trans "Load manifest" as loadManifest %} "{{ loadManifest|escapejs }}"'
+        loading-manifest='{% trans "Loading manifest" as loadingManifest %} "{{ loadingManifest|escapejs }}"'
+        error-loading-manifest='{% trans "Error loading manifest" as errorLoadingManifest %} "{{ errorLoadingManifest|escapejs }}"'
+        overlays='{% trans "Overlays" as overlays %} "{{ overlays|escapejs }}"'
+        filter-images='{% trans "Filter images" as filterImages %} "{{ filterImages|escapejs }}"'
+        draw-a='{% trans "Draw a" as drawA %} "{{ drawA|escapejs }}"'
+        view-gallery='{% trans "View Gallery" as viewGallery %} "{{ viewGallery|escapejs }}"'
+        image='{% trans "Image" as image %} "{{ image|escapejs }}"'
+        image-list='{% trans "Image List" as imageList %} "{{ imageList|escapejs }}"'
+        image-tools='{% trans "Image Tools" as imageTools %} "{{ imageTools|escapejs }}"'
+        switch-image-service='{% trans "Switch Image Service" as switchImageService %} "{{ switchImageService|escapejs }}"'
+        resource-instance-name='{% trans "Resource Instance Name" as resourceInstanceName %} "{{ resourceInstanceName|escapejs }}"'
+        related-resource-summary='{% trans "Related Resource Summary" as relatedResourceSummary %} "{{ relatedResourceSummary|escapejs }}"'
+        resource-model='{% trans "Resource Model" as resourceModel %} "{{ resourceModel|escapejs }}"'
+        resource-type='{% trans "Resource Type" as resourceType %} "{{ resourceType|escapejs }}"'
+        resource-details='{% trans "Resource Details" as resourceDetails %} "{{ resourceDetails|escapejs }}"'
+        resource-details-text='{% trans "Click the 'Details' link on a search result from the list on the left to view more information about a resource." as resourceDetailsText %} "{{ resourceDetailsText|escapejs }}"'
+        resource-information='{% trans "Resource Information" as resourceInformation %} "{{ resourceInformation|escapejs }}"'
+        has-relationship='{% trans "Has Relationship" as hasRelationship %} "{{ hasRelationship|escapejs }}"'
+        resources-relationship-to='{% trans "Resource's relationship to" as resourcesRelationshipTo %} "{{ resourcesRelationshipTo|escapejs }}"'
+        related-to='{% trans "Related to" as relatedTo %} "{{ relatedTo|escapejs }}"'
+        relationship-to-resource='{% trans "'s relationship to Resource" as relationshipToResource %} "{{ relationshipToResource|escapejs }}"'
+        relationships='{% trans "Relationships" as relationships %} "{{ relationships|escapejs }}"'
+        relationships-shown='{% trans "relationships shown" as relationshipsShown %} "{{ relationshipsShown|escapejs }}"'
+        search-network='{% trans "Search Network" as searchNetwork %} "{{ searchNetwork|escapejs }}"'
+        analyze-network='{% trans "Analyze Network" as analyzeNetwork %} "{{ analyzeNetwork|escapejs }}"'
+        click-node-info='{% trans "Click a node/edge for info" as clickNodeInfo %} "{{ clickNodeInfo|escapejs }}"'
+        click-node-relationships='{% trans "Click a node to show more relationships" as clickNodeRelationships %} "{{ clickNodeRelationships|escapejs }}"'
+        click-node-refocus='{% trans "Click a node refocus" as clickNodeRefocus %} "{{ clickNodeRefocus|escapejs }}"'
+        click-node-remove='{% trans "Click a node/edge to remove" as clickNodeRemove %} "{{ clickNodeRemove|escapejs }}"'
+        load-more='{% trans "Load More" as loadMore %} "{{ loadMore|escapejs }}"'
+        workflow-complete='{% trans "Workflow Complete" as workflowComplete %} "{{ workflowComplete|escapejs }}"'
+        with='{% trans "with" as with %} "{{ with|escapejs }}"'
+        link-text='{% trans "Link Text (Optional)" as linkText %} "{{ linkText|escapejs }}"'
+        url-for-link='{% trans "URL for link" as urlForLink %} "{{ urlForLink|escapejs }}"'
+        url-link-color='{% trans "URL Link Color" as urlLinkColor %} "{{ urlLinkColor|escapejs }}"'
+        url-placeholder='{% trans "URL Placeholder" as urlPlaceholder %} "{{ urlPlaceholder|escapejs }}"'
+        url-label-placeholder='{% trans "URL Label Placeholder" as urlLabelPlaceholder %} "{{ urlLabelPlaceholder|escapejs }}"'
+        default-relationship-to='{% trans "Default relationship to" as defaultRelationshipTo %} "{{ defaultRelationshipTo|escapejs }}"'
+        default-inverse-relationship-to='{% trans "Default inverse relationship to" as defaultInverseRelationshipTo %} "{{ defaultInverseRelationshipTo|escapejs }}"'
+        references='{% trans "References" as references %} "{{ references|escapejs }}"'
+        does-not-reference='{% trans "Does not reference" as doesNotReference %} "{{ doesNotReference|escapejs }}"'
+        legend='{% trans "Legend" as legend %} "{{ legend|escapejs }}"'
+        limit-dropdown-to-widget-nodes='{% trans "Check to limit the dropdown to only this widget's node rather than all nodes in the tile." as limitDropdownToWidgetNodes %} "{{ limitDropdownToWidgetNodes|escapejs }}"'
+        show-only-selected-node-in-dropdown='{% trans "Show only the value of the selected node in the dropdown options" as showOnlySelectedNodeInDropdown %} "{{ showOnlySelectedNodeInDropdown|escapejs }}"'
+        dropdown-format='{% trans "Dropdown Format" as dropdownFormat %} "{{ dropdownFormat|escapejs }}"'
+        provisional='{% trans "Provisional" as provisional %} "{{ provisional|escapejs }}"'
+        card-name='{% trans "Card Name" as cardName %} "{{ cardName|escapejs }}"'
+        add-tab='{% trans "Add Tab" as addTab %} "{{ addTab|escapejs }}"'
+        tab-name='{% trans "Tab Name" as tabName %} "{{ tabName|escapejs }}"'
+        find-a-resource='{% trans "Find a Resource" as findAResource %} "{{ findAResource|escapejs }}"'
+        find-an-icon='{% trans "Find an icon" as findAnIcon %} "{{ findAnIcon|escapejs }}"'
+        select-tab-icon='{% trans "Select Tab icon" as selectTabIcon %} "{{ selectTabIcon|escapejs }}"'
+        select-cards-in-tab='{% trans "Select cards in this tab" as selectCardsInTab %} "{{ selectCardsInTab|escapejs }}"'
+        enter-manifest-url='{% trans "Enter manifest URL" as enterManifestUrl %} "{{ enterManifestUrl|escapejs }}"'
+        default-image-service-url='{% trans "Default Image Service URL" as defaultImageServiceUrl %} "{{ defaultImageServiceUrl|escapejs }}"'
+        included-image-nodes='{% trans "Included Image Nodes" as includedImageNodes %} "{{ includedImageNodes|escapejs }}"'
+        select-image-nodes='{% trans "Select image nodes to include" as selectImageNodes %} "{{ selectImageNodes|escapejs }}"'
+        select-an-ontology-property='{% trans "Select an Ontology Property" as selectAnOntologyProperty %} "{{ selectAnOntologyProperty|escapejs }}"'
+        select-a-resource='{% trans "Select a resource" as selectAResource %} "{{ selectAResource|escapejs }}"'
+        select-a-resource-model='{% trans "Select a resource model" as selectAResourceModel %} "{{ selectAResourceModel|escapejs }}"'
+        select-a-nodegroup='{% trans "Select a Nodegroup" as selectANodegroup %} "{{ selectANodegroup|escapejs }}"'
+        return-to-approved-edits='{% trans "Return to approved edits" as returnToApprovedEdits %} "{{ returnToApprovedEdits|escapejs }}"'
+        choose-sibling-card='{% trans "Choose a sibling card" as chooseSiblingCard %} "{{ chooseSiblingCard|escapejs }}"'
+        showing-edits-by='{% trans "Showing edits by" as showingEditsBy %} "{{ showingEditsBy|escapejs }}"'
+        showing-most-recent-approved-edits='{% trans "Currently showing the most recent approved edits" as showingMostRecentApprovedEdits %} "{{ showingMostRecentApprovedEdits|escapejs }}"'
+        new-provisional-contirubtion='{% trans "This is a new contribution by a provisional editor." as newProvisionalContribution %} "{{ newProvisionalContribution|escapejs }}"'
+        pending-provisional-edits='{% trans "This resource has provisional edits that are pending review" as pendingProvisionalEdits %} "{{ pendingProvisionalEdits|escapejs }}"'
+        pending-provisional-edits-not-displayed='{% trans "This resource has provisional edits (not displayed in this report) that are pending review" as pendingProvisionalEditsNotDisplayed %} "{{ pendingProvisionalEditsNotDisplayed|escapejs }}"'
+        geocoder-place-holder='{% trans "Find an address" as geocoderPlaceHolder %} "{{ geocoderPlaceHolder|escapejs }}"'
+        select-drawings-text='{% trans "Select drawings text (optional)" as selectDrawingsText %} "{{ selectDrawingsText|escapejs }}"'
+        select-drawings-map-source='{% trans "Select drawings map source (optional)" as selectDrawingsMapSource %} "{{ selectDrawingsMapSource|escapejs }}"'
+        select-drawings-map-source-layer='{% trans "Select drawings map source layer (optional)" as selectDrawingsMapSourceLayer %} "{{ selectDrawingsMapSourceLayer|escapejs }}"'
+        map-center-longitude='{% trans "Map Center Longitude" as mapCenterLongitude %} "{{ mapCenterLongitude|escapejs }}"'
+        map-center-latitude='{% trans "Map Center Latitude" as mapCenterLatitude %} "{{ mapCenterLatitude|escapejs }}"'
+        longitude-x-coordinate='{% trans "Longitude (x coordinate)" as longitudeXCoordinate %} "{{ longitudeXCoordinate|escapejs }}"'
+        latitude-y-coordinate='{% trans "Latitude (y coordinate)" as latitudeYCoordinate %} "{{ latitudeYCoordinate|escapejs }}"'
+        available-geometry-types='{% trans "Available Geometry Types" as availableGeometryTypes %} "{{ availableGeometryTypes|escapejs }}"'
+        zoom-level='{% trans "Zoom Level" as zoomLevel %} "{{ zoomLevel|escapejs }}"'
+        default-zoom='{% trans "Default Zoom" as defaultZoom %} "{{ defaultZoom|escapejs }}"'
+        update-features='{% trans "Update Features" as updateFeatures %} "{{ updateFeatures|escapejs }}"'
+        features='{% trans "feature(s)" as features %} "{{ features|escapejs }}"'
+        point='{% trans "Point" as point %} "{{ point|escapejs }}"'
+        line='{% trans "Line" as line %} "{{ line|escapejs }}"'
+        polygon='{% trans "Polygon" as polygon %} "{{ polygon|escapejs }}"'
+        map-add-point='{% trans "Add point" as mapAddPoint %} "{{ mapAddPoint|escapejs }}"'
+        map-add-line='{% trans "Add line" as mapAddLine %} "{{ mapAddLine|escapejs }}"'
+        map-add-polygon='{% trans "Add polygon" as mapAddPolygon %} "{{ mapAddPolygon|escapejs }}"'
+        map-select-drawing='{% trans "Select drawing" as mapSelectDrawing %} "{{ mapSelectDrawing|escapejs }}"'
+        related-instance-map-sources='{% trans "Related instance map sources" as relatedInstanceMapSources %} "{{ relatedInstanceMapSources|escapejs }}"'
+        related-instance-map-source-layers='{% trans "Related instance map source layers (optional)" as relatedInstanceMapSourceLayers %} "{{ relatedInstanceMapSourceLayers|escapejs }}"'
+        intersection-layer-configuration='{% trans "Intersection layer configuration" as intersectionLayerConfiguration %} "{{ intersectionLayerConfiguration|escapejs }}"'
+        ri-select-create-new='{% trans "Create a new ${graphName}" as riSelectCreateNew %} "{{ riSelectCreateNew|escapejs }}"'
+        ri-select-placeholder='{% trans "Add new Relationship" as riSelectPlaceholder %} "{{ riSelectPlaceholder|escapejs }}"'
+        re-network-reponse-error='{% trans "Network response was not ok" as reNetworkReponseError %} "{{ reNetworkReponseError|escapejs }}"'
+        term-search-concept='{% trans "Concepts" as termSearchConcept %} "{{ termSearchConcept|escapejs }}"'
+        term-search-term='{% trans "Term Matches" as termSearchTerm %} "{{ termSearchTerm|escapejs }}"'
+        time-wheel-date-matches='{% trans "${total} date values" as timeWheelDateMatches %} "{{ timeWheelDateMatches|escapejs }}"'
+        card-constraints-placeholder='{% trans "Select Widgets" as cardConstraintsPlaceholder %} "{{ cardConstraintsPlaceholder|escapejs }}"'
+        card-function-node-desc='{% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} "{{ cardFunctionNodeDesc|escapejs }}"'
+        card-function-node-name='{% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} "{{ cardFunctionNodeName|escapejs }}"'
+        grouping-error-title='{% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} "{{ groupingErrorTitle|escapejs }}"'
+        grouping-error-message='{% trans "The cardinality of this card cannot be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}"'
+        model-does-not-exist='{% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} "{{ modelDoesNotExist|escapejs }}"'
+        layer-preview='{% trans "Layer Preview" as layerPreview %} "{{ layerPreview|escapejs }}"'
+        layer-icon='{% trans "Layer Icon" as layerIcon %} "{{ layerIcon|escapejs }}"'
+        save-edits='{% trans "Save Edits" as saveEdits %} "{{ saveEdits|escapejs }}"'
+        discard-edits='{% trans "Discard Edits" as discardEdits %} "{{ discardEdits|escapejs }}"'
+        activated='{% trans "Activated" as activated %} "{{ activated|escapejs }}"'
+        service-styling='{% trans "Service Styling" as serviceStyling %} "{{ serviceStyling|escapejs }}"'
+        permissions='{% trans "Permissions" as permissions %} "{{ permissions|escapejs }}"'
+        clustering='{% trans "Clustering" as clustering %} "{{ clustering|escapejs }}"'
+        layer-name='{% trans "Layer Name" as layerName %} "{{ layerName|escapejs }}"'
+        add-search-map-default='{% trans "Add to search map by default:" as addSearchMapDefault %} "{{ addSearchMapDefault|escapejs }}"'
+        legend-content='{% trans "Legend content" as legendContent %} "{{ legendContent|escapejs }}"'
+        advanced='{% trans "Advanced" as advanced %} "{{ advanced|escapejs }}"'
+        preview-map-warning='{% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." as previewMapWarning %} "{{ previewMapWarning|escapejs }}"'
+        point-style='{% trans "Point Style" as pointStyle %} "{{ pointStyle|escapejs }}"'
+        line-style='{% trans "Line Style" as lineStyle %} "{{ lineStyle|escapejs }}"'
+        polygon-style='{% trans "Polygon Style" as polygonStyle %} "{{ polygonStyle|escapejs }}"'
+        color='{% trans "Color" as color %} "{{ color|escapejs }}"'
+        halo-color='{% trans "Halo color" as haloColor %} "{{ haloColor|escapejs }}"'
+        fill-color='{% trans "Fill color" as fillColor %} "{{ fillColor|escapejs }}"'
+        radius='{% trans "Radius" as radius %} "{{ radius|escapejs }}"'
+        halo-radius='{% trans "Halo radius" as haloRadius %} "{{ haloRadius|escapejs }}"'
+        weight='{% trans "Weight" as weight %} "{{ weight|escapejs }}"'
+        halo-weight='{% trans "Halo weight" as haloWeight %} "{{ haloWeight|escapejs }}"'
+        outline-color='{% trans "Outline color" as outlineColor %} "{{ outlineColor|escapejs }}"'
+        outline-weight='{% trans "Outline weight" as outlineWeight %} "{{ outlineWeight|escapejs }}"'
+        cluster-distance='{% trans "Cluster Distance" as clusterDistance %} "{{ clusterDistance|escapejs }}"'
+        cluster-max-zoom='{% trans "Cluster Max Zoom" as clusterMaxZoom %} "{{ clusterMaxZoom|escapejs }}"'
+        cluster-min-points='{% trans "Cluster Min Points" as clusterMinPoints %} "{{ clusterMinPoints|escapejs }}"'
+        vector-simplification='{% trans "Vector Simplification" as vectorSimplification %} "{{ vectorSimplification|escapejs }}"'
+        cluster-setting-change-info='{% trans "Changes to cluster settings will only be reflected after saving." as clusterSettingChangeInfo %} "{{ clusterSettingChangeInfo|escapejs }}"'
+        preview-map-clustering-warning='{% trans "Preview map data do not use clustering algorithm.  Add data for this resource model to see real clustered data." as previewMapClusteringWarning %} "{{ previewMapClusteringWarning|escapejs }}"'
+        layer-node-permission-info='{% trans "The following users and groups can view this layer. If you wish to change who can access this layer, please update the permissions on the layer node." as layerNodePermissionInfo %} "{{ layerNodePermissionInfo|escapejs }}"'
+        users='{% trans "Users" as users %} "{{ users|escapejs }}"'
+        groups='{% trans "Groups" as groups %} "{{ groups|escapejs }}"'
+        related-resources-editor='{% trans "Related Resources Editor" as relatedResourcesEditor %} "{{ relatedResourcesEditor|escapejs }}"'
+        add-related-resources='{% trans "Add Related Resources" as addRelatedResources %} "{{ addRelatedResources|escapejs }}"'
+        related-resources-editor-desc='{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay between physical objects, events, activities, people and documents. Relating resources lets you build a network of relationships for your data objects." as relatedResourcesEditorDesc %} "{{ relatedResourcesEditorDesc|escapejs }}"'
+        related-resource-summary='{% trans "Related Resource Summary" as relatedResourceSummary %} "{{ relatedResourceSummary|escapejs }}"'
+        table='{% trans "Table" as table %} "{{ table|escapejs }}"'
+        visualization='{% trans "Visualization" as visualization %} "{{ visualization|escapejs }}"'
+        show-me-how='{% trans "Show Me How" as showMeHow %} "{{ showMeHow|escapejs }}"'
+        add-relationship-instruction='{% trans "Select resources and relate it to this one" as addRelationshipInstruction %} "{{ addRelationshipInstruction|escapejs }}"'
+        egText='{% trans "e.g.: .txt" as egText %} "{{ egText|escapejs }}"'
+        resource-relations='{% trans "resource relations" as resourceRelations %} "{{ resourceRelations|escapejs }}"'
+        select-ontology-property='{% trans "'Select an Ontology Property'" as selectOntologyProperty %} "{{ selectOntologyProperty|escapejs }}"'
+        node-resource-relationship-text='{% trans "This is a Node to Resource Instance relationship" as nodeResourceRelationshipText %} "{{ nodeResourceRelationshipText|escapejs }}"'
+        relationship-text='{% trans "'s relationship to " as relationshipText %} "{{ relationshipText|escapejs }}"'
+        relationship-to='{% trans "Relationship to" as relationshipTo %} "{{ relationshipTo|escapejs }}"'
+        inverse-relationship-to='{% trans "Inverse Relationship to" as inverseRelationshipTo %} "{{ inverseRelationshipTo|escapejs }}"'
+        relationship-desc='{% trans "This is a Resource Instance to Resource Instance relationship" as relationshipDesc %} "{{ relationshipDesc|escapejs }}"'
+        relationship='{% trans "Relationship" as relationship %} "{{ relationship|escapejs }}"'
+        from-date='{% trans "From Date" as fromDate %} "{{ fromDate|escapejs }}"'
+        to-date='{% trans "To Date" as toDate %} "{{ toDate|escapejs }}"'
+        description='{% trans "Description" as description %} "{{ description|escapejs }}"'
+        delete-this-entry='{% trans "Delete this entry" as deleteThisEntry %} "{{ deleteThisEntry|escapejs }}"'
+        save='{% trans "Save" as save %} "{{ save|escapejs }}"'
+        noRelatedResourceText='{% trans "This resource is not related to any other resources" as noRelatedResourceText %} "{{ noRelatedResourceText|escapejs }}"'
+        service='{% trans "Service" as service %} "{{ service|escapejs }}"'
+        canvas='{% trans "Canvas" as canvas %} "{{ canvas|escapejs }}"'
+        manage-image-service='{% trans "Manage Image Service" as manageImageService %} "{{ manageImageService|escapejs }}"'
+        title='{% trans "Title" as title %} "{{ title|escapejs }}"'
+        description='{% trans "Description" as description %} "{{ description|escapejs }}"'
+        attribution='{% trans "Attribution" as attribution %} "{{ attribution|escapejs }}"'
+        attribution-logo='{% trans "Attribution Logo" as attributionLogo %} "{{ attributionLogo|escapejs }}"'
+        metadata='{% trans "Metadata" as metadata %} "{{ metadata|escapejs }}"'
+        delete='{% trans "Delete" as delete %} "{{ delete|escapejs }}"'
+        manage-image-canvases='{% trans "Manage Image Canvases" as manageImageCanvases %} "{{ manageImageCanvases|escapejs }}"'
+        images='{% trans "Images" as images %} "{{ images|escapejs }}"'
+        image-service-instruction='{% trans "Select image to delete from the image service" as imageServiceInstruction %} "{{ imageServiceInstruction|escapejs }}"'
+        select-all='{% trans "Select All" as selectAll %} "{{ selectAll|escapejs }}"'
+        clear-all='{% trans "Clear All" as clearAll %} "{{ clearAll|escapejs }}"'
+        delete-selected='{% trans "Delete Selected" as deleteSelected %} "{{ deleteSelected|escapejs }}"'
+        dropzone-drag-or-drop-desc1='{% trans "Drag or " as dropzoneDragDrop1 %} "{{ dropzoneDragDrop1|escapejs }}"'
+        dropzone-drag-or-drop-desc2='{% trans "click here " as dropzoneDragDrop2 %} "{{ dropzoneDragDrop2|escapejs }}"'
+        dropzone-drag-or-drop-desc3='{% trans "to upload photos" as dropzoneDragDrop3 %} "{{ dropzoneDragDrop3|escapejs }}"'
+        selected-image-name='{% trans "Selected Image Name" as selectedImageName %} "{{ selectedImageName|escapejs }}"'
+        create-new-service='{% trans "Create New Service" as createNewService %} "{{ createNewService|escapejs }}"'
+        edit-service='{% trans "Edit a service" as editService %} "{{ editService|escapejs }}"'
+        image-upload-caption='{% trans "Drag & Drop Your Images Here" as imageUploadCaption %} "{{ imageUploadCaption|escapejs }}"'
+        image-upload-instruction='{% trans "Import digital images and create a new image service" as imageUploadInstruction %} "{{ imageUploadInstruction|escapejs }}"'
+        select-images='{% trans "Select Images" as selectImages %} "{{ selectImages|escapejs }}"'
+        image-service-create-desc='{% trans "Create a new service by uploading one or more images. Images will be uploaded and processes so that you can view, annotate, and share them with others" as imageServiceCreateDesc %} "{{ imageServiceCreateDesc|escapejs }}"'
+        edit-existing-image-service='{% trans "Edit an existing Image Service" as editExistingImageService %} "{{ editExistingImageService|escapejs }}"'
+        image-service-edit-desc='{% trans "Update the information and images related to an existing Image Service. Or copy and paste in the URL of a IIIF Manifest to add a service from an external service" as imageServiceEditDesc %} "{{ imageServiceEditDesc|escapejs }}"'
+        switch-image-service='{% trans "Switch Image Service" as switchImageService %} "{{ switchImageService|escapejs }}"'
+        create-image-service='{% trans "Create Image Service" as createImageService %} "{{ createImageService|escapejs }}"'
+        no-manifest-selected='{% trans "No manifest selected" as noManifestSelected %} "{{ noManifestSelected|escapejs }}"'
+        service-title='{% trans "Service Title" as serviceTitle %} "{{ serviceTitle|escapejs }}"'
+        service-description='{% trans "Service Description" as serviceDescription %} "{{ serviceDescription|escapejs }}"'
+        metadata-label='{% trans "Metadata Label" as metadataLabel %} "{{ metadataLabel|escapejs }}"'
+        metadata-value='{% trans "Metadata Value" as metadataValue %} "{{ metadataValue|escapejs }}"'
+        image-caption='{% trans "Image Caption" as imageCaption %} "{{ imageCaption|escapejs }}"'        
+        upload-csv-zip-file='{% trans "Upload .csv or .zip File" as uploadCsvZipFile %} "{{ uploadCsvZipFile|escapejs }}"'
+        dropzone-file-upload-caption='{% trans "Drag & Drop your file onto this area to upload" as dropzoneFileUploadCaption %} "{{ dropzoneFileUploadCaption|escapejs }}"'
+        select-file='{% trans "Select File" as selectFile %} "{{ selectFile|escapejs }}"'
+        cancel-file-import='{% trans "Cancel File Import" as cancelFileImport %} "{{ cancelFileImport|escapejs }}"'
+        etl-file-upload-message='{% trans "Use this workflow to upload a file with data that you want to use to create new data instances of a model." as etlFileUploadMessage %} "{{ etlFileUploadMessage|escapejs }}"'
+        etl-single-csv-title='{% trans "Import Format: Single .csv file" as etlSingleCSVTitle %} "{{ etlSingleCSVTitle|escapejs }}"'
+        file-summary='{% trans "File Summary" as fileSummary %} "{{ fileSummary|escapejs }}"'
+        file-name='{% trans "File name" as fileName %} "{{ fileName|escapejs }}"'
+        file-size='{% trans "File size" as fileSize %} "{{ fileSize|escapejs }}"'
+        number-of-rows='{% trans "Number of rows" as numberOfRows %} "{{ numberOfRows|escapejs }}"'
+        target-model='{% trans "Target Model" as targetModel %} "{{ targetModel|escapejs }}"'
+        import-details='{% trans "Import Details" as importDetails %} "{{ importDetails|escapejs }}"'
+        column-name-first-row='{% trans "Column names in the first row" as columnNameFirstRow %} "{{ columnNameFirstRow|escapejs }}"'
+        showing-first='{% trans "Showing First" as showingFirst %} "{{ showingFirst|escapejs }}"'
+        showing-all='{% trans "Showing All" as showingAll %} "{{ showingAll|escapejs }}"'
+        rows='{% trans "Rows" as rows %} "{{ rows|escapejs }}"'
+        import-data='{% trans "Import data" as importData %} "{{ importData|escapejs }}"'
+        cancel-file-import='{% trans "Cancel File Import" as cancelFileImport %} "{{ cancelFileImport|escapejs }}"'
+        import-single-csv='{% trans "Import Single CSV" as importSingleCsv %} "{{ importSingleCsv|escapejs }}"'
+        target-resource='{% trans "Target Resource" as targetResource %} "{{ targetResource|escapejs }}"'
+        target-fields='{% trans "Target Fields" as targetFields %} "{{ targetFields|escapejs }}"'
+        download-templates='{% trans "Download Templates" as downloadTemplates %} "{{ downloadTemplates|escapejs }}"'
+        select-template='{% trans "Select Template" as selectTemplate %} "{{ selectTemplate|escapejs }}"'
+        upload-zip-file='{% trans "Upload .zip File" as uploadZipFile %} "{{ uploadZipFile|escapejs }}"'
+        upload-your-zip-file='{% trans "Upload Your .zip File" as uploadYourZipFile %} "{{ uploadYourZipFile|escapejs }}"'
+        branch-excel='{% trans "Branch Excel" as branchExcel %} "{{ branchExcel|escapejs }}"'
+        file-upload-summary='{% trans "File Upload Summary" as fileUploadSummary %} "{{ fileUploadSummary|escapejs }}"'
+        file='{% trans "File" as file %} "{{ file|escapejs }}"'
+        size='{% trans "Size" as size %} "{{ size|escapejs }}"'
+        submit='{% trans "Submit" as submit %} "{{ submit|escapejs }}"'
+        file-contents='{% trans "File contents" as fileContents %} "{{ fileContents|escapejs }}"'
+        import-branch-excel-summary='{% trans "Import Branch Excel Summary" as importBranchExcelSummary %} "{{ importBranchExcelSummary|escapejs }}"'
+        excel-file='{% trans "Excel File" as excelFile %} "{{ excelFile|escapejs }}"'
+        worksheets='{% trans "Worksheets" as worksheets %} "{{ worksheets|escapejs }}"'
+        tiles='{% trans "Tiles" as tiles %} "{{ tiles|escapejs }}"'
+        import='{% trans "Import" as import %} "{{ import|escapejs }}"'
+        export='{% trans "Export" as export %} "{{ export|escapejs }}"'
+        filter-tasks='{% trans "Filter Tasks" as filterTasks %} "{{ filterTasks|escapejs }}"'
+        filter-modules='{% trans "Filter Modules" as filterModules %} "{{ filterModules|escapejs }}"'
+        start='{% trans "Start" as start %} "{{ start|escapejs }}"'
+        warning='{% trans "Warning" as warning %} "{{ warning|escapejs }}"'
+        etl-reverse-warning-message='{% trans "Are you sure you want to delete this load?" as etlReverseWarningMessage %} "{{ etlReverseWarningMessage|escapejs }}"'
+        undo-import='{% trans "undo import" as undoImport %} "{{ undoImport|escapejs }}"'
+        remove-from-history='{% trans "remove from history" as removeFromHistory %} "{{ removeFromHistory|escapejs }}"'
+        indexing='{% trans "indexing" as indexing %} "{{ indexing|escapejs }}"'
+        completed='{% trans "completed" as completed %} "{{ completed|escapejs }}"'
+        failed='{% trans "failed" as failed %} "{{ failed|escapejs }}"'
+        running='{% trans "running" as running %} "{{ running|escapejs }}"'
+        unloading='{% trans "unloading" as unloading %} "{{ unloading|escapejs }}"'
+        unloaded='{% trans "unloaded" as unloaded %} "{{ unloaded|escapejs }}"'
+        validation-errors='{% trans "Validation Errors" as validationErrors %} "{{ validationErrors|escapejs }}"'
+        no-error-found='{% trans "No Error Found" as noErrorFound %} "{{ noErrorFound|escapejs }}"'
+        loading-data='{% trans "Loading data" as loadingData %} "{{ loadingData|escapejs }}"'
+        loading-status='{% trans "Loading status" as loadingStatus %} "{{ loadingStatus|escapejs }}"'
+        loading-started='{% trans "Loading started" as loadingStarted %} "{{ loadingStarted|escapejs }}"'
+        loading-ended='{% trans "Loading ended" as loadingEnded %} "{{ loadingEnded|escapejs }}"'
+        load-duration='{% trans "Load duration" as loadDuration %} "{{ loadDuration|escapejs }}"'
+        indexing-ended='{% trans "Indexing ended" as indexingEnded %} "{{ indexingEnded|escapejs }}"'
+        indexing-duration='{% trans "Indexing duration" as indexingDuration %} "{{ indexingDuration|escapejs }}"'
+        manage='{% trans "Manage" as manage %} "{{ manage|escapejs }}"'
+        unable-to-display-selected-file='{% trans "Unable to display the selected file" as unableToDisplaySelectedFile %} "{{ unableToDisplaySelectedFile|escapejs }}"'
+        file-display-error-message1='{% trans "This file can't be displayed." as fileDisplayErrorMessage1 %} "{{ fileDisplayErrorMessage1|escapejs }}"'
+        file-display-error-message2='{% trans "It may be a proprietary format or there isn't a loader available yet" as fileDisplayErrorMessage2 %} "{{ fileDisplayErrorMessage2|escapejs }}"'
+        file-display-error-message3='{% trans "to present it in this webpage." as fileDisplayErrorMessage3 %} "{{ fileDisplayErrorMessage3|escapejs }}"'
+        file-loader-parse-error-message='{% trans "Unable to parse your file with the " as fileLoaderParseErrorMessage %} "{{ fileLoaderParseErrorMessage|escapejs }}"'
+        loader-lowercase='{% trans "loader" as loaderLowercase %} "{{ loaderLowercase|escapejs }}"'
+        select-file-loader='{% trans "Select File Loader" as selectFileLoader %} "{{ selectFileLoader|escapejs }}"'
+        select-loader-message='{% trans "Select the loader best suited for processing and visualizing the selected file" as selectLoaderMessage %} "{{ selectLoaderMessage|escapejs }}"'
+        upload-files='{% trans "Upload Files" as uploadFiles %} "{{ uploadFiles|escapejs }}"'
+        file-upload-number-size-desc='{% trans "You may upload as many files as you wish; check with the site admin on the maximum file size." as fileUploadNumberSizeDesc %} "{{ fileUploadNumberSizeDesc|escapejs }}"'
+        optional='{% trans "optional" as optional %} "{{ optional|escapejs }}"'
+        file-upload-optional='{% trans "Adding files to this record is" as fileUploadOptional %} "{{ fileUploadOptional|escapejs }}"'
+        image-upload_format-desc='{% trans "Images formatted as .jpg, .png files may be uploaded. Other formats may require a loader to view." as imageUploadFormatDesc %} "{{ imageUploadFormatDesc|escapejs }}"'
+        file-filter='{% trans "File Filter" as fileFilter %} "{{ fileFilter|escapejs }}"'
+        select-all='{% trans "Select All" as selectAll %} "{{ selectAll|escapejs }}"'
+        clear-all='{% trans "Clear All" as clearAll %} "{{ clearAll|escapejs }}"'
+        delete-selected='{% trans "Delete Selected" as deleteSelected %} "{{ deleteSelected|escapejs }}"'
+        download-selected='{% trans "Download Selected" as downloadSelected %} "{{ downloadSelected|escapejs }}"'
+        loader='{% trans "Loader" as loader %} "{{ loader|escapejs }}"'
+        file-renderer='{% trans "File Renderer" as fileRenderer %} "{{ fileRenderer|escapejs }}"'
+        delete='{% trans "Delete" as delete %} "{{ delete|escapejs }}"'
+        save='{% trans "Save" as save %} "{{ save|escapejs }}"'
+        files-selected='{% trans "files selected" as filesSelected %} "{{ filesSelected|escapejs }}"'
+        add-files='{% trans "add files" as addFiles %} "{{ addFiles|escapejs }}"'
+        apply-to-selected-files='{% trans "Apply to Selected Files" as applyToSelectedFiles %} "{{ applyToSelectedFiles|escapejs }}"'
+        apply-same-loader-to-all='{% trans "Apply the same loader to all selected files in the dataset" as applySameLoaderToAll %} "{{ applySameLoaderToAll|escapejs }}"'
+        id-column-selection='{% trans "Use as an id" as idColumnSelection %} "{{ idColumnSelection|escapejs }}"'
+    ></div>
+    {% endblock arches_translations %}
+    {% block arches_urls %}
+    <div 
+        class='arches-urls'
+        root="{% url 'root' %}"
+        home="{% url 'home' %}"
+        media="{{ STATIC_URL }}"
+        rdm="{% url 'rdm' ''%}"
+        uploadedfiles="{{ MEDIA_URL }}"
+        url_subpath="{{app_settings.FORCE_SCRIPT_NAME}}"
+        concept_tree="{% url 'concept_tree' '' %}"
+        concept="{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        concept_search="{% url 'concept_search' %}"
+        concept_value="{% url 'concept_value' %}"
+        concept_manage_parents="{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        concept_make_collection="{% url 'make_collection' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        change_password="{% url 'change_password' %}"
+        export_concept="{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        export_concept_collections="{% url 'export_concept_collections' %}"
+        get_concept_collections="{% url 'get_concept_collections' %}"
+        dropdown="{% url 'dropdown' %}"
+        paged_dropdown="{% url 'paged_dropdown' %}"
+        get_pref_label="{% url 'get_pref_label' %}"
+        from_sparql_endpoint="{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        search_sparql_endpoint="{% url 'search_sparql_endpoint' %}"
+        confirm_delete="{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        search_home="{% url 'search_home' %}"
+        search_terms="{% url 'search_terms' %}"
+        search_results="{% url 'search_results' %}"
+        export_results="{% url 'export_results' %}"
+        get_export_file="{% url 'get_export_file' %}"
+        buffer="{% url 'buffer'%}"
+        config="{% url 'config' %}"
+        node="{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        graph_nodes='(graphid)=>{return "{% url "graph_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        nodegroup="{% url 'nodegroup' %}"
+        node_layer="{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        graph='"{% url "graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        graph_designer='(graphid)=>{return "{% url "graph_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        graph_settings='(graphid)=>{return "{% url "graph_settings" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        get_notifications="{% url 'get_notifications' %}"
+        dismiss_notifications="{% url 'dismiss_notifications' %}"
+        get_notification_types="{% url 'get_notification_types' %}"
+        update_notification_types="{% url 'update_notification_types' %}"
+        card="{% url 'card' '' %}"
+        reorder_cards="{% url 'reorder_cards'%}"
+        resource="{% url 'resource' %}"
+        resource_editor='"{% url "resource_editor" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        resource_copy='"{% url "resource_copy" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        resource_report='"{% url "resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        resource_edit_log='"{% url "resource_edit_log" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        get_resource_edit_log='(graphid)=>{return "{% url "resource_edit_log" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        resource_data='"{% url "resource_data" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, "")'
+        resource_cards='"{% url "resource_cards" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        related_resources='"{% url "related_resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        resource_descriptors='"{% url "resource_descriptors" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        resource_tiles="{% url 'resource_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        tile="{% url 'tile' %}"
+        reorder_tiles="{% url 'reorder_tiles' %}"
+        reorder_nodes="{% url 'reorder_nodes' %}"
+        delete_provisional_tile="{% url 'delete_provisional_tile' %}"
+        tile_history="{% url 'tile_history' %}"
+        download_files="{% url 'download_files' %}"
+        apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        remove_functions='"{% url "remove_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        time_wheel_config="{% url 'time_wheel_config' %}"
+        two_factor_authentication_reset="{% url 'two-factor-authentication-reset' %}"
+        reindex="{% url 'reindex' %}"
+        permission_data="{% url 'permission_data' %}"
+        resource_permission_data="{% url 'resource_permission_data' %}"
+        permission_manager_data="{% url 'permission_manager_data' %}"
+        clear_user_permission_cache="{% url 'clear_user_permission_cache' %}"
+        get_user_names="{% url 'get_user_names' %}"
+        feature_popup_content="{% url 'feature_popup_content' %}"
+        related_resource_candidates="{% url 'related_resource_candidates' %}"
+        relatable_resources="{% url 'relatable_resources' %}"
+        languages="{% url 'language' %}"
+        get_domain_connections='(graphid)=>{return "{% url "get_domain_connections" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        clone_graph='(graphid)=>{return "{% url "clone_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        export_graph='(graphid)=>{return "{% url "export_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        publish_graph='(graphid)=>{return "{% url "publish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        unpublish_graph='(graphid)=>{return "{% url "unpublish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        delete_graph='(graphid)=>{return "{% url "delete_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        delete_instances='(graphid)=>{return "{% url "delete_instances" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        export_mapping_file='(graphid)=>{return "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        add_resource='(graphid)=>{return "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
+        transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
+        mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
+        help_template="{% url 'help_templates' %}"
+        graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        api_card='"{% url "api_card" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        api_tiles='(tileid)=>{ 
+            return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);
+        }'
+        api_nodegroup='(nodegroupid)=>{
+            return "{% url "api_nodegroup" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodegroupid);
+        }'
+        api_nodes='(nodeid)=>{
+            return "{% url "api_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid);
+        }'
+        api_node_value="{% url 'api_node_value' %}"
+        api_resource_report='(resourceid)=>{return "{% url "api_resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
+        api_bulk_resource_report="{% url 'api_bulk_resource_report' %}"
+        api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
+        api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
+        api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
+        geojson="{% url 'geojson' %}"
+        icons="{% url 'icons' %}"
+        ontology_properties="{% url 'ontology_properties' %}"
+        iiifmanifest="{% url 'iiifmanifest' %}"
+        manifest_manager="{% url 'manifest_manager' %}"
+        etl_manager="{% url 'etl_manager' %}"
+        iiifannotations="{% url 'iiifannotations' %}"
+        iiifannotationnodes="{% url 'iiifannotationnodes' %}"
+        validatejson='"{% url "validatejson" "aaaa"%}".replace("aaaa", "")'
+        get_dsl="{% url 'get_dsl' %}"
+        transform_edtf_for_tile="{% url 'transform_edtf_for_tile' %}"
+    ></div>
+    {% endblock arches_urls %}
+    {% block arches_data %}
+    <div 
+        class='arches-data'
+        celery-running="{{celery_running}}"
+        concept-collections='[{% for concept_collection in concept_collections %}{
+            "label": "{{ concept_collection.label | escapejs }}",
+            "id": "{{ concept_collection.id }}"
+        },{% endfor %}]'
+        export-html-templates='[{% for template in export_html_templates %} "{{ template }}", {% endfor %}]'
+        geocoder-default="{{ map_info.geocoder_default }}"
+        geocoding-providers='[{% for provider in geocoding_providers %}{
+            "name": "{{ provider.name }}",
+            "geocoderid": "{{ provider.geocoderid }}",
+            "api_key": {% if provider.api_key != None %} "{{ provider.api_key }}" {% elif provider.api_key == None %} null {% endif %},
+            "component": "{{ provider.component }}"
+        },{% endfor %}]'
+        graphs="{{graphs|default:'[]'}}"
+        hex-bin-size="{{ map_info.hex_bin_size | unlocalize }}"
+        hex-bin-bounds="{{ map_info.hex_bin_bounds }}"
+        active-language="{{ app_settings.ACTIVE_LANGUAGE }}"
+        active-language-dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}"
+        languages='{{ app_settings.LANGUAGES }}'
+        mapbox-api-key="{{ map_info.mapbox_api_key }}"
+        mapbox-glyphs="{{ map_info.mapbox_glyphs }}"
+        mapbox-sprites="{{ map_info.mapbox_sprites }}"
+        map-default-x="{{ map_info.x|unlocalize }}"
+        map-default-y="{{ map_info.y|unlocalize }}"
+        map-default-zoom="{{ map_info.zoom | unlocalize }}"
+        map-default-min-zoom="{{ map_info.map_min_zoom | unlocalize }}"
+        map-default-max-zoom="{{ map_info.map_max_zoom | unlocalize }}"
+        map-layers='[{% for map_layer in map_layers %}{
+            "maplayerid": "{{ map_layer.maplayerid }}",
+            "name": "{{ map_layer.name }}",
+            "layer_definitions": {{ map_layer.layer_json }},
+            "isoverlay": {{ map_layer.isoverlay|lower }},
+            "icon": "{{ map_layer.icon }}",
+            "legend": "{{ map_layer.legend | default_if_none:"" | escapejs  }}",
+            "searchonly": {{ map_layer.searchonly|lower }},
+            "activated": {{ map_layer.activated|lower }},
+            "addtomap": {{ map_layer.addtomap|lower }},
+            "is_resource_layer": false,
+            "centerx": {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
+            "centery": {{ map_layer.centery|default_if_none:"null"|unlocalize }},
+            "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
+        },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
+            "maplayerid": "{{ resource_map_layer.nodeid }}",
+            "name": "{{ resource_map_layer.name }}",
+            "layer_definitions": {{ resource_map_layer.layer_definitions }},
+            "searchonly": false,
+            "isoverlay": true,
+            "icon": "{{ resource_map_layer.icon }}",
+            "legend": "{{ resource_map_layer.legend | escapejs  }}",
+            "activated": true,
+            "addtomap": {{ resource_map_layer.addtomap|lower }},
+            "is_resource_layer": true
+        },{% endfor %}]'
+        map-markers='[{% for map_marker in map_markers %}{
+            "name": "{{ map_marker.name }}",
+            "url": "{{ map_marker.url }}"
+        },{% endfor %}]'
+        map-sources='{
+            {% for map_source in map_sources %}
+                "{{ map_source.name }}": {{ map_source.source_json }},
+            {% endfor %}
+            {% for resource_map_source in resource_map_sources %}
+                "{{ resource_map_source.name }}": {{ resource_map_source.source }},
+            {% endfor %}
+        }'
+        preferred-coordinate-systems="{{ map_info.preferred_coordinate_systems }}"
+        resources='[{% for resource in resource_graphs %}{
+            "maplayerid": "{{resource.graphid}}",
+            "graphid": "{{resource.graphid}}",
+            "name": "{{ resource.name | escapejs }}",
+            "icon": "{{ resource.iconclass }}"
+        },{% endfor %}]'
+        user-email='{{ user.email }}'
+        use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
+        version="{{ app_settings.VERSION }}"
+    ></div>
+    {% endblock arches_data %}
 
-    define('resource-types', [], function () {
-        var resourceTypes = {
-            {% for type, type_data in resource_types %}
+
+    <!-- consumed by media/js/card-components.js -->
+    <div 
+        id="cardComponentData"
+        style="display: none;"
+        cardComponents='{{% for component in card_components %}
+            "{{ component.pk }}": {
+                "componentname": "{{ component.componentname }}",
+                "component": "{{ component.component }}",
+                "defaultconfig": {{ component.defaultconfig_json }}
+            },
+        {% endfor %}}'
+    ></div>
+
+
+    <!-- consumed by media/js/datatype-config-components.js -->
+    <div 
+        id="datatypeConfigComponentData"
+        style="display: none;"
+        datatypeConfigComponents='{{% for datatype in datatypes %}
+            {% if datatype.configcomponent != None %}
+                "{{ datatype.pk }}" : {
+                    "datatype": "{{ datatype.datatype }}",
+                    "iconclass": "{{ datatype.iconclass }}",
+                    "modulename": "{{ datatype.modulename }}",
+                    "classname": "{{ datatype.classname }}",
+                    "configcomponent": "{{ datatype.configcomponent }}",
+                    "defaultconfig": {{ datatype.defaultconfig }},
+                    "configname": "{{ datatype.configname }}",
+                    "isgeometric": "{{ datatype.isgeometric }}",
+                    "defaultwidget": "{{ datatype.defaultwidget }}",
+                    "issearchable": "{{ datatype.issearchable }}"
+                },
+            {% endif %}
+        {% endfor %}}'
+    ></div>
+
+
+    <!-- consumed by media/js/file-renderers.js -->
+    <div 
+        id="fileRendererData"
+        style="display: none;"
+        fileRenderers='{{% for renderer in app_settings.RENDERERS  %}
+            "{{ renderer.id }}": {
+                "name": "{{ renderer.name }}",
+                "title": "{{ renderer.title }}",
+                "description": "{{ renderer.description }}",
+                "component": "{{ renderer.component }}",
+                "id": "{{ renderer.id }}",
+                "iconclass": "{{ renderer.iconclass }}",
+                "text": "{{ renderer.title }}",
+                "type": "{{ renderer.type }}",
+                "ext": "{{ renderer.ext }}",
+                "exclude": "{{ renderer.exclude }}"
+            },
+        {% endfor %}}'
+    ></div>
+
+
+    <!-- consumed by media/js/function-templates.js -->
+    <div 
+        id="functionTemplateData"
+        style="display: none;"
+        functionTemplates='{{% for template in function_templates  %}
+            "{{ template.pk }}": {
+                "component": "{{ template.component }}",
+                "classname": "{{ template.classname }}",
+                "name": "{{ template.name }}",
+                "functiontype": "{{ template.functiontype }}",
+                "modulename": "{{ template.modulename }}",
+                "description": "{{ template.description }}",
+                "defaultconfig": "{{ template.defaultconfig }}"
+            },
+        {% endfor %}}'
+    ></div>
+
+
+    <!-- consumed by media/js/geocoder-templates.js -->
+    <div 
+        id="geocoderTemplateData"
+        style="display: none;"
+        geocoderTemplates='{{% for provider in geocoding_providers %}
+            "{{ provider.geocoderid }}": {
+                "component": "{{ provider.component }}",
+                "name": "{{ provider.name }}",
+                "api_key": "{{ provider.api_key }}"
+            },
+        {% endfor %}}'
+    ></div>
+
+
+    <!-- consumed by media/js/plugins.js -->
+    <div
+        id="pluginsData"
+        style="display: none;"
+        plugins='{{ plugins_json }}'
+    ></div>
+
+
+    <!-- consumed by media/js/resource-types.js -->
+    <div 
+        id="resourceTypeData"
+        style="display: none;"
+        resourceTypes='{{% for type, type_data in resource_types %}
             "{{type}}": {
-                id: "{{type_data.resourcetypeid}}",
-                icon: "{{type_data.icon_class}}",
-                name: "{{type_data.name | escapejs}}",
-                defaultDescription: "{{type_data.default_description | escapejs}}",
-                descriptionNode: "{{type_data.description_node | escapejs}}",
-                categories: [
+                "id": "{{type_data.resourcetypeid}}",
+                "icon": "{{type_data.icon_class}}",
+                "name": "{{type_data.name}}",
+                "defaultDescription": "{{type_data.default_description}}",
+                "descriptionNode": "{{type_data.description_node}}",
+                "categories": [
                     {% for category in type_data.categories %}
-                    "{{category | escapejs}}"
+                        "{{category}}"
                     {% endfor %}
                 ],
-                color: "{{type_data.marker_color | escapejs}}",
-                strokeColor: "{{type_data.stroke_color | escapejs}}",
-                fillColor: "{{type_data.fill_color | escapejs}}"
+                "color": "{{type_data.marker_color}}",
+                "strokeColor": "{{type_data.stroke_color}}",
+                "fillColor": "{{type_data.fill_color}}"
             },
-            {% endfor %}
-        };
+        {% endfor %}}'
+    ></div>
 
-        return resourceTypes;
-    });
 
-    define('widgets', [{% for widget in widgets %}'{{ widget.component | escapejs }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for widget in widgets %}
-            '{{ widget.pk }}': {
-                'name': '{{ widget.name | escapejs }}',
-                'component': '{{ widget.component | escapejs }}',
-                'datatype': '{{ widget.datatype | escapejs }}',
-                'defaultconfig': '{{ widget.defaultconfig_json }}'
+    <!-- consumed by media/js/report-templates.js -->
+    <div 
+        id="reportTemplateData"
+        style="display: none;"
+        reportTemplates='{{% for template in report_templates %}
+            "{{ template.pk }}": {
+                "componentname": "{{ template.componentname }}",
+                "component": "{{ template.component }}",
+                "defaultconfig": {{ template.defaultconfig_json }},
+                "name": "{{ template.name }}",
+                "preload_resource_data": "{{ template.preload_resource_data }}"
             },
-        {% endfor %}{% endautoescape %}};
-    });
+        {% endfor %}}'
+    ></div>
 
-    define('report-templates', [{% for template in report_templates %}'{{ template.component | escapejs }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for template in report_templates %}
-            '{{ template.pk }}': {
-                'componentname': '{{ template.componentname | escapejs }}',
-                'component': '{{ template.component | escapejs }}',
-                'defaultconfig': '{{ template.defaultconfig_json }}',
-                'name': '{{ template.name | escapejs }}',
-                'preload_resource_data': '{{ template.preload_resource_data }}'
+
+    <!-- consumed by media/js/search-components.js -->
+    <div 
+        id="searchComponentData"
+        style="display: none;"
+        searchComponents='{{% for component in search_components %}
+            "{{ component.pk }}": {{ component.toJSON }},
+        {% endfor %}}'
+    ></div>
+
+
+    <!-- consumed by media/js/widgets.js -->
+    <div 
+        id="widgetData"
+        style="display: none;"
+        widgets='{{% for widget in widgets %}
+            "{{ widget.pk }}": {
+                "name": "{{ widget.name }}",
+                "component": "{{ widget.component }}",
+                "datatype": "{{ widget.datatype }}",
+                "defaultconfig": {{ widget.defaultconfig_json }}
             },
-        {% endfor %}{% endautoescape %}};
-    });
-
-    define('card-components', [{% for component in card_components %}'{{ component.component }}',{% endfor %}], function () {
-        return {{% autoescape off %}{% for component in card_components %}
-            '{{ component.pk }}': {
-                'componentname': '{{ component.componentname | escapejs }}',
-                'component': '{{ component.component | escapejs }}',
-                'defaultconfig': '{{ component.defaultconfig_json }}'
-            },
-        {% endfor %}{% endautoescape %}};
-    });
-
-    define('function-templates', [{% for template in function_templates %}'{{ template.component | escapejs }}',{% endfor %}], function () {
-         return;
-    });
-
-    define('component-templates', ['views/components/nodegroup-selector','views/components/simple-switch'], function () {
-         return;
-    });
-
-    define('geocoder-templates', [{% for provider in geocoding_providers %}'{{ provider.component | escapejs }}',{% endfor %}], function () {
-         return;
-    });
-
-    define('file-renderers', [{% for renderer in app_settings.RENDERERS %}'{{ renderer.component | escapejs }}',{% endfor %}], function () {
-        return [{% autoescape off %}{% for renderer in app_settings.RENDERERS %}
-                {'name': '{{ renderer.name | escapejs }}',
-                'title': '{{ renderer.title | escapejs }}',
-                'description': '{{ renderer.description | escapejs }}',
-                'component': '{{ renderer.component | escapejs }}',
-                'id': '{{ renderer.id }}',
-                'iconclass': '{{ renderer.iconclass }}',
-                'text': '{{ renderer.title | escapejs }}',
-                'type': '{{ renderer.type | escapejs }}',
-                'ext': '{{ renderer.ext }}',
-                'exclude': '{{ renderer.exclude }}',
-                 },
-                {% endfor %}{% endautoescape %}];
-    });
-
-    define('datatype-config-components',
-        [{% for datatype in datatypes %}
-            {% if datatype.configcomponent != None %}
-            "{{ datatype.configcomponent | escapejs }}",
-            {% endif %}
-        {% endfor %}
-        ],
-        function () { return });
-
-    define('geoms', function () {
-        {% autoescape off %}return {{geoms}};{% endautoescape %}
-    });
-
-    define('search-components', [{% for component in search_components %}'{{ component.componentpath | escapejs }}',{% endfor %}], function () {
-            return {% autoescape off %}[{% for component in search_components %}
-                {{component.toJSON}},
-            {% endfor %}]{% endautoescape %};
-    });
-
-    define('leaflet-draw-local', [
-        'leaflet',
-        'leaflet-draw'
-    ], function (L) {
-        L.drawLocal.draw.toolbar.actions.title = "{% trans "Cancel drawing" %}";
-        L.drawLocal.draw.toolbar.actions.text = "{% trans "Cancel" %}";
-
-        L.drawLocal.draw.toolbar.finish.title = "{% trans "Finish drawing" %}";
-        L.drawLocal.draw.toolbar.finish.text = "{% trans "Finish" %}";
-
-        L.drawLocal.draw.toolbar.undo.title = "{% trans "Delete last point drawn" %}";
-        L.drawLocal.draw.toolbar.undo.text = "{% trans "Delete last point" %}";
-
-        L.drawLocal.draw.toolbar.buttons.polyline = "{% trans "Draw a polyline" %}";
-        L.drawLocal.draw.toolbar.buttons.polygon = "{% trans "Draw a polygon" %}";
-        L.drawLocal.draw.toolbar.buttons.rectangle = "{% trans "Draw a rectangle" %}";
-        L.drawLocal.draw.toolbar.buttons.circle = "{% trans "Draw a circle" %}";
-        L.drawLocal.draw.toolbar.buttons.marker = "{% trans "Draw a marker" %}";
-
-        L.drawLocal.draw.handlers.circle.tooltip.start = "{% trans "Click and drag to draw circle." %}";
-        L.drawLocal.draw.handlers.circle.radius = "{% trans "Radius" %}";
-
-        L.drawLocal.draw.handlers.marker.tooltip.start = "{% trans "Click map to place marker." %}";
-
-        L.drawLocal.draw.handlers.polygon.tooltip.start = "{% trans "Click to start drawing shape." %}";
-        L.drawLocal.draw.handlers.polygon.tooltip.cont = "{% trans "Click to continue drawing shape." %}";
-        L.drawLocal.draw.handlers.polygon.tooltip.end = "{% trans "Click first point to close this shape." %}";
-
-        L.drawLocal.draw.handlers.polyline.error = "{% trans "<strong>Error:</strong> shape edges cannot cross!" %}";
-        L.drawLocal.draw.handlers.polyline.tooltip.start = "{% trans "Click to start drawing line." %}";
-        L.drawLocal.draw.handlers.polyline.tooltip.cont = "{% trans "Click to continue drawing line." %}";
-        L.drawLocal.draw.handlers.polyline.tooltip.end = "{% trans "Click last point to finish line." %}";
-
-        L.drawLocal.draw.handlers.rectangle.tooltip.start = "{% trans "Click and drag to draw rectangle." %}";
-        L.drawLocal.draw.handlers.simpleshape.tooltip.end = "{% trans "Release mouse to finish drawing." %}";
-
-        L.drawLocal.edit.toolbar.actions.save.title = "{% trans "Apply changes." %}";
-        L.drawLocal.edit.toolbar.actions.save.text = "{% trans "Apply" %}";
-
-        L.drawLocal.edit.toolbar.actions.cancel.title = "{% trans "Undo edits, discards all changes." %}";
-        L.drawLocal.edit.toolbar.actions.cancel.text = "{% trans "Undo" %}";
-
-        L.drawLocal.edit.toolbar.buttons.edit = "{% trans "Edit drawings." %}";
-        L.drawLocal.edit.toolbar.buttons.editDisabled = "{% trans "No drawings to edit." %}";
-        L.drawLocal.edit.toolbar.buttons.remove = "{% trans "Delete drawings." %}";
-        L.drawLocal.edit.toolbar.buttons.removeDisabled = "{% trans "No drawings to delete." %}";
-
-        L.drawLocal.edit.handlers.edit.tooltip.text = "{% trans "Drag handles, or marker to edit feature." %}";
-        L.drawLocal.edit.handlers.edit.tooltip.subtext = "{% trans "Click undo to cancel changes." %}";
-
-        L.drawLocal.edit.handlers.remove.tooltip.text = "{% trans "Click on a feature to remove" %}";
-    });
-</script>
+        {% endfor %}}'
+    ></div>
 {% endblock arches_modules %}
 
 {% block project_modules %}

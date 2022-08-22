@@ -24,7 +24,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
-<span data-bind="if: dirty">
+<span style="display: flex" data-bind="if: dirty">
     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel"><span>{% trans "Discard Edits" %}</span></button>
     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Save Edits" %}</span></button>
 </span>
@@ -153,18 +153,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-<script>
-    {% autoescape off %}
-    define('graph-functions-data', [], function () {
-        return {
-            functions: {{functions}},
-            applied_functions: {{applied_functions}},
-            // datatypes: {{ datatypes_json }},
-            // widgets: {{ widgets_json }},
-            // resourceid: '{{resourceid}}',
-            // graph: {{graph_json}},
-        };
-    });
-    {% endautoescape %}
-</script>
+<div 
+    id="graphFunctionsData"
+    style="display: none;"
+    graphFunctionsData='{
+        "functions": {{functions}},
+        "applied_functions": {{applied_functions}},
+    }'
+></div>
 {% endblock pre_require_js %}

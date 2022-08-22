@@ -11,7 +11,7 @@
     <!-- Date Selector -->
     <div class="provisional-edit-history-filter">
         <div class="calendar">
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%'}">
+            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType">
                 <!-- <option value="custom">{% trans "Custom date range" %}</option> -->
                 <option value="today">{% trans "Today" %}</option>
                 <option value="last-7">{% trans "Last 7 days" %}</option>
@@ -23,7 +23,15 @@
             </select>
         </div>
 
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: sortDescending, config:{ label: {% quoted_trans "Youngest to oldest" %}, subtitle: ''}}}"></div>
+        <div 
+            data-bind="component: { 
+                name: 'views/components/simple-switch', 
+                params: {
+                    value: sortDescending, 
+                    config:{ label: {% quoted_trans "Youngest to oldest" %}, subtitle: ''}
+                }
+            }"
+        ></div>
     </div>
     <!-- /ko -->
     {% endblock %}

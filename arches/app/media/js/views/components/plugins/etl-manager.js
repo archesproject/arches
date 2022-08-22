@@ -4,10 +4,13 @@ define([
     'js-cookie',
     'arches',
     'viewmodels/alert',
-], function($, ko, Cookies, arches, AlertViewModel) {
+    'templates/views/components/plugins/etl-manager.htm',
+    'utils/load-component-dependencies'
+], function($, ko, Cookies, arches, AlertViewModel, ETLManagerTemplate, loadComponentDependencies) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
+             
             this.loading = params.loading;
             this.alert = params.alert;
             this.loading(true);
@@ -123,7 +126,7 @@ define([
                     }).then(function() {
                         //pass
                     });
-                    }
+                }
                 ));
             };
 
@@ -185,7 +188,7 @@ define([
                     }
                 }).then(function(data){
                     self.etlModules = data.map(function(etl){
-                        require([etl.component]);
+                        loadComponentDependencies([`${etl.component}`]);
                         return etl;
                     });
                     self.loading(false);
@@ -193,8 +196,8 @@ define([
                 this.activeTab("start");
             };
             this.init();
-            setInterval(this.fetchLoadEvent, 5000)
+            setInterval(this.fetchLoadEvent, 5000);
         },
-        template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
+        template: ETLManagerTemplate,
     });
 });

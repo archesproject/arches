@@ -284,9 +284,10 @@ class BaseDataType(object):
             base_query.must(null_query)
         query.must(base_query)
 
-    def handle_request(self, current_tile, request, node):
+    def pre_tile_save(self, tile, nodeid):
         """
-        Updates files
+        Called during tile.save operation but before the tile is actually saved to the database
+
         """
         pass
 
@@ -296,9 +297,9 @@ class BaseDataType(object):
         """
         return tile.data[str(nodeid)]
 
-    def pre_tile_save(self, tile, nodeid):
+    def post_tile_save(self, tile, nodeid, request):
         """
-        Called during tile.save operation but before the tile is actually saved to the database
+        Called after the tile is saved to the database
 
         """
         pass
@@ -454,3 +455,9 @@ class BaseDataType(object):
         Returns a CSV column header or headers for a given node ID of this type
         """
         return node["file_field_name"]
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        """
+        Adds properties to a tile necessary for some clients, but not essential to the tile
+        """
+        pass

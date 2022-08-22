@@ -1,8 +1,9 @@
 define([
     'knockout',
     'views/components/workflows/new-tile-step',
-    'viewmodels/alert'
-], function(ko, NewTileStepViewModel, AlertViewModel) {
+    'viewmodels/alert',
+    'templates/views/components/workflows/new-multi-tile-step.htm'
+], function(ko, NewTileStepViewModel, AlertViewModel, newMultiTileStepTemplate) {
 
     /** 
      * A generic viewmodel for workflow steps that can add multiple tiles
@@ -10,6 +11,8 @@ define([
      **/
 
     function NewMultiTileStepViewModel(params) {
+         
+
         NewTileStepViewModel.apply(this, [params]);
         var self = this;
         this.itemName = ko.observable();
@@ -47,9 +50,7 @@ define([
     }
     ko.components.register('new-multi-tile-step', {
         viewModel: NewMultiTileStepViewModel,
-        template: {
-            require: 'text!templates/views/components/workflows/new-multi-tile-step.htm'
-        }
+        template: newMultiTileStepTemplate,
     });
     return NewMultiTileStepViewModel;
 });

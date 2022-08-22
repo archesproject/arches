@@ -4,11 +4,14 @@ define([
     'knockout-mapping',
     'arches',
     'viewmodels/alert',
+    'templates/views/resource/permissions/permissions-manager.htm',
     'bindings/select2-query'
-], function($, ko, koMapping, arches, AlertViewModel) {
+], function($, ko, koMapping, arches, AlertViewModel, permissionsManagerTemplate) {
     return ko.components.register('permissions-manager', {
         viewModel: function(params) {
             var self = this;
+
+             
             this.instancePermissions = ko.observable();
             this.resourceId = params.resourceId();
             this.alert = params.alert;
@@ -207,6 +210,6 @@ define([
 
             this.getInstancePermissions();
         },
-        template: { require: 'text!templates/views/resource/permissions/permissions-manager.htm' }
+        template: permissionsManagerTemplate,
     });
 });

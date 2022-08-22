@@ -25,6 +25,7 @@ from uuid import UUID
 from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth.models import User, Group, Permission
+from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
@@ -34,10 +35,11 @@ from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.mappings import TERMS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
+from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
+from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
@@ -75,13 +77,20 @@ class Resource(models.ResourceInstance):
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
+
+        if self.descriptors is None:
+            self.descriptors = {}
+
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(
+
+            self.descriptors[descriptor] = module.get_primary_descriptor_from_nodes(
                 self, graph_function[0].config["descriptor_types"][descriptor], context
             )
         else:
-            return "undefined"
+            self.descriptors[descriptor] = "undefined"
+
+        return self.descriptors[descriptor]
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -90,7 +99,9 @@ class Resource(models.ResourceInstance):
         return self.get_descriptor("map_popup", context)
 
     def displayname(self, context=None):
-        return self.get_descriptor("name", context)
+        descriptor = self.get_descriptor("name", context)
+        self.name = descriptor
+        return descriptor
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
@@ -256,6 +267,8 @@ class Resource(models.ResourceInstance):
                     doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                     es_index.index_document(document=doc, id=doc_id)
 
+            super(Resource, self).save()
+
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """
         Gets all the documents nessesary to index a single resource
@@ -405,7 +418,7 @@ class Resource(models.ResourceInstance):
             for related_resource in models.ResourceXResource.objects.filter(
                 Q(resourceinstanceidfrom=self.resourceinstanceid) | Q(resourceinstanceidto=self.resourceinstanceid)
             ):
-                related_resource.delete(deletedResourceId=self.resourceinstanceid, index=False)
+                related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
             if index:
                 self.delete_index()
@@ -436,14 +449,6 @@ class Resource(models.ResourceInstance):
         bool_query.filter(Terms(field="resourceinstanceid", terms=[resourceinstanceid]))
         query.add_query(bool_query)
         query.delete(index=TERMS_INDEX)
-
-        # delete any related resource index entries
-        query = Query(se)
-        bool_query = Bool()
-        bool_query.should(Terms(field="resourceinstanceidto", terms=[resourceinstanceid]))
-        bool_query.should(Terms(field="resourceinstanceidfrom", terms=[resourceinstanceid]))
-        query.add_query(bool_query)
-        query.delete(index=RESOURCE_RELATIONS_INDEX)
 
         # reindex any related resources
         query = Query(se)
@@ -522,51 +527,49 @@ class Resource(models.ResourceInstance):
             start = limit * int(page - 1)
 
         def get_relations(resourceinstanceid, start, limit, resourceinstance_graphid=None):
-            query = Query(se, start=start, limit=limit)
-            bool_filter = Bool()
-            bool_filter.should(Terms(field="resourceinstanceidfrom", terms=resourceinstanceid))
-            bool_filter.should(Terms(field="resourceinstanceidto", terms=resourceinstanceid))
+            final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(resourceinstanceidto_id=resourceinstanceid)
 
             if resourceinstance_graphid:
-                graph_filter = Bool()
-                to_graph_id_filter = Bool()
-                to_graph_id_filter.filter(Terms(field="resourceinstancefrom_graphid", terms=str(self.graph_id)))
-                to_graph_id_filter.filter(Terms(field="resourceinstanceto_graphid", terms=resourceinstance_graphid))
-                graph_filter.should(to_graph_id_filter)
+                to_graph_id_filter = Q(resourceinstancefrom_graphid_id=str(self.graph_id)) & Q(
+                    resourceinstanceto_graphid_id=resourceinstance_graphid
+                )
+                from_graph_id_filter = Q(resourceinstancefrom_graphid_id=resourceinstance_graphid) & Q(
+                    resourceinstanceto_graphid_id=str(self.graph_id)
+                )
+                final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
 
-                from_graph_id_filter = Bool()
-                from_graph_id_filter.filter(Terms(field="resourceinstancefrom_graphid", terms=resourceinstance_graphid))
-                from_graph_id_filter.filter(Terms(field="resourceinstanceto_graphid", terms=str(self.graph_id)))
-                graph_filter.should(from_graph_id_filter)
-                bool_filter.must(graph_filter)
+            relations = {
+                "total": models.ResourceXResource.objects.filter(final_query).count(),
+                "relations": models.ResourceXResource.objects.filter(final_query)[start:limit],
+            }
 
-            query.add_query(bool_filter)
-
-            return query.search(index=RESOURCE_RELATIONS_INDEX)
+            return relations  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
 
         resource_relations = get_relations(
-            resourceinstanceid=self.resourceinstanceid, start=start, limit=limit, resourceinstance_graphid=resourceinstance_graphid,
+            resourceinstanceid=self.resourceinstanceid,
+            start=start,
+            limit=limit,
+            resourceinstance_graphid=resourceinstance_graphid,
         )
 
-
-
-        ret["total"] = resource_relations["hits"]["total"]
+        ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
 
         restricted_instances = get_restricted_instances(user, se) if user is not None else []
-        for relation in resource_relations["hits"]["hits"]:
+        for relation in resource_relations["relations"]:
+            relation = model_to_dict(relation)
             try:
-                preflabel = get_preflabel_from_valueid(relation["_source"]["relationshiptype"], lang)
-                relation["_source"]["relationshiptype_label"] = preflabel["value"] or ""
+                preflabel = get_preflabel_from_valueid(relation["relationshiptype"], lang)
+                relation["relationshiptype_label"] = preflabel["value"] or ""
             except:
-                relation["_source"]["relationshiptype_label"] = relation["_source"]["relationshiptype"] or ""
+                relation["relationshiptype_label"] = relation["relationshiptype"] or ""
 
-            resourceid_to = relation["_source"]["resourceinstanceidto"]
-            resourceid_from = relation["_source"]["resourceinstanceidfrom"]
+            resourceid_to = relation["resourceinstanceidto"]
+            resourceid_from = relation["resourceinstanceidfrom"]
             if resourceid_to not in restricted_instances and resourceid_from not in restricted_instances:
-                ret["resource_relationships"].append(relation["_source"])
-                instanceids.add(resourceid_to)
-                instanceids.add(resourceid_from)
+                ret["resource_relationships"].append(relation)
+                instanceids.add(str(resourceid_to))
+                instanceids.add(str(resourceid_from))
             else:
                 ret["total"]["value"] -= 1
 
@@ -576,6 +579,9 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+
+                current_language = get_language()
+
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
@@ -583,7 +589,25 @@ class Resource(models.ResourceInstance):
                         limit=0,
                     )
                     if resource["found"]:
-                        resource["_source"]["total_relations"] = relations["hits"]["total"]
+                        resource["_source"]["total_relations"] = relations["total"]
+
+                        # manually updates output to current language for `displaydescription` and `displayname`
+                        current_language_display_description = [
+                            description_object["value"]
+                            for description_object in resource["_source"]["displaydescription"]
+                            if description_object.get("language") == current_language
+                        ]
+                        current_language_display_name = [
+                            name_object["value"]
+                            for name_object in resource["_source"]["displayname"]
+                            if name_object.get("language") == current_language
+                        ]
+
+                        if len(current_language_display_description):
+                            resource["_source"]["displaydescription"] = current_language_display_description[0]
+                        if len(current_language_display_name):
+                            resource["_source"]["displayname"] = current_language_display_name[0]
+
                         ret["related_resources"].append(resource["_source"])
 
         return ret

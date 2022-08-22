@@ -1,6 +1,6 @@
-Django==3.2.12
+Django==3.2.14
 psycopg2-binary==2.8.4
-elasticsearch>=7.11.0,<8.0.0
+elasticsearch>=8.3.1,<9.0.0
 rdflib==4.2.2
 django-guardian==2.3.0
 python-memcached==1.59
@@ -29,5 +29,6 @@ arcgis2geojson==2.0.0
 openpyxl==3.0.7
 django_compressor==3.1
 django-libsass==0.9
+django-webpack-loader==1.5.0
 filetype==1.0.13
 defusedxml==0.7.1
