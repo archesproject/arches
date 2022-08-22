@@ -79,6 +79,11 @@ define([
                 return isImmutable;
             };
 
+            this.extendNode = function(node, parameters)
+            {
+                return _.extend(node, parameters);
+            };
+
             this.toggleRequired = function() {
                 var isImmutable = self.checkIfImmutable();
                 if (isImmutable === false) {
