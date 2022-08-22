@@ -7,7 +7,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8578_rr_load_performance"),
+        ("models", "8770_bulk_index_queue_insert"),
     ]
 
     sql = """
