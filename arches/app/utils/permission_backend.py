@@ -227,8 +227,10 @@ def get_createable_resource_types(user):
     user -- the user to check
 
     """
-
-    return get_resource_types_by_perm(user, "models.write_nodegroup")
+    if user_is_resource_editor(user):
+        return get_resource_types_by_perm(user, "models.write_nodegroup")
+    else:
+        return []
 
 
 def get_resource_types_by_perm(user, perms):
