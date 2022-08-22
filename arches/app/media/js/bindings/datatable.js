@@ -25,17 +25,17 @@ define([
     ko.bindingHandlers.dataTablesForEach = {
         page: 0,
         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor());
+            const options = ko.unwrap(valueAccessor());
             ko.unwrap(options.data);
             if (valueAccessor().serverSide == false) {
                 if (options.dataTableOptions.paging) {
                     valueAccessor().data.subscribe(function(changes) {
-                        var table = $(element).closest('table').DataTable();
+                        const table = $(element).closest('table').DataTable();
                         ko.bindingHandlers.dataTablesForEach.page = table.page();
                         table.destroy();
                     }, null, 'arrayChange');
                 }
-                var nodes = Array.prototype.slice.call(element.childNodes, 0);
+                const nodes = Array.prototype.slice.call(element.childNodes, 0);
                 ko.utils.arrayForEach(nodes, function(node) {
                     if (node && node.nodeType !== 1) {
                         node.parentNode.removeChild(node);
@@ -44,14 +44,14 @@ define([
                 return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
             }
             else {
-                var table = $(element).closest('table').DataTable(valueAccessor().dataTableOptions);
+                const table = $(element).closest('table').DataTable(valueAccessor().dataTableOptions);
                 table.destroy();
 
                 return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
             }
         },
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor()),
+            const options = ko.unwrap(valueAccessor()),
                 key = 'DataTablesForEach_Initialized';
             ko.unwrap(options.data);
             var table;
