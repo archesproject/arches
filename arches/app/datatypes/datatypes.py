@@ -303,6 +303,8 @@ class StringDataType(BaseDataType):
     def pre_structure_tile_data(self, tile, nodeid, **kwargs):
         all_language_codes = {lang.code for lang in kwargs["languages"]}
         direction_lookup = {lang.code: lang.default_direction for lang in kwargs["languages"]}
+        if tile.data[nodeid] is None:
+            tile.data[nodeid] = {}
         tile_language_codes = set(tile.data[nodeid].keys())
         for code in all_language_codes - tile_language_codes:
             tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
