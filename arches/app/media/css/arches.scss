@@ -13551,26 +13551,20 @@ ul.select2-choices:after {
     font-size: 0.9em;
 }
 
-.edtf-style-tools-collapser {
-    cursor: pointer;
-    padding: 5px;
-    font-size: 0.9em;
-    left: 510px;
-    position: absolute;
-    top: 6px;
-}
-
-.i18n-style-tools-collapser {
+.widget-inline-tools-collapser {
     cursor: pointer;
     font-size: 0.9em;
-    position: absolute;
-    padding: 0px 12px;
-    right: 0px;
+    display: flex;
     z-index: 1;
+    margin-bottom: 5px;
 }
 
-.workbench-card-sidepanel .edtf-style-tools-collapser {
-    left: 250px;
+.widget-inline-tools-collapser>label {
+    flex-grow: 1;
+}
+
+.widget-inline-tools-collapser>span {
+    padding-inline-end: 12px;
 }
 
 .style-tools-panel {
@@ -13600,7 +13594,6 @@ ul.select2-choices:after {
     padding: 10px;
     height: 140px;
     position: relative;
-    top: -10px;
     width: 100%;
 }
 

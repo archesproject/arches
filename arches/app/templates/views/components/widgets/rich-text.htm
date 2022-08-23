@@ -5,16 +5,19 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">        
-        <div class="i18n-style-tools-collapser" data-bind=" click: function() {
+        <div class="widget-inline-tools-collapser" data-bind=" click: function() {
             showi18nOptions(!showi18nOptions());
         }">
-            <i class="fa" data-bind="{
-                css: {
-                    'fa-caret-down' : !showi18nOptions(),
-                    'fa-caret-up' : showi18nOptions(),
-                }
-            }"></i>
-            <span data-bind="text: $root.translations.languages"></span>
+            <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+            <span>
+                <i class="fa" data-bind="{
+                    css: {
+                        'fa-caret-down' : !showi18nOptions(),
+                        'fa-caret-up' : showi18nOptions(),
+                    }
+                }"></i>
+                <span data-bind="text: $root.translations.languages"></span>
+            </span>
         </div>
         <div class="form-horizontal" data-bind="if: showi18nOptions">
             <div class="i18n-style-tools-panel">
@@ -45,7 +48,6 @@
                 </div>
             </div>
         </div>
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
