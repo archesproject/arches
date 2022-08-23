@@ -227,19 +227,20 @@ class StringDataType(BaseDataType):
             pass
 
         try:
-            value = ast.literal_eval(value)
-        except:
-            pass
-
-        if type(value) is str:
+            parsed_value = json.loads(value)
+        except ValueError:
+            parsed_value = ast.literal_eval(value)
+            
+        try:
+            parsed_value.keys()
+            return parsed_value
+        except AttributeError:
             if language is not None:
                 language_objects = list(models.Language.objects.filter(code=language))
                 if len(language_objects) > 0:
                     return {language: {"value": value, "direction": language_objects[0].default_direction}}
 
             return {get_language(): {"value": value, "direction": "ltr"}}
-        elif type(value) is dict:
-            return value
 
     def from_rdf(self, json_ld_node):
         transformed_value = None
