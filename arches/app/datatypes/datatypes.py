@@ -228,10 +228,10 @@ class StringDataType(BaseDataType):
 
         try:
             parsed_value = json.loads(value)
-        except ValueError:
+        except Exception:
             try:
                 parsed_value = ast.literal_eval(value)
-            except ValueError:
+            except Exception:
                 parsed_value = value
 
         try:
