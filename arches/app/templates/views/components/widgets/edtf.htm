@@ -4,21 +4,23 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-        <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-        <!-- /ko -->
-        <div class="form-group">
-          <div class="edtf-style-tools-collapser" data-bind=" click: function() {
-              showEDTFFormats(!showEDTFFormats());
-          }">
-              <i class="fa" data-bind="{
-                  css: {
-                      'fa-caret-down' : !showEDTFFormats(),
-                      'fa-caret-up' : showEDTFFormats(),
-                  }
-              }"></i>
-              <span data-bind="text: $root.translations.edtfFormats"></span>
+    <!-- ko if: node -->
+    <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+    <!-- /ko -->
+    <div class="form-group">
+        <div class="widget-inline-tools-collapser" style="max-width: 600px;" data-bind=" click: function() {
+            showEDTFFormats(!showEDTFFormats());
+        }">
+            <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+            <span>
+                <i class="fa" data-bind="{
+                    css: {
+                        'fa-caret-down' : !showEDTFFormats(),
+                        'fa-caret-up' : showEDTFFormats(),
+                    }
+                }"></i>
+                <span data-bind="text: $root.translations.edtfFormats"></span>
+            </span>
           </div>
           <div class="form-horizontal" data-bind="if: showEDTFFormats">
               <div class="edtf-style-tools-panel">

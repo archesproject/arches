@@ -13551,16 +13551,7 @@ ul.select2-choices:after {
     font-size: 0.9em;
 }
 
-.edtf-style-tools-collapser {
-    cursor: pointer;
-    padding: 5px;
-    font-size: 0.9em;
-    left: 510px;
-    position: absolute;
-    top: 6px;
-}
-
-.i18n-style-tools-collapser {
+.widget-inline-tools-collapser {
     cursor: pointer;
     font-size: 0.9em;
     display: flex;
@@ -13568,16 +13559,12 @@ ul.select2-choices:after {
     margin-bottom: 5px;
 }
 
-.i18n-style-tools-collapser>label {
+.widget-inline-tools-collapser>label {
     flex-grow: 1;
 }
 
-.i18n-style-tools-collapser>span {
+.widget-inline-tools-collapser>span {
     padding-inline-end: 12px;
-}
-
-.workbench-card-sidepanel .edtf-style-tools-collapser {
-    left: 250px;
 }
 
 .style-tools-panel {
