@@ -13563,10 +13563,17 @@ ul.select2-choices:after {
 .i18n-style-tools-collapser {
     cursor: pointer;
     font-size: 0.9em;
-    position: absolute;
-    padding: 0px 12px;
-    right: 0px;
+    display: flex;
     z-index: 1;
+    margin-bottom: 5px;
+}
+
+.i18n-style-tools-collapser>label {
+    flex-grow: 1;
+}
+
+.i18n-style-tools-collapser>span {
+    padding-inline-end: 12px;
 }
 
 .workbench-card-sidepanel .edtf-style-tools-collapser {
@@ -13600,7 +13607,6 @@ ul.select2-choices:after {
     padding: 10px;
     height: 140px;
     position: relative;
-    top: -10px;
     width: 100%;
 }
 
