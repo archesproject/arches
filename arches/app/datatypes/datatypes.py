@@ -230,7 +230,7 @@ class StringDataType(BaseDataType):
             parsed_value = json.loads(value)
         except ValueError:
             parsed_value = ast.literal_eval(value)
-            
+
         try:
             parsed_value.keys()
             return parsed_value
