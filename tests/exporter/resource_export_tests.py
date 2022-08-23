@@ -35,6 +35,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 
 
 class BusinessDataExportTests(ArchesTestCase):
+    maxDiff = None
     @classmethod
     def setUpClass(self):
         self.loadOntology()
