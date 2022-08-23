@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Yael Alef <yaelalef@gmail.com>, 2022
 # Elishai Cohen, 2022
+# Yael Alef <yaelalef@gmail.com>, 2022
 # 
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-03 14:33-0800\n"
 "PO-Revision-Date: 2021-12-03 22:37+0000\n"
-"Last-Translator: Elishai Cohen, 2022\n"
+"Last-Translator: Yael Alef <yaelalef@gmail.com>, 2022\n"
 "Language-Team: Hebrew (https://www.transifex.com/archesproject/teams/56656/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -81,8 +81,8 @@ msgid ""
 "Incorrect Extended Date Time Format. See "
 "http://www.loc.gov/standards/datetime/ for supported formats."
 msgstr ""
-"פורמט תאריך זמן מורחב שגוי. לפורמטים נתמכים ראה "
-"http://www.loc.gov/standards/datetime/ "
+"פורמט תאריך זמן מורחב שגוי. לפורמטים נתמכים ראה \n"
+"http://www.loc.gov/standards/datetime "
 
 #: arches/app/datatypes/datatypes.py:580
 msgid ""
@@ -162,8 +162,8 @@ msgstr "לא מוגדר"
 #: arches/app/models/concept.py:153
 msgid "Only include values for include or exclude, but not both"
 msgstr ""
-"כמנהל מסד נתונים, תשתמש במנהל Arches Collector כדי ליצור ולנהל את הפרויקטים "
-"עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של Arches Collector."
+"כמנהל מסד נתונים, תשתמש במנהל ארצ'ס קולקטור כדי ליצור ולנהל את הפרויקטים "
+"עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של ארצ'ס קולקטור."
 
 #: arches/app/models/concept.py:844
 #, python-format
@@ -378,8 +378,8 @@ msgid ""
 "Celery appears not to be running, you need to have celery running in order "
 "to sync from Arches Collector."
 msgstr ""
-"נראה שהCelery לא מופעל, הCelery צריך להיות פעיל כדי לבצע סנכרון מ-Arches "
-"Collector "
+".לא מופעל Celery-נראה שה \n"
+".צריך להיות פעיל כדי לבצע סנכרון מ-ארצ'ס קולקטור Celery "
 
 #: arches/app/models/mobile_survey.py:331
 msgid "Sync Completed"
@@ -387,7 +387,7 @@ msgstr "הסנכרון הושלם"
 
 #: arches/app/models/mobile_survey.py:346
 msgid "Pushing Edits to Arches"
-msgstr "מתבצע עדכון לעריכות בArches"
+msgstr "מתבצע עדכון לעריכות בארצ'ס"
 
 #: arches/app/models/models.py:403
 msgid "Only resource models may be edited - branches are not editable"
@@ -838,10 +838,10 @@ msgid ""
 "through the <a href=\"https://arches.readthedocs.io/en/stable/using-arches-"
 "collector\" target=\"_blank\">Arches Collector</a> mobile app."
 msgstr ""
-"כמנהל מסד נתונים, תשתמש במנהל Arches Collector כדי ליצור ולנהל את הפרויקטים "
+"כמנהל מסד נתונים, תשתמש במנהל ארצ'ס קולקטור כדי ליצור ולנהל את הפרויקטים "
 "עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של <a "
 "href=\"https://arches.readthedocs.io/en/stable/using-arches-collector\" "
-"target=\"_blank\">Arches Collector</a>."
+"target=\"_blank\">ארצ'ס קולקטור</a>."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:11
 msgid ""
@@ -889,7 +889,7 @@ msgid ""
 "collecting data."
 msgstr ""
 "הפעלה ראשונית זו שומרת את תוכן הפרויקט שלך לבמה מסד נתונים, שממנו משתמשי "
-"Arches קולקטור יורידו אותו ויתחילו איסוף מידע."
+"ארצ'ס קולקטור יורידו אותו ויתחילו איסוף מידע."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:27
 msgid ""
@@ -898,8 +898,8 @@ msgid ""
 "href=\"https://arches.readthedocs.io/en/stable/api/#registering-an-"
 "application-with-arches\" target=\"_blank\">register an application</a>."
 msgstr ""
-"חשוב!: על מנת שמשתמשי Arches Collector יתחברו ל Arches - מנהל מערכת חייב "
-"תחילה <a href=\"https://arches.readthedocs.io/en/stable/api/#registering-an-"
+"חשוב!: על מנת שמשתמשי ארצ'ס קולקטור יתחברו ל ארצ'ס - מנהל מערכת חייב תחילה "
+"<a href=\"https://arches.readthedocs.io/en/stable/api/#registering-an-"
 "application-with-arches\" target=\"_blank\">לבצע רישום לאפליקציה</a>."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:32
@@ -1001,7 +1001,7 @@ msgstr "שם"
 msgid ""
 "This name will be used in Arches Collector when users connect to this Arches"
 " instance."
-msgstr "השם הזה ישמש בArches קולקטור כאשר משתמשים יתחברו לפלטפורמת Arches זו."
+msgstr "השם הזה ישמש בארצ'ס קולקטור כאשר משתמשים יתחברו לפלטפורמת ארצ'ס זו."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:63
 msgid "Start Date/End Date"
@@ -1036,7 +1036,7 @@ msgid ""
 "included when users download the project using Arches Collector."
 msgstr ""
 "אפשר להוסיף תיאור לפרויקט שלך. תיאור זה יהיה כלול כאשר משתמשים מורידים את "
-"הפרויקט באמצעות Arches קולקטור."
+"הפרויקט באמצעות ארצ'ס קולקטור."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:75
 msgid "Map Extent"
@@ -1063,7 +1063,7 @@ msgid ""
 "collect data with Arches Collector."
 msgstr ""
 "הגדר את שכבת/ות מפת הבסיס שתהיה זמינה למשתמשים בזמן שהם אוספים נתונים עם "
-"Arches קולקטור."
+"ארצ'ס קולקטור."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:87
 msgid ""
@@ -1074,11 +1074,8 @@ msgid ""
 "href=\"https://arches.readthedocs.io/en/stable/arches-collector-manager/\" "
 "target=\"_blank\">Arches Collector Manager</a> documentation."
 msgstr ""
-"אם איסוף נתונים עשוי להתרחש באזורים שאין להם חיבור סלולרי/wifi מהימן, השתמש "
-"בפרמטר זה כדי לקשר ל-קובץ MBTiles שמשתמשים יורידו כשיורידו את הפרויקט. אתה "
-"יכול ללמוד עוד על יצירת קובץ זה בתיעוד החיצוני שלנו. <a "
-"href=\"https://arches.readthedocs.io/en/stable/arches-collector-manager/\" "
-"target=\"_blank\">Arches Collector Manager</a>"
+"אם איסוף נתונים עשוי להתרחש באזורים שאין להם חיבור סלולרי/wifi מהימן, השתמש בפרמטר זה כדי לקשר ל-קובץ MBTiles שמשתמשים יורידו כשיורידו את הפרויקט. אתה יכול ללמוד עוד על יצירת קובץ זה בתיעוד החיצוני שלנו.\n"
+" <a href=\"https://arches.readthedocs.io/en/stable/arches-collector-manager/\" target=\"_blank\">ארצ'ס Collector Manager</a>"
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:92
 msgid "Models"
@@ -1104,8 +1101,8 @@ msgid ""
 "By only including certain cards, you can keep the Arches Collector users "
 "focused on the specific information you want them to gather."
 msgstr ""
-"על ידי הכללת כרטיסים מסוימים בלבד, תוכל לשמור שמשתמשי Arches Collector "
-"יתמקדו במידע הספציפי שאתה רוצה שהם יאספו."
+"על ידי הכללת כרטיסים מסוימים בלבד, תוכל לשמור שמשתמשי ארצ'ס קולקטור יתמקדו "
+"במידע הספציפי שאתה רוצה שהם יאספו."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:99
 msgid ""
@@ -1152,8 +1149,8 @@ msgid ""
 " Arches Collector, they will only be able to access this project if they "
 "have been approved to do so."
 msgstr ""
-"כאשר מישהו מתחבר למופע Arches הזה מהמכשיר הנייד שלו באמצעות Arches קולקטור, "
-"הם יוכלו לגשת לפרויקט הזה רק אם הם אושרו לעשות זאת."
+"כאשר מישהו מתחבר למופע ארצ'ס הזה מהמכשיר הנייד שלו באמצעות ארצ'ס קולקטור, הם"
+" יוכלו לגשת לפרויקט הזה רק אם הם אושרו לעשות זאת."
 
 #: arches/app/templates/help/arches-collector-manager-help.htm:117
 msgid "When modifying group and user approvals, bear in mind the following: "
@@ -1253,9 +1250,8 @@ msgid ""
 "href=\"https://arches.readthedocs.io/en/stable/import-export\" "
 "target=\"_blank\">bulk import resources</a> from a CSV file."
 msgstr ""
-"תזדקק לקובץ מיפוי אם אתה מתכנן לעשות זאת <a "
-"href=\"https://arches.readthedocs.io/en/stable/import-export\" "
-"target=\"_blank\">משאבי ייבוא בכמות גדולה</a> מקובץ CSV."
+"תזדקק לקובץ מיפוי אם אתה מתכנן לעשות זאת <a href=\"https://arches.readthedocs.io/en/stable/import-export\" target=\"_blank\">משאבי ייבוא בכמות גדולה</a> \n"
+" CSV מקובץ."
 
 #: arches/app/templates/help/arches-designer-help.htm:28
 #: arches/app/templates/views/graph.htm:120
@@ -1283,8 +1279,8 @@ msgid ""
 "Export this graph to a .json file. It can then be imported into a different "
 "Arches installation, or copied into a package."
 msgstr ""
-"ייצא גרף זה לקובץ json. לאחר מכן ניתן לייבא אותו לצורך התקנת Arches אחרת, או"
-" כדי להעתיק אותו לחבילה."
+"ייצא גרף זה לקובץ json. לאחר מכן ניתן לייבא אותו לצורך התקנת ארצ'ס אחרת, או "
+"כדי להעתיק אותו לחבילה."
 
 #: arches/app/templates/help/arches-designer-help.htm:36
 #: arches/app/templates/views/graph.htm:126
@@ -1339,7 +1335,7 @@ msgid ""
 "At the core of an Arches database are a series of structures called "
 "\"graphs\", of which there are two types:"
 msgstr ""
-"בליבת מסד הנתונים של Arches מצויה סדרה של מבנים הנקראים \"גרפים\", מהם ישנם "
+"בליבת מסד הנתונים של ארצ'ס מצויה סדרה של מבנים הנקראים \"גרפים\", מהם ישנם "
 "שני סוגים:"
 
 #: arches/app/templates/help/arches-designer-help.htm:53
@@ -1354,8 +1350,8 @@ msgstr ""
 "<strong>מודלים של משאבים</strong> - בעת יצירת משאבים חדשים, נתון משתמש כניסה"
 " חייב להחליט באיזה מודל משאב להשתמש, ולקבוע במה מידע נאסף עבור המשאב. תחשוב "
 "על משאב שונה מודלים כקטגוריות של רשומות במסד הנתונים שלך -\"בניינים\" לעומת "
-"\"אתרים ארכיאולוגיים\" לעומת \"בתי קברות\", למשל. כל Arches מסד הנתונים חייב"
-" להיות להכיל מודל משאב אחד."
+"\"אתרים ארכיאולוגיים\" לעומת \"בתי קברות\", למשל. כל ארצ'ס מסד הנתונים חייב "
+"להיות להכיל מודל משאב אחד."
 
 #: arches/app/templates/help/arches-designer-help.htm:54
 msgid ""
@@ -1469,12 +1465,8 @@ msgid ""
 "negative (270 faces west; -180 faces south). Use <code>ctrl + click</code> "
 "then pan the map to change Pitch and Bearing."
 msgstr ""
-"אתה יכול להגדיר את המיקום על ידי הזזה של המפה. בעת טעינת הדוח, המפה תעשה זאת"
-" הזזה והגדלה אוטומטית למיקום הגיאוגרפי של המשאב אם יש כזה (ראה גם "
-"<strong>ערך ברירת מחדל</strong> למטה). ערכי הגובה הם 0-60 (גבוה יותר = יותר "
-"אלכסוני), <strong>ערכי נושא</strong> יכולים להיות חיוביים או שלילי (270 "
-"פניות מערבה; -180 פניות דרומה). השתמש ב- <code>ctrl + click</code> לאחר מכן "
-"הזיזו את המפה כדי לשנות את ה-Pitch and Bearing."
+"אתה יכול להגדיר את המיקום על ידי הזזה של המפה. בעת טעינת הדוח, המפה תעשה זאת הזזה והגדלה אוטומטית למיקום הגיאוגרפי של המשאב אם יש כזה (ראה גם <strong>ערך ברירת מחדל</strong> למטה). ערכי הגובה הם 0-60 (גבוה יותר = יותר אלכסוני), <strong>ערכי נושא</strong> יכולים להיות חיוביים או שלילי (270 פניות מערבה; -180 פניות דרומה). השתמש ב- <code>קונטרול+קליק</code> לאחר מכן הזיזו את המפה כדי לשנות את ה-\n"
+"Pitch and Bearing."
 
 #: arches/app/templates/help/cards-tab-help.htm:46
 msgid "Zoom"
@@ -1796,7 +1788,8 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"<p>Arches מגיע עם שלוש פונקציות ברירת מחדל (ראה להלן). עם זאת, פונקציות נתפסות בתור ה-hook שדרכו מפתחים יכולים להתאים אישית בקלות את יכולות Arches, מכיוון שניתן להוסיף פונקציות חדשות להתקנת Arches האישית שלך. למידע נוסף <a href=\"https://github.com/archesproject/arches/wiki/Creating-New-Functions%%2C-DataTypes%%2C-and-Widgets\" target=\"_blank\">כאן</a>.</p>"
+"<p>ארצ'ס מגיע עם שלוש פונקציות ברירת מחדל (ראה להלן). עם   hook זאת, פונקציות נתפסות בתור ה-\n"
+" שדרכו מפתחים יכולים להתאים אישית בקלות את יכולות ארצ'ס, מכיוון שניתן להוסיף פונקציות חדשות להתקנת ארצ'ס האישית שלך. למידע נוסף <a href=\"https://github.com/archesproject/arches/wiki/Creating-New-Functions%%2C-DataTypes%%2C-and-Widgets\" target=\"_blank\">כאן</a>.</p>"
 
 #: arches/app/templates/help/function-help.htm:26
 msgid "Define Resource Descriptors"
@@ -1922,7 +1915,7 @@ msgstr ""
 
 #: arches/app/templates/help/graph-tab-help.htm:33
 msgid "Optional subtitle, displayed on the Arches Designer home page."
-msgstr "כתובית אופציונלית, מוצגת בדף הבית של מעצב המידע של Arches."
+msgstr "כתובית אופציונלית, מוצגת בדף הבית של מעצב המידע של ארצ'ס."
 
 #: arches/app/templates/help/graph-tab-help.htm:36
 #: arches/app/templates/views/graph/graph-designer/graph-settings.htm:55
@@ -1940,11 +1933,9 @@ msgid ""
 "or branch has been added to this graph the <strong>Ontology</strong> setting"
 " <em>cannot be modified</em>."
 msgstr ""
-"החליטו אם אונטולוגיה תיאכף בגרף זה. ללמוד יותר על מה זה אומר, קרא <a "
-"href=\"https://arches.readthedocs.io/en/stable/ontologies-in-arches\" "
-"target=\"_blank\">אונטולוגיות בArches</a> . כברירת מחדל, אתה רשאי בחר בין "
-"שימוש ב-CIDOC CRM v6.2, או שימוש ללא אונטולוגיה. פעם צומת או ענף נוספה לגרף "
-"זה ההגדרה <strong>אונטולוגיה</strong> <em>לא ניתן לשנות</em>."
+"החליטו אם אונטולוגיה תיאכף בגרף זה. ללמוד על כך, קרא <a href=\"https://arches.readthedocs.io/en/stable/ontologies-in-arches\" target=\"_blank\">אונטולוגיות בארצ'ס</a> . כברירת מחדל, אתה רשאי לבחור בין שימוש ב-\n"
+"CIDOC CRM v6.2, \n"
+"או שימוש ללא אונטולוגיה.כאשר צומת או ענף נוספים לגרף זה את הגדרת <strong>האונטולוגיה</strong> <em>לא ניתן לשנות</em>."
 
 #: arches/app/templates/help/graph-tab-help.htm:40
 #: arches/app/templates/views/graph/graph-designer/graph-settings.htm:67
@@ -2097,7 +2088,7 @@ msgid ""
 "Awesome</a> icon library; custom icons are not supported."
 msgstr ""
 "בחר סמל כדי לזהות את הגרף הזה בכל ממשק האפליקציה. אתה יכול עיין בסמלים כדי "
-"לבחור אחד, או הקלד בסרגל החיפוש כדי לסנן אותם. Arches משתמש<a "
+"לבחור אחד, או הקלד בסרגל החיפוש כדי לסנן אותם. ארצ'ס משתמש<a "
 "href=\"http://fontawesome.io/\" target=\"_blank\">בגופן</a> ספריית אייקונים "
 "מדהימה; אייקונים מותאמים אישית אינם נתמכים."
 
@@ -2180,7 +2171,7 @@ msgid ""
 msgstr ""
 "הגדרה זו מקצה מחלקה אונטולוגית לצומת זה. למידע נוסף, קרא <a "
 "href=\"https://arches.readthedocs.io/en/stable/managing-"
-"resources/#ontologies-in-arches\" target=\"_blank\">אונטולוגיות ב-Arches</a>"
+"resources/#ontologies-in-arches\" target=\"_blank\">אונטולוגיות ב-ארצ'ס</a>"
 
 #: arches/app/templates/help/graph-tab-help.htm:137
 msgid "Relationship to..."
@@ -2343,13 +2334,9 @@ msgid ""
 " href='https://www.loc.gov/standards/datetime/pre-submission.html' "
 "target='_blank'>EDTF draft specification</a>."
 msgstr ""
-"מאחסן את <a href='https://www.loc.gov/standards/datetime/' "
-"target='_blank'>ערך פורמט תאריך/שעה מורחב</a>. השתמש בסוג נתונים זה עבור "
-"תאריכים לפני הספירה או תאריכים עם אי ודאות. סוג נתונים זה דורש תוספת תצורה "
-"ליידע את שיטות החיפוש של מסד הנתונים כיצד לפרש EDTF ערכים. משתמשים בהזנת "
-"נתונים יכולים להזין תאריכי edtf באמצעות פורמטים המפורטים ב- <a "
-"href='https://www.loc.gov/standards/datetime/pre-submission.html' "
-"target='_blank'>מפרט טיוטת EDTF</a> ."
+"מאחסן את <a href='https://www.loc.gov/standards/datetime/' target='_blank'>ערך פורמט תאריך/שעה מורחב</a>. השתמש בסוג נתונים זה עבור תאריכים לפני הספירה או תאריכים עם אי ודאות. סוג נתונים זה דורש תוספת תצורה ליידע את שיטות     EDTF החיפוש של מסד הנתונים כיצד לפרש  ערכי \n"
+"EDTF משתמשים בהזנת נתונים יכולים להזין תאריכי\n"
+"EDTF באמצעות פורמטים המפורטים ב- <a href='https://www.loc.gov/standards/datetime/pre-submission.html' target='_blank'>מפרט טיוטת</a> ."
 
 #: arches/app/templates/help/graph-tab-help.htm:193
 msgid "file-list"
@@ -2526,10 +2513,10 @@ msgid ""
 msgstr ""
 "הגדר את הדרך שבה תכונות ייראו במפה. למפה לדוגמה יש תכונות הדגמה שנותנות לך "
 "תצוגה מקדימה של השינויים שאתה מבצע. אתה יכול לבחור להשתמש <strong>בעריכה "
-"מתקדמת</strong> כדי ליצור ניואנסים יותר סִגְנוֹן. שימו לב ששינויים שנעשו "
-"בעריכה מתקדמת לא יבואו לידי ביטוי אם אתה חוזר לעריכה בסיסית. לעיון "
+"מתקדמת</strong> כדי ליצור סגנון עם יותר ניואנסים. שימו לב ששינויים שנעשו "
+"בעריכה מתקדמת לא יבואו לידי ביטוי אם אתה חוזר לעריכה בסיסית. לעיון   MapBox "
 "בסטיילינג, בדוק את <a href='https://www.mapbox.com/mapbox-gl-js/style-spec/'"
-" target='_blank'>מפרט סגנון MapBox</a> ."
+" target='_blank'>מפרט הסגנון של</a> ."
 
 #: arches/app/templates/help/map-manager-help.htm:17
 msgid ""
@@ -2552,8 +2539,8 @@ msgid ""
 "(zoomed out). You are able to control the clustering settings for each layer"
 " individually."
 msgstr ""
-"Arches משתמש ב'clustering' כדי להציג משאבים בצורה טובה יותר ברמות זום נמוכות"
-" (הגדלה). אתה יכול לשלוט בהגדרות האשכולות עבור כל שכבה בנפרד."
+"ארצ'ס משתמש ב'clustering' כדי להציג משאבים בצורה טובה יותר ברמות זום נמוכות "
+"(הגדלה). אתה יכול לשלוט בהגדרות האשכולות עבור כל שכבה בנפרד."
 
 #: arches/app/templates/help/map-manager-help.htm:21
 msgid ""
@@ -2600,9 +2587,9 @@ msgid ""
 "default basemaps, but advanced users are able to add more. Once added, there"
 " are few ways to configure each basemap."
 msgstr ""
-"מפת בסיס תמיד תהיה קיימת במפה שלך. Arches מגיעות עם כמה מפות בסיס ברירת "
-"מחדל, אך משתמשים מתקדמים יכולים להוסיף עוד. לאחר שהוספת, שם יש כמה דרכים "
-"להגדיר כל מפת בסיס."
+"מפת בסיס תמיד תהיה קיימת במפה שלך. ארצ'ס מגיעות עם כמה מפות בסיס ברירת מחדל,"
+" אך משתמשים מתקדמים יכולים להוסיף עוד. לאחר שהוספת, שם יש כמה דרכים להגדיר "
+"כל מפת בסיס."
 
 #: arches/app/templates/help/map-manager-help.htm:35
 msgid ""
@@ -2682,7 +2669,7 @@ msgid ""
 "the condition assessment section of a Resource Model. Rules like these are "
 "all enforced using permissions."
 msgstr ""
-"Arches מאפשר לך להגדיר הרשאות משתמש וקבוצת משתמשים ב- בסיס קבוצת צמתים. "
+"ארצ'ס מאפשר לך להגדיר הרשאות משתמש וקבוצת משתמשים ב- בסיס קבוצת צמתים. "
 "לדוגמה, ייתכן שתרצה להסתיר את הקואורדינטות של משאב מהציבור, או אפשר לקבוצה "
 "מסוימת של משתמשים לעדכן רק סעיף הערכת מצב של מודל משאב. חוקים כאלה הם נאכפים"
 " באמצעות הרשאות."
@@ -2752,7 +2739,7 @@ msgid ""
 " that all permissions applied to the Guest group will be given to anyone who"
 " views the website without logging in."
 msgstr ""
-"ייתכן שתבחין כי כברירת מחדל, Arches מגיע עם קבוצת \"אורח\" גם כן בתור משתמש "
+"ייתכן שתבחין כי כברירת מחדל, ארצ'ס מגיע עם קבוצת \"אורח\" גם כן בתור משתמש "
 "בשם \"אנונימי\" שהוא חבר באותה קבוצה. <strong>כל משתמש לא-מזוהה יטופל כמשתמש"
 " \"אנונימי\".</strong> זה אומר שכל ההרשאות שהוחלו על קבוצת האורחים יינתנו "
 "לכל מי צופה באתר מבלי להתחבר."
@@ -2768,7 +2755,7 @@ msgstr ""
 "מנהל הפרופילים מאפשר לך לעדכן את פרטי החשבון שלך, כגון הסיסמה שלך, בכל עת. "
 "זה גם נותן לך סיכום של השתתפותך במאמצי איסוף נתונים המתקיימים באמצעות <a "
 "href=\"https://arches.readthedocs.io/en/stable/using-arches-collector.html\""
-" target=\"_blank\">Arches Collector</a> ."
+" target=\"_blank\">ארצ'ס קולקטור</a> ."
 
 #: arches/app/templates/help/rdm-help.htm:6
 msgid ""
@@ -2781,7 +2768,7 @@ msgid ""
 "your database as data input dropdown lists."
 msgstr ""
 "Reference Data Management (RDM) מאפשר יצירה ותחזוקה של אוצר מילים מבוקר עבור"
-" מסד הנתונים שלך. בArches, אוצר מילים מבוקר מורכב מקונספטים (מושגים), והללו "
+" מסד הנתונים שלך. בארצ'ס  אוצר מילים מבוקר מורכב מקונספטים (מושגים), והללו "
 "מנוהלים בתזאורוס ובאוספים. ב-RDM תוכל ליצור תזאורוס חדש, קונספטים חדשים, "
 "לייבא קונספטים מבחוץ (כמו ה-Getty AAT), ו -- המטרה הסופית -- ליצור אוספים, "
 "שישמשו ב מסד הנתונים שלך כרשימות נפתחות להזנת הנתונים."
@@ -2831,7 +2818,7 @@ msgid ""
 "used throughout the app."
 msgstr ""
 "תזאורוס הוא סט שלם של קונספטים שניתן לייבא ולייצא כשלם. אתה יכול ליצור כמה "
-"תזאורס חדשים שאתה צריך, או פשוט להוסיף חדש קונספטים לברירת המחדל \"Arches\" "
+"תזאורס חדשים שאתה צריך, או פשוט להוסיף חדש קונספטים לברירת המחדל \"ארצ'ס\" "
 "תזאורוס. הארגון שלך לתזאורס אין השפעה על הדרך שבה מושגים ייחשפו לציבור או "
 "בשימוש בכל האפליקציה."
 
@@ -3243,7 +3230,7 @@ msgid ""
 "              "
 msgstr ""
 "\n"
-"<strong>שם האפליקציה</strong> - שם אפליקציית Arches שלך, שיוצג בשורת הכותרת של הדפדפן ובמקומות אחרים.<br> \n"
+"<strong>שם האפליקציה</strong> - שם אפליקציית ארצ'ס שלך, שיוצג בשורת הכותרת של הדפדפן ובמקומות אחרים.<br> \n"
 "<strong>ברירת מחדל של ייבוא/ייצוא של משתמש</strong> - שם לשיוך לנתונים המיובאים למערכת.<br>"
 
 #: arches/app/templates/help/system-settings-help.htm:20
@@ -3285,8 +3272,8 @@ msgid ""
 "Arches uses the Mapbox mapping library for map display and data creation. "
 "Arches also supports Mapbox basemaps and other services."
 msgstr ""
-"Arches משתמש בספריית המיפוי של Mapbox להצגת מפה ויצירת נתונים. Arches תומך "
-"גם במפות בסיס ושירותים אחרים של Mapbox."
+"ארצ'ס משתמש בספריית המיפוי של Mapbox להצגת מפה ויצירת נתונים. ארצ'ס תומך גם "
+"במפות בסיס ושירותים אחרים של Mapbox."
 
 #: arches/app/templates/help/system-settings-help.htm:40
 msgid ""
@@ -3297,8 +3284,8 @@ msgid ""
 "services to be activated. Alternatively, you could remove all of the default"
 " basemaps and add your own, non-Mapbox layers."
 msgstr ""
-"<strong>Mapbox API Key (אופציונלי)</strong> - כברירת מחדל, Arches משתמש בחלק"
-" שירותי מפות בסיס מ- Mapbox. אתה תצטרך <a "
+"<strong>Mapbox API Key (אופציונלי)</strong> - כברירת מחדל, ארצ'ס משתמש בחלק "
+"שירותי מפות בסיס מ- Mapbox. אתה תצטרך <a "
 "href='https://www.mapbox.com/help/create-api-access-token/' "
 "target=\"_blank\">לצור מפתח API חינמי</a> (או \"אסימון גישה\") עבור אלה "
 "שירותים שיופעלו. לחלופין, תוכל להסיר את כל ברירת המחדל מפות בסיס והוסיפו "
@@ -3375,8 +3362,8 @@ msgid ""
 "Arches aggregates search results and displays them as hexagons. You will "
 "need to set default parameters for the hexagon size and precision."
 msgstr ""
-"Arches אוסף תוצאות חיפוש ומציג אותן כמשושים. אתה צריך להגדיר פרמטרים של "
-"ברירת מחדל עבור גודל המשושה והדיוק."
+"ארצ'ס אוסף תוצאות חיפוש ומציג אותן כמשושים. אתה צריך להגדיר פרמטרים של ברירת"
+" מחדל עבור גודל המשושה והדיוק."
 
 #: arches/app/templates/help/system-settings-help.htm:56
 msgid ""
@@ -3426,7 +3413,7 @@ msgstr ""
 "<p>\n"
 "<strong>מספר תוצאות החיפוש בכל עמוד</strong>- הגדר את מספר תוצאות החיפוש המוצגות בכל עמוד. שים לב שזה גם מגדיר את מספר סמני תוצאות החיפוש המוצגים במפה.<br>\n"
 "<strong>מספר רמזי חיפוש לכל תפריט</strong> נפתח - הגדר את מספר רמזי החיפוש שיופיעו מתחת לשורת החיפוש תוך כדי הקלדה של מונחי חיפוש.<br>\n"
-"<strong>מספר מקסימלי של תוצאות חיפוש לייצוא</strong> - הגדר את המספר המרבי של משאבים לייצוא מתוצאות החיפוש. ערך זה אמור להיות מתחלק באופן שווה על ידי ההגדרה SEARCH_RESULT_LIMIT ב-Arches (10,000 כברירת מחדל).\n"
+"<strong>מספר מקסימלי של תוצאות חיפוש לייצוא</strong> - הגדר את המספר המרבי של משאבים לייצוא מתוצאות החיפוש. ערך זה אמור להיות מתחלק באופן שווה על ידי ההגדרה SEARCH_RESULT_LIMIT ב-ארצ'ס (10,000 כברירת מחדל).\n"
 "</p>"
 
 #: arches/app/templates/help/system-settings-help.htm:76
@@ -3439,7 +3426,7 @@ msgid ""
 "allow for quick temporal visualization and queries. A few aspects of this "
 "temporal search are defined here."
 msgstr ""
-"Arches יוצר גלגל זמן המבוסס על המשאבים במסד הנתונים שלך, כדי לאפשר הדמיה "
+"ארצ'ס יוצר גלגל זמן המבוסס על המשאבים במסד הנתונים שלך, כדי לאפשר הדמיה "
 "זמנית ושאילתות מהירים. כמה היבטים של זה חיפוש זמני מוגדרים כאן."
 
 #: arches/app/templates/help/system-settings-help.htm:80
@@ -3470,8 +3457,8 @@ msgid ""
 "users. Saved Searches appear as search options in the main Search page. "
 "Creating a Saved Search is a three-step process."
 msgstr ""
-"Arches מאפשר לך לשמור חיפוש ולהציג אותו כנוחות עבורך משתמשים. חיפושים שמורים"
-" מופיעים כאפשרויות חיפוש בדף החיפוש הראשי. יצירת חיפוש שמור היא תהליך בן "
+"ארצ'ס מאפשר לך לשמור חיפוש ולהציג אותו כנוחות עבורך משתמשים. חיפושים שמורים "
+"מופיעים כאפשרויות חיפוש בדף החיפוש הראשי. יצירת חיפוש שמור היא תהליך בן "
 "שלושה שלבים."
 
 #: arches/app/templates/help/system-settings-help.htm:90
@@ -3490,15 +3477,15 @@ msgstr ""
 #: arches/app/templates/index.htm:69
 #, python-format
 msgid "Arches | %(version)s"
-msgstr "Arches | %(version)s"
+msgstr "ארצ'ס | %(version)s"
 
 #: arches/app/templates/index.htm:77
 msgid "Arches Features"
-msgstr "תכונות Arches"
+msgstr "תכונות ארצ'ס"
 
 #: arches/app/templates/index.htm:80
 msgid "Search Arches"
-msgstr "חפש ב Arches"
+msgstr "חפש בארצ'ס ."
 
 #: arches/app/templates/index.htm:89
 msgid "Sign in"
@@ -3531,7 +3518,7 @@ msgstr "נייד"
 #: arches/app/templates/index.htm:167
 #, python-format
 msgid "Arches %(version)s"
-msgstr "Arches %(version)s"
+msgstr "ארצ'ס %(version)s"
 
 #: arches/app/templates/index.htm:168
 msgid "A web and mobile platform for"
@@ -3560,7 +3547,7 @@ msgid ""
 "having to write any code."
 msgstr ""
 "עיצוב יישומי ניהול מידע מותאמים אישית תוך שעות. בנה את שלך מסדי נתונים עם "
-"מעצב המידע של Arches, ולאחר מכן הגדר את הממשק שלך ללא צורך לכתוב כל קוד."
+"מעצב המידע של ארצ'ס, ולאחר מכן הגדר את הממשק שלך ללא צורך לכתוב כל קוד."
 
 #: arches/app/templates/index.htm:218
 msgid "Interface Manager"
@@ -3572,8 +3559,8 @@ msgid ""
 "Use Arches' Card Manager to configure the look and feel of your data entry "
 "UI."
 msgstr ""
-"Arches יוצר באופן אוטומטי טפסי הזנת נתונים בהתבסס על דגמי הנתונים שלך. השתמש"
-" ב-Arches' Card Manager כדי להגדיר את המראה והתחושה של הזנת הנתונים שלך UI."
+"ארצ'ס יוצר באופן אוטומטי טפסי הזנת נתונים בהתבסס על דגמי הנתונים שלך. השתמש "
+"ב-ארצ'ס' Card Manager כדי להגדיר את המראה והתחושה של הזנת הנתונים שלך UI."
 
 #: arches/app/templates/index.htm:229
 msgid "Data Security"
@@ -3585,7 +3572,7 @@ msgid ""
 "user groups and individual accounts.  You can define read/write/delete and "
 "no-access permissions."
 msgstr ""
-"השתמש במנהל ההרשאות של Arches כדי להגדיר כללי גישה לנתונים עבור כל קבוצות "
+"השתמש במנהל ההרשאות של ארצ'ס כדי להגדיר כללי גישה לנתונים עבור כל קבוצות "
 "משתמשים וחשבונות בודדים. אתה יכול להגדיר קריאה/כתיבה/מחיקה ו הרשאות ללא "
 "גישה."
 
@@ -3603,7 +3590,7 @@ msgstr ""
 
 #: arches/app/templates/index.htm:278
 msgid "Arches Search Tools"
-msgstr "כלי חיפוש של Arches"
+msgstr "כלי חיפוש של ארצ'ס"
 
 #: arches/app/templates/index.htm:279
 msgid "Find what you're looking for"
@@ -3614,8 +3601,8 @@ msgid ""
 "Arches comes with powerful built-in search tools.  Quickly filter large "
 "databases with term, geospatial, and time-based search components"
 msgstr ""
-"Arches מגיע עם כלי חיפוש מובנים רבי עוצמה. מסנן במהירות גדולה מסדי נתונים עם"
-" רכיבי חיפוש מבוססי מונחים, גיאו-מרחביים וזמן"
+"ארצ'ס מגיע עם כלי חיפוש מובנים רבי עוצמה. מסנן במהירות גדולה מסדי נתונים עם "
+"רכיבי חיפוש מבוססי מונחים, גיאו-מרחביים וזמן"
 
 #: arches/app/templates/index.htm:294
 msgid "Search Options"
@@ -3629,9 +3616,9 @@ msgid ""
 "provides you with advanced filtering options that support boolean logic, "
 "inverses, and many other filtering options."
 msgstr ""
-"Arches נותן לך דרכים רבות למצוא בדיוק את המידע שאתה צריך, אפילו אם אפליקציית"
-" Arches שלך מכילה 10 של מיליוני רשומות. ב בנוסף למונח, תזאורוס, מסננים גיאו-"
-"מרחביים וזמניים, Arches מספק לך אפשרויות סינון מתקדמות התומכות בלוגיקה "
+"ארצ'ס נותן לך דרכים רבות למצוא בדיוק את המידע שאתה צריך, אפילו אם אפליקציית "
+"ארצ'ס שלך מכילה 10 של מיליוני רשומות. ב בנוסף למונח, תזאורוס, מסננים גיאו-"
+"מרחביים וזמניים, ארצ'ס מספק לך אפשרויות סינון מתקדמות התומכות בלוגיקה "
 "בוליאני, הפוך, ואפשרויות סינון רבות אחרות."
 
 #: arches/app/templates/index.htm:300
@@ -3640,7 +3627,7 @@ msgid ""
 "visualizations, including interactive displays of the connections between "
 "your data objects using a Force Directed Graph."
 msgstr ""
-"יכולות החיפוש של Arches מספקות גם נתונים מתוחכמים הדמיות, כולל תצוגות "
+"יכולות החיפוש של ארצ'ס מספקות גם נתונים מתוחכמים הדמיות, כולל תצוגות "
 "אינטראקטיביות של הקשרים ביניהם אובייקטי הנתונים שלך באמצעות גרף מכוון בכוח."
 
 #: arches/app/templates/index.htm:304
@@ -3649,7 +3636,7 @@ msgid ""
 "services and create your own filters, reports, and visualizations to best "
 "show off your particular dataset."
 msgstr ""
-"אם אתה מפתח תוכנה, אתה יכול לבנות על החיפוש המודולרי של Arches שירותים וצור "
+"אם אתה מפתח תוכנה, אתה יכול לבנות על החיפוש המודולרי של ארצ'ס שירותים וצור "
 "מסננים, דוחות והדמיות משלך כמיטב יכולתך להראות את מערך הנתונים הספציפי שלך."
 
 #: arches/app/templates/index.htm:328
@@ -3664,18 +3651,18 @@ msgid ""
 "locations.  Then synch your changes to your Arches application when you re-"
 "establish a network connection."
 msgstr ""
-"Arches קולקטור מאפשר לך ליצור נתונים חדשים ולערוך רשומות קיימות כשאתה רחוק "
+"ארצ'ס קולקטור מאפשר לך ליצור נתונים חדשים ולערוך רשומות קיימות כשאתה רחוק "
 "מהמחשב שלך. אל תדאג אם אתה מחוץ לתא או טווח Wi-Fi. צור רשומות חדשות, עדכן "
 "מידע, אפילו הוסף מפה חדשה מיקומים. לאחר מכן סנכרן את השינויים שלך עם "
-"אפליקציית Arches שלך כאשר תוכל להתחבר לרשת."
+"אפליקציית ארצ'ס שלך כאשר תוכל להתחבר לרשת."
 
 #: arches/app/templates/index.htm:334
 msgid ""
 "Arches Collector is available for iOS and Android devices.  Download the app"
 " from your favorite marketplace."
 msgstr ""
-"Arches קולקטור זמין עבור מכשירי iOS ואנדרואיד. הורד את האפליקציה מהאתר "
-"המועדף עליך."
+"ארצ'ס קולקטור זמין עבור מכשירי iOS ואנדרואיד. הורד את האפליקציה מהאתר המועדף"
+" עליך."
 
 #: arches/app/templates/index.htm:356
 msgid "Sample Institution Name"
@@ -3703,11 +3690,11 @@ msgstr "מדריכים ותיעוד"
 
 #: arches/app/templates/index.htm:376
 msgid "What is Arches"
-msgstr "אז מה זה Arches?"
+msgstr "אז מה זה ארצ'ס?"
 
 #: arches/app/templates/index.htm:379
 msgid "Arches Collector"
-msgstr "Arches קולקטור"
+msgstr "ארצ'ס קולקטור"
 
 #: arches/app/templates/index.htm:382
 msgid "Implementation Considerations"
@@ -3731,11 +3718,11 @@ msgstr "מדריך התקנה"
 
 #: arches/app/templates/index.htm:409
 msgid "Arches Project Background"
-msgstr "רקע לפרויקט Arches"
+msgstr "רקע לפרויקט ארצ'ס"
 
 #: arches/app/templates/index.htm:412
 msgid "Arches Webinars/Presentations"
-msgstr "וובינרים/מצגות של Arches"
+msgstr "וובינרים/מצגות של ארצ'ס"
 
 #: arches/app/templates/index.htm:431
 msgid "Terms & Conditions"
@@ -3747,7 +3734,7 @@ msgstr "מדיניות פרטיות"
 
 #: arches/app/templates/index.htm:435
 msgid "Powered by Arches"
-msgstr "Powered by Arches"
+msgstr "Powered by ארצ'ס"
 
 #: arches/app/templates/javascript.htm:279
 msgid "Find an address..."
@@ -4097,7 +4084,7 @@ msgstr "התחבר"
 msgid ""
 "Sign in to Arches to access your data modeling, editing, and discovery "
 "tools."
-msgstr "התחבר ל-Arches כדי לגשת לכלי המידול, העריכה וחקר הנתונים שלך"
+msgstr "התחבר ל-ארצ'ס כדי לגשת לכלי המידול, העריכה וחקר הנתונים שלך"
 
 #: arches/app/templates/login.htm:65
 msgid "Login failed"
@@ -4121,7 +4108,7 @@ msgstr "צור חשבון חדש"
 
 #: arches/app/templates/login.htm:78 arches/app/templates/signup.htm:153
 msgid "Learn more about <a href='http://www.archesproject.org'>Arches</a>"
-msgstr "למידע נוסף על <a href='http://www.archesproject.org'>Arches</a>"
+msgstr "למידע נוסף על <a href='http://www.archesproject.org'>ארצ'ס</a>"
 
 #: arches/app/templates/navbar/function-manage-menu.htm:11
 msgid "Select a graph..."
@@ -5920,7 +5907,7 @@ msgstr "חיפוש שמור"
 
 #: arches/app/templates/views/components/search/saved-searches.htm:17
 msgid "The Arches site administrator"
-msgstr "מנהל האתר של Arches"
+msgstr "מנהל האתר של ארצ'ס"
 
 #: arches/app/templates/views/components/search/saved-searches.htm:18
 msgid "hasn't saved any searches yet."
@@ -6204,7 +6191,9 @@ msgstr ""
 
 #: arches/app/templates/views/components/widgets/edtf.htm:28
 msgid "EDTF Date Specfication (Library of Congress)"
-msgstr "פורמט תאריך EDTF על פי ספריית הקונגרס (Library of Congress)"
+msgstr ""
+"על פי ספריית הקונגרס  EDTF פורמט תאריך\n"
+"(Library of Congress)"
 
 #: arches/app/templates/views/components/widgets/edtf.htm:31
 msgid "Some common encodings:"
@@ -6657,7 +6646,7 @@ msgstr "לא תוכל לבטל פעולה זו!"
 
 #: arches/app/templates/views/forms/delete-resource.htm:22
 msgid "Are you sure you want to permanently delete this resource from Arches?"
-msgstr "האם אתה בטוח שברצונך למחוק לצמיתות משאב זה מArches?"
+msgstr "האם אתה בטוח שברצונך למחוק לצמיתות משאב זה מארצ'ס?"
 
 #: arches/app/templates/views/forms/edit-history.htm:9
 msgid "Edit History"
@@ -6674,7 +6663,7 @@ msgstr "רשומת המשאב נוצרה"
 
 #: arches/app/templates/views/forms/edit-history.htm:62
 msgid "Record created by Arches with reference number"
-msgstr "רשומה שנוצרה על ידי Arches עם מספר סימוכין"
+msgstr "רשומה שנוצרה על ידי ארצ'ס עם מספר סימוכין"
 
 #: arches/app/templates/views/forms/edit-history.htm:73
 msgid "record updated"
@@ -7491,8 +7480,8 @@ msgid ""
 "files will require longer downloads and more storage space on mobile "
 "devices."
 msgstr ""
-"Arches משתמש ב-mbtiles שאתה הגדרת כדי להבטיח שיש לצוות השטח שלך מפת בסיס, גם"
-" כאשר אין להם גישה לרשת סלולרית או WiFi חיבור. אתה יכול ליצור קובץ mbtile "
+"ארצ'ס משתמש ב-mbtiles שאתה הגדרת כדי להבטיח שיש לצוות השטח שלך מפת בסיס, גם "
+"כאשר אין להם גישה לרשת סלולרית או WiFi חיבור. אתה יכול ליצור קובץ mbtile "
 "באמצעות נתונים גיאו-מרחביים משלך וכלי GIS. או שאתה יכול להשיג mbtiles באיכות"
 " גבוהה וזולה מאתרים כגון <strong><a href=\"https://openmaptiles.com\" "
 "class=\"\" target=\"_blank\">https://openmaptiles.com</a></strong> . שימו לב"
@@ -7513,7 +7502,7 @@ msgid ""
 "target=\"_blank\">https://docs.mapbox.com/mapbox-gl-js/style-"
 "spec</a></strong>)"
 msgstr ""
-"Arches משתמש בכתובת האתר המקוונת של מפת בסיס שאתה מציין כמפת הבסיס המוגדרת "
+"ארצ'ס משתמש בכתובת האתר המקוונת של מפת בסיס שאתה מציין כמפת הבסיס המוגדרת "
 "כברירת מחדל עבור צוות השטח שלך כאשר רשת סלולרית או חיבור WiFi זמין. אתה עשוי"
 " להשתמש בשירות מפות משלך, או בכל שירות מפות בסיס מקוון (כגון אלה נוצר עם "
 "ESRI, GeoServer או שרתי מיפוי אחרים). אתה תצטרך ליצור קובץ json בסגנון "
@@ -7546,8 +7535,8 @@ msgid ""
 " have selected the models, click on a model in the tree to <br> select which"
 " data entry forms to include in your project."
 msgstr ""
-"Arches מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים. בחר את המשאבים"
-" שצריכים להשתתף <br> בפרוייקט. פעם אחת אתה בחרת את המודלים, לחץ על מודל בעץ "
+"ארצ'ס מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים. בחר את המשאבים "
+"שצריכים להשתתף <br> בפרוייקט. פעם אחת אתה בחרת את המודלים, לחץ על מודל בעץ "
 "כדי <br> בחר איזה טפסי הזנת נתונים לכלול בפרויקט שלך."
 
 #: arches/app/templates/views/mobile-survey-designer.htm:498
@@ -7560,8 +7549,8 @@ msgid ""
 " in the field. You can decide which models your field team can access, and "
 "the number of resources to download."
 msgstr ""
-"הורדת נתונים מאפשרת למשתמשים לגשת ולערוך מידע קיים של Arches בתחום. אתה יכול"
-" להחליט לאילו מודלים צוות השטח שלך יכול לגשת, וכן מספר המשאבים להורדה."
+"הורדת נתונים מאפשרת למשתמשים לגשת ולערוך מידע קיים של ארצ'ס בתחום. אתה יכול "
+"להחליט לאילו מודלים צוות השטח שלך יכול לגשת, וכן מספר המשאבים להורדה."
 
 #: arches/app/templates/views/mobile-survey-designer.htm:523
 msgid "Download Details"
@@ -7592,7 +7581,7 @@ msgstr "להגדרת רשומות להורדה"
 
 #: arches/app/templates/views/mobile-survey-designer.htm:567
 msgid "copy and paste the URL from Arches search page"
-msgstr "העתק והעבר את ה- URL מדף החיפוש של Arches"
+msgstr "העתק והעבר את ה- URL מדף החיפוש של ארצ'ס"
 
 #: arches/app/templates/views/mobile-survey-designer.htm:586
 msgid "Project Participants"
@@ -7605,7 +7594,7 @@ msgid ""
 "the project.  Once you have selected the groups, click on a group in <br> "
 "the tree to select specific users who should join your survery."
 msgstr ""
-"Arches מאפשר לך לבחור את קבוצות המשתמשים שברצונך לכלול בשדה מאמץ לאיסוף "
+"ארצ'ס מאפשר לך לבחור את קבוצות המשתמשים שברצונך לכלול בשדה מאמץ לאיסוף "
 "נתונים.<br> בחר את הקבוצות בהן כדאי להשתתף הפרויקט. לאחר שבחרת את הקבוצות, "
 "לחץ על קבוצה ב<br> העץ כדי לבחור משתמשים ספציפיים שצריכים להצטרף לסקר שלך."
 
@@ -7772,7 +7761,7 @@ msgstr "צור פרויקט"
 msgid ""
 "Arches allows you to create and edit data in the field using mobile devices "
 "such as"
-msgstr "Arches מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים כמו"
+msgstr "ארצ'ס מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים כמו"
 
 #: arches/app/templates/views/mobile-survey-manager.htm:42
 msgid ""
@@ -7995,7 +7984,7 @@ msgstr "מחק תמונה"
 #: arches/app/templates/views/rdm/concept-report.htm:277
 #: arches/app/templates/views/rdm/entitytype-report.htm:161
 msgid "Arches ID:"
-msgstr "מזהה (ID) Arches:"
+msgstr "מזהה (ID) ארצ'ס:"
 
 #: arches/app/templates/views/rdm/concept-report.htm:298
 #: arches/app/templates/views/rdm/entitytype-report.htm:176
@@ -8014,7 +8003,7 @@ msgstr "כן"
 
 #: arches/app/templates/views/rdm/concept-report.htm:341
 msgid "Arches Reference Data Manager"
-msgstr "Arches Reference Data Manager"
+msgstr "ארצ'ס Reference Data Manager"
 
 #: arches/app/templates/views/rdm/concept-report.htm:350
 msgid "Schemes"
@@ -8102,7 +8091,7 @@ msgid ""
 "permanently delete this entire collection from Arches?"
 msgstr ""
 "לא תוכל לבטל את הפעולה הזו! אתה בטוח שאתה רוצה האם למחוק לצמיתות את כל האוסף"
-" הזה מArches?"
+" הזה מארצ'ס?"
 
 #: arches/app/templates/views/rdm/modals/delete-scheme-form.htm:8
 msgid "Delete Scheme"
@@ -8118,7 +8107,7 @@ msgid ""
 "permanently delete this entire scheme from Arches?"
 msgstr ""
 "לא תוכל לבטל את הפעולה הזו! אתה בטוח שאתה רוצה למחוק לצמיתות את כל הסכימה "
-"הזו מArches?"
+"הזו מארצ'ס?"
 
 #: arches/app/templates/views/rdm/modals/export-scheme-form.htm:8
 msgid "Export Scheme"
@@ -8402,7 +8391,7 @@ msgstr "לפי סוג עריכה"
 
 #: arches/app/templates/views/resource/edit-log.htm:52
 msgid "Record created by Arches with unique identifer"
-msgstr "רשומה שנוצרה על ידי Arches עם מזהה ייחודי"
+msgstr "רשומה שנוצרה על ידי ארצ'ס עם מזהה ייחודי"
 
 #: arches/app/templates/views/resource/edit-log.htm:57
 #: arches/app/templates/views/resource/edit-log.htm:60
@@ -8462,7 +8451,7 @@ msgstr "האם אתה מעוניין להמשיך?"
 
 #: arches/app/templates/views/resource/editor.htm:163
 msgid "Welcome to Arches' Resource Editor"
-msgstr "ברוכים הבאים לעורך המשאבים של Arches"
+msgstr "ברוכים הבאים לעורך המשאבים של ארצ'ס"
 
 #: arches/app/templates/views/resource/editor.htm:166
 msgid ""
@@ -8481,8 +8470,7 @@ msgid ""
 "Arches will create your new resource record once you've saved a data entry "
 "card."
 msgstr ""
-"Arches תיצור את רשומת המשאבים החדשה שלך לאחר שתשמור את הנתונים שהוזנו "
-"לכרטיס."
+"ארצ'ס תיצור את רשומת המשאבים החדשה שלך לאחר שתשמור את הנתונים שהוזנו לכרטיס."
 
 #: arches/app/templates/views/resource/editor.htm:174
 msgid "No cards are available for this model."
@@ -8566,8 +8554,8 @@ msgid ""
 "Arches allows you to define relationships between resources so you can "
 "better understand the context and interplay"
 msgstr ""
-"Arches מאפשר לך להגדיר יחסים בין משאבים כך שתוכל להבין טוב יותר את ההקשר ואת"
-" המשחק"
+"ארצ'ס מאפשר לך להגדיר יחסים בין משאבים כך שתוכל להבין טוב יותר את ההקשר ואת "
+"המשחק"
 
 #: arches/app/templates/views/resource/related-resources/related-resources-manager.htm:20
 msgid "between physical objects, events, activities, people and documents."
@@ -8649,7 +8637,7 @@ msgstr "משאב זה אינו קשור למשאבים אחרים"
 msgid ""
 "Arches keeps track of how resources are related. Click the \"related "
 "resources\" link"
-msgstr "Arches עוקב אחר איך המשאבים קשורים. לחץ על \"קישור משאבים קשורים\"."
+msgstr "ארצ'ס עוקב אחר איך המשאבים קשורים. לחץ על \"קישור משאבים קשורים\"."
 
 #: arches/app/templates/views/resource/related-resources/related-resources-manager.htm:329
 msgid "on a search result from the list on the left"
@@ -8701,11 +8689,11 @@ msgstr "טלפון"
 
 #: arches/app/templates/views/user-profile-manager.htm:112
 msgid "Arches user name"
-msgstr "שם משתמש Arches"
+msgstr "שם משתמש ארצ'ס"
 
 #: arches/app/templates/views/user-profile-manager.htm:120
 msgid "This is the unique email or name that you use to log on to Arches."
-msgstr "זהו הדוא\"ל או השם הייחודיים שבהם אתה משתמש כדי להיכנס לArches."
+msgstr "זהו הדוא\"ל או השם הייחודיים שבהם אתה משתמש כדי להיכנס לארצ'ס."
 
 #: arches/app/templates/views/user-profile-manager.htm:136
 #: arches/app/templates/views/user-profile-manager.htm:137
@@ -8717,7 +8705,7 @@ msgid ""
 "Arches uses your name and phone number to make it easier for other users to "
 "find and work with you."
 msgstr ""
-"Arches משתמש בשם ובמספר הטלפון שלך כדי להקל על משתמשים אחרים למצוא ולעבוד "
+"ארצ'ס משתמש בשם ובמספר הטלפון שלך כדי להקל על משתמשים אחרים למצוא ולעבוד "
 "איתך."
 
 #: arches/app/templates/views/user-profile-manager.htm:157
@@ -8737,7 +8725,7 @@ msgstr "דוא\"ל ליצירת קשר"
 msgid ""
 "Arches uses your e-maill to alert you to projects and tasks assigned to you."
 msgstr ""
-"Arches משתמש בדואר האלקטרוני שלך כדי להתריע על פרויקטים ומשימות שהוקצו לך."
+"ארצ'ס משתמש בדואר האלקטרוני שלך כדי להתריע על פרויקטים ומשימות שהוקצו לך."
 
 #: arches/app/templates/views/user-profile-manager.htm:285
 msgid "Notification Settings"
@@ -8766,7 +8754,7 @@ msgstr "ייצוא תוצאות חיפוש"
 
 #: arches/app/templates/views/user-profile-manager.htm:337
 msgid "Arches Collector Projects"
-msgstr "פרויקטים של Arches קולקטור"
+msgstr "פרויקטים של ארצ'ס קולקטור"
 
 #: arches/app/templates/views/user-profile-manager.htm:341
 msgid "Sorry, but you haven't been invited to a project yet..."
@@ -9017,14 +9005,14 @@ msgstr "למשתמש אין הרשאה לערוך את הצומת הזה."
 
 #: arches/app/views/auth.py:117
 msgid "Signup for Arches"
-msgstr "הרשמה לArches"
+msgstr "הרשמה לארצ'ס"
 
 #: arches/app/views/auth.py:120
 msgid ""
 "Thanks for your interest in Arches. Click on link below                     "
 "to confirm your email address! Use your email address to login."
 msgstr ""
-"תודה על התעניינותך בArches. לחץ על הקישור למטה כדי לאשר את כתובת המייל שלך! "
+"תודה על התעניינותך בארצ'ס. לחץ על הקישור למטה כדי לאשר את כתובת המייל שלך! "
 "השתמש בכתובת האימייל שלך כדי להתחבר."
 
 #: arches/app/views/auth.py:124
@@ -9038,7 +9026,7 @@ msgstr ""
 
 #: arches/app/views/auth.py:133
 msgid "Welcome to Arches!"
-msgstr "ברוכים הבאים לArches!"
+msgstr "ברוכים הבאים לארצ'ס!"
 
 #: arches/app/views/auth.py:138
 #, python-format
@@ -9077,7 +9065,7 @@ msgstr "לא ניתן לטעון קובץ SKOS"
 
 #: arches/app/views/concept.py:236
 msgid "There was an issue saving the contents of the file to Arches. "
-msgstr "הייתה בעיה בשמירת תוכן הקובץ ל-Arches."
+msgstr "הייתה בעיה בשמירת תוכן הקובץ ל-ארצ'ס."
 
 #: arches/app/views/concept.py:272
 msgid "Unable to Delete"
@@ -9107,7 +9095,7 @@ msgstr "לא ניתן ליצור אוסף מהקונספט שנבחר."
 
 #: arches/app/views/graph.py:146
 msgid "Using the Arches Designer"
-msgstr "שימוש במעצב המודלים של Arches"
+msgstr "שימוש במעצב המודלים של ארצ'ס"
 
 #: arches/app/views/graph.py:163
 #, python-brace-format
@@ -9198,14 +9186,16 @@ msgid ""
 "                  Please take a moment to review the mobile_survey "
 "description and mobile_survey start and end dates."
 msgstr ""
-"ברוכים הבאים לArches! נוספת זה עתה לסקר נייד. אנא הקדישו רגע לעיון ב- "
+"ברוכים הבאים לארצ'ס! נוספת זה עתה לסקר נייד. אנא הקדישו רגע לעיון ב- "
 "mobile_survey תאריכי התחלה וסיום של הסקר."
 
 #: arches/app/views/mobile_survey.py:402 arches/app/views/mobile_survey.py:428
 #, python-brace-format
 msgid ""
 "If you have any qustions contact the site administrator at {admin_email}."
-msgstr "אם יש לך שאלות כלשהן, פנה למנהל האתר בכתובת {admin_email}."
+msgstr ""
+"אם יש לך שאלות כלשהן, פנה למנהל האתר בכתובת \n"
+"{admin_email}."
 
 #: arches/app/views/mobile_survey.py:411
 #, python-brace-format
