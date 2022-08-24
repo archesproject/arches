@@ -225,15 +225,25 @@ class StringDataType(BaseDataType):
                 value = match.groups()[0]
         except Exception as e:
             pass
-        if type(value) is str:
+
+        try:
+            parsed_value = json.loads(value)
+        except Exception:
+            try:
+                parsed_value = ast.literal_eval(value)
+            except Exception:
+                parsed_value = value
+
+        try:
+            parsed_value.keys()
+            return parsed_value
+        except AttributeError:
             if language is not None:
                 language_objects = list(models.Language.objects.filter(code=language))
                 if len(language_objects) > 0:
                     return {language: {"value": value, "direction": language_objects[0].default_direction}}
 
             return {get_language(): {"value": value, "direction": "ltr"}}
-        elif type(value) is dict:
-            return value
 
     def from_rdf(self, json_ld_node):
         transformed_value = None
@@ -296,6 +306,8 @@ class StringDataType(BaseDataType):
     def pre_structure_tile_data(self, tile, nodeid, **kwargs):
         all_language_codes = {lang.code for lang in kwargs["languages"]}
         direction_lookup = {lang.code: lang.default_direction for lang in kwargs["languages"]}
+        if tile.data[nodeid] is None:
+            tile.data[nodeid] = {}
         tile_language_codes = set(tile.data[nodeid].keys())
         for code in all_language_codes - tile_language_codes:
             tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
