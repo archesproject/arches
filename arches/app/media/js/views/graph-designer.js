@@ -53,6 +53,7 @@ define([
                     shouldShowGraphPublishButtons = false;
                 }
                 else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                    console.log("()()()", viewModel.selectedNode())
                     shouldShowGraphPublishButtons = false;
                 }
                 else if (ko.unwrap(viewModel.cardTree.selection)) {

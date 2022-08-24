@@ -172,6 +172,7 @@ define([
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
+                    console.log("LLLL", response)
                     response.responseJSON.nodes.forEach(function(node){
                         this.get('nodes').push(new NodeModel({
                             source: node,
@@ -671,6 +672,7 @@ define([
             var self = this;
             var nodes = [];
             var edges = [];
+            // console.log(node, self.get('edges')())
             self.get('edges')().filter(function(edge){
                 return edge.domainnode_id === node.nodeid;
             }).forEach(function(edge) {

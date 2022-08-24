@@ -21,7 +21,6 @@
         <!-- ko foreach: $data.filtered_items -->
             <div class="library-card" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.publication_id===true, disabled: $data.publication_id === false }">
                 <div class="library-icon" style="">
-                    <div style="display: none;" data-bind="text: console.log('ppp', $data)" ></div>
                     <!-- ko if: $data.publication_id -->
                     <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
                         <i class="branch-library-icon ion-plus-round"></i>
