@@ -119,6 +119,8 @@
                 position: absolute;
                 margin: -41px 50px;
                 padding: 50px 0px 0px 0px;
+                max-height: calc(100vh - 150px);
+                overflow-y: auto;
                 
                 > li {
                     height: 40px;
