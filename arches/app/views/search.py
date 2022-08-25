@@ -366,7 +366,7 @@ def search_results(request, returnDsl=False):
 
         def get_localized_descriptor(resource, descriptor_type, language_codes):
             descriptor = resource["_source"][descriptor_type]
-            result = descriptor[0]
+            result = descriptor[0] if len(descriptor) > 0 else ""
             for language_code in language_codes:
                 for entry in descriptor:
                     if entry["language"] == language_code and entry["value"] != "":
