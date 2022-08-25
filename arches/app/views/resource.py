@@ -741,7 +741,7 @@ class ResourceDescriptors(View):
         language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
 
         descriptor = document["_source"][descriptor_type]
-        result = descriptor[0] if len(descriptor) > 0 else None
+        result = descriptor[0] if len(descriptor) > 0 else { "value": _("Undefined") }
         for language_code in language_codes:
             for entry in descriptor:
                 if entry["language"] == language_code and entry["value"] != "":
