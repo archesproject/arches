@@ -13,6 +13,7 @@ import logging
 import requests
 from arches.setup import unzip_file
 from arches.management.commands import utils
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils import import_class_from_string
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1213,6 +1214,8 @@ class Command(BaseCommand):
         Imports objects from arches.json.
 
         """
+
+        LanguageSynchronizer.synchronize_settings_with_db()
 
         if data_source == "":
             data_source = settings.RESOURCE_GRAPH_LOCATIONS
