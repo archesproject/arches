@@ -204,8 +204,6 @@ class GraphDesignerView(GraphBaseView):
                 .distinct()
             )
 
-        # import pdb; pdb.set_trace()
-
         context = self.get_context_data(
             main_script="views/graph-designer",
             datatypes_json=JSONSerializer().serialize(datatypes, exclude=["modulename", "isgeometric"]),
