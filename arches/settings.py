@@ -63,7 +63,7 @@ ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICS
 ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
 
 # Uncomment this line for a development setup after running the ubuntu_setup.sh script (do not use in production)
-#ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
