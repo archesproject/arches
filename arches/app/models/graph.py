@@ -151,7 +151,7 @@ class Graph(models.GraphModel):
                     for card_dict in self.serialized_graph["cards"]:
                         card_slug = {}
 
-                        for key, value in card_dict.items(): 
+                        for key, value in card_dict.items():
                             # filter out keys from the serialized_graph that would cause an error on instantiation
                             if key not in ["constraints", "is_editable"]:
                                 if isinstance(value, str):
@@ -160,14 +160,14 @@ class Graph(models.GraphModel):
                                     except ValueError:
                                         pass
                                 card_slug[key] = value
-                                
+
                         card_slugs.append(card_slug)
 
                     edge_slugs = []
                     for edge_dict in self.serialized_graph["edges"]:
                         edge_slug = {}
 
-                        for key, value in edge_dict.items(): 
+                        for key, value in edge_dict.items():
                             if isinstance(value, str):
                                 try:
                                     value = uuid.UUID(value)

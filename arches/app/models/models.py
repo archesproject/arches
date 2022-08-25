@@ -542,7 +542,6 @@ class Node(models.Model):
         if isinstance(self.id, str):
             self.id = uuid.UUID(self.id)
 
-
     nodeid = models.UUIDField(primary_key=True)
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
