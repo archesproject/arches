@@ -314,14 +314,8 @@ define([
                 parentcards.push(newCardViewModel);
 
                 var node = _.find(self.graphModel.get('nodes')(), function(node) {
-                    console.log(node.nodeid, data.card.nodegroup_id)
                     return node.nodeid === data.card.nodegroup_id;
                 });
-                
-                if (!node) {
-                    console.log("()()", self.graphModel.get('nodes')(), data)
-                }
-                
                 self.graphModel.getChildNodesAndEdges(node).nodes.forEach(function(node) {
                     var card = _.find(ko.unwrap(parentcards), function(card) {
                         return card.nodegroupid === (ko.unwrap(node.nodeGroupId) ||

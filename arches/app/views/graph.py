@@ -394,6 +394,7 @@ class GraphDataView(View):
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = None
+                    # import pdb; pdb.set_trace()
                     ret.save()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 

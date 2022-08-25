@@ -53,7 +53,6 @@ define([
                     shouldShowGraphPublishButtons = false;
                 }
                 else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
-                    console.log("()()()", viewModel.selectedNode())
                     shouldShowGraphPublishButtons = false;
                 }
                 else if (ko.unwrap(viewModel.cardTree.selection)) {
@@ -268,8 +267,9 @@ define([
 
             viewModel.graphModel.on('changed', function(model, response) {
                 viewModel.alert(null);
-                viewModel.loading(false);
+                // viewModel.loading(false);  // TODO: @cbyrd 8842 disable page refresh on branch append
                 if (response.status !== 200) {
+                    viewModel.loading(false);
                     viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                 }
             });

@@ -192,14 +192,19 @@ class Graph(models.GraphModel):
                         card_x_node_x_widget_slugs.append(card_x_node_x_widget_slug)
 
                     nodes = [models.Node(**node_slug) for node_slug in node_slugs]
-                    cards = [models.CardModel(**card_slug) for card_slug in card_slugs]
                     edges = [models.Edge(**edge_dict) for edge_dict in edge_slugs]
-                    card_x_node_x_widgets = [models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in card_x_node_x_widget_slugs]
+                    cards = [models.CardModel(**card_slug) for card_slug in card_slugs]
+                    # card_x_node_x_widgets = [models.CardXNodeXWidget(**card_x_node_x_widget_dict) for card_x_node_x_widget_dict in card_x_node_x_widget_slugs]
 
                     # import pdb; pdb.set_trace()
-
                     edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
-                    self.widgets = {widget.pk: widget for widget in card_x_node_x_widgets}
+
+                    for card in cards:
+                        widgets = list(card.cardxnodexwidget_set.all())
+                        for widget in widgets:
+                            self.widgets[widget.pk] = widget
+
+                    # self.widgets = {widget.pk: widget for widget in card_x_node_x_widgets}
                 else:
                     nodes = self.node_set.all()
                     edges = self.edge_set.all()
@@ -680,7 +685,7 @@ class Graph(models.GraphModel):
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
-            return branch_copy
+            return self
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """
@@ -797,6 +802,8 @@ class Graph(models.GraphModel):
         nodegroup_map = {}
 
         copy_of_self = deepcopy(self)
+
+        # import pdb; pdb.set_trace()
 
 
         if root is not None:
@@ -1319,12 +1326,14 @@ class Graph(models.GraphModel):
 
         """
         if self.serialized_graph:
+            # import pdb; pdb.set_trace()
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
                     nodegroup["nodegroupid"] = uuid.UUID(nodegroup["nodegroupid"])
             return [models.NodeGroup(**nodegroup_dict) for nodegroup_dict in nodegroups]
         else:
+            # import pdb; pdb.set_trace()
             nodegroups = set()
             for node in self.nodes.values():
                 if node.is_collector:

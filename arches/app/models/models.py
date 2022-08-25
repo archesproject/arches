@@ -246,6 +246,8 @@ class Edge(models.Model):
         super(Edge, self).__init__(*args, **kwargs)
         if not self.edgeid:
             self.edgeid = uuid.uuid4()
+        if isinstance(self.edgeid, str):
+            self.edgeid = uuid.UUID(self.edgeid)
 
     class Meta:
         managed = True
