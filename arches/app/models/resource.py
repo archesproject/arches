@@ -81,16 +81,28 @@ class Resource(models.ResourceInstance):
         if self.descriptors is None:
             self.descriptors = {}
 
+        if self.name is None:
+            self.name = {}
+
+        requested_language = None
+        if context is not None and "language" in context:
+            requested_language = context["language"]
+        language = requested_language or get_language()
+
+        if language not in self.descriptors:
+            self.descriptors[language] = {}
+
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-
-            self.descriptors[descriptor] = module.get_primary_descriptor_from_nodes(
+            self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
                 self, graph_function[0].config["descriptor_types"][descriptor], context
             )
+            if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                self.name[language] = self.descriptors[language][descriptor]
         else:
-            self.descriptors[descriptor] = "undefined"
+            self.descriptors[language][descriptor] = None
 
-        return self.descriptors[descriptor]
+        return self.descriptors[language][descriptor]
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -99,9 +111,7 @@ class Resource(models.ResourceInstance):
         return self.get_descriptor("map_popup", context)
 
     def displayname(self, context=None):
-        descriptor = self.get_descriptor("name", context)
-        self.name = descriptor
-        return descriptor
+        return self.get_descriptor("name", context)
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
@@ -292,28 +302,41 @@ class Resource(models.ResourceInstance):
         document["legacyid"] = self.legacyid
 
         document["displayname"] = []
-        displayname = self.displayname(context)
-        if displayname is not None:
-            try:
-                display_name = JSONDeserializer().deserialize(displayname)
-                for key in display_name.keys():
-                    document["displayname"].append({"value": display_name[key]["value"], "language": key})
-            except:
-                display_name = {"value": displayname, "language": get_language()}
-                document["displayname"].append(display_name)
-
         document["displaydescription"] = []
-        displaydescription = self.displaydescription(context)
-        if displaydescription is not None:
-            try:
-                display_description = JSONDeserializer().deserialize(displaydescription)
-                for key in display_description.keys():
-                    document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
-            except:
-                display_description = {"value": displaydescription, "language": get_language()}
-                document["displaydescription"].append(display_description)
+        document["map_popup"] = []
+        for lang in settings.LANGUAGES:
+            if context is None:
+                context = {}
+            context["language"] = lang[0]
+            displayname = self.displayname(context)
+            if displayname is not None and displayname != "Undefined":
+                try:
+                    display_name = JSONDeserializer().deserialize(displayname)
+                    for key in display_name.keys():
+                        document["displayname"].append({"value": display_name[key]["value"], "language": key})
+                except:
+                    display_name = {"value": displayname, "language": lang[0]}
+                    document["displayname"].append(display_name)
 
-        document["map_popup"] = self.map_popup(context)
+            displaydescription = self.displaydescription(context)
+            if displaydescription is not None and displaydescription != "Undefined":
+                try:
+                    display_description = JSONDeserializer().deserialize(displaydescription)
+                    for key in display_description.keys():
+                        document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
+                except:
+                    display_description = {"value": displaydescription, "language": lang[0]}
+                    document["displaydescription"].append(display_description)
+
+            mappopup = self.map_popup(context)
+            if mappopup is not None and mappopup != "Undefined":
+                try:
+                    map_popup = JSONDeserializer().deserialize(mappopup)
+                    for key in map_popup.keys():
+                        document["map_popup"].append({"value": map_popup[key]["value"], "language": key})
+                except:
+                    map_popup = {"value": mappopup, "language": lang[0]}
+                    document["map_popup"].append(map_popup)
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 

@@ -130,7 +130,7 @@ def prepare_search_index(create=False):
                 "root_ontology_class": {"type": "keyword"},
                 "displayname": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
                 "displaydescription": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
-                "map_popup": {"type": "keyword"},
+                "map_popup": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
                 "provisional_resource": {"type": "keyword"},
                 "tiles": {
                     "type": "nested",
