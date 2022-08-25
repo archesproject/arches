@@ -285,7 +285,9 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
             serialized_cards = JSONSerializer().serializeToPython(cards)
-            cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
+            cardwidgets = []
+            for card in cards:
+                cardwidgets += list(card.cardxnodexwidget_set.order_by("sortorder").all())
 
         updated_cardwidgets = add_i18n_to_cardwidget_defaults(cardwidgets)
 
