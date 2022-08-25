@@ -28,8 +28,6 @@ define([
         initialize: function(options) {
             var viewModel = options.viewModel;
 
-            console.log("()()", data)
-
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
