@@ -158,8 +158,6 @@ class CardXNodeXWidget(models.Model):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
         if not self.id:
             self.id = uuid.uuid4()
-        if isinstance(self.id, str):
-            self.id = uuid.UUID(self.id)
 
     class Meta:
         managed = True
