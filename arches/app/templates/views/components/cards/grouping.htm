@@ -183,18 +183,20 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 data-bind="text: card.model.name"></h4>
-            <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
-            <h4 data-bind="text: card.isFuncNode()"></h4>
-            <!-- /ko -->
-            <!-- ko if: card.model.helpenabled -->
-            <span>
-                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> 
-                    <span data-bind="text: $root.translations.help"></span>
-                    <i class="fa fa-question-circle"></i>
-                </a>
-            </span>
-            <!-- /ko -->
+            <div style="display: flex;">
+                <h4 class="card-title" data-bind="text: card.model.name"></h4>
+                <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
+                <h4 data-bind="text: card.isFuncNode()"></h4>
+                <!-- /ko -->
+                <!-- ko if: card.model.helpenabled -->
+                <span>
+                    <a data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> 
+                        <span data-bind="text: $root.translations.help"></span>
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </span>
+                <!-- /ko -->
+            </div>
             <h5 data-bind="text: card.model.instructions"></h5>
             {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 -->

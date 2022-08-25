@@ -681,6 +681,10 @@ dl.inline-flex dd {
     display: unset;
 }
 
+.card-title {
+    flex-grow: 1;
+}
+
 .tabbed-workflow-step-body .card-title,
 .tabbed-workflow-step-body .card-instructions {
     display: none;
@@ -2113,11 +2117,12 @@ div.final-cons-step-separator>h4 {
 .overlay-listing {
     font-size: 16px;
     color: rgb(158, 158, 158);
+    display: flex;
 }
 
 .basemap-listing:before,
 .overlay-listing .overlay-name:before {
-    margin-right: 4px;
+    margin: 0px 4px;
     font-family: FontAwesome;
 }
 
@@ -2495,6 +2500,7 @@ div.final-cons-step-separator>h4 {
 
 .layer-listing-icon {
     display: inline-block;
+    padding-inline-end: 4px;
 }
 
 .layer-listing-icon::before {
@@ -4049,7 +4055,7 @@ ul.nav.nav-tabs.nav-justified {
 .settings-panel-heading {
     background: #25476a;
     color: #fff;
-    padding-left: 15px;
+    padding: 0px 15px;
     min-height: 50px;
     display: flex;
     align-items: center;
@@ -4063,13 +4069,13 @@ ul.nav.nav-tabs.nav-justified {
 .graph-crm-class {
     font-size: 15px;
     color: #ddd;
-    padding-left: 10px;
+    padding: 0px 10px;
 }
 
 .graph-type {
     font-size: 15px;
     color: #777;
-    padding-left: 10px;
+    padding: 0px 10px;
 }
 
 .graph-designer {
@@ -4090,7 +4096,7 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .graph-designer-title i {
-    padding-right: 5px;
+    padding: 0px 5px;
 }
 
 .graph-designer-title .name {
@@ -5514,11 +5520,10 @@ div.dropdown-menu.open {
 .change-password-form .panel-heading {
     text-align: left;
     position: relative;
-    padding-top: 10px;
+    padding: 10px 15px;
     height: 40px;
     background-color: #f5f6f7;
     color: #5c7174;
-    padding-left: 15px;
     line-height: 1.1;
     border-bottom: solid 0.5px #babebf;
     font-weight: 300;
@@ -6860,9 +6865,7 @@ th.notif-type {
 }
 
 .ep-help-title {
-    float: left;
-    padding-left: 15px;
-    padding-top: 10px;
+    padding: 10px 15px;
 }
 
 .ep-help-title span {
@@ -7859,7 +7862,6 @@ ul .card-tree-list a .node-subname {
     display: inline-block;
     color: #5F7D9A;
     font-size: 12px;
-    padding-right: 10px;
 }
 
 .note-editor .note-toolbar {
@@ -12961,8 +12963,8 @@ ul.select2-choices:after {
 }
 
 .add-new-crumb {
-    float: right;
     cursor: pointer;
+    float: right;
     padding: 4px 12px;
     font-size: 13px;
     background: #6984A0;
@@ -14689,4 +14691,8 @@ table.csv-mapping-table th {
 table.csv-mapping-table td {
     vertical-align: text-top;
     border-right: 1px solid #ddd;
+}
+
+.notif-table th{
+    text-align: start;
 }
