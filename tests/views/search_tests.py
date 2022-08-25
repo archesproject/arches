@@ -33,6 +33,7 @@ from django.test.client import Client
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm
@@ -55,6 +56,7 @@ class SearchTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
+        LanguageSynchronizer.synchronize_settings_with_db()
         models.ResourceInstance.objects.all().delete()
         with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)

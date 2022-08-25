@@ -255,9 +255,10 @@ class StringDataType(BaseDataType):
                 transformed_value = self.rdf_transform([{"value": new_value[0], "language": new_value[1]}])
         return transformed_value
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
-        current_language = get_language()
+        requested_language = kwargs.pop("language", None)
+        current_language = requested_language or get_language()
         if not current_language:
             current_language = settings.LANGUAGE_CODE
         if data:
@@ -329,7 +330,7 @@ class NumberDataType(BaseDataType):
             errors.append(error_message)
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
             display_value = data.get(str(node.nodeid))
@@ -421,7 +422,7 @@ class BooleanDataType(BaseDataType):
 
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
             raw_value = data.get(str(node.nodeid))
@@ -635,7 +636,7 @@ class DateDataType(BaseDataType):
         mapping = {"type": "date", "format": es_date_formats}
         return mapping
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
             og_value = data[str(node.pk)]
@@ -666,7 +667,7 @@ class EDTFDataType(BaseDataType):
                 errors.append(error_message)
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
             value = data[str(node.pk)]["value"]
@@ -1463,7 +1464,7 @@ class FileListDataType(BaseDataType):
 
         return terms
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         files = data[str(node.pk)]
         file_urls = ""
@@ -1841,7 +1842,7 @@ class DomainDataType(BaseDomainDataType):
             }
             document["strings"].append(val)
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
             return self.get_localized_option_text(node, data[str(node.nodeid)])
@@ -2011,7 +2012,7 @@ class DomainListDataType(BaseDomainDataType):
                 }
                 document["strings"].append(val)
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         new_values = []
         data = self.get_tile_data(tile)
         if data[str(node.nodeid)] is not None:
@@ -2138,7 +2139,7 @@ class ResourceInstanceDataType(BaseDataType):
             ret = cursor.fetchone()
         return ret
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
         resourceid = None
@@ -2322,7 +2323,7 @@ class NodeValueDataType(BaseDataType):
                 errors.append({"type": "ERROR", "message": f"{value} {row_number} is not a valid tile id. This data was not imported."})
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         datatype_factory = DataTypeFactory()
         try:
             value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
