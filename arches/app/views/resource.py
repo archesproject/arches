@@ -745,7 +745,7 @@ class ResourceDescriptors(View):
         for language_code in language_codes:
             for entry in descriptor:
                 if entry["language"] == language_code and entry["value"] != "":
-                    result = entry
+                    return result["value"]
         return result["value"]
 
     def get(self, request, resourceid=None):
