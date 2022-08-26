@@ -17,7 +17,7 @@ ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 def localize_complex_input(input):
     """
     This method accepts an input of a list, dictionary, or model. It will then recursively update the
-    inputs' key/value pairs to return only the localized version of any i18n data
+    inputs' data to return only the localized version of any i18n values
 
     Arguments:
     input -- (required) A list, dictionary, or model
