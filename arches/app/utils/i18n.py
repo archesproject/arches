@@ -11,8 +11,6 @@ from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, La
 from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 
-from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
-
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
 
