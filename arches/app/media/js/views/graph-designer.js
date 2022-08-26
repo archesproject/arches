@@ -265,8 +265,9 @@ define([
 
             viewModel.graphModel.on('changed', function(model, response) {
                 viewModel.alert(null);
-                viewModel.loading(false);
+                // viewModel.loading(false);  // TODO: @cbyrd 8842 disable page refresh on branch append
                 if (response.status !== 200) {
+                    viewModel.loading(false);
                     viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                 }
             });

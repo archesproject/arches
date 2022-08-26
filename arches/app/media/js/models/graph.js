@@ -168,7 +168,12 @@ define([
             return this._doRequest({
                 type: "POST",
                 url: this.url + this.get('graphid') + '/append_branch',
-                data: JSON.stringify({nodeid:node.nodeid, property: property, graphid: branch_graph.get('graphid')})
+                data: JSON.stringify({
+                    nodeid:node.nodeid, 
+                    property: property, 
+                    graphid: branch_graph.get('graphid'),
+                    return_appended_graph: true,
+                })
             }, function(response, status){
                 if (status === 'success' &&  response.responseJSON) {
                     var branchroot = response.responseJSON.root;
