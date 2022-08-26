@@ -739,13 +739,12 @@ class ResourceCards(View):
 class ResourceDescriptors(View):
     def get_localized_descriptor(self, document, descriptor_type):
         language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
-
         descriptor = document["_source"][descriptor_type]
         result = descriptor[0] if len(descriptor) > 0 else {"value": _("Undefined")}
         for language_code in language_codes:
             for entry in descriptor:
                 if entry["language"] == language_code and entry["value"] != "":
-                    return result["value"]
+                    return entry["value"]
         return result["value"]
 
     def get(self, request, resourceid=None):
