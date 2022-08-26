@@ -47,8 +47,14 @@ def export_search_results(self, userid, request_values, format, report_link):
 
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
-    email = request_values["email"]
-    export_name = request_values["exportName"][0]
+    try:
+        email = request_values["email"]
+    except KeyError:
+        email = None
+    try:
+        export_name = request_values["exportName"][0]
+    except KeyError:
+        export_name = None
     new_request = HttpRequest()
     new_request.method = "GET"
     new_request.user = _user

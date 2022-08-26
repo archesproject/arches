@@ -4126,12 +4126,14 @@ ul.nav.nav-tabs.nav-justified {
 
 .graph-settings-switch-label {
     margin-left: 40px;
+    margin-right: 40px;
     margin-top: -20px;
     margin-bottom: 0px;
 }
 
 .graph-settings-switch-subtitle {
     margin-left: 40px;
+    margin-right: 40px;
     margin-top: -5px;
     display: inline-block;
     color: #5F7D9A;
@@ -4143,6 +4145,7 @@ ul.nav.nav-tabs.nav-justified {
 
 .exportable-field-name {
     padding-left: 40px;
+    padding-right: 40px;
 }
 
 .graph-settings-panel-body {
@@ -4658,7 +4661,7 @@ div.dropdown-menu.open {
     background: #fefefe;
 }
 
-.btn-notifs-download {
+.notifications-container .btn.btn-notifs-download {
     color: #6494cc;
     background-color: transparent;
     border: 1px solid #ddd;
@@ -7844,6 +7847,7 @@ ul .card-tree-list a .node-subname {
 
 .arches-toggle-sm {
     margin-left: 40px;
+    margin-right: 40px;
     margin-top: -17px;
     margin-bottom: 0;
     font-size: 12px;
@@ -7851,6 +7855,7 @@ ul .card-tree-list a .node-subname {
 
 .arches-toggle-subtitle {
     margin-left: 40px;
+    margin-right: 40px;
     display: inline-block;
     color: #5F7D9A;
     font-size: 12px;
@@ -13254,6 +13259,10 @@ ul.select2-choices:after {
     display: none;
 }
 
+.tabbed-workflow-step-container .install-buttons {
+    display: none;
+}
+
 .iiif-gallery-panel {
     display: flex;
     flex-direction: column;
@@ -13542,26 +13551,20 @@ ul.select2-choices:after {
     font-size: 0.9em;
 }
 
-.edtf-style-tools-collapser {
-    cursor: pointer;
-    padding: 5px;
-    font-size: 0.9em;
-    left: 510px;
-    position: absolute;
-    top: 6px;
-}
-
-.i18n-style-tools-collapser {
+.widget-inline-tools-collapser {
     cursor: pointer;
     font-size: 0.9em;
-    position: absolute;
-    padding: 0px 12px;
-    right: 0px;
+    display: flex;
     z-index: 1;
+    margin-bottom: 5px;
 }
 
-.workbench-card-sidepanel .edtf-style-tools-collapser {
-    left: 250px;
+.widget-inline-tools-collapser>label {
+    flex-grow: 1;
+}
+
+.widget-inline-tools-collapser>span {
+    padding-inline-end: 12px;
 }
 
 .style-tools-panel {
@@ -13591,7 +13594,6 @@ ul.select2-choices:after {
     padding: 10px;
     height: 140px;
     position: relative;
-    top: -10px;
     width: 100%;
 }
 
@@ -14608,9 +14610,9 @@ ul.select2-choices:after {
 }
 
 .etl-module-preview {
-    height: calc(100vh - 95px);
-    width: calc(100vw - 450px);
-    padding: 20px 25px;
+    height: calc(100vh - 95px); 
+    width: calc(100vw - 490px); 
+    padding: 20px 25px; 
     overflow: scroll;
     background: #fbfbfb;
 }
@@ -14647,7 +14649,7 @@ ul.select2-choices:after {
 
 .csv-mapping-table-container {
     overflow: auto;
-    width: inherit;
+    width: calc(100vw - 100px);
     margin-top: 10px;
     margin-bottom: 5px;
     border: 1px solid rgba(0,0,0,0.14);

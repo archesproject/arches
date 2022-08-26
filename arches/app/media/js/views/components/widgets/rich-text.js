@@ -1,13 +1,14 @@
 define([
     'jquery',
     'knockout', 
+    'knockout-mapping',
     'underscore', 
     'viewmodels/widget', 
     'arches', 
     'templates/views/components/widgets/rich-text.htm',
     'bindings/ckeditor', 
     'bindings/chosen'
-], function($, ko, _, WidgetViewModel, arches, richTextWidgetTemplate) {
+], function($, ko, koMapping, _, WidgetViewModel, arches, richTextWidgetTemplate) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget
@@ -24,14 +25,15 @@ define([
         const initialCurrent = {};
         self.showi18nOptions = ko.observable(false);
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
-        let currentValue = ko.unwrap(self.value) || initialCurrent;
         const currentLanguage = {"code": arches.activeLanguage};
+        let currentValue = koMapping.toJS(self.value);
         self.currentLanguage = ko.observable(currentLanguage);
 
         if(self.form){
-            const originalValue = JSON.parse(JSON.stringify(self.value()));
             self.form.on('tile-reset', (x) => {
-                self.value(originalValue);
+                currentValue = koMapping.toJS(self.value);
+                self.currentText(currentValue[self.currentLanguage().code]?.value);
+                self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
             });
         }
 
@@ -57,30 +59,30 @@ define([
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
             currentValue[currentLanguage.code].value = newValue;
-            self.value(currentValue);
+            if (ko.isObservable(self.value)) {
+                self.value(currentValue);
+            } else {
+                self.value[currentLanguage.code].value(newValue);
+            }
         });
         self.currentDirection.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
             currentValue[currentLanguage.code].direction = newValue;
-            self.value(currentValue);
+            if (ko.isObservable(self.value)) {
+                self.value(currentValue);
+            } else {
+                self.value[currentLanguage.code].direction(newValue);
+            }
         });
 
         self.currentLanguage.subscribe(() => {
             if(!self.currentLanguage()){ return; }
 
             const currentLanguage = self.currentLanguage();
-            if(!currentValue?.[currentLanguage.code]) {
-                currentValue[currentLanguage.code] = {
-                    value: '',
-                    direction: currentLanguage?.default_direction
-                };
-                self.value(currentValue);
-            }
 
-            self.currentText(self.value()?.[currentLanguage.code]?.value);
-            self.currentDirection(ko.unwrap(self.value()?.[currentLanguage.code]?.direction));
-            
+            self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
+            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);            
         });
 
         this.displayfullvalue(params.displayfullvalue);

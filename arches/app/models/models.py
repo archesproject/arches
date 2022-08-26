@@ -82,6 +82,8 @@ class CardModel(models.Model):
         super(CardModel, self).__init__(*args, **kwargs)
         if not self.cardid:
             self.cardid = uuid.uuid4()
+        if isinstance(self.cardid, str):
+            self.cardid = uuid.UUID(self.cardid)
 
     class Meta:
         managed = True
@@ -242,6 +244,8 @@ class Edge(models.Model):
         super(Edge, self).__init__(*args, **kwargs)
         if not self.edgeid:
             self.edgeid = uuid.uuid4()
+        if isinstance(self.edgeid, str):
+            self.edgeid = uuid.UUID(self.edgeid)
 
     class Meta:
         managed = True
@@ -530,6 +534,13 @@ class Node(models.Model):
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
 
     """
+
+    def __init__(self, *args, **kwargs):
+        super(Node, self).__init__(*args, **kwargs)
+        if not self.id:
+            self.id = uuid.uuid4()
+        if isinstance(self.id, str):
+            self.id = uuid.UUID(self.id)
 
     nodeid = models.UUIDField(primary_key=True)
     name = models.TextField()
@@ -891,7 +902,7 @@ class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
-    name = models.TextField(blank=True, null=True)
+    name = I18n_TextField(blank=True, null=True)
     descriptors = JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)

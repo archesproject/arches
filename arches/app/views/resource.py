@@ -285,7 +285,9 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             cards = graph.cardmodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups).prefetch_related("cardxnodexwidget_set")
             serialized_cards = JSONSerializer().serializeToPython(cards)
-            cardwidgets = [widget for widget in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in cards]]
+            cardwidgets = []
+            for card in cards:
+                cardwidgets += list(card.cardxnodexwidget_set.order_by("sortorder").all())
 
         updated_cardwidgets = add_i18n_to_cardwidget_defaults(cardwidgets)
 
@@ -737,6 +739,16 @@ class ResourceCards(View):
 
 
 class ResourceDescriptors(View):
+    def get_localized_descriptor(self, document, descriptor_type):
+        language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
+        descriptor = document["_source"][descriptor_type]
+        result = descriptor[0] if len(descriptor) > 0 else {"value": _("Undefined")}
+        for language_code in language_codes:
+            for entry in descriptor:
+                if entry["language"] == language_code and entry["value"] != "":
+                    return entry["value"]
+        return result["value"]
+
     def get(self, request, resourceid=None):
         if Resource.objects.filter(pk=resourceid).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_ID).exists():
             try:
@@ -747,9 +759,9 @@ class ResourceDescriptors(View):
                     {
                         "graphid": document["_source"]["graph_id"],
                         "graph_name": resource.graph.name,
-                        "displaydescription": document["_source"]["displaydescription"],
-                        "map_popup": document["_source"]["map_popup"],
-                        "displayname": document["_source"]["displayname"],
+                        "displaydescription": self.get_localized_descriptor(document, "displaydescription"),
+                        "map_popup": self.get_localized_descriptor(document, "map_popup"),
+                        "displayname": self.get_localized_descriptor(document, "displayname"),
                         "geometries": document["_source"]["geometries"],
                         "permissions": document["_source"]["permissions"],
                         "userid": request.user.id,

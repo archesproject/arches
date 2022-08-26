@@ -144,9 +144,10 @@ define([
             if(this.selectedNode()){
                 this.loading(true);
                 this.graphModel.appendBranch(this.selectedNode(), null, item.graphModel, function(response, status){
-                    this.loading(false);
+                    // this.loading(false); // TODO: @cbyrd 8842 disable page refresh on branch append
                     _.delay(_.bind(function(){
                         if(status === 'success'){
+                            window.location.reload();  // TODO: @cbyrd 8842 disable page refresh on branch append
                             this.closeForm();
                         }
                     }, this), 300, true);
