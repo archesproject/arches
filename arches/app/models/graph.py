@@ -616,7 +616,7 @@ class Graph(models.GraphModel):
 
         return tree
 
-    def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False):
+    def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False, return_appended_graph=False):
         """
         Appends a branch onto this graph
 
@@ -660,7 +660,10 @@ class Graph(models.GraphModel):
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
-            return branch_copy
+            if return_appended_graph:
+                return self
+            else:
+                return branch_copy
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """

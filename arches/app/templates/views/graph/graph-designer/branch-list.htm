@@ -19,10 +19,10 @@
         <!-- /ko -->
 
         <!-- ko foreach: $data.filtered_items -->
-            <div class="library-card" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.publication_id===true, disabled: $data.publication_id === false }">
-                <div class="library-icon" style="">
+            <div class="library-card" style="display: flex; align-items: center;" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.publication_id===true, disabled: $data.publication_id === false }"> 
+                <div class="library-icon" style="margin: 5px;">
                     <!-- ko if: $data.publication_id -->
-                    <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
+                    <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint" style="cursor: pointer;" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">
                         <i class="branch-library-icon ion-plus-round"></i>
                     </span>
                     <!-- /ko -->
@@ -32,11 +32,23 @@
                     </span>
                     <!-- /ko -->
                 </div>
-                <div class="library-card-main" data-bind="attr: {'data-arches-graphid': $data.graphid}">
-                    <a class="listitem_name" data-bind="text: $data.name + ($data.publication_id ? '': ' - unpublished')">
-                    </a>
-                </div>
-                <div class="library-card-subtitle" data-bind="text: $data.description">
+                <div>
+                    <div class="library-card-main" data-bind="attr: {'data-arches-graphid': $data.graphid}">
+                        <a class="listitem_name" data-bind="text: $data.name + ($data.publication_id ? '': ' - unpublished')">
+                        </a>
+                    </div>
+                    <div 
+                        class="library-card-subtitle" 
+                        style="
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            white-space: nowrap;
+                            max-width: 250px;
+                            font-size: smaller;
+                        "
+                        data-bind="text: $data.description"
+                    >
+                    </div>
                 </div>
             </div>
         <!-- /ko -->
