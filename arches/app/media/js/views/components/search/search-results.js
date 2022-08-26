@@ -185,6 +185,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             displayname: result._source.displayname,
                             resourceinstanceid: result._source.resourceinstanceid,
                             displaydescription: result._source.displaydescription,
+                            alternativelanguage: result._source.displayname_language != arches.activeLanguage,
                             "map_popup": result._source.map_popup,
                             "provisional_resource": result._source.provisional_resource,
                             geometries: ko.observableArray(result._source.geometries),
@@ -232,25 +233,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 var data = $(evt.currentTarget).data();
                 this.trigger('find_on_map', data.resourceid, data);
             },
-
-            getLocalizedText: function(data){
-                if (data && data.find) {
-                    const d = data.find((element) => {
-                        return arches.activeLanguage == element.language;
-                    });
-                    if(!!d && d["value"] !== "") {
-                        return { displayText: d["value"], alternative: false };
-                    } else {
-                        const allValues = data.filter((entry) => {
-                            return !!entry["value"];
-                        }).map((entry) => {
-                            return entry["value"];
-                        });
-    
-                        return { displayText: allValues.join(","), alternative: true };
-                    }
-                }
-            }
         }),
         template: searchResultsTemplate
     });

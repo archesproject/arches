@@ -15,7 +15,7 @@
           {
             "data": {
               "677f39a8-09cc-11e7-834a-6c4008b05c4c": "7949d7b5-6e57-469a-8f38-87aac08e1788",
-              "677f303d-09cc-11e7-9aa6-6c4008b05c4c": {"en": {"value": "\"Prehistoric building, 181-183 High Street\"", "direction": "ltr"}}
+              "677f303d-09cc-11e7-9aa6-6c4008b05c4c": {"en": {"value": "Prehistoric building, 181-183 High Street", "direction": "ltr"}}
             },
             "provisionaledits": null,
             "parenttile_id": "074c5da1-9aad-495a-a5f7-043679f44de6",
@@ -132,16 +132,14 @@
           }
         ],
         "resourceinstance": {
-          "descriptors": {
-            "description": "Undefined", 
-            "map_popup": "Undefined", 
-            "name": "\"Prehistoric building, 181-183 High Street\""
+          "descriptors":  {
+            "ar": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}, "de": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}, "en": {"description": "Undefined", "map_popup": "Undefined", "name": "Prehistoric building, 181-183 High Street"}, "en-gb": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}, "es": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}
           },
           "publication_id": "f546e4de-aa0d-11ec-99a5-8e0f431ffc6d",
           "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
           "resourceinstanceid": "b546621a-9556-4955-8997-8be88dcabf2b",
           "legacyid": "b546621a-9556-4955-8997-8be88dcabf2b",
-          "name": "\"Prehistoric building, 181-183 High Street\""
+          "name": "Prehistoric building, 181-183 High Street"
         }
       },
       {
@@ -158,7 +156,7 @@
           {
             "data": {
               "677f39a8-09cc-11e7-834a-6c4008b05c4c": "9fa56006-6828-480f-8395-ad5c5a84726b",
-              "677f303d-09cc-11e7-9aa6-6c4008b05c4c":  {"en": {"value": "\"Prehistoric building, 181-183 High Street\"", "direction": "ltr"}}
+              "677f303d-09cc-11e7-9aa6-6c4008b05c4c":  {"en": {"value": "Prehistoric building, 181-183 High Street", "direction": "ltr"}}
             },
             "provisionaledits": null,
             "parenttile_id": "691178e1-1588-49f6-9dea-c4b69d04d3f7",
@@ -276,11 +274,9 @@
         ],
         "resourceinstance": {
           "descriptors": {
-            "description": "Undefined", 
-            "map_popup": "Undefined", 
-            "name": "\"Prehistoric building, 181-183 High Street\""
+            "ar": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}, "de": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}, "en": {"description": "Undefined", "map_popup": "Undefined", "name": "Prehistoric building, 181-183 High Street"}, "en-gb": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}, "es": {"description": "Undefined", "map_popup": "Undefined", "name": "Undefined"}
           },
-          "name": "\"Prehistoric building, 181-183 High Street\"",
+          "name": "Prehistoric building, 181-183 High Street",
           "publication_id": "f546e4de-aa0d-11ec-99a5-8e0f431ffc6d",
           "graph_id": "ab74af76-fa0e-11e6-9e3e-026d961c88e6",
           "resourceinstanceid": "75226cdb-6ecb-4dab-8f83-3537fa298ca3",

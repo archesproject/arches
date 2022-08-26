@@ -35,12 +35,13 @@ class ImportSingleCsv(BaseImportModule):
         self.blank_tile_lookup = {}
 
     def get_graphs(self, request):
+        graph_name_i18n = "name__" + settings.LANGUAGE_CODE
         graphs = (
             GraphModel.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication=False)
-            # .order_by(Lower("name"))
+            .exclude(publication_id__isnull=True)
+            .order_by(graph_name_i18n)
         )
         return {"success": True, "data": graphs}
 

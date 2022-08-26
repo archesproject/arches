@@ -203,7 +203,7 @@ class BaseDataType(object):
             logger.exception(_("Tile has no authoritative or provisional data"))
 
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         """
         Returns a list of concept values for a given node
         """
