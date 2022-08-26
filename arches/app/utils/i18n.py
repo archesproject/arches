@@ -18,7 +18,7 @@ ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 def localize_complex_input(input):
     """
     This method accepts an input. If the input is not JSON, this will attempt to convert it to JSON before processing.
-    This method will then recursively update the serialized objects' key/value pairs to return only the localized version 
+    This method will then recursively update the serialized objects' key/value pairs to return only the localized version
     of any i18n data
 
     Arguments:
@@ -28,6 +28,7 @@ def localize_complex_input(input):
     A JSON string representing the input json object/objects, with any internationalized string/text dictionaries
     localized to a string in the requested language, with the application language as a fallback.
     """
+
     def _recursive_localize(deserialized_json):
         if isinstance(deserialized_json, list):
             for obj in deserialized_json:
