@@ -15,35 +15,42 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializ
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
 
-def localize_serialized_object(json):
+def localize_complex_input(input):
     """
-    This method accepts a a serialized object or objects ( eg. the output of JSONSerializer().serialize() )
-    and recursively updates the serialized objects' key/value pairs to return only the localized
-    version of any i18n data
+    This method accepts an input. If the input is not JSON, this will attempt to convert it to JSON before processing.
+    This method will then recursively update the serialized objects' key/value pairs to return only the localized version 
+    of any i18n data
 
     Arguments:
-    json -- (required) A JSON string representing a serialized object or objects
+    input -- (required) Either valid JSON, or any input compatible with JSONSerializer().serialize()
 
     Returns:
     A JSON string representing the input json object/objects, with any internationalized string/text dictionaries
     localized to a string in the requested language, with the application language as a fallback.
     """
-    deserialized_json = JSONDeserializer().deserialize(json)
-
-    def recursive_localize(deserialized_json):
+    def _recursive_localize(deserialized_json):
         if isinstance(deserialized_json, list):
             for obj in deserialized_json:
-                recursive_localize(obj)
+                _recursive_localize(obj)
         if isinstance(deserialized_json, dict):
             for key in deserialized_json.keys():
                 try:
                     localized_value = get_localized_value(deserialized_json[key])
                     deserialized_json[key] = localized_value["value"] if isinstance(localized_value, dict) else localized_value
                 except:
-                    recursive_localize(deserialized_json[key])
+                    _recursive_localize(deserialized_json[key])
         return deserialized_json
 
-    recursive_localize(deserialized_json)
+    json = None
+
+    if isinstance(input, str):  # if input is a string we assume it's valid JSON
+        json = input
+    else:
+        json = JSONSerializer().serialize(input)
+
+    deserialized_json = JSONDeserializer().deserialize(json)
+
+    _recursive_localize(deserialized_json)
 
     return JSONSerializer().serialize(deserialized_json)
 
