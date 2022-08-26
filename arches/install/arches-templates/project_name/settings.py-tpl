@@ -46,6 +46,9 @@ DEBUG = True
 
 ROOT_URLCONF = '{{ project_name }}.urls'
 
+# Modify this line as needed for your project to connect to elasticsearch with a password that you generate
+ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = '{{ project_name }}'
 
