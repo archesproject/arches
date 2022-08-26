@@ -21,16 +21,21 @@ require([
                 'delete edit': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'}
             }
 
+            var handleChildCards = function(card) {
+                if (card.cards.length > 0) {
+                    _.each(card.cards, function(sub_card) {
+                        _.each(_.where(edits, { nodegroupid: sub_card.nodegroup_id }), function(match) { match.card = sub_card; match.card_container_name = card.name; });
+                        handleChildCards(sub_card);
+                    }, this);
+                }
+            }
+
             var assignCards = function(){
                 _.each(cards, function(card) {
-                    _.each(_.where(edits, {nodegroupid: card.nodegroup_id}), function(match){match.card = card; match.card_container_name = null})
-                    if (card.cards.length > 0) {
-                        _.each(card.cards, function(sub_card){
-                            _.each(_.where(edits, {nodegroupid: sub_card.nodegroup_id}), function(match){match.card = sub_card; match.card_container_name = card.name})
-                        }, this)
-                    }
-                }, this)
-            }
+                    _.each(_.where(edits, {nodegroupid: card.nodegroup_id}), function(match){match.card = card; match.card_container_name = null;});
+                    handleChildCards(card);
+                }, this);
+            };
             assignCards();
 
             var createFullValue = function(value, edit) {
