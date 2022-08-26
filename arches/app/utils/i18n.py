@@ -8,6 +8,7 @@ from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
+from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
@@ -17,42 +18,34 @@ ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
 def localize_complex_input(input):
     """
-    This method accepts an input. If the input is not JSON, this will attempt to convert it to JSON before processing.
-    This method will then recursively update the serialized objects' key/value pairs to return only the localized version 
-    of any i18n data
+    This method accepts an input of a list, dictionary, or model. It will then recursively update the
+    inputs' key/value pairs to return only the localized version of any i18n data
 
     Arguments:
-    input -- (required) Either valid JSON, or any input compatible with JSONSerializer().serialize()
+    input -- (required) A list, dictionary, or model
 
     Returns:
-    A JSON string representing the input json object/objects, with any internationalized string/text dictionaries
-    localized to a string in the requested language, with the application language as a fallback.
+    The input, with any internationalized string/text dictionaries localized to a string in the requested 
+    language, with the application language as a fallback.
     """
-    def _recursive_localize(deserialized_json):
-        if isinstance(deserialized_json, list):
-            for obj in deserialized_json:
-                _recursive_localize(obj)
-        if isinstance(deserialized_json, dict):
-            for key in deserialized_json.keys():
+    def _recursive_localize(obj):
+        if isinstance(obj, list):
+            for item in obj:
+                _recursive_localize(item)
+        if isinstance(obj, dict):
+            for key in obj.keys():
                 try:
-                    localized_value = get_localized_value(deserialized_json[key])
-                    deserialized_json[key] = localized_value["value"] if isinstance(localized_value, dict) else localized_value
+                    localized_value = get_localized_value(obj[key])
+                    obj[key] = localized_value["value"] if isinstance(localized_value, dict) else localized_value
                 except:
-                    _recursive_localize(deserialized_json[key])
-        return deserialized_json
+                    _recursive_localize(obj[key])
+        if isinstance(obj, Model):
+            for field in obj._meta.get_fields():
+                data = getattr(obj, field.name)
+                _recursive_localize(data)
+        return obj
 
-    json = None
-
-    if isinstance(input, str):  # if input is a string we assume it's valid JSON
-        json = input
-    else:
-        json = JSONSerializer().serialize(input)
-
-    deserialized_json = JSONDeserializer().deserialize(json)
-
-    _recursive_localize(deserialized_json)
-
-    return JSONSerializer().serialize(deserialized_json)
+    return _recursive_localize(input)
 
 
 def get_localized_value(obj, lang=None, return_lang=False):

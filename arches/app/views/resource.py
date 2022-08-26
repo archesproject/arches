@@ -596,7 +596,7 @@ class ResourceEditLogView(BaseManagerView):
                 resource_type=graph_name,
                 resource_description=resource.displaydescription(),
                 iconclass=resource_instance.graph.iconclass,
-                edits=localize_complex_input(permitted_edits),
+                edits=JSONSerializer().serialize(localize_complex_input(permitted_edits)),
                 resourceid=resourceid,
                 displayname=_("Unnamed Resource") if displayname == "undefined" else displayname,
             )
