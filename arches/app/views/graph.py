@@ -368,10 +368,10 @@ class GraphDataView(View):
 
                 elif self.action == "append_branch":
                     ret = graph.append_branch(
-                        data["property"], 
-                        nodeid=data["nodeid"], 
-                        graphid=data["graphid"], 
-                        return_appended_graph=data.get('return_appended_graph', False)
+                        data["property"],
+                        nodeid=data["nodeid"],
+                        graphid=data["graphid"],
+                        return_appended_graph=data.get("return_appended_graph", False),
                     )
                     ret = ret.serialize()
                     ret["nodegroups"] = graph.get_nodegroups()
