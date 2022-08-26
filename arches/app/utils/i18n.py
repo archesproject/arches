@@ -23,9 +23,10 @@ def localize_complex_input(input):
     input -- (required) A list, dictionary, or model
 
     Returns:
-    The input, with any internationalized string/text dictionaries localized to a string in the requested 
+    The input, with any internationalized string/text dictionaries localized to a string in the requested
     language, with the application language as a fallback.
     """
+
     def _recursive_localize(obj):
         if isinstance(obj, list):
             for item in obj:
