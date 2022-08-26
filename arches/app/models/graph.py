@@ -660,7 +660,7 @@ class Graph(models.GraphModel):
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
-            return self
+            return branch_copy
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """
