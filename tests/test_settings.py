@@ -102,7 +102,7 @@ NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--v
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
-
+ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),
