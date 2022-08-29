@@ -17,8 +17,8 @@ function install_postgres {
   sudo -u postgres psql -d postgres -c "ALTER USER postgres with encrypted password '$PGPASS';"
   sudo echo "*:*:*:postgres:$PGPASS" >> ~/.pgpass
   sudo chmod 600 ~/.pgpass
-  sudo chmod 664 /etc/postgresql/14/main/postgresql.conf
-  sudo chmod 664 /etc/postgresql/14/main/pg_hba.conf
+  sudo chmod 666 /etc/postgresql/14/main/postgresql.conf
+  sudo chmod 666 /etc/postgresql/14/main/pg_hba.conf
   sudo echo "standard_conforming_strings = off" >> /etc/postgresql/14/main/postgresql.conf
   sudo echo "listen_addresses = '*'" >> /etc/postgresql/14/main/postgresql.conf
   sudo echo "#TYPE   DATABASE  USER  CIDR-ADDRESS  METHOD" > /etc/postgresql/14/main/pg_hba.conf
@@ -26,6 +26,8 @@ function install_postgres {
   sudo echo "host    all       all   127.0.0.1/32  trust" >> /etc/postgresql/14/main/pg_hba.conf
   sudo echo "host    all       all   ::1/128       trust" >> /etc/postgresql/14/main/pg_hba.conf
   sudo echo "host    all       all   0.0.0.0/0     md5" >> /etc/postgresql/14/main/pg_hba.conf
+  sudo chmod 664 /etc/postgresql/14/main/postgresql.conf
+  sudo chmod 664 /etc/postgresql/14/main/pg_hba.conf
   sudo service postgresql restart
 
   sudo -u postgres createdb -E UTF8 -T template0 --locale=en_US.utf8 template_postgis
