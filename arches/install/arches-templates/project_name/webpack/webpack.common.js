@@ -208,7 +208,11 @@ module.exports = {
                             */ 
                             if (failureCount < 5) {
                                 try {
-                                    resp = await fetch(djangoServerAddress + templatePath);
+                                    let serverAddress = djangoServerAddress;
+                                    if (serverAddress.charAt(serverAddress.length - 1) !== '/') {
+                                        serverAddress = serverAddress + '/'
+                                    }
+                                    resp = await fetch(serverAddress + templatePath);
                                 }
                                 catch(e) { 
                                     failureCount += 1;

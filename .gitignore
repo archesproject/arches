@@ -5,7 +5,7 @@ tests/elasticsearch
 tests/logs
 tests/fixtures/testing_prj/testing_prj/media/packages/*
 arches/install/elasticsearch-*.zip
-build
+build/*
 arches.egg*
 arches/elasticsearch
 arches/uploadedfiles
