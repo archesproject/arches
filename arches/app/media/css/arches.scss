@@ -13857,8 +13857,8 @@ ul.select2-choices:after {
     }
     .edge-node-information {
         position: relative;
+        display: flex;
         .edge-node-graph-color {
-            position: absolute;
             width: 50px;
             height: 50px;
             border-radius: 100%;
@@ -13866,7 +13866,6 @@ ul.select2-choices:after {
             margin: 5px 10px;
         }
         .edge-node-title {
-            margin-left: 74px;
             min-height: 70px;
             padding: 4px 0;
             .edge-node-display-name {
