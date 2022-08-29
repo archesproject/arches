@@ -11053,17 +11053,13 @@ ul.pagination {
 }
 
 .filter-title {
+    display: flex;
     font-size: 17px;
-    margin-top: 30px;
+    margin-top: 3px 0px 15px 0px;
 }
 
-.time-search-container .filter-title:first-child {
-    margin-top: 3px;
-    margin-bottom: 15px;
-}
-
-.filter-title .pull-right {
-    margin-top: -7px;
+.filter-title>span {
+    flex-grow: 1;
 }
 
 .title-underline {
