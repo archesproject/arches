@@ -10685,16 +10685,6 @@ a.search-query-link-captions:focus {
     padding-right: 7px;
 }
 
-.search-listing-footer a {
-    margin-top: -5px;
-    padding: 5px 5px;
-}
-
-.search-listing-footer a:focus {
-    background: #d6d6d6;
-    border-radius: 1px;
-}
-
 .search-control-container.slide {
     margin-left: -400px;
     transition: all .5s;
@@ -11041,11 +11031,23 @@ ul.pagination {
 }
 
 .search-listing-footer {
+    display: flex;
     height: 40px;
     font-size: 11px;
     padding: 10px 10px 0px 10px;
     background: #f5f5f5;
     border-top: 1px solid #ddd;
+
+    a {
+        margin-top: -5px;
+        padding: 5px 5px;
+
+        &:focus {
+            background: #d6d6d6;
+            border-radius: 1px;
+        }
+    }
+    
 }
 
 .time-wheel-wrap {
