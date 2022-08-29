@@ -8,9 +8,43 @@ from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
+from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
+
+
+def localize_complex_input(input):
+    """
+    This method accepts an input of a list, dictionary, or model. It will then recursively update the
+    inputs' data to return only the localized version of any i18n values
+
+    Arguments:
+    input -- (required) A list, dictionary, or model
+
+    Returns:
+    The input, with any internationalized string/text dictionaries localized to a string in the requested
+    language, with the application language as a fallback.
+    """
+
+    def _recursive_localize(obj):
+        if isinstance(obj, list):
+            for item in obj:
+                _recursive_localize(item)
+        if isinstance(obj, dict):
+            for key in obj.keys():
+                try:
+                    localized_value = get_localized_value(obj[key])
+                    obj[key] = localized_value["value"] if isinstance(localized_value, dict) else localized_value
+                except:
+                    _recursive_localize(obj[key])
+        if isinstance(obj, Model):
+            for field in obj._meta.get_fields():
+                data = getattr(obj, field.name)
+                _recursive_localize(data)
+        return obj
+
+    return _recursive_localize(input)
 
 
 def get_localized_value(obj, lang=None, return_lang=False):
@@ -58,8 +92,9 @@ def get_localized_value(obj, lang=None, return_lang=False):
 
             if settings.LANGUAGE_CODE in obj:
                 found_lang = settings.LANGUAGE_CODE
-            else:
-                found_lang = langcode
+
+        if found_lang not in obj:
+            raise Exception()
 
         return {found_lang: obj[found_lang]} if return_lang else obj[found_lang]
 

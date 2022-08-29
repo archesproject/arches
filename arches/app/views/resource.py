@@ -49,7 +49,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
-from arches.app.utils.i18n import LanguageSynchronizer
+from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
@@ -598,7 +598,7 @@ class ResourceEditLogView(BaseManagerView):
                 resource_type=graph_name,
                 resource_description=resource.displaydescription(),
                 iconclass=resource_instance.graph.iconclass,
-                edits=JSONSerializer().serialize(permitted_edits),
+                edits=JSONSerializer().serialize(localize_complex_input(permitted_edits)),
                 resourceid=resourceid,
                 displayname=_("Unnamed Resource") if displayname == "undefined" else displayname,
             )
