@@ -2118,12 +2118,17 @@ div.final-cons-step-separator>h4 {
     font-size: 16px;
     color: rgb(158, 158, 158);
     display: flex;
+
+    span {
+        padding-top: 3px;
+    }
 }
 
 .basemap-listing:before,
 .overlay-listing .overlay-name:before {
-    margin: 0px 4px;
+    margin: 0px 8px;
     font-family: FontAwesome;
+    padding-top: 3px;
 }
 
 .basemap-listing:before {
@@ -2136,6 +2141,7 @@ div.final-cons-step-separator>h4 {
 
 .overlay-listing {
     position: relative;
+    display: flex;
 }
 
 .overlay-listing.rr-map-card .overlay-name:before {
@@ -2404,26 +2410,9 @@ div.final-cons-step-separator>h4 {
     padding: 0 16px 16px;
 }
 
-.basemap-listing:before,
-.overlay-listing .overlay-name:before {
-    margin-right: 4px;
-    font-family: FontAwesome;
-}
-
-.basemap-listing:before {
-    content: "\f10c";
-}
-
-.overlay-listing .overlay-name:before {
-    content: "\f204";
-}
-
-.overlay-listing {
-    position: relative;
-}
 
 .overlay-listing .overlay-name {
-    display: inline-block;
+    display: flex;
     width: 300px;
     white-space: nowrap;
     overflow: hidden;
@@ -2466,7 +2455,6 @@ div.final-cons-step-separator>h4 {
     transition-delay: 100ms;
     position: absolute;
     padding: 6px 6px 6px 8px;
-    top: 16px;
     right: 6px;
     width: 30px;
     height: 38px;
