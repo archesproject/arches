@@ -53,10 +53,10 @@
                 </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile create'-->
-            <!--ko if: card_container_name -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: card_container_name + ': ' + card.name + ' '"></span>{% trans 'Created' %}</h4>
+            <!--ko if: cardContainerName -->
+            <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Created' %}</h4>
             <!--/ko-->
-            <!--ko ifnot: card_container_name -->
+            <!--ko ifnot: cardContainerName -->
             <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Created' %}</h4>
             <!--/ko-->
 
@@ -89,10 +89,10 @@
             </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile edit'-->
-            <!--ko if: card_container_name -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: card_container_name + ': ' + card.name + ' '"></span>{% trans 'Edit' %}</h4>
+            <!--ko if: cardContainerName -->
+            <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Edit' %}</h4>
             <!--/ko-->
-            <!--ko ifnot: card_container_name -->
+            <!--ko ifnot: cardContainerName -->
             <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Edit' %}</h4>
             <!--/ko-->
 
@@ -158,10 +158,10 @@
             </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile delete'-->
-            <!--ko if: card_container_name -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: card_container_name + ': ' + card.name + ' '"></span>{% trans 'Deleted' %}</h4>
+            <!--ko if: cardContainerName -->
+            <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Deleted' %}</h4>
             <!--/ko-->
-            <!--ko ifnot: card_container_name -->
+            <!--ko ifnot: cardContainerName -->
             <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Deleted' %}</h4>
 
             <!--/ko-->
@@ -194,7 +194,7 @@
 
 {% block pre_require_js %}
 {{ block.super }}
-<div 
+<div
     id="resourceEditHistoryData"
     style="display: none;"
     resourceEditHistoryData='{
