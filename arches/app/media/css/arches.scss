@@ -6655,7 +6655,6 @@ th.notif-type {
 
 .ep-tools:hover {
     background: #fafafa;
-    border-bottom: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
 
@@ -6687,13 +6686,18 @@ th.notif-type {
     border-left: 1px solid #ddd;
     background: #fff;
     font-size: 17px;
-    padding-left: 16px;
+    padding-left: 18px;
     padding-right: 20px;
     max-width: 50px;
+    height: 49px;
 }
 
 .ep-tools-right a:first-child {
     margin: auto;
+}
+
+#lang_dd_chosen {
+    border: 1px solid #fff;
 }
 
 .ep-tools-login {
@@ -6703,7 +6707,12 @@ th.notif-type {
     vertical-align: middle;
     background: #fff;
     border-left: 1px solid #ddd;
+    height:49px;
+}
+
+.aside-left .ep-tools-login {
     border-right: 1px solid #ddd;
+    margin-right: -1px;
 }
 
 .ep-tool-title {
@@ -13645,7 +13654,7 @@ ul.select2-choices:after {
 }
 
 .lang-switch .chosen-single {
-    border: none;
+    border: 1px solid #fff;
     font-size: 12px;
     color: #454545;
     padding-top: 8px;
