@@ -206,3 +206,5 @@ To create it, use:
 
         if os.path.isfile(settings_data_local):
             management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
+
+        management.call_command("graph", operation="publish")
