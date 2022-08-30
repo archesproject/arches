@@ -131,37 +131,66 @@ class Graph(models.GraphModel):
                 if not has_deferred_args and self.publication:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
-                    # filter out keys from the serialized_graph that would cause an error on instantiation
                     node_slugs = []
                     for node_dict in self.serialized_graph["nodes"]:
-                        node_slugs.append({key: value for key, value in node_dict.items() if key not in ["is_collector", "parentproperty"]})
+                        node_slug = {}
 
-                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                        for key, value in node_dict.items():
+                            # filter out keys from the serialized_graph that would cause an error on instantiation
+                            if key not in ["is_collector", "parentproperty"]:
+                                if isinstance(value, str):
+                                    try:
+                                        value = uuid.UUID(value)
+                                    except ValueError:
+                                        pass
+                                node_slug[key] = value
+
+                        node_slugs.append(node_slug)
+
                     card_slugs = []
                     for card_dict in self.serialized_graph["cards"]:
-                        card_slugs.append({key: value for key, value in card_dict.items() if key not in ["constraints", "is_editable"]})
+                        card_slug = {}
+
+                        for key, value in card_dict.items():
+                            # filter out keys from the serialized_graph that would cause an error on instantiation
+                            if key not in ["constraints", "is_editable"]:
+                                if isinstance(value, str):
+                                    try:
+                                        value = uuid.UUID(value)
+                                    except ValueError:
+                                        pass
+                                card_slug[key] = value
+
+                        card_slugs.append(card_slug)
+
+                    edge_slugs = []
+                    for edge_dict in self.serialized_graph["edges"]:
+                        edge_slug = {}
+
+                        for key, value in edge_dict.items():
+                            if isinstance(value, str):
+                                try:
+                                    value = uuid.UUID(value)
+                                except ValueError:
+                                    pass
+                            edge_slug[key] = value
+
+                        edge_slugs.append(edge_slug)
 
                     nodes = [models.Node(**node_slug) for node_slug in node_slugs]
+                    edges = [models.Edge(**edge_dict) for edge_dict in edge_slugs]
                     cards = [models.CardModel(**card_slug) for card_slug in card_slugs]
-                    edges = [models.Edge(**edge_dict) for edge_dict in self.serialized_graph["edges"]]
-                    card_x_node_x_widgets = [
-                        models.CardXNodeXWidget(**card_x_node_x_widget_dict)
-                        for card_x_node_x_widget_dict in self.serialized_graph["widgets"]
-                    ]
-
-                    edge_lookup = {edge["edgeid"]: edge for edge in self.serialized_graph["edges"]}
-                    self.widgets = {widget.pk: widget for widget in card_x_node_x_widgets}
                 else:
                     nodes = self.node_set.all()
                     edges = self.edge_set.all()
                     cards = self.cardmodel_set.all()
 
-                    edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
+                edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
 
-                    for card in cards:
-                        widgets = list(card.cardxnodexwidget_set.all())
-                        for widget in widgets:
-                            self.widgets[widget.pk] = widget
+                for card in cards:
+                    widgets = list(card.cardxnodexwidget_set.all())
+                    for widget in widgets:
+                        self.widgets[widget.pk] = widget
 
                 node_lookup = {}
                 for node in nodes:
@@ -587,7 +616,7 @@ class Graph(models.GraphModel):
 
         return tree
 
-    def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False):
+    def append_branch(self, property, nodeid=None, graphid=None, skip_validation=False, return_appended_graph=False):
         """
         Appends a branch onto this graph
 
@@ -631,7 +660,10 @@ class Graph(models.GraphModel):
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
 
-            return branch_copy
+            if return_appended_graph:
+                return self
+            else:
+                return branch_copy
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
         """
@@ -798,6 +830,7 @@ class Graph(models.GraphModel):
             is_collector = node.is_collector
             node.pk = uuid.uuid1()
             node_map[node_id] = node.pk
+
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
