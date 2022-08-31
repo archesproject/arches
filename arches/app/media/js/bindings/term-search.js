@@ -125,9 +125,9 @@ define([
                 },
                 formatSelection: function(result, container) {
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
-                    var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="margin-right: 7px;display:none;"></i>' + result.text + '</span>' + context;
+                    var markup = '<span data-filter="external-filter"><i class="fa fa-minus" style="display:none;"></i>' + result.text + '</span>' + context;
                     if (result.inverted()) {
-                        markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted" style="margin-right: 7px;"></i>' + result.text + '</span>' + context;
+                        markup = '<span data-filter="external-filter"><i class="fa fa-minus inverted"></i>' + result.text + '</span>' + context;
                     }
                     if (result.type !== 'string' && result.type !== 'concept' && result.type !== 'term') {
                         $(container.prevObject).addClass('filter-flag');

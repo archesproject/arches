@@ -77,10 +77,12 @@
                             <i data-bind="css: icon" class="layer-listing-icon"></i>
                             <span data-bind="text: name"></span>
                         </div>
-                        <div class="overlay-opacity-control">
-                            <i class="fa fa-adjust"></i>
-                            <div class="overlay-opacity-slider">
-                                <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'">
+                        <div class="relative">
+                            <div class="overlay-opacity-control">
+                                <i class="fa fa-adjust"></i>
+                                <div class="overlay-opacity-slider">
+                                    <input type="range" min="0" max="100" step="1" data-bind="value: opacity, valueUpdate: 'input'">
+                                </div>
                             </div>
                         </div>
                     </div>
