@@ -51,7 +51,7 @@
         "mapbox-gl": "^1.8.1",
         "metismenu": "2.7.2",
         "moment": ">=2.10.5",
-        "moment-timezone": "0.5.0",
+        "moment-timezone": "0.5.35",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
         "proj4": "^2.3.15",
