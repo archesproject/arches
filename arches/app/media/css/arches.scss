@@ -11050,7 +11050,7 @@ ul.pagination {
             border-radius: 1px;
         }
     }
-    
+
 }
 
 .time-wheel-wrap {
@@ -14091,6 +14091,17 @@ ul.select2-choices:after {
     background: #bbb;
 }
 
+.jstree-container-ul {
+    .filtered {
+        font-weight: 600;
+        color: #fff;
+        background: #3acaa1;
+        span, i {
+            color: #fff;
+        }
+    }
+}
+
 @keyframes loader {
     0% {
         background: #ddd;
@@ -14611,9 +14622,9 @@ ul.select2-choices:after {
 }
 
 .etl-module-preview {
-    height: calc(100vh - 95px); 
-    width: calc(100vw - 490px); 
-    padding: 20px 25px; 
+    height: calc(100vh - 95px);
+    width: calc(100vw - 490px);
+    padding: 20px 25px;
     overflow: scroll;
     background: #fbfbfb;
 }
