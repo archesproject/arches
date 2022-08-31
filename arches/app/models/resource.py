@@ -531,6 +531,18 @@ class Resource(models.ResourceInstance):
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
+
+        # TODO This function is very similar to code in search results and the resource view. Needs to be centralized. 
+        def get_localized_descriptor(document, descriptor_type):
+            language_codes = (get_language(), settings.LANGUAGE_CODE)
+            descriptor = document["_source"][descriptor_type]
+            result = descriptor[0] if len(descriptor) > 0 else {"value": _("Undefined")}
+            for language_code in language_codes:
+                for entry in descriptor:
+                    if entry["language"] == language_code and entry["value"] != "":
+                        return entry["value"]
+            return result["value"]
+
         if not graphs:
             graphs = list(
                 models.GraphModel.objects.all()
@@ -603,7 +615,6 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
 
-                current_language = get_language()
 
                 for resource in related_resources["docs"]:
                     relations = get_relations(
@@ -614,22 +625,12 @@ class Resource(models.ResourceInstance):
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["total"]
 
-                        # manually updates output to current language for `displaydescription` and `displayname`
-                        current_language_display_description = [
-                            description_object["value"]
-                            for description_object in resource["_source"]["displaydescription"]
-                            if description_object.get("language") == current_language
-                        ]
-                        current_language_display_name = [
-                            name_object["value"]
-                            for name_object in resource["_source"]["displayname"]
-                            if name_object.get("language") == current_language
-                        ]
-
-                        if len(current_language_display_description):
-                            resource["_source"]["displaydescription"] = current_language_display_description[0]
-                        if len(current_language_display_name):
-                            resource["_source"]["displayname"] = current_language_display_name[0]
+                        for descriptor_type in ("displaydescription", "displayname"):
+                            descriptor = get_localized_descriptor(resource, descriptor_type)
+                            if descriptor:
+                                resource["_source"][descriptor_type] = descriptor
+                            else:
+                                resource["_source"][descriptor_type] = _("Undefined")
 
                         ret["related_resources"].append(resource["_source"])
 
