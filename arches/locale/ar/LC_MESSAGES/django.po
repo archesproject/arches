@@ -77,7 +77,7 @@ msgstr ""
 #: app/datatypes/datatypes.py:564
 #, python-brace-format
 msgid "{value} is an invalid date format"
-msgstr "{القيمة} هي تنسيق تاريخ غير صالح"
+msgstr "{value} هي تنسيق تاريخ غير صالح"
 
 #: app/datatypes/datatypes.py:665
 #, fuzzy
@@ -559,7 +559,7 @@ msgstr "خطأ فهرس البحث غير معرف :"
 #, python-format
 msgid ""
 "The index \"%s\" is not defined in settings.ELASTICSEARCH_CUSTOM_INDEXES"
-msgstr "لم يتم تعريف الفهرس \"٪ s\" في الإعدادات. ELASTICSEARCH_CUSTOM_INDEXES"
+msgstr "لم يتم تعريف الفهرس \"%s\" في الإعدادات. ELASTICSEARCH_CUSTOM_INDEXES"
 
 #: app/search/components/map_filter.py:75
 msgid "Feature geometry is not defined"
@@ -3101,7 +3101,7 @@ msgstr ""
 #: app/templates/index.htm:72
 #, python-format
 msgid "Arches | %(version)s"
-msgstr "Arches|  (version)s %1"
+msgstr "Arches | %(version)s"
 
 #: app/templates/index.htm:80
 msgid "Arches Features"
@@ -3138,7 +3138,7 @@ msgstr "سير العمل"
 #: app/templates/index.htm:183
 #, python-format
 msgid "Arches %(version)s"
-msgstr "Arches|  (version)s %1"
+msgstr "Arches %(version)s"
 
 #: app/templates/index.htm:184
 msgid "A web and mobile platform for"
@@ -7802,7 +7802,7 @@ msgstr ""
 "<strong> خطأ في استعلام SPARQL: </strong> <br> اختبر هذا الاستعلام مباشرةً عن "
 "طريق لصق الاستعلام أدناه في نقطة نهاية SPARQL الخاصة بـ Getty في <a href = "
 "'http: //vocab.getty.edu/sparql' target = '_blank'> http://vocab.getty.edu/"
-"sparql </a> <i> <pre>٪ s </pre> </i> عرض الاستعلام 0 نتيجة ، يرجى التحقق من "
+"sparql </a> <i> <pre>%s </pre> </i> عرض الاستعلام 0 نتيجة ، يرجى التحقق من "
 "الاستعلام بحثًا عن أخطاء. قد تحتاج إلى إضافة اللغات المناسبة إلى قاعدة "
 "البيانات لكي يعمل هذا الاستعلام <br> <br>"
 
@@ -7925,7 +7925,7 @@ msgstr "لم يتم العثور على نود تتطابق مع طلب البح
 #: app/views/api.py:1364
 #, python-format
 msgid "No graph found for graphid %s"
-msgstr "لم يتم العثور على رسم بياني يتوافق مع الرسم البياني٪ s"
+msgstr "لم يتم العثور على رسم بياني يتوافق مع الرسم البياني %s"
 
 #: app/views/api.py:1424
 msgid "User does not have permission to edit this node."
@@ -7967,7 +7967,7 @@ msgid ""
 "An email has been sent to <br><strong>%s</strong><br> with a link to "
 "activate your account"
 msgstr ""
-"تم إرسال بريد إلكتروني إلى <br> <strong>٪ s </strong> <br> به رابط لتفعيل "
+"تم إرسال بريد إلكتروني إلى <br><strong>%s</strong><br> به رابط لتفعيل "
 "حسابك "
 
 #: app/views/auth.py:232
@@ -8230,7 +8230,7 @@ msgstr ""
 msgid ""
 "Your search exceeds the {download_limit} instance download limit. Please "
 "refine your search"
-msgstr "ان نتائج البحث تتعدى الحد المسموح به للتحميل، من فضلك أعد المحاولة"
+msgstr "تجاوزت نتائج البحث حد التنزيل المسموح به {download_limit} ، يرجى المحاولة مرة أخرى"
 
 #: app/views/search.py:270
 msgid ""
@@ -8329,7 +8329,7 @@ msgstr "يجب عليك توفير ontology_config.json في دليل مصدر �
 #: management/commands/load_ontology.py:85
 #, python-brace-format
 msgid "'{config_file}' was not found."
-msgstr "لم يتم العثور على: config_file"
+msgstr "لم يتم العثور على: '{config_file}'"
 
 #: management/commands/load_ontology.py:89
 msgid "You must supply a version number using the -vn/--version argument."
