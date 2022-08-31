@@ -214,7 +214,10 @@ class I18n_JSON(object):
         ret = {}
 
         if isinstance(value, str):
-            ret = json.loads(value)
+            try:
+                ret = json.loads(value)
+            except:
+                ret = json.loads(json.dumps(value))
         elif value is None:
             ret[lang] = None if use_nulls else ""
         elif isinstance(value, I18n_JSON):
