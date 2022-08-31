@@ -15,7 +15,7 @@ define([], function() {
     parsedResourceEditorData["relationship_types"] = JSON.parse(forceDoubleQuotes(parsedResourceEditorData["relationship_types"]));
     parsedResourceEditorData["creator"] = JSON.parse(parsedResourceEditorData["creator"]);
     parsedResourceEditorData["userisreviewer"] = Boolean(parsedResourceEditorData["userisreviewer"] === "True");
-    parsedResourceEditorData["useriscreator"] = Boolean(parsedResourceEditorData["useriscreator"] === "True");
+    parsedResourceEditorData["useriscreator"] = ["true", "True"].includes(parsedResourceEditorData["useriscreator"]);
 
     return parsedResourceEditorData;
 });
