@@ -27,7 +27,6 @@ from django.db.models import Q
 from django.contrib.auth.models import User, Group, Permission
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
@@ -535,7 +534,7 @@ class Resource(models.ResourceInstance):
 
         # TODO This function is very similar to code in search results and the resource view. Needs to be centralized. 
         def get_localized_descriptor(document, descriptor_type):
-            language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
+            language_codes = (get_language(), settings.LANGUAGE_CODE)
             descriptor = document["_source"][descriptor_type]
             result = descriptor[0] if len(descriptor) > 0 else {"value": _("Undefined")}
             for language_code in language_codes:
