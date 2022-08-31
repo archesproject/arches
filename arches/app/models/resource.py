@@ -532,7 +532,7 @@ class Resource(models.ResourceInstance):
 
         """
 
-        # TODO This function is very similar to code in search results and the resource view. Needs to be centralized. 
+        # TODO This function is very similar to code in search results and the resource view. Needs to be centralized.
         def get_localized_descriptor(document, descriptor_type):
             language_codes = (get_language(), settings.LANGUAGE_CODE)
             descriptor = document["_source"][descriptor_type]
