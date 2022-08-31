@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-30 19:07-0700\n"
+"POT-Creation-Date: 2022-08-31 11:12-0700\n"
 "PO-Revision-Date: 2021-12-03 22:37+0000\n"
 "Last-Translator: Yael Alef <yaelalef@gmail.com>, 2022\n"
 "Language-Team: Hebrew (https://www.transifex.com/archesproject/teams/56656/"
@@ -47,7 +47,7 @@ msgstr ""
 
 #: app/datatypes/concept_types.py:148
 msgid "This is an invalid concept prefLabel, or an incomplete UUID"
-msgstr "זה אינו קונספט prefLabel חוקי, או שה-UUID אינו שלם"
+msgstr "  זה אינו קונספט prefLabel חוקי, או שהUUID אינו שלם."
 
 #: app/datatypes/concept_types.py:156
 msgid "This UUID is not an available concept value"
@@ -70,13 +70,13 @@ msgid ""
 "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the "
 "format in settings.DATE_IMPORT_EXPORT_FORMAT."
 msgstr ""
-"פורמט שגוי. וודא שהפורמט המבוקש נמצא ב settings.DATE_FORMATS או הגדר את "
-"פורמט ב settings.DATE_IMPORT_EXPORT_FORMAT."
+"פורמט שגוי. וודא שהפורמט נמצא ב settings.DATE_FORMATS או הגדר את הפורמט ב "
+"settings.DATE_IMPORT_EXPORT_FORMAT."
 
 #: app/datatypes/datatypes.py:564
 #, python-brace-format
 msgid "{value} is an invalid date format"
-msgstr "{value} אינו פורמט תאריך חוקי"
+msgstr " {value} אינו פורמט תאריך חוקי"
 
 #: app/datatypes/datatypes.py:665
 #, fuzzy
@@ -87,8 +87,8 @@ msgid ""
 "Incorrect Extended Date Time Format. See http://www.loc.gov/standards/"
 "datetime/ for supported formats"
 msgstr ""
-"פורמט תאריך זמן מורחב שגוי. לפורמטים נתמכים ראה \n"
-"http://www.loc.gov/standards/datetime "
+"פורמט תאריך זמן מורחב שגוי. לפורמטים נתמכים ראה /http://www.loc.gov/"
+"standards/datetime"
 
 #: app/datatypes/datatypes.py:718
 msgid ""
@@ -267,8 +267,8 @@ msgstr "לא מוגדר"
 #: app/models/concept.py:153
 msgid "Only include values for include or exclude, but not both"
 msgstr ""
-"כמנהל מסד נתונים, תשתמש במנהל ארצ'ס קולקטור כדי ליצור ולנהל את הפרויקטים "
-"עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של ארצ'ס קולקטור."
+"כמנהל מסד נתונים, תשתמש במנהל Arches Collector כדי ליצור ולנהל את הפרויקטים "
+"עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של Arches Collector."
 
 #: app/models/concept.py:844
 #, python-format
@@ -353,8 +353,8 @@ msgid ""
 "saved.                             You cannot delete nodes from a Resource "
 "Model with instances."
 msgstr ""
-"במודל המשאב שלך: {self.name}, כבר נשמר מופעים. לא ניתן למחוק צמתים ממודל "
-"משאב עם מופעים."
+" למודל המשאב שלך: {self.name} כבר נשמרו מופעים. לא ניתן למחוק צמתים ממודל "
+"משאב  עם מופעים."
 
 #: app/models/graph.py:1037
 msgid "The graph you wish to append needs to define an ontology"
@@ -371,7 +371,7 @@ msgid ""
 "saved.                                 You cannot modify a Resource Model "
 "with instances."
 msgstr ""
-"במודל המשאב שלך: {self.name}, כבר נשמרו מופעים. אינך יכול לשנות מודל משאב עם "
+" במודל המשאב שלך: {self.name} כבר נשמרו מופעים. אינך יכול לשנות מודל משאב עם "
 "מופעים."
 
 #: app/models/graph.py:1541
@@ -391,8 +391,8 @@ msgid ""
 "collector.                             Hint: check that nodegroup_id of your "
 "resource node(s) are not null."
 msgstr ""
-"הצומת העליון של גרף המשאבים שלך: {self.root.name} צריך להיות קולקטור "
-"הנתונים. רמז: בדוק שה-nodegroup_id של צומת/י המשאב שלך אינו ריק (null)."
+"הצומת העליון של גרף המשאבים שלך: {self.root.name} צריך להיות אספן  נתונים "
+"(collector). רמז: בדוק שה-nodegroup_id של צומת/י המשאב שלך אינו ריק (null)."
 
 #: app/models/graph.py:1592
 msgid "The top node of your resource graph must have a datatype of 'semantic'."
@@ -453,8 +453,8 @@ msgid ""
 "via Property '{edge.ontologyproperty}'."
 msgstr ""
 "הגרף שלך אינו חוקי סמנטית. דומיין הישות '{edge.domainnode.ontologyclass}' "
-"וטווח הישות '{edge.rangenode.ontologyclass}' אינו יכול להיות מקושר דרך "
-"מאפיין האונטולוגיה של המשאב '{edge.ontologyproperty}'."
+"וטווח הישות '{edge.rangenode.ontologyclass}'אינו יכול להיות מקושר דרך מאפיין "
+"האונטולוגיה של המשאב '{edge.ontologyproperty}'."
 
 #: app/models/graph.py:1672
 #, python-brace-format
@@ -480,7 +480,7 @@ msgstr "ההקשר של json-ld שסיפקת לא מעוצב כהלכה."
 #, fuzzy, python-brace-format
 #| msgid "Another resource modal already uses the slug '{self.slug}'"
 msgid "Another resource model already uses the slug '{self.slug}'"
-msgstr "שיטת משאבים אחרת כבר משתמשת בסלוג '{self.slug}'"
+msgstr "מודל משאבים אחר כבר משתמש ב- slug  (ב '{self.slug}') "
 
 #: app/models/graph.py:1753
 msgid "Graph Validation Error"
@@ -633,9 +633,7 @@ msgstr "טעינת המשאבים הסתיימה."
 msgid ""
 "Hello,\n"
 "Your package has successfully loaded into your Arches project."
-msgstr ""
-"שלום, \n"
-"החבילה שלך נטענה בהצלחה לפרויקט הארצ'ס שלך."
+msgstr "שלום, החבילה שלך נטענה בהצלחה לפרויקט הArches שלך."
 
 #: app/tasks.py:147
 msgid "Log me in"
@@ -709,7 +707,7 @@ msgstr "הוסף משאב חדש"
 
 #: app/templates/base-manager.htm:149 app/views/graph.py:151
 msgid "Arches Designer"
-msgstr "מעצב המידע של ארצ'ס"
+msgstr "מעצב המידע של Arches"
 
 #: app/templates/base-manager.htm:155 app/templates/index.htm:399
 #: app/templates/views/graph.htm:64
@@ -855,7 +853,7 @@ msgstr "הסיסמה שלך חייבת:"
 #: app/templates/errors/404.htm:11 app/templates/errors/500.htm:11
 #: app/templates/javascript.htm:206
 msgid "Arches"
-msgstr "ארצ'ס"
+msgstr "Arches"
 
 #: app/templates/errors/404.htm:19 app/templates/errors/500.htm:19
 msgid "Oops!"
@@ -988,13 +986,12 @@ msgid ""
 "negative (270 faces west; -180 faces south). Use <code>ctrl + click</code> "
 "then pan the map to change Pitch and Bearing."
 msgstr ""
-"אתה יכול להגדיר את המיקום על ידי הזזה של המפה. בעת טעינת הדוח, המפה תעשה זאת "
+"ניתן להגדיר את המיקום על ידי הזזה של המפה. בעת טעינת הדוח, המפה תעשה זאת "
 "הזזה והגדלה אוטומטית למיקום הגיאוגרפי של המשאב אם יש כזה (ראה גם <strong>ערך "
 "ברירת מחדל</strong> למטה). ערכי הגובה הם 0-60 (גבוה יותר = יותר אלכסוני), "
 "<strong>ערכי נושא</strong> יכולים להיות חיוביים או שלילי (270 פניות מערבה; "
 "-180 פניות דרומה). השתמש ב- <code>קונטרול+קליק</code> לאחר מכן הזיזו את המפה "
-"כדי לשנות את ה-\n"
-"Pitch and Bearing."
+"כדי לשנות את ה-Pitch and Bearing."
 
 #: app/templates/help/cards-tab-help.htm:46
 msgid "Zoom"
@@ -1312,12 +1309,12 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"<p>ארצ'ס מגיע עם שלוש פונקציות ברירת מחדל (ראה להלן). עם   hook זאת, "
+"<p>Arches מגיע עם שלוש פונקציות ברירת מחדל (ראה להלן). עם   hook זאת, "
 "פונקציות נתפסות בתור ה-\n"
-" שדרכו מפתחים יכולים להתאים אישית בקלות את יכולות ארצ'ס, מכיוון שניתן להוסיף "
-"פונקציות חדשות להתקנת ארצ'ס האישית שלך. למידע נוסף <a href=\"https://github."
-"com/archesproject/arches/wiki/Creating-New-Functions%%2C-DataTypes%%2C-and-"
-"Widgets\" target=\"_blank\">כאן</a>.</p>"
+" שדרכו מפתחים יכולים להתאים אישית בקלות את יכולות Arches, מכיוון שניתן "
+"להוסיף פונקציות חדשות להתקנת Arches האישית שלך. למידע נוסף <a href=\"https://"
+"github.com/archesproject/arches/wiki/Creating-New-Functions%%2C-DataTypes"
+"%%2C-and-Widgets\" target=\"_blank\">כאן</a>.</p>"
 
 #: app/templates/help/function-help.htm:26
 msgid "Define Resource Descriptors"
@@ -1388,10 +1385,9 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"<h5>דוגמא</h5>\n"
-"<p>שקול משאב שבו  <strong>שם</strong> הוא ערך הצומת הוא Folsom<em> School</"
-"em> וערך הצומת של <strong>סוג שם</strong> הוא <em>ראשי</em>.</p>\n"
-"<p>בחירה <strong>שם</strong> הכרטיס תאכלס את התבנית ב- <code>&lt;Name "
+"<h5>דוגמא</h5>  משאב שבו <strong>שם</strong> ערך הצומת הוא <em>Folsom "
+"School</em> ו<strong>סוג שם</strong>  ערך הצומת הוא <em>ראשי</em>.</p>\n"
+"<p>בחירת <strong>שם</strong> הכרטיס תאכלס את התבנית ב- <code>&lt;Name "
 "Type&gt;, &lt;Name&gt;</code>. התיאור המתקבל יקרא </em>ראשי, Folsom School</"
 "em> . שינוי התבנית ל <code>שם בניין: &lt;שם&gt;</code> יניב <em>שם בניין: "
 "Folsom School</em></p>"
@@ -1458,7 +1454,7 @@ msgstr ""
 
 #: app/templates/help/graph-tab-help.htm:33
 msgid "Optional subtitle, displayed on the Arches Designer home page."
-msgstr "כתובית אופציונלית, מוצגת בדף הבית של מעצב המידע של ארצ'ס."
+msgstr "כתובית אופציונלית, מוצגת בדף הבית של מעצב המידע של Arches."
 
 #: app/templates/help/graph-tab-help.htm:36
 #: app/templates/views/graph/graph-designer/graph-settings.htm:56
@@ -1476,9 +1472,8 @@ msgid ""
 msgstr ""
 "החליטו אם אונטולוגיה תיאכף בגרף זה. ללמוד על כך, קרא <a href=\"https://"
 "arches.readthedocs.io/en/stable/ontologies-in-arches\" target=\"_blank"
-"\">אונטולוגיות בארצ'ס</a> . כברירת מחדל, אתה רשאי לבחור בין שימוש ב-\n"
-"CIDOC CRM v6.2, \n"
-"או שימוש ללא אונטולוגיה.כאשר צומת או ענף נוספים לגרף זה את הגדרת "
+"\">אונטולוגיות בArches</a> . כברירת מחדל, אתה רשאי לבחור בין שימוש ב-CIDOC "
+"CRM v6.2, או שימוש ללא אונטולוגיה. כאשר צומת או ענף נוספים לגרף זה את הגדרת "
 "<strong>האונטולוגיה</strong> <em>לא ניתן לשנות</em>."
 
 #: app/templates/help/graph-tab-help.htm:40
@@ -1625,7 +1620,7 @@ msgid ""
 "Awesome</a> icon library; custom icons are not supported."
 msgstr ""
 "בחר סמל כדי לזהות את הגרף הזה בכל ממשק האפליקציה. אתה יכול עיין בסמלים כדי "
-"לבחור אחד, או הקלד בסרגל החיפוש כדי לסנן אותם. ארצ'ס משתמש<a href=\"http://"
+"לבחור אחד, או הקלד בסרגל החיפוש כדי לסנן אותם. Arches משתמש<a href=\"http://"
 "fontawesome.io/\" target=\"_blank\">בגופן</a> ספריית אייקונים מדהימה; "
 "אייקונים מותאמים אישית אינם נתמכים."
 
@@ -1708,7 +1703,7 @@ msgid ""
 msgstr ""
 "הגדרה זו מקצה מחלקה אונטולוגית לצומת זה. למידע נוסף, קרא <a href=\"https://"
 "arches.readthedocs.io/en/stable/managing-resources/#ontologies-in-arches\" "
-"target=\"_blank\">אונטולוגיות ב-ארצ'ס</a>"
+"target=\"_blank\">אונטולוגיות ב-Arches</a>"
 
 #: app/templates/help/graph-tab-help.htm:137
 msgid "Relationship to..."
@@ -2060,9 +2055,9 @@ msgstr ""
 "הגדר את הדרך שבה תכונות ייראו במפה. למפה לדוגמה יש תכונות הדגמה שנותנות לך "
 "תצוגה מקדימה של השינויים שאתה מבצע. אתה יכול לבחור להשתמש <strong>בעריכה "
 "מתקדמת</strong> כדי ליצור סגנון עם יותר ניואנסים. שימו לב ששינויים שנעשו "
-"בעריכה מתקדמת לא יבואו לידי ביטוי אם אתה חוזר לעריכה בסיסית. לעיון   MapBox "
-"בסטיילינג, בדוק את <a href='https://www.mapbox.com/mapbox-gl-js/style-spec/' "
-"target='_blank'>מפרט הסגנון של</a> ."
+"בעריכה מתקדמת לא יבואו לידי ביטוי אם אתה חוזר לעריכה בסיסית. לעיון   "
+"בסטיילינג , בדוק את <a href='https://www.mapbox.com/mapbox-gl-js/style-"
+"spec/' target='_blank'>מפרט הסגנון של MapBox </a> ."
 
 #: app/templates/help/map-manager-help.htm:16
 #: app/templates/help/map-manager-help.htm:36
@@ -2092,7 +2087,7 @@ msgid ""
 "(zoomed out). You are able to control the clustering settings for each layer "
 "individually."
 msgstr ""
-"ארצ'ס משתמש ב'clustering' כדי להציג משאבים בצורה טובה יותר ברמות זום נמוכות "
+"Arches משתמש ב'clustering' כדי להציג משאבים בצורה טובה יותר ברמות זום נמוכות "
 "(הגדלה). אתה יכול לשלוט בהגדרות האשכולות עבור כל שכבה בנפרד."
 
 #: app/templates/help/map-manager-help.htm:21
@@ -2138,9 +2133,9 @@ msgid ""
 "default basemaps, but advanced users are able to add more. Once added, there "
 "are few ways to configure each basemap."
 msgstr ""
-"מפת בסיס תמיד תהיה קיימת במפה שלך. ארצ'ס מגיעות עם כמה מפות בסיס ברירת מחדל, "
-"אך משתמשים מתקדמים יכולים להוסיף עוד. לאחר שהוספת, שם יש כמה דרכים להגדיר כל "
-"מפת בסיס."
+"מפת בסיס תמיד תהיה קיימת במפה שלך. Arches מגיעות עם כמה מפות בסיס ברירת "
+"מחדל, אך משתמשים מתקדמים יכולים להוסיף עוד. לאחר שהוספת, שם יש כמה דרכים "
+"להגדיר כל מפת בסיס."
 
 #: app/templates/help/map-manager-help.htm:35
 msgid ""
@@ -2151,7 +2146,7 @@ msgid ""
 msgstr ""
 "הגדר סגנון עבור מפת בסיס זו. שימו לב כי בהתאם לסוג השכבה, ישנן אפשרויות "
 "סטיילינג שונות. לעיון בסטיילינג, בדוק את <a href='https://www.mapbox.com/"
-"mapbox-gl-js/style-spec/#layers' target='_blank'>מפרט סגנון MapBox</a> ."
+"mapbox-gl-js/style-spec/#layers' target='_blank'>מפרט הסגנון של MapBox</a> ."
 
 #: app/templates/help/map-manager-help.htm:38
 msgid "<strong>Layer name</strong> - enter a name to identify this basemap"
@@ -2190,7 +2185,7 @@ msgid ""
 msgstr ""
 "הגדר סגנון עבור שכבת-על זו. שימו לב כי בהתאם לסוג השכבה, ישנן אפשרויות "
 "סטיילינג שונות. לעיון בסטיילינג, בדוק את <a href='https://www.mapbox.com/"
-"mapbox-gl-js/style-spec/#layers' target='_blank'>מפרט סגנון MapBox </a>."
+"mapbox-gl-js/style-spec/#layers' target='_blank'>מפרט הסגנון של MapBox </a>."
 
 #: app/templates/help/map-manager-help.htm:53
 msgid "<strong>Layer name</strong> - enter a name to identify this overlay"
@@ -2218,7 +2213,7 @@ msgid ""
 "the condition assessment section of a Resource Model. Rules like these are "
 "all enforced using permissions."
 msgstr ""
-"ארצ'ס מאפשר לך להגדיר הרשאות משתמש וקבוצת משתמשים ב- בסיס קבוצת צמתים. "
+"Arches מאפשר לך להגדיר הרשאות משתמש וקבוצת משתמשים ב- בסיס קבוצת צמתים. "
 "לדוגמה, ייתכן שתרצה להסתיר את הקואורדינטות של משאב מהציבור, או אפשר לקבוצה "
 "מסוימת של משתמשים לעדכן רק סעיף הערכת מצב של מודל משאב. חוקים כאלה הם נאכפים "
 "באמצעות הרשאות."
@@ -2295,7 +2290,7 @@ msgid ""
 "that all permissions applied to the Guest group will be given to anyone who "
 "views the website without logging in."
 msgstr ""
-"ייתכן שתבחין כי כברירת מחדל, ארצ'ס מגיע עם קבוצת \"אורח\" גם כן בתור משתמש "
+"ייתכן שתבחין כי כברירת מחדל, Arches מגיע עם קבוצת \"אורח\" גם כן בתור משתמש "
 "בשם \"אנונימי\" שהוא חבר באותה קבוצה. <strong>כל משתמש לא-מזוהה יטופל כמשתמש "
 "\"אנונימי\".</strong> זה אומר שכל ההרשאות שהוחלו על קבוצת האורחים יינתנו לכל "
 "מי צופה באתר מבלי להתחבר."
@@ -2317,7 +2312,7 @@ msgid ""
 "your database as data input dropdown lists."
 msgstr ""
 "Reference Data Management (RDM) מאפשר יצירה ותחזוקה של אוצר מילים מבוקר עבור "
-"מסד הנתונים שלך. בארצ'ס  אוצר מילים מבוקר מורכב מקונספטים (מושגים), והללו "
+"מסד הנתונים שלך. בArches  אוצר מילים מבוקר מורכב מקונספטים (מושגים), והללו "
 "מנוהלים בתזאורוס ובאוספים. ב-RDM תוכל ליצור תזאורוס חדש, קונספטים חדשים, "
 "לייבא קונספטים מבחוץ (כמו ה-Getty AAT), ו -- המטרה הסופית -- ליצור אוספים, "
 "שישמשו ב מסד הנתונים שלך כרשימות נפתחות להזנת הנתונים."
@@ -2366,7 +2361,7 @@ msgid ""
 "used throughout the app."
 msgstr ""
 "תזאורוס הוא סט שלם של קונספטים שניתן לייבא ולייצא כשלם. אתה יכול ליצור כמה "
-"תזאורס חדשים שאתה צריך, או פשוט להוסיף חדש קונספטים לברירת המחדל \"ארצ'ס\" "
+"תזאורס חדשים שאתה צריך, או פשוט להוסיף חדש קונספטים לברירת המחדל \"Arches\" "
 "תזאורוס. הארגון שלך לתזאורס אין השפעה על הדרך שבה מושגים ייחשפו לציבור או "
 "בשימוש בכל האפליקציה."
 
@@ -2775,8 +2770,8 @@ msgid ""
 "              "
 msgstr ""
 "\n"
-"<strong>שם האפליקציה</strong> - שם אפליקציית ארצ'ס שלך, שיוצג בשורת הכותרת "
-"של הדפדפן ובמקומות אחרים.<br> \n"
+"שם האפליקציה</strong> - שם אפליקציית Arches שלך, שיוצג בשורת הכותרת של "
+"הדפדפן ובמקומות אחרים.<br> \n"
 "<strong>ברירת מחדל של ייבוא/ייצוא של משתמש</strong> - שם לשיוך לנתונים "
 "המיובאים למערכת.<br>"
 
@@ -2826,8 +2821,8 @@ msgid ""
 "Arches uses the Mapbox mapping library for map display and data creation. "
 "Arches also supports Mapbox basemaps and other services."
 msgstr ""
-"ארצ'ס משתמש בספריית המיפוי של Mapbox להצגת מפה ויצירת נתונים. ארצ'ס תומך גם "
-"במפות בסיס ושירותים אחרים של Mapbox."
+"Arches משתמש בספריית המיפוי של Mapbox להצגת מפה ויצירת נתונים. Arches תומך "
+"גם במפות בסיס ושירותים אחרים של Mapbox."
 
 #: app/templates/help/system-settings-help.htm:40
 msgid ""
@@ -2838,7 +2833,7 @@ msgid ""
 "Alternatively, you could remove all of the default basemaps and add your "
 "own, non-Mapbox layers."
 msgstr ""
-"<strong>Mapbox API Key (אופציונלי)</strong> - כברירת מחדל, ארצ'ס משתמש בחלק "
+"<strong>Mapbox API Key (אופציונלי)</strong> - כברירת מחדל, Arches משתמש בחלק "
 "שירותי מפות בסיס מ- Mapbox. אתה תצטרך <a href='https://www.mapbox.com/help/"
 "create-api-access-token/' target=\"_blank\">לצור מפתח API חינמי</a> (או "
 "\"אסימון גישה\") עבור אלה שירותים שיופעלו. לחלופין, תוכל להסיר את כל ברירת "
@@ -2914,8 +2909,8 @@ msgid ""
 "Arches aggregates search results and displays them as hexagons. You will "
 "need to set default parameters for the hexagon size and precision."
 msgstr ""
-"ארצ'ס אוסף תוצאות חיפוש ומציג אותן כמשושים. אתה צריך להגדיר פרמטרים של ברירת "
-"מחדל עבור גודל המשושה והדיוק."
+"Arches אוסף תוצאות חיפוש ומציג אותן כמשושים. אתה צריך להגדיר פרמטרים של "
+"ברירת מחדל עבור גודל המשושה והדיוק."
 
 #: app/templates/help/system-settings-help.htm:56
 msgid ""
@@ -2977,7 +2972,7 @@ msgstr ""
 "שיופיעו מתחת לשורת החיפוש תוך כדי הקלדה של מונחי חיפוש.<br>\n"
 "<strong>מספר מקסימלי של תוצאות חיפוש לייצוא</strong> - הגדר את המספר המרבי "
 "של משאבים לייצוא מתוצאות החיפוש. ערך זה אמור להיות מתחלק באופן שווה על ידי "
-"ההגדרה SEARCH_RESULT_LIMIT ב-ארצ'ס (10,000 כברירת מחדל).\n"
+"ההגדרה SEARCH_RESULT_LIMIT ב-Arches (10,000 כברירת מחדל).\n"
 "</p>"
 
 #: app/templates/help/system-settings-help.htm:76
@@ -2990,7 +2985,7 @@ msgid ""
 "allow for quick temporal visualization and queries. A few aspects of this "
 "temporal search are defined here."
 msgstr ""
-"ארצ'ס יוצר גלגל זמן המבוסס על המשאבים במסד הנתונים שלך, כדי לאפשר הדמיה "
+"Arches יוצר גלגל זמן המבוסס על המשאבים במסד הנתונים שלך, כדי לאפשר הדמיה "
 "זמנית ושאילתות מהירים. כמה היבטים של זה חיפוש זמני מוגדרים כאן."
 
 #: app/templates/help/system-settings-help.htm:80
@@ -3001,8 +2996,9 @@ msgid ""
 "md' target=\"_blank\">d3 API reference</a>."
 msgstr ""
 "<strong>צבע רמפת</strong> - <em>לא מיושם כרגע</em> צבע הרמפה לגלגל הזמן. "
-"לעיון נוסף, בדוק את <a href='https://github.com/d3/d3-3.x-api-reference/blob/"
-"master/Ordinal-Scales.md' target=\"_blank\">d3 API reference3</a>."
+"לעיון נוסף, בדוק את\n"
+" <a href='https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-"
+"Scales.md' target=\"_blank\">d3 API reference3</a>."
 
 #: app/templates/help/system-settings-help.htm:81
 msgid ""
@@ -3020,7 +3016,7 @@ msgid ""
 "users. Saved Searches appear as search options in the main Search page. "
 "Creating a Saved Search is a three-step process."
 msgstr ""
-"ארצ'ס מאפשר לך לשמור חיפוש ולהציג אותו כנוחות עבורך משתמשים. חיפושים שמורים "
+"Arches מאפשר לך לשמור חיפוש ולהציג אותו כנוחות עבורך משתמשים. חיפושים שמורים "
 "מופיעים כאפשרויות חיפוש בדף החיפוש הראשי. יצירת חיפוש שמור היא תהליך בן "
 "שלושה שלבים."
 
@@ -3055,15 +3051,15 @@ msgstr ""
 #: app/templates/index.htm:72
 #, python-format
 msgid "Arches | %(version)s"
-msgstr "ארצ'ס | %(version)s"
+msgstr "Arches | %(version)s"
 
 #: app/templates/index.htm:80
 msgid "Arches Features"
-msgstr "תכונות ארצ'ס"
+msgstr "Arches תכונות"
 
 #: app/templates/index.htm:83
 msgid "Search Arches"
-msgstr "חפש בארצ'ס ."
+msgstr " Arches חפש ב -"
 
 #: app/templates/index.htm:92
 msgid "Sign in"
@@ -3092,7 +3088,7 @@ msgstr "תהליכי עבודה"
 #: app/templates/index.htm:183
 #, python-format
 msgid "Arches %(version)s"
-msgstr "ארצ'ס %(version)s"
+msgstr "Arches %(version)s"
 
 #: app/templates/index.htm:184
 msgid "A web and mobile platform for"
@@ -3119,7 +3115,7 @@ msgid ""
 "having to write any code."
 msgstr ""
 "עיצוב יישומי ניהול מידע מותאמים אישית תוך שעות. בנה את שלך מסדי נתונים עם "
-"מעצב המידע של ארצ'ס, ולאחר מכן הגדר את הממשק שלך ללא צורך לכתוב כל קוד."
+"מעצב המידע של Arches, ולאחר מכן הגדר את הממשק שלך ללא צורך לכתוב כל קוד."
 
 #: app/templates/index.htm:235
 msgid "Interface Manager"
@@ -3131,8 +3127,8 @@ msgid ""
 "Use Arches' Card Manager to configure the look and feel of your data entry "
 "UI."
 msgstr ""
-"ארצ'ס יוצר באופן אוטומטי טפסי הזנת נתונים בהתבסס על דגמי הנתונים שלך. השתמש "
-"ב-ארצ'ס' Card Manager כדי להגדיר את המראה והתחושה של הזנת הנתונים שלך UI."
+"Arches יוצר באופן אוטומטי טפסי הזנת נתונים בהתבסס על דגמי הנתונים שלך. השתמש "
+"ב-Arches' Card Manager כדי להגדיר את המראה והתחושה של הזנת הנתונים שלך UI."
 
 #: app/templates/index.htm:246
 msgid "Data Security"
@@ -3144,7 +3140,7 @@ msgid ""
 "user groups and individual accounts.  You can define read/write/delete and "
 "no-access permissions."
 msgstr ""
-"השתמש במנהל ההרשאות של ארצ'ס כדי להגדיר כללי גישה לנתונים עבור כל קבוצות "
+"השתמש במנהל ההרשאות של Arches כדי להגדיר כללי גישה לנתונים עבור כל קבוצות "
 "משתמשים וחשבונות בודדים. אתה יכול להגדיר קריאה/כתיבה/מחיקה ו הרשאות ללא גישה."
 
 #: app/templates/index.htm:270
@@ -3161,7 +3157,7 @@ msgstr ""
 
 #: app/templates/index.htm:295
 msgid "Arches Search Tools"
-msgstr "כלי חיפוש של ארצ'ס"
+msgstr "כלי חיפוש של Arches"
 
 #: app/templates/index.htm:296
 msgid "Find what you're looking for"
@@ -3172,7 +3168,7 @@ msgid ""
 "Arches comes with powerful built-in search tools.  Quickly filter large "
 "databases with term, geospatial, and time-based search components"
 msgstr ""
-"ארצ'ס מגיע עם כלי חיפוש מובנים רבי עוצמה. מסנן במהירות גדולה מסדי נתונים עם "
+"Arches מגיע עם כלי חיפוש מובנים רבי עוצמה. מסנן במהירות גדולה מסדי נתונים עם "
 "רכיבי חיפוש מבוססי מונחים, גיאו-מרחביים וזמן"
 
 #: app/templates/index.htm:311
@@ -3187,9 +3183,9 @@ msgid ""
 "provides you with advanced filtering options that support boolean logic, "
 "inverses, and many other filtering options."
 msgstr ""
-"ארצ'ס נותן לך דרכים רבות למצוא בדיוק את המידע שאתה צריך, אפילו אם אפליקציית "
-"ארצ'ס שלך מכילה 10 של מיליוני רשומות. ב בנוסף למונח, תזאורוס, מסננים גיאו-"
-"מרחביים וזמניים, ארצ'ס מספק לך אפשרויות סינון מתקדמות התומכות בלוגיקה "
+"Arches נותן לך דרכים רבות למצוא בדיוק את המידע שאתה צריך, אפילו אם אפליקציית "
+"Arches שלך מכילה 10 של מיליוני רשומות. ב בנוסף למונח, תזאורוס, מסננים גיאו-"
+"מרחביים וזמניים, Arches מספק לך אפשרויות סינון מתקדמות התומכות בלוגיקה "
 "בוליאני, הפוך, ואפשרויות סינון רבות אחרות."
 
 #: app/templates/index.htm:317
@@ -3198,7 +3194,7 @@ msgid ""
 "visualizations, including interactive displays of the connections between "
 "your data objects using a Force Directed Graph."
 msgstr ""
-"יכולות החיפוש של ארצ'ס מספקות גם נתונים מתוחכמים הדמיות, כולל תצוגות "
+"יכולות החיפוש של Arches מספקות גם נתונים מתוחכמים הדמיות, כולל תצוגות "
 "אינטראקטיביות של הקשרים ביניהם אובייקטי הנתונים שלך באמצעות גרף מכוון בכוח."
 
 #: app/templates/index.htm:321
@@ -3207,7 +3203,7 @@ msgid ""
 "services and create your own filters, reports, and visualizations to best "
 "show off your particular dataset."
 msgstr ""
-"אם אתה מפתח תוכנה, אתה יכול לבנות על החיפוש המודולרי של ארצ'ס שירותים וצור "
+"אם אתה מפתח תוכנה, אתה יכול לבנות על החיפוש המודולרי של Arches שירותים וצור "
 "מסננים, דוחות והדמיות משלך כמיטב יכולתך להראות את מערך הנתונים הספציפי שלך."
 
 #: app/templates/index.htm:343
@@ -3236,7 +3232,7 @@ msgstr "מדריכים ותיעוד"
 
 #: app/templates/index.htm:363
 msgid "What is Arches"
-msgstr "אז מה זה ארצ'ס?"
+msgstr "אז מה זה Arches?"
 
 #: app/templates/index.htm:366
 msgid "Implementation Considerations"
@@ -3260,11 +3256,11 @@ msgstr "מדריך התקנה"
 
 #: app/templates/index.htm:393
 msgid "Arches Project Background"
-msgstr "רקע לפרויקט ארצ'ס"
+msgstr "רקע לפרויקט Arches"
 
 #: app/templates/index.htm:396
 msgid "Arches Webinars/Presentations"
-msgstr "וובינרים/מצגות של ארצ'ס"
+msgstr "וובינרים/מצגות של Arches"
 
 #: app/templates/index.htm:415
 msgid "Terms & Conditions"
@@ -3276,7 +3272,7 @@ msgstr "מדיניות פרטיות"
 
 #: app/templates/index.htm:419
 msgid "Powered by Arches"
-msgstr "Powered by ארצ'ס"
+msgstr "Powered by Arches"
 
 #: app/templates/javascript.htm:114
 msgid "Delete All Resources Associated with this Graph?"
@@ -3495,7 +3491,7 @@ msgid ""
 "Arches keeps track of how resources are related. Click the 'related "
 "resources' link on a search result from the list on the left to see its "
 "relatives displayed in an interactive graph"
-msgstr "ארצ'ס עוקב אחר איך המשאבים קשורים. לחץ על \"קישור משאבים קשורים\"."
+msgstr "Arches עוקב אחר איך המשאבים קשורים. לחץ על \"קישור משאבים קשורים\"."
 
 #: app/templates/javascript.htm:198
 msgid "Report Date:"
@@ -4251,7 +4247,7 @@ msgstr "מידע"
 #, fuzzy
 #| msgid "Arches"
 msgid "Arches Export"
-msgstr "ארצ'ס"
+msgstr "Arches"
 
 #: app/templates/javascript.htm:361
 msgid "Include the report link in the export?"
@@ -5365,7 +5361,7 @@ msgid ""
 "events, activities, people and documents. Relating resources lets you build "
 "a network of relationships for your data objects."
 msgstr ""
-"ארצ'ס מאפשר לך להגדיר יחסים בין משאבים כך שתוכל להבין טוב יותר את ההקשר ואת "
+"Arches מאפשר לך להגדיר יחסים בין משאבים כך שתוכל להבין טוב יותר את ההקשר ואת "
 "המשחק"
 
 #: app/templates/javascript.htm:621
@@ -6020,7 +6016,7 @@ msgstr "התחבר"
 #: app/templates/login.htm:40
 msgid ""
 "Sign in to Arches to access your data modeling, editing, and discovery tools."
-msgstr "התחבר ל-ארצ'ס כדי לגשת לכלי המידול, העריכה וחקר הנתונים שלך"
+msgstr "התחבר ל-Arches כדי לגשת לכלי המידול, העריכה וחקר הנתונים שלך"
 
 #: app/templates/login.htm:46
 msgid "Your account has been created. Please sign in."
@@ -6048,7 +6044,7 @@ msgstr "צור חשבון חדש"
 
 #: app/templates/login.htm:90 app/templates/signup.htm:153
 msgid "Learn more about <a href='http://www.archesproject.org'>Arches</a>"
-msgstr "למידע נוסף על <a href='http://www.archesproject.org'>ארצ'ס</a>"
+msgstr "למידע נוסף על <a href='http://www.archesproject.org'>Arches</a>"
 
 #: app/templates/navbar/function-manage-menu.htm:11
 msgid "Select a graph..."
@@ -6065,12 +6061,12 @@ msgstr "הגדר גרף"
 #: app/templates/navbar/function-manage-menu.htm:28
 #: app/templates/navbar/graph-designer-menu.htm:102
 msgid "Return to Arches Designer"
-msgstr "חזור למעצב המידע של ארצ'ס"
+msgstr "חזור למעצב המידע של Arches"
 
 #: app/templates/navbar/function-manage-menu.htm:29
 #: app/templates/navbar/graph-designer-menu.htm:103
 msgid "Create Arches Resource Models and Branches"
-msgstr "צור מודלים של משאבים וענפים של ארצ'ס"
+msgstr "צור מודלים של משאבים וענפים של Arches"
 
 #: app/templates/navbar/function-manage-menu.htm:37
 #: app/templates/navbar/graph-designer-menu.htm:111
@@ -7135,7 +7131,7 @@ msgstr "מחק תמונה"
 #: app/templates/views/rdm/concept-report.htm:274
 #: app/templates/views/rdm/entitytype-report.htm:165
 msgid "Arches ID:"
-msgstr "מזהה (ID) ארצ'ס:"
+msgstr "מזהה (ID) Arches:"
 
 #: app/templates/views/rdm/concept-report.htm:294
 #: app/templates/views/rdm/entitytype-report.htm:179
@@ -7154,7 +7150,7 @@ msgstr "כן"
 
 #: app/templates/views/rdm/concept-report.htm:339
 msgid "Arches Reference Data Manager"
-msgstr "ארצ'ס Reference Data Manager"
+msgstr "Arches Reference Data Manager"
 
 #: app/templates/views/rdm/concept-report.htm:348
 msgid "Schemes"
@@ -7242,7 +7238,7 @@ msgid ""
 "permanently delete this entire collection from Arches?"
 msgstr ""
 "לא תוכל לבטל את הפעולה הזו! אתה בטוח שאתה רוצה האם למחוק לצמיתות את כל האוסף "
-"הזה מארצ'ס?"
+"הזה מArches?"
 
 #: app/templates/views/rdm/modals/delete-scheme-form.htm:7
 msgid "Delete Scheme"
@@ -7258,7 +7254,7 @@ msgid ""
 "permanently delete this entire scheme from Arches?"
 msgstr ""
 "לא תוכל לבטל את הפעולה הזו! אתה בטוח שאתה רוצה למחוק לצמיתות את כל הסכימה "
-"הזו מארצ'ס?"
+"הזו מArches?"
 
 #: app/templates/views/rdm/modals/export-scheme-form.htm:7
 msgid "Export Scheme"
@@ -7474,7 +7470,7 @@ msgstr "רשומת המשאב נוצרה"
 
 #: app/templates/views/resource/edit-log.htm:52
 msgid "Record created by Arches with unique identifer"
-msgstr "רשומה שנוצרה על ידי ארצ'ס עם מזהה ייחודי"
+msgstr "רשומה שנוצרה על ידי Arches עם מזהה ייחודי"
 
 #: app/templates/views/resource/edit-log.htm:57
 #: app/templates/views/resource/edit-log.htm:60
@@ -7522,7 +7518,7 @@ msgstr "נהל הרשאות"
 
 #: app/templates/views/resource/editor.htm:166
 msgid "Welcome to Arches' Resource Editor"
-msgstr "ברוכים הבאים לעורך המשאבים של ארצ'ס"
+msgstr "ברוכים הבאים לעורך המשאבים של Arches"
 
 #: app/templates/views/resource/editor.htm:169
 msgid ""
@@ -7541,7 +7537,7 @@ msgid ""
 "Arches will create your new resource record once you've saved a data entry "
 "card."
 msgstr ""
-"ארצ'ס תיצור את רשומת המשאבים החדשה שלך לאחר שתשמור את הנתונים שהוזנו לכרטיס."
+"Arches תיצור את רשומת המשאבים החדשה שלך לאחר שתשמור את הנתונים שהוזנו לכרטיס."
 
 #: app/templates/views/resource/editor.htm:177
 msgid "No cards are available for this model."
@@ -7609,7 +7605,7 @@ msgstr "טלפון"
 
 #: app/templates/views/user-profile-manager.htm:141
 msgid "Arches user name"
-msgstr "שם משתמש ארצ'ס"
+msgstr "שם משתמש Arches"
 
 #: app/templates/views/user-profile-manager.htm:149
 msgid "This is the unique email or name that you use to log on to Arches."
@@ -7625,7 +7621,7 @@ msgid ""
 "Arches uses your name and phone number to make it easier for other users to "
 "find and work with you."
 msgstr ""
-"ארצ'ס משתמש בשם ובמספר הטלפון שלך כדי להקל על משתמשים אחרים למצוא ולעבוד "
+"Arches משתמש בשם ובמספר הטלפון שלך כדי להקל על משתמשים אחרים למצוא ולעבוד "
 "איתך."
 
 #: app/templates/views/user-profile-manager.htm:186
@@ -7645,7 +7641,7 @@ msgstr "דוא\"ל ליצירת קשר"
 msgid ""
 "Arches uses your e-maill to alert you to projects and tasks assigned to you."
 msgstr ""
-"ארצ'ס משתמש בדואר האלקטרוני שלך כדי להתריע על פרויקטים ומשימות שהוקצו לך."
+"Arches משתמש בדואר האלקטרוני שלך כדי להתריע על פרויקטים ומשימות שהוקצו לך."
 
 #: app/templates/views/user-profile-manager.htm:256
 msgid "Click here to update Two-Factor Authentication settings via email"
@@ -7825,7 +7821,7 @@ msgstr "KibanaProxy נכשל"
 
 #: app/views/api.py:105
 msgid "Failed to create API request"
-msgstr "יצירת בקשת API נכשלה"
+msgstr "יצירת בקשת  API נכשלה"
 
 #: app/views/api.py:121 app/views/api.py:797 app/views/resource.py:236
 #: app/views/resource.py:603
@@ -7877,7 +7873,7 @@ msgid ""
 "Thanks for your interest in Arches. Click on link below                     "
 "to confirm your email address! Use your email address to login."
 msgstr ""
-"תודה על התעניינותך בארצ'ס. לחץ על הקישור למטה כדי לאשר את כתובת המייל שלך! "
+"תודה על התעניינותך בArches. לחץ על הקישור למטה כדי לאשר את כתובת המייל שלך! "
 "השתמש בכתובת האימייל שלך כדי להתחבר."
 
 #: app/views/auth.py:176
@@ -7965,7 +7961,7 @@ msgstr "לא ניתן לטעון קובץ SKOS"
 
 #: app/views/concept.py:238
 msgid "There was an issue saving the contents of the file to Arches. "
-msgstr "הייתה בעיה בשמירת תוכן הקובץ ל-ארצ'ס."
+msgstr "הייתה בעיה בשמירת תוכן הקובץ ל-Arches."
 
 #: app/views/concept.py:274
 msgid "Unable to Delete"
@@ -7995,7 +7991,7 @@ msgstr "לא ניתן ליצור אוסף מהקונספט שנבחר."
 
 #: app/views/graph.py:154
 msgid "Using the Arches Designer"
-msgstr "שימוש במעצב המודלים של ארצ'ס"
+msgstr "שימוש במעצב המודלים של Arches"
 
 #: app/views/graph.py:171
 #, python-brace-format
@@ -8272,11 +8268,11 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "Celery appears not to be running, you need to have celery running in "
 #~ "order to sync from Arches Collector."
 #~ msgstr ""
-#~ ".לא מופעל Celery-נראה שה \n"
-#~ ".צריך להיות פעיל כדי לבצע סנכרון מ-ארצ'ס קולקטור Celery "
+#~ "נראה שה Celery לא מופעל. Celery צריך להיות פעיל כדי לבצע סנכרון מ-Arches "
+#~ "Collector."
 
 #~ msgid "Pushing Edits to Arches"
-#~ msgstr "מתבצע עדכון לעריכות בארצ'ס"
+#~ msgstr "מתבצע עדכון לעריכות בArches"
 
 #~ msgid "This model is not yet active; unable to save."
 #~ msgstr "מודל זה אינו פעיל עדיין; לא ניתן לשמור."
@@ -8286,8 +8282,9 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 
 #~ msgid "Model Inactive Error"
 #~ msgstr ""
-#~ "הצומת העליון של גרף המשאבים שלך: {self.root.name} צריך להיות קולקטור "
-#~ "הנתונים. רמז: בדוק שה-nodegroup_id של צומת/י המשאב שלך אינו ריק (null)."
+#~ "הצומת העליון של גרף המשאבים שלך: {self.root.name} צריך להיות "
+#~ "Collectorהנתונים. רמז: בדוק שה-nodegroup_id של צומת/י המשאב שלך אינו ריק "
+#~ "(null)."
 
 #~ msgid ""
 #~ "Unable to save a tile to a card with cardinality 1 where a tile has "
@@ -8296,11 +8293,10 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 
 #~ msgid ""
 #~ "Details: card: {0}, graph: {1}, resource: {2}, tile: {3}, nodegroup: {4}"
-#~ msgstr ""
-#~ "פרטים: כרטיס: {0}, גרף: {1}, משאב: {2}, אריח (Tile): {3}, קבוצת צומת: {4}"
+#~ msgstr "פרטים: כרטיס: {0}, גרף: {1}, משאב: {2}, אריח: {3}, קבוצת צומת: {4}"
 
 #~ msgid "Arches Collector Manager"
-#~ msgstr "מנהל ארצ'ס קולקטור"
+#~ msgstr "מנהל Arches Collector"
 
 #~ msgid ""
 #~ "As a database administrator, you will use the Arches Collector Manager to "
@@ -8308,10 +8304,10 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "through the <a href=\"https://arches.readthedocs.io/en/stable/using-"
 #~ "arches-collector\" target=\"_blank\">Arches Collector</a> mobile app."
 #~ msgstr ""
-#~ "כמנהל מסד נתונים, תשתמש במנהל ארצ'ס קולקטור כדי ליצור ולנהל את הפרויקטים "
-#~ "עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של <a href=\"https://"
-#~ "arches.readthedocs.io/en/stable/using-arches-collector\" target=\"_blank"
-#~ "\">ארצ'ס קולקטור</a>."
+#~ "כמנהל מסד נתונים, תשתמש במנהל Arches Collectorכדי ליצור ולנהל את "
+#~ "הפרויקטים עבור משתמשים שאוספים נתונים באמצעות האפליקציה לנייד של <a href="
+#~ "\"https://arches.readthedocs.io/en/stable/using-arches-collector\" target="
+#~ "\"_blank\">Arches Collector</a>."
 
 #~ msgid ""
 #~ "When you begin creating a new project, you'll be brought to the project "
@@ -8334,7 +8330,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "collecting data."
 #~ msgstr ""
 #~ "הפעלה ראשונית זו שומרת את תוכן הפרויקט שלך לבמה מסד נתונים, שממנו משתמשי "
-#~ "ארצ'ס קולקטור יורידו אותו ויתחילו איסוף מידע."
+#~ "Arches Collector יורידו אותו ויתחילו איסוף מידע."
 
 #~ msgid ""
 #~ "IMPORTANT: In order for Arches Collector users to connect to this Arches "
@@ -8342,7 +8338,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "io/en/stable/api/#registering-an-application-with-arches\" target=\"_blank"
 #~ "\">register an application</a>."
 #~ msgstr ""
-#~ "חשוב!: על מנת שמשתמשי ארצ'ס קולקטור יתחברו ל ארצ'ס - מנהל מערכת חייב "
+#~ "חשוב!: על מנת שמשתמשי Arches Collector יתחברו ל Arches - מנהל מערכת חייב "
 #~ "תחילה <a href=\"https://arches.readthedocs.io/en/stable/api/#registering-"
 #~ "an-application-with-arches\" target=\"_blank\">לבצע רישום לאפליקציה</a>."
 
@@ -8410,7 +8406,8 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ msgid ""
 #~ "This name will be used in Arches Collector when users connect to this "
 #~ "Arches instance."
-#~ msgstr "השם הזה ישמש בארצ'ס קולקטור כאשר משתמשים יתחברו לפלטפורמת ארצ'ס זו."
+#~ msgstr ""
+#~ "השם הזה ישמש ב Arches Collector כאשר משתמשים יתחברו לפלטפורמת Arches זו."
 
 #~ msgid "Start Date/End Date"
 #~ msgstr "תאריך התחלה/תאריך סיום"
@@ -8431,7 +8428,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "included when users download the project using Arches Collector."
 #~ msgstr ""
 #~ "אפשר להוסיף תיאור לפרויקט שלך. תיאור זה יהיה כלול כאשר משתמשים מורידים את "
-#~ "הפרויקט באמצעות ארצ'ס קולקטור."
+#~ "הפרויקט באמצעות Arches Collector."
 
 #~ msgid "Map Extent"
 #~ msgstr "תחום המפה"
@@ -8454,7 +8451,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "collect data with Arches Collector."
 #~ msgstr ""
 #~ "הגדר את שכבת/ות מפת הבסיס שתהיה זמינה למשתמשים בזמן שהם אוספים נתונים עם "
-#~ "ארצ'ס קולקטור."
+#~ "Arches Collector."
 
 #~ msgid ""
 #~ "If you expect data collection to happen in areas that do not have "
@@ -8468,7 +8465,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "השתמש בפרמטר זה כדי לקשר ל-קובץ MBTiles שמשתמשים יורידו כשיורידו את "
 #~ "הפרויקט. אתה יכול ללמוד עוד על יצירת קובץ זה בתיעוד החיצוני שלנו.\n"
 #~ " <a href=\"https://arches.readthedocs.io/en/stable/arches-collector-"
-#~ "manager/\" target=\"_blank\">ארצ'ס Collector Manager</a>"
+#~ "manager/\" target=\"_blank\">Arches Collector Manager</a>"
 
 #~ msgid "Models"
 #~ msgstr "מודלים"
@@ -8490,7 +8487,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "By only including certain cards, you can keep the Arches Collector users "
 #~ "focused on the specific information you want them to gather."
 #~ msgstr ""
-#~ "על ידי הכללת כרטיסים מסוימים בלבד, תוכל לשמור שמשתמשי ארצ'ס קולקטור "
+#~ "על ידי הכללת כרטיסים מסוימים בלבד, תוכל לשמור שמשתמשי Arches Collector "
 #~ "יתמקדו במידע הספציפי שאתה רוצה שהם יאספו."
 
 #~ msgid ""
@@ -8533,8 +8530,8 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "using Arches Collector, they will only be able to access this project if "
 #~ "they have been approved to do so."
 #~ msgstr ""
-#~ "כאשר מישהו מתחבר למופע ארצ'ס הזה מהמכשיר הנייד שלו באמצעות ארצ'ס קולקטור, "
-#~ "הם יוכלו לגשת לפרויקט הזה רק אם הם אושרו לעשות זאת."
+#~ "כאשר מישהו מתחבר למופע Arches הזה מהמכשיר הנייד שלו באמצעות Arches "
+#~ "Collector, הם יוכלו לגשת לפרויקט הזה רק אם הם אושרו לעשות זאת."
 
 #~ msgid ""
 #~ "When modifying group and user approvals, bear in mind the following: "
@@ -8626,7 +8623,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "Export this graph to a .json file. It can then be imported into a "
 #~ "different Arches installation, or copied into a package."
 #~ msgstr ""
-#~ "ייצא גרף זה לקובץ json. לאחר מכן ניתן לייבא אותו לצורך התקנת ארצ'ס אחרת, "
+#~ "ייצא גרף זה לקובץ json. לאחר מכן ניתן לייבא אותו לצורך התקנת Arches אחרת, "
 #~ "או כדי להעתיק אותו לחבילה."
 
 #~ msgid "Clone"
@@ -8654,7 +8651,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "At the core of an Arches database are a series of structures called "
 #~ "\"graphs\", of which there are two types:"
 #~ msgstr ""
-#~ "בליבת מסד הנתונים של ארצ'ס מצויה סדרה של מבנים הנקראים \"גרפים\", מהם "
+#~ "בליבת מסד הנתונים של Arches מצויה סדרה של מבנים הנקראים \"גרפים\", מהם "
 #~ "ישנם שני סוגים:"
 
 #~ msgid ""
@@ -8665,11 +8662,11 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "\"Archaeological Sites\" vs. \"Cemeteries\", for example. Every Arches "
 #~ "database must have at least one Resource Model."
 #~ msgstr ""
-#~ "<strong>מודלים של משאבים</strong> - בעת יצירת משאבים חדשים, נתון משתמש "
-#~ "כניסה חייב להחליט באיזה מודל משאב להשתמש, ולקבוע במה מידע נאסף עבור "
-#~ "המשאב. תחשוב על משאב שונה מודלים כקטגוריות של רשומות במסד הנתונים שלך -"
-#~ "\"בניינים\" לעומת \"אתרים ארכיאולוגיים\" לעומת \"בתי קברות\", למשל. כל "
-#~ "ארצ'ס מסד הנתונים חייב להיות להכיל מודל משאב אחד."
+#~ "<strong>מודלים של משאבים</strong> - בעת יצירת משאבים חדשים, מזין הנתונים "
+#~ "חייב להחליט באיזה מודל משאב להשתמש, ולקבוע במה מידע נאסף עבור המשאב. "
+#~ "תחשוב על משאב שונה מודלים כקטגוריות של רשומות במסד הנתונים שלך -\"בניינים"
+#~ "\" לעומת \"אתרים ארכיאולוגיים\" לעומת \"בתי קברות\", למשל. כל Arches מסד "
+#~ "הנתונים חייב להיות להכיל מודל משאב אחד."
 
 #~ msgid ""
 #~ "<strong>Branches</strong> - You can think of Branches as \"partial\" "
@@ -8693,7 +8690,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "מנהל הפרופילים מאפשר לך לעדכן את פרטי החשבון שלך, כגון הסיסמה שלך, בכל "
 #~ "עת. זה גם נותן לך סיכום של השתתפותך במאמצי איסוף נתונים המתקיימים באמצעות "
 #~ "<a href=\"https://arches.readthedocs.io/en/stable/using-arches-collector."
-#~ "html\" target=\"_blank\">ארצ'ס קולקטור</a> ."
+#~ "html\" target=\"_blank\">Arches Collector</a> ."
 
 #~ msgid "Mobile"
 #~ msgstr "נייד"
@@ -8715,20 +8712,20 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "locations.  Then synch your changes to your Arches application when you "
 #~ "re-establish a network connection."
 #~ msgstr ""
-#~ "ארצ'ס קולקטור מאפשר לך ליצור נתונים חדשים ולערוך רשומות קיימות כשאתה רחוק "
-#~ "מהמחשב שלך. אל תדאג אם אתה מחוץ לתא או טווח Wi-Fi. צור רשומות חדשות, עדכן "
-#~ "מידע, אפילו הוסף מפה חדשה מיקומים. לאחר מכן סנכרן את השינויים שלך עם "
-#~ "אפליקציית ארצ'ס שלך כאשר תוכל להתחבר לרשת."
+#~ "Arches Collectorמאפשר לך ליצור נתונים חדשים ולערוך רשומות קיימות כשאתה "
+#~ "רחוק מהמחשב שלך. אל תדאג אם אתה מחוץ לתא או טווח Wi-Fi. צור רשומות חדשות, "
+#~ "עדכן מידע, אפילו הוסף מפה חדשה מיקומים. לאחר מכן סנכרן את השינויים שלך עם "
+#~ "אפליקציית Arches שלך כאשר תוכל להתחבר לרשת."
 
 #~ msgid ""
 #~ "Arches Collector is available for iOS and Android devices.  Download the "
 #~ "app from your favorite marketplace."
 #~ msgstr ""
-#~ "ארצ'ס קולקטור זמין עבור מכשירי iOS ואנדרואיד. הורד את האפליקציה מהאתר "
+#~ "Arches Collectorזמין עבור מכשירי iOS ואנדרואיד. הורד את האפליקציה מהאתר "
 #~ "המועדף עליך."
 
 #~ msgid "Arches Collector"
-#~ msgstr "ארצ'ס קולקטור"
+#~ msgstr "Arches Collector"
 
 #~ msgid "Edits pending..."
 #~ msgstr "עריכות בהמתנה..."
@@ -9054,7 +9051,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ msgstr "נקה מסנן מרחבי"
 
 #~ msgid "The Arches site administrator"
-#~ msgstr "מנהל האתר של ארצ'ס"
+#~ msgstr "מנהל האתר של Arches"
 
 #~ msgid "to view more information about a resource."
 #~ msgstr "כדי להציג מידע נוסף על משאב."
@@ -9101,13 +9098,13 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 
 #~ msgid ""
 #~ "Are you sure you want to permanently delete this resource from Arches?"
-#~ msgstr "האם אתה בטוח שברצונך למחוק לצמיתות משאב זה מארצ'ס?"
+#~ msgstr "האם אתה בטוח שברצונך למחוק לצמיתות משאב זה מArches?"
 
 #~ msgid "Edit History"
 #~ msgstr "היסטוריית עריכה"
 
 #~ msgid "Record created by Arches with reference number"
-#~ msgstr "רשומה שנוצרה על ידי ארצ'ס עם מספר סימוכין"
+#~ msgstr "רשומה שנוצרה על ידי Arches עם מספר סימוכין"
 
 #~ msgid "record updated"
 #~ msgstr "הרשומה עודכנה"
@@ -9415,7 +9412,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "that large files will require longer downloads and more storage space on "
 #~ "mobile devices."
 #~ msgstr ""
-#~ "ארצ'ס משתמש ב-mbtiles שאתה הגדרת כדי להבטיח שיש לצוות השטח שלך מפת בסיס, "
+#~ "Arches משתמש ב-mbtiles שאתה הגדרת כדי להבטיח שיש לצוות השטח שלך מפת בסיס, "
 #~ "גם כאשר אין להם גישה לרשת סלולרית או WiFi חיבור. אתה יכול ליצור קובץ "
 #~ "mbtile באמצעות נתונים גיאו-מרחביים משלך וכלי GIS. או שאתה יכול להשיג "
 #~ "mbtiles באיכות גבוהה וזולה מאתרים כגון <strong><a href=\"https://"
@@ -9436,13 +9433,13 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "style-spec\" class=\"\" target=\"_blank\">https://docs.mapbox.com/mapbox-"
 #~ "gl-js/style-spec</a></strong>)"
 #~ msgstr ""
-#~ "ארצ'ס משתמש בכתובת האתר המקוונת של מפת בסיס שאתה מציין כמפת הבסיס המוגדרת "
-#~ "כברירת מחדל עבור צוות השטח שלך כאשר רשת סלולרית או חיבור WiFi זמין. אתה "
-#~ "עשוי להשתמש בשירות מפות משלך, או בכל שירות מפות בסיס מקוון (כגון אלה נוצר "
-#~ "עם ESRI, GeoServer או שרתי מיפוי אחרים). אתה תצטרך ליצור קובץ json בסגנון "
-#~ "MapBox (ראה <strong><a href=\"https://docs.mapbox.com/mapbox-gl-js/style-"
-#~ "spec\" class=\"\" target=\"_blank\">https://docs.mapbox.com/mapbox-gl-js/"
-#~ "style-spec</a></strong>)"
+#~ "Arches משתמש בכתובת האתר המקוונת של מפת בסיס שאתה מציין כמפת הבסיס "
+#~ "המוגדרת כברירת מחדל עבור צוות השטח שלך כאשר רשת סלולרית או חיבור WiFi "
+#~ "זמין. אתה עשוי להשתמש בשירות מפות משלך, או בכל שירות מפות בסיס מקוון "
+#~ "(כגון אלה נוצר עם ESRI, GeoServer או שרתי מיפוי אחרים). אתה תצטרך ליצור "
+#~ "קובץ json בסגנון MapBox (ראה <strong><a href=\"https://docs.mapbox.com/"
+#~ "mapbox-gl-js/style-spec\" class=\"\" target=\"_blank\">https://docs."
+#~ "mapbox.com/mapbox-gl-js/style-spec</a></strong>)"
 
 #~ msgid ""
 #~ "These options cannot be modified because users have already synced with "
@@ -9462,7 +9459,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "project. Once you have selected the models, click on a model in the tree "
 #~ "to <br> select which data entry forms to include in your project."
 #~ msgstr ""
-#~ "ארצ'ס מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים. בחר את "
+#~ "Arches מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים. בחר את "
 #~ "המשאבים שצריכים להשתתף <br> בפרוייקט. פעם אחת אתה בחרת את המודלים, לחץ על "
 #~ "מודל בעץ כדי <br> בחר איזה טפסי הזנת נתונים לכלול בפרויקט שלך."
 
@@ -9474,7 +9471,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "information in the field. You can decide which models your field team can "
 #~ "access, and the number of resources to download."
 #~ msgstr ""
-#~ "הורדת נתונים מאפשרת למשתמשים לגשת ולערוך מידע קיים של ארצ'ס בתחום. אתה "
+#~ "הורדת נתונים מאפשרת למשתמשים לגשת ולערוך מידע קיים של Arches בתחום. אתה "
 #~ "יכול להחליט לאילו מודלים צוות השטח שלך יכול לגשת, וכן מספר המשאבים להורדה."
 
 #~ msgid "Download Details"
@@ -9499,7 +9496,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ msgstr "להגדרת רשומות להורדה"
 
 #~ msgid "copy and paste the URL from Arches search page"
-#~ msgstr "העתק והעבר את ה- URL מדף החיפוש של ארצ'ס"
+#~ msgstr "העתק והעבר את ה- URL מדף החיפוש של Arches"
 
 #~ msgid "Project Participants"
 #~ msgstr "משתתפי הפרויקט"
@@ -9511,7 +9508,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ "a group in <br> the tree to select specific users who should join your "
 #~ "survery."
 #~ msgstr ""
-#~ "ארצ'ס מאפשר לך לבחור את קבוצות המשתמשים שברצונך לכלול בשדה מאמץ לאיסוף "
+#~ "Arches מאפשר לך לבחור את קבוצות המשתמשים שברצונך לכלול בשדה מאמץ לאיסוף "
 #~ "נתונים.<br> בחר את הקבוצות בהן כדאי להשתתף הפרויקט. לאחר שבחרת את "
 #~ "הקבוצות, לחץ על קבוצה ב<br> העץ כדי לבחור משתמשים ספציפיים שצריכים להצטרף "
 #~ "לסקר שלך."
@@ -9636,7 +9633,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ msgid ""
 #~ "Arches allows you to create and edit data in the field using mobile "
 #~ "devices such as"
-#~ msgstr "ארצ'ס מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים כמו"
+#~ msgstr "Arches מאפשר ליצור ולערוך נתונים בשטח באמצעות מכשירים ניידים כמו"
 
 #~ msgid ""
 #~ "Android and iOS phones or tablets. Projects are a way to define the time, "
@@ -9720,7 +9717,7 @@ msgstr "עליך לספק מספר גרסה באמצעות הארגומנט -vn/
 #~ msgstr "תוצאות:"
 
 #~ msgid "Arches Collector Projects"
-#~ msgstr "פרויקטים של ארצ'ס קולקטור"
+#~ msgstr "פרויקטים של Arches Collector"
 
 #~ msgid "Sorry, but you haven't been invited to a project yet..."
 #~ msgstr "מצטערים, אך טרם הוזמנת לפרויקט..."
