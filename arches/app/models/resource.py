@@ -616,8 +616,6 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
 
-                current_language = get_language()
-
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
