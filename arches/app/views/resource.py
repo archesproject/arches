@@ -902,7 +902,6 @@ class RelatedResourcesView(BaseManagerView):
             except ObjectDoesNotExist:
                 logger.exception(_("Unable to delete. Relationship does not exist"))
         start = request.GET.get("start", 0)
-        se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
         related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
@@ -981,7 +980,6 @@ class RelatedResourcesView(BaseManagerView):
                 return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
 
         start = request.GET.get("start", 0)
-        se.es.indices.refresh(index=se._add_prefix("resource_relations"))
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
         page = 1 if request.GET.get("page") == "" else int(request.GET.get("page", 1))
         related_resources = resource.get_related_resources(lang=lang, start=start, limit=1000, page=page, user=request.user)
