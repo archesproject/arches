@@ -1997,12 +1997,13 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-sidebar {
     position: absolute;
-    right: 0;
+    right: 0px;
+    top: 0px;
     height: 100%;
-    width: 92px;
-    background-color: rgb(247, 247, 247);
-    border-left: 1px solid rgb(216, 216, 216);
-    z-index: 200;
+    width: 75px;
+    background-color: #f1f1f1;
+    border-left: 1px solid #ddd;
+    z-index: 1000;
 }
 
 .workbench-card-sidebar-tab.disabled {
@@ -2217,16 +2218,6 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container-wrapper.workbench-card-container-sidepanel-active {
     z-index: 249;
-}
-
-.workbench-card-sidebar {
-    position: absolute;
-    right: 0;
-    top: 0px;
-    height: 100%;
-    width: 75px;
-    background-color: #f1f1f1;
-    border-left: 1px solid #ddd;
 }
 
 .workbench-card-sidebar-tab {
@@ -13028,6 +13019,7 @@ ul.select2-choices:after {
     height: 100%;
     width: calc(100% - 75px);
     position: absolute;
+    left: 0px;
 }
 
 .workbench-card-wrapper .workbench-card-container-wrapper.wide {
@@ -13807,7 +13799,7 @@ ul.select2-choices:after {
     }
     .workbench-card-container-sidepanel-active .related-resources-graph-controls,
     .workbench-card-container-sidepanel-active .related-resources-graph-controls-instructions {
-        padding-right: $sidebar-width + $controls-right;
+        padding-right: $sidebar-width;
     }
     .related-resources-graph-controls {
         top: $controls-top;
