@@ -503,8 +503,9 @@ class Resource(models.ResourceInstance):
         ret = {"resource_instance": self, "resource_relationships": [], "related_resources": [], "node_config_lookup": graph_lookup}
 
         if page > 0:
-            limit = settings.RELATED_RESOURCES_PER_PAGE
-            start = limit * int(page - 1)
+            number_per_page = settings.RELATED_RESOURCES_PER_PAGE
+            start = number_per_page * int(page - 1)
+            limit = number_per_page * page
 
         def get_relations(resourceinstanceid, start, limit, resourceinstance_graphid=None):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(resourceinstanceidto_id=resourceinstanceid)
