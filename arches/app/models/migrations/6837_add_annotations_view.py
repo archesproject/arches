@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             t.resourceinstanceid,
             t.nodegroupid,
             n.nodeid,
-            json_array_elements(t.tiledata::json->n.nodeid::text->'features') as feature,
+            jsonb_array_elements(t.tiledata::jsonb->n.nodeid::text->'features') as feature,
             json_array_elements(t.tiledata::json->n.nodeid::text->'features')->'properties'->>'canvas' as canvas
         FROM tiles t
             LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
