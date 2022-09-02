@@ -206,6 +206,7 @@ class ManifestManagerView(View):
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
         metadata = request.POST.get("metadata")
+        print(metadata)
         selected_canvases = request.POST.get("selected_canvases")
         try:
             metadata = json.loads(request.POST.get("metadata"))
@@ -273,8 +274,7 @@ class ManifestManagerView(View):
                 logger.warning("You have to select a manifest to add images")
                 return None
 
-        if metadata:
-            change_manifest_metadata(manifest)
+        change_manifest_metadata(manifest)
 
         manifest.save()
         return JSONResponse(manifest)
