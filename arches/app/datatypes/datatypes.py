@@ -1820,7 +1820,7 @@ class DomainDataType(BaseDomainDataType):
             except ValueError:
                 try:
                     value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
-                except KeyError:
+                except Exception:
                     value = value
         return value
 
