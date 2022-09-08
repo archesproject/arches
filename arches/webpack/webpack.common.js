@@ -62,6 +62,8 @@ for (let arg of process.argv) {
     }
 }
 
+console.log('9009', archesCoreDirectory)
+
 const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${archesCoreDirectory}/app/media/js`), {});
 const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, `${appRootDirectory}/media/js`), {});
 

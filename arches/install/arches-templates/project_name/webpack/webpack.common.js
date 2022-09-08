@@ -83,7 +83,7 @@ const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
     ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup 
 };
 
-const { ARCHES_CORE_NODE_MODULES_ALIASES } = require(`${archesCoreDirectory}/../webpack/webpack-meta-config.js`);
+const { ARCHES_CORE_NODE_MODULES_ALIASES } = require(`${archesCoreDirectory}/webpack/webpack-meta-config.js`);
 const parsedArchesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
     // eval() should be safe here, it's running developer-defined code during build
     acc[alias] = eval(executeableString);

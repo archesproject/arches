@@ -1,5 +1,5 @@
 const Path = require('path');
-const projectPath = Path.resolve(Path.parse(__dirname)['dir'], './arches');
+const projectPath = Path.resolve(Path.parse(__dirname)['dir']);
 
 const archesCoreDirectory = projectPath;
 const appRootDirectory = projectPath + '/app';
