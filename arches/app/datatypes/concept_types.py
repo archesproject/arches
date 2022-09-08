@@ -303,7 +303,8 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_value_for_tile(self, value, **kwargs):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
+            lines = [line for line in val]
+            for v in lines:
                 try:
                     stripped = v.strip()
                     uuid.UUID(stripped)
