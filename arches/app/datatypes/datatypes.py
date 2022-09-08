@@ -1360,7 +1360,7 @@ class FileListDataType(BaseDataType):
                     for file_json in current_tile_data[nodeid]:
                         if file_json["name"] == file_data.name and file_json["url"] is None:
                             file_json["file_id"] = str(file_model.pk)
-                            file_json["url"] = "/files/" + str(file_model.fileid)
+                            file_json["url"] = settings.MEDIA_URL + str(file_model.fileid)
                             file_json["status"] = "uploaded"
                             resave_tile = True
                         updated_file_records.append(file_json)
@@ -1436,7 +1436,7 @@ class FileListDataType(BaseDataType):
             else:
                 models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
 
-            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
             tile_file["accepted"] = True
             compatible_renderers = self.get_compatible_renderers(tile_file)
             if len(compatible_renderers) == 1:
@@ -1450,7 +1450,7 @@ class FileListDataType(BaseDataType):
             for file in tile.data[nodeid]:
                 try:
                     if file["file_id"]:
-                        if file["url"] == "/files/{}".format(file["file_id"]):
+                        if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
                             file_path = "uploadedfiles/" + file["name"]
                             try:
