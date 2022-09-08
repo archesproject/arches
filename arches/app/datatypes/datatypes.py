@@ -692,7 +692,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         arches_json_geometry["properties"] = {}
                         arches_geojson["features"].append(arches_json_geometry)
                 except ValueError:
-                    if value in ('', None, 'None'):
+                    if value in ("", None, "None"):
                         return None
 
         return arches_geojson
@@ -1924,7 +1924,7 @@ class ResourceInstanceDataType(BaseDataType):
                 except ValueError:
                     message = _("The related resource with id '{0}' is not a valid uuid.".format(resourceid))
                     error_type = "ERROR"
-                    errors.append({"type": error_type, "message": message})  
+                    errors.append({"type": error_type, "message": message})
         return errors
 
     def post_tile_save(self, tile, nodeid, request):
