@@ -674,22 +674,26 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 arches_geojson = {}
                 arches_geojson["type"] = "FeatureCollection"
                 arches_geojson["features"] = []
-                geometry = GEOSGeometry(value, srid=4326)
-                if geometry.geom_type == "GeometryCollection":
-                    for geom in geometry:
+                try:
+                    geometry = GEOSGeometry(value, srid=4326)
+                    if geometry.geom_type == "GeometryCollection":
+                        for geom in geometry:
+                            arches_json_geometry = {}
+                            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                            arches_json_geometry["type"] = "Feature"
+                            arches_json_geometry["id"] = str(uuid.uuid4())
+                            arches_json_geometry["properties"] = {}
+                            arches_geojson["features"].append(arches_json_geometry)
+                    else:
                         arches_json_geometry = {}
-                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                         arches_json_geometry["type"] = "Feature"
                         arches_json_geometry["id"] = str(uuid.uuid4())
                         arches_json_geometry["properties"] = {}
                         arches_geojson["features"].append(arches_json_geometry)
-                else:
-                    arches_json_geometry = {}
-                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-                    arches_json_geometry["type"] = "Feature"
-                    arches_json_geometry["id"] = str(uuid.uuid4())
-                    arches_json_geometry["properties"] = {}
-                    arches_geojson["features"].append(arches_json_geometry)
+                except ValueError:
+                    if value in ('', None, 'None'):
+                        return None
 
         return arches_geojson
 
