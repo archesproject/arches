@@ -1910,7 +1910,7 @@ class ResourceInstanceDataType(BaseDataType):
                                         results = query.search(index=RESOURCES_INDEX)
                                         count = results["hits"]["total"]["value"]
                                         assert count == 1
-                                    except:                               
+                                    except:
                                         raise ObjectDoesNotExist()
                             if len(node.config["graphs"]) > 0:
                                 graphids = map(lambda x: x["graphid"], node.config["graphs"])
