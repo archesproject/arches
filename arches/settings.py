@@ -755,13 +755,14 @@ except ImportError as e:
 # # returns an output that can be read by NODEJS
 if __name__ == "__main__":
     print(
-        json.dumps({
-            'ARCHES_NAMESPACE_FOR_DATA_EXPORT': ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-            'STATIC_URL': STATIC_URL,
-            'ROOT_DIR': ROOT_DIR,
-            'APP_ROOT': ROOT_DIR + '/app',
-            'WEBPACK_DEVELOPMENT_SERVER_PORT': WEBPACK_DEVELOPMENT_SERVER_PORT,
-        })
+        json.dumps(
+            {
+                "ARCHES_NAMESPACE_FOR_DATA_EXPORT": ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                "STATIC_URL": STATIC_URL,
+                "ROOT_DIR": ROOT_DIR,
+                "APP_ROOT": ROOT_DIR + "/app",
+                "WEBPACK_DEVELOPMENT_SERVER_PORT": WEBPACK_DEVELOPMENT_SERVER_PORT,
+            }
+        )
     )
     sys.stdout.flush()
-
