@@ -2101,35 +2101,33 @@ class ResourceInstanceDataType(BaseDataType):
                 resourceid = resourceXresourceId["resourceId"]
                 try:
                     uuid.UUID(resourceid)
-                    try:
-                        if not node:
-                            node = models.Node.objects.get(pk=nodeid)
-                        if node.config["searchString"] != "":
-                            dsl = node.config["searchDsl"]
-                            if dsl:
-                                query = Query(se)
-                                bool_query = Bool()
-                                ri_query = Dsl(dsl)
-                                bool_query.must(ri_query)
-                                ids_query = Dsl({"ids": {"values": [resourceid]}})
-                                bool_query.must(ids_query)
-                                query.add_query(bool_query)
-                                try:
-                                    results = query.search(index=RESOURCES_INDEX)
-                                    count = results["hits"]["total"]["value"]
-                                    assert count == 1
-                                except:
+                    if strict:
+                        try:
+                            if not node:
+                                node = models.Node.objects.get(pk=nodeid)
+                            if node.config["searchString"] != "":
+                                dsl = node.config["searchDsl"]
+                                if dsl:
+                                    query = Query(se)
+                                    bool_query = Bool()
+                                    ri_query = Dsl(dsl)
+                                    bool_query.must(ri_query)
+                                    ids_query = Dsl({"ids": {"values": [resourceid]}})
+                                    bool_query.must(ids_query)
+                                    query.add_query(bool_query)
+                                    try:
+                                        results = query.search(index=RESOURCES_INDEX)
+                                        count = results["hits"]["total"]["value"]
+                                        assert count == 1
+                                    except:                               
+                                        raise ObjectDoesNotExist()
+                            if len(node.config["graphs"]) > 0:
+                                graphids = map(lambda x: x["graphid"], node.config["graphs"])
+                                if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
                                     raise ObjectDoesNotExist()
-                        if len(node.config["graphs"]) > 0:
-                            graphids = map(lambda x: x["graphid"], node.config["graphs"])
-                            if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
-                                raise ObjectDoesNotExist()
-                    except ObjectDoesNotExist:
-                        message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
-                        error_type = "WARNING"
-                        if strict:
-                            error_type = "ERROR"
-                        errors.append({"type": error_type, "message": message})
+                        except ObjectDoesNotExist:
+                            message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
+                            errors.append({"type": "ERROR", "message": message})
                 except ValueError:
                     message = _("The related resource with id '{0}' is not a valid uuid.".format(resourceid))
                     error_type = "ERROR"
