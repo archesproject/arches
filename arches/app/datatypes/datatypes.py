@@ -1925,19 +1925,6 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append({"type": error_type, "message": message})
         return errors
 
-    def post_tile_save(self, tile, nodeid, request):
-        ret = False
-        sql = """
-            SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
-        """ % (
-            tile.pk
-        )
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-            ret = cursor.fetchone()
-        return ret
-
     def get_display_value(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
