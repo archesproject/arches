@@ -326,7 +326,9 @@ class BranchCsvImporter(BaseImportModule):
                     result = _("delegated_to_celery")
                     return {"success": True, "data": result}
                 else:
-                    err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
+                    err = _(
+                        "Unable to perform this operation because Celery does not appear to be running. Please contact your administrator."
+                    )
                     with connection.cursor() as cursor:
                         cursor.execute(
                             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
