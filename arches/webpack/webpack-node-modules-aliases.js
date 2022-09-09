@@ -60,4 +60,4 @@ module.exports = {
         "cytoscape-cola": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/cytoscape-cola/cytoscape-cola`)",
         "webcola": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/webcola/WebCola/cola.min`)"
     }),
-}
+};
