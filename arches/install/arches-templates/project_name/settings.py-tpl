@@ -2,7 +2,9 @@
 Django settings for {{ project_name }} project.
 """
 
+import json
 import os
+import sys
 import arches
 import inspect
 from django.utils.translation import gettext_lazy as _
@@ -330,14 +332,14 @@ except ImportError:
     pass
 
 
-# # returns an output that can be read by NODEJS
+# returns an output that can be read by NODEJS
 if __name__ == "__main__":
     print(
         json.dumps({
             'ARCHES_NAMESPACE_FOR_DATA_EXPORT': ARCHES_NAMESPACE_FOR_DATA_EXPORT,
             'STATIC_URL': STATIC_URL,
             'ROOT_DIR': ROOT_DIR,
-            'APP_ROOT': ROOT_DIR + '/app',
+            'APP_ROOT': APP_ROOT,
             'WEBPACK_DEVELOPMENT_SERVER_PORT': WEBPACK_DEVELOPMENT_SERVER_PORT,
         })
     )

@@ -200,10 +200,10 @@ module.exports = (env) => {
                                                 `"${templatePath}" has failed to load! Falling back to un-rendered file.`
                                             );
                                             resp = {
-                                               text: () => (
+                                               text: (env) => (
                                                     new Promise((resolve, _reject) => {
                                                         /*
-                                                            if isTestEnvironment is true, failures will return a empty string which will
+                                                            if run in a test environment, failures will return a empty string which will
                                                             still allow the package to build.
                                                         */ 
                                                         
