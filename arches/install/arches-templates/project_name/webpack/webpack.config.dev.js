@@ -15,7 +15,7 @@ module.exports = () => {
                 mode: 'development',
                 // devtool: 'inline-source-map',
                 output: {
-                    chunkFilename: 'js/[name].chunk.js',
+                    chunkFilename: Path.join('js', '[name].chunk.js'),
                 },
                 devServer: {
                     historyApiFallback: true,
@@ -29,7 +29,7 @@ module.exports = () => {
                     host: '0.0.0.0',
                     devMiddleware: {
                         index: true,
-                        publicPath: '/static',
+                        publicPath: commonWebpackConfig.STATIC_URL,
                         writeToDisk: true,
                     },
                     port: commonWebpackConfig.WEBPACK_DEVELOPMENT_SERVER_PORT,

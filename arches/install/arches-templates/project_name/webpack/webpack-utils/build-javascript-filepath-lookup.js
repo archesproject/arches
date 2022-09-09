@@ -5,26 +5,27 @@ function buildJavascriptFilepathLookup(path, outerAcc, javascriptDirectoryPath) 
     const outerPath = javascriptDirectoryPath || path;   // original `path` arg is persisted through recursion
 
     return fs.readdirSync(path).reduce((acc, name) => {
-        if (fs.lstatSync(path + '/' + name).isDirectory() ) {
+        if (fs.lstatSync(Path.join(path, name)).isDirectory() ) {
             return buildJavascriptFilepathLookup(
-                path + '/' + name, 
+                Path.join(path, name), 
                 acc, 
                 outerPath 
             );
         }
         else {
-            const subPath = (path + '/' + name).split('js/')[1];
+            let subPath = Path.join(path, name).split(/js(.*)/s)[1];  // splits only on first occurance
+            subPath = subPath.substring(1);
             const parsedPath = Path.parse(subPath);
 
             let pathName = parsedPath['name'];
         
             if (parsedPath['dir']) {
-                pathName = parsedPath['dir'] + '/' + parsedPath['name'];
+                pathName = Path.join(parsedPath['dir'], parsedPath['name']);
             }
 
             return { 
                 ...acc, 
-                [pathName]: { 'import': `${outerPath}/${subPath}`, 'filename': `js/[name].js` } 
+                [pathName]: { 'import': Path.join(outerPath, subPath), 'filename': Path.join('js', '[name].js') } 
             };
         }
     }, outerAcc);

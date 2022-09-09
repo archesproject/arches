@@ -1,5 +1,6 @@
 /* eslint-disable */
 
+const Path = require('path');
 const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 
@@ -13,8 +14,8 @@ module.exports = () => {
                 devtool: false,
                 bail: true,
                 output: {
-                    filename: 'js/[name].[chunkhash:8].js',
-                    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
+                    filename: Path.join('js', '[name].[chunkhash:8].js'),
+                    chunkFilename: Path.join('js', '[name].[chunkhash:8].chunk.js'),
                 },
                 plugins: [
                     new Webpack.DefinePlugin({
