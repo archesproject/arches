@@ -19,7 +19,7 @@ const project_settings = spawn(
     [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
 );
 
-module.exports = (env) => {
+module.exports = () => {
     return new Promise((resolve, _reject) => {
         project_settings.stdout.on('data', function(data) {  // reads from application's settings.py
             const parsedData = JSON.parse(data);
@@ -167,7 +167,18 @@ module.exports = (env) => {
                                     const resourcePath = loaderContext['resourcePath'];
                                     const projectResourcePathData = resourcePath.split(APP_ROOT);
                                     const templatePath = projectResourcePathData.length > 1 ? projectResourcePathData[1] : resourcePath.split(Path.join(ROOT_DIR, 'app'))[1]; 
-            
+
+                                    let isTestEnvironment = false;
+
+                                    for (let arg of process.argv) {
+                                        const keyValuePair = arg.split('=');
+                                        const key = keyValuePair[0].toLowerCase();
+                                    
+                                        if (key === 'test') {
+                                            isTestEnvironment = true;
+                                        }
+                                    }
+
                                     let resp;
                                     
                                     console.log(`Loading "${templatePath}" from Django server...`)
@@ -200,14 +211,14 @@ module.exports = (env) => {
                                                 `"${templatePath}" has failed to load! Falling back to un-rendered file.`
                                             );
                                             resp = {
-                                               text: (env) => (
+                                               text: () => (
                                                     new Promise((resolve, _reject) => {
                                                         /*
                                                             if run in a test environment, failures will return a empty string which will
                                                             still allow the package to build.
                                                         */ 
                                                         
-                                                        resolve(env.test ? '' : content);  
+                                                        resolve(isTestEnvironment ? '' : content);  
                                                     })
                                                )
                                             };
