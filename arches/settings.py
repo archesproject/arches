@@ -16,8 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import inspect
+import json
+import os
+import sys
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -388,6 +390,8 @@ WEBPACK_LOADER = {
     },
 }
 
+WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
+
 ROOT_URLCONF = "arches.urls"
 
 WSGI_APPLICATION = "arches.wsgi.application"
@@ -399,7 +403,8 @@ try:
         "x-authorization",
     ]
 except Exception as e:
-    print(e)
+    if __name__ == "__main__":
+        print(e)
 
 LOGGING = {
     "version": 1,
@@ -746,3 +751,17 @@ except ImportError as e:
         from arches.settings_local import *
     except ImportError as e:
         pass
+
+# # returns an output that can be read by NODEJS
+if __name__ == "__main__":
+    print(
+        json.dumps({
+            'ARCHES_NAMESPACE_FOR_DATA_EXPORT': ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+            'STATIC_URL': STATIC_URL,
+            'ROOT_DIR': ROOT_DIR,
+            'APP_ROOT': ROOT_DIR + '/app',
+            'WEBPACK_DEVELOPMENT_SERVER_PORT': WEBPACK_DEVELOPMENT_SERVER_PORT,
+        })
+    )
+    sys.stdout.flush()
+
