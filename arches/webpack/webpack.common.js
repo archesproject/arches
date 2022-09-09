@@ -14,15 +14,12 @@ const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascr
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
 const { PROJECT_NODE_MODULES_ALIASES } = require('./webpack-node-modules-aliases');
 
-let isTestEnvironment = false;
-
-
 const project_settings = spawn(
     'python',
     [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
 );
 
-module.exports = () => {
+module.exports = (env) => {
     return new Promise((resolve, _reject) => {
         project_settings.stdout.on('data', function(data) {  // reads from application's settings.py
             const parsedData = JSON.parse(data);
@@ -210,7 +207,7 @@ module.exports = () => {
                                                             still allow the package to build.
                                                         */ 
                                                         
-                                                        resolve(isTestEnvironment ? '' : content);  
+                                                        resolve(env.test ? '' : content);  
                                                     })
                                                )
                                             };
