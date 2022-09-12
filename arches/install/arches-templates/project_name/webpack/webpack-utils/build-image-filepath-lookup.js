@@ -5,22 +5,24 @@ const _buildImageFilePathLookup = function(publicPath, path, outerAcc, imageDire
     const outerPath = imageDirectoryPath || path;   // original `path` arg is persisted through recursion
 
     return fs.readdirSync(path).reduce((acc, name) => {
-        if (fs.lstatSync(path + '/' + name).isDirectory() ) {
+        if (fs.lstatSync(Path.join(path, name)).isDirectory() ) {
             return _buildImageFilePathLookup(
                 publicPath,
-                path + '/' + name, 
+                Path.join(path, name), 
                 acc, 
                 outerPath
             );
         }
         else {
-            const subPath = (path + '/' + name).split('/img/')[1];
+            let subPath = Path.join(path, name).split(/img(.*)/s)[1];  // splits only on first occurance
+            subPath = subPath.substring(1);
+            
             const parsedPath = Path.parse(subPath);
-            const filename = parsedPath['dir'] ? parsedPath['dir'] + '/' + parsedPath['base'] : parsedPath['base'];
+            const filename = parsedPath['dir'] ? Path.join(parsedPath['dir'], parsedPath['base']) : parsedPath['base'];
 
             return { 
                 ...acc, 
-                [`${publicPath}img/${filename}`]: Path.resolve(__dirname, `${outerPath}/${subPath}`)
+                [Path.join(publicPath, 'img', filename)]: Path.resolve(__dirname, Path.join(outerPath, subPath))
             };
         }
     }, outerAcc);

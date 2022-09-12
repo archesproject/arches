@@ -5,21 +5,23 @@ const _buildTemplateFilePathLookup = function(path, outerAcc, templateDirectoryP
     const outerPath = templateDirectoryPath || path;   // original `path` arg is persisted through recursion
 
     return fs.readdirSync(path).reduce((acc, name) => {
-        if (fs.lstatSync(path + '/' + name).isDirectory() ) {
+        if (fs.lstatSync(Path.join(path, name)).isDirectory() ) {
             return _buildTemplateFilePathLookup(
-                path + '/' + name, 
+                Path.join(path, name), 
                 acc, 
                 outerPath
             );
         }
         else {
-            const subPath = (path + '/' + name).split('/templates/')[1];
+            let subPath = (Path.join(path, name)).split(/templates(.*)/s)[1];  // splits only on first occurance
+            subPath = subPath.substring(1);
+
             const parsedPath = Path.parse(subPath);
-            const filename = parsedPath['dir'] ? parsedPath['dir'] + '/' + parsedPath['base'] : parsedPath['base'];
+            const filename = parsedPath['dir'] ? Path.join(parsedPath['dir'], parsedPath['base']) : parsedPath['base'];
 
             return { 
                 ...acc, 
-                [`templates/${filename}`]: Path.resolve(__dirname, `${outerPath}/${subPath}`)
+                [Path.join('templates', filename)]: Path.resolve(__dirname, Path.join(outerPath, subPath))
             };
         }
     }, outerAcc);
