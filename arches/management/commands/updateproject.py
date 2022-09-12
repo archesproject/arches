@@ -22,8 +22,9 @@ class Command(BaseCommand):
         # copy webpack config files to project
         project_webpack_path = os.path.join(settings.APP_ROOT, "webpack")
 
-        if not os.path.isdir(project_webpack_path):
-            shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "webpack"), project_webpack_path)
+        if os.path.exists(project_webpack_path):
+            shutil.rmtree(project_webpack_path)
+        shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "webpack"), project_webpack_path)
 
         # publish graphs that were previously active
         with connection.cursor() as cursor:
