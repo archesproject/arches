@@ -50,7 +50,7 @@
         <div class="row widget-wrapper">
             <label class="control-label">{% trans "Attribution Logo" %}</label>
             <input type="text" placeholder="{% trans 'Enter an Image URL' %}" class="form-control input-lg" style="height: 36px;"
-                data-bind="value: self.manifestLogo">
+                data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">
         <label class="control-label">{% trans "Metadata" %}</label>
