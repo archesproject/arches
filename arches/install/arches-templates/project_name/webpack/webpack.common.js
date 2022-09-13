@@ -14,25 +14,10 @@ const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascr
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
 const { PROJECT_NODE_MODULES_ALIASES } = require('./webpack-node-modules-aliases');
 
-let projectSettings;
-
-projectSettings = spawn(
-    'python3',
-    [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
-);
-
-projectSettings.on('exit', (code, signal) => {
-    if (code || signal) {  // if process exited with error code or was killed with signal
-        projectSettings = spawn(
-            'python',
-            [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
-        );
-    }
-  });
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
-        projectSettings.stdout.on('data', function(data) {  // reads from application's settings.py
+        const createWebpackConfig = function(data) {  // reads from application's settings.py
             const parsedData = JSON.parse(data);
         
             const ROOT_DIR = parsedData['ROOT_DIR'];
@@ -254,6 +239,24 @@ module.exports = () => {
                     ],
                 },
             });
+        };
+
+        let projectSettings = spawn(
+            'python3',
+            [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
+        );
+
+        projectSettings.on('exit', () => {
+            projectSettings.stdout.on('data', createWebpackConfig);
         });
+
+        projectSettings.on('error', () => {
+            projectSettings = spawn(
+                'python',
+                [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
+            );
+            projectSettings.stdout.on('data', createWebpackConfig);
+        });
+
     });
 };
