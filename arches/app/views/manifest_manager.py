@@ -209,7 +209,6 @@ class ManifestManagerView(View):
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
         metadata = request.POST.get("metadata")
-        print(metadata)
         selected_canvases = request.POST.get("selected_canvases")
         try:
             metadata = json.loads(request.POST.get("metadata"))
