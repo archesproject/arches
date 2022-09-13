@@ -16,17 +16,19 @@ const { PROJECT_NODE_MODULES_ALIASES } = require('./webpack-node-modules-aliases
 
 let projectSettings;
 
-try {
-    projectSettings = spawn(
-        'python3',
-        [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
-    );
-} catch (_error) {
-    projectSettings = spawn(
-        'python',
-        [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
-    );
-}
+projectSettings = spawn(
+    'python3',
+    [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
+);
+
+projectSettings.on('exit', (code, signal) => {
+    if (code || signal) {  // if process exited with error code or was killed with signal
+        projectSettings = spawn(
+            'python',
+            [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
+        );
+    }
+  });
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
