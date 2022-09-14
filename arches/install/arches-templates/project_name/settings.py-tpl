@@ -336,15 +336,6 @@ except ImportError as e:
     except ImportError as e:
         pass
 
-if DOCKER:
-    try:
-        from .settings_docker import *
-    except ImportError:
-        try: 
-            from settings_docker import *
-        except ImportError as e:
-            pass
-
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
     print(
