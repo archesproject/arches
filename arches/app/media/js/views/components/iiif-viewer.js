@@ -137,7 +137,7 @@ define([
         });
 
         this.showLogo = ko.pureComputed(() => {
-            const imageExtenstion = ["bmp", "gif", "jpeg", "jpg", "png", "svg", "tif", "tiff"]
+            const imageExtenstion = ["bmp", "gif", "jpeg", "jpg", "png", "svg", "tif", "tiff", "webp"]
             return !!imageExtenstion.find((ext) => self.manifestLogo().endsWith(ext))
         });
 
