@@ -19,7 +19,7 @@ module.exports = () => {
     return new Promise((resolve, _reject) => {
         const createWebpackConfig = function(data) {  // reads from application's settings.py
             const parsedData = JSON.parse(data);
-        
+            
             const ROOT_DIR = parsedData['ROOT_DIR'];
             const APP_ROOT = parsedData['APP_ROOT'];
             const STATIC_URL = parsedData['STATIC_URL']
@@ -245,17 +245,16 @@ module.exports = () => {
             'python3',
             [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
         );
-
-        projectSettings.on('exit', () => {
-            projectSettings.stdout.on('data', createWebpackConfig);
-        });
+        projectSettings.stderr.on("data", process.stderr.write);
+        projectSettings.stdout.on("data", createWebpackConfig);
 
         projectSettings.on('error', () => {
             projectSettings = spawn(
                 'python',
                 [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
             );
-            projectSettings.stdout.on('data', createWebpackConfig);
+            projectSettings.stderr.on("data", process.stderr.write);
+            projectSettings.stdout.on("data", createWebpackConfig);
         });
 
     });
