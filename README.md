@@ -12,28 +12,38 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.0.0 release notes](https://github.com/archesproject/arches/blob/dev/7.0.x/releases/7.0.0.md)
+[Version 7.1.0 release notes](https://github.com/archesproject/arches/blob/dev/7.1.x/releases/7.1.0.md)
 
 #### Quick Install
 
 Installation is fully documented in the official documentation, [arches.readthedocs.io/en/stable](https://arches.readthedocs.io/en/stable), but assuming you have all of the dependencies installed you should make a virtual environment, activate it, and then run
-
+```
     pip install arches
-
+```
 then
-
+```
     arches-project create myproject
-
+```
 enter the new `myproject` directory
-
+```
     cd myproject
-
+```
 and run
-
+```
     python manage.py setup_db
     python manage.py runserver
+```
+in a separate terminal, activate your virtual environment and navigate to the root directory of the project ( you should be on the same level as `package.json`) 
+```
+    cd myproject/myproject
+```
+and run
+```   
+    yarn build_development
+```
+to create a frontend asset bundle. This process should complete in less than 2 minutes.
 
-and visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
+Finally, visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
 
 If you run into problems, please review our the full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
 
