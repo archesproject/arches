@@ -195,9 +195,15 @@ class ManifestManagerView(View):
 
         files = request.FILES.getlist("files")
         name = request.POST.get("manifest_title")
+        if name == "null" or name == "undefined":
+            try:
+                name = os.path.splitext(files[0].name)[0]
+            except:
+                pass
+
         attribution = request.POST.get("manifest_attribution", "")
         logo = request.POST.get("manifest_logo", "")
-        desc = request.POST.get("manifest_description")
+        desc = request.POST.get("manifest_description", "")
         operation = request.POST.get("operation")
         manifest_url = request.POST.get("manifest")
         canvas_label = request.POST.get("canvas_label")
@@ -226,7 +232,7 @@ class ManifestManagerView(View):
                 else:
                     logger.warn("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest(canvases=canvases)
+            pres_dict = create_manifest(name=name, canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
 
@@ -270,8 +276,7 @@ class ManifestManagerView(View):
                 logger.warning("You have to select a manifest to add images")
                 return None
 
-        if metadata:
-            change_manifest_metadata(manifest)
+        change_manifest_metadata(manifest)
 
         manifest.save()
         return JSONResponse(manifest)
