@@ -122,7 +122,7 @@ class SystemSettings(LazySettings):
                         try:
                             datatype_factory = DataTypeFactory()
                             datatype = datatype_factory.get_instance(node.datatype)
-                            val = datatype.get_first_language_value_from_node(tile, node.nodeid)
+                            val = datatype.get_default_language_value_from_localized_node(tile, node.nodeid)
                             setattr(self, node.name, val)
                         except:
                             pass

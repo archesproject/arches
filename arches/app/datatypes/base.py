@@ -291,7 +291,7 @@ class BaseDataType(object):
         """
         pass
 
-    def get_first_language_value_from_node(self, tile, nodeid):
+    def get_default_language_value_from_localized_node(self, tile, nodeid):
         """
         If value is internationalized, return only the first value in the i18n object
         """
