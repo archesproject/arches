@@ -280,8 +280,8 @@ class StringDataType(BaseDataType):
         text_mapping = {"properties": {}}
         return text_mapping
 
-    def get_first_language_value_from_node(self, tile, nodeid):
-        return tile.data[str(nodeid)][list(tile.data[str(nodeid)].keys())[0]]["value"]
+    def get_default_language_value_from_localized_node(self, tile, nodeid):
+        return tile.data[str(nodeid)][settings.LANGUAGE_CODE]["value"]
 
     def is_multilingual_rdf(self, rdf):
         if len(rdf) > 1 and len(set(val["language"] for val in rdf)) > 1:
