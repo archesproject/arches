@@ -136,10 +136,12 @@ define(['jquery',
         updateRelatedResourcesLookup: function(json) {
             var relatedResourcesLookup = this.relatedResourcesLookup();
 
-            for (var [graphId, value] of Object.entries(json)) {
+            Object.values(json).forEach(function(value) {
+            // for (var [graphId, value] of Object.entries(json)) {
                 var relatedResources;
                 var paginator;
                 var remainingResources;
+                var graphId = value.graphid;
                 
                 if (!relatedResourcesLookup[graphId]) {
                     // add graphId to lookup if we haven't added it yet
@@ -153,6 +155,8 @@ define(['jquery',
                     }
                     else if (value['resources']) {
                         totalRelatedResources = value['resources'].length;
+                        var copy = JSON.stringify(value['resources']);
+                        relatedResources(JSON.parse(copy));
                     }
                     else {
                         totalRelatedResources = 0;
@@ -179,7 +183,7 @@ define(['jquery',
                     if there's no paginator, the incoming json is all related resource instances,
                     and we should remove the ones we already have so as not to duplicate them
                 */
-                if (!value['paginator']) {relatedResources.removeAll();}
+                // if (!value['paginator']) {relatedResources.removeAll();}
 
                 if (value['related_resources']) { /* for paginated response */ 
                     // add new resource relationships to lookup entry
@@ -207,15 +211,17 @@ define(['jquery',
                     remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
                 }
                 else if (value['resources'].length > 0) {
+                    var rel;
                     for (let relatedResource of value['resources']) {
+                        rel = relatedResource.relationships ? relatedResource.relationships[0] : "";
                         relatedResources.push({
                             'displayName': relatedResource.displayname,
-                            'relationship': relatedResource.relationships[0],
+                            'relationship': rel,
                             'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
                         });
                     }
                 }
-            }
+            });
 
             this.relatedResourcesLookup(relatedResourcesLookup);
         },
