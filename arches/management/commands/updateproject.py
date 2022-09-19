@@ -15,17 +15,27 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        if "7.0.0" in arches.__version__:
-            self.update_to_v7()
+        self.update_to_v7()
 
     def update_to_v7(self):
         # copy webpack config files to project
+        print("Copying webpack directory to project root directory")
         project_webpack_path = os.path.join(settings.APP_ROOT, "webpack")
 
         if os.path.exists(project_webpack_path):
             shutil.rmtree(project_webpack_path)
 
         shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "webpack"), project_webpack_path)
+
+        # copy dotfiles
+        for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json"]:
+            print("Copying {} to project root directory".format(dotfile))
+            shutil.copy2(os.path.join(settings.ROOT_DIR, dotfile), settings.APP_ROOT)
+
+        # ensure project has a `media/img` directory
+        if not os.path.isdir(os.path.join(settings.APP_ROOT, "media", "img")):
+            print("Creating /media/img directory")
+            os.mkdir(os.path.join(settings.APP_ROOT, "media", "img"))
 
         #  check if temp_graph_status table exists
         with connection.cursor() as cursor:
