@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
     def update_to_v7(self):
         # copy webpack config files to project
-        print('Copying webpack directory to project root directory')
+        print("Copying webpack directory to project root directory")
         project_webpack_path = os.path.join(settings.APP_ROOT, "webpack")
 
         if os.path.exists(project_webpack_path):
@@ -28,8 +28,8 @@ class Command(BaseCommand):
         shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "webpack"), project_webpack_path)
 
         # copy dotfiles
-        for dotfile in [ '.eslintrc.js', '.eslintignore', '.babelrc', '.browserslistrc', '.stylelintrc.json' ]:
-            print('Copying {} to project root directory'.format(dotfile))
+        for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json"]:
+            print("Copying {} to project root directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, dotfile), settings.APP_ROOT)
 
         #  check if temp_graph_status table exists
