@@ -152,13 +152,9 @@ define(['jquery',
                     var totalRelatedResources;
                     if (value['related_resources']) {
                         totalRelatedResources = value['related_resources']['total']['value'];
-                    }
-                    else if (value['resources']) {
+                    } else if (value['resources']) {
                         totalRelatedResources = value['resources'].length;
-                        var copy = JSON.stringify(value['resources']);
-                        relatedResources(JSON.parse(copy));
-                    }
-                    else {
+                    } else {
                         totalRelatedResources = 0;
                     }
 
@@ -209,8 +205,7 @@ define(['jquery',
                     var remainingResourcesCount = value['related_resources']['total']['value'] - relatedResources().length;
     
                     remainingResources(remainingResourcesCount < resourceLimit ? remainingResourcesCount : resourceLimit);
-                }
-                else if (value['resources'].length > 0) {
+                } else if (value['resources'].length > 0) {
                     var rel;
                     for (let relatedResource of value['resources']) {
                         rel = relatedResource.relationships ? relatedResource.relationships[0] : "";
