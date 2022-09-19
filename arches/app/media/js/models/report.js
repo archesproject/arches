@@ -211,6 +211,7 @@ define(['jquery',
                         rel = relatedResource.relationships ? relatedResource.relationships[0] : "";
                         relatedResources.push({
                             'displayName': relatedResource.displayname,
+                            'resourceinstanceid': relatedResource.resourceinstanceid,
                             'relationship': rel,
                             'link': arches.urls.resource_report + relatedResource.resourceinstanceid,
                         });
