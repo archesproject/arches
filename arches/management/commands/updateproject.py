@@ -32,6 +32,11 @@ class Command(BaseCommand):
             print("Copying {} to project root directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, dotfile), settings.APP_ROOT)
 
+        # ensure project has a `media/img` directory
+        if not os.path.isdir(os.path.join(settings.APP_ROOT, 'media', 'img')):
+            print("Creating /media/img directory")
+            os.mkdir(os.path.join(settings.APP_ROOT, 'media', 'img'))
+
         #  check if temp_graph_status table exists
         with connection.cursor() as cursor:
             cursor.execute(
