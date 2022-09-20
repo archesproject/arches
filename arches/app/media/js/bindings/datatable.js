@@ -27,13 +27,9 @@ define([
         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             const options = ko.unwrap(valueAccessor());
             ko.unwrap(options.data);
-            if (valueAccessor().serverSide === true) 
-            
-            {
+            if (valueAccessor().serverSide === true) {
                 const table = $(element).closest('table').DataTable(valueAccessor().dataTableOptions);
                 table.destroy();
-
-                return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
             }
             else {
                 if (options.dataTableOptions.paging) {
@@ -49,8 +45,8 @@ define([
                         node.parentNode.removeChild(node);
                     }
                 });
-                return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
             }
+            return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
         },
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             const options = ko.unwrap(valueAccessor()),
