@@ -4,6 +4,7 @@ define([
     'backbone',
     'knockout',
     'arches',
+    'views/components/simple-switch',
     'bindings/chosen'
 ], function($, _, Backbone, ko, arches) {
     var NodeFormView = Backbone.View.extend({
@@ -76,6 +77,11 @@ define([
             this.checkIfImmutable = function() {
                 var isImmutable = _.contains(this.restrictedNodegroups, self.node().nodeGroupId());
                 return isImmutable;
+            };
+
+            this.extendNode = function(node, parameters)
+            {
+                return _.extend(node, parameters);
             };
 
             this.toggleRequired = function() {

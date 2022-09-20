@@ -33,7 +33,7 @@
 <div class="iiif-image-tools">
     <div class="form-group">
         <div class="row widget-wrapper">
-        <label class="control-label">{% trans "Title" %}</label>
+        <label class="control-label">{% trans "Image Service Title" %}</label>
         <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
             data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
         </div>  
@@ -49,7 +49,7 @@
             </div>  
         <div class="row widget-wrapper">
             <label class="control-label">{% trans "Attribution Logo" %}</label>
-            <input type="text" placeholder="Attribution Logo" class="form-control input-lg" style="height: 36px;"
+            <input type="text" placeholder="{% trans 'Enter an Image URL' %}" class="form-control input-lg" style="height: 36px;"
                 data-bind="textInput: self.manifestLogo, valueUpdate: 'keyup'">
             </div>  
         <div class="row widget-wrapper">

@@ -164,7 +164,7 @@ class ImportSingleCsv(BaseImportModule):
                 result = _("delegated_to_celery")
                 return {"success": True, "data": result}
             else:
-                err = _("Cannot start process. Unable to run process as a background task at this time.")
+                err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
