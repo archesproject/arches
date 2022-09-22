@@ -72,6 +72,7 @@ define([
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
+        this.params = params;
         var selection;
         var emptyConstraint = [{
             uniquetoallinstances: false,
