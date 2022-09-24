@@ -1,6 +1,9 @@
 ---
 name: Feature Ticket (Dev version)
 about: Developer's Feature Ticket
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
