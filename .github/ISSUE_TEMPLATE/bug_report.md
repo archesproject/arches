@@ -13,9 +13,9 @@ assignees: ''
 
 <!-- IMPORTANT: Make sure another ticket doesn't already exist describing the same problem -->
 
-<!-- Specify the version or branch of Arches that had the issue -->
-*   Arches Version/Branch:     <!-- EG: 6.1.0, dev/7.1.x -->
+<!-- YOU MUST: Specify the version(s) or branch(es) of Arches where you observed the issue -->
+**Arches Version/Branch:** <!-- EG: 6.1.0, dev/7.1.x -->
 
-**Describe the bug and how to reproduce it**
+**Describe the bug and how to reproduce it:**
 <!--- By fully explaining what you are encountering, you can help us understand and reproduce the issue.  -->
 <!--- Often times, a screenshot or animated GIF can help show what you are encountering.   -->
