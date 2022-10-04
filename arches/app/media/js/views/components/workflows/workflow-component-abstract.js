@@ -308,8 +308,15 @@ define([
                             self.complete(true);
                         }
                         
+                        self.card.subscribe(function(card) {
+                            if (!card.selected()) {
+                                card.selected(card.tiles().length);
+                            }
+                        });
+
                         self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
                             self.componentData.parameters.dirty(false);
+                            self.card().selected(true);
                             self.dirty(false);
                             self.saving(false);
                             self.complete(true);
