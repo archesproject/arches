@@ -240,7 +240,7 @@ define([
 
             self.value.subscribe(updateNameAndOntologyClass);
             // Resolve Resource Instance Names from the incoming values
-            self.value.valueHasMutated();
+            updateNameAndOntologyClass(self.value);
 
             this.relationshipsInFilter = ko.computed(function() {
                 if(!self.value()) {
