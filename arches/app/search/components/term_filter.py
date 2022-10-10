@@ -1,6 +1,8 @@
+import re
+import uuid
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Nested, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Match, Nested, SimpleQueryString, Term, Terms, Wildcard
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -28,10 +30,29 @@ class TermFilter(BaseSearchFilter):
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
                 elif term["type"] == "string":
-                    if language != "*":
-                        string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
-                    string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
-                    string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
+                    try:
+                        uuid.UUID(str(term["value"]))
+                        string_filter.must(Ids(ids=term["value"]))
+                    except:
+                        if language != "*":
+                            string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
+                        exact_terms = re.findall('"([^"]*)"', term["value"])
+                        exact_terms_inclusive = re.findall('\'([^"]*)\'', term["value"])
+                        if len(exact_terms) > 0:
+                            for exact_term in exact_terms:
+                                string_filter.must(Match(field="strings.string.raw", query=exact_term, type="phrase"))
+                                # string_filter.must(SimpleQueryString(field="strings.string.raw", operator='and', analyze_wildcard=True, query="*"+exact_term+"*")) # don't know why not working
+                        elif len(exact_terms_inclusive) > 0:
+                            for exact_term in exact_terms_inclusive:
+                                string_filter.must(Wildcard(field="strings.string.raw", term="*"+exact_term+"*"))
+                        elif "?" in term["value"] or "*" in term["value"]:
+                            string_filter.must(Wildcard(field="strings.string", term=term["value"]))
+                            string_filter.must(Wildcard(field="strings.string.folded", term=term["value"]))
+                        elif "|" in term["value"] or "+" in term["value"]:
+                            string_filter.must(SimpleQueryString(field="strings.string", operator='and', query=term["value"]))
+                        else:
+                            string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
+                            string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
 
                 if include_provisional is False:
                     string_filter.must_not(Match(field="strings.provisional", query="true", type="phrase"))

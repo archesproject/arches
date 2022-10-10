@@ -315,21 +315,22 @@ class SimpleQueryString(Dsl):
     """
 
     def __init__(self, **kwargs):
-        self.field = kwargs.pop("field", "_all")  # can be a list of fields
+        self.field = kwargs.pop("field", "_all")
         self.query = kwargs.pop("query", "")
         self.operator = kwargs.pop("operator", "or")
         self.analyzer = kwargs.pop("analyzer", "snowball")
         self.flags = kwargs.pop("flags", "OR|AND|PREFIX")
+        self.analyze_wildcard = kwargs.pop("analyze_wildcard", False)
         # The available flags are: ALL, NONE, AND, OR, PREFIX, PHRASE, PRECEDENCE, ESCAPE, WHITESPACE, FUZZY, NEAR, and SLOP.
 
-        # if not isinstance(self.field, list):
-        #     self.field = [self.field]
+        if not isinstance(self.field, list):
+            self.field = [self.field]
 
         self.dsl = {
-            "simple_query_string": {"fields": self.field, "query": self.query, "default_operator": self.operator, "flags": self.flags}
+            "simple_query_string": {"fields": self.field, "query": self.query, "default_operator": self.operator, "flags": self.flags, "analyze_wildcard": self.analyze_wildcard}
         }
 
-        self.dsl = {"prefix": {self.field: self.query}}
+        # self.dsl = {"prefix": {self.field: self.query}}
 
 
 class Exists(Dsl):
@@ -576,3 +577,16 @@ class NestedAgg(Aggregation):
 
 class NestedAggDSLException(Exception):
     pass
+
+
+class Wildcard(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.term = kwargs.pop("term", "")
+
+        self.dsl = {"wildcard": {self.field: {"value": self.term}}}
