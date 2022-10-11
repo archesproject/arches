@@ -197,7 +197,6 @@ class StringDataType(BaseDataType):
         return terms
 
     def append_search_filters(self, value, node, query, request):
-        print("datatypes", value)
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
