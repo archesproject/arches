@@ -1197,8 +1197,8 @@ class Concept(object):
                     and v.valuetype in ('prefLabel','sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                 ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
-            """, 
-            [conceptid]
+            """,
+            [conceptid],
         )
         rows = cursor.fetchall()
 
