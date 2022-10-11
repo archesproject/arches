@@ -27,7 +27,20 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.i18n import get_localized_value
-from arches.app.search.elasticsearch_dsl_builder import Bool, Dsl, Exists, Match, Nested, Query, Range, RangeDSLException, SimpleQueryString, Term, Terms, Wildcard
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Dsl,
+    Exists,
+    Match,
+    Nested,
+    Query,
+    Range,
+    RangeDSLException,
+    SimpleQueryString,
+    Term,
+    Terms,
+    Wildcard,
+)
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -184,7 +197,7 @@ class StringDataType(BaseDataType):
         return terms
 
     def append_search_filters(self, value, node, query, request):
-        print("datatypes",value)
+        print("datatypes", value)
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
@@ -193,13 +206,19 @@ class StringDataType(BaseDataType):
                 if value["lang"]:
                     exact_terms = re.findall('"([^"]*)"', value["val"])
                     if len(exact_terms) > 0 and "~" not in value["op"]:
-                        match_query = Match(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=exact_terms[0], type=match_type)
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=exact_terms[0], type=match_type
+                        )
                     elif len(exact_terms) > 0 and "~" in value["op"]:
-                        match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), term="*"+exact_terms[0]+"*")
+                        match_query = Wildcard(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), term="*" + exact_terms[0] + "*"
+                        )
                     elif "?" in value["val"] or "*" in value["val"]:
                         match_query = Wildcard(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), term=value["val"])
                     else:
-                        match_query = Match(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type)
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type
+                        )
                 else:
                     match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
 

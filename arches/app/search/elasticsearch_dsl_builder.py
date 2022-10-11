@@ -327,7 +327,13 @@ class SimpleQueryString(Dsl):
             self.field = [self.field]
 
         self.dsl = {
-            "simple_query_string": {"fields": self.field, "query": self.query, "default_operator": self.operator, "flags": self.flags, "analyze_wildcard": self.analyze_wildcard}
+            "simple_query_string": {
+                "fields": self.field,
+                "query": self.query,
+                "default_operator": self.operator,
+                "flags": self.flags,
+                "analyze_wildcard": self.analyze_wildcard,
+            }
         }
 
         # self.dsl = {"prefix": {self.field: self.query}}
