@@ -2,7 +2,7 @@ import re
 import uuid
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Match, Nested, SimpleQueryString, Term, Terms, Wildcard
+from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Match, Nested, SimpleQueryString, Terms, Wildcard
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
