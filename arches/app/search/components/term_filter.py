@@ -41,7 +41,6 @@ class TermFilter(BaseSearchFilter):
                         if len(exact_terms) > 0:
                             for exact_term in exact_terms:
                                 string_filter.must(Match(field="strings.string.raw", query=exact_term, type="phrase"))
-                                # string_filter.must(SimpleQueryString(field="strings.string.raw", operator='and', analyze_wildcard=True, query="*"+exact_term+"*")) # don't know why not working
                         elif len(exact_terms_inclusive) > 0:
                             for exact_term in exact_terms_inclusive:
                                 string_filter.must(Wildcard(field="strings.string.raw", term="*" + exact_term + "*"))
