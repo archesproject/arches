@@ -408,7 +408,7 @@ def paged_dropdown(request):
                 cursor.execute(
                     """
                         SELECT value, valueid
-                        FROM 
+                        FROM
                         (
                             SELECT *, CASE WHEN LOWER(languageid) = %s THEN 10
                             WHEN LOWER(languageid) like %s'%%' THEN 5
