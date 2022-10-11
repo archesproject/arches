@@ -420,7 +420,7 @@ def paged_dropdown(request):
                         AND valuetype in ('prefLabel')
                         ORDER BY score desc limit 1
                     """,
-                    [languageid, languageid.split("-")[0], query.lower()]
+                    [languageid, languageid.split("-")[0], query.lower()],
                 )
                 rows = cursor.fetchall()
 
