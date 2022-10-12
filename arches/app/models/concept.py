@@ -662,8 +662,8 @@ class Concept(object):
                     'subquery': AsIs(subquery),
                     'recursive_table': AsIs(recursive_table),
                     'languageid': languageid,
-                    'short_languageid': languageid.split("-")[0],
-                    'default_languageid': settings.LANGUAGE_CODE,
+                    'short_languageid': languageid.split("-")[0] + '%',
+                    'default_languageid': settings.LANGUAGE_CODE + '%',
                 }
             )
         else:
