@@ -653,18 +653,18 @@ class Concept(object):
             languageid = get_language() if languageid is None else languageid
 
             cursor.execute(
-                sql, 
+                sql,
                 {
-                    'conceptid': conceptid,
-                    'relationtypes': AsIs(relationtypes),
-                    'depth_limit': AsIs(depth_limit),
-                    'limit_clause': AsIs(limit_clause),
-                    'subquery': AsIs(subquery),
-                    'recursive_table': AsIs(recursive_table),
-                    'languageid': languageid,
-                    'short_languageid': languageid.split("-")[0] + '%',
-                    'default_languageid': settings.LANGUAGE_CODE + '%',
-                }
+                    "conceptid": conceptid,
+                    "relationtypes": AsIs(relationtypes),
+                    "depth_limit": AsIs(depth_limit),
+                    "limit_clause": AsIs(limit_clause),
+                    "subquery": AsIs(subquery),
+                    "recursive_table": AsIs(recursive_table),
+                    "languageid": languageid,
+                    "short_languageid": languageid.split("-")[0] + "%",
+                    "default_languageid": settings.LANGUAGE_CODE + "%",
+                },
             )
         else:
             sql = """
