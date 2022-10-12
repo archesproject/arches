@@ -653,18 +653,18 @@ class Concept(object):
             languageid = get_language() if languageid is None else languageid
 
             cursor.execute(
-                sql, 
+                sql,
                 {
-                    'conceptid': conceptid,
-                    'relationtypes': AsIs(relationtypes),
-                    'depth_limit': AsIs(depth_limit),
-                    'limit_clause': AsIs(limit_clause),
-                    'subquery': AsIs(subquery),
-                    'recursive_table': AsIs(recursive_table),
-                    'languageid': languageid,
-                    'short_languageid': languageid.split("-")[0] + '%',
-                    'default_languageid': settings.LANGUAGE_CODE + '%',
-                }
+                    "conceptid": conceptid,
+                    "relationtypes": AsIs(relationtypes),
+                    "depth_limit": AsIs(depth_limit),
+                    "limit_clause": AsIs(limit_clause),
+                    "subquery": AsIs(subquery),
+                    "recursive_table": AsIs(recursive_table),
+                    "languageid": languageid,
+                    "short_languageid": languageid.split("-")[0] + "%",
+                    "default_languageid": settings.LANGUAGE_CODE + "%",
+                },
             )
         else:
             sql = """
@@ -712,19 +712,21 @@ class Concept(object):
                 """
 
             child_valuetypes = ("','").join(
-                child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
+                child_valuetypes
+                if child_valuetypes
+                else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
             )
 
             cursor.execute(
                 sql,
                 {
-                    'conceptid': conceptid,
-                    'relationtypes': AsIs(relationtypes),
-                    'child_valuetypes': AsIs(child_valuetypes),
-                    'columns': AsIs(columns),
-                    'depth_limit': AsIs(depth_limit),
-                    'limit_clause': AsIs(limit_clause),
-                }
+                    "conceptid": conceptid,
+                    "relationtypes": AsIs(relationtypes),
+                    "child_valuetypes": AsIs(child_valuetypes),
+                    "columns": AsIs(columns),
+                    "depth_limit": AsIs(depth_limit),
+                    "limit_clause": AsIs(limit_clause),
+                },
             )
 
         return cursor.fetchall()
