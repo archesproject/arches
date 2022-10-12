@@ -714,15 +714,17 @@ class Concept(object):
             cursor.execute(
                 sql,
                 {
-                    'conceptid': conceptid,
-                    'relationtypes': AsIs(relationtypes),
-                    'child_valuetypes': ("','").join(
-                        child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
+                    "conceptid": conceptid,
+                    "relationtypes": AsIs(relationtypes),
+                    "child_valuetypes": ("','").join(
+                        child_valuetypes
+                        if child_valuetypes
+                        else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
                     ),
-                    'columns': AsIs(columns),
-                    'depth_limit': AsIs(depth_limit),
-                    'limit_clause': AsIs(limit_clause),
-                }
+                    "columns": AsIs(columns),
+                    "depth_limit": AsIs(depth_limit),
+                    "limit_clause": AsIs(limit_clause),
+                },
             )
 
         return cursor.fetchall()
