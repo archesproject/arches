@@ -711,16 +711,14 @@ class Concept(object):
                     categoryfrom, categoryto
                 """
 
-            child_valuetypes = ("','").join(
-                child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
-            )
-
             cursor.execute(
                 sql,
                 {
                     'conceptid': conceptid,
                     'relationtypes': AsIs(relationtypes),
-                    'child_valuetypes': AsIs(child_valuetypes),
+                    'child_valuetypes': ("','").join(
+                        child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
+                    ),
                     'columns': AsIs(columns),
                     'depth_limit': AsIs(depth_limit),
                     'limit_clause': AsIs(limit_clause),
