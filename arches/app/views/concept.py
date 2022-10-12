@@ -411,7 +411,7 @@ def paged_dropdown(request):
                         FROM
                         (
                             SELECT *, CASE WHEN LOWER(languageid) = %(languageid)s THEN 10
-                            WHEN LOWER(languageid) like %(short_languageid)s'%%' THEN 5
+                            WHEN LOWER(languageid) like %(short_languageid)s THEN 5
                             ELSE 0
                             END score
                             FROM values
@@ -420,7 +420,7 @@ def paged_dropdown(request):
                         AND valuetype in ('prefLabel')
                         ORDER BY score desc limit 1
                     """,
-                    { 'languageid': languageid, 'short_languageid': languageid.split("-")[0], 'query': query.lower() },
+                    { 'languageid': languageid, 'short_languageid': languageid.split("-")[0] + '%', 'query': query.lower() },
                 )
                 rows = cursor.fetchall()
 
