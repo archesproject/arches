@@ -594,6 +594,7 @@ class Migration(migrations.Migration):
                 ("icon", models.TextField(default=None)),
                 ("activated", models.BooleanField(default=True)),
                 ("addtomap", models.BooleanField(default=False)),
+                ("sortorder", models.IntegerField(null=True)),
             ],
             options={"db_table": "map_layers", "managed": True,},
         ),
