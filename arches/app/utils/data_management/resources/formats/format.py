@@ -15,6 +15,7 @@ from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, transaction
 from django.utils.translation import ugettext as _
 
@@ -98,6 +99,7 @@ class Reader(object):
 
         for relation_count, relation in enumerate(relations):
             relation_count = relation_count + 2
+            relid = None
             if relation_count % 500 == 0:
                 print("{0} relations saved".format(str(relation_count)))
 
@@ -168,6 +170,8 @@ class Reader(object):
                     relation["nodeid"] = None
                 if "tileid" not in relation or relation["tileid"] == "" or relation["tileid"] == "None":
                     relation["tileid"] = None
+                if "resourcexid" in relation:
+                    relid = uuid.UUID(relation["resourcexid"])
                 relation = ResourceXResource(
                     resourceinstanceidfrom=Resource(resourceinstancefrom),
                     resourceinstanceidto=Resource(resourceinstanceto),
@@ -180,6 +184,8 @@ class Reader(object):
                     dateended=relation["dateended"],
                     notes=relation["notes"],
                 )
+                if relid:
+                    relation.resourcexid = relid
                 relation.save()
 
         self.report_errors()
