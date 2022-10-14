@@ -33,7 +33,7 @@ define([
             }
             else {
                 if (options.dataTableOptions.paging) {
-                    options.data.subscribe(function(changes) {
+                    valueAccessor().data.subscribe(function(changes) {
                         const table = $(element).closest('table').DataTable();
                         ko.bindingHandlers.dataTablesForEach.page = table.page();
                         table.destroy();
