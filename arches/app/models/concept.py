@@ -509,6 +509,8 @@ class Concept(object):
 
         # this interpolation is safe because `relationtypes` is hardcoded in all calls, and not accessible via the API
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
+        offset_clause = " limit %(limit)s offset %(offset)s" if offset else ""
+        depth_clause = " and depth < %(depth_limit)s" if depth_limit else ""
 
         cursor = connection.cursor()
 
@@ -646,16 +648,6 @@ class Concept(object):
             else:
                 subquery = ""
 
-            if offset:
-                offset_clause = " limit %(limit)s offset %(offset)s"
-            else:
-                offset_clause = ""
-
-            if depth_limit:
-                depth_clause = "and depth < %(depth_limit)s"
-            else:
-                depth_clause = ""
-
             sql = sql.format(subquery=subquery, offset_clause=offset_clause, depth_clause=depth_clause)
 
             recursive_table = "results" if query else "children"
@@ -711,6 +703,8 @@ class Concept(object):
                     FROM results {offset_clause}
             """
 
+            sql = sql.format(offset_clause=offset_clause, depth_clause=depth_clause)
+            
             if not columns:
                 columns = """
                     conceptidfrom::text, conceptidto::text,
@@ -720,18 +714,6 @@ class Concept(object):
                     languagefrom, languageto,
                     categoryfrom, categoryto
                 """
-
-            if offset:
-                offset_clause = " limit %(limit)s offset %(offset)s"
-            else:
-                offset_clause = ""
-
-            if depth_limit:
-                depth_clause = "and depth < %(depth_limit)s"
-            else:
-                depth_clause = ""
-
-            sql = sql.format(offset_clause=offset_clause, depth_clause=depth_clause)
 
             cursor.execute(
                 sql,
