@@ -28,12 +28,12 @@ define([
             const options = ko.unwrap(valueAccessor());
             ko.unwrap(options.data);
             if (options.dataTableOptions.serverSide === true) {
-                const table = $(element).closest('table').DataTable(valueAccessor().dataTableOptions);
+                const table = $(element).closest('table').DataTable(options.dataTableOptions);
                 table.destroy();
             }
             else {
                 if (options.dataTableOptions.paging) {
-                    valueAccessor().data.subscribe(function(changes) {
+                    options.data.subscribe(function(changes) {
                         const table = $(element).closest('table').DataTable();
                         ko.bindingHandlers.dataTablesForEach.page = table.page();
                         table.destroy();
