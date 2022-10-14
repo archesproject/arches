@@ -507,9 +507,8 @@ class Concept(object):
         except:
             return []
 
+        # this interpolation is safe because `relationtypes` is hardcoded in all calls, and not accessible via the API
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        depth_limit = "and depth < %s" % depth_limit if depth_limit else ""
-        limit_clause = " limit %s offset %s" % (limit, offset) if offset is not None else ""
 
         cursor = connection.cursor()
 
@@ -603,10 +602,10 @@ class Concept(object):
                         FROM ordered_relationships r
                         JOIN children b ON(b.conceptidto = r.conceptidfrom)
                         WHERE (%(relationtypes)s)
-                        %(depth_limit)s
+                        {depth_clause}
                 )
 
-                %(subquery)s
+                {subquery}
 
                 SELECT
                 (
@@ -627,27 +626,37 @@ class Concept(object):
                 ) as valueto,
                 depth, collector, count(*) OVER() AS full_count
 
-               FROM %(recursive_table)s order by row %(limit_clause)s;
+               FROM %(recursive_table)s order by row {offset_clause};
             """
 
-            subquery = (
-                """
-                    , results as (
-                        SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
-                        FROM children c
-                        JOIN values ON(values.conceptid = c.conceptidto)
-                        WHERE LOWER(values.value) like '%%%s%%'
-                        AND values.valuetype in ('prefLabel')
-                            UNION
-                        SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
-                        FROM children c
-                        JOIN results r on (r.conceptidfrom=c.conceptidto)
-                    )
-                """
-                % query.lower()
-                if query is not None
-                else ""
-            )
+            if query:
+                subquery = """
+                        , results as (
+                            SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
+                            FROM children c
+                            JOIN values ON(values.conceptid = c.conceptidto)
+                            WHERE LOWER(values.value) like %(query)s
+                            AND values.valuetype in ('prefLabel')
+                                UNION
+                            SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
+                            FROM children c
+                            JOIN results r on (r.conceptidfrom=c.conceptidto)
+                        )
+                    """
+            else:
+                subquery = ""
+
+            if offset:
+                offset_clause = " limit %(limit)s offset %(offset)s"
+            else:
+                offset_clause = ""
+
+            if depth_limit:
+                depth_clause = "and depth < %(depth_limit)s"
+            else:
+                depth_clause = ""
+
+            sql = sql.format(subquery=subquery, offset_clause=offset_clause, depth_clause=depth_clause)
 
             recursive_table = "results" if query else "children"
             languageid = get_language() if languageid is None else languageid
@@ -657,9 +666,10 @@ class Concept(object):
                 {
                     "conceptid": conceptid,
                     "relationtypes": AsIs(relationtypes),
-                    "depth_limit": AsIs(depth_limit),
-                    "limit_clause": AsIs(limit_clause),
-                    "subquery": AsIs(subquery),
+                    "depth_limit": depth_limit,
+                    "limit": limit,
+                    "offset": offset,
+                    "query": "%" + query.lower() + "%",
                     "recursive_table": AsIs(recursive_table),
                     "languageid": languageid,
                     "short_languageid": languageid.split("-")[0] + "%",
@@ -679,7 +689,7 @@ class Concept(object):
                             FROM relations r
                             JOIN children c ON(c.conceptidto = r.conceptidfrom)
                             WHERE (%(relationtypes)s)
-                            %(depth_limit)s
+                            {depth_clause}
                     ),
                     results AS (
                         SELECT
@@ -698,7 +708,7 @@ class Concept(object):
                         AND valuefrom.valuetype in (%(child_valuetypes)s)
                     )
                     SELECT distinct %(columns)s
-                    FROM results %(limit_clause)s
+                    FROM results {offset_clause}
             """
 
             if not columns:
@@ -711,6 +721,18 @@ class Concept(object):
                     categoryfrom, categoryto
                 """
 
+            if offset:
+                offset_clause = " limit %(limit)s offset %(offset)s"
+            else:
+                offset_clause = ""
+
+            if depth_limit:
+                depth_clause = "and depth < %(depth_limit)s"
+            else:
+                depth_clause = ""
+
+            sql = sql.format(offset_clause=offset_clause, depth_clause=depth_clause)
+
             cursor.execute(
                 sql,
                 {
@@ -722,8 +744,9 @@ class Concept(object):
                         else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
                     ),
                     "columns": AsIs(columns),
-                    "depth_limit": AsIs(depth_limit),
-                    "limit_clause": AsIs(limit_clause),
+                    "depth_limit": depth_limit,
+                    "limit": limit,
+                    "offset": offset,
                 },
             )
 
