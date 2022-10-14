@@ -671,7 +671,7 @@ class Concept(object):
                     "depth_limit": depth_limit,
                     "limit": limit,
                     "offset": offset,
-                    "query": '%' + query.lower() +'%' if query else "",
+                    "query": '%' + query.lower() +'%',
                     "recursive_table": AsIs(recursive_table),
                     "languageid": languageid,
                     "short_languageid": languageid.split("-")[0] + "%",
