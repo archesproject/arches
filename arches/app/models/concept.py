@@ -630,8 +630,7 @@ class Concept(object):
             """
 
             if query:
-                subquery = (
-                    """
+                subquery = """
                         , results as (
                             SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
                             FROM children c
@@ -644,7 +643,6 @@ class Concept(object):
                             JOIN results r on (r.conceptidfrom=c.conceptidto)
                         )
                     """
-                )
             else:
                 subquery = ""
 
@@ -654,8 +652,8 @@ class Concept(object):
                 offset_clause = ""
 
             if depth_limit:
-                depth_clause = "and depth < %(depth_limit)s" 
-            else: 
+                depth_clause = "and depth < %(depth_limit)s"
+            else:
                 depth_clause = ""
 
             sql = sql.format(subquery=subquery, offset_clause=offset_clause, depth_clause=depth_clause)
@@ -671,7 +669,7 @@ class Concept(object):
                     "depth_limit": depth_limit,
                     "limit": limit,
                     "offset": offset,
-                    "query": '%' + query.lower() +'%',
+                    "query": "%" + query.lower() + "%",
                     "recursive_table": AsIs(recursive_table),
                     "languageid": languageid,
                     "short_languageid": languageid.split("-")[0] + "%",
@@ -729,8 +727,8 @@ class Concept(object):
                 offset_clause = ""
 
             if depth_limit:
-                depth_clause = "and depth < %(depth_limit)s" 
-            else: 
+                depth_clause = "and depth < %(depth_limit)s"
+            else:
                 depth_clause = ""
 
             sql = sql.format(offset_clause=offset_clause, depth_clause=depth_clause)
@@ -738,16 +736,18 @@ class Concept(object):
             cursor.execute(
                 sql,
                 {
-                    'conceptid': conceptid,
-                    'relationtypes': AsIs(relationtypes),
-                    'child_valuetypes': ("','").join(
-                        child_valuetypes if child_valuetypes else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
+                    "conceptid": conceptid,
+                    "relationtypes": AsIs(relationtypes),
+                    "child_valuetypes": ("','").join(
+                        child_valuetypes
+                        if child_valuetypes
+                        else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
                     ),
-                    'columns': AsIs(columns),
-                    'depth_limit': depth_limit,
+                    "columns": AsIs(columns),
+                    "depth_limit": depth_limit,
                     "limit": limit,
                     "offset": offset,
-                }
+                },
             )
 
         return cursor.fetchall()
