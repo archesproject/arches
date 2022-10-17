@@ -1,4 +1,4 @@
-define(['underscore', 'arches', 'knockout', 'uuid'], function (_, arches, ko, uuid) {
+define(['underscore', 'arches', 'knockout', 'uuid'], function(_, arches, ko, uuid) {
     ko.components.register('domain-value-datatype-config', {
         viewModel: function(params) {
             var self = this;
