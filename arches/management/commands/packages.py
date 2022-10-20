@@ -317,7 +317,7 @@ class Command(BaseCommand):
             self.import_node_value_data(options["source"], options["overwrite"])
 
         if options["operation"] == "import_business_data_relations":
-            self.import_business_data_relations(options["source"])
+            self.import_business_data_relations(options["source"], bulk=options["bulk_load"])
 
         if options["operation"] == "import_mapping_file":
             self.import_mapping_file(options["source"])
@@ -749,7 +749,7 @@ class Command(BaseCommand):
 
             relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
             for relation in relations:
-                self.import_business_data_relations(relation)
+                self.import_business_data_relations(relation, bulk=bulk_load)
 
             uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
             dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
@@ -1160,7 +1160,7 @@ class Command(BaseCommand):
             )
             sys.exit()
 
-    def import_business_data_relations(self, data_source):
+    def import_business_data_relations(self, data_source, bulk=False):
         """
         Imports business data relations
         """
@@ -1170,7 +1170,7 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 relations = csv.DictReader(open(path, "r"))
-                RelationImporter().import_relations(relations)
+                RelationImporter().import_relations(relations, bulk=bulk)
             else:
                 utils.print_message("No file found at indicated location: {0}".format(path))
                 sys.exit()

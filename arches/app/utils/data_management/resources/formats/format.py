@@ -2,6 +2,7 @@ import os
 import uuid
 import shutil
 import datetime
+from time import time
 from arches.app.models.concept import Concept
 from arches.app.models import models
 from arches.app.models.models import ResourceXResource
@@ -88,7 +89,7 @@ class Reader(object):
     def import_business_data(self):
         pass
 
-    def import_relations(self, relations=None):
+    def import_relations(self, relations=None, bulk=False):
         def get_resourceid_from_legacyid(legacyid):
             ret = Resource.objects.filter(legacyid=legacyid)
 
@@ -97,11 +98,17 @@ class Reader(object):
             else:
                 return ret[0].resourceinstanceid
 
-        for relation_count, relation in enumerate(relations):
-            relation_count = relation_count + 2
+        start = time()
+        bulk_relations = []
+        for i, relation in enumerate(relations):
+            relation_count = i + 2
             relid = None
+            exists = False
             if relation_count % 500 == 0:
                 print("{0} relations saved".format(str(relation_count)))
+                if bulk:
+                    ResourceXResource.bulk_save(bulk_relations)
+                    del bulk_relations[:]
 
             def validate_resourceinstanceid(resourceinstanceid, key):
                 # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
@@ -186,8 +193,28 @@ class Reader(object):
                 )
                 if relid:
                     relation.resourcexid = relid
-                relation.save()
+                    exists = ResourceXResource.objects.filter(pk=relid).exists()
+                if bulk and not exists:
+                    bulk_relations.append(relation)
+                elif not exists:
+                    relation.save()
+                else:
+                    relation_count -= 1
+            else:
+                self.errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": f"Relation # {relid} on row {i+1} incomplete: from {resourceinstancefrom} -- to {resourceinstanceto}",
+                        }
+                    )
 
+        if bulk and len(bulk_relations) > 0:
+            ResourceXResource.bulk_save(bulk_relations)
+            print("{0} relations saved".format(str(relation_count)))
+            del bulk_relations[:]
+        elapsed = time() - start
+        bulk_str = " bulk" if bulk else ""
+        print("Time to{0} import resource relations = {0}".format(bulk_str, datetime.timedelta(seconds=elapsed)))
         self.report_errors()
 
     def report_errors(self):

@@ -755,6 +755,20 @@ class ResourceXResource(models.Model):
         se.index_data(index=RESOURCE_RELATIONS_INDEX, body=document, idfield="resourcexid")
         super(ResourceXResource, self).save()
 
+    @staticmethod
+    def bulk_save(relations):
+        from arches.app.search.search_engine_factory import SearchEngineInstance as se
+        from arches.app.search.mappings import RESOURCE_RELATIONS_INDEX
+        documents = []
+        for rr in relations:
+            if not rr.created:
+                rr.created = datetime.datetime.now()
+            rr.modified = datetime.datetime.now()
+            document = model_to_dict(rr)
+            documents.append(se.create_bulk_item(index=RESOURCE_RELATIONS_INDEX, id=document["resourcexid"], data=document))
+        ResourceXResource.objects.bulk_create(relations)
+        se.bulk_index(documents)
+
     class Meta:
         managed = True
         db_table = "resource_x_resource"
