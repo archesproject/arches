@@ -29,7 +29,7 @@ define([
         var editor = $element.ckeditor(options).editor;
 
         allBindings()?.attr?.disabled?.subscribe(disabled => {
-            if(disabled === true || disabled === false) {
+            if(!!editor?.editable() && (disabled === true || disabled === false)) {
                 editor?.setReadOnly(disabled);
             }
         });
