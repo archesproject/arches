@@ -594,5 +594,13 @@ class Wildcard(Dsl):
     def __init__(self, **kwargs):
         self.field = kwargs.pop("field", "_all")
         self.term = kwargs.pop("term", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
 
-        self.dsl = {"wildcard": {self.field: {"value": self.term}}}
+        self.dsl = {
+            "wildcard": {
+                self.field: {
+                    "value": self.term, 
+                    "case_insensitive": self.case_insensitive
+                }
+            }
+        }
