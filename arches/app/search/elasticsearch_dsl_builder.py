@@ -596,11 +596,4 @@ class Wildcard(Dsl):
         self.term = kwargs.pop("term", "")
         self.case_insensitive = kwargs.pop("case_insensitive", True)
 
-        self.dsl = {
-            "wildcard": {
-                self.field: {
-                    "value": self.term, 
-                    "case_insensitive": self.case_insensitive
-                }
-            }
-        }
+        self.dsl = {"wildcard": {self.field: {"value": self.term, "case_insensitive": self.case_insensitive}}}

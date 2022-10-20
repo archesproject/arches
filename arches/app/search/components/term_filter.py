@@ -43,7 +43,9 @@ class TermFilter(BaseSearchFilter):
                                 string_filter.should(Match(field="strings.string.raw", query=exact_term, type="phrase"))
                         elif len(exact_terms_inclusive) > 0:
                             for exact_term in exact_terms_inclusive:
-                                string_filter.should(Wildcard(field="strings.string.raw", term="*" + exact_term + "*", case_insensitive=False))
+                                string_filter.should(
+                                    Wildcard(field="strings.string.raw", term="*" + exact_term + "*", case_insensitive=False)
+                                )
                         elif "?" in term["value"] or "*" in term["value"]:
                             string_filter.should(Wildcard(field="strings.string", term=term["value"]))
                             string_filter.should(Wildcard(field="strings.string.folded", term=term["value"]))
@@ -85,7 +87,8 @@ class TermFilter(BaseSearchFilter):
 
         search_results_object["query"].add_query(search_query)
         import json
-        print({"query": json.dumps(search_query.dsl) })
+
+        print({"query": json.dumps(search_query.dsl)})
 
 
 def _get_child_concepts(conceptid):
