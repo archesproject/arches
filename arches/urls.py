@@ -71,6 +71,7 @@ from arches.app.views.auth import (
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
+from django.urls import path
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -281,8 +282,8 @@ urlpatterns = [
         name="password_reset",
     ),
     url(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
-    url(
-        r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
+    path(
+        "reset/<uidb64>/<token>/",
         PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
