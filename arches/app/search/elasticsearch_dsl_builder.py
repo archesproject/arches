@@ -336,8 +336,6 @@ class SimpleQueryString(Dsl):
             }
         }
 
-        # self.dsl = {"prefix": {self.field: self.query}}
-
 
 class Exists(Dsl):
     """
@@ -364,6 +362,41 @@ class Ids(Dsl):
         if not isinstance(self.ids, list):
             self.ids = [self.ids]
         self.dsl = {"ids": {"values": self.ids}}
+
+
+class Wildcard(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
+
+        self.dsl = {"wildcard": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
+
+
+class Prefix(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
+
+        self.dsl = {
+            "prefix": {
+                self.field: {
+                    "value": self.query, 
+                    "case_insensitive": self.case_insensitive
+                }
+            }
+        }
 
 
 class Aggregation(Dsl):
@@ -583,17 +616,3 @@ class NestedAgg(Aggregation):
 
 class NestedAggDSLException(Exception):
     pass
-
-
-class Wildcard(Dsl):
-    """
-    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html
-
-    """
-
-    def __init__(self, **kwargs):
-        self.field = kwargs.pop("field", "_all")
-        self.term = kwargs.pop("term", "")
-        self.case_insensitive = kwargs.pop("case_insensitive", True)
-
-        self.dsl = {"wildcard": {self.field: {"value": self.term, "case_insensitive": self.case_insensitive}}}

@@ -36,19 +36,16 @@ class TermFilter(BaseSearchFilter):
                     except:
                         if language != "*":
                             string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
-                        exact_terms = re.findall('"(.*)"', term["value"])
-                        exact_terms_inclusive = re.findall("'(.*)'", term["value"])
-                        if len(exact_terms) > 0:
-                            for exact_term in exact_terms:
-                                string_filter.should(Match(field="strings.string.raw", query=exact_term, type="phrase"))
-                        elif len(exact_terms_inclusive) > 0:
-                            for exact_term in exact_terms_inclusive:
-                                string_filter.should(
-                                    Wildcard(field="strings.string.raw", term="*" + exact_term + "*", case_insensitive=False)
-                                )
+                        exact_term = re.search('"(?P<search_string>.*)"', term["value"])
+                        if exact_term:
+                            search_string = exact_term.group('search_string')
+                            if "?" in search_string or "*" in search_string:
+                                string_filter.should(Wildcard(field="strings.string.raw", query=search_string, case_insensitive=False))
+                            else:
+                                string_filter.should(Match(field="strings.string.raw", query=search_string, type="phrase"))
                         elif "?" in term["value"] or "*" in term["value"]:
-                            string_filter.should(Wildcard(field="strings.string", term=term["value"]))
-                            string_filter.should(Wildcard(field="strings.string.folded", term=term["value"]))
+                            string_filter.should(Wildcard(field="strings.string", query=term["value"]))
+                            string_filter.should(Wildcard(field="strings.string.folded", query=term["value"]))
                         elif "|" in term["value"] or "+" in term["value"]:
                             string_filter.must(SimpleQueryString(field="strings.string", operator="and", query=term["value"]))
                         else:
@@ -86,9 +83,6 @@ class TermFilter(BaseSearchFilter):
                     search_query.filter(nested_conceptid_filter)
 
         search_results_object["query"].add_query(search_query)
-        import json
-
-        print({"query": json.dumps(search_query.dsl)})
 
 
 def _get_child_concepts(conceptid):
