@@ -389,14 +389,7 @@ class Prefix(Dsl):
         self.query = kwargs.pop("query", "")
         self.case_insensitive = kwargs.pop("case_insensitive", True)
 
-        self.dsl = {
-            "prefix": {
-                self.field: {
-                    "value": self.query, 
-                    "case_insensitive": self.case_insensitive
-                }
-            }
-        }
+        self.dsl = {"prefix": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
 
 
 class Aggregation(Dsl):

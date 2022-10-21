@@ -38,7 +38,7 @@ class TermFilter(BaseSearchFilter):
                             string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
                         exact_term = re.search('"(?P<search_string>.*)"', term["value"])
                         if exact_term:
-                            search_string = exact_term.group('search_string')
+                            search_string = exact_term.group("search_string")
                             if "?" in search_string or "*" in search_string:
                                 string_filter.should(Wildcard(field="strings.string.raw", query=search_string, case_insensitive=False))
                             else:
