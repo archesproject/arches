@@ -283,6 +283,7 @@ define([
             Promise.all(requests).finally(function(){
                 params.loading(false);
                 self.selectGroupCard();
+                self.resetTiles();
             });
             errors.subscribe(function(errors){
                 var title = [];
