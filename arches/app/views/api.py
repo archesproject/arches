@@ -599,6 +599,18 @@ class Resources(APIBase):
                         version=version,
                         hide_hidden_nodes=hide_hidden_nodes,
                     )
+                    if not out["resource"]:
+                        provisional = resource.to_json(
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version,
+                            hide_hidden_nodes=hide_hidden_nodes,
+                            user_id=user.id,
+                        )
+                        if provisional["resource"]:
+                            out["provisional"] = provisional["resource"]
                 else:
                     out = {
                         "resource": resource.to_json(

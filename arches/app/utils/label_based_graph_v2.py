@@ -7,7 +7,6 @@ TILE_ID_KEY = "@tile_id"
 
 NON_DATA_COLLECTING_NODE = "NON_DATA_COLLECTING_NODE"
 
-
 class LabelBasedNode(object):
     def __init__(self, name, node_id, tile_id, value, cardinality=None):
         self.name = name
@@ -114,6 +113,7 @@ class LabelBasedGraph(object):
         compact=False,
         hide_empty_nodes=False,
         as_json=True,
+        user_id=None
     ):
         """
         Generates a label-based graph from a given tile
@@ -139,6 +139,7 @@ class LabelBasedGraph(object):
             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
             node_cache=node_cache,
             datatype_factory=datatype_factory,
+            user_id=user_id
         )
 
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
@@ -155,6 +156,7 @@ class LabelBasedGraph(object):
         user=None,
         perm=None,
         hide_hidden_nodes=False,
+        user_id=None
     ):
         """
         Generates a label-based graph from a given resource
@@ -185,6 +187,7 @@ class LabelBasedGraph(object):
                 compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
                 as_json=False,
+                user_id=user_id
             )
 
             if label_based_graph:
@@ -242,13 +245,13 @@ class LabelBasedGraph(object):
         return resource_label_based_graphs
 
     @classmethod
-    def _get_display_value(cls, tile, node, datatype_factory):
+    def _get_display_value(cls, tile, node, datatype_factory, user_id=None):
         display_value = None
 
         # if the node is unable to collect data, let's explicitly say so
         if datatype_factory.datatypes[node.datatype].defaultwidget is None:
             display_value = NON_DATA_COLLECTING_NODE
-        elif tile.data:
+        elif tile.get_tile_data(user_id):
             datatype = datatype_factory.get_instance(node.datatype)
 
             # `get_display_value` varies between datatypes,
@@ -262,8 +265,11 @@ class LabelBasedGraph(object):
 
     @classmethod
     def _build_graph(
-        cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
+        cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory, user_id=None
     ):
+        # Prevents circularity with Resource
+        from arches.app.models.tile import Tile
+
         def is_valid_semantic_node(node, tile):
             if node.datatype == "semantic":
                 child_nodes = node.get_direct_child_nodes()
@@ -271,7 +277,7 @@ class LabelBasedGraph(object):
                 non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype != "semantic"]
 
                 for non_semantic_child_node in non_semantic_child_nodes:
-                    if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
+                    if str(non_semantic_child_node.pk) in tile.get_tile_data(user_id=user_id) or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
                         return True
 
                 has_valid_child_semantic_node = False
@@ -286,12 +292,13 @@ class LabelBasedGraph(object):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.data:
+                associated_tile = Tile.objects.get(pk=associated_tile.pk)
+                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.get_tile_data(user_id=user_id):
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
                         node_id=str(input_node.pk),
                         tile_id=str(associated_tile.pk),
-                        value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
+                        value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory, user_id=user_id),
                         cardinality=nodegroup_cardinality_reference.get(str(associated_tile.nodegroup_id)),
                     )
 
@@ -313,6 +320,7 @@ class LabelBasedGraph(object):
                             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
                             node_cache=node_cache,
                             datatype_factory=datatype_factory,
+                            user_id=user_id
                         )
 
         return parent_tree
