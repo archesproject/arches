@@ -201,34 +201,31 @@ class StringDataType(BaseDataType):
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                if value["lang"]:
-                    exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
-                    if exact_terms:
-                        if "~" in value["op"]:
-                            match_query = Wildcard(
-                                field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
-                                query=f"*{exact_terms.group('search_string')}*",
-                                case_insensitive=False,
-                            )
-                        else:
-                            match_query = Match(
-                                field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
-                                query=exact_terms.group("search_string"),
-                                type=match_type,
-                            )
-                    elif "?" in value["val"] or "*" in value["val"]:
-                        match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
+                exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
+                if exact_terms:
+                    if "~" in value["op"]:
+                        match_query = Wildcard(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=f"*{exact_terms.group('search_string')}*",
+                            case_insensitive=False,
+                        )
                     else:
-                        if "~" in value["op"]:
-                            match_query = Bool()
-                            for word in value["val"].split(" "):
-                                match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
-                        else:
-                            match_query = Match(
-                                field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type
-                            )
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=exact_terms.group("search_string"),
+                            type=match_type,
+                        )
+                elif "?" in value["val"] or "*" in value["val"]:
+                    match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
                 else:
-                    match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                    if "~" in value["op"]:
+                        match_query = Bool()
+                        for word in value["val"].split(" "):
+                            match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
+                    else:
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type
+                        )
 
                 if "!" in value["op"]:
                     query.must_not(match_query)
