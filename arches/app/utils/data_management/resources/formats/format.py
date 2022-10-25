@@ -214,7 +214,7 @@ class Reader(object):
             del bulk_relations[:]
         elapsed = time() - start
         bulk_str = " bulk" if bulk else ""
-        print("Time to{0} import resource relations = {0}".format(bulk_str, datetime.timedelta(seconds=elapsed)))
+        print(f"Time to{bulk_str} import resource relations = {datetime.timedelta(seconds=elapsed)}")
         self.report_errors()
 
     def report_errors(self):
