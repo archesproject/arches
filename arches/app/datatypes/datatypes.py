@@ -39,7 +39,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Terms,
     Wildcard,
     Prefix,
-    Nested
+    Nested,
 )
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
@@ -244,10 +244,7 @@ class StringDataType(BaseDataType):
                                     return null_docs;
                                 """,
                                     "lang": "painless",
-                                    "params": {
-                                        "node_id": f"{str(node.pk)}",
-                                        "lang": f"{value['lang']}"
-                                    },
+                                    "params": {"node_id": f"{str(node.pk)}", "lang": f"{value['lang']}"},
                                 }
                             }
                         }
@@ -1926,7 +1923,6 @@ class DomainDataType(BaseDomainDataType):
             if settings.WORDS_PER_SEARCH_TERM is None or (len(text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(SearchTerm(value=text, lang=lang))
         return terms
-
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         node = models.Node.objects.get(nodeid=nodeid)

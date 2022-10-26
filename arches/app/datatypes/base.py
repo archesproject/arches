@@ -269,9 +269,7 @@ class BaseDataType(object):
                                     return null_docs;
                                 """,
                                     "lang": "painless",
-                                    "params": {
-                                        "node_id": f"{str(node.pk)}"
-                                    },
+                                    "params": {"node_id": f"{str(node.pk)}"},
                                 }
                             }
                         }
