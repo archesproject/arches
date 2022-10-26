@@ -817,7 +817,7 @@ class CsvReader(Reader):
                         if value != "" and key.upper() != "RESOURCEID" and key.upper() in col_header_to_nodeid_dict
                     ]
 
-                def transform_value(datatype, value, source, nodeid):
+                def transform_value(datatype, value, source, nodeid, tileid=None):
                     """
                     Transforms values from probably string/wkt representation to specified datatype in arches.
                     This code could probably move to somehwere where it can be accessed by other importers.
@@ -837,7 +837,7 @@ class CsvReader(Reader):
                                 if collection_id is not None:
                                     value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                         try:
-                            value = datatype_instance.transform_value_for_tile(value)
+                            value = datatype_instance.transform_value_for_tile(value, tileid=tileid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
                             errors.append(
@@ -1038,6 +1038,7 @@ class CsvReader(Reader):
                                                         source_column[source_key],
                                                         row_number,
                                                         source_key,
+                                                        tileid=prototype_tile_copy.tileid
                                                     )
                                                     prototype_tile_copy.data[source_key] = value["value"]
                                                     # print(prototype_tile_copy.data[source_key]
@@ -1050,7 +1051,7 @@ class CsvReader(Reader):
                                     s_tile_value = source_dict.get(target_key, None)
                                     if s_tile_value is not None and prototype_tile_copy.data[target_key] is None:
                                         try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=prototype_tile_copy.tileid)
                                             prototype_tile_copy.data[target_key] = value["value"]
                                             found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
                                             if len(found) > 0:
@@ -1066,7 +1067,7 @@ class CsvReader(Reader):
                                         and isinstance(prototype_tile_copy.data[target_key], list)
                                     ):  # weve found a pre-existing value for this node on tile
                                         try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=prototype_tile_copy.tileid)
                                             value = value["value"]
                                             if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
                                                 value, list
@@ -1148,7 +1149,7 @@ class CsvReader(Reader):
                                                 if tile_to_populate.data[source_key] is None:
                                                     # If match populate tile_to_populate node with transformed value.
                                                     value = transform_value(
-                                                        node_datatypes[source_key], source_tile[source_key], row_number, source_key
+                                                        node_datatypes[source_key], source_tile[source_key], row_number, source_key, tileid=tile_to_populate.tileid
                                                     )
                                                     tile_to_populate.data[source_key] = value["value"]
                                                     # tile_to_populate.request = value['request']
@@ -1160,7 +1161,7 @@ class CsvReader(Reader):
                                     if s_tile_value is not None and tile_to_populate.data[target_key] is None:
                                         # If match populate tile_to_populate node with transformed value.
                                         try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=tile_to_populate.tileid)
 
                                             tile_to_populate.data[target_key] = value["value"]
                                             found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
@@ -1177,7 +1178,7 @@ class CsvReader(Reader):
                                         and isinstance(tile_to_populate.data[target_key], list)
                                     ):  # weve found a pre-existing value for this node on tile
                                         try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key)
+                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=tile_to_populate.tileid)
                                             value = value["value"]
                                             if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
                                                 value, list
