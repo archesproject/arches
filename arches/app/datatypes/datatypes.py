@@ -39,6 +39,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Terms,
     Wildcard,
     Prefix,
+    Nested
 )
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
@@ -194,6 +195,70 @@ class StringDataType(BaseDataType):
                 except:
                     pass
         return terms
+
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that have not been populated or are empty strings
+        """
+        base_query = Bool()
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
+        data_exists = Bool()
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value")
+        nested_query = Nested(path="tiles", query=data_exists_query)
+        data_exists.must(nested_query)
+
+        if value["op"] == "not_null":
+            query.must(base_query)
+            query.must(data_exists)
+            non_blank_string_query = Wildcard(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
+            query.must(Nested(path="tiles", query=non_blank_string_query))
+
+        if value["op"] == "null":
+            # search for resources that could have tiles with that data but don't
+            exists_query = Bool()
+            exists_query.must_not(data_exists)
+            base_query.should(exists_query)
+
+            # search for tiles that do exist, but that have null, [], or "" as values
+            func_query = Dsl()
+            func_query.dsl = {
+                "function_score": {
+                    "min_score": 1,
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": """
+                                    int null_docs = 0;
+                                    for(tile in params._source.tiles){
+                                        if(tile.data.containsKey(params.node_id)){
+                                            def val = tile.data.get(params.node_id).get(params.lang).value;
+                                            if (val == null || (val instanceof List && val.length==0) || val == "") {
+                                                null_docs++;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    return null_docs;
+                                """,
+                                    "lang": "painless",
+                                    "params": {
+                                        "node_id": f"{str(node.pk)}",
+                                        "lang": f"{value['lang']}"
+                                    },
+                                }
+                            }
+                        }
+                    ],
+                    "score_mode": "max",
+                    "boost": 1,
+                    "boost_mode": "replace",
+                }
+            }
+            base_query.should(func_query)
+            query.must(base_query)
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -1861,6 +1926,7 @@ class DomainDataType(BaseDomainDataType):
             if settings.WORDS_PER_SEARCH_TERM is None or (len(text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
                 terms.append(SearchTerm(value=text, lang=lang))
         return terms
+
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         node = models.Node.objects.get(nodeid=nodeid)

@@ -236,7 +236,7 @@ class BaseDataType(object):
         base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
         null_query = Bool()
-        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}")
         nested_query = Nested(path="tiles", query=data_exists_query)
         null_query.must(nested_query)
         if value["op"] == "null":
@@ -269,7 +269,9 @@ class BaseDataType(object):
                                     return null_docs;
                                 """,
                                     "lang": "painless",
-                                    "params": {"node_id": "%s" % (str(node.pk))},
+                                    "params": {
+                                        "node_id": f"{str(node.pk)}"
+                                    },
                                 }
                             }
                         }
