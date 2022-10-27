@@ -1360,30 +1360,34 @@ class FileListDataType(BaseDataType):
         tileid = None
         if "tileid" in kwargs:
             tileid = kwargs["tileid"]
-        if isinstance(json.loads(value.replace("\'","\"")), list):
-            file_objs = json.loads(value.replace("\'","\""))
-            for file_obj in file_objs:
-                tile_file = {}
-                try:
-                    file_stats = os.stat(file_obj["url"].replace(settings.MEDIA_URL, settings.MEDIA_ROOT))
-                    tile_file["lastModified"] = file_stats.st_mtime
-                    tile_file["size"] = file_stats.st_size
-                except FileNotFoundError as e:
-                    pass
-                tile_file["status"] = "uploaded"
-                tile_file["name"] = file_obj["name"] or os.path.basename(file_obj["url"])
-                file_path = "uploadedfiles/" + str(file_obj["name"])
-                tile_file["type"] = file_obj["type"] if file_obj["type"] not in ["None", None, ""] else mime.guess_type(file_obj["url"])[0]
-                tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-                tile_file["file_id"] = file_obj["file_id"] or str(uuid.uuid4())
-                models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path, tile_id=tileid)
-                tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
-                tile_file["accepted"] = True
-                compatible_renderers = self.get_compatible_renderers(tile_file)
-                if len(compatible_renderers) == 1:
-                    tile_file["renderer"] = compatible_renderers[0]
-                tile_data.append(tile_file)
-            return json.loads(json.dumps(tile_data))
+        if "[" in value:
+            value = value.replace("None", "null")
+            value = value.replace("True", "true")
+            value = value.replace("False", "false")
+            if isinstance(json.loads(value.replace("\'","\"")), list):
+                file_objs = json.loads(value.replace("\'","\""))
+                for file_obj in file_objs:
+                    tile_file = {}
+                    try:
+                        file_stats = os.stat(file_obj["url"].replace(settings.MEDIA_URL, settings.MEDIA_ROOT))
+                        tile_file["lastModified"] = file_stats.st_mtime
+                        tile_file["size"] = file_stats.st_size
+                    except FileNotFoundError as e:
+                        pass
+                    tile_file["status"] = "uploaded"
+                    tile_file["name"] = file_obj["name"] or os.path.basename(file_obj["url"])
+                    file_path = "uploadedfiles/" + str(file_obj["name"])
+                    tile_file["type"] = file_obj["type"] if file_obj["type"] not in ["None", None, ""] else mime.guess_type(file_obj["url"])[0]
+                    tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
+                    tile_file["file_id"] = file_obj["file_id"] or str(uuid.uuid4())
+                    models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path, tile_id=tileid)
+                    tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
+                    tile_file["accepted"] = True
+                    compatible_renderers = self.get_compatible_renderers(tile_file)
+                    if len(compatible_renderers) == 1:
+                        tile_file["renderer"] = compatible_renderers[0]
+                    tile_data.append(tile_file)
+                return json.loads(json.dumps(tile_data))
         
         for file_path in value.split(","):
             tile_file = {}
