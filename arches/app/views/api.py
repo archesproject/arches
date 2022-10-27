@@ -59,7 +59,7 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 
@@ -263,11 +263,12 @@ class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
     def get_name(self, resource):
-        module = importlib.import_module("arches.app.functions.primary_descriptors")
-        PrimaryDescriptorsFunction = getattr(module, "PrimaryDescriptorsFunction")()
-        functionConfig = models.FunctionXGraph.objects.filter(graph_id=resource.graph_id, function__functiontype="primarydescriptors")
-        if len(functionConfig) == 1:
-            return PrimaryDescriptorsFunction.get_primary_descriptor_from_nodes(resource, functionConfig[0].config["name"])
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=resource.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
+        if len(graph_function) == 1:
+            module = graph_function[0].function.get_class_module()()
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
         else:
             return _("Unnamed Resource")
 
@@ -565,6 +566,7 @@ class Resources(APIBase):
 
         allowed_formats = ["json", "json-ld", "arches-json"]
         format = request.GET.get("format", "json-ld")
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         user = request.user
         perm = "read_nodegroup"
 
@@ -586,17 +588,29 @@ class Resources(APIBase):
                 hide_empty_nodes = bool(request.GET.get("hide_empty_nodes", "false").lower() == "true")  # default False
 
                 if version == "beta":
-                    out = resource.to_json(compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version)
+                    out = resource.to_json(
+                        compact=compact,
+                        hide_empty_nodes=hide_empty_nodes,
+                        user=user,
+                        perm=perm,
+                        version=version,
+                        hide_hidden_nodes=hide_hidden_nodes,
+                    )
                 else:
                     out = {
                         "resource": resource.to_json(
-                            compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, version=version
+                            compact=compact,
+                            hide_empty_nodes=hide_empty_nodes,
+                            user=user,
+                            perm=perm,
+                            version=version,
+                            hide_hidden_nodes=hide_hidden_nodes,
                         ),
-                        "displaydescription": resource.displaydescription,
-                        "displayname": resource.displayname,
+                        "displaydescription": resource.displaydescription(),
+                        "displayname": resource.displayname(),
                         "graph_id": resource.graph_id,
                         "legacyid": resource.legacyid,
-                        "map_popup": resource.map_popup,
+                        "map_popup": resource.map_popup(),
                         "resourceinstanceid": resource.resourceinstanceid,
                     }
 
@@ -980,7 +994,7 @@ class Card(APIBase):
             tiles = []
             displayname = _("New Resource")
         else:
-            displayname = resource_instance.displayname
+            displayname = resource_instance.displayname()
             if displayname == "undefined":
                 displayname = _("Unnamed Resource")
             if str(resource_instance.graph_id) == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
@@ -1064,7 +1078,7 @@ class SearchComponentData(APIBase):
     def get(self, request, componentname):
         search_filter_factory = SearchFilterFactory(request)
         search_filter = search_filter_factory.get_filter(componentname)
-        if search_filter and not (componentname == "advanced-search" and request.user.username == "anonymous"):
+        if search_filter:
             return JSONResponse(search_filter.view_data())
         return JSONResponse(status=404)
 
@@ -1222,7 +1236,7 @@ class ResourceReport(APIBase):
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
-            "displayname": resource.displayname,
+            "displayname": resource.displayname(),
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
@@ -1421,13 +1435,15 @@ class BulkResourceReport(APIBase):
 class BulkDisambiguatedResourceInstance(APIBase):
     def get(self, request):
         resource_ids = request.GET.get("resource_ids").split(",")
-        uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
-        compact = True
-        if uncompacted_value == "true":
-            compact = False
+        hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
+        compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+
         return JSONResponse(
-            {resource.pk: resource.to_json(compact=compact, version=version) for resource in Resource.objects.filter(pk__in=resource_ids)}
+            {
+                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                for resource in Resource.objects.filter(pk__in=resource_ids)
+            }
         )
 
 
@@ -1691,3 +1707,22 @@ class Validator(APIBase):
             return JSONResponse(self.validate_tile(tile, verbose, strict), indent=indent)
 
         return JSONResponse(status=400)
+
+
+class TransformEdtfForTile(APIBase):
+    def get(self, request):
+        try:
+            value = request.GET.get("value")
+            datatype_factory = DataTypeFactory()
+            edtf_datatype = datatype_factory.get_instance("edtf")
+            transformed_value = edtf_datatype.transform_value_for_tile(value)
+            is_valid = len(edtf_datatype.validate(transformed_value)) == 0
+            result = (transformed_value, is_valid)
+
+        except TypeError as e:
+            return JSONResponse({"data": (str(e), False)})
+
+        except Exception as e:
+            return JSONResponse(str(e), status=500)
+
+        return JSONResponse({"data": result})
