@@ -1360,8 +1360,8 @@ class FileListDataType(BaseDataType):
         tileid = None
         if "tileid" in kwargs:
             tileid = kwargs["tileid"]
-        if isinstance(json.loads(value), list):
-            file_objs = json.loads(value)
+        if isinstance(json.loads(value.replace("\'","\"")), list):
+            file_objs = json.loads(value.replace("\'","\""))
             for file_obj in file_objs:
                 tile_file = {}
                 try:
