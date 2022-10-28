@@ -299,6 +299,7 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
+            node.publication_id = nodeobj.get("publication_id", None)
             if node.hascustomalias:
                 node.alias = nodeobj.get("alias", "")
             self.create_node_alias(node)
@@ -482,9 +483,11 @@ class Graph(models.GraphModel):
 
             if nodeid is not None:
                 node = self.nodes[nodeid]
+                branch_publication_id = node.publication_id
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
+                    node.publication_id = None
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
@@ -494,6 +497,10 @@ class Graph(models.GraphModel):
                         logger.error(err)
                         message = _('Fail to save node "{0}".'.format(node.name))
                         raise GraphValidationError(message)
+                if branch_publication_id:
+                    for branch_node in models.Node.objects.filter(publication_id=branch_publication_id):
+                        branch_node.publication_id = None
+                        branch_node.save()
 
             else:
                 for node in self.nodes.values():
@@ -638,12 +645,14 @@ class Graph(models.GraphModel):
 
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
+            branch_publication_id = branch_graph.publication_id # == branch_copy.publication_id
             branch_copy.root.istopnode = False
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
             for node in branch_copy.nodes.values():
+                node.publication_id = branch_publication_id
                 self.add_node(node)
             for card in branch_copy.get_cards():
                 self.add_card(card)
