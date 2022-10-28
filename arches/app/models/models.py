@@ -558,6 +558,7 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
+    publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", blank=True, null=True, on_delete=models.SET_NULL)
 
     def get_child_nodes_and_edges(self):
         """
