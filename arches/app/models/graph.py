@@ -645,7 +645,7 @@ class Graph(models.GraphModel):
 
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
-            branch_publication_id = branch_graph.publication_id # == branch_copy.publication_id
+            branch_publication_id = branch_graph.publication_id  # == branch_copy.publication_id
             branch_copy.root.istopnode = False
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
