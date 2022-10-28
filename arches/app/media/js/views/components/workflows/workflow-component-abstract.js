@@ -294,7 +294,9 @@ define([
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
 
-                $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                const resourceInstanceOrGraphId = self.componentData.parameters['resourceid'] || self.componentData.parameters['graphid'];
+
+                $.getJSON(( arches.urls.resource + `/${resourceInstanceOrGraphId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
                     if (self.cardinality() === '1') {
                         if (data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
