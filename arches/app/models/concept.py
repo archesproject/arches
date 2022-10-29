@@ -1176,30 +1176,31 @@ class Concept(object):
 
         """
         cursor = connection.cursor()
-
-        sql = """
-        WITH RECURSIVE children AS (
-            SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
-                FROM relations d
-                JOIN values c ON(c.conceptid = d.conceptidto)
-                JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
-                WHERE d.conceptidfrom = '{0}'
-                and c2.valuetype = 'prefLabel'
-                and c.valuetype in ('prefLabel', 'sortorder', 'collector')
-                and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-                UNION
-                SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
-                FROM relations  d
-                JOIN children b ON(b.conceptidto = d.conceptidfrom)
-                JOIN values v ON(v.conceptid = d.conceptidto)
-                JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
-                WHERE  v2.valuetype = 'prefLabel'
-                and v.valuetype in ('prefLabel','sortorder', 'collector')
-                and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-            ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
-        """.format(
-            conceptid
+        cursor.execute(
+            """
+            WITH RECURSIVE children AS (
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
+                    FROM relations d
+                    JOIN values c ON(c.conceptid = d.conceptidto)
+                    JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
+                    WHERE d.conceptidfrom = %s
+                    and c2.valuetype = 'prefLabel'
+                    and c.valuetype in ('prefLabel', 'sortorder', 'collector')
+                    and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
+                    UNION
+                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
+                    FROM relations  d
+                    JOIN children b ON(b.conceptidto = d.conceptidfrom)
+                    JOIN values v ON(v.conceptid = d.conceptidto)
+                    JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
+                    WHERE  v2.valuetype = 'prefLabel'
+                    and v.valuetype in ('prefLabel','sortorder', 'collector')
+                    and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
+                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
+            """,
+            [conceptid]
         )
+        rows = cursor.fetchall()
 
         column_names = [
             "conceptidfrom",
@@ -1213,8 +1214,6 @@ class Concept(object):
             "conceptpath",
             "vtype",
         ]
-        cursor.execute(sql)
-        rows = cursor.fetchall()
 
         class Val(object):
             def __init__(self, conceptid):
