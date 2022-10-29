@@ -704,7 +704,7 @@ class Concept(object):
             """
 
             sql = sql.format(offset_clause=offset_clause, depth_clause=depth_clause)
-            
+
             if not columns:
                 columns = """
                     conceptidfrom::text, conceptidto::text,
