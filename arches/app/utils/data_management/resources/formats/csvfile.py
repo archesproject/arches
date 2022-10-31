@@ -470,12 +470,14 @@ class CsvReader(Reader):
         headers = [k.upper() for k in business_data[0].keys() if k.upper() != "RESOURCEID"]
         non_unique_col_headers = False
         unique_nodeids = set(list(mapping_filefieldname_to_nodeid_dict.values()))
-        evaluation_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd"  # parent tiledata IS semantic, parenttile=null
+        hist_res_eval_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd"  # parent tiledata IS semantic, parenttile=null
         component_nodegroupid = "a271c312-1037-11ec-b65f-31043b30bbcd"  # tiledata is not semantic, parenttile=null
         component_type_nodeid = "a271c374-1037-11ec-b65f-31043b30bbcd"
-        place_nodegroupid = "a271c336-1037-11ec-b65f-31043b30bbcd"
-        address_nodegroupid = "a271c321-1037-11ec-b65f-31043b30bbcd"
+        # place_nodegroupid = "a271c336-1037-11ec-b65f-31043b30bbcd"
+        # address_nodegroupid = "a271c321-1037-11ec-b65f-31043b30bbcd"
         hist_dist_eval_nodegroupid = "bb6de9e8-98a2-11eb-b28f-5f1901ec6b3b"
+        plan_dist_eval_nodegroupid = "2ae3b6ad-3752-11ec-b65f-31043b30bbcd"
+        eval_nodegroups = [hist_res_eval_nodegroupid, hist_dist_eval_nodegroupid, plan_dist_eval_nodegroupid]
         if len(unique_nodeids) != len(list(mapping_filefieldname_to_nodeid_dict.keys())):
             non_unique_col_headers = True
         non_unique_col_headers = False
@@ -975,7 +977,7 @@ class CsvReader(Reader):
                     if group_valid:
                         if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
                             group_no = row["GROUP_NO"] + "-" + str(prefix)
-                        elif str(tile_to_populate.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
+                        elif str(tile_to_populate.nodegroup_id) in eval_nodegroups:
                             group_no = row["GROUP_NO"]
                     # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
                     if tile_to_populate.tileid is None:
@@ -1358,7 +1360,7 @@ class CsvReader(Reader):
                         if group_valid and not isinstance(row["GROUP_NO"], str):
                             row["GROUP_NO"] = str(row["GROUP_NO"])
 
-                        if group_valid and str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
+                        if group_valid and str(target_tile.nodegroup_id) in eval_nodegroups:
                             group_no = row["GROUP_NO"]
 
                         # {
@@ -1391,11 +1393,11 @@ class CsvReader(Reader):
                             continue
 
                         if (
-                            str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid, component_nodegroupid]
+                            str(target_tile.nodegroup_id) in eval_nodegroups.extend([component_nodegroupid])
                             and group_valid
                         ):
 
-                            if str(target_tile.nodegroup_id) in [evaluation_nodegroupid, hist_dist_eval_nodegroupid]:
+                            if str(target_tile.nodegroup_id) in eval_nodegroups:
                                 if group_no not in group_no_to_tileids:
                                     group_no_to_tileids[group_no] = {}
                                 # checks for whether a parent tile exists since get_blank_tile starts out getting parent
