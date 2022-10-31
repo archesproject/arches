@@ -188,6 +188,7 @@ define([
                     exportable: self.exportable,
                     alias: self.alias,
                     hascustomalias: self.hasCustomAlias,
+                    publication_id: self.publicationId
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
@@ -273,6 +274,7 @@ define([
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
+            self.publicationId = source.publication_id;
 
             self.set('id', self.nodeid);
             self.set('graph_id', source.graph_id);
