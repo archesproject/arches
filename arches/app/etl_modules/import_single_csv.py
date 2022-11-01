@@ -280,12 +280,18 @@ class ImportSingleCsv(BaseImportModule):
                                 config = current_node.config
                                 config["path"] = temp_dir
                                 value = (
-                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
+                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None and source_value != '' else None
                                 )
                                 errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
                             else:
-                                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
-                                errors = datatype_instance.validate(value)
+                                try:
+                                    config = current_node.config
+                                except TypeError:
+                                    config = {}
+                                value = (
+                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None and source_value != '' else None
+                                )
+                                errors = datatype_instance.validate(value, nodeid=node)
                             valid = True if len(errors) == 0 else False
                             error_message = ""
                             for error in errors:
