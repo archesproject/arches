@@ -101,6 +101,8 @@ RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
 RUN python3.8 -m venv ENV \
     && . ENV/bin/activate \
+    && pip install wheel setuptools requests \
+    && pip install rjsmin==1.2.0 MarkupSafe==2.0.0 \
     && pip install requests \
     && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -f ${WHEELS} gunicorn \
