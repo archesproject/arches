@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "7.1.0",
+    "version": "7.2.0",
     "scripts": {
         "build_production": "NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
         "build_development": "NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
@@ -12,7 +12,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.1.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.2.x"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
