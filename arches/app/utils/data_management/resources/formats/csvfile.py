@@ -1393,7 +1393,7 @@ class CsvReader(Reader):
                             continue
 
                         if (
-                            str(target_tile.nodegroup_id) in eval_nodegroups.extend([component_nodegroupid])
+                            (str(target_tile.nodegroup_id) in eval_nodegroups or str(target_tile.nodegroup_id) == component_nodegroupid)
                             and group_valid
                         ):
 
