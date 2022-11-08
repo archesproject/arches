@@ -276,16 +276,14 @@ class ImportSingleCsv(BaseImportModule):
                             datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                             datatype_instance = self.datatype_factory.get_instance(datatype)
                             source_value = row[key]
+                            config = current_node.config
                             if datatype == "file-list":
-                                config = current_node.config
                                 config["path"] = temp_dir
-                                value = (
-                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
-                                )
+                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
                                 errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
                             else:
-                                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
-                                errors = datatype_instance.validate(value)
+                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
+                                errors = datatype_instance.validate(value, nodeid=node)
                             valid = True if len(errors) == 0 else False
                             error_message = ""
                             for error in errors:
