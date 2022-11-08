@@ -464,6 +464,17 @@ if DEBUG is True:
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
 
+# external oauth configuration
+EXTERNAL_OAUTH_CONFIGURATION = {
+    "default_user_group": "",
+    "user_domain": "fargeo.com",
+    "app_id": "",
+    "app_secret": "",
+    "redirect_url": "",
+    "scopes": "",
+    "authority": ""
+}
+
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
     "user_permission": {
