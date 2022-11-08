@@ -36,9 +36,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	 	<div class="cls-content-sm panel login-panel" style="width: 350px;">
 			<div class="panel-body">
 				<h3 class="login-panel-header arches-signin">{% trans "Sign In" %}</h3>
+				{% if not existing_user %}
 				<p class="arches-signin-subtext">
 					{% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
 				</p>
+				{% endif %}
+				{% if existing_user %}
+				<p class="arches-signin-subtext">
+					Welcome back, <b>{{ full_name }}</b>! Please enter your paasword (a tag in a trans tag isn't working yet!)
+				</p>
+				{% endif %}
 
 				{% if registration_success %}
 					<hr style="border-color: #eee;">
@@ -51,18 +58,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
 					{% csrf_token %}
 					<input type="hidden" name="next" value="{{ next }}" />
+					{% if not existing_user %}
 					<div class="form-group">
 						<div class="input-group">
 							<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
 							<input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
 						</div>
 					</div>
+					{% endif %}
+					{% if existing_user %}
+					<input type="hidden" name="username" value="{{ username }}" />
 					<div class="form-group">
 						<div class="input-group">
 							<div class="input-group-addon"><i class="ion-asterisk"></i></div>
-							<input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+							<input type="password" class="form-control input-lg" placeholder="Password" name='password' autofocus>
 						</div>
 					</div>
+					{% endif %}
 					<div class="form-group">
                         <div class="arches-signin-btn">
                             <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>

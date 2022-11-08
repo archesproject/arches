@@ -85,6 +85,37 @@ class LoginView(View):
         user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
 
+        try:
+            domain = username.split('@')[1]
+            if domain == "fargeo.com": #settings.SSO_Domain?
+                # then get the token and do something with it
+                response = {"username":"Azure User", "token": "response_token"} # check get token back
+                username = response["username"]
+                if response["token"]:
+                    # authenticate the Azue User!
+                    pass
+                return redirect(next)
+        except:
+            pass
+
+        if username is not None and password is None:
+            try:
+                user = User.objects.get(username=username)
+                full_name = user.get_full_name()
+                if user:
+                    return render(
+                        request,
+                        "login.htm",
+                        {
+                            "username": username,
+                            "full_name": full_name,
+                            "existing_user": True,
+                            "next": next,
+                            "user_signup_enabled": settings.ENABLE_USER_SIGNUP
+                        }
+                    )
+            except:
+                pass
         if user is not None and user.is_active:
             if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
                 user_profile = models.UserProfile.objects.get(user=user)
