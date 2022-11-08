@@ -345,6 +345,7 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
     "arches.app.utils.permission_backend.PermissionBackend",
     "guardian.backends.ObjectPermissionBackend",
+    "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend"
 )
 
 INSTALLED_APPS = (
@@ -395,8 +396,6 @@ WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
 ROOT_URLCONF = "arches.urls"
 
 WSGI_APPLICATION = "arches.wsgi.application"
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 try:
     CORS_ALLOW_HEADERS = list(default_headers) + [

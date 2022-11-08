@@ -30,6 +30,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                     token_record.id_token = id_token
                     token_record.access_token_expiration = expiration_date
                     token_record.user = user
+                    token_record.save()
                     return user
                 
         except Exception as e:
