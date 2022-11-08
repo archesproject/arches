@@ -36,14 +36,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 	 	<div class="cls-content-sm panel login-panel" style="width: 350px;">
 			<div class="panel-body">
 				<h3 class="login-panel-header arches-signin">{% trans "Sign In" %}</h3>
-				{% if not existing_user %}
+				{% if not username_entered %}
 				<p class="arches-signin-subtext">
 					{% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
 				</p>
-				{% endif %}
-				{% if existing_user %}
 				<p class="arches-signin-subtext">
-					Welcome back, <b>{{ full_name }}</b>! Please enter your paasword (a tag in a trans tag isn't working yet!)
+					{% trans "Enter your email or username to get started." %}
+				</p>
+				{% endif %}
+				{% if username_entered %}
+				<p class="arches-signin-subtext">
+					{% trans "Please enter your password" %}
 				</p>
 				{% endif %}
 
@@ -58,7 +61,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
 					{% csrf_token %}
 					<input type="hidden" name="next" value="{{ next }}" />
-					{% if not existing_user %}
+					{% if not username_entered %}
 					<div class="form-group">
 						<div class="input-group">
 							<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
@@ -66,7 +69,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 						</div>
 					</div>
 					{% endif %}
-					{% if existing_user %}
+					{% if username_entered %}
 					<input type="hidden" name="username" value="{{ username }}" />
 					<div class="form-group">
 						<div class="input-group">
@@ -77,7 +80,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 					{% endif %}
 					<div class="form-group">
                         <div class="arches-signin-btn">
-                            <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+							{% if not username_entered %}
+                            <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Continue" %}</button>
+							{% endif %}
+							{% if username_entered %}
+							<button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+							{% endif %}
                         </div>
                     </div>
 					<div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">

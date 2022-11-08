@@ -82,40 +82,28 @@ class LoginView(View):
         # POST request is taken to mean user is logging in
         username = request.POST.get("username", None)  # user-input value, NOT source of truth
         password = request.POST.get("password", None)  # user-input value, NOT source of truth
-        user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
-
-        try:
-            domain = username.split('@')[1]
-            if domain == "fargeo.com": #settings.SSO_Domain?
-                # then get the token and do something with it
-                response = {"username":"Azure User", "token": "response_token"} # check get token back
-                username = response["username"]
-                if response["token"]:
-                    # authenticate the Azue User!
-                    pass
-                return redirect(next)
-        except:
-            pass
 
         if username is not None and password is None:
             try:
-                user = User.objects.get(username=username)
-                full_name = user.get_full_name()
-                if user:
-                    return render(
-                        request,
-                        "login.htm",
-                        {
-                            "username": username,
-                            "full_name": full_name,
-                            "existing_user": True,
-                            "next": next,
-                            "user_signup_enabled": settings.ENABLE_USER_SIGNUP
-                        }
-                    )
+                domain = username.split('@')[1]
+                if domain == settings.EXTERNAL_OAUTH_CONFIGURATION["user_domain"]:
+                    redirect("eoauth_start")
             except:
                 pass
+            return render(
+                request,
+                "login.htm",
+                {
+                    "username": username,
+                    "username_entered": True,
+                    "next": next,
+                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP
+                }
+            )
+
+        user = authenticate(username=username, password=password)
+
         if user is not None and user.is_active:
             if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
                 user_profile = models.UserProfile.objects.get(user=user)
