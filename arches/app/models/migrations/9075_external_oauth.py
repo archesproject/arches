@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
             fields=[
                 ("token_id", models.UUIDField(primary_key=True, serialize=False, unique=True)),
                 ("user", models.ForeignKey(
-                    db_column="userid", null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                    db_column="userid", null=False, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
                 )),
                 ("id_token", models.TextField()),
                 ("access_token", models.TextField()),
-                ("access_token_expiration", models.DateTimeField(null=False)),
+                ("access_token_expiration", models.DateTimeField()),
                 ("refresh_token", models.TextField()),
                 ("created", models.DateTimeField(auto_now_add=True)),
                 ("updated", models.DateTimeField(auto_now=True)),

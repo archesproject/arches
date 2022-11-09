@@ -24,12 +24,14 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                     
                 if user is not None:
                     expiration_date = datetime.now() + timedelta(seconds=expires_in)
-                    token_record = ExternalOauthToken()
-                    token_record.access_token = access_token
-                    token_record.refresh_token = refresh_token
-                    token_record.id_token = id_token
-                    token_record.access_token_expiration = expiration_date
-                    token_record.user = user
+                    ExternalOauthToken.objects.filter(user=user).delete()
+                    token_record = ExternalOauthToken.objects.create(
+                        user = user,
+                        access_token = access_token,
+                        refresh_token = refresh_token,
+                        id_token = id_token,
+                        access_token_expiration = expiration_date
+                    )
                     token_record.save()
                     return user
                 

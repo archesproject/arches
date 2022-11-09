@@ -20,6 +20,7 @@ import base64
 import io
 
 from django.http import response
+from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 import qrcode
 import pyotp
 import time
@@ -549,13 +550,14 @@ class ExternalOauth(View):
     def start(request):
         if not settings.EXTERNAL_OAUTH_CONFIGURATION or 'authorization_url' not in settings.EXTERNAL_OAUTH_CONFIGURATION:
             return JSONResponse("")
+        next = request.GET.get("next", reverse("home"))
         client_id = settings.EXTERNAL_OAUTH_CONFIGURATION['app_id']
         redirect_uri = settings.EXTERNAL_OAUTH_CONFIGURATION['redirect_url']
         scope = settings.EXTERNAL_OAUTH_CONFIGURATION['scopes']
         auth_url = settings.EXTERNAL_OAUTH_CONFIGURATION['authorization_url']
         #http://localhost:8009/auth/eoauth_cb?code=0.AX0AKoorpnCpRE20HSOFzaH9NLWrAObmKDhJusTLh-jyohScAFg.AgABAAIAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P8alaO6kwqy1qX1248IuRh-0Ppelu-xD3JGIV4QJ6nxgPdlHirNt6edQ53MAphv6jJNZlL92Wu_W7QarbNR9cHTuCEYKvo7NzBUG1aSI-TYcaTEfAk7sxCMNN3fsXWe3JzOHu1ZoCe4tuS9ftIn-9uqImmMZVewt5yNodxGz5EBtAdSdzyDFEeRRAME011oy55PjZNoOHTybHnaaxdumZDYUdR6YShF9wCsbFtRPGFvc2pS3oqm85gdenmZiiF_p5nB0Hlrqje8H9BqKofQeOFSVb83fyN80YawMffHMfv8RzjO8SkktjqdAqoQrt-DKTCZCn-Px1IduFytVIG7z6IRegD0TV0lzBZ_xAxoZcrfN2CbGzFyJzKgbScGflzLVM2J_FrsOqD5fVMPBVkvnADjYEYlveIdws8rRYaAmes-kBj9nF2eLBQW62u-oddHKqhWQiPKegiAlAzcX3fS23bWg2SqgmLB9PTYkm3vApc1Bwk0nYFPjORYcpPgtwe8u-HsRpXtx3OBM0J1RKnCg6NW53sTl2JZYdNgf2Y3jGM19ECUhdU3w46VwwtQ7fiDKYn16F40-FDD05PFyqcOaQO_hTdJ8FsEjfIbr3r6kIer1fwPifydHNqaOLut9r38qWfpOfIMNZbgVLx0OjAsj2xXJn8e6XV6v5EXxa9jVuzy6Uj6P8XDb6Cdysxro0vtjVrLT9d5shq8zIrx6PqUo8hiI0rUPUa4PqAqlq5d2sDQSBCs5V-8tbE&state=pg4w2qJzjvZQDFpRvbuupaifjcOlEk&session_state=c1e94cdc-48af-46bf-98c9-6fb2fee8951a#
         oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
-        authorization_url, state = oauth.authorization_url(auth_url)
+        authorization_url, state = oauth.authorization_url(auth_url, next=next)
         return redirect(authorization_url)
     
     # TODO: handle the following.
@@ -575,7 +577,7 @@ class ExternalOauth(View):
 
         token_response = oauth.fetch_token(token_url, authorization_response=request.build_absolute_uri(), client_secret=client_secret)
         alg = jwt.get_unverified_header(token_response['id_token'])['alg']
-        
+        #next = token_response["next"]
         if validate_id_token: 
             token_key_id = jwt.get_unverified_header(token_response['id_token'])['kid']
             jwkeys = requests.get(jwks_uri).json()['keys']
@@ -588,7 +590,16 @@ class ExternalOauth(View):
         else:
             decoded_id_token = jwt.decode(token_response['id_token'], algorithms=[alg], options={"verify_signature": False})
 
+        user = None
+
         if uid_claim_source == "id_token":
-            authenticate(username=decoded_id_token[uid_claim], sso_authentication=True, expires_in=token_response['expires_in'],id_token=token_response['id_token'], access_token=token_response['access_token'], refresh_token=token_response['refresh_token'])
+            user = authenticate(username=decoded_id_token[uid_claim], sso_authentication=True, expires_in=token_response['expires_in'],id_token=token_response['id_token'], access_token=token_response['access_token'], refresh_token=token_response['refresh_token'])
         
-        return redirect("root")
+        if user != None:
+            login(request, user, backend=ExternalOauthAuthenticationBackend)
+            # if next != None:
+            #     return redirect(next)
+            # else:
+            return redirect("root")
+        else:
+            return redirect("auth")
