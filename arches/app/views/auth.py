@@ -596,7 +596,7 @@ class ExternalOauth(View):
             user = authenticate(username=decoded_id_token[uid_claim], sso_authentication=True, expires_in=token_response['expires_in'],id_token=token_response['id_token'], access_token=token_response['access_token'], refresh_token=token_response['refresh_token'])
         
         if user != None:
-            login(request, user, backend=ExternalOauthAuthenticationBackend)
+            login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
             # if next != None:
             #     return redirect(next)
             # else:
