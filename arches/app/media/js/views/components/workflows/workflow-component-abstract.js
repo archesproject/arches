@@ -318,6 +318,8 @@ define([
 
                         self.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
                             if (!(savedData instanceof Array)) { savedData = [savedData]; }
+
+                            self.card().getNewTile();
             
                             self.savedData(savedData.map(function(savedDatum) {
                                 return {
