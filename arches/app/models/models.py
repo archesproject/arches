@@ -294,7 +294,7 @@ class ExternalOauthToken(models.Model):
     id_token = models.TextField()
     access_token_expiration = models.DateTimeField()
     access_token = models.TextField()
-    refresh_token = models.TextField()
+    refresh_token = models.TextField(null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

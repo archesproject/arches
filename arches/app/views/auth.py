@@ -26,6 +26,7 @@ import pyotp
 import time
 import requests
 import jwt
+from jwt import PyJWKClient
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.http.response import HttpResponseForbidden
@@ -57,10 +58,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from requests_oauthlib import OAuth2Session
 import logging
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from base64 import b64decode
 
 logger = logging.getLogger(__name__)
 
@@ -548,58 +545,32 @@ class Token(View):
 
 class ExternalOauth(View):
     def start(request):
-        if not settings.EXTERNAL_OAUTH_CONFIGURATION or 'authorization_url' not in settings.EXTERNAL_OAUTH_CONFIGURATION:
-            return JSONResponse("")
+        oauth2_settings = ExternalOauthAuthenticationBackend.get_oauth2_settings()
+        if oauth2_settings is None:
+            redirect("auth")
+
         next = request.GET.get("next", reverse("home"))
+        username = request.GET.get("username", None)
         client_id = settings.EXTERNAL_OAUTH_CONFIGURATION['app_id']
         redirect_uri = settings.EXTERNAL_OAUTH_CONFIGURATION['redirect_url']
         scope = settings.EXTERNAL_OAUTH_CONFIGURATION['scopes']
-        auth_url = settings.EXTERNAL_OAUTH_CONFIGURATION['authorization_url']
+        auth_url = oauth2_settings['authorization_endpoint']
         #http://localhost:8009/auth/eoauth_cb?code=0.AX0AKoorpnCpRE20HSOFzaH9NLWrAObmKDhJusTLh-jyohScAFg.AgABAAIAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P8alaO6kwqy1qX1248IuRh-0Ppelu-xD3JGIV4QJ6nxgPdlHirNt6edQ53MAphv6jJNZlL92Wu_W7QarbNR9cHTuCEYKvo7NzBUG1aSI-TYcaTEfAk7sxCMNN3fsXWe3JzOHu1ZoCe4tuS9ftIn-9uqImmMZVewt5yNodxGz5EBtAdSdzyDFEeRRAME011oy55PjZNoOHTybHnaaxdumZDYUdR6YShF9wCsbFtRPGFvc2pS3oqm85gdenmZiiF_p5nB0Hlrqje8H9BqKofQeOFSVb83fyN80YawMffHMfv8RzjO8SkktjqdAqoQrt-DKTCZCn-Px1IduFytVIG7z6IRegD0TV0lzBZ_xAxoZcrfN2CbGzFyJzKgbScGflzLVM2J_FrsOqD5fVMPBVkvnADjYEYlveIdws8rRYaAmes-kBj9nF2eLBQW62u-oddHKqhWQiPKegiAlAzcX3fS23bWg2SqgmLB9PTYkm3vApc1Bwk0nYFPjORYcpPgtwe8u-HsRpXtx3OBM0J1RKnCg6NW53sTl2JZYdNgf2Y3jGM19ECUhdU3w46VwwtQ7fiDKYn16F40-FDD05PFyqcOaQO_hTdJ8FsEjfIbr3r6kIer1fwPifydHNqaOLut9r38qWfpOfIMNZbgVLx0OjAsj2xXJn8e6XV6v5EXxa9jVuzy6Uj6P8XDb6Cdysxro0vtjVrLT9d5shq8zIrx6PqUo8hiI0rUPUa4PqAqlq5d2sDQSBCs5V-8tbE&state=pg4w2qJzjvZQDFpRvbuupaifjcOlEk&session_state=c1e94cdc-48af-46bf-98c9-6fb2fee8951a#
         oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
+        # token = ExternalOauthAuthenticationBackend.get_token(user)
+        # if(token != None and token.access_token_expiration > datetime.now()):
+        #     return user
         authorization_url, state = oauth.authorization_url(auth_url, next=next)
         return redirect(authorization_url)
     
-    # TODO: handle the following.
-    # /auth/eoauth_cb?error=consent_required&error_description=AADSTS65004%3a+User+declined+to+consent+to+access+the+app.%0d%0aTrace+ID%3a+b0a4f024-00e5-4c01-a84a-3389adb1a500%0d%0aCorrelation+ID%3a+03e62e05-596b-4431-9b7b-e46475284faf%0d%0aTimestamp%3a+2022-11-07+17%3a47%3a35Z&error_uri=https%3a%2f%2flogin.microsoftonline.com%2ferror%3fcode%3d65004&state=px6GkMVsq8mQWeqYvmKRPDmxv9qBwz
-    def get(self, request):
-        if not settings.EXTERNAL_OAUTH_CONFIGURATION or 'authorization_url' not in settings.EXTERNAL_OAUTH_CONFIGURATION:
-            return JSONResponse("")
-        client_id = settings.EXTERNAL_OAUTH_CONFIGURATION['app_id']
-        client_secret = settings.EXTERNAL_OAUTH_CONFIGURATION['app_secret']
-        redirect_uri = settings.EXTERNAL_OAUTH_CONFIGURATION['redirect_url']
-        token_url = settings.EXTERNAL_OAUTH_CONFIGURATION['token_url']
-        uid_claim = settings.EXTERNAL_OAUTH_CONFIGURATION['uid_claim']
-        uid_claim_source = settings.EXTERNAL_OAUTH_CONFIGURATION['uid_claim_source']
-        jwks_uri = settings.EXTERNAL_OAUTH_CONFIGURATION['jwks_uri']
-        validate_id_token = settings.EXTERNAL_OAUTH_CONFIGURATION['validate_id_token']
-        oauth = OAuth2Session(client_id, redirect_uri=redirect_uri)
-
-        token_response = oauth.fetch_token(token_url, authorization_response=request.build_absolute_uri(), client_secret=client_secret)
-        alg = jwt.get_unverified_header(token_response['id_token'])['alg']
-        #next = token_response["next"]
-        if validate_id_token: 
-            token_key_id = jwt.get_unverified_header(token_response['id_token'])['kid']
-            jwkeys = requests.get(jwks_uri).json()['keys']
-            jwk = [key for key in jwkeys if key['kid'] == token_key_id][0]
-            der_cert = b64decode(jwk['x5c'][0])
-            cert = x509.load_der_x509_certificate(der_cert, default_backend())
-            public_key = cert.public_key()
-            pem_key = public_key.public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
-            decoded_id_token = jwt.decode(token_response['id_token'], pem_key, audience=client_id, algorithms=[alg])
-        else:
-            decoded_id_token = jwt.decode(token_response['id_token'], algorithms=[alg], options={"verify_signature": False})
-
-        user = None
-
-        if uid_claim_source == "id_token":
-            user = authenticate(username=decoded_id_token[uid_claim], sso_authentication=True, expires_in=token_response['expires_in'],id_token=token_response['id_token'], access_token=token_response['access_token'], refresh_token=token_response['refresh_token'])
+    
+    def callback(request):
+        user = authenticate(request, sso_authentication=True)
         
         if user != None:
             login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
-            # if next != None:
-            #     return redirect(next)
-            # else:
+            token = ExternalOauthAuthenticationBackend.get_token(user)
+            request.session.set_expiry((token.access_token_expiration - datetime.now()).total_seconds())
             return redirect("root")
         else:
             return redirect("auth")
