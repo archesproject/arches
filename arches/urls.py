@@ -72,7 +72,7 @@ from arches.app.views.auth import (
     TwoFactorAuthenticationLoginView,
     TwoFactorAuthenticationSettingsView,
     TwoFactorAuthenticationResetView,
-    ExternalOauth
+    ExternalOauth,
 )
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page

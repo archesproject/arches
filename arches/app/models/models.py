@@ -286,11 +286,10 @@ class EditLog(models.Model):
         managed = True
         db_table = "edit_log"
 
+
 class ExternalOauthToken(models.Model):
     token_id = models.UUIDField(primary_key=True, serialize=False, unique=True)
-    user = models.ForeignKey(
-        db_column="userid", null=False, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL
-    )
+    user = models.ForeignKey(db_column="userid", null=False, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)
     id_token = models.TextField()
     access_token_expiration = models.DateTimeField()
     access_token = models.TextField()
@@ -302,10 +301,11 @@ class ExternalOauthToken(models.Model):
         super(ExternalOauthToken, self).__init__(*args, **kwargs)
         if not self.token_id:
             self.token_id = uuid.uuid4()
-    
+
     class Meta:
         managed = True
         db_table = "external_oauth_tokens"
+
 
 class ResourceRevisionLog(models.Model):
     logid = models.UUIDField(primary_key=True)

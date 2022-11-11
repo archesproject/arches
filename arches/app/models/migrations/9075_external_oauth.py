@@ -4,6 +4,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -15,9 +16,12 @@ class Migration(migrations.Migration):
             name="ExternalOauthToken",
             fields=[
                 ("token_id", models.UUIDField(primary_key=True, serialize=False, unique=True)),
-                ("user", models.ForeignKey(
-                    db_column="userid", null=False, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
-                )),
+                (
+                    "user",
+                    models.ForeignKey(
+                        db_column="userid", null=False, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                    ),
+                ),
                 ("id_token", models.TextField()),
                 ("access_token", models.TextField()),
                 ("access_token_expiration", models.DateTimeField()),

@@ -345,7 +345,7 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
     "arches.app.utils.permission_backend.PermissionBackend",
     "guardian.backends.ObjectPermissionBackend",
-    "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend"
+    "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
 INSTALLED_APPS = (
@@ -471,7 +471,7 @@ EXTERNAL_OAUTH_CONFIGURATION = {
     "app_secret": "",
     "redirect_url": "",
     "scopes": "",
-    "authority": ""
+    "authority": "",
 }
 
 CACHES = {
