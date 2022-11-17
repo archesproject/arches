@@ -147,7 +147,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             user = User.objects.get(username=username)
             return ExternalOauthAuthenticationBackend.get_token(user), user
         except User.DoesNotExist:
-            return None
+            return (None, None)
 
     def get_oauth2_settings() -> dict or None:
         """Get oauth2 settings from oidc endpoint or settings.EXTERNAL_OAUTH_CONFIGURATION"""
