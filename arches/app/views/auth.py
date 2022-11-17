@@ -548,7 +548,7 @@ class ExternalOauth(View):
         username = request.GET.get("username", None)
 
         token, user = ExternalOauthAuthenticationBackend.get_token_for_username(username)
-        if token != None and token.access_token_expiration > datetime.now():
+        if token is not None and token.access_token_expiration > datetime.now():
             return ExternalOauth.log_user_in(request, user, next)
 
         authorization_url, state = ExternalOauthAuthenticationBackend.get_authorization_url(request)
@@ -566,7 +566,7 @@ class ExternalOauth(View):
         return ExternalOauth.log_user_in(request, user, next_url)
 
     def log_user_in(request, user, next_url):
-        if user != None:
+        if user is not None:
             login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
             return redirect(next_url)
         else:
