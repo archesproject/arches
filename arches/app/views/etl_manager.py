@@ -12,6 +12,7 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 logger = logging.getLogger(__name__)
 
+
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ETLManagerView(View):
     """

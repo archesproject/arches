@@ -548,22 +548,23 @@ class ExternalOauth(View):
         username = request.GET.get("username", None)
 
         token, user = ExternalOauthAuthenticationBackend.get_token_for_username(username)
-        if(token != None and token.access_token_expiration > datetime.now()):
+        if token != None and token.access_token_expiration > datetime.now():
             return ExternalOauth.log_user_in(request, user, next)
 
         authorization_url, state = ExternalOauthAuthenticationBackend.get_authorization_url(request)
-        request.session['oauth_state'] = state
-        request.session['next'] = next
-        request.session['user'] = username
+        request.session["oauth_state"] = state
+        request.session["next"] = next
+        request.session["user"] = username
         return redirect(authorization_url)
-    
-    @method_decorator(csrf_exempt, name="dispatch") #exempt; returned from other oauth2 authorization server, handled by 'oauth_state' in session
+
+    @method_decorator(
+        csrf_exempt, name="dispatch"
+    )  # exempt; returned from other oauth2 authorization server, handled by 'oauth_state' in session
     def callback(request):
-        next_url = request.session['next'] if 'next' in request.session else reverse('home')
-        user = authenticate(request, username=request.session['user'], sso_authentication=True)
+        next_url = request.session["next"] if "next" in request.session else reverse("home")
+        user = authenticate(request, username=request.session["user"], sso_authentication=True)
         return ExternalOauth.log_user_in(request, user, next_url)
-        
-    
+
     def log_user_in(request, user, next_url):
         if user != None:
             login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
