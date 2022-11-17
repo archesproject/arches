@@ -2,15 +2,17 @@ import logging
 from django.db import connection
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
+from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
+from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 logger = logging.getLogger(__name__)
 
-
+@method_decorator(group_required("Resource Editor"), name="dispatch")
 class ETLManagerView(View):
     """
     to get the ETL modules from db

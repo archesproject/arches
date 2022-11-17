@@ -56,11 +56,9 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
-from requests_oauthlib import OAuth2Session
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 class LoginView(View):
     def get(self, request):
@@ -546,31 +544,29 @@ class Token(View):
 
 class ExternalOauth(View):
     def start(request):
-        oauth2_settings = ExternalOauthAuthenticationBackend.get_oauth2_settings()
-        if oauth2_settings is None:
-            redirect("auth")
-
         next = request.GET.get("next", reverse("home"))
         username = request.GET.get("username", None)
-        client_id = settings.EXTERNAL_OAUTH_CONFIGURATION["app_id"]
-        redirect_uri = settings.EXTERNAL_OAUTH_CONFIGURATION["redirect_url"]
-        scope = settings.EXTERNAL_OAUTH_CONFIGURATION["scopes"]
-        auth_url = oauth2_settings["authorization_endpoint"]
-        # http://localhost:8009/auth/eoauth_cb?code=0.AX0AKoorpnCpRE20HSOFzaH9NLWrAObmKDhJusTLh-jyohScAFg.AgABAAIAAAD--DLA3VO7QrddgJg7WevrAgDs_wQA9P8alaO6kwqy1qX1248IuRh-0Ppelu-xD3JGIV4QJ6nxgPdlHirNt6edQ53MAphv6jJNZlL92Wu_W7QarbNR9cHTuCEYKvo7NzBUG1aSI-TYcaTEfAk7sxCMNN3fsXWe3JzOHu1ZoCe4tuS9ftIn-9uqImmMZVewt5yNodxGz5EBtAdSdzyDFEeRRAME011oy55PjZNoOHTybHnaaxdumZDYUdR6YShF9wCsbFtRPGFvc2pS3oqm85gdenmZiiF_p5nB0Hlrqje8H9BqKofQeOFSVb83fyN80YawMffHMfv8RzjO8SkktjqdAqoQrt-DKTCZCn-Px1IduFytVIG7z6IRegD0TV0lzBZ_xAxoZcrfN2CbGzFyJzKgbScGflzLVM2J_FrsOqD5fVMPBVkvnADjYEYlveIdws8rRYaAmes-kBj9nF2eLBQW62u-oddHKqhWQiPKegiAlAzcX3fS23bWg2SqgmLB9PTYkm3vApc1Bwk0nYFPjORYcpPgtwe8u-HsRpXtx3OBM0J1RKnCg6NW53sTl2JZYdNgf2Y3jGM19ECUhdU3w46VwwtQ7fiDKYn16F40-FDD05PFyqcOaQO_hTdJ8FsEjfIbr3r6kIer1fwPifydHNqaOLut9r38qWfpOfIMNZbgVLx0OjAsj2xXJn8e6XV6v5EXxa9jVuzy6Uj6P8XDb6Cdysxro0vtjVrLT9d5shq8zIrx6PqUo8hiI0rUPUa4PqAqlq5d2sDQSBCs5V-8tbE&state=pg4w2qJzjvZQDFpRvbuupaifjcOlEk&session_state=c1e94cdc-48af-46bf-98c9-6fb2fee8951a#
-        oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
-        # token = ExternalOauthAuthenticationBackend.get_token(user)
-        # if(token != None and token.access_token_expiration > datetime.now()):
-        #     return user
-        authorization_url, state = oauth.authorization_url(auth_url, next=next)
+
+        token, user = ExternalOauthAuthenticationBackend.get_token_for_username(username)
+        if(token != None and token.access_token_expiration > datetime.now()):
+            return ExternalOauth.log_user_in(request, user, next)
+
+        authorization_url, state = ExternalOauthAuthenticationBackend.get_authorization_url(request)
+        request.session['oauth_state'] = state
+        request.session['next'] = next
+        request.session['user'] = username
         return redirect(authorization_url)
-
+    
+    @method_decorator(csrf_exempt, name="dispatch") #exempt; returned from other oauth2 authorization server, handled by 'oauth_state' in session
     def callback(request):
-        user = authenticate(request, sso_authentication=True)
-
+        next_url = request.session['next'] if 'next' in request.session else reverse('home')
+        user = authenticate(request, username=request.session['user'], sso_authentication=True)
+        return ExternalOauth.log_user_in(request, user, next_url)
+        
+    
+    def log_user_in(request, user, next_url):
         if user != None:
             login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
-            token = ExternalOauthAuthenticationBackend.get_token(user)
-            request.session.set_expiry((token.access_token_expiration - datetime.now()).total_seconds())
-            return redirect("root")
+            return redirect(next_url)
         else:
             return redirect("auth")
