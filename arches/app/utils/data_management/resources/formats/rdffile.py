@@ -619,11 +619,7 @@ class JsonLdReader(Reader):
                             except:
                                 self.printline(f"Errored testing concept {uri} in collection {collid}", indent + 1)
                         elif self.is_semantic_node(o):
-                            if uri != "":
-                                if o["node_id"] in uri:
-                                    possible.append([o, "", potential_tile])
-                            else:
-                                possible.append([o, "", potential_tile])
+                            possible.append([o, "", potential_tile])
                         elif o["datatype"].accepts_rdf_uri(uri):
                             # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
                             possible.append([o, uri, potential_tile])
