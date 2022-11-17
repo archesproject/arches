@@ -89,7 +89,7 @@ class LoginView(View):
 
         if username is not None and password is None:
             try:
-                domain = username.split('@')[1]
+                domain = username.split("@")[1]
                 if domain == settings.EXTERNAL_OAUTH_CONFIGURATION["user_domain"]:
                     redirect_url = "eoauth_start?username={}".format(username)
                     return redirect(redirect_url)
@@ -98,12 +98,7 @@ class LoginView(View):
             return render(
                 request,
                 "login.htm",
-                {
-                    "username": username,
-                    "username_entered": True,
-                    "next": next,
-                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP
-                }
+                {"username": username, "username_entered": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP},
             )
 
         user = authenticate(username=username, password=password)
