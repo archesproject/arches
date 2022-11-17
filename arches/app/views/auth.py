@@ -566,7 +566,7 @@ class ExternalOauth(View):
     def start(request):
         next = request.GET.get("next", reverse("home"))
         username = request.GET.get("username", None)
-        print(username)
+
         token, user = ExternalOauthAuthenticationBackend.get_token_for_username(username)
         if token is not None and token.access_token_expiration > datetime.now():
             return ExternalOauth.log_user_in(request, user, next)
