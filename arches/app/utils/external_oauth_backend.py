@@ -83,7 +83,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                 return None
 
             token = ExternalOauthAuthenticationBackend.get_token(user)
-            if token != None and token.access_token_expiration > datetime.now():
+            if token is not None and token.access_token_expiration > datetime.now():
                 return user
 
             expiration_date = datetime.now() + timedelta(seconds=int(expires_in))
