@@ -9,7 +9,7 @@ import sys
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
-from arches.app.models.models import Value
+from arches.app.models.models import Value, EditLog
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
@@ -29,7 +29,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
+def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0, trueup=None):
     """
     Deletes any existing indicies from elasticsearch and then indexes all
     concepts and resources from the database
@@ -42,19 +42,20 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
     max_subprocesses - limits multiprocessing to a this number of processes. Default is half cpu count.
     """
 
-    index_concepts(clear_index=clear_index, batch_size=batch_size)
+    index_concepts(clear_index=clear_index, batch_size=batch_size, trueup=trueup)
     index_resources(
         clear_index=clear_index,
         batch_size=batch_size,
         quiet=quiet,
         use_multiprocessing=use_multiprocessing,
         max_subprocesses=max_subprocesses,
+        trueup=trueup
     )
-    index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
+    index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet, trueup=trueup)
 
 
 def index_resources(
-    clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
+    clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0, trueup=None
 ):
     """
     Indexes all resources from the database
@@ -80,6 +81,7 @@ def index_resources(
         quiet=quiet,
         use_multiprocessing=use_multiprocessing,
         max_subprocesses=max_subprocesses,
+        trueup=trueup
     )
 
 
@@ -174,7 +176,7 @@ def index_resources_using_singleprocessing(
     return os.getpid()
 
 def index_resources_by_type(
-    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0
+    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0, trueup:datetime=None
 ):
     """
     Indexes all resources of a given type(s)
@@ -220,17 +222,26 @@ def index_resources_by_type(
             rq.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
-            resources = [
-                str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
-            ]
+            if trueup is None:
+                resources = [
+                    str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
+                ]
+            else:
+                resources_ids = [EditLog.objects.filter(timestamp__gte=trueup).values_list("resourceinstanceid", flat=True)]
+                resources = [Resource.objects.filter(resourceinstanceid__in=resources_ids, graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)]
+
             index_resources_using_multiprocessing(
                 resourceids=resources, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses
             )
 
         else:
             from arches.app.search.search_engine_factory import SearchEngineInstance as _se
-
-            resources = Resource.objects.filter(graph_id=str(resource_type))
+            if trueup is None:
+                resources = Resource.objects.filter(graph_id=str(resource_type))
+            else:
+                resource_ids = [EditLog.objects.filter(timestamp__gte=trueup).values_list("resourceinstanceid", flat=True)]
+                resources = Resource.objects.filter(resourceinstanceid__in=resource_ids, graph_id=str(resource_type))
+            
             index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title=graph_name)
 
         q = Query(se=se)

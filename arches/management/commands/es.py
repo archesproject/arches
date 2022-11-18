@@ -52,6 +52,7 @@ class Command(BaseCommand):
                 "delete_indexes",
                 "index_database",
                 "reindex_database",
+                "trueup_index",
                 "index_concepts",
                 "index_resources",
                 "index_resources_by_type",
@@ -106,6 +107,16 @@ class Command(BaseCommand):
             type=int,
             default=settings.BULK_IMPORT_BATCH_SIZE,
             help="The number of records to index as a group, the larger the number to more memory required",
+        )
+
+        parser.add_argument(
+            "-tt",
+            "--trueup_time",
+            action="store",
+            dest="trueup_time",
+            type=int,
+            default=settings.BULK_IMPORT_BATCH_SIZE,
+            help="The time from which to trueup from the editlog.",
         )
 
         parser.add_argument(
@@ -179,6 +190,17 @@ class Command(BaseCommand):
                 max_subprocesses=options["max_subprocesses"],
             )
 
+
+        if options["operation"] == "trueup_index":
+            self.trueup_index(
+                batch_size=options["batch_size"],
+                name=options["name"],
+                quiet=options["quiet"],
+                use_multiprocessing=options["use_multiprocessing"],
+                max_subprocesses=options["max_subprocesses"],
+                trueup=options["trueup_time"]
+            )
+
         if options["operation"] == "index_concepts":
             index_database_util.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
 
@@ -222,7 +244,7 @@ class Command(BaseCommand):
         es_index = get_index(name)
         es_index.delete_index()
 
-    def index_database(self, batch_size, clear_index=True, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0):
+    def index_database(self, batch_size, clear_index=True, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0, trueup=None):
         if name is not None:
             index_database_util.index_custom_indexes(
                 index_name=name,
@@ -231,6 +253,7 @@ class Command(BaseCommand):
                 quiet=quiet,
                 use_multiprocessing=use_multiprocessing,
                 max_subprocesses=max_subprocesses,
+                trueup=trueup
             )
         else:
             index_database_util.index_db(
@@ -239,6 +262,7 @@ class Command(BaseCommand):
                 quiet=quiet,
                 use_multiprocessing=use_multiprocessing,
                 max_subprocesses=max_subprocesses,
+                trueup=trueup
             )
 
     def reindex_database(
@@ -258,6 +282,26 @@ class Command(BaseCommand):
             quiet=quiet,
             use_multiprocessing=use_multiprocessing,
             max_subprocesses=max_subprocesses,
+        )
+
+
+    def trueup_index(
+        self,
+        batch_size,
+        name=None,
+        quiet=False,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+        trueup=None
+    ):
+        self.index_database(
+            batch_size=batch_size,
+            clear_index=False,
+            name=name,
+            quiet=quiet,
+            use_multiprocessing=use_multiprocessing,
+            max_subprocesses=max_subprocesses,
+            trueup=trueup
         )
 
     def setup_indexes(self, name=None):
