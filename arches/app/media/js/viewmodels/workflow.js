@@ -223,11 +223,13 @@ define([
                 value = matchingWorkflowComponentAbstract;
                 
                 var workflowAbstractComponent = matchingWorkflowComponentAbstract[pathAsArray[1]];
+                console.log("DS()", value, workflowAbstractComponent)
                 
                 if (workflowAbstractComponent) {
                     value = ko.unwrap(workflowAbstractComponent.savedData);
                     
                     var updatedPath = pathAsArray.slice(2);
+                    console.log("()()", value, updatedPath)
                     
                     for (var chunk of updatedPath) {
                         if (value[chunk] !== undefined) {
@@ -236,7 +238,6 @@ define([
                     }
                 }
             }
-
             return value;
         };
 

@@ -8,6 +8,8 @@ define([
     return function(params) {
         var self = this;
 
+        console.log("!!!", params)
+
         if (!params.card && ko.unwrap(params.form.card)) {
             params.card = ko.unwrap(params.form.card);
         }

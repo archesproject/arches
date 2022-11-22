@@ -12293,6 +12293,7 @@ ul.select2-choices:after {
 
 .left-panel {
     flex: 0 0 300px;
+    min-width: 360px;
     overflow: hidden;
     z-index: 3;
 }

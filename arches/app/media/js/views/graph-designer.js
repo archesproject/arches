@@ -28,6 +28,86 @@ define([
         initialize: function(options) {
             var viewModel = options.viewModel;
 
+            viewModel.foo = () => {
+                const fooElement = document.querySelector('#foo')
+                const barElement = document.querySelector('#bar')
+
+                // console.log("()()()", fooElement, barElement)
+
+                fooElement.style.display = 'none'
+                barElement.style.display = 'block'
+            };
+
+
+            console.log(options, viewData, data)
+            viewModel.publicationHistory = data.publicationHistory;
+            viewModel.bar = ko.observable();
+            viewModel.bar.subscribe(function(publicationId) {
+                console.log("!#", publicationId)
+            })
+
+            viewModel.baz = () => {
+                console.log("!!!!", self, viewModel)
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(viewModel['publicationHistory'][0]),
+                    url: arches.urls.publish_foo(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        if (status === 'success') {
+                        }
+                        else {
+                        }
+                    }
+                });
+                
+                // let isGraphPublished = viewModel.isGraphPublished();
+
+                // if (isGraphPublished) {
+                //     viewModel.unpublishGraph();
+                // }
+
+                // viewModel.graph = koMapping.fromJS(viewModel.bar().serialized_graph);
+
+                // viewModel.graphModel = new GraphModel({
+                //     data: viewModel.bar().serialized_graph,
+                //     datatypes: data.datatypes,
+                //     ontology_namespaces: data.ontology_namespaces
+                // });
+
+                // viewModel.graphTree = new GraphTree({
+                //     graphModel: viewModel.graphModel,
+                //     graphSettings: viewModel.graphSettingsViewModel,
+                //     cardTree: viewModel.cardTree,
+                //     permissionTree: viewModel.permissionTree,
+                //     appliedFunctions: viewModel.appliedFunctions,
+                //     primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
+                //     restrictedNodegroups: data.restrictedNodegroups
+                // });
+
+                // if (isGraphPublished) {
+                //     viewModel.publishGraph();
+                // }
+            };
+
+            viewModel.qux = () => {
+                const oldView = document.querySelector('#qux');
+                const fooElement = document.querySelector('#foo')
+                const barElement = document.querySelector('#bar')
+
+                console.log(viewModel)
+
+
+                fooElement.style.display = 'none'
+                barElement.style.display = 'none'
+
+
+                oldView.style.display = 'block';
+            }
+
+
+
+
+
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');

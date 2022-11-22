@@ -235,6 +235,12 @@ class GraphDesignerView(GraphBaseView):
             ),
         )
 
+        publication_history = models.PublishedGraph.objects.filter(
+            publication_id__in=models.GraphXPublishedGraph.objects.filter(graph_id=graphid).values_list('publicationid', flat=True)
+        )
+
+        context['publication_history'] = JSONSerializer().serialize(publication_history)
+
         context["graphs"] = JSONSerializer().serialize(
             graph_models, exclude=["functions"]
         )  # returns empty array when called in 'get_context_data'
@@ -335,6 +341,8 @@ class GraphDataView(View):
             if self.action == "import_graph":
                 graph_file = request.FILES.get("importedGraph").read()
                 graphs = JSONDeserializer().deserialize(graph_file)["graph"]
+
+                import pdb; pdb.set_trace()
                 ret = GraphImporter.import_graph(graphs)
             else:
                 if graphid is not None:
@@ -468,6 +476,13 @@ class GraphDataView(View):
 
         return HttpResponseNotFound()
 
+class GraphPublicationFooView(View):
+    def post(self, request, graphid):
+        if request.body:
+            data = JSONDeserializer().deserialize(request.body)
+
+        import pdb; pdb.set_trace()
+        pass
 
 class GraphPublicationView(View):
     action = None

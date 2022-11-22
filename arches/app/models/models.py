@@ -76,6 +76,8 @@ class CardModel(models.Model):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
             return True
         else:
+            # import pdb; pdb.set_trace()
+            # print('!!!!!!!!!!!!!!!', self.nodegroup)
             return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     def __init__(self, *args, **kwargs):
