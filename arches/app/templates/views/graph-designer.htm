@@ -73,12 +73,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- ko foreach: { data: $data.publicationHistory, as: 'publicationHistory'} -->
             <div data-bind="click: function() { $parent.bar(publicationHistory) }">
                 <span data-bind="text: publicationHistory.publication_id" ></span>
+                <span data-bind="text: publicationHistory.notes" ></span>
             </div>
         <!-- /ko -->
     </div>
     <div>
         <!-- ko if: $data.bar() -->
-            <button data-bind="click: $data.baz" class="btn btn-info">SELECT THIS PUBLICATION</button>
+            <button data-bind="click: function() { $data.baz($data.bar().serialized_graph) }" class="btn btn-info">SELECT THIS PUBLICATION</button>
             <button class="btn btn-success" data-bind="click: $data.qux">FOO</button>
             <div data-bind="text: ko.toJSON($data.bar().serialized_graph)" ></div>
         <!-- /ko -->

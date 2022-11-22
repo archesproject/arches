@@ -516,8 +516,12 @@ class Graph(models.GraphModel):
                 node_constraint.save()
 
             if self.widgets:
-                for widget in self.widgets.values():
-                    widget.save()
+                # if isinstance(self.widgets, list):
+                #     for widget in self.widgets:
+                #         widget.save()
+                if isinstance(self.widgets, dict):
+                    for widget in self.widgets.values():
+                        widget.save()
 
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.

@@ -235,11 +235,26 @@ class GraphDesignerView(GraphBaseView):
             ),
         )
 
+        foo = models.GraphXPublishedGraph.objects.filter(graph_id=graphid)
+
         publication_history = models.PublishedGraph.objects.filter(
-            publication_id__in=models.GraphXPublishedGraph.objects.filter(graph_id=graphid).values_list('publicationid', flat=True)
+            publication_id__in=foo.values_list('publicationid', flat=True)
         )
 
-        context['publication_history'] = JSONSerializer().serialize(publication_history)
+        publication_id_to_publication_notes = {
+            str(bar.publicationid): bar.notes
+            for bar in foo
+        }
+
+        publication_history_json = JSONDeserializer().deserialize(JSONSerializer().serialize(publication_history))
+
+        for historical_publication in publication_history_json:
+            historical_publication['notes'] = publication_id_to_publication_notes.get(historical_publication['publication_id'])
+
+
+        # import pdb; pdb.set_trace()
+
+        context['publication_history'] = JSONSerializer().serialize(publication_history_json)
 
         context["graphs"] = JSONSerializer().serialize(
             graph_models, exclude=["functions"]
@@ -480,9 +495,11 @@ class GraphPublicationFooView(View):
     def post(self, request, graphid):
         if request.body:
             data = JSONDeserializer().deserialize(request.body)
+            foo = GraphImporter.import_graph([data])
 
-        import pdb; pdb.set_trace()
-        pass
+
+            # import pdb; pdb.set_trace()
+        return JSONResponse({"success": True})
 
 class GraphPublicationView(View):
     action = None

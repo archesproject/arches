@@ -43,16 +43,21 @@ define([
             viewModel.publicationHistory = data.publicationHistory;
             viewModel.bar = ko.observable();
             viewModel.bar.subscribe(function(publicationId) {
-                console.log("!#", publicationId)
+                console.log("!#", publicationId, viewModel)
             })
 
-            viewModel.baz = () => {
-                console.log("!!!!", self, viewModel)
+            viewModel.baz = (serialized_graph) => {
+                console.log("!!!!", serialized_graph, self, viewModel)
+                viewModel.loading(true);
+
                 $.ajax({
                     type: "POST",
-                    data: JSON.stringify(viewModel['publicationHistory'][0]),
+                    data: JSON.stringify(serialized_graph),
                     url: arches.urls.publish_foo(viewModel.graph.graphid()),
                     complete: function(response, status) {
+                        // viewModel.loading(false);
+                        window.location.reload();
+
                         if (status === 'success') {
                         }
                         else {
