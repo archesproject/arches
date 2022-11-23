@@ -158,7 +158,16 @@ def prepare_search_index(create=False):
                     "properties": {
                         "string": {
                             "type": "text",
-                            "fields": {"raw": {"type": "keyword"}, "folded": {"type": "text", "analyzer": "folding"}},
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                },
+                                "folded": {
+                                    "type": "text",
+                                    "analyzer": "folding"
+                                }
+                            },
                         },
                         "nodegroup_id": {"type": "keyword"},
                         "language": {"type": "text"},
