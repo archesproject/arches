@@ -27,7 +27,7 @@ define([
         self.showi18nOptions = ko.observable(false);
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
         const currentLanguage = {"code": arches.activeLanguage};
-        let currentValue = koMapping.toJS(self.value);
+        let currentValue = koMapping.toJS(self.value) || initialCurrent;
         self.currentLanguage = ko.observable(currentLanguage);
 
         if(self.form){
@@ -43,7 +43,6 @@ define([
         self.currentLanguage(languages.find(element => element.code == arches.activeLanguage));
 
         if(!currentValue?.[currentLanguage.code]){
-            currentValue ??= {};
             self.currentText = ko.observable('');
             self.currentDirection = ko.observable('ltr');
             currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
