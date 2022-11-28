@@ -356,12 +356,16 @@ class GraphDataView(View):
             if self.action == "import_graph":
                 graph_file = request.FILES.get("importedGraph").read()
                 graphs = JSONDeserializer().deserialize(graph_file)["graph"]
-
-                import pdb; pdb.set_trace()
                 ret = GraphImporter.import_graph(graphs)
             else:
                 if graphid is not None:
                     graph = Graph.objects.get(graphid=graphid)
+                    foo = graph.serialize()
+                    
+                    foo['publication_id'] = None
+                    graph = Graph(foo)
+
+                    # import pdb; pdb.set_trace()
                 data = JSONDeserializer().deserialize(request.body)
 
                 if self.action == "new_graph":
@@ -369,8 +373,11 @@ class GraphDataView(View):
                     name = _("New Resource Model") if isresource else _("New Branch")
                     author = request.user.first_name + " " + request.user.last_name
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
+                    ret.publish(user=None, notes='Created empty graph slug.')
 
                 elif self.action == "update_node":
+
+                    # import pdb; pdb.set_trace()
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
@@ -499,6 +506,11 @@ class GraphPublicationFooView(View):
 
 
             # import pdb; pdb.set_trace()
+        return JSONResponse({"success": True})
+
+class GraphPublicationBarView(View):
+    def post(self, request, graphid):
+        import pdb; pdb.set_trace()
         return JSONResponse({"success": True})
 
 class GraphPublicationView(View):

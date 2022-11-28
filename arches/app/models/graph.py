@@ -77,6 +77,9 @@ class Graph(models.GraphModel):
         self.temp_node_name = _("New Node")
         self.serialized_graph = None
 
+        if kwargs.get('foo'):
+            import pdb; pdb.set_trace()
+
         if args:
             if isinstance(args[0], dict):
 
@@ -259,9 +262,11 @@ class Graph(models.GraphModel):
             ontology=None,
             slug=None,
         )
+
         if not is_resource:
             nodegroup = models.NodeGroup.objects.create(pk=newid)
             models.CardModel.objects.create(nodegroup=nodegroup, name=name, graph=graph)
+
         root = models.Node.objects.create(
             pk=newid,
             name=_("Top Node"),
@@ -272,6 +277,10 @@ class Graph(models.GraphModel):
             nodegroup=nodegroup,
             graph=graph,
         )
+
+        # import pdb; pdb.set_trace
+
+        # graph.publish()
 
         return Graph.objects.get(pk=graph.graphid)
 
@@ -515,13 +524,9 @@ class Graph(models.GraphModel):
                 node_constraint.constraint = constraint_x_node["constraint"]
                 node_constraint.save()
 
-            if self.widgets:
-                # if isinstance(self.widgets, list):
-                #     for widget in self.widgets:
-                #         widget.save()
-                if isinstance(self.widgets, dict):
-                    for widget in self.widgets.values():
-                        widget.save()
+            if self.widgets and isinstance(self.widgets, dict):
+                for widget in self.widgets.values():
+                    widget.save()
 
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
@@ -1386,12 +1391,12 @@ class Graph(models.GraphModel):
             cards.append(card_dict)
         return cards
 
-    def get_widgets(self, use_raw_i18n_json=False):
+    def get_widgets(self, use_raw_i18n_json=False, force_recalculation=False):
         """
         get the widget data (if any) associated with this graph
 
         """
-        if self.serialized_graph:
+        if self.serialized_graph and not force_recalculation:
             return self.serialized_graph["widgets"]
         else:
             widgets = []

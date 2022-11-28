@@ -109,6 +109,39 @@ define([
                 oldView.style.display = 'block';
             }
 
+            viewModel.quux = () => {
+                const oldView = document.querySelector('#qux');
+                const fooElement = document.querySelector('#foo')
+                const barElement = document.querySelector('#bar')
+
+                console.log(viewModel)
+
+
+                fooElement.style.display = 'flex'
+                barElement.style.display = 'flex'
+
+
+                oldView.style.display = 'none';
+            }
+
+
+            viewModel.corge = () => {
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify({}),
+                    url: arches.urls.publish_bar(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        // viewModel.loading(false);
+                        // window.location.reload();
+
+                        if (status === 'success') {
+                        }
+                        else {
+                        }
+                    }
+                });
+            }
+
 
 
 
