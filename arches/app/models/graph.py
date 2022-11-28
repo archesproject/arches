@@ -1420,12 +1420,14 @@ class Graph(models.GraphModel):
                 return serialized_graph
             except:
                 self.refresh_from_database()
-                return self.serialize(fields=fields, exclude=exclude, force_recalculation=True, use_raw_i18n_json=use_raw_i18n_json, **kwargs)
+                return self.serialize(
+                    fields=fields, exclude=exclude, force_recalculation=True, use_raw_i18n_json=use_raw_i18n_json, **kwargs
+                )
 
         else:
             ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, use_raw_i18n_json=use_raw_i18n_json)
             ret["root"] = self.root
-            
+
             if "relatable_resource_model_ids" not in exclude:
                 ret["relatable_resource_model_ids"] = [
                     str(relatable_node.graph_id) for relatable_node in self.root.get_relatable_resources()
