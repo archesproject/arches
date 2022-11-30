@@ -26,6 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
+from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -35,6 +36,7 @@ from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation
+
 
 
 logger = logging.getLogger(__name__)
@@ -248,7 +250,7 @@ class Graph(models.GraphModel):
     def new(name="", is_resource=False, author=""):
         newid = uuid.uuid1()
         nodegroup = None
-        graph = models.GraphModel.objects.create(
+        graph_model = models.GraphModel.objects.create(
             name=name,
             subtitle="",
             author=author,
@@ -261,7 +263,7 @@ class Graph(models.GraphModel):
         )
         if not is_resource:
             nodegroup = models.NodeGroup.objects.create(pk=newid)
-            models.CardModel.objects.create(nodegroup=nodegroup, name=name, graph=graph)
+            models.CardModel.objects.create(nodegroup=nodegroup, name=name, graph=graph_model)
         root = models.Node.objects.create(
             pk=newid,
             name=_("Top Node"),
@@ -270,10 +272,13 @@ class Graph(models.GraphModel):
             ontologyclass=None,
             datatype="semantic",
             nodegroup=nodegroup,
-            graph=graph,
+            graph=graph_model,
         )
 
-        return Graph.objects.get(pk=graph.graphid)
+        graph = Graph.objects.get(pk=graph_model.graphid)
+        graph.publish(user=None, notes=_("New graph created."))
+
+        return graph
 
     def add_node(self, node, nodegroups=None):
         """
@@ -1709,13 +1714,46 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
+    def create_editable_future_graph(self):
+        """
+        Creates an additional entry in the Graphs table that represents an editable version of the current graph
+        """
+        previous_editable_future_graph = models.GraphModel.objects.get(original_graphid=self.graphid)
+        if previous_editable_future_graph:
+            previous_editable_future_graph.delete()
+
+        graph_copy = self.copy()
+
+        editable_future_graph = graph_copy['copy']
+        editable_future_graph.name = I18n_String(value={ 
+            key: value + '__EDITABLE_FUTURE_VERSION' for key, value in editable_future_graph.name.raw_value.items() 
+        })
+        editable_future_graph.original_graphid = self.graphid
+        
+        editable_future_graph.save()
+        return editable_future_graph
+
+    def consolidate_current_graph_with_editable_future_graph(self):
+        editable_future_graph = models.GraphModel.objects.get(original_graphid=self.graphid)
+
+        if not editable_future_graph:
+            return None
+        
+        # NEED TO: diff current graph and editable future graph, resolving differences to the current graph.
+        # a complexity here is that any nodes created in the future graph should retain their identifiers when
+        # moved to the current graph
+        pass
+
     def publish(self, user, notes=None):
         """
-        Adds a row to the GraphXPublishedGraph table
-        Assigns GraphXPublishedGraph id to Graph
+        Creates an additional entry in the Graphs table that represents an editable version 
+        of the current graph, adds a corresponding entry to the GraphXPublishedGraph table,
+        and creates a PublishedGraph entry for every active language
         """
         with transaction.atomic():
             try:
+                self.create_editable_future_graph()
+
                 publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,
                     notes=notes,
@@ -1747,8 +1785,10 @@ class Graph(models.GraphModel):
         """
         Unassigns GraphXPublishedGraph id from Graph
         """
-        self.publication = None
-        self.save(validate=False)
+        # CURRENT BRANCH REMOVE ABILITY TO UNPUBLISH
+        pass
+        # self.publication = None
+        # self.save(validate=False)
 
 
 class GraphValidationError(Exception):
