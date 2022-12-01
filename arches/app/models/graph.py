@@ -1718,7 +1718,7 @@ class Graph(models.GraphModel):
         """
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
-        previous_editable_future_graph = models.GraphModel.objects.get(original_graphid=self.graphid)
+        previous_editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
         if previous_editable_future_graph:
             previous_editable_future_graph.delete()
 
@@ -1728,13 +1728,13 @@ class Graph(models.GraphModel):
         editable_future_graph.name = I18n_String(
             value={key: value + "__EDITABLE_FUTURE_VERSION" for key, value in editable_future_graph.name.raw_value.items()}
         )
-        editable_future_graph.original_graphid = self.graphid
+        editable_future_graph.source_identifier = self.graphid
 
         editable_future_graph.save()
         return editable_future_graph
 
     def consolidate_current_graph_with_editable_future_graph(self):
-        editable_future_graph = models.GraphModel.objects.get(original_graphid=self.graphid)
+        editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
 
         if not editable_future_graph:
             return None

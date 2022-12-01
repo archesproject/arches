@@ -428,7 +428,7 @@ class GraphModel(models.Model):
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
-    original_graphid = models.UUIDField(blank=True, null=True)
+    source_identifier = models.UUIDField(blank=True, null=True)
 
     @property
     def disable_instance_creation(self):
