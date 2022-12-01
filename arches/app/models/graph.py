@@ -1739,8 +1739,8 @@ class Graph(models.GraphModel):
         if not editable_future_graph:
             return None
         
-        # NEED TO: diff current graph and editable future graph, resolving differences to the current graph.
-        # a complexity here is that any nodes created in the future graph should retain their identifiers when
+        # TODO: Diff current graph and editable future graph, resolving differences to the current graph.
+        # A complexity here is that any nodes created in the future graph should retain their identifiers when
         # moved to the current graph
         pass
 

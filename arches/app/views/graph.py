@@ -491,18 +491,6 @@ class GraphDataView(View):
         return HttpResponseNotFound()
 
 
-class GraphBarView(View):
-    def post(self, request, graphid):
-        graph = Graph.objects.get(graphid='7d39d082-7019-11ed-b83e-acde48001122')
-        future_graph = Graph.objects.get(graphid=graphid)
-
-
-
-        import pdb; pdb.set_trace()
-
-        return JSONResponse(graph)
-
-
 class GraphPublicationView(View):
     action = None
 
