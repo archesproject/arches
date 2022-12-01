@@ -276,7 +276,7 @@ class Graph(models.GraphModel):
         )
 
         graph = Graph.objects.get(pk=graph_model.graphid)
-        graph.publish(user=None, notes=_("New graph created."))
+        graph.create_editable_future_graph()
 
         return graph
 
@@ -1752,8 +1752,6 @@ class Graph(models.GraphModel):
         """
         with transaction.atomic():
             try:
-                self.create_editable_future_graph()
-
                 publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,
                     notes=notes,
