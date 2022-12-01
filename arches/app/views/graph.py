@@ -92,13 +92,9 @@ class GraphSettingsView(GraphBaseView):
         )
 
     def post(self, request, graphid):
-        foo = Graph.objects.get(graphid=graphid)
-        bar = foo.copy()
-        graph = bar["copy"]
-
+        graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
 
-        # import pdb; pdb.set_trace()
         for key, value in data.get("graph").items():
             if key in [
                 "iconclass",
@@ -364,8 +360,6 @@ class GraphDataView(View):
                     ret["updated_values"] = updated_values
                     ret["default_card_name"] = graph.temp_node_name
 
-                    # import pdb; pdb.set_trace()
-
                 elif self.action == "update_node_layer":
                     nodeid = uuid.UUID(str(data.get("nodeid")))
                     node = graph.nodes[nodeid]
@@ -387,19 +381,7 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == "append_node":
-                    # # _graph = graph
-                    # foo = graph.copy()
-                    # graph = foo['copy']
-
-                    # baz =  { key: value + '_FUTURE' for key, value in graph.name.raw_value.items() }
-                    # graph.name = I18n_String(value=baz)
-                    # # import pdb; pdb.set_trace()
-                    # graph.save()
-
-                    # bar = foo['nodes'][uuid.UUID(data['nodeid'])]
-
                     ret = graph.append_node(nodeid=data["nodeid"])
-
                     graph.save()
 
                 elif self.action == "move_node":

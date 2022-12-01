@@ -1746,8 +1746,7 @@ class Graph(models.GraphModel):
 
     def publish(self, user, notes=None):
         """
-        Creates an additional entry in the Graphs table that represents an editable version
-        of the current graph, adds a corresponding entry to the GraphXPublishedGraph table,
+        Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
         with transaction.atomic():
@@ -1783,10 +1782,8 @@ class Graph(models.GraphModel):
         """
         Unassigns GraphXPublishedGraph id from Graph
         """
-        # CURRENT BRANCH REMOVE ABILITY TO UNPUBLISH
-        pass
-        # self.publication = None
-        # self.save(validate=False)
+        self.publication = None
+        self.save(validate=False)
 
 
 class GraphValidationError(Exception):
