@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8974_rr_load_performance_v2'),
+        ("models", "8974_rr_load_performance_v2"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='graphmodel',
-            name='original_graphid',
+            model_name="graphmodel",
+            name="original_graphid",
             field=models.UUIDField(blank=True, null=True),
         )
     ]

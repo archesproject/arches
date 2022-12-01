@@ -38,8 +38,8 @@ from django.db.models.base import Deferred
 from django.utils import translation
 
 
-
 logger = logging.getLogger(__name__)
+
 
 class Graph(models.GraphModel):
     """
@@ -1724,12 +1724,12 @@ class Graph(models.GraphModel):
 
         graph_copy = self.copy()
 
-        editable_future_graph = graph_copy['copy']
-        editable_future_graph.name = I18n_String(value={ 
-            key: value + '__EDITABLE_FUTURE_VERSION' for key, value in editable_future_graph.name.raw_value.items() 
-        })
+        editable_future_graph = graph_copy["copy"]
+        editable_future_graph.name = I18n_String(
+            value={key: value + "__EDITABLE_FUTURE_VERSION" for key, value in editable_future_graph.name.raw_value.items()}
+        )
         editable_future_graph.original_graphid = self.graphid
-        
+
         editable_future_graph.save()
         return editable_future_graph
 
@@ -1746,7 +1746,7 @@ class Graph(models.GraphModel):
 
     def publish(self, user, notes=None):
         """
-        Creates an additional entry in the Graphs table that represents an editable version 
+        Creates an additional entry in the Graphs table that represents an editable version
         of the current graph, adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """

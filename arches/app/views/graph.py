@@ -94,7 +94,7 @@ class GraphSettingsView(GraphBaseView):
     def post(self, request, graphid):
         foo = Graph.objects.get(graphid=graphid)
         bar = foo.copy()
-        graph = bar['copy']
+        graph = bar["copy"]
 
         data = JSONDeserializer().deserialize(request.body)
 
@@ -396,12 +396,9 @@ class GraphDataView(View):
                     # # import pdb; pdb.set_trace()
                     # graph.save()
 
-
                     # bar = foo['nodes'][uuid.UUID(data['nodeid'])]
 
-
-                    ret = graph.append_node(nodeid=data['nodeid'])
-
+                    ret = graph.append_node(nodeid=data["nodeid"])
 
                     graph.save()
 
