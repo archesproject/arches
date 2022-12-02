@@ -82,7 +82,7 @@ class BaseImportModule(object):
                 )
                 return {"success": False, "data": "failed"}
 
-    def load_data_async(self,request):
+    def load_data_async(self, request):
         if task_management.check_if_celery_available():
             logger.info(_("Delegating load to Celery task"))
             self.run_load_task_async(request)
