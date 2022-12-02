@@ -1,10 +1,8 @@
 from datetime import datetime
-import io
 import json
 import logging
 import math
 import os
-import shutil
 import uuid
 import zipfile
 import arches.app.tasks as tasks
@@ -12,7 +10,6 @@ from django.core.files import File
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
-from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -22,7 +19,6 @@ from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
-import arches.app.utils.task_management as task_management
 from arches.app.etl_modules.base_import_module import BaseImportModule
 
 logger = logging.getLogger(__name__)
@@ -221,45 +217,8 @@ class BranchCsvImporter(BaseImportModule):
             AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""",
                 (error_message, self.loadid, self.loadid),
             )
-            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", (self.loadid,))
-            row = cursor.fetchall()
+        row = self.get_validation_result()
         return {"success": success, "data": row}
-
-    def complete_load(self, loadid, multiprocessing=True):
-        self.loadid = loadid
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-                row = cursor.fetchall()
-            except (IntegrityError, ProgrammingError) as e:
-                logger.error(e)
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                return {
-                    "status": 400,
-                    "success": False,
-                    "title": _("Failed to complete load"),
-                    "message": _("Unable to insert record into staging table"),
-                }
-            if row[0][0]:
-                cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                    ("completed", datetime.now(), loadid),
-                )
-                index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
-                cursor.execute(
-                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, loadid),
-                )
-                return {"success": True, "data": "success"}
-            else:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                return {"success": False, "data": "failed"}
 
     def read(self, request):
         self.loadid = request.POST.get("load_id")
@@ -307,6 +266,20 @@ class BranchCsvImporter(BaseImportModule):
                 result["message"] = _("Unable to initialize load")
         return {"success": result["started"], "data": result}
 
+    def run_load_task_async(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.file_details = request.POST.get("load_details", None)
+        result = {}
+        if self.file_details:
+            details = json.loads(self.file_details)
+            files = details["result"]["summary"]["files"]
+            summary = details["result"]["summary"]
+
+        tasks.load_branch_csv.apply_async(
+            (self.userid, files, summary, result, self.temp_dir, self.loadid),
+        )
+
     def write(self, request):
         self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
@@ -318,23 +291,7 @@ class BranchCsvImporter(BaseImportModule):
             summary = details["result"]["summary"]
             use_celery_file_size_threshold_in_MB = 0.1
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
-                if task_management.check_if_celery_available():
-                    logger.info(_("Delegating load to Celery task"))
-                    tasks.load_branch_csv.apply_async(
-                        (self.userid, files, summary, result, self.temp_dir, self.loadid),
-                    )
-                    result = _("delegated_to_celery")
-                    return {"success": True, "data": result}
-                else:
-                    err = _(
-                        "Unable to perform this operation because Celery does not appear to be running. Please contact your administrator."
-                    )
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                            ("failed", datetime.now(), self.loadid),
-                        )
-                    return {"success": False, "data": {"title": _("Error"), "message": err}}
+                response = self.load_data_async(request)
             else:
                 response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 
@@ -347,7 +304,7 @@ class BranchCsvImporter(BaseImportModule):
             cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
             result["validation"] = self.validate()
             if len(result["validation"]["data"]) == 0:
-                self.complete_load(loadid, multiprocessing=False)
+                self.save_to_tiles(loadid, multiprocessing=False)
             else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
@@ -356,16 +313,6 @@ class BranchCsvImporter(BaseImportModule):
         self.delete_from_default_storage(temp_dir)
         result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
-
-    def delete_from_default_storage(self, directory):
-        dirs, files = default_storage.listdir(directory)
-        for dir in dirs:
-            dir_path = os.path.join(directory, dir)
-            self.delete_from_default_storage(dir_path)
-        for file in files:
-            file_path = os.path.join(directory, file)
-            default_storage.delete(file_path)
-        default_storage.delete(directory)
 
     def download(self, request):
         format = request.POST.get("format")
