@@ -2758,9 +2758,9 @@ anymatch@~3.1.2:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.1.x:
-  version "7.1.0"
-  resolved "https://codeload.github.com/archesproject/arches-dev-dependencies/tar.gz/ab04bc385cfa6963e63769c287b28e26ca081858"
+arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.2.x:
+  version "7.2.0"
+  resolved "https://codeload.github.com/archesproject/arches-dev-dependencies/tar.gz/ec81715dce94b5d59fb7d5b6d6177234a367884e"
   dependencies:
     "@babel/core" "^7.16.7"
     "@babel/eslint-parser" "^7.18.2"
@@ -3224,10 +3224,9 @@ chrome-trace-event@^1.0.2:
   resolved "https://registry.yarnpkg.com/chrome-trace-event/-/chrome-trace-event-1.0.3.tgz#1015eced4741e15d06664a957dbbf50d041e26ac"
   integrity sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==
 
-ckeditor@^4.6.2:
-  version "4.12.1"
-  resolved "https://registry.yarnpkg.com/ckeditor/-/ckeditor-4.12.1.tgz#954a7b028dd611e44ba51cc7c2fe051cf1052186"
-  integrity sha512-pH2Su4oi0D4iN/3U8nUcwI7/lXHoOJi0aiN8e2zxnm4Ow5kq8eZP2ZGmpYyuqRyKZ2tHaU8+OyYi7laXcjiq9Q==
+ckeditor4@ckeditor/ckeditor4-releases#full/4.20.x:
+  version "4.20.1"
+  resolved "https://codeload.github.com/ckeditor/ckeditor4-releases/tar.gz/57330b55df70c77bb03194d9f948927a3e396f0e"
 
 clean-css@^5.2.2:
   version "5.3.1"

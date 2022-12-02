@@ -30,6 +30,7 @@ define([
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
+        CKEDITOR.config.editorplaceholder = 'FOOOOOOOO'
 
         direction.subscribe(newValue => {
             CKEDITOR.config.contentsLangDirection = newValue;
