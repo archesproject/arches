@@ -73,7 +73,10 @@ class RDMView(BaseManagerView):
 def get_sparql_providers(endpoint=None):
     sparql_providers = {}
     for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-        provider_class = provider["SPARQL_ENDPOINT_PROVIDER"][settings.LANGUAGE_CODE]["value"]
+        if isinstance(provider["SPARQL_ENDPOINT_PROVIDER"], str):
+            provider_class = provider["SPARQL_ENDPOINT_PROVIDER"]
+        else:
+            provider_class = provider["SPARQL_ENDPOINT_PROVIDER"][settings.LANGUAGE_CODE]["value"]
         Provider = import_string(provider_class)()
         sparql_providers[Provider.endpoint] = Provider
 
