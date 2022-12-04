@@ -107,7 +107,7 @@ class ConceptDataType(BaseConceptDataType):
         # first check to see if the validator has been passed a valid UUID,
         # which should be the case at this point. return error if not.
         if value is not None:
-            if type(value) == list:
+            if isinstance(value, list):
                 message = _("The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve")
                 error_message = self.create_error_message(value, source, row_number, message)
                 errors.append(error_message)

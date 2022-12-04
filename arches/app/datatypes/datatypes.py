@@ -357,9 +357,9 @@ class DateDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         value = None if value == "" else value
         if value is not None:
-            if type(value) == list:
+            if isinstance(value, list):
                 value = value[0]
-            elif type(value) == str and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
+            elif isinstance(value, str) and len(value) < 4 and value.startswith("-") is False:  # a year before 1000 but not BCE
                 value = value.zfill(4)
             valid_date_format, valid = self.get_valid_date_format(value)
             if valid:

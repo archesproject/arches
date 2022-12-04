@@ -720,7 +720,7 @@ class ResourceXResource(models.Model):
         if deletedResourceId and self.tileid and self.nodeid:
             newTileData = []
             data = self.tileid.data[str(self.nodeid_id)]
-            if type(data) != list:
+            if not isinstance(data, list):
                 data = [data]
             for relatedresourceItem in data:
                 if relatedresourceItem["resourceId"] != str(deletedResourceId):
