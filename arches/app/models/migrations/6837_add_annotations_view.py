@@ -12,14 +12,14 @@ class Migration(migrations.Migration):
         DROP VIEW IF EXISTS vw_annotations;
 
         CREATE OR REPLACE VIEW vw_annotations AS
-        SELECT json_array_elements(t.tiledata::json->n.nodeid::text->'features')->>'id' as feature_id,
+        SELECT json_array_elements(t.tiledata::json->n.nodeid::text->'features')->>'id' AS feature_id,
             t.tileid,
             t.tiledata,
             t.resourceinstanceid,
             t.nodegroupid,
             n.nodeid,
-            json_array_elements(t.tiledata::json->n.nodeid::text->'features') as feature,
-            json_array_elements(t.tiledata::json->n.nodeid::text->'features')->'properties'->>'canvas' as canvas
+            jsonb_array_elements(t.tiledata::jsonb->n.nodeid::text->'features') AS feature,
+            json_array_elements(t.tiledata::json->n.nodeid::text->'features')->'properties'->>'canvas' AS canvas
         FROM tiles t
             LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
         WHERE (

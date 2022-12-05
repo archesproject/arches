@@ -37,11 +37,17 @@
 <div class="iiif-image-tools">
     <div class="form-group">
         <div class="row widget-wrapper">
+<<<<<<< HEAD
         <label class="control-label">
             <span data-bind="text: $root.translations.title"></span>
         </label>
         <input type="text" class="form-control input-lg" style="height: 36px;"
             data-bind="attr:{placeholder: $root.translations.serviceTitle}, textInput: self.manifestName, valueUpdate: 'keyup'">
+=======
+        <label class="control-label">{% trans "Image Service Title" %}</label>
+        <input type="text" placeholder="Service Title" class="form-control input-lg" style="height: 36px;"
+            data-bind="textInput: self.manifestName, valueUpdate: 'keyup'">
+>>>>>>> 567df36d46cb57ee6d566c194d79cec821bc17c0
         </div>  
         <div class="row widget-wrapper">  
         <label class="control-label">

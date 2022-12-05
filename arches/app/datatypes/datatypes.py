@@ -929,22 +929,26 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 arches_geojson = {}
                 arches_geojson["type"] = "FeatureCollection"
                 arches_geojson["features"] = []
-                geometry = GEOSGeometry(value, srid=4326)
-                if geometry.geom_type == "GeometryCollection":
-                    for geom in geometry:
+                try:
+                    geometry = GEOSGeometry(value, srid=4326)
+                    if geometry.geom_type == "GeometryCollection":
+                        for geom in geometry:
+                            arches_json_geometry = {}
+                            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                            arches_json_geometry["type"] = "Feature"
+                            arches_json_geometry["id"] = str(uuid.uuid4())
+                            arches_json_geometry["properties"] = {}
+                            arches_geojson["features"].append(arches_json_geometry)
+                    else:
                         arches_json_geometry = {}
-                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                         arches_json_geometry["type"] = "Feature"
                         arches_json_geometry["id"] = str(uuid.uuid4())
                         arches_json_geometry["properties"] = {}
                         arches_geojson["features"].append(arches_json_geometry)
-                else:
-                    arches_json_geometry = {}
-                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-                    arches_json_geometry["type"] = "Feature"
-                    arches_json_geometry["id"] = str(uuid.uuid4())
-                    arches_json_geometry["properties"] = {}
-                    arches_geojson["features"].append(arches_json_geometry)
+                except ValueError:
+                    if value in ("", None, "None"):
+                        return None
 
         return arches_geojson
 
@@ -1611,7 +1615,7 @@ class FileListDataType(BaseDataType):
                     for file_json in current_tile_data[nodeid]:
                         if file_json["name"] == file_data.name and file_json["url"] is None:
                             file_json["file_id"] = str(file_model.pk)
-                            file_json["url"] = "/files/" + str(file_model.fileid)
+                            file_json["url"] = settings.MEDIA_URL + str(file_model.fileid)
                             file_json["status"] = "uploaded"
                             resave_tile = True
                         updated_file_records.append(file_json)
@@ -1687,7 +1691,7 @@ class FileListDataType(BaseDataType):
             else:
                 models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
 
-            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
             tile_file["accepted"] = True
             compatible_renderers = self.get_compatible_renderers(tile_file)
             if len(compatible_renderers) == 1:
@@ -1701,7 +1705,7 @@ class FileListDataType(BaseDataType):
             for file in tile.data[nodeid]:
                 try:
                     if file["file_id"]:
-                        if file["url"] == "/files/{}".format(file["file_id"]):
+                        if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
                             file_path = "uploadedfiles/" + file["name"]
                             try:
@@ -1911,7 +1915,7 @@ class DomainDataType(BaseDomainDataType):
             except ValueError:
                 try:
                     value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
-                except KeyError:
+                except Exception:
                     value = value
         return value
 
@@ -2191,33 +2195,37 @@ class ResourceInstanceDataType(BaseDataType):
             for resourceXresourceId in resourceXresourceIds:
                 resourceid = resourceXresourceId["resourceId"]
                 try:
-                    if not node:
-                        node = models.Node.objects.get(pk=nodeid)
-                    if node.config["searchString"] != "":
-                        dsl = node.config["searchDsl"]
-                        if dsl:
-                            query = Query(se)
-                            bool_query = Bool()
-                            ri_query = Dsl(dsl)
-                            bool_query.must(ri_query)
-                            ids_query = Dsl({"ids": {"values": [resourceid]}})
-                            bool_query.must(ids_query)
-                            query.add_query(bool_query)
-                            try:
-                                results = query.search(index=RESOURCES_INDEX)
-                                count = results["hits"]["total"]["value"]
-                                assert count == 1
-                            except:
-                                raise ObjectDoesNotExist()
-                    if len(node.config["graphs"]) > 0:
-                        graphids = map(lambda x: x["graphid"], node.config["graphs"])
-                        if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
-                            raise ObjectDoesNotExist()
-                except ObjectDoesNotExist:
-                    message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
-                    error_type = "WARNING"
+                    uuid.UUID(resourceid)
                     if strict:
-                        error_type = "ERROR"
+                        try:
+                            if not node:
+                                node = models.Node.objects.get(pk=nodeid)
+                            if node.config["searchString"] != "":
+                                dsl = node.config["searchDsl"]
+                                if dsl:
+                                    query = Query(se)
+                                    bool_query = Bool()
+                                    ri_query = Dsl(dsl)
+                                    bool_query.must(ri_query)
+                                    ids_query = Dsl({"ids": {"values": [resourceid]}})
+                                    bool_query.must(ids_query)
+                                    query.add_query(bool_query)
+                                    try:
+                                        results = query.search(index=RESOURCES_INDEX)
+                                        count = results["hits"]["total"]["value"]
+                                        assert count == 1
+                                    except:
+                                        raise ObjectDoesNotExist()
+                            if len(node.config["graphs"]) > 0:
+                                graphids = map(lambda x: x["graphid"], node.config["graphs"])
+                                if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
+                                    raise ObjectDoesNotExist()
+                        except ObjectDoesNotExist:
+                            message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
+                            errors.append({"type": "ERROR", "message": message})
+                except ValueError:
+                    message = _("The related resource with id '{0}' is not a valid uuid.".format(resourceid))
+                    error_type = "ERROR"
                     errors.append({"type": error_type, "message": message})
         return errors
 
@@ -2289,7 +2297,10 @@ class ResourceInstanceDataType(BaseDataType):
             return json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
-            return ast.literal_eval(value)
+            try:
+                return ast.literal_eval(value)
+            except:
+                return None
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
@@ -2457,7 +2468,10 @@ class AnnotationDataType(BaseDataType):
             return json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
-            return ast.literal_eval(value)
+            try:
+                return ast.literal_eval(value)
+            except:
+                return None
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
