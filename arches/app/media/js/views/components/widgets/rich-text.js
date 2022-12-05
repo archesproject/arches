@@ -41,7 +41,7 @@ define([
         self.languages =  ko.observableArray(languages);
         self.currentLanguage(languages.find(element => element.code == arches.activeLanguage));
 
-        if(!currentValue?.[currentLanguage.code]){
+        if(currentValue && !currentValue?.[currentLanguage.code]){
             self.currentText = ko.observable('');
             self.currentDirection = ko.observable('ltr');
             currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};

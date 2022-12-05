@@ -30,6 +30,7 @@ define([
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
+        CKEDITOR.config.editorplaceholder = 'fooo'
 
         direction.subscribe(newValue => {
             CKEDITOR.config.contentsLangDirection = newValue;
@@ -97,7 +98,7 @@ define([
     ko.bindingHandlers.ckeditor = {
         init: (element, valueAccessor, allBindings) => {
             window.jQuery = $;
-            require(['ckeditor', 'ckeditor-jquery'], () => {
+            require(['ckeditor4', 'ckeditor-jquery'], () => {
                 initialize(element, valueAccessor, allBindings);
             });
         }
