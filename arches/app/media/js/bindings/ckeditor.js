@@ -30,6 +30,7 @@ define([
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
+        CKEDITOR.config.removeButtons = 'Save,NewPage,Preview,Print,Templates,ExportPdf,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Subscript,Superscript,CopyFormatting,CreateDiv,BidiLtr,BidiRtl,Language,Image,Smiley,PageBreak,Iframe,Font,FontSize,TextColor,BGColor,Maximize,ShowBlocks';
         CKEDITOR.config.editorplaceholder = 'fooo'
 
         direction.subscribe(newValue => {

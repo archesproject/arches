@@ -58,6 +58,14 @@
 </div>
 {% endblock form %}
 
+{% block config_form %}
+<div class="control-label">
+    <span data-bind="text: $root.translations.placeholder"></span>
+</div>
+
+<textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+{% endblock config_form %}
+
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd data-bind="html: strippedValue || $root.translations.none"></dd>
