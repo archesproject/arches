@@ -17,18 +17,24 @@ class Migration(migrations.Migration):
             field=models.UUIDField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='cardmodel',
-            name='source_identifier',
-            field=models.ForeignKey(blank=True, db_column='source_identifier', null=True, on_delete=models.deletion.DO_NOTHING, to='models.cardmodel'),
+            model_name="cardmodel",
+            name="source_identifier",
+            field=models.ForeignKey(
+                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.DO_NOTHING, to="models.cardmodel"
+            ),
         ),
         migrations.AddField(
-            model_name='edge',
-            name='source_identifier',
-            field=models.ForeignKey(blank=True, db_column='source_identifier', null=True, on_delete=models.deletion.CASCADE, to='models.edge'),
+            model_name="edge",
+            name="source_identifier",
+            field=models.ForeignKey(
+                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.edge"
+            ),
         ),
         migrations.AddField(
-            model_name='node',
-            name='source_identifier',
-            field=models.ForeignKey(blank=True, db_column='source_identifier', null=True, on_delete=models.deletion.CASCADE, to='models.node'),
+            model_name="node",
+            name="source_identifier",
+            field=models.ForeignKey(
+                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.node"
+            ),
         ),
     ]
