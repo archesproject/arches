@@ -538,6 +538,12 @@ class Graph(models.GraphModel):
     def delete(self):
         if self.is_editable() is True:
             with transaction.atomic():
+                try:
+                    editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+                    editable_future_graph.delete()
+                except models.GraphModel.DoesNotExist:
+                    pass # no editable future graph to delete
+
                 for nodegroup in self.get_nodegroups():
                     nodegroup.delete()
 
