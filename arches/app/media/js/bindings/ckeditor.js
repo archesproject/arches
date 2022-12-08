@@ -30,8 +30,22 @@ define([
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
-        CKEDITOR.config.removeButtons = 'Save,NewPage,Preview,Print,Templates,ExportPdf,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Subscript,Superscript,CopyFormatting,CreateDiv,BidiLtr,BidiRtl,Language,Image,Smiley,PageBreak,Iframe,Font,FontSize,TextColor,BGColor,Maximize,ShowBlocks';
-        CKEDITOR.config.editorplaceholder = 'fooo'
+        CKEDITOR.config.toolbar = [
+            { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+            { name: 'editing', groups: [ /* 'find' , 'selection',*/ 'spellchecker' ], items: [ /* 'Find', 'Replace', '-', 'SelectAll', '-',*/ 'Scayt' ] },
+            { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+            // { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+            { name: 'insert', items: [ 'Image', /*'Flash',*/ 'Table', 'HorizontalRule', /*'Smiley',*/ 'SpecialChar', 'PageBreak', /*'Iframe'*/ ] },
+            { name: 'tools', items: [ 'Maximize', /*'ShowBlocks'*/ ] },
+            '/',
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', /*'Subscript', 'Superscript',*/ '-', 'RemoveFormat' ] },
+            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', /*'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language'*/ ] },
+            { name: 'styles', items: [ 'Styles', 'Format', /*'Font', 'FontSize'*/ ] },
+            // { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+            // { name: 'others', items: [ '-' ] },
+            { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', /*'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates'*/ ] },
+            { name: 'about', items: [ 'About' ] }
+        ];
 
         direction.subscribe(newValue => {
             CKEDITOR.config.contentsLangDirection = newValue;
@@ -50,6 +64,11 @@ define([
         // Set initial value and create the CKEditor
         $element.html(value);
         var editor = $element.ckeditor(options).editor;
+
+        const placeholder = allBindings.get('placeholder')
+        if (placeholder) {
+            editor.config.editorplaceholder = ko.unwrap(allBindings.get('placeholder'));
+        }
 
         allBindings()?.attr?.disabled?.subscribe(disabled => {
             if(CKEDITOR.currentInstance && disabled === true || disabled === false) {

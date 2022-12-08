@@ -18,8 +18,9 @@ define([
     */
 
     const viewModel = function(params) {
-        params.configKeys = ['displayfullvalue'];
+        params.configKeys = ['placeholder', 'displayfullvalue'];
         const self = this;
+        self.card = params.card;
          
         WidgetViewModel.apply(self, [params]);
         const initialCurrent = {};
@@ -50,6 +51,15 @@ define([
             self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
         }
 
+        // self.cur.subscribe(newValue => {
+        //     console.log("11111", newValue)
+        //     // const currentLanguage = self.currentDefaultLanguage();
+        //     // if(!currentLanguage) { return; }
+        //     // currentDefaultValue[currentLanguage.code].value = newValue;
+        //     // self.defaultValue(currentDefaultValue);
+        //     // self.card._card.valueHasMutated();
+        // });
+
         self.strippedValue = ko.pureComputed(() => {
             return $(`<span>${self.currentText()}</span>`).text();
         });
@@ -58,7 +68,20 @@ define([
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
-            currentValue[currentLanguage.code].value = newValue;
+
+            if (currentValue) {
+                currentValue[currentLanguage.code].value = newValue;
+            }
+            // else {
+            // }
+            // self.card._card.valueHasMutated();
+            var foo = self.config();
+
+            foo.placeholder = 'bar';
+
+            self.config(foo)
+            console.log("()()#", self, params)
+
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
@@ -68,7 +91,10 @@ define([
         self.currentDirection.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
-            currentValue[currentLanguage.code].direction = newValue;
+
+            if (currentValue) {
+                currentValue[currentLanguage.code].direction = newValue;
+            }
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {

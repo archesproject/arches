@@ -52,7 +52,18 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+            <textarea 
+                rows="10" 
+                cols="80" 
+                data-bind="
+                    ckeditor: currentText, 
+                    language: currentLanguage.code, 
+                    direction: currentDirection, 
+                    placeholder: placeholder, 
+                    ckeditorOptions: {},  
+                    valueUpdate: 'afterkeydown', 
+                    attr: {disabled: disabled}
+                "></textarea>
         </div>
     </div>
 </div>
@@ -63,7 +74,20 @@
     <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 
-<textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+<textarea 
+    rows="10" 
+    cols="80" 
+    class="form-control input-md widget-input" 
+    data-bind="
+        ckeditor: currentText, 
+        language: currentLanguage.code, 
+        direction: currentDirection,
+        placeholder: placeholder,
+        ckeditorOptions: {},  
+        valueUpdate: 'afterkeydown', 
+        attr: {disabled: disabled}
+    "
+></textarea>
 {% endblock config_form %}
 
 {% block report %}
