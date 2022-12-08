@@ -121,17 +121,23 @@ def sort(object, dict_key=None):
 
 
 def get_graphs_for_export(graphids=None):
+    def get_original_graphs(graphs):
+        for i in range(len(graphs)):
+            if graphs[i].source_identifier is not None:
+                graphs[i] = Graph.objects.get(pk=graphs[i].source_identifier)
+        return graphs
+
     graphs = {}
     graphs["graph"] = []
     if graphids is None or graphids[0] == "all" or graphids == [""]:
-        resource_graphs = Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resource_graphs = Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).filter(source_identification__isnull=False)
     elif graphids[0] == "resource_models":
-        resource_graphs = Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resource_graphs = Graph.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).filter(source_identification__isnull=False)
     elif graphids[0] == "branches":
-        resource_graphs = Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        resource_graphs = Graph.objects.filter(isresource=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).filter(source_identification__isnull=False)
     else:
         try:
-            resource_graphs = Graph.objects.filter(graphid__in=graphids)
+            resource_graphs = get_original_graphs(list(Graph.objects.filter(graphid__in=graphids)))
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
             print("*" * 80)
