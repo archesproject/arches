@@ -43,7 +43,7 @@ define([
                     return graph.isresource;
                 });
             });
-            options.viewModel.createableResources = ko.observableArray(data.createableResources.filter(currentGraph => currentGraph.source_identifier === null));
+            options.viewModel.createableResources = ko.observableArray(data.createableResources.filter(currentGraph => currentGraph.source_identifier === null)); 
             options.viewModel.userCanReadResources = data.userCanReadResources;
             options.viewModel.userCanEditResources = data.userCanEditResources;
 
