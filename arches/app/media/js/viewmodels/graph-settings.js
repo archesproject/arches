@@ -17,7 +17,7 @@ define([
         self.relatable_resources = ko.computed(function() {
             return _.each(self.resource_data(), function(resource) {
                 resource.isRelatable = ko.observable(resource.is_relatable);
-            });
+            }).filter(resource => !resource.graph.source_identifier);
         });
 
         self.designerViewModel = params.designerViewModel;

@@ -177,7 +177,7 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
+        self.graph = Graph.objects.get(source_identifier=graphid)
         serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
         datatypes = models.DDataType.objects.all()
