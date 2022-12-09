@@ -276,7 +276,6 @@ class Graph(models.GraphModel):
         )
 
         graph = Graph.objects.get(pk=graph_model.graphid)
-        graph.create_editable_future_graph()
 
         return graph
 
