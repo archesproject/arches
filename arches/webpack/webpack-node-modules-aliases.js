@@ -18,7 +18,7 @@ module.exports = {
         "d3": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/d3/dist/d3.min`)",
         "dropzone": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/dropzone/dist/min/dropzone-amd-module.min`)",
         "ckeditor4": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor4/ckeditor`)",
-        "ckeditor-jquery": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor/adapters/jquery`)",
+        "ckeditor-jquery": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor4/adapters/jquery`)",
         "knockout": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/knockout/build/output/knockout-latest`)",
         "knockout-mapping": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/knockout-mapping/dist/knockout.mapping.min`)",
         "moment": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/moment/moment.js`)",
