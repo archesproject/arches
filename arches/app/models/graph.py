@@ -1724,7 +1724,11 @@ class Graph(models.GraphModel):
         """
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
-        previous_editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+        try:
+            previous_editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+        except models.GraphModel.DoesNotExist:
+            previous_editable_future_graph = None
+
         if previous_editable_future_graph:
             previous_editable_future_graph.delete()
 
