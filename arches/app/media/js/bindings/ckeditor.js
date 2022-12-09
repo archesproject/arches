@@ -65,7 +65,7 @@ define([
         $element.html(value);
         var editor = $element.ckeditor(options).editor;
 
-        const placeholder = allBindings.get('placeholder')
+        const placeholder = allBindings.get('placeholder');
         if (placeholder) {
             editor.config.editorplaceholder = ko.unwrap(allBindings.get('placeholder'));
         }

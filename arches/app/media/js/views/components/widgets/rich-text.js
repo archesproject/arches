@@ -51,36 +51,24 @@ define([
             self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
         }
 
-        // self.cur.subscribe(newValue => {
-        //     console.log("11111", newValue)
-        //     // const currentLanguage = self.currentDefaultLanguage();
-        //     // if(!currentLanguage) { return; }
-        //     // currentDefaultValue[currentLanguage.code].value = newValue;
-        //     // self.defaultValue(currentDefaultValue);
-        //     // self.card._card.valueHasMutated();
-        // });
-
         self.strippedValue = ko.pureComputed(() => {
             return $(`<span>${self.currentText()}</span>`).text();
         });
 
         self.strippedValue();
+
+        self.defaultText = ko.observable();
+        self.defaultText.subscribe(newValue => {
+            const config = self.config();
+            config.placeholder = newValue;
+            self.config(config);
+        });
+
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
-            if (currentValue) {
-                currentValue[currentLanguage.code].value = newValue;
-            }
-            // else {
-            // }
-            // self.card._card.valueHasMutated();
-            var foo = self.config();
-
-            foo.placeholder = 'bar';
-
-            self.config(foo)
-            console.log("()()#", self, params)
+            currentValue[currentLanguage.code].value = newValue;
 
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
@@ -92,9 +80,8 @@ define([
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
-            if (currentValue) {
-                currentValue[currentLanguage.code].direction = newValue;
-            }
+            currentValue[currentLanguage.code].direction = newValue;
+
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
