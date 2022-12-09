@@ -85,8 +85,23 @@ class LoginView(View):
         # POST request is taken to mean user is logging in
         username = request.POST.get("username", None)  # user-input value, NOT source of truth
         password = request.POST.get("password", None)  # user-input value, NOT source of truth
-        user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
+
+        if username is not None and password is None:
+            try:
+                domain = username.split("@")[1]
+                if domain == settings.EXTERNAL_OAUTH_CONFIGURATION["user_domain"]:
+                    redirect_url = "eoauth_start?username={}".format(username)
+                    return redirect(redirect_url)
+            except:
+                pass
+            return render(
+                request,
+                "login.htm",
+                {"username": username, "username_entered": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP},
+            )
+
+        user = authenticate(username=username, password=password)
 
         if user is not None and user.is_active:
             if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
