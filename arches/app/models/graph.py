@@ -776,7 +776,7 @@ class Graph(models.GraphModel):
             function_copy = models.FunctionXGraph(function=function_x_graph.function, config=config_copy, graph=self)
             function_copy.save()
 
-    def copy(self, root=None):
+    def copy(self, root=None, set_source=False):
         """
         returns an unsaved copy of self
 
@@ -833,6 +833,8 @@ class Graph(models.GraphModel):
                 copy_of_self.root = node
             node.graph = copy_of_self
             is_collector = node.is_collector
+            if set_source:
+                node.source_identifier = node.pk
             node.pk = uuid.uuid1()
             node_map[node_id] = node.pk
 
@@ -844,6 +846,8 @@ class Graph(models.GraphModel):
                 for card in copy_of_self.cards.values():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         new_id = uuid.uuid1()
+                        if set_source:
+                            card.source_identifier = card.pk
                         card_map[card.pk] = new_id
                         card.pk = new_id
                         card.nodegroup = node.nodegroup
@@ -862,6 +866,8 @@ class Graph(models.GraphModel):
         copy_of_self.nodes = {node.pk: node for node_id, node in copy_of_self.nodes.items()}
 
         for edge_id, edge in copy_of_self.edges.items():
+            if set_source:
+                edge.source_identifier = edge.pk
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
             copied_domainnode = edge.domainnode
@@ -1722,7 +1728,7 @@ class Graph(models.GraphModel):
         if previous_editable_future_graph:
             previous_editable_future_graph.delete()
 
-        graph_copy = self.copy()
+        graph_copy = self.copy(set_source=True)
 
         editable_future_graph = graph_copy["copy"]
         editable_future_graph.name = I18n_String(
