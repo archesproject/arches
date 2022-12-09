@@ -30,6 +30,7 @@ define([
         CKEDITOR.config.language_list = languageList;
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
+        CKEDITOR.config.autoParagraph = false;
         CKEDITOR.config.toolbar = [
             { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
             { name: 'editing', groups: [ /* 'find' , 'selection',*/ 'spellchecker' ], items: [ /* 'Find', 'Replace', '-', 'SelectAll', '-',*/ 'Scayt' ] },
@@ -67,7 +68,11 @@ define([
 
         const placeholder = allBindings.get('placeholder');
         if (placeholder) {
-            editor.config.editorplaceholder = ko.unwrap(allBindings.get('placeholder'));
+            editor.config.editorplaceholder = ko.unwrap(placeholder);
+
+            if (allBindings.get('isConfigForm')) {
+                $element[0].defaultValue = ko.unwrap(placeholder);
+            }
         }
 
         allBindings()?.attr?.disabled?.subscribe(disabled => {
