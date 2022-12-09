@@ -834,7 +834,7 @@ class Graph(models.GraphModel):
             node.graph = copy_of_self
             is_collector = node.is_collector
             if set_source:
-                node.source_identifier = node.pk
+                node.source_identifier_id = node.pk
             node.pk = uuid.uuid1()
             node_map[node_id] = node.pk
 
@@ -847,7 +847,7 @@ class Graph(models.GraphModel):
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         new_id = uuid.uuid1()
                         if set_source:
-                            card.source_identifier = card.pk
+                            card.source_identifier_id = card.pk
                         card_map[card.pk] = new_id
                         card.pk = new_id
                         card.nodegroup = node.nodegroup
@@ -867,7 +867,7 @@ class Graph(models.GraphModel):
 
         for edge_id, edge in copy_of_self.edges.items():
             if set_source:
-                edge.source_identifier = edge.pk
+                edge.source_identifier_id = edge.pk
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
             copied_domainnode = edge.domainnode
