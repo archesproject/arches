@@ -24,6 +24,8 @@ define([
         WidgetViewModel.apply(this, [params]);
         const self = this;
 
+        console.log('@@@', self, params)
+
         self.card = params.card;
         self.currentLanguage = ko.observable({code: arches.activeLanguage});
         self.languages = ko.observableArray();
@@ -57,25 +59,13 @@ define([
             self.currentLanguage(currentLanguage);
             self.currentDefaultLanguage(currentLanguage);
 
-            if (currentLanguage?.code && currentValue?.[currentLanguage.code]){
-                self.currentText(currentValue?.[currentLanguage.code]?.value);
-                self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
-            } else if (!currentLanguage?.code) {
-                self.currentText('');
-                self.currentDirection('ltr');
-            } else {
-                self.currentText('');
-                self.currentDirection('ltr');
-                currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
-            }
-
             if(currentLanguage?.code && currentDefaultValue?.[currentLanguage.code]){
                 self.currentDefaultText(currentDefaultValue?.[currentLanguage.code]?.value);
                 self.currentDefaultDirection(currentDefaultValue?.[currentLanguage.code]?.direction);
             } else if (!currentLanguage?.code) {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
-            } else {
+            } else if (currentDefaultValue) {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};

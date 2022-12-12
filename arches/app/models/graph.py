@@ -1465,6 +1465,8 @@ class Graph(models.GraphModel):
 
             ret["edges"] = [edge for key, edge in self.edges.items()] if "edges" not in exclude else ret.pop("edges", None)
 
+            # import pdb; pdb.set_trace()
+
             if "nodes" not in exclude:
                 ret["nodes"] = []
                 for key, node in self.nodes.items():
@@ -1737,50 +1739,87 @@ class Graph(models.GraphModel):
         editable_future_graph.save()
         return editable_future_graph
 
-    def consolidate_current_graph_with_editable_future_graph(self):
-        editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+    def consolidate_with_source_graph(self):
+        # self.create_editable_future_graph()
+        try:
+            source_graph = Graph.objects.get(graphid=self.source_identifier)
+        except:
+            raise Exception(_('No identifiable source Graph'))
 
-        if not editable_future_graph:
-            return None
 
-        # TODO: Diff current graph and editable future graph, resolving differences to the current graph.
-        # A complexity here is that any nodes created in the future graph should retain their identifiers when
-        # moved to the current graph
-        pass
+        import pdb; pdb.set_trace()
+
+
+
+        for _cardid, card in self.cards.items():
+            card.graph_id = source_graph.pk
+            card.save()
+
+        # for _nodeid, node in self.nodes.items():
+        #     node.graph_id = source_graph.pk
+        #     node.save()
+
+        # for _edgeid, edge in self.edges.items():
+        #     edge.graph_id = source_graph.pk
+        #     edge.save()
+
+
+
+
+
+        # source_graph.root.delete()
+
+        # source_graph.slug = None
+        # source_graph.root = self.root
+        # source_graph.cards = self.cards
+        # source_graph.nodes = self.nodes
+        # source_graph.edges = self.edges
+
+
+        source_graph.save()
+
+        self.cards = {}
+        self.nodes = {}
+        self.edges = {}
+
+        self.delete()
+
+        return source_graph.create_editable_future_graph()
 
     def publish(self, user, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
-        with transaction.atomic():
-            try:
-                publication = models.GraphXPublishedGraph.objects.create(
-                    graph=self,
-                    notes=notes,
-                    user=user,
-                )
-                publication.save()
+        self.consolidate_with_source_graph()
+        # with transaction.atomic():
+        #     try:
+        #         publication = models.GraphXPublishedGraph.objects.create(
+        #             graph=self,
+        #             notes=notes,
+        #             user=user,
+        #         )
+        #         publication.save()
 
-                self.publication = publication
-                self.save(validate=False)
+        #         self.publication = publication
+        #         self.save(validate=False)
 
-                for language_tuple in settings.LANGUAGES:
-                    language = models.Language.objects.get(code=language_tuple[0])
+        #         for language_tuple in settings.LANGUAGES:
+        #             language = models.Language.objects.get(code=language_tuple[0])
 
-                    translation.activate(language=language_tuple[0])
+        #             translation.activate(language=language_tuple[0])
 
-                    published_graph = models.PublishedGraph.objects.create(
-                        publication=publication,
-                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
-                        language=language,
-                    )
+        #             published_graph = models.PublishedGraph.objects.create(
+        #                 publication=publication,
+        #                 serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+        #                 language=language,
+        #             )
 
-                    published_graph.save()
+        #             published_graph.save()
 
-                translation.deactivate()
-            except Exception as e:
-                raise UnpublishedModelError(e)
+        #         translation.deactivate()
+        #     except Exception as e:
+        #         raise UnpublishedModelError(e)
 
     def unpublish(self):
         """

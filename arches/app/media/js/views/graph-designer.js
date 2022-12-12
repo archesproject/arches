@@ -105,7 +105,7 @@ define([
             viewModel.shouldShowPublishModal = ko.observable(false);
 
             viewModel.displayUnpublishWarning = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph));
+                viewModel.alert(new AlertViewModel('ep-alert-red', _('Unpublish the graph?'), _('This will make the graph inaccessible to other users.'), function() {}, viewModel.unpublishGraph));
             };
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
