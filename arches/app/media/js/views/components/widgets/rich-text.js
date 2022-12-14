@@ -18,8 +18,9 @@ define([
     */
 
     const viewModel = function(params) {
-        params.configKeys = ['displayfullvalue'];
+        params.configKeys = ['placeholder', 'displayfullvalue'];
         const self = this;
+        self.card = params.card;
          
         WidgetViewModel.apply(self, [params]);
         const initialCurrent = {};
@@ -41,7 +42,7 @@ define([
         self.languages =  ko.observableArray(languages);
         self.currentLanguage(languages.find(element => element.code == arches.activeLanguage));
 
-        if(!currentValue?.[currentLanguage.code]){
+        if(currentValue && !currentValue?.[currentLanguage.code]){
             self.currentText = ko.observable('');
             self.currentDirection = ko.observable('ltr');
             currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
@@ -55,10 +56,20 @@ define([
         });
 
         self.strippedValue();
+
+        self.defaultText = ko.observable();
+        self.defaultText.subscribe(newValue => {
+            const config = self.config();
+            config.placeholder = newValue;
+            self.config(config);
+        });
+
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
+
             currentValue[currentLanguage.code].value = newValue;
+
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
@@ -68,7 +79,9 @@ define([
         self.currentDirection.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
+
             currentValue[currentLanguage.code].direction = newValue;
+
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {

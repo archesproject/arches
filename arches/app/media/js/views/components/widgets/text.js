@@ -63,7 +63,7 @@ define([
             } else if (!currentLanguage?.code) {
                 self.currentText('');
                 self.currentDirection('ltr');
-            } else {
+            } else if (currentValue) {
                 self.currentText('');
                 self.currentDirection('ltr');
                 currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
@@ -75,7 +75,7 @@ define([
             } else if (!currentLanguage?.code) {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
-            } else {
+            } else if (currentDefaultValue) {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
