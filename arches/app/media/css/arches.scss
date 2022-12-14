@@ -2259,7 +2259,7 @@ div.final-cons-step-separator>h4 {
     height: 100%;
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
-    overflow-y: hidden;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     align-items: normal;
@@ -2331,7 +2331,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel .new-provisional-edit-card-container {
-    padding-bottom: 40px;
+    padding-bottom: 20px;
 }
 
 .workbench-card-sidepanel-header-container {
@@ -14282,7 +14282,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .map-coordinate-editor-crs-selector {
-    position: fixed;
+    position: absolute;
     margin-top: 25px;
     background: #fff;
     padding-bottom: 8px;
@@ -14348,7 +14348,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .map-coordinate-editor-header {
-    position: fixed;
+    position: absolute;
     background: #fff;
     padding: 6px 0;
     font-size: 1.2em;
