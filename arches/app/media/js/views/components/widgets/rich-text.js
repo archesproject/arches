@@ -1,12 +1,12 @@
 define([
     'jquery',
-    'knockout', 
+    'knockout',
     'knockout-mapping',
-    'underscore', 
-    'viewmodels/widget', 
-    'arches', 
+    'underscore',
+    'viewmodels/widget',
+    'arches',
     'templates/views/components/widgets/rich-text.htm',
-    'bindings/ckeditor', 
+    'bindings/ckeditor',
     'bindings/chosen'
 ], function($, ko, koMapping, _, WidgetViewModel, arches, richTextWidgetTemplate) {
     /**
@@ -21,13 +21,13 @@ define([
         params.configKeys = ['placeholder', 'displayfullvalue'];
         const self = this;
         self.card = params.card;
-         
+
         WidgetViewModel.apply(self, [params]);
         const initialCurrent = {};
         self.showi18nOptions = ko.observable(false);
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
         const currentLanguage = {"code": arches.activeLanguage};
-        let currentValue = koMapping.toJS(self.value);
+        let currentValue = koMapping.toJS(self.value) || initialCurrent;
         self.currentLanguage = ko.observable(currentLanguage);
 
         if(self.form){
@@ -42,7 +42,7 @@ define([
         self.languages =  ko.observableArray(languages);
         self.currentLanguage(languages.find(element => element.code == arches.activeLanguage));
 
-        if(currentValue && !currentValue?.[currentLanguage.code]){
+        if(!currentValue?.[currentLanguage.code]){
             self.currentText = ko.observable('');
             self.currentDirection = ko.observable('ltr');
             currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
@@ -95,7 +95,7 @@ define([
             const currentLanguage = self.currentLanguage();
 
             self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
-            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);            
+            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
         });
 
         this.displayfullvalue(params.displayfullvalue);
