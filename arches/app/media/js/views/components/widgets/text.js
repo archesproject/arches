@@ -57,6 +57,18 @@ define([
             self.currentLanguage(currentLanguage);
             self.currentDefaultLanguage(currentLanguage);
 
+            if (currentLanguage?.code && currentValue?.[currentLanguage.code]){
+                self.currentText(currentValue?.[currentLanguage.code]?.value);
+                self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
+            } else if (!currentLanguage?.code) {
+                self.currentText('');
+                self.currentDirection('ltr');
+            } else if (currentValue) {
+                self.currentText('');
+                self.currentDirection('ltr');
+                currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
+            }
+
             if(currentLanguage?.code && currentDefaultValue?.[currentLanguage.code]){
                 self.currentDefaultText(currentDefaultValue?.[currentLanguage.code]?.value);
                 self.currentDefaultDirection(currentDefaultValue?.[currentLanguage.code]?.direction);
