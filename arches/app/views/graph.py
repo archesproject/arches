@@ -348,7 +348,6 @@ class GraphDataView(View):
                     author = request.user.first_name + " " + request.user.last_name
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
                     ret.save()
-                    ret.create_editable_future_graph()
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
@@ -401,7 +400,6 @@ class GraphDataView(View):
                     ret = clone_data["copy"]
                     ret.slug = None
                     ret.save()
-                    ret.create_editable_future_graph()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":

@@ -24,7 +24,9 @@ from copy import copy, deepcopy
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
+from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
+from django.dispatch import receiver
 from arches.app.models import models
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.resource import Resource, UnpublishedModelError
@@ -1800,6 +1802,10 @@ class Graph(models.GraphModel):
         self.publication = None
         self.save(validate=False)
 
+@receiver(post_save, sender=Graph)
+def new_future_graph(sender, instance, created, **kwargs):
+    if instance.source_identifier is None and created:
+        instance.create_editable_future_graph()
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
