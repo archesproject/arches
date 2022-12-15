@@ -1802,10 +1802,12 @@ class Graph(models.GraphModel):
         self.publication = None
         self.save(validate=False)
 
+
 @receiver(post_save, sender=Graph)
 def new_future_graph(sender, instance, created, **kwargs):
     if instance.source_identifier is None and created:
         instance.create_editable_future_graph()
+
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
