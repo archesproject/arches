@@ -11,7 +11,9 @@ create or replace function __arches_get_tile_cardinality_violations()
     returns table(graph_name text, node_names text[], resourceinstanceid uuid, nodegroupid uuid, parenttileid uuid, tilecount bigint) as
 $$
 DECLARE
+    default_lang text;
 BEGIN
+    select code into default_lang from languages where isdefault limit 1;
     return query with tile_violations as ( SELECT t.resourceinstanceid,
                         t.nodegroupid,
                         t.parenttileid parent_tileid,
@@ -23,14 +25,14 @@ BEGIN
                  group by t.resourceinstanceid, t.nodegroupid,
                           t.parenttileid
                  having count(*) > 1)
-        select g.name->>'en',
+        select g.name->>default_lang,
                array_agg(n.name), tv.*
             from tile_violations tv,
                  nodes n,
                  graphs g
                 where tv.nodegroupid = n.nodegroupid
                   and n.graphid = g.graphid
-            group by g.name->>'en', tv.resourceinstanceid, tv.nodegroupid, tv.parent_tileid, tv.tilecount
+            group by g.name->>default_lang, tv.resourceinstanceid, tv.nodegroupid, tv.parent_tileid, tv.tilecount
     order by nodegroupid, resourceinstanceid;
 END $$
     language plpgsql;
