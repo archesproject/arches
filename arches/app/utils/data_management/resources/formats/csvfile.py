@@ -467,7 +467,7 @@ class CsvReader(Reader):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()
         mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
-        headers = [k.upper() for k in business_data[0].keys() if k.upper() != "RESOURCEID"]
+        headers = [k.upper() for k in business_data[0].keys() if k and k.upper() != "RESOURCEID"]
         non_unique_col_headers = False
         unique_nodeids = set(list(mapping_filefieldname_to_nodeid_dict.values()))
         hist_res_eval_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd"  # parent tiledata IS semantic, parenttile=null
@@ -816,7 +816,7 @@ class CsvReader(Reader):
                     return [
                         {col_header_to_nodeid_dict[key.upper()]: value}
                         for key, value in row.items()
-                        if value != "" and key.upper() != "RESOURCEID" and key.upper() in col_header_to_nodeid_dict
+                        if value != "" and key and key.upper() != "RESOURCEID" and key.upper() in col_header_to_nodeid_dict
                     ]
 
                 def transform_value(datatype, value, source, nodeid, tileid=None):
