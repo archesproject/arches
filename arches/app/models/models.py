@@ -1402,3 +1402,15 @@ class GeoJSONGeometry(models.Model):
     class Meta:
         managed = True
         db_table = "geojson_geometries"
+
+
+class PerformanceTracker(models.Model):
+    eventid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    timestamp = models.DateTimeField(auto_now_add=True, blank=True)
+    eventname = models.TextField(blank=True, null=True)
+    metadata = JSONField(blank=True, null=True)
+    eventdurationsec = models.IntegerField()
+
+    class Meta:
+        managed = True
+        db_table = "performance_tracker"
