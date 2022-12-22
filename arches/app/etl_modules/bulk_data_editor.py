@@ -24,8 +24,9 @@ logger = logging.getLogger(__name__)
 #     "classname": "BulkDataEditor",
 #     "config": '{"bgColor": "#5B8899", "circleColor": "#AEC6CF", "show": true}',
 #     "icon": "fa fa-upload",
-#     "slug": "bulk-data-editor"    
+#     "slug": "bulk-data-editor"
 # }
+
 
 class BulkDataEditor(BaseImportModule):
     def __init__(self, request=None):
@@ -62,7 +63,7 @@ class BulkDataEditor(BaseImportModule):
         return self.node_lookup[graphid]
 
     def create_load_event(self, cursor, request):
-        result = {"success": False }
+        result = {"success": False}
         try:
             cursor.execute(
                 """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
@@ -84,10 +85,11 @@ class BulkDataEditor(BaseImportModule):
             resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
         print(resourceids)
 
-        result = {"success": False }
+        result = {"success": False}
         try:
-            cursor.execute("""SELECT * FROM __arches_stage_data_for_bulk_edit(%s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids))
+            cursor.execute(
+                """SELECT * FROM __arches_stage_data_for_bulk_edit(%s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, self.moduleid, (resourceids)),
             )
             result["success"] = True
         except Exception as e:
@@ -103,23 +105,22 @@ class BulkDataEditor(BaseImportModule):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
 
-        result = {"success": False }
+        result = {"success": False}
         try:
-            cursor.execute("""SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, node_id, language_code, operation, old_text, new_text)
+            cursor.execute(
+                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s)""",
+                (self.loadid, node_id, language_code, operation, old_text, new_text),
             )
             result["success"] = True
         except Exception as e:
             logger.error(e)
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
-    
+
     def save_to_tiles(self, cursor, request):
-        result = {"success": False }
+        result = {"success": False}
         try:
-            cursor.execute("""SELECT * FROM __arches_save_tile_for_edit(%s)""",
-                [self.loadid]
-            )
+            cursor.execute("""SELECT * FROM __arches_save_tile_for_edit(%s)""", [self.loadid])
             result["success"] = True
 
         except Exception as e:
@@ -129,9 +130,9 @@ class BulkDataEditor(BaseImportModule):
 
     def log_event(self, cursor, status):
         cursor.execute(
-                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                (status, datetime.now(), self.loadid),
-            )
+            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+            (status, datetime.now(), self.loadid),
+        )
 
     def validate(self, request):
         return {"success": True, "data": {}}
@@ -139,29 +140,29 @@ class BulkDataEditor(BaseImportModule):
     def write(self, request):
         with connection.cursor() as cursor:
             event_created = self.create_load_event(cursor, request)
-            if event_created['success']:
+            if event_created["success"]:
                 data_staged = self.stage_data(cursor, request)
             else:
                 self.log_event(cursor, "failed")
-                return { "success": False, "data": event_created["message"]}
+                return {"success": False, "data": event_created["message"]}
 
-            if data_staged['success']:
+            if data_staged["success"]:
                 data_updated = self.edit_staged_data(cursor, request)
             else:
                 self.log_event(cursor, "failed")
-                return { "success": False, "data": data_staged["message"]}
+                return {"success": False, "data": data_staged["message"]}
 
-            if data_updated['success']:
+            if data_updated["success"]:
                 data_updated = self.save_to_tiles(cursor, request)
                 self.log_event(cursor, "completed")
 
                 index_resources_by_transaction(self.loadid)
                 cursor.execute(
-                        """UPDATE load_event SET (complete, successful, status, indexed_time) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                        (True, True, 'indexed', datetime.now(), self.loadid),
-                    )
+                    """UPDATE load_event SET (complete, successful, status, indexed_time) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                    (True, True, "indexed", datetime.now(), self.loadid),
+                )
 
-                return { "success": True, "data": "done"}
+                return {"success": True, "data": "done"}
             else:
                 self.log_event(cursor, "failed")
-                return { "success": False, "data": data_updated["message"]}
+                return {"success": False, "data": data_updated["message"]}

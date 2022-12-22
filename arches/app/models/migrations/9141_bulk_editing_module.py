@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -166,12 +167,6 @@ class Migration(migrations.Migration):
             add_stage_data_for_bulk_edit_function,
             remove_stage_data_for_bulk_edit_function,
         ),
-        migrations.RunSQL(
-            add_edit_staged_data_function,
-            remove_edit_staged_data_function
-        ),
-        migrations.RunSQL(
-            add_save_tile_for_edit_function,
-            remove_save_tile_for_edit_function
-        ),
+        migrations.RunSQL(add_edit_staged_data_function, remove_edit_staged_data_function),
+        migrations.RunSQL(add_save_tile_for_edit_function, remove_save_tile_for_edit_function),
     ]
