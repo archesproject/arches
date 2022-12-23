@@ -91,6 +91,8 @@ class Migration(migrations.Migration):
         LANGUAGE 'plpgsql'
         AS $$
             DECLARE
+                node_ids uuid[];
+                language_codes text[];
                 tile_id uuid;
                 tile_data jsonb;
                 nodegroup_id uuid;
@@ -99,28 +101,50 @@ class Migration(migrations.Migration):
                 data_type text;
                 transform_sql text;
                 data_for_staging jsonb;
-
             BEGIN
-                SELECT datatype INTO data_type FROM nodes WHERE nodeid = node_id;
-                data_for_staging := '{}'::jsonb;
-                UPDATE load_staging
-                SET value = jsonb_set(
-                    value,
-                    FORMAT('{%I, "en", "value"}', node_id)::text[],
-                    CASE operation
-                        WHEN 'replace' THEN
-                            FORMAT('"%s"', REPLACE(value -> node_id::text -> 'en' ->> 'value', old_text, new_text))::jsonb
-                        WHEN 'upper' THEN
-                            FORMAT('"%s"', UPPER(value -> node_id::text -> 'en' ->> 'value'))::jsonb
-                        WHEN 'lower' THEN
-                            FORMAT('"%s"', LOWER(value -> node_id::text -> 'en' ->> 'value'))::jsonb
-                        WHEN 'trim' THEN
-                            FORMAT('"%s"', TRIM(value -> node_id::text -> 'en' ->> 'value'))::jsonb
-                        WHEN 'capitalize' THEN
-                            FORMAT('"%s"', INITCAP(value -> node_id::text -> 'en' ->> 'value'))::jsonb
-                    END
-                )
-                WHERE loadid = load_id;
+                IF node_id IS NULL THEN
+                    node_ids := ARRAY(
+                        SELECT nodeid
+                        FROM nodes
+                        WHERE datatype = 'string'
+                        AND graphid <> 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+                    );
+                ELSE
+                    node_ids = ARRAY[node_id];
+                END IF;
+
+                IF language_code IS NULL THEN
+                    language_codes := ARRAY(SELECT code FROM languages);
+                ELSE
+                    language_codes = ARRAY[language_code];
+                END IF;
+
+                FOREACH node_id IN ARRAY node_ids LOOP
+                    FOREACH language_code IN ARRAY language_codes LOOP
+                        SELECT datatype INTO data_type FROM nodes WHERE nodeid = node_id;
+                        IF data_type = 'string' THEN
+                            data_for_staging := '{}'::jsonb;
+                            UPDATE load_staging
+                            SET value = jsonb_set(
+                                value,
+                                FORMAT('{%s, %s, "value"}', node_id, language_code)::text[],
+                                CASE operation
+                                    WHEN 'replace' THEN
+                                        FORMAT('"%s"', REPLACE(value -> node_id::text -> language_code ->> 'value', old_text, new_text))::jsonb
+                                    WHEN 'upper' THEN
+                                        FORMAT('"%s"', UPPER(value -> node_id::text -> language_code ->> 'value'))::jsonb
+                                    WHEN 'lower' THEN
+                                        FORMAT('"%s"', LOWER(value -> node_id::text -> language_code ->> 'value'))::jsonb
+                                    WHEN 'trim' THEN
+                                        FORMAT('"%s"', TRIM(value -> node_id::text -> language_code ->> 'value'))::jsonb
+                                    WHEN 'capitalize' THEN
+                                        FORMAT('"%s"', INITCAP(value -> node_id::text -> 'en' ->> 'value'))::jsonb
+                                END
+                            )
+                            WHERE loadid = load_id;
+                        END IF;
+                    END LOOP;
+                END LOOP;
             END;
         $$;
     """

@@ -68,7 +68,7 @@ define([
         });
         this.selectedNode.subscribe(value=>console.log(value, value));
 
-        this.resourceids(['cde6aa45-8013-433e-b1f1-9040ca011d7d', '08d547ab-16a9-4a66-b7ec-2e33bf9cd510']);
+        // this.resourceids(['cde6aa45-8013-433e-b1f1-9040ca011d7d', '08d547ab-16a9-4a66-b7ec-2e33bf9cd510']);
         this.write = function() {
             self.formData.append('operation', self.operation());
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
