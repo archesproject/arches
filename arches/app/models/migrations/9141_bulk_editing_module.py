@@ -138,7 +138,7 @@ class Migration(migrations.Migration):
                                     WHEN 'trim' THEN
                                         FORMAT('"%s"', TRIM(value -> node_id::text -> language_code ->> 'value'))::jsonb
                                     WHEN 'capitalize' THEN
-                                        FORMAT('"%s"', INITCAP(value -> node_id::text -> 'en' ->> 'value'))::jsonb
+                                        FORMAT('"%s"', INITCAP(value -> node_id::text -> language_code ->> 'value'))::jsonb
                                 END
                             )
                             WHERE loadid = load_id;
