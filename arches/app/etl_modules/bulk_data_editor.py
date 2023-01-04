@@ -99,6 +99,7 @@ class BulkDataEditor(BaseImportModule):
         return result
 
     def edit_staged_data(self, cursor, request):
+        graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
         operation = request.POST.get("operation", None)
         language_code = request.POST.get("language_code")
@@ -108,8 +109,8 @@ class BulkDataEditor(BaseImportModule):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, node_id, language_code, operation, old_text, new_text),
+                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, language_code, operation, old_text, new_text),
             )
             result["success"] = True
         except Exception as e:
@@ -117,7 +118,7 @@ class BulkDataEditor(BaseImportModule):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def save_to_tiles(self, cursor, request):
+    def save_edits_to_tiles(self, cursor, request):
         result = {"success": False}
         try:
             cursor.execute("""SELECT * FROM __arches_save_tile_for_edit(%s)""", [self.loadid])

@@ -81,6 +81,7 @@ class Migration(migrations.Migration):
     add_edit_staged_data_function = """
         CREATE OR REPLACE FUNCTION __arches_edit_staged_data(
             load_id uuid,
+            graph_id uuid,
             node_id uuid,
             language_code text,
             operation text,
@@ -100,14 +101,18 @@ class Migration(migrations.Migration):
                 resourceinstance_id uuid;
                 data_type text;
                 transform_sql text;
-                data_for_staging jsonb;
+                updated_staged_data jsonb;
+                updated_value jsonb;
+                staged_record record;
+                _key text;
+                _value text;
             BEGIN
                 IF node_id IS NULL THEN
                     node_ids := ARRAY(
                         SELECT nodeid
                         FROM nodes
                         WHERE datatype = 'string'
-                        AND graphid <> 'ff623370-fa12-11e6-b98b-6c4008b05c4c'
+                        AND graphid = graph_id
                     );
                 ELSE
                     node_ids = ARRAY[node_id];
@@ -119,37 +124,58 @@ class Migration(migrations.Migration):
                     language_codes = ARRAY[language_code];
                 END IF;
 
-                FOREACH node_id IN ARRAY node_ids LOOP
-                    FOREACH language_code IN ARRAY language_codes LOOP
-                        SELECT datatype INTO data_type FROM nodes WHERE nodeid = node_id;
-                        IF data_type = 'string' THEN
-                            data_for_staging := '{}'::jsonb;
-                            UPDATE load_staging
-                            SET value = jsonb_set(
-                                value,
-                                FORMAT('{%s, %s, "value"}', node_id, language_code)::text[],
-                                CASE operation
-                                    WHEN 'replace' THEN
-                                        FORMAT('"%s"', REPLACE(value -> node_id::text -> language_code ->> 'value', old_text, new_text))::jsonb
-                                    WHEN 'upper' THEN
-                                        FORMAT('"%s"', UPPER(value -> node_id::text -> language_code ->> 'value'))::jsonb
-                                    WHEN 'lower' THEN
-                                        FORMAT('"%s"', LOWER(value -> node_id::text -> language_code ->> 'value'))::jsonb
-                                    WHEN 'trim' THEN
-                                        FORMAT('"%s"', TRIM(value -> node_id::text -> language_code ->> 'value'))::jsonb
-                                    WHEN 'capitalize' THEN
-                                        FORMAT('"%s"', INITCAP(value -> node_id::text -> language_code ->> 'value'))::jsonb
-                                END
-                            )
-                            WHERE loadid = load_id;
+                FOR staged_record IN (SELECT value, tileid FROM load_staging WHERE loadid = load_id) LOOP
+                    updated_staged_data = '{}'::jsonb;
+                    FOR _key, _value IN SELECT * FROM jsonb_each(staged_record.value) LOOP
+                        SELECT datatype INTO data_type FROM nodes WHERE nodeid = _key::uuid;
+                        updated_value = _value::jsonb;
+                        IF _key::uuid = ANY(node_ids) THEN
+                            IF data_type = 'string' THEN
+                                FOREACH language_code IN ARRAY language_codes LOOP
+                                    updated_value = jsonb_set(
+                                        updated_value,
+                                        FORMAT('{%s, "value"}', language_code)::text[],
+                                        CASE operation
+                                            WHEN 'replace' THEN
+                                                FORMAT('"%s"', REPLACE(updated_value -> language_code ->> 'value', old_text, new_text))::jsonb
+                                            WHEN 'upper' THEN
+                                                FORMAT('"%s"', UPPER(updated_value -> language_code ->> 'value'))::jsonb
+                                            WHEN 'lower' THEN
+                                                FORMAT('"%s"', LOWER(updated_value -> language_code ->> 'value'))::jsonb
+                                            WHEN 'trim' THEN
+                                                FORMAT('"%s"', TRIM(updated_value -> language_code ->> 'value'))::jsonb
+                                            WHEN 'capitalize' THEN
+                                                FORMAT('"%s"', INITCAP(updated_value -> language_code ->> 'value'))::jsonb
+                                            ELSE
+                                                FORMAT('"%s"', updated_value -> language_code ->> 'value')::jsonb								
+                                        END
+                                    );
+                                -- ELSEIF for other datatypes
+                                END LOOP;
+                            END IF;
                         END IF;
+                        updated_staged_data = jsonb_set(
+                            updated_staged_data,
+                            FORMAT('{%s}', _key)::text[],
+                            jsonb_build_object(
+                                'notes', '',
+                                'valid', true,
+                                'source', 'bulk-edit',
+                                'datatype', data_type,
+                                'value', updated_value
+                            ),
+                            true
+                        );
+                        UPDATE load_staging
+                        SET value = updated_staged_data
+                        WHERE loadid = load_id AND tileid = staged_record.tileid;
                     END LOOP;
                 END LOOP;
             END;
         $$;
     """
     remove_edit_staged_data_function = """
-        DROP FUNCTION IF EXISTS __arches_edit_staged_data(uuid,uuid,text,text,text,text);
+        DROP FUNCTION IF EXISTS __arches_edit_staged_data(uuid,uuid,uuid,text,text,text,text);
     """
 
     add_save_tile_for_edit_function = """
