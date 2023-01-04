@@ -118,17 +118,6 @@ class BulkDataEditor(BaseImportModule):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def save_edits_to_tiles(self, cursor, request):
-        result = {"success": False}
-        try:
-            cursor.execute("""SELECT * FROM __arches_save_tile_for_edit(%s)""", [self.loadid])
-            result["success"] = True
-
-        except Exception as e:
-            logger.error(e)
-            result["message"] = _("Unable to save the edits to tiles: {}").format(str(e))
-        return result
-
     def log_event(self, cursor, status):
         cursor.execute(
             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
