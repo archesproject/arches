@@ -153,17 +153,8 @@ class BulkDataEditor(BaseImportModule):
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": data_staged["message"]}
 
-            if data_updated["success"]:
-                data_updated = self.save_to_tiles(cursor, self.loadid)
-                self.log_event(cursor, "completed")
-
-                index_resources_by_transaction(self.loadid)
-                cursor.execute(
-                    """UPDATE load_event SET (complete, successful, status, indexed_time) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    (True, True, "indexed", datetime.now(), self.loadid),
-                )
-
-                return {"success": True, "data": "done"}
-            else:
-                self.log_event(cursor, "failed")
-                return {"success": False, "data": data_updated["message"]}
+        if data_updated["success"]:
+            data_updated = self.save_to_tiles(self.loadid)
+            return {"success": True, "data": "done"}
+        else:
+            return {"success": False, "data": data_updated["message"]}
