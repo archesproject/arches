@@ -1,9 +1,9 @@
 define([
-    'knockout', 
+    'knockout',
     'knockout-mapping',
-    'underscore', 
-    'viewmodels/widget', 
-    'arches', 
+    'underscore',
+    'viewmodels/widget',
+    'arches',
     'templates/views/components/widgets/text.htm',
     'bindings/chosen'
 ], function(ko, koMapping, _, WidgetViewModel, arches, textWidgetTemplate) {
@@ -20,7 +20,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
-         
+
         WidgetViewModel.apply(this, [params]);
         const self = this;
 
@@ -42,7 +42,7 @@ define([
         initialDefault[arches.activeLanguage] = {value: '', direction: 'ltr'};
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
         let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
-        let currentValue = koMapping.toJS(self.value);
+        let currentValue = koMapping.toJS(self.value) || initialCurrent;
 
         if(self.form){
             self.form.on('tile-reset', (x) => {
@@ -58,6 +58,18 @@ define([
             self.languages(languages);
             self.currentLanguage(currentLanguage);
             self.currentDefaultLanguage(currentLanguage);
+
+            if (currentLanguage?.code && currentValue?.[currentLanguage.code]){
+                self.currentText(currentValue?.[currentLanguage.code]?.value);
+                self.currentDirection(currentValue?.[currentLanguage.code]?.direction);
+            } else if (!currentLanguage?.code) {
+                self.currentText('');
+                self.currentDirection('ltr');
+            } else if (currentValue) {
+                self.currentText('');
+                self.currentDirection('ltr');
+                currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
+            }
 
             if(currentLanguage?.code && currentDefaultValue?.[currentLanguage.code]){
                 self.currentDefaultText(currentDefaultValue?.[currentLanguage.code]?.value);
@@ -75,7 +87,7 @@ define([
         init();
 
         self.disable = ko.computed(() => {
-            return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
+            return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable);
         }, self);
 
         self.currentDefaultText.subscribe(newValue => {
@@ -111,13 +123,13 @@ define([
 
             self.currentDefaultText(self.defaultValue()?.[currentLanguage.code]?.value);
             self.currentDefaultDirection(self.defaultValue()?.[currentLanguage.code]?.direction);
-            
+
         });
 
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
-            currentValue[currentLanguage.code].value = newValue;       
+            currentValue[currentLanguage.code].value = newValue;
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
@@ -146,7 +158,7 @@ define([
 
             self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
             self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
-        
+
         });
 
     };

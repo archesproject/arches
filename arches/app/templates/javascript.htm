@@ -8,7 +8,7 @@
 
 {% block require_config %}
 <script>
-    var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor/' %}";
+    var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor4/' %}";
     window.CKEDITOR_BASEPATH = CKEDITOR_BASEPATH;
     require.config({
         baseUrl: "{% webpack_static 'build/js' %}",
@@ -91,13 +91,7 @@
             },
             'leaflet-fullscreen': {
                 deps: ['leaflet']
-            },
-            'ckeditor': {
-                deps: ['jquery']
-            },
-            'ckeditor-jquery': {
-                deps: ['jquery', 'ckeditor']
-            },
+            }
             {% block shim %}{% endblock shim %}
         }
     });
