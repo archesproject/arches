@@ -154,7 +154,7 @@ class BulkDataEditor(BaseImportModule):
                 return {"success": False, "data": data_staged["message"]}
 
             if data_updated["success"]:
-                data_updated = self.save_to_tiles(cursor, request)
+                data_updated = self.save_to_tiles(cursor, self.loadid)
                 self.log_event(cursor, "completed")
 
                 index_resources_by_transaction(self.loadid)
