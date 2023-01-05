@@ -160,7 +160,7 @@ class Migration(migrations.Migration):
                             jsonb_build_object(
                                 'notes', '',
                                 'valid', true,
-                                'source', 'bulk-edit',
+                                'source', 'bulk_edit',
                                 'datatype', data_type,
                                 'value', updated_value
                             ),
