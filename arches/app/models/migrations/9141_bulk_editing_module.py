@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     ]
 
     add_bulk_data_editor = """
-        insert into etl_modules (
+        INSERT INTO etl_modules (
             etlmoduleid,
             name,
             description,
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             config,
             icon,
             slug)
-        values (
+        VALUES (
             '6d0e7625-5792-4b83-b14b-82f603913706',
             'Bulk Data Editor',
             'Edit Existing Data in Arches',
@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
             'bulk-data-editor');
         """
     remove_bulk_data_editor = """
-        delete from etl_modules where etlmoduleid = '6d0e7625-5792-4b83-b14b-82f603913706';
+        DELETE FROM etl_modules WHERE etlmoduleid = '6d0e7625-5792-4b83-b14b-82f603913706';
     """
 
     add_stage_data_for_bulk_edit_function = """
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 resourceinstance_id uuid;
             BEGIN
                 INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, passes_validation)
-                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit_test', true
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', true
                     FROM tiles t, nodes n
                     WHERE t.nodegroupid = n.nodegroupid
                     AND CASE
@@ -274,7 +274,7 @@ class Migration(migrations.Migration):
                                 old_data = null;
                             END IF;
 
-                            IF source = 'bulk_edit_test' THEN
+                            IF source = 'bulk_edit' THEN
                                 UPDATE tiles
                                     SET tiledata = tile_data
                                     WHERE tileid = tile_id;
