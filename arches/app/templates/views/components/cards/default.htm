@@ -93,7 +93,7 @@
         <i class="fa fa-file-o" role="presentation"></i>
         <span data-bind="text: card.model.name"></span>
         <!-- ko if: card.showIds -->
-        <span style="font-weight:bold" data-bind="text: ': ' + card.model.nodegroup_id()"></span>
+        <span style="font-weight:bold" data-bind="text: ': ' + cardIdentifier()"></span>
         <!-- /ko -->
     </a>
     <!-- ko if: (card.cards().length > 0 || card.widgets().length > 0) && card.expanded()  -->

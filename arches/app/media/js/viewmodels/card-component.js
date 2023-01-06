@@ -64,6 +64,11 @@ define([
                 });
             }
 
+            self.cardIdentifier = ko.computed(function() {
+                var cardIdentifier = self.card.model.attributes.source_identifier_id ? self.card.model.attributes.source_identifier_id : self.card.model.nodegroup_id();
+                return cardIdentifier;
+            })
+
             self.dirty = ko.computed(function() {
                 if (!ko.unwrap(self.tiles)) {
                     return true;

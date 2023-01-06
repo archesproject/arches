@@ -47,6 +47,7 @@ define([
             self.slug = ko.observable(null);
             self.alias = ko.observable(null);
             self.hasCustomAlias = ko.observable(false);
+            self.sourceIdentifierId = ko.observable(null);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -188,6 +189,7 @@ define([
                     exportable: self.exportable,
                     alias: self.alias,
                     hascustomalias: self.hasCustomAlias,
+                    sourceidentifierid: self.sourceIdentifierId
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
@@ -266,6 +268,7 @@ define([
             self.exportable(source.exportable);
             self.alias(source.alias);
             self.hasCustomAlias(source.hascustomalias);
+            self.sourceIdentifierId(source.source_identifier_id)
 
             if (source.config) {
                 self.setupConfig(source.config);
