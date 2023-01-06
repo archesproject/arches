@@ -34,6 +34,8 @@ class Migration(migrations.Migration):
             'bulk-data-editor');
         """
     remove_bulk_data_editor = """
+        DELETE FROM load_event WHERE etl_module_id = '6d0e7625-5792-4b83-b14b-82f603913706';
+        DELETE FROM load_staging WHERE loadid IN (SELECT loadid FROM load_event WHERE etl_module_id = '6d0e7625-5792-4b83-b14b-82f603913706');
         DELETE FROM etl_modules WHERE etlmoduleid = '6d0e7625-5792-4b83-b14b-82f603913706';
     """
 
