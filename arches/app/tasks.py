@@ -251,7 +251,7 @@ def edit_bulk_data(load_id, graph_id, node_id, operation, language_code, old_tex
 
     try:
         BulkDataEditor = bulk_data_editor.BulkDataEditor(loadid=load_id)
-        print("load_id",load_id)
+        print("load_id", load_id)
         BulkDataEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)

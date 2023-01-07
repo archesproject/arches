@@ -14,6 +14,7 @@ from arches.app.utils.index_database import index_resources_by_transaction
 
 logger = logging.getLogger(__name__)
 
+
 class BulkDataEditor(BaseImportModule):
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
