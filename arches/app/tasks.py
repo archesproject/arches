@@ -242,6 +242,30 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_n
         load_event.status = _("Failed")
         load_event.save()
 
+
+@shared_task
+def edit_bulk_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+    from arches.app.etl_modules import bulk_data_editor
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        BulkDataEditor = bulk_data_editor.BulkDataEditor(loadid=load_id)
+        print("load_id",load_id)
+        BulkDataEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = _("Failed")
+        load_event.save()
+
+
 @shared_task
 def reverse_etl_load(loadid):
     from arches.app.etl_modules import base_import_module
