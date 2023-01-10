@@ -116,9 +116,20 @@ class ConceptDataType(BaseConceptDataType):
             try:
                 uuid.UUID(str(value))
             except ValueError:
-                message = _("This is an invalid concept prefLabel, or an incomplete UUID")
-                error_message = self.create_error_message(value, source, row_number, message)
-                errors.append(error_message)
+                if len(str(value)) == 37:
+                    clipped_value = str(value)
+                    clipped_value = clipped_value[0:36]
+                    try:
+                        uuid.UUID(str(clipped_value))
+                        value = clipped_value
+                    except ValueError:
+                        message = _("This is an invalid concept prefLabel, or an incomplete UUID")
+                        error_message = self.create_error_message(value, source, row_number, message)
+                        errors.append(error_message)
+                else:
+                    message = _("This is an invalid concept prefLabel, or an incomplete UUID")
+                    error_message = self.create_error_message(value, source, row_number, message)
+                    errors.append(error_message)
                 return errors
 
             try:
