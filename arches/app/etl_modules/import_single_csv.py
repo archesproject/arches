@@ -268,6 +268,12 @@ class ImportSingleCsv(BaseImportModule):
                                         }
                                     }
                                 ]
+                            if not valid:
+                                cursor.execute("""
+                                    INSERT INTO load_errors (errorid, type, value, source, message, datatype, loadid, nodeid)
+						            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                                    (uuid.uuid4(), 'node', source_value, csv_file_name, error_message, datatype, loadid, node)
+                                )
 
                     for nodegroup in dict_by_nodegroup:
                         tile_data = self.get_blank_tile_lookup(nodegroup)
@@ -309,6 +315,13 @@ class ImportSingleCsv(BaseImportModule):
                         )
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
+                cursor.execute("""
+                    INSERT INTO load_errors (errorid, type, source, message, loadid, nodegroupid)
+					SELECT gen_random_uuid(), 'tile', source_description, error_message, loadid, nodegroupid
+                    FROM load_staging 
+                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null""",
+                    [loadid]
+                )
 
         self.delete_from_default_storage(temp_dir)
 
