@@ -23,7 +23,20 @@ class ETLManagerView(View):
         """
 
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [loadid])
+            cursor.execute("""
+                    (SELECT n.name as source, n.datatype as message, e.error as error, e.loadid
+                    FROM load_errors e 
+                    JOIN nodes n ON e.nodeid = n.nodeid
+					WHERE loadid = %s
+                    GROUP BY n.name, n.datatype, e.error, e.loadid)
+                    UNION
+                    (SELECT n.name as source, e.message as message, e.error as error, e.loadid
+                    FROM load_errors e 
+                    JOIN nodes n ON e.nodegroupid = n.nodeid
+					WHERE loadid = %s
+                    GROUP BY n.name, e.message, e.error, e.loadid);
+                """, [loadid, loadid]
+            )
             rows = cursor.fetchall()
         return {"success": True, "data": rows}
 
