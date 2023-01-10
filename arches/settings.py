@@ -465,13 +465,17 @@ USER_SIGNUP_GROUP = "Crowdsource Editor"
 
 # external oauth configuration
 EXTERNAL_OAUTH_CONFIGURATION = {
-    "default_user_group": "",
-    "user_domain": "fargeo.com",
+    "default_user_groups": [],
+    "user_domain": "",
+    "uid_claim": "",
     "app_id": "",
     "app_secret": "",
     "redirect_url": "",
-    "scopes": "",
-    "authority": "",
+    "scopes": [],
+    "authorization_endpoint": "",
+    "validate_id_token": True, # AVOID setting this to False
+    "token_endpoint": "",
+    "jwks_uri": ""
 }
 
 CACHES = {

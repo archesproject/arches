@@ -67,8 +67,8 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             # default_user_groups are used to assign groups to users that don't yet exist.
             if user is None and "default_user_groups" in oauth2_settings:
                 email = decoded_id_token["email"] if "email" in decoded_id_token else None
-                given_name = decoded_id_token["given_name"] if "given_name" in decoded_id_token else None
-                family_name = decoded_id_token["family_name"] if "family_name" in decoded_id_token else None
+                given_name = decoded_id_token["given_name"] if "given_name" in decoded_id_token else ''
+                family_name = decoded_id_token["family_name"] if "family_name" in decoded_id_token else ''
                 is_superuser = True if "create_as_superuser" in oauth2_settings and oauth2_settings["create_as_superuser"] else False
                 is_staff = True if "create_as_staff" in oauth2_settings and oauth2_settings["create_as_staff"] else False
                 user = User.objects.create_user(
@@ -120,7 +120,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
     def logout(sender, user, request, **kwargs):
         try:
             token = ExternalOauthAuthenticationBackend.get_token(user)
-            token.delete()
+            if token is not None: token.delete()
         except ExternalOauthToken.DoesNotExist:
             pass
 
