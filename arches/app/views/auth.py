@@ -20,6 +20,7 @@ import base64
 import io
 
 from django.http import response
+from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 import qrcode
 import pyotp
 import time
@@ -43,6 +44,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
 from django.shortcuts import render, redirect
+from django.core.exceptions import ValidationError
 import django.contrib.auth.password_validation as validation
 from arches import __version__
 from arches.app.utils.response import JSONResponse, Http401Response
@@ -52,11 +54,9 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
-from django.core.exceptions import ValidationError
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 class LoginView(View):
     def get(self, request):
@@ -83,8 +83,23 @@ class LoginView(View):
         # POST request is taken to mean user is logging in
         username = request.POST.get("username", None)  # user-input value, NOT source of truth
         password = request.POST.get("password", None)  # user-input value, NOT source of truth
-        user = authenticate(username=username, password=password)
         next = request.POST.get("next", reverse("home"))
+
+        if username is not None and password is None:
+            try:
+                domain = username.split("@")[1]
+                if domain == settings.EXTERNAL_OAUTH_CONFIGURATION["user_domain"]:
+                    redirect_url = "eoauth_start?username={}".format(username)
+                    return redirect(redirect_url)
+            except:
+                pass
+            return render(
+                request,
+                "login.htm",
+                {"username": username, "username_entered": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP},
+            )
+
+        user = authenticate(username=username, password=password)
 
         if user is not None and user.is_active:
             if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
@@ -538,3 +553,34 @@ class Token(View):
             r = requests.post(url, data=data)
             return JSONResponse(r.json(), indent=4)
         return HttpResponseForbidden()
+
+
+class ExternalOauth(View):
+    def start(request):
+        next = request.GET.get("next", reverse("home"))
+        username = request.GET.get("username", None)
+
+        token, user = ExternalOauthAuthenticationBackend.get_token_for_username(username)
+        if token is not None and token.access_token_expiration > datetime.now():
+            return ExternalOauth.log_user_in(request, user, next)
+
+        authorization_url, state = ExternalOauthAuthenticationBackend.get_authorization_url(request)
+        request.session["oauth_state"] = state
+        request.session["next"] = next
+        request.session["user"] = username
+        return redirect(authorization_url)
+
+    @method_decorator(
+        csrf_exempt, name="dispatch"
+    )  # exempt; returned from other oauth2 authorization server, handled by 'oauth_state' in session
+    def callback(request):
+        next_url = request.session["next"] if "next" in request.session else reverse("home")
+        user = authenticate(request, username=request.session["user"], sso_authentication=True)
+        return ExternalOauth.log_user_in(request, user, next_url)
+
+    def log_user_in(request, user, next_url):
+        if user is not None:
+            login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
+            return redirect(next_url)
+        else:
+            return redirect("auth")
