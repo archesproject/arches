@@ -1482,6 +1482,8 @@ class Graph(models.GraphModel):
                 ret["nodes"] = []
                 for key, node in self.nodes.items():
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
+
+                    # HERE HERHEHEHREHEHREHEHEREHEREHEREHEREHEREHEREHEREHEREHREDHERHERHERHE
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
                     ret["nodes"].append(nodeobj)
             else:
@@ -1727,7 +1729,7 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def create_editable_future_graph(self):
+    def create_editable_future_graph(self, foo=None):
         """
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
@@ -1747,90 +1749,210 @@ class Graph(models.GraphModel):
         )
         editable_future_graph.source_identifier = self.graphid
 
+        if foo == 'bar':
+            import pdb; pdb.set_trace()
         editable_future_graph.save()
         return editable_future_graph
 
-    def consolidate_with_source_graph(self):
-        # self.create_editable_future_graph()
+    def update_from_editable_future_graph(self):
+        """
+        Updates the graph with any changes made to the editable future graph
+        """
         try:
-            source_graph = Graph.objects.get(graphid=self.source_identifier)
+            editable_future_graph = Graph.objects.get(source_identifier=self.pk)
         except:
-            raise Exception(_('No identifiable source Graph'))
+            raise Exception(_('No identifiable future Graph'))
 
+        def _update_source_nodegroup_hierarchy(nodegroup):
+            node = models.Node.objects.get(pk=nodegroup.pk)
+            if node.source_identifier_id:
+                source_nodegroup = models.NodeGroup.objects.get(pk=node.source_identifier_id)
 
-        import pdb; pdb.set_trace()
+                source_nodegroup.cardinality = nodegroup.cardinality
+                source_nodegroup.legacygroupid = nodegroup.legacygroupid
 
+                if nodegroup.parentnodegroup_id:
+                    nodegroup_parent_node = models.Node.objects.get(pk=nodegroup.parentnodegroup_id)
 
+                    if nodegroup_parent_node.source_identifier_id:
+                        source_nodegroup.parentnodegroup_id = nodegroup_parent_node.source_identifier_id
 
-        for _cardid, card in self.cards.items():
-            card.graph_id = source_graph.pk
-            card.save()
+                source_nodegroup.save()
 
-        # for _nodeid, node in self.nodes.items():
-        #     node.graph_id = source_graph.pk
-        #     node.save()
-
-        # for _edgeid, edge in self.edges.items():
-        #     edge.graph_id = source_graph.pk
-        #     edge.save()
-
-
-
-
-
-        # source_graph.root.delete()
-
-        # source_graph.slug = None
-        # source_graph.root = self.root
-        # source_graph.cards = self.cards
-        # source_graph.nodes = self.nodes
-        # source_graph.edges = self.edges
-
-
-        source_graph.save()
+            if nodegroup.parentnodegroup:
+                _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
 
         self.cards = {}
         self.nodes = {}
         self.edges = {}
 
-        self.delete()
+        # Updates cards
+        for future_card in editable_future_graph.cards.values():
+            future_card_nodegroup_node = models.Node.objects.get(pk=future_card.nodegroup.pk)
 
-        return source_graph.create_editable_future_graph()
+            if future_card.source_identifier:
+                source_card = future_card.source_identifier
+                self.cards[source_card.pk] = source_card
+
+                source_card.active = future_card.active
+                source_card.component_id = future_card.component_id
+                source_card.config = future_card.config
+                source_card.cssclass = future_card.cssclass
+                source_card.description = future_card.description
+                source_card.helpenabled = future_card.helpenabled
+                source_card.helptext = future_card.helptext
+                source_card.helptitle = future_card.helptitle
+                source_card.instructions = future_card.instructions
+                source_card.name = future_card.name
+                source_card.sortorder = future_card.sortorder
+                source_card.visible = future_card.visible
+
+                if future_card_nodegroup_node.source_identifier_id:
+                    source_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
+                else:
+                    source_card.nodegroup_id = future_card.nodegroup.pk
+
+                source_card.save()
+            else:  # newly-created card
+                self.cards[future_card.pk] = future_card
+                editable_future_graph.cards[future_card.pk] = None
+
+                future_card.graph_id = self.pk
+
+                if future_card_nodegroup_node.source_identifier_id:
+                    future_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
+
+                future_card.save()
+
+            _update_source_nodegroup_hierarchy(future_card.nodegroup)
+
+        # Updates nodes
+        for future_node in editable_future_graph.nodes.values():
+            future_node_nodegroup_node = models.Node.objects.get(pk=future_node.nodegroup.pk)
+
+            if future_node.source_identifier:
+                source_node = future_node.source_identifier
+                self.nodes[source_node.pk] = source_node
+
+                source_node.alias = future_node.alias
+                source_node.config = future_node.config
+                source_node.datatype = future_node.datatype
+                source_node.description = future_node.description
+                source_node.exportable = future_node.exportable
+                source_node.fieldname = future_node.fieldname
+                source_node.hascustomalias = future_node.hascustomalias
+                # source_node.is_collector = future_node.is_collector
+                source_node.isrequired = future_node.isrequired
+                source_node.issearchable = future_node.issearchable
+                source_node.istopnode = future_node.istopnode
+                source_node.name = future_node.name
+                source_node.ontologyclass = future_node.ontologyclass
+                source_node.sortorder = future_node.sortorder
+
+                if future_node_nodegroup_node.source_identifier_id:
+                    source_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
+                else:
+                    source_node.nodegroup_id = future_node.nodegroup.pk
+  
+                source_node.save()
+            else:  # newly-created node
+                self.nodes[future_node.pk] = future_node
+                editable_future_graph.nodes[future_node.pk] = None
+
+                future_node.graph_id = self.pk
+
+                if future_node_nodegroup_node.source_identifier_id:
+                    future_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
+
+                future_node.save()
+
+            _update_source_nodegroup_hierarchy(future_node.nodegroup)
+
+        # Updates edges
+        for future_edge in editable_future_graph.edges.values():
+            if future_edge.source_identifier_id:
+                source_edge = future_edge.source_identifier
+                self.edges[source_edge.pk] = source_edge
+
+
+                source_edge.description = future_edge.description
+                source_edge.name = future_edge.name
+                source_edge.ontologyproperty = future_edge.ontologyproperty
+
+                source_edge.domainnode_id = future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
+                source_edge.rangenode_id = future_edge.rangenode.source_identifier.pk if future_edge.rangenode.source_identifier else future_edge.rangenode_id
+
+                source_edge.save()
+            else:
+                self.edges[future_edge.pk] = future_edge
+                editable_future_graph.edges[future_edge.pk] = None
+
+                future_edge.graph_id = self.pk
+
+                future_edge.domainnode_id = future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
+                future_edge.rangenode_id = future_edge.rangenode.source_identifier.pk if future_edge.rangenode.source_identifier else future_edge.rangenode_id
+                
+                future_edge.save()
+
+        # import pdb; pdb.set_trace()
+        self.save()
+
+        for card in editable_future_graph.cards.values():
+            if card:
+                card.delete()
+        for node in editable_future_graph.nodes.values():
+            if node:
+                node.delete()
+        for edge in editable_future_graph.edges.values():
+            if edge:
+                edge.delete()
+
+        editable_future_graph.cards = {}
+        editable_future_graph.nodes = {}
+        editable_future_graph.edges = {}
+        editable_future_graph.delete()
+
+
+        #HEREHEHRE
+        self.create_editable_future_graph(foo='bar')
+
+        # returns an updated copy of self
+        return type(self).objects.get(pk=self.pk)
 
     def publish(self, user, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
-        self.consolidate_with_source_graph()
-        # with transaction.atomic():
-        #     try:
-        #         publication = models.GraphXPublishedGraph.objects.create(
-        #             graph=self,
-        #             notes=notes,
-        #             user=user,
-        #         )
-        #         publication.save()
+        # self.consolidate_with_source_graph()
+        with transaction.atomic():
+            try:
+                publication = models.GraphXPublishedGraph.objects.create(
+                    graph=self,
+                    notes=notes,
+                    user=user,
+                )
+                publication.save()
 
-        #         self.publication = publication
-        #         self.save(validate=False)
+                self.publication = publication
+                self.save(validate=False)
 
-        #         for language_tuple in settings.LANGUAGES:
-        #             language = models.Language.objects.get(code=language_tuple[0])
+                for language_tuple in settings.LANGUAGES:
+                    language = models.Language.objects.get(code=language_tuple[0])
 
-        #             translation.activate(language=language_tuple[0])
+                    translation.activate(language=language_tuple[0])
 
-        #             published_graph = models.PublishedGraph.objects.create(
-        #                 publication=publication,
-        #                 serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
-        #                 language=language,
-        #             )
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication=publication,
+                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                        language=language,
+                    )
 
-        #             published_graph.save()
+                    published_graph.save()
 
-        #         translation.deactivate()
-        #     except Exception as e:
-        #         raise UnpublishedModelError(e)
+                translation.deactivate()
+            except Exception as e:
+                raise UnpublishedModelError(e)
 
     def unpublish(self):
         """

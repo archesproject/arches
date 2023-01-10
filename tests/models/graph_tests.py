@@ -406,7 +406,14 @@ class GraphTests(ArchesTestCase):
         editable_future_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
         editable_future_graph.save()
 
-        editable_future_graph.consolidate_with_source_graph()
+        foo = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph, force_recalculation=True))
+        bar = JSONDeserializer().deserialize(JSONSerializer().serialize(source_graph, force_recalculation=True))
+
+        updated_source_graph = source_graph.update_from_editable_future_graph()
+        baz = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph, force_recalculation=True))
+
+        import pdb; pdb.set_trace()
+
 
         # # tests sync with populated graph
         # editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
