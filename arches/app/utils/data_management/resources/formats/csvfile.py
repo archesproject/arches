@@ -572,17 +572,14 @@ class CsvReader(Reader):
                 try:
                     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], legacyid, overwrite)
                 except KeyError:
-                    try:
-                        resourceinstanceid = process_resourceid(business_data[0]["RESOURCEID"], legacyid, overwrite)
-                    except KeyError:
-                        print("*" * 80)
-                        print(
-                            "ERROR: No column 'ResourceID' found in business data file. \
-                            Please add a 'ResourceID' column with a unique resource identifier."
-                        )
-                        print("*" * 80)
-                        if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
-                            sys.exit()
+                    print("*" * 80)
+                    print(
+                        "ERROR: No column 'ResourceID' found in business data file. \
+                        Please add a 'ResourceID' column with a unique resource identifier."
+                    )
+                    print("*" * 80)
+                    if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
+                        sys.exit()
                 graphid = mapping["resource_model_id"]
                 blanktilecache = {}
                 populated_cardinality_1_nodegroups = {}
