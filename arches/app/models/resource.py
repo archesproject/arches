@@ -204,7 +204,7 @@ class Resource(models.ResourceInstance):
 
         for resource in resources_to_create:
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
-            if resource.legacyid is not None:
+            if resource.legacyid is not None and str(resource.pk) != str(resource.legacyid):
                 logger.info(f"{str(resource.pk)} saved for legacyid: {resource.legacyid}")
 
         for resource in resources:
