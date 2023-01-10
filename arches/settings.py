@@ -473,9 +473,9 @@ EXTERNAL_OAUTH_CONFIGURATION = {
     "redirect_url": "",
     "scopes": [],
     "authorization_endpoint": "",
-    "validate_id_token": True, # AVOID setting this to False
+    "validate_id_token": True,  # AVOID setting this to False
     "token_endpoint": "",
-    "jwks_uri": ""
+    "jwks_uri": "",
 }
 
 CACHES = {
