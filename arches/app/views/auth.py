@@ -25,8 +25,6 @@ import qrcode
 import pyotp
 import time
 import requests
-import jwt
-from jwt import PyJWKClient
 from datetime import datetime, timedelta
 from django.http import HttpResponse
 from django.http.response import HttpResponseForbidden
