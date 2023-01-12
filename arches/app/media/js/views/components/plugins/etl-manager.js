@@ -179,7 +179,6 @@ define([
                     }
                 }).then(function(data){
                     const sampleErrors = data?.data.slice(0,5);
-                    console.log(sampleErrors);
                     self.validationErrors().map(error => {
                         if (error.nodeid === data.data[0].nodeid) {
                             error.details(sampleErrors);
