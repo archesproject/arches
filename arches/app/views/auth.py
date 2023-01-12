@@ -89,7 +89,8 @@ class LoginView(View):
             try:
                 domain = username.split("@")[1]
                 if domain == settings.EXTERNAL_OAUTH_CONFIGURATION["user_domain"]:
-                    redirect_url = "eoauth_start?username={}".format(username)
+                    oauth_url = reverse("external_oauth_start")
+                    redirect_url = f"{oauth_url}?username={username}"
                     return redirect(redirect_url)
             except:
                 pass
