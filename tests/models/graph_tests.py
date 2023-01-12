@@ -400,18 +400,71 @@ class GraphTests(ArchesTestCase):
 
     def test_consolidate_with_source_graph(self):
         source_graph = Graph.new(name="TEST RESOURCE")
+        editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
 
         # tests sync to empty graph
-        editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
         editable_future_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
         editable_future_graph.save()
 
-        foo = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph, force_recalculation=True))
-        bar = JSONDeserializer().deserialize(JSONSerializer().serialize(source_graph, force_recalculation=True))
-
         updated_source_graph = source_graph.update_from_editable_future_graph()
-        baz = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph, force_recalculation=True))
 
+        # ensure updated_source_graph contains data saved to editable_future_graph
+        foo = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
+        bar = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
+
+        for idx, editable_future_graph_serialized_card in enumerate(foo['cards']):
+            updated_source_graph_serialized_card = bar['cards'][idx]
+
+            for key, value in editable_future_graph_serialized_card.items():
+                if key not in ['graph_id', 'nodegroup_id', 'name', 'cardid', 'source_identifier_id']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_card[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_card[key])
+
+        for idx, editable_future_graph_serialized_node in enumerate(foo['nodes']):
+            updated_source_graph_serialized_node = bar['nodes'][idx]
+
+            for key, value in editable_future_graph_serialized_node.items():
+                if key not in ['graph_id', 'nodegroup_id', 'nodeid', 'source_identifier_id']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_node[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_node[key])
+
+        for idx, editable_future_graph_serialized_edge in enumerate(foo['edges']):
+            updated_source_graph_serialized_edge = bar['edges'][idx]
+
+            for key, value in editable_future_graph_serialized_edge.items():
+                if key not in ['graph_id', 'domainnode_id', 'rangenode_id', 'edgeid', 'source_identifier_id']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_edge[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_edge[key])
+
+        for idx, editable_future_graph_serialized_nodegroup in enumerate(foo['nodegroups']):
+            updated_source_graph_serialized_nodegroup = bar['nodegroups'][idx]
+
+            for key, value in editable_future_graph_serialized_nodegroup.items():
+                if key not in ['parentnodegroup_id', 'nodegroupid', 'legacygroupid']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_nodegroup[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_nodegroup[key])
+
+        # NEED TO TEST FUNCTIONS / WIDGETS
+
+        for key, value in foo.items():
+            print(key)
+            if key == 'name':
+                self.assertEqual(value, bar[key] + '__EDITABLE_FUTURE_VERSION')
+            elif key not in ['graphid', 'cards', 'nodes', 'edges', 'nodegroups', 'functions', 'root', 'widgets', 'source_identifier']:
+                if type(value) == 'dict':
+                    self.assertDictEqual(value, bar[key])
+                else:
+                    self.assertEqual(value, bar[key])
+
+        # updated_editable_future_graph = Graph.objects.get(source_identifier=updated_source_graph.pk)
         import pdb; pdb.set_trace()
 
 

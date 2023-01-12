@@ -81,7 +81,6 @@ class Graph(models.GraphModel):
 
         if args:
             if isinstance(args[0], dict):
-
                 for key, value in args[0].items():
                     if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable", "publication"):
                         setattr(self, key, value)
@@ -118,7 +117,6 @@ class Graph(models.GraphModel):
                 if "publication" in args[0] and args[0]["publication"] is not None:
                     publication_data = args[0]["publication"]
                     self.publication = models.GraphXPublishedGraph(**publication_data)
-
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
@@ -188,23 +186,20 @@ class Graph(models.GraphModel):
                     cards = self.cardmodel_set.all()
 
                 edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
-
                 for card in cards:
                     widgets = list(card.cardxnodexwidget_set.all())
                     for widget in widgets:
                         self.widgets[widget.pk] = widget
-
                 node_lookup = {}
                 for node in nodes:
                     self.add_node(node)
                     node_lookup[str(node.nodeid)] = node
-
                 for edge in edges:
+                    # print(edge_lookup)
                     edge_dict = edge_lookup[str(edge.edgeid)]
                     edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
                     edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
                     self.add_edge(edge)
-
                 for card in cards:
                     self.add_card(card)
 
@@ -1749,8 +1744,8 @@ class Graph(models.GraphModel):
         )
         editable_future_graph.source_identifier = self.graphid
 
-        if foo == 'bar':
-            import pdb; pdb.set_trace()
+        # if foo == 'bar':
+        #     import pdb; pdb.set_trace()
         editable_future_graph.save()
         return editable_future_graph
 
@@ -1894,7 +1889,6 @@ class Graph(models.GraphModel):
                 
                 future_edge.save()
 
-        # import pdb; pdb.set_trace()
         self.save()
 
         for card in editable_future_graph.cards.values():
@@ -1912,12 +1906,10 @@ class Graph(models.GraphModel):
         editable_future_graph.edges = {}
         editable_future_graph.delete()
 
-
-        #HEREHEHRE
-        self.create_editable_future_graph(foo='bar')
-
-        # returns an updated copy of self
-        return type(self).objects.get(pk=self.pk)
+        graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
+        graph_from_database.create_editable_future_graph()
+        
+        return graph_from_database
 
     def publish(self, user, notes=None):
         """
