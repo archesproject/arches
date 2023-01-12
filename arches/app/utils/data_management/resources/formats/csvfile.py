@@ -829,6 +829,10 @@ class CsvReader(Reader):
                         errors = []
                         datatype_instance = self.datatype_factory.get_instance(datatype)
                         if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
+                            if len(str(value)) == 37:
+                                value = str(value)
+                                value = value[0:36]
+                                logger.warn(f"Extra character removed {row_number} from index 36 of UUID {value}")
                             try:
                                 uuid.UUID(value)
                             except:
