@@ -195,7 +195,6 @@ class Graph(models.GraphModel):
                     self.add_node(node)
                     node_lookup[str(node.nodeid)] = node
                 for edge in edges:
-                    # print(edge_lookup)
                     edge_dict = edge_lookup[str(edge.edgeid)]
                     edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
                     edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
@@ -1471,14 +1470,10 @@ class Graph(models.GraphModel):
 
             ret["edges"] = [edge for key, edge in self.edges.items()] if "edges" not in exclude else ret.pop("edges", None)
 
-            # import pdb; pdb.set_trace()
-
             if "nodes" not in exclude:
                 ret["nodes"] = []
                 for key, node in self.nodes.items():
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
-
-                    # HERE HERHEHEHREHEHREHEHEREHEREHEREHEREHEREHEREHEREHEREHREDHERHERHERHE
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
                     ret["nodes"].append(nodeobj)
             else:
@@ -1789,34 +1784,19 @@ class Graph(models.GraphModel):
                 source_card = future_card.source_identifier
                 self.cards[source_card.pk] = source_card
 
-                source_card.active = future_card.active
-                source_card.component_id = future_card.component_id
-                source_card.config = future_card.config
-                source_card.cssclass = future_card.cssclass
-                source_card.description = future_card.description
-                source_card.helpenabled = future_card.helpenabled
-                source_card.helptext = future_card.helptext
-                source_card.helptitle = future_card.helptitle
-                source_card.instructions = future_card.instructions
-                source_card.name = future_card.name
-                source_card.sortorder = future_card.sortorder
-                source_card.visible = future_card.visible
+                serialized_card = JSONDeserializer().deserialize(JSONSerializer().serialize(source_card))
+                for key in serialized_card.keys():
+                    if key not in ['graph_id', 'cardid', 'nodegroup_id', 'source_identifier_id']:
+                        setattr(source_card, key, getattr(future_card, key))
 
-                if future_card_nodegroup_node.source_identifier_id:
-                    source_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
-                else:
-                    source_card.nodegroup_id = future_card.nodegroup.pk
-
+                source_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id if future_card_nodegroup_node.source_identifier_id else source_card.nodegroup_id
                 source_card.save()
             else:  # newly-created card
                 self.cards[future_card.pk] = future_card
                 editable_future_graph.cards[future_card.pk] = None
 
                 future_card.graph_id = self.pk
-
-                if future_card_nodegroup_node.source_identifier_id:
-                    future_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
-
+                future_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id if future_card_nodegroup_node.source_identifier_id else future_card.nodegroup_id
                 future_card.save()
 
             _update_source_nodegroup_hierarchy(future_card.nodegroup)
@@ -1829,36 +1809,19 @@ class Graph(models.GraphModel):
                 source_node = future_node.source_identifier
                 self.nodes[source_node.pk] = source_node
 
-                source_node.alias = future_node.alias
-                source_node.config = future_node.config
-                source_node.datatype = future_node.datatype
-                source_node.description = future_node.description
-                source_node.exportable = future_node.exportable
-                source_node.fieldname = future_node.fieldname
-                source_node.hascustomalias = future_node.hascustomalias
-                # source_node.is_collector = future_node.is_collector
-                source_node.isrequired = future_node.isrequired
-                source_node.issearchable = future_node.issearchable
-                source_node.istopnode = future_node.istopnode
-                source_node.name = future_node.name
-                source_node.ontologyclass = future_node.ontologyclass
-                source_node.sortorder = future_node.sortorder
+                serialized_node = JSONDeserializer().deserialize(JSONSerializer().serialize(source_node))
+                for key in serialized_node.keys():
+                    if key not in ['graph_id', 'nodeid', 'nodegroup_id', 'source_identifier_id', 'is_collector']:
+                        setattr(source_node, key, getattr(future_node, key))
 
-                if future_node_nodegroup_node.source_identifier_id:
-                    source_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
-                else:
-                    source_node.nodegroup_id = future_node.nodegroup.pk
-  
+                source_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id if future_node_nodegroup_node.source_identifier_id else future_node.nodegroup_id
                 source_node.save()
             else:  # newly-created node
                 self.nodes[future_node.pk] = future_node
                 editable_future_graph.nodes[future_node.pk] = None
 
                 future_node.graph_id = self.pk
-
-                if future_node_nodegroup_node.source_identifier_id:
-                    future_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
-
+                future_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id if future_node_nodegroup_node.source_identifier_id else future_node.nodegroup_id 
                 future_node.save()
 
             _update_source_nodegroup_hierarchy(future_node.nodegroup)
@@ -1869,24 +1832,21 @@ class Graph(models.GraphModel):
                 source_edge = future_edge.source_identifier
                 self.edges[source_edge.pk] = source_edge
 
-
-                source_edge.description = future_edge.description
-                source_edge.name = future_edge.name
-                source_edge.ontologyproperty = future_edge.ontologyproperty
+                serialized_edge = JSONDeserializer().deserialize(JSONSerializer().serialize(source_edge))
+                for key in serialized_edge.keys():
+                    if key not in ['domainnode_id', 'edgeid', 'graph_id', 'rangenode_id', 'source_identifier_id']:
+                        setattr(source_edge, key, getattr(future_edge, key))
 
                 source_edge.domainnode_id = future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
                 source_edge.rangenode_id = future_edge.rangenode.source_identifier.pk if future_edge.rangenode.source_identifier else future_edge.rangenode_id
-
                 source_edge.save()
-            else:
+            else:  # newly-created edge
                 self.edges[future_edge.pk] = future_edge
                 editable_future_graph.edges[future_edge.pk] = None
 
                 future_edge.graph_id = self.pk
-
                 future_edge.domainnode_id = future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
                 future_edge.rangenode_id = future_edge.rangenode.source_identifier.pk if future_edge.rangenode.source_identifier else future_edge.rangenode_id
-                
                 future_edge.save()
 
         self.save()

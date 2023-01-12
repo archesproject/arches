@@ -402,7 +402,7 @@ class GraphTests(ArchesTestCase):
         source_graph = Graph.new(name="TEST RESOURCE")
         editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
 
-        # tests sync to empty graph
+        # BEGIN tests sync to empty graph
         editable_future_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
         editable_future_graph.save()
 
@@ -466,6 +466,8 @@ class GraphTests(ArchesTestCase):
 
         # updated_editable_future_graph = Graph.objects.get(source_identifier=updated_source_graph.pk)
         import pdb; pdb.set_trace()
+        # END tests sync to empty graph
+
 
 
         # # tests sync with populated graph
