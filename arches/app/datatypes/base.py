@@ -37,7 +37,7 @@ class BaseDataType(object):
         error_message = {
             "type": "ERROR",
             "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_name, value, source_info, message),
-            "title": title
+            "title": title,
         }
         return error_message
 

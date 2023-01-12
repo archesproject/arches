@@ -1637,6 +1637,7 @@ class LoadStaging(models.Model):
         managed = True
         db_table = "load_staging"
 
+
 class loadErrors(models.Model):
     load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
     nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE)

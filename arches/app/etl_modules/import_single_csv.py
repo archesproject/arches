@@ -243,10 +243,11 @@ class ImportSingleCsv(BaseImportModule):
                                 error_message = (
                                     "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
                                 )
-                                cursor.execute("""
+                                cursor.execute(
+                                    """
                                     INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
 						            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                                    ('node', source_value, csv_file_name, error["title"], error["message"], datatype, loadid, node)
+                                    ("node", source_value, csv_file_name, error["title"], error["message"], datatype, loadid, node),
                                 )
 
                             if nodegroupid in dict_by_nodegroup:
@@ -314,12 +315,14 @@ class ImportSingleCsv(BaseImportModule):
                         )
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
 					SELECT 'tile', source_description, error_message, loadid, nodegroupid
                     FROM load_staging 
                     WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-                    """,[loadid]
+                    """,
+                    [loadid],
                 )
 
         self.delete_from_default_storage(temp_dir)

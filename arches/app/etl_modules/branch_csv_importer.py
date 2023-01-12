@@ -124,10 +124,11 @@ class BranchCsvImporter(BaseImportModule):
                 error_message = ""
                 for error in validation_errors:
                     error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                         INSERT INTO load_errors (type, value, error, message, datatype, loadid, nodeid)
                         VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                        ('node', source_value, error["title"], error["message"], datatype, self.loadid, nodeid)
+                        ("node", source_value, error["title"], error["message"], datatype, self.loadid, nodeid),
                     )
 
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
@@ -164,7 +165,9 @@ class BranchCsvImporter(BaseImportModule):
                         nodegroup_depth, str(tileid), previous_tile, nodegroup_alias, nodegroup_tile_lookup
                     )
                     legacyid, resourceid = self.set_legacy_id(resourceid)
-                    tile_value_json, passes_validation = self.create_tile_value(cell_values, data_node_lookup, node_lookup, row_details, cursor)
+                    tile_value_json, passes_validation = self.create_tile_value(
+                        cell_values, data_node_lookup, node_lookup, row_details, cursor
+                    )
                     cursor.execute(
                         """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (
@@ -307,12 +310,14 @@ class BranchCsvImporter(BaseImportModule):
             for file in files.keys():
                 self.stage_excel_file(file, summary, cursor)
             cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
                 SELECT 'tile', source_description, error_message, loadid, nodegroupid
                 FROM load_staging 
                 WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-                """,[loadid]
+                """,
+                [loadid],
             )
             result["validation"] = self.validate()
             if len(result["validation"]["data"]) == 0:

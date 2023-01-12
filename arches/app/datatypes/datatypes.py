@@ -864,8 +864,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
-                    message = _("Geometry has too many coordinates for Elasticsearch ({0}), \
-                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(coordinate_count, coord_limit))
+                    message = _(
+                        "Geometry has too many coordinates for Elasticsearch ({0}), \
+                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
+                            coordinate_count, coord_limit
+                        )
+                    )
                     title = _("Geometry Too Many Coordinates for ES")
                     errors.append(
                         {
@@ -878,8 +882,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     )
 
                 if bbox.contains(geom) == False:
-                    message = _("Geometry does not fall within the bounding box of the selected coordinate system. \
-                         Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property.")
+                    message = _(
+                        "Geometry does not fall within the bounding box of the selected coordinate system. \
+                         Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
+                    )
                     title = _("Geometry Out Of Bounds")
                     errors.append(
                         {
@@ -2434,13 +2440,9 @@ class NodeValueDataType(BaseDataType):
             try:
                 models.TileModel.objects.get(tileid=value)
             except ObjectDoesNotExist:
-                message = _("{0} {1} is not a valid tile id. This data was not imported.".format(value,row_number))
+                message = _("{0} {1} is not a valid tile id. This data was not imported.".format(value, row_number))
                 title = _("Invalid Tile Id")
-                errors.append({
-                    "type": "ERROR",
-                    "message": message,
-                    "title": title
-                })
+                errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
     def get_display_value(self, tile, node, **kwargs):
