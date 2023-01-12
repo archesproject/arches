@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.signals import user_logged_out, user_logged_in
 from django.dispatch import receiver
+from django.urls import reverse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ExternalOauthToken
 from datetime import datetime, timedelta
@@ -26,7 +27,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             uid_claim = oauth2_settings["uid_claim"]
             client_id = oauth2_settings["app_id"]
             app_secret = oauth2_settings["app_secret"]
-            redirect_uri = oauth2_settings["redirect_url"]
+            redirect_uri = request.build_absolute_uri(reverse("external_oauth_callback"))
             uid_claim_source = oauth2_settings["uid_claim_source"] if "uid_claim_source" in oauth2_settings else "id_token"
 
             oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.session["oauth_state"])
@@ -174,7 +175,7 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
         """Return authorization URL to redirect user to and XSRF state token"""
         oauth2_settings = ExternalOauthAuthenticationBackend.get_oauth2_settings()
         client_id = oauth2_settings["app_id"]
-        redirect_uri = oauth2_settings["redirect_url"]
+        redirect_uri = request.build_absolute_uri(reverse("external_oauth_callback"))
         scope = oauth2_settings["scopes"]
         auth_url = oauth2_settings["authorization_endpoint"]
 
