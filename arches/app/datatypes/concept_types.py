@@ -116,20 +116,9 @@ class ConceptDataType(BaseConceptDataType):
             try:
                 uuid.UUID(str(value))
             except ValueError:
-                if len(str(value)) == 37:
-                    clipped_value = str(value)
-                    clipped_value = clipped_value[0:36]
-                    try:
-                        uuid.UUID(str(clipped_value))
-                        value = clipped_value
-                    except ValueError:
-                        message = _("This is an invalid concept prefLabel, or an incomplete UUID")
-                        error_message = self.create_error_message(value, source, row_number, message)
-                        errors.append(error_message)
-                else:
-                    message = _("This is an invalid concept prefLabel, or an incomplete UUID")
-                    error_message = self.create_error_message(value, source, row_number, message)
-                    errors.append(error_message)
+                message = _("This is an invalid concept prefLabel, or an incomplete UUID")
+                error_message = self.create_error_message(value, source, row_number, message)
+                errors.append(error_message)
                 return errors
 
             try:
@@ -142,7 +131,12 @@ class ConceptDataType(BaseConceptDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        return value.strip()
+        value = value.strip()
+        if len(str(value)) == 37:
+            value = str(value)
+            value = value[0:36]
+            logger.warn(f"Extra character removed from index 36 of UUID {value}")
+        return value
 
     def transform_export_values(self, value, *args, **kwargs):
         concept_export_value_type = kwargs.get("concept_export_value_type", None)
