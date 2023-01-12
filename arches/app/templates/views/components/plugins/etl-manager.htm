@@ -195,32 +195,61 @@
                             <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                                 <thead>
                                     <tr>
-                                        <th data-bind="text: 'Error'"></th>
-                                        <th data-bind="text: 'Source'"></th>
+                                        <th>{% trans "Location" %}</th>
+                                        <th>{% trans "Error" %}</th>
+                                        <th>{% trans "Datatype" %}</th>
+                                        <th>{% trans "Count" %}</th>
+                                        <th>{% trans "Details" %}</th>
                                     </tr>
                                 </thead>
                                 <!-- ko if: selectedLoadEvent().error_message -->
                                 <tbody>
                                     <tr>
-                                        <td colspan="3" data-bind="text: selectedLoadEvent().error_message"></td>
+                                        <td colspan="5" data-bind="text: selectedLoadEvent().error_message"></td>
                                     </tr>
-                                </tbody>
-                                <!-- /ko --> 
-                                <!-- ko if: validationError().length -->
-                                <tbody>
-                                    <!-- ko foreach: validationError -->
-                                    <tr>
-                                        <td data-bind="text: $data[1]"></td>
-                                        <td data-bind="text: $data[0]"></td>
-                                    </tr>
-                                    <!-- /ko -->
                                 </tbody>
                                 <!-- /ko -->
-                                <!-- ko ifnot: validationError().length || selectedLoadEvent().error_message -->
+                                <!-- ko if: validationErrors().length -->
+                                <tbody>
+                                    <!-- ko foreach: validationErrors -->
+                                    <tr>
+                                        <td data-bind="text: $data.source"></td>
+                                        <td data-bind="text: $data.error"></td>
+                                        <td data-bind="text: $data.datatype"></td>
+                                        <td data-bind="text: $data.count"></td>
+                                        <td class='etl-error-report-link'
+                                            data-bind="
+                                                if: $data.type === 'node',
+                                                click: function(){
+                                                    $data.showDetails(!$data.showDetails());
+                                                    $parent.getNodeError($parent.selectedLoadEvent().loadid, $data);
+                                                }">{% trans "Show 1st Five" %}</td>
+                                    </tr>
+                                        <!-- ko if: $data.showDetails -->
+                                        <tr>
+                                            <td><em>{% trans "Value" %}</em></td>
+                                            <td><em>{% trans "Source" %}</em></td>
+                                            <td><em>{% trans "Description" %}</em></td>
+                                        </tr>
+                                            <!-- ko foreach: { data: $data.details, as: "details" } -->
+                                            <tr>
+                                                <td data-bind="text: details.value"></td>
+                                                <td data-bind="text: details.source"></td>
+                                                <td data-bind="text: details.message"></td>
+                                            </tr>
+                                            <!-- /ko -->
+                                        <!-- /ko -->
+                                    <!-- /ko -->
+                                    <tr>
+                                        <td class='etl-error-report-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
+                                    </tr>
+                                </tbody>
+                                <!-- /ko -->
+                                <!-- ko ifnot: validationErrors().length || selectedLoadEvent().error_message -->
                                 <tbody>
                                     <tr>
                                         <span ></span>
-                                        <td colspan="3">
+                                        <td colspan="5">
                                             <span data-bind="text: $root.translations.noErrorFound"></span>
                                         </td>
                                     </tr>

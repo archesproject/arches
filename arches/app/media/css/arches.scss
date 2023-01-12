@@ -14581,6 +14581,11 @@ ul.select2-choices:after {
     cursor: pointer;
 }
 
+.etl-error-report-link {
+    color: steelblue;
+    cursor: pointer;
+}
+
 .etl-job-task-bar .task a:hover{
     background: rgba(156, 195, 228, 0.35);
     border: 1px solid #6AA0CC;

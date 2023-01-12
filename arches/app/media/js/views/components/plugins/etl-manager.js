@@ -20,7 +20,7 @@ define([
             this.loadEvents = ko.observable();
             this.selectedLoadEvent = ko.observable();
             this.validated = ko.observable();
-            this.validationError = ko.observableArray();
+            this.validationErrors = ko.observableArray();
             this.paginator = ko.observable();
 
             this.selectedLoadEvent.subscribe(function(val){
@@ -157,7 +157,34 @@ define([
                     }
                 }).then(function(data){
                     self.validated(true);
-                    self.validationError(data.data);
+                    const errors = data.data;
+                    errors.map(error => {
+                        error.showDetails = ko.observable(false);
+                        error.details = ko.observable();    
+                    })
+                    self.validationErrors(errors);
+                });
+            };
+
+            this.getErrorReport = function(loadid){
+                const url = arches.urls.etl_manager + "?action=errorReport&loadid="+loadid;
+                window.open(url);
+            };
+
+            this.getNodeError = function(loadid, error){
+                const url = `${arches.urls.etl_manager}?action=nodeError&nodeid=${error.nodeid}&error=${error.error}&loadid=${loadid}`;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    const sampleErrors = data?.data.slice(0,5);
+                    console.log(sampleErrors);
+                    self.validationErrors().map(error => {
+                        if (error.nodeid === data.data[0].nodeid) {
+                            error.details(sampleErrors);
+                        }
+                    });
                 });
             };
 
