@@ -131,12 +131,7 @@ class ConceptDataType(BaseConceptDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        value = value.strip()
-        if len(str(value)) == 37:
-            value = str(value)
-            value = value[0:36]
-            logger.warn(f"Extra character removed from index 36 of UUID {value}")
-        return value
+        return value.strip()
 
     def transform_export_values(self, value, *args, **kwargs):
         concept_export_value_type = kwargs.get("concept_export_value_type", None)
