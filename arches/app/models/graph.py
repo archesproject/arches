@@ -1777,7 +1777,7 @@ class Graph(models.GraphModel):
         self.edges = {}
 
         # Updates cards
-        for future_card in editable_future_graph.cards.values():
+        for future_card in list(editable_future_graph.cards.values()):
             future_card_nodegroup_node = models.Node.objects.get(pk=future_card.nodegroup.pk)
 
             if future_card.source_identifier:
@@ -1793,7 +1793,7 @@ class Graph(models.GraphModel):
                 source_card.save()
             else:  # newly-created card
                 self.cards[future_card.pk] = future_card
-                editable_future_graph.cards[future_card.pk] = None
+                del editable_future_graph.cards[future_card.pk]
 
                 future_card.graph_id = self.pk
                 future_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id if future_card_nodegroup_node.source_identifier_id else future_card.nodegroup_id
@@ -1802,7 +1802,7 @@ class Graph(models.GraphModel):
             _update_source_nodegroup_hierarchy(future_card.nodegroup)
 
         # Updates nodes
-        for future_node in editable_future_graph.nodes.values():
+        for future_node in list(editable_future_graph.nodes.values()):
             future_node_nodegroup_node = models.Node.objects.get(pk=future_node.nodegroup.pk)
 
             if future_node.source_identifier:
@@ -1818,7 +1818,7 @@ class Graph(models.GraphModel):
                 source_node.save()
             else:  # newly-created node
                 self.nodes[future_node.pk] = future_node
-                editable_future_graph.nodes[future_node.pk] = None
+                del editable_future_graph.nodes[future_node.pk]
 
                 future_node.graph_id = self.pk
                 future_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id if future_node_nodegroup_node.source_identifier_id else future_node.nodegroup_id 
@@ -1827,7 +1827,7 @@ class Graph(models.GraphModel):
             _update_source_nodegroup_hierarchy(future_node.nodegroup)
 
         # Updates edges
-        for future_edge in editable_future_graph.edges.values():
+        for future_edge in list(editable_future_graph.edges.values()):
             if future_edge.source_identifier_id:
                 source_edge = future_edge.source_identifier
                 self.edges[source_edge.pk] = source_edge
@@ -1842,7 +1842,7 @@ class Graph(models.GraphModel):
                 source_edge.save()
             else:  # newly-created edge
                 self.edges[future_edge.pk] = future_edge
-                editable_future_graph.edges[future_edge.pk] = None
+                del editable_future_graph.edges[future_edge.pk]
 
                 future_edge.graph_id = self.pk
                 future_edge.domainnode_id = future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
@@ -1851,19 +1851,17 @@ class Graph(models.GraphModel):
 
         self.save()
 
-        for card in editable_future_graph.cards.values():
-            if card:
-                card.delete()
-        for node in editable_future_graph.nodes.values():
-            if node:
-                node.delete()
-        for edge in editable_future_graph.edges.values():
-            if edge:
-                edge.delete()
+        # manually deletes `card`, `node`, and `widget` objects from the `editable_future_graph`, then sets these values
+        # to empty dicts on the `editable_future_graph`. This ensures that superflous objects are deleted, and essential 
+        # objects that have been re-assigned to the `source_graph` are NOT deleted via waterfall deletion when the
+        # `editable_future_graph` is deleted.
+        for value in list(editable_future_graph.cards.values()) + list(editable_future_graph.nodes.values()) + list(editable_future_graph.edges.values()):
+            value.delete()
 
         editable_future_graph.cards = {}
         editable_future_graph.nodes = {}
         editable_future_graph.edges = {}
+
         editable_future_graph.delete()
 
         graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
