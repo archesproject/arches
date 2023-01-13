@@ -36,7 +36,8 @@ define([
         this.numberOfCol = ko.observable();
         this.numberOfRow = ko.observable();
         this.numberOfExampleRow = ko.observable();
-
+        this.languages = ko.observableArray();
+        this.languages(arches.languages);
         this.fileAdded = ko.observable(false);
         this.validated = ko.observable();
         this.validationError = ko.observableArray();
@@ -79,6 +80,7 @@ define([
                         return {
                             field: header,
                             node: ko.observable(),
+                            language: ko.observable(arches.activeLanguage),
                         };
                     })
                 );
@@ -136,6 +138,12 @@ define([
                 self.formData.append('graphid', graph);
                 self.submit('get_nodes').then(function(response){
                     const nodes = response.result.map(node => ({ ...node, label: node.alias }));
+                    self.stringNodes = nodes.reduce((acc, node) => {
+                        if (node.datatype === 'string') {
+                            acc.push(node.alias);
+                        }
+                        return acc;
+                    }, []);
                     nodes.unshift({
                         alias: "resourceid",
                         label: arches.translations.idColumnSelection,
@@ -161,6 +169,7 @@ define([
                 self.fileAdded(true);
                 self.loading(false);
             }).fail(function(err) {
+                console.log(err);
                 self.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON, null, function(){}));
                 self.loading(false);
             });
@@ -181,6 +190,7 @@ define([
                 self.submit('write').then(data => {
                     console.log(data.result);
                 }).fail( function(err) {
+                    console.log(err);
                     self.alert(
                         new JsonErrorAlertViewModel(
                             'ep-alert-red',
