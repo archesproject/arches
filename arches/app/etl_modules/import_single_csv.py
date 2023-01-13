@@ -206,7 +206,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join("uploadedfiles", "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         with default_storage.open(csv_file_path, mode="r") as csvfile:
-            reader = csv.reader(csvfile) # if there is a duplicate field, DictReader will not work
+            reader = csv.reader(csvfile)  # if there is a duplicate field, DictReader will not work
 
             if has_headers:
                 next(reader)
@@ -242,12 +242,14 @@ class ImportSingleCsv(BaseImportModule):
                                 errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
                             elif datatype == "string":
                                 try:
-                                    code  = csv_mapping[i]["language"]["code"]
-                                    direction  = csv_mapping[i]["language"]["default_direction"]
+                                    code = csv_mapping[i]["language"]["code"]
+                                    direction = csv_mapping[i]["language"]["default_direction"]
                                     transformed_value = {code: {"value": row[i], "direction": direction}}
                                 except:
                                     transformed_value = source_value
-                                value = datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
+                                value = (
+                                    datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
+                                )
                                 errors = datatype_instance.validate(value, nodeid=node)
                             else:
                                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
@@ -294,11 +296,11 @@ class ImportSingleCsv(BaseImportModule):
                         for node in dict_by_nodegroup[nodegroup]:
                             for key in node:
                                 if tile_data[key]:
-                                    if tile_data[key]['datatype'] == 'string':
-                                        tile_data[key]['value'].update(node[key]['value'])
-                                        tile_data[key]["source"] += (" | " + node[key]['source'])
-                                        tile_data[key]["notes"] = " | ".join([tile_data[key]["notes"], node[key]['notes']])
-                                        tile_data[key]["valid"] = tile_data[key]["valid"] and node[key]['valid']
+                                    if tile_data[key]["datatype"] == "string":
+                                        tile_data[key]["value"].update(node[key]["value"])
+                                        tile_data[key]["source"] += " | " + node[key]["source"]
+                                        tile_data[key]["notes"] = " | ".join([tile_data[key]["notes"], node[key]["notes"]])
+                                        tile_data[key]["valid"] = tile_data[key]["valid"] and node[key]["valid"]
                                 else:
                                     tile_data[key] = node[key]
                                 if node[key]["valid"] is False:
