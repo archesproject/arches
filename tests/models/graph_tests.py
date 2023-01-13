@@ -398,107 +398,200 @@ class GraphTests(ArchesTestCase):
     #         with self.assertRaises(KeyError):
     #             graph.edges[newedge.pk]
 
-    def test_consolidate_with_source_graph(self):
+    # def test_update_empty_graph_from_editable_future_graph(self):
+    #     source_graph = Graph.new(name="TEST RESOURCE")
+    #     editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
+
+    #     editable_future_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
+    #     editable_future_graph.save()
+
+    #     updated_source_graph = source_graph.update_from_editable_future_graph()
+
+    #     serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
+    #     serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
+
+    #     for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph['cards']):
+    #         updated_source_graph_serialized_card = serialized_updated_source_graph['cards'][idx]
+
+    #         # ensures all relevant values are equal between graphs
+    #         for key, value in editable_future_graph_serialized_card.items():
+    #             if key not in ['graph_id', 'nodegroup_id', 'name', 'cardid', 'source_identifier_id']:
+    #                 if type(value) == 'dict':
+    #                     self.assertDictEqual(value, updated_source_graph_serialized_card[key])
+    #                 else:
+    #                     self.assertEqual(value, updated_source_graph_serialized_card[key])
+
+    #         # ensures all superflous values relating to `editable_future_graph` have been deleted
+    #         try:
+    #             future_card_from_database = models.CardModel.objects.get(pk=editable_future_graph_serialized_card['cardid'])
+    #             self.assertEqual(str(future_card_from_database.graph_id), updated_source_graph_serialized_card['graph_id'])
+    #         except models.CardModel.DoesNotExist:
+    #             pass  # card has been successfully deleted
+
+    #     for idx, editable_future_graph_serialized_node in enumerate(serialized_editable_future_graph['nodes']):
+    #         updated_source_graph_serialized_node = serialized_updated_source_graph['nodes'][idx]
+
+    #         # ensures all relevant values are equal between graphs
+    #         for key, value in editable_future_graph_serialized_node.items():
+    #             if key not in ['graph_id', 'nodegroup_id', 'nodeid', 'source_identifier_id']:
+    #                 if type(value) == 'dict':
+    #                     self.assertDictEqual(value, updated_source_graph_serialized_node[key])
+    #                 else:
+    #                     self.assertEqual(value, updated_source_graph_serialized_node[key])
+
+    #         # ensures all superflous values relating to `editable_future_graph` have been deleted
+    #         try:
+    #             future_node_from_database = models.Node.objects.get(pk=editable_future_graph_serialized_node['nodeid'])
+    #             self.assertEqual(str(future_node_from_database.graph_id), updated_source_graph_serialized_node['graph_id'])
+    #         except models.Node.DoesNotExist:
+    #             pass  # node has been successfully deleted
+
+    #     for idx, editable_future_graph_serialized_edge in enumerate(serialized_editable_future_graph['edges']):
+    #         updated_source_graph_serialized_edge = serialized_updated_source_graph['edges'][idx]
+
+    #         # ensures all relevant values are equal between graphs
+    #         for key, value in editable_future_graph_serialized_edge.items():
+    #             if key not in ['graph_id', 'domainnode_id', 'rangenode_id', 'edgeid', 'source_identifier_id']:
+    #                 if type(value) == 'dict':
+    #                     self.assertDictEqual(value, updated_source_graph_serialized_edge[key])
+    #                 else:
+    #                     self.assertEqual(value, updated_source_graph_serialized_edge[key])
+
+    #         # ensures all superflous values relating to `editable_future_graph` have been deleted
+    #         try:
+    #             future_edge_from_database = models.Edge.objects.get(pk=editable_future_graph_serialized_edge['edgeid'])
+    #             self.assertEqual(str(future_edge_from_database.graph_id), updated_source_graph_serialized_edge['graph_id'])
+    #         except models.Edge.DoesNotExist:
+    #             pass  # edge has been successfully deleted
+
+    #     for idx, editable_future_graph_serialized_nodegroup in enumerate(serialized_editable_future_graph['nodegroups']):
+    #         updated_source_graph_serialized_nodegroup = serialized_updated_source_graph['nodegroups'][idx]
+
+    #         # ensures all relevant values are equal between graphs
+    #         for key, value in editable_future_graph_serialized_nodegroup.items():
+    #             if key not in ['parentnodegroup_id', 'nodegroupid', 'legacygroupid']:
+    #                 if type(value) == 'dict':
+    #                     self.assertDictEqual(value, updated_source_graph_serialized_nodegroup[key])
+    #                 else:
+    #                     self.assertEqual(value, updated_source_graph_serialized_nodegroup[key])
+
+    #     for key, value in serialized_editable_future_graph.items():
+    #         if key == 'name':
+    #             self.assertEqual(value, serialized_updated_source_graph[key] + '__EDITABLE_FUTURE_VERSION')
+    #         elif key not in ['graphid', 'cards', 'nodes', 'edges', 'nodegroups', 'functions', 'root', 'widgets', 'source_identifier']:
+    #             if type(value) == 'dict':
+    #                 self.assertDictEqual(value, serialized_updated_source_graph[key])
+    #             else:
+    #                 self.assertEqual(value, serialized_updated_source_graph[key])
+
+    def test_update_graph_from_editable_future_graph_after_node_deletion(self):
         source_graph = Graph.new(name="TEST RESOURCE")
+
+        source_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
+        source_graph.save()
+        # serialized_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(source_graph))
+
         editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
 
-        # BEGIN tests sync to empty graph
-        editable_future_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
-        editable_future_graph.save()
+        child_node = [node for node in editable_future_graph.nodes.values()][len(editable_future_graph.nodes.values()) - 1]
+        child_node_source_identifier = child_node.source_identifier_id
+        
+        editable_future_graph.delete_node(child_node)
+        editable_future_graph = Graph.objects.get(pk=editable_future_graph.pk)  # updates from DB to refresh node list
 
-        updated_source_graph = source_graph.update_from_editable_future_graph()
-
-        serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
-        serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
-
-        for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph['cards']):
-            updated_source_graph_serialized_card = serialized_updated_source_graph['cards'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_card.items():
-                if key not in ['graph_id', 'nodegroup_id', 'name', 'cardid', 'source_identifier_id']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_card[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_card[key])
-
-            # ensures all superflous values relating to `editable_future_graph` have been deleted
-            try:
-                future_card_from_database = models.CardModel.objects.get(pk=editable_future_graph_serialized_card['cardid'])
-                self.assertEqual(str(future_card_from_database.graph_id), updated_source_graph_serialized_card['graph_id'])
-            except models.CardModel.DoesNotExist:
-                pass  # card has been successfully deleted
-
-        for idx, editable_future_graph_serialized_node in enumerate(serialized_editable_future_graph['nodes']):
-            updated_source_graph_serialized_node = serialized_updated_source_graph['nodes'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_node.items():
-                if key not in ['graph_id', 'nodegroup_id', 'nodeid', 'source_identifier_id']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_node[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_node[key])
-
-            # ensures all superflous values relating to `editable_future_graph` have been deleted
-            try:
-                future_node_from_database = models.Node.objects.get(pk=editable_future_graph_serialized_node['nodeid'])
-                self.assertEqual(str(future_node_from_database.graph_id), updated_source_graph_serialized_node['graph_id'])
-            except models.Node.DoesNotExist:
-                pass  # node has been successfully deleted
-
-        for idx, editable_future_graph_serialized_edge in enumerate(serialized_editable_future_graph['edges']):
-            updated_source_graph_serialized_edge = serialized_updated_source_graph['edges'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_edge.items():
-                if key not in ['graph_id', 'domainnode_id', 'rangenode_id', 'edgeid', 'source_identifier_id']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_edge[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_edge[key])
-
-            # ensures all superflous values relating to `editable_future_graph` have been deleted
-            try:
-                future_edge_from_database = models.Edge.objects.get(pk=editable_future_graph_serialized_edge['edgeid'])
-                self.assertEqual(str(future_edge_from_database.graph_id), updated_source_graph_serialized_edge['graph_id'])
-            except models.Edge.DoesNotExist:
-                pass  # edge has been successfully deleted
-
-        for idx, editable_future_graph_serialized_nodegroup in enumerate(serialized_editable_future_graph['nodegroups']):
-            updated_source_graph_serialized_nodegroup = serialized_updated_source_graph['nodegroups'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_nodegroup.items():
-                if key not in ['parentnodegroup_id', 'nodegroupid', 'legacygroupid']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_nodegroup[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_nodegroup[key])
-
-        # NEED TO TEST FUNCTIONS / WIDGETS
-
-        for key, value in serialized_editable_future_graph.items():
-            if key == 'name':
-                self.assertEqual(value, serialized_updated_source_graph[key] + '__EDITABLE_FUTURE_VERSION')
-            elif key not in ['graphid', 'cards', 'nodes', 'edges', 'nodegroups', 'functions', 'root', 'widgets', 'source_identifier']:
-                if type(value) == 'dict':
-                    self.assertDictEqual(value, serialized_updated_source_graph[key])
-                else:
-                    self.assertEqual(value, serialized_updated_source_graph[key])
-        # END tests sync to empty graph
-
-        # updated_editable_future_graph = Graph.objects.get(source_identifier=updated_source_graph.pk)
-
-
-        # # tests sync with populated graph
-        # editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
-        # editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by", graphid=self.NODE_NODETYPE_GRAPHID)
-        # editable_future_graph.save()
-
-        # editable_future_graph.consolidate_with_source_graph()
+        # updated_source_graph = source_graph.update_from_editable_future_graph()
 
         # import pdb; pdb.set_trace()
+
+        with self.assertRaises(Exception):
+            models.Node.objects.get(pk=child_node_source_identifier)
+
+        # serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
+        # serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
+
+
+        # for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph['cards']):
+        #     updated_source_graph_serialized_card = serialized_updated_source_graph['cards'][idx]
+
+        #     # ensures all relevant values are equal between graphs
+        #     for key, value in editable_future_graph_serialized_card.items():
+        #         if key not in ['graph_id', 'nodegroup_id', 'name', 'cardid', 'source_identifier_id']:
+        #             if type(value) == 'dict':
+        #                 self.assertDictEqual(value, updated_source_graph_serialized_card[key])
+        #             else:
+        #                 self.assertEqual(value, updated_source_graph_serialized_card[key])
+
+        #     # ensures all superflous values relating to `editable_future_graph` have been deleted
+        #     try:
+        #         future_card_from_database = models.CardModel.objects.get(pk=editable_future_graph_serialized_card['cardid'])
+        #         self.assertEqual(str(future_card_from_database.graph_id), updated_source_graph_serialized_card['graph_id'])
+        #     except models.CardModel.DoesNotExist:
+        #         pass  # card has been successfully deleted
+
+        # for idx, editable_future_graph_serialized_node in enumerate(serialized_editable_future_graph['nodes']):
+        #     updated_source_graph_serialized_node = serialized_updated_source_graph['nodes'][idx]
+
+        #     # ensures all relevant values are equal between graphs
+        #     for key, value in editable_future_graph_serialized_node.items():
+        #         if key not in ['graph_id', 'nodegroup_id', 'nodeid', 'source_identifier_id']:
+        #             if type(value) == 'dict':
+        #                 self.assertDictEqual(value, updated_source_graph_serialized_node[key])
+        #             else:
+        #                 self.assertEqual(value, updated_source_graph_serialized_node[key])
+
+        #     # ensures all superflous values relating to `editable_future_graph` have been deleted
+        #     try:
+        #         future_node_from_database = models.Node.objects.get(pk=editable_future_graph_serialized_node['nodeid'])
+        #         self.assertEqual(str(future_node_from_database.graph_id), updated_source_graph_serialized_node['graph_id'])
+        #     except models.Node.DoesNotExist:
+        #         pass  # node has been successfully deleted
+
+        # for idx, editable_future_graph_serialized_edge in enumerate(serialized_editable_future_graph['edges']):
+        #     updated_source_graph_serialized_edge = serialized_updated_source_graph['edges'][idx]
+
+        #     # ensures all relevant values are equal between graphs
+        #     for key, value in editable_future_graph_serialized_edge.items():
+        #         if key not in ['graph_id', 'domainnode_id', 'rangenode_id', 'edgeid', 'source_identifier_id']:
+        #             if type(value) == 'dict':
+        #                 self.assertDictEqual(value, updated_source_graph_serialized_edge[key])
+        #             else:
+        #                 self.assertEqual(value, updated_source_graph_serialized_edge[key])
+
+        #     # ensures all superflous values relating to `editable_future_graph` have been deleted
+        #     try:
+        #         future_edge_from_database = models.Edge.objects.get(pk=editable_future_graph_serialized_edge['edgeid'])
+        #         self.assertEqual(str(future_edge_from_database.graph_id), updated_source_graph_serialized_edge['graph_id'])
+        #     except models.Edge.DoesNotExist:
+        #         pass  # edge has been successfully deleted
+
+        # for idx, editable_future_graph_serialized_nodegroup in enumerate(serialized_editable_future_graph['nodegroups']):
+        #     updated_source_graph_serialized_nodegroup = serialized_updated_source_graph['nodegroups'][idx]
+
+        #     # ensures all relevant values are equal between graphs
+        #     for key, value in editable_future_graph_serialized_nodegroup.items():
+        #         if key not in ['parentnodegroup_id', 'nodegroupid', 'legacygroupid']:
+        #             if type(value) == 'dict':
+        #                 self.assertDictEqual(value, updated_source_graph_serialized_nodegroup[key])
+        #             else:
+        #                 self.assertEqual(value, updated_source_graph_serialized_nodegroup[key])
+
+        # # NEED TO TEST FUNCTIONS / WIDGETS
+
+        # for key, value in serialized_editable_future_graph.items():
+        #     if key == 'name':
+        #         self.assertEqual(value, serialized_updated_source_graph[key] + '__EDITABLE_FUTURE_VERSION')
+        #     elif key not in ['graphid', 'cards', 'nodes', 'edges', 'nodegroups', 'functions', 'root', 'widgets', 'source_identifier']:
+        #         if type(value) == 'dict':
+        #             self.assertDictEqual(value, serialized_updated_source_graph[key])
+        #         else:
+        #             self.assertEqual(value, serialized_updated_source_graph[key])
+
+
+
+
+
+
+
 
 
     # def test_branch_append_with_ontology(self):

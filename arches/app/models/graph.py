@@ -1772,6 +1772,10 @@ class Graph(models.GraphModel):
             if nodegroup.parentnodegroup:
                 _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
 
+        previous_card_ids = [ str(card.pk) for card in self.cards.values() ]
+        previous_node_ids = [ str(node.pk) for node in self.nodes.values() ]
+        previous_edge_ids = [ str(edge.pk) for edge in self.edges.values() ]
+
         self.cards = {}
         self.nodes = {}
         self.edges = {}
@@ -1851,7 +1855,7 @@ class Graph(models.GraphModel):
 
         self.save()
 
-        # manually deletes `card`, `node`, and `widget` objects from the `editable_future_graph`, then sets these values
+        # manually deletes `card`, `node`, and `edge` objects created from the `editable_future_graph`, then sets these values
         # to empty dicts on the `editable_future_graph`. This ensures that superflous objects are deleted, and essential 
         # objects that have been re-assigned to the `source_graph` are NOT deleted via waterfall deletion when the
         # `editable_future_graph` is deleted.
@@ -1866,7 +1870,36 @@ class Graph(models.GraphModel):
 
         graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
         graph_from_database.create_editable_future_graph()
-        
+
+        # manually deletes `card`, `node`, and `edge` objects that have been deleted in the `editable_future_graph` 
+        updated_card_ids = [ str(card.pk) for card in editable_future_graph.cards.values() ]
+        updated_node_ids = [ str(node.pk) for node in editable_future_graph.nodes.values() ]
+        updated_edge_ids = [ str(edge.pk) for edge in editable_future_graph.edges.values() ]
+
+        for previous_card_id in previous_card_ids:
+            if previous_card_id not in updated_card_ids:
+                try:
+                    card = models.CardModel.objects.get(pk=previous_card_id)
+                    card.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
+
+        for previous_node_id in previous_node_ids:
+            if previous_node_id not in updated_node_ids:
+                try:
+                    node = models.Node.objects.get(pk=previous_node_id)
+                    node.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
+
+        for previous_edge_id in previous_edge_ids:
+            if previous_edge_id not in updated_edge_ids:
+                try:
+                    edge = models.Edge.objects.get(pk=previous_edge_id)
+                    edge.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
+
         return graph_from_database
 
     def publish(self, user, notes=None):
