@@ -276,8 +276,7 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm.status_code, 200)  # Success, we got one.
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
-        tile = self.get_tile_by_id(
-            "39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm["tiles"])
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm["tiles"])
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We're knights of the Round Table, we dance whene'er we're able.",
@@ -326,8 +325,7 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
         data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
-        tile = self.get_tile_by_id(
-            "39cd6433-370c-471d-85a7-64de182fce6b", data_put_get_confirm["tiles"])
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_put_get_confirm["tiles"])
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
@@ -373,8 +371,7 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
-        tile = self.get_tile_by_id(
-            "39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm_mod["tiles"])
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm_mod["tiles"])
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
