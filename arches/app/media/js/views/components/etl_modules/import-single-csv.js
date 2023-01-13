@@ -80,7 +80,9 @@ define([
                         return {
                             field: header,
                             node: ko.observable(),
-                            language: ko.observable(arches.activeLanguage),
+                            language: ko.observable(
+                                arches.languages.find(lang => lang.code == arches.activeLanguage)
+                            ),
                         };
                     })
                 );

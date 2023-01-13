@@ -128,6 +128,9 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
+        csv_mapping = request.POST.get("fieldMapping")
+        if csv_mapping:
+            csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
@@ -153,17 +156,18 @@ class ImportSingleCsv(BaseImportModule):
         if csv_size > use_celery_threshold:
             response = self.load_data_async(request)
         else:
-            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         return response
 
-    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
 
-        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         validation = self.validate()
         if len(validation["data"]) == 0:
-            self.save_to_tiles(loadid, multiprocessing=False)
+            response = self.save_to_tiles(loadid, multiprocessing=False)
+            return response
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -176,11 +180,14 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
+        csv_mapping = request.POST.get("fieldMapping")
+        if csv_mapping:
+            csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         id_label = "resourceid"
 
         tasks.load_single_csv.apply_async(
-            (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
+            (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label),
         )
 
     def start(self, request):
@@ -195,45 +202,53 @@ class ImportSingleCsv(BaseImportModule):
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
-
+    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
         temp_dir = os.path.join("uploadedfiles", "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
-
         with default_storage.open(csv_file_path, mode="r") as csvfile:
-            reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+            reader = csv.reader(csvfile) # if there is a duplicate field, DictReader will not work
 
             if has_headers:
                 next(reader)
 
             with connection.cursor() as cursor:
                 for row in reader:
-                    if id_label in row:
+                    if id_label in fieldnames:
+                        id_index = fieldnames.index(id_label)
                         try:
-                            resourceid = uuid.UUID(row[id_label])
+                            resourceid = uuid.UUID(row[id_index])
                             legacyid = None
                         except (AttributeError, ValueError):
                             resourceid = uuid.uuid4()
-                            legacyid = row[id_label]
+                            legacyid = row[id_index]
                     else:
                         resourceid = uuid.uuid4()
                         legacyid = None
 
                     dict_by_nodegroup = {}
 
-                    for key in row:
-                        if key != "" and key != id_label:
-                            current_node = self.get_node_lookup(graphid).get(alias=key)
+                    for i in range(len(fieldnames)):
+                        if fieldnames[i] != "" and fieldnames[i] != id_label:
+                            current_node = self.get_node_lookup(graphid).get(alias=fieldnames[i])
                             nodegroupid = str(current_node.nodegroup_id)
                             node = str(current_node.nodeid)
                             datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                             datatype_instance = self.datatype_factory.get_instance(datatype)
-                            source_value = row[key]
+                            source_value = row[i]
                             config = current_node.config
                             if datatype == "file-list":
                                 config["path"] = temp_dir
                                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
                                 errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
+                            elif datatype == "string":
+                                try:
+                                    code  = csv_mapping[i]["language"]["code"]
+                                    direction  = csv_mapping[i]["language"]["default_direction"]
+                                    transformed_value = {code: {"value": row[i], "direction": direction}}
+                                except:
+                                    transformed_value = source_value
+                                value = datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
+                                errors = datatype_instance.validate(value, nodeid=node)
                             else:
                                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
                                 errors = datatype_instance.validate(value, nodeid=node)
@@ -245,36 +260,47 @@ class ImportSingleCsv(BaseImportModule):
                                 )
 
                             if nodegroupid in dict_by_nodegroup:
-                                dict_by_nodegroup[nodegroupid].append(
-                                    {
-                                        node: {
-                                            "value": value,
-                                            "valid": valid,
-                                            "source": source_value,
-                                            "notes": error_message,
-                                            "datatype": datatype,
+                                if value:
+                                    dict_by_nodegroup[nodegroupid].append(
+                                        {
+                                            node: {
+                                                "value": value,
+                                                "valid": valid,
+                                                "source": source_value,
+                                                "notes": error_message,
+                                                "datatype": datatype,
+                                            }
                                         }
-                                    }
-                                )
+                                    )
                             else:
-                                dict_by_nodegroup[nodegroupid] = [
-                                    {
-                                        node: {
-                                            "value": value,
-                                            "valid": valid,
-                                            "source": source_value,
-                                            "notes": error_message,
-                                            "datatype": datatype,
+                                if value:
+                                    dict_by_nodegroup[nodegroupid] = [
+                                        {
+                                            node: {
+                                                "value": value,
+                                                "valid": valid,
+                                                "source": source_value,
+                                                "notes": error_message,
+                                                "datatype": datatype,
+                                            }
                                         }
-                                    }
-                                ]
+                                    ]
 
                     for nodegroup in dict_by_nodegroup:
                         tile_data = self.get_blank_tile_lookup(nodegroup)
                         passes_validation = True
+                        for key in tile_data:
+                            tile_data[key] = None
                         for node in dict_by_nodegroup[nodegroup]:
                             for key in node:
-                                tile_data[key] = node[key]
+                                if tile_data[key]:
+                                    if tile_data[key]['datatype'] == 'string':
+                                        tile_data[key]['value'].update(node[key]['value'])
+                                        tile_data[key]["source"] += (" | " + node[key]['source'])
+                                        tile_data[key]["notes"] = " | ".join([tile_data[key]["notes"], node[key]['notes']])
+                                        tile_data[key]["valid"] = tile_data[key]["valid"] and node[key]['valid']
+                                else:
+                                    tile_data[key] = node[key]
                                 if node[key]["valid"] is False:
                                     passes_validation = False
 
