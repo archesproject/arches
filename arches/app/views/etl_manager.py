@@ -33,13 +33,13 @@ class ETLManagerView(View):
             cursor.execute(
                 """
                 (SELECT n.name as source, e.error as error, n.datatype as datatype, count(n.name), e.type, e.nodeid
-                FROM load_errors e 
+                FROM load_errors e
                 JOIN nodes n ON e.nodeid = n.nodeid
                 WHERE loadid = %s AND e.type = 'node'
                 GROUP BY n.name, e.error, n.datatype, e.type, e.nodeid)
                 UNION
                 (SELECT n.name as source, e.error as error, e.datatype as datatype, count(n.name), e.type, e.nodegroupid
-                FROM load_errors e 
+                FROM load_errors e
                 JOIN nodes n ON e.nodegroupid = n.nodeid
                 WHERE loadid = %s AND e.type = 'tile'
                 GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid);
@@ -58,7 +58,7 @@ class ETLManagerView(View):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                -- SELECT n.name as node, e.error, e.message, e.value, e.source 
+                -- SELECT n.name as node, e.error, e.message, e.value, e.source
                 SELECT n.name as node, e.*
                 FROM load_errors e
                 JOIN nodes n ON n.nodeid = e.nodeid
@@ -78,7 +78,7 @@ class ETLManagerView(View):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT n.name as node, e.error, e.message, e.value, e.source, e.nodeid, e.nodegroupid 
+                SELECT n.name as node, e.error, e.message, e.value, e.source, e.nodeid, e.nodegroupid
                 FROM load_errors e
                 JOIN nodes n ON n.nodeid = e.nodeid
                 WHERE loadid = %s AND e.nodeid = %s AND e.error = %s
