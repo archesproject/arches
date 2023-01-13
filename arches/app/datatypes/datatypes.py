@@ -234,8 +234,14 @@ class StringDataType(BaseDataType):
                                     int null_docs = 0;
                                     for(tile in params._source.tiles){
                                         if(tile.data.containsKey(params.node_id)){
-                                            def val = tile.data.get(params.node_id).get(params.lang).value;
-                                            if (val == null || (val instanceof List && val.length==0) || val == "") {
+                                            if(tile.data.get(params.node_id).containsKey(params.lang)){
+                                                def val = tile.data.get(params.node_id).get(params.lang).value;
+                                                if (val == null || (val instanceof List && val.length==0) || val == "") {
+                                                    null_docs++;
+                                                    break;
+                                                }
+                                            }
+                                            else{
                                                 null_docs++;
                                                 break;
                                             }

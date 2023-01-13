@@ -53,6 +53,7 @@ class APITests(ArchesTestCase):
     def setUpClass(cls):
         geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         cls.loadOntology()
+        LanguageSynchronizer.synchronize_settings_with_db()
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
@@ -75,6 +76,12 @@ class APITests(ArchesTestCase):
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
         LanguageSynchronizer.synchronize_settings_with_db()
+
+    def get_tile_by_id(self, tileid, tiles):
+        for tile in tiles:
+            if tile["tileid"] == tileid:
+                return tile
+        return None
 
     def test_api_base_view(self):
         """
@@ -269,8 +276,9 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm.status_code, 200)  # Success, we got one.
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm["tiles"])
         self.assertEqual(
-            data_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
+            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We're knights of the Round Table, we dance whene'er we're able.",
         )  # Success, we got the right one.
         # ==================================================================================================
@@ -317,10 +325,7 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
         data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
-
-        # self.assertEqual(
-        #     data_put_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
-        tile = next(x for x in data_put_get_confirm["tiles"] if x["tileid"] == "39cd6433-370c-471d-85a7-64de182fce6b")
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_put_get_confirm["tiles"])
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
@@ -366,10 +371,8 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
-
-        tile = next(x for x in data_put_get_confirm["tiles"] if x["tileid"] == "39cd6433-370c-471d-85a7-64de182fce6b")
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm_mod["tiles"])
         self.assertEqual(
-            # data_get_confirm_mod["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )
