@@ -60,9 +60,9 @@ class RelationalDataModelTests(ArchesTestCase):
         super().loadOntology()
         cls.custom_data_type_graphid = "ceed156d-aadf-4a13-b383-c044624c64bb"
         cls.custom_datatype_graph_filename = os.path.join(test_settings.TEST_ROOT, "fixtures", "resource_graphs",
-                                          "relational_data_model_tests.json")
+                                                          "relational_data_model_tests.json")
         cls.custom_string_datatype_filename = os.path.join(test_settings.TEST_ROOT, "fixtures", "datatypes",
-                                             "extended_string_datatype.py")
+                                                           "extended_string_datatype.py")
         custom_string_datatype_name = "extended-string-datatype"
         custom_string_datatype = DDataType.objects.filter(datatype=custom_string_datatype_name)
 
@@ -72,11 +72,10 @@ class RelationalDataModelTests(ArchesTestCase):
             cls.custom_string_datatype_existed = True
 
         graph = Graph.objects.filter(graphid=cls.custom_data_type_graphid)
-        print("Graph exists? %s" % len(graph))
 
         # Create the Datatype Graph if it doesn't exist
         if len(graph) != 1:
-            print("Creating data type graph")
+            print("Creating custom data type graph")
             management.call_command('packages', operation="import_graphs", source=cls.custom_datatype_graph_filename)
         else:
             print("Graph existed: %s" % str(graph))
