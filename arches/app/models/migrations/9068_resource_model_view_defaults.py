@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8974_rr_load_performance_v2"),
+        ("models", "9141_bulk_editing_module"),
     ]
 
     operations = [
