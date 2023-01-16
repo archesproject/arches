@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8974_rr_load_performance_v2"),
+        ("models", "9075_external_oauth"),
     ]
 
     add_bulk_data_editor = """
