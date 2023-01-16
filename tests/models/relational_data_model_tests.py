@@ -59,15 +59,27 @@ class RelationalDataModelTests(ArchesTestCase):
         super().setUpClass()
         super().loadOntology()
         cls.custom_data_type_graphid = "ceed156d-aadf-4a13-b383-c044624c64bb"
-        cls.custom_datatype_graph_filename = os.path.join(test_settings.TEST_ROOT, "fixtures", "resource_graphs",
-                                                          "relational_data_model_tests.json")
-        cls.custom_string_datatype_filename = os.path.join(test_settings.TEST_ROOT, "fixtures", "datatypes",
-                                                           "extended_string_datatype.py")
+        cls.custom_datatype_graph_filename = os.path.join(
+            test_settings.TEST_ROOT,
+            "fixtures",
+            "resource_graphs",
+            "relational_data_model_tests.json",
+        )
+        cls.custom_string_datatype_filename = os.path.join(
+            test_settings.TEST_ROOT,
+            "fixtures",
+            "datatypes",
+            "extended_string_datatype.py",
+        )
         custom_string_datatype_name = "extended-string-datatype"
-        custom_string_datatype = DDataType.objects.filter(datatype=custom_string_datatype_name)
+        custom_string_datatype = DDataType.objects.filter(
+            datatype=custom_string_datatype_name
+        )
 
         if custom_string_datatype is None or len(custom_string_datatype) != 1:
-            management.call_command('datatype', 'register', source=cls.custom_string_datatype_filename)
+            management.call_command(
+                "datatype", "register", source=cls.custom_string_datatype_filename
+            )
         else:
             cls.custom_string_datatype_existed = True
 
@@ -76,7 +88,11 @@ class RelationalDataModelTests(ArchesTestCase):
         # Create the Datatype Graph if it doesn't exist
         if len(graph) != 1:
             print("Creating custom data type graph")
-            management.call_command('packages', operation="import_graphs", source=cls.custom_datatype_graph_filename)
+            management.call_command(
+                "packages",
+                operation="import_graphs",
+                source=cls.custom_datatype_graph_filename,
+            )
         else:
             print("Graph existed: %s" % str(graph))
             cls.custom_data_type_graph_existed = True
@@ -90,7 +106,9 @@ class RelationalDataModelTests(ArchesTestCase):
             Graph.objects.get(pk=cls.custom_data_type_graphid).delete()
 
         if not cls.custom_string_datatype_existed:
-            management.call_command('datatype', 'unregister', datatype=cls.custom_string_datatype_filename)
+            management.call_command(
+                "datatype", "unregister", datatype=cls.custom_string_datatype_filename
+            )
 
     @classmethod
     def setUpTestData(cls):
@@ -101,8 +119,10 @@ class RelationalDataModelTests(ArchesTestCase):
         Test that the generated Postgres datatype is JSON
         """
         # Create the relational data model views
-        sql = f"select public.__arches_create_resource_model_views('%s'::uuid);" \
-              % RelationalDataModelTests.custom_data_type_graphid
+        sql = (
+            f"select public.__arches_create_resource_model_views('%s'::uuid);"
+            % RelationalDataModelTests.custom_data_type_graphid
+        )
         cursor = connection.cursor()
         cursor.execute(sql)
         # row = cursor.fetchone()
@@ -118,9 +138,13 @@ class RelationalDataModelTests(ArchesTestCase):
             where table_schema = '%s'
             and table_name = '%s'
             and column_name = '%s'
-        """ % (schema_name, view_name, column_name)
+        """ % (
+            schema_name,
+            view_name,
+            column_name,
+        )
 
         cursor.execute(validation_sql)
         row = cursor.fetchone()
 
-        assert (row is not None and row[0] == expected_datatype)
+        assert row is not None and row[0] == expected_datatype
