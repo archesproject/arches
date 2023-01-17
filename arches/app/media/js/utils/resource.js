@@ -11,7 +11,7 @@ define(['arches'], function(arches) {
             if (resourceLookup[resourceid] && usecache) {
                 return Promise.resolve(resourceLookup[resourceid]);
             } else {
-                return window.fetch(arches.urls.search_results + "?id=" + resourceid)
+                return window.fetch(arches.urls.search_results + "?id=" + resourceid + "&tiles=true")
                     .then(function(response) {
                         if (response.ok) {
                             return response.json();
