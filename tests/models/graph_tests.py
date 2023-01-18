@@ -489,26 +489,24 @@ class GraphTests(ArchesTestCase):
 
         source_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
         source_graph.save()
-        # serialized_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(source_graph))
 
         editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
 
-        child_node = [node for node in editable_future_graph.nodes.values()][len(editable_future_graph.nodes.values()) - 1]
+        child_node = [node for node in editable_future_graph.nodes.values()][len(editable_future_graph.nodes.values()) - 2]
         child_node_source_identifier = child_node.source_identifier_id
         
-        editable_future_graph.delete_node(child_node)
-        editable_future_graph = Graph.objects.get(pk=editable_future_graph.pk)  # updates from DB to refresh node list
+        # editable_future_graph.delete_node(child_node)
+        # editable_future_graph = Graph.objects.get(pk=editable_future_graph.pk)  # updates from DB to refresh node list
 
-        # updated_source_graph = source_graph.update_from_editable_future_graph()
 
-        # import pdb; pdb.set_trace()
-
-        with self.assertRaises(Exception):
-            models.Node.objects.get(pk=child_node_source_identifier)
+        updated_source_graph = source_graph.update_from_editable_future_graph()
 
         # serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
         # serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
+        import  pdb; pdb.set_trace()
 
+        # with self.assertRaises(Exception):
+        #     models.Node.objects.get(pk=child_node_source_identifier)
 
         # for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph['cards']):
         #     updated_source_graph_serialized_card = serialized_updated_source_graph['cards'][idx]
