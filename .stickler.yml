@@ -8,7 +8,7 @@ linters:
     config: ./pyproject.toml
     fixer: true
   eslint:
-    config: './.eslintrc.js'
+    config: './arches/.eslintrc.js'
 files:
   ignore:
     - 'arches/app/media/packages/*'
