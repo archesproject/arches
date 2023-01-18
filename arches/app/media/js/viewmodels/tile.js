@@ -286,7 +286,13 @@ define([
                     if (nodeId === widget.node_id()) {
                         var defaultValue = ko.unwrap(widget.config.defaultValue);
                         if (defaultValue) {
-                            self.data[nodeId](defaultValue);
+                            if(typeof self.data[nodeId] === 'function') {
+                                self.data[nodeId](defaultValue);
+                            } else if (typeof self.data[nodeId] === 'object') {
+                                if(typeof self.data[nodeId]?.[arches.activeLanguage]?.["value"] === 'function') {
+                                    self.data[nodeId][arches.activeLanguage]["value"](defaultValue);
+                                }
+                            }
                             _tileDataTemp[nodeId] = defaultValue;
                             hasDefaultValue = true;
                         }
