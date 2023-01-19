@@ -179,333 +179,226 @@ class GraphTests(ArchesTestCase):
     def tearDown(self):
         self.deleteGraph(self.rootNode.graph_id)
 
-    # def test_new_graph(self):
-    #     name = "TEST NEW GRAPH"
-    #     author = "ARCHES TEST"
-    #     graph = Graph.new(name=name, is_resource=True, author=author)
-    #     self.assertEqual(graph.name, name)
-    #     self.assertEqual(graph.author, author)
-    #     self.assertTrue(graph.isresource)
-    #     self.assertFalse(graph.root.is_collector)
-    #     self.assertEqual(len(graph.nodes), 1)
-    #     self.assertEqual(len(graph.cards), 0)
-    #     self.assertEqual(len(graph.get_nodegroups()), 0)
+    def test_new_graph(self):
+        name = "TEST NEW GRAPH"
+        author = "ARCHES TEST"
+        graph = Graph.new(name=name, is_resource=True, author=author)
+        self.assertEqual(graph.name, name)
+        self.assertEqual(graph.author, author)
+        self.assertTrue(graph.isresource)
+        self.assertFalse(graph.root.is_collector)
+        self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.cards), 0)
+        self.assertEqual(len(graph.get_nodegroups()), 0)
 
-    #     graph = Graph.new(name=name, is_resource=False, author=author)
-    #     self.assertEqual(graph.name, name)
-    #     self.assertEqual(graph.author, author)
-    #     self.assertFalse(graph.isresource)
-    #     self.assertTrue(graph.root.is_collector)
-    #     self.assertEqual(len(graph.nodes), 1)
-    #     self.assertEqual(len(graph.cards), 1)
-    #     self.assertEqual(len(graph.get_nodegroups()), 1)
+        graph = Graph.new(name=name, is_resource=False, author=author)
+        self.assertEqual(graph.name, name)
+        self.assertEqual(graph.author, author)
+        self.assertFalse(graph.isresource)
+        self.assertTrue(graph.root.is_collector)
+        self.assertEqual(len(graph.nodes), 1)
+        self.assertEqual(len(graph.cards), 1)
+        self.assertEqual(len(graph.get_nodegroups()), 1)
 
-    # def test_graph_doesnt_pollute_db(self):
-    #     """
-    #     test that the mere act of creating a Graph instance doesn't save anything to the database
+    def test_graph_doesnt_pollute_db(self):
+        """
+        test that the mere act of creating a Graph instance doesn't save anything to the database
 
-    #     """
+        """
 
-    #     graph_obj = {
-    #         "name": "TEST GRAPH",
-    #         "subtitle": "ARCHES TEST GRAPH",
-    #         "author": "Arches",
-    #         "description": "ARCHES TEST GRAPH",
-    #         "version": "v1.0.0",
-    #         "isresource": True,
-    #         "iconclass": "fa fa-building",
-    #         "nodegroups": [],
-    #         "nodes": [
-    #             {
-    #                 "status": None,
-    #                 "description": "",
-    #                 "name": "ROOT_NODE",
-    #                 "istopnode": True,
-    #                 "ontologyclass": "",
-    #                 "nodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
-    #                 "nodegroup_id": "",
-    #                 "datatype": "semantic",
-    #             },
-    #             {
-    #                 "status": None,
-    #                 "description": "",
-    #                 "name": "NODE_NAME",
-    #                 "istopnode": False,
-    #                 "ontologyclass": "",
-    #                 "nodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
-    #                 "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
-    #                 "datatype": "string",
-    #             },
-    #         ],
-    #         "edges": [
-    #             {
-    #                 "rangenode_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
-    #                 "name": "",
-    #                 "edgeid": "11111111-d50f-11e5-8754-80e6500ee4e4",
-    #                 "domainnode_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
-    #                 "ontologyproperty": "P2",
-    #                 "description": "",
-    #             }
-    #         ],
-    #         "cards": [
-    #             {
-    #                 "name": "NODE_NAME",
-    #                 "description": "",
-    #                 "instructions": "",
-    #                 "helptext": "",
-    #                 "cardinality": "n",
-    #                 "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
-    #             }
-    #         ],
-    #         "functions": [],
-    #     }
+        graph_obj = {
+            "name": "TEST GRAPH",
+            "subtitle": "ARCHES TEST GRAPH",
+            "author": "Arches",
+            "description": "ARCHES TEST GRAPH",
+            "version": "v1.0.0",
+            "isresource": True,
+            "iconclass": "fa fa-building",
+            "nodegroups": [],
+            "nodes": [
+                {
+                    "status": None,
+                    "description": "",
+                    "name": "ROOT_NODE",
+                    "istopnode": True,
+                    "ontologyclass": "",
+                    "nodeid": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                    "nodegroup_id": "",
+                    "datatype": "semantic",
+                },
+                {
+                    "status": None,
+                    "description": "",
+                    "name": "NODE_NAME",
+                    "istopnode": False,
+                    "ontologyclass": "",
+                    "nodeid": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                    "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                    "datatype": "string",
+                },
+            ],
+            "edges": [
+                {
+                    "rangenode_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                    "name": "",
+                    "edgeid": "11111111-d50f-11e5-8754-80e6500ee4e4",
+                    "domainnode_id": "55555555-343e-4af3-8857-f7322dc9eb4b",
+                    "ontologyproperty": "P2",
+                    "description": "",
+                }
+            ],
+            "cards": [
+                {
+                    "name": "NODE_NAME",
+                    "description": "",
+                    "instructions": "",
+                    "helptext": "",
+                    "cardinality": "n",
+                    "nodegroup_id": "66666666-24c9-4226-bde2-2c40ee60a26c",
+                }
+            ],
+            "functions": [],
+        }
 
-    #     nodes_count_before = models.Node.objects.count()
-    #     edges_count_before = models.Edge.objects.count()
-    #     cards_count_before = models.CardModel.objects.count()
-    #     nodegroups_count_before = models.NodeGroup.objects.count()
+        nodes_count_before = models.Node.objects.count()
+        edges_count_before = models.Edge.objects.count()
+        cards_count_before = models.CardModel.objects.count()
+        nodegroups_count_before = models.NodeGroup.objects.count()
 
-    #     graph = Graph(graph_obj)
+        graph = Graph(graph_obj)
 
-    #     self.assertEqual(models.Node.objects.count() - nodes_count_before, 0)
-    #     self.assertEqual(models.Edge.objects.count() - edges_count_before, 0)
-    #     self.assertEqual(models.CardModel.objects.count() - cards_count_before, 0)
-    #     self.assertEqual(models.NodeGroup.objects.count() - nodegroups_count_before, 0)
-    #     self.assertEqual(graph_obj["name"], graph.name)
-    #     self.assertEqual(graph_obj["subtitle"], graph.subtitle)
-    #     self.assertEqual(graph_obj["author"], graph.author)
-    #     self.assertEqual(graph_obj["description"], graph.description)
-    #     self.assertEqual(graph_obj["version"], graph.version)
-    #     self.assertEqual(graph_obj["isresource"], graph.isresource)
-    #     self.assertEqual(graph_obj["iconclass"], graph.iconclass)
+        self.assertEqual(models.Node.objects.count() - nodes_count_before, 0)
+        self.assertEqual(models.Edge.objects.count() - edges_count_before, 0)
+        self.assertEqual(models.CardModel.objects.count() - cards_count_before, 0)
+        self.assertEqual(models.NodeGroup.objects.count() - nodegroups_count_before, 0)
+        self.assertEqual(graph_obj["name"], graph.name)
+        self.assertEqual(graph_obj["subtitle"], graph.subtitle)
+        self.assertEqual(graph_obj["author"], graph.author)
+        self.assertEqual(graph_obj["description"], graph.description)
+        self.assertEqual(graph_obj["version"], graph.version)
+        self.assertEqual(graph_obj["isresource"], graph.isresource)
+        self.assertEqual(graph_obj["iconclass"], graph.iconclass)
 
-    # def test_nodes_are_byref(self):
-    #     """
-    #     test that the nodes referred to in the Graph.edges are exact references to
-    #     the nodes as opposed to a node with the same attribute values
+    def test_nodes_are_byref(self):
+        """
+        test that the nodes referred to in the Graph.edges are exact references to
+        the nodes as opposed to a node with the same attribute values
 
-    #     """
+        """
 
-    #     graph = Graph.objects.get(graphid=self.rootNode.graph_id)
-    #     graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
-    #     graph.save()
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
+        graph.save()
 
-    #     node_mapping = {nodeid: id(node) for nodeid, node in list(graph.nodes.items())}
+        node_mapping = {nodeid: id(node) for nodeid, node in list(graph.nodes.items())}
 
-    #     for key, edge in list(graph.edges.items()):
-    #         self.assertEqual(node_mapping[edge.domainnode.pk], id(edge.domainnode))
-    #         self.assertEqual(node_mapping[edge.rangenode.pk], id(edge.rangenode))
+        for key, edge in list(graph.edges.items()):
+            self.assertEqual(node_mapping[edge.domainnode.pk], id(edge.domainnode))
+            self.assertEqual(node_mapping[edge.rangenode.pk], id(edge.rangenode))
 
-    #     for key, node in list(graph.nodes.items()):
-    #         for key, edge in list(graph.edges.items()):
-    #             newid = uuid.uuid4()
-    #             if edge.domainnode.pk == node.pk:
-    #                 node.pk = newid
-    #                 self.assertEqual(edge.domainnode.pk, newid)
-    #             elif edge.rangenode.pk == node.pk:
-    #                 node.pk = newid
-    #                 self.assertEqual(edge.rangenode.pk, newid)
+        for key, node in list(graph.nodes.items()):
+            for key, edge in list(graph.edges.items()):
+                newid = uuid.uuid4()
+                if edge.domainnode.pk == node.pk:
+                    node.pk = newid
+                    self.assertEqual(edge.domainnode.pk, newid)
+                elif edge.rangenode.pk == node.pk:
+                    node.pk = newid
+                    self.assertEqual(edge.rangenode.pk, newid)
 
-    # def test_copy_graph(self):
-    #     """
-    #     test that a copy of a graph has the same number of nodes and edges and that the primary keys have been changed
-    #     and that the actual node references are different
+    def test_copy_graph(self):
+        """
+        test that a copy of a graph has the same number of nodes and edges and that the primary keys have been changed
+        and that the actual node references are different
 
-    #     """
+        """
 
-    #     graph = Graph.new(name="TEST RESOURCE")
-    #     graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by", graphid=self.NODE_NODETYPE_GRAPHID)
-    #     graph_copy = graph.copy()["copy"]
+        graph = Graph.new(name="TEST RESOURCE")
+        graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by", graphid=self.NODE_NODETYPE_GRAPHID)
+        graph_copy = graph.copy()["copy"]
 
-    #     self.assertEqual(len(graph_copy.nodes), 3)
-    #     self.assertEqual(len(graph_copy.edges), 2)
-    #     self.assertEqual(len(graph_copy.cards), 2)
-    #     self.assertEqual(len(graph_copy.get_nodegroups()), 2)
-    #     self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
-    #     self.assertEqual(len(graph.edges), len(graph_copy.edges))
-    #     self.assertEqual(len(graph.cards), len(graph_copy.cards))
-    #     self.assertEqual(len(graph.get_nodegroups()), len(graph_copy.get_nodegroups()))
+        self.assertEqual(len(graph_copy.nodes), 3)
+        self.assertEqual(len(graph_copy.edges), 2)
+        self.assertEqual(len(graph_copy.cards), 2)
+        self.assertEqual(len(graph_copy.get_nodegroups()), 2)
+        self.assertEqual(len(graph.nodes), len(graph_copy.nodes))
+        self.assertEqual(len(graph.edges), len(graph_copy.edges))
+        self.assertEqual(len(graph.cards), len(graph_copy.cards))
+        self.assertEqual(len(graph.get_nodegroups()), len(graph_copy.get_nodegroups()))
 
-    #     # assert the copied nodegroup heirarchy is maintained
-    #     for nodegroup in graph_copy.get_nodegroups():
-    #         if graph_copy.nodes[nodegroup.pk] is graph_copy.root:
-    #             parentnodegroup_copy = nodegroup
-    #         else:
-    #             childnodegroup_copy = nodegroup
-    #     self.assertTrue(parentnodegroup_copy.parentnodegroup is None)
-    #     self.assertEqual(childnodegroup_copy.parentnodegroup, parentnodegroup_copy)
-    #     self.assertFalse(parentnodegroup_copy.parentnodegroup_id)
-    #     self.assertEqual(childnodegroup_copy.parentnodegroup_id, parentnodegroup_copy.pk)
+        # assert the copied nodegroup heirarchy is maintained
+        for nodegroup in graph_copy.get_nodegroups():
+            if graph_copy.nodes[nodegroup.pk] is graph_copy.root:
+                parentnodegroup_copy = nodegroup
+            else:
+                childnodegroup_copy = nodegroup
+        self.assertTrue(parentnodegroup_copy.parentnodegroup is None)
+        self.assertEqual(childnodegroup_copy.parentnodegroup, parentnodegroup_copy)
+        self.assertFalse(parentnodegroup_copy.parentnodegroup_id)
+        self.assertEqual(childnodegroup_copy.parentnodegroup_id, parentnodegroup_copy.pk)
 
-    #     # assert the copied node groups are not equal to the originals
-    #     for nodegroup in graph.get_nodegroups():
-    #         if graph.nodes[nodegroup.pk] is graph.root:
-    #             parentnodegroup = nodegroup
-    #         else:
-    #             childnodegroup = nodegroup
+        # assert the copied node groups are not equal to the originals
+        for nodegroup in graph.get_nodegroups():
+            if graph.nodes[nodegroup.pk] is graph.root:
+                parentnodegroup = nodegroup
+            else:
+                childnodegroup = nodegroup
 
-    #     self.assertNotEqual(parentnodegroup, parentnodegroup_copy)
-    #     self.assertNotEqual(parentnodegroup.pk, parentnodegroup_copy.pk)
-    #     self.assertNotEqual(childnodegroup, childnodegroup_copy)
-    #     self.assertNotEqual(childnodegroup.pk, childnodegroup_copy.pk)
+        self.assertNotEqual(parentnodegroup, parentnodegroup_copy)
+        self.assertNotEqual(parentnodegroup.pk, parentnodegroup_copy.pk)
+        self.assertNotEqual(childnodegroup, childnodegroup_copy)
+        self.assertNotEqual(childnodegroup.pk, childnodegroup_copy.pk)
 
-    #     # assert the nodegroups attached to the cards are heirarchically correct
-    #     for card in list(graph_copy.cards.values()):
-    #         if str(card.nodegroup_id) == str(graph_copy.root.nodeid):
-    #             parentcard_copy = card
-    #         else:
-    #             childcard_copy = card
+        # assert the nodegroups attached to the cards are heirarchically correct
+        for card in list(graph_copy.cards.values()):
+            if str(card.nodegroup_id) == str(graph_copy.root.nodeid):
+                parentcard_copy = card
+            else:
+                childcard_copy = card
 
-    #     self.assertTrue(parentcard_copy.nodegroup is not None)
-    #     self.assertTrue(childcard_copy.nodegroup is not None)
-    #     self.assertTrue(parentcard_copy.nodegroup.parentnodegroup is None)
-    #     self.assertTrue(childcard_copy.nodegroup.parentnodegroup is not None)
-    #     self.assertEqual(parentcard_copy.nodegroup, childcard_copy.nodegroup.parentnodegroup)
+        self.assertTrue(parentcard_copy.nodegroup is not None)
+        self.assertTrue(childcard_copy.nodegroup is not None)
+        self.assertTrue(parentcard_copy.nodegroup.parentnodegroup is None)
+        self.assertTrue(childcard_copy.nodegroup.parentnodegroup is not None)
+        self.assertEqual(parentcard_copy.nodegroup, childcard_copy.nodegroup.parentnodegroup)
 
-    #     def findNodeByName(graph, name):
-    #         for node in list(graph.nodes.values()):
-    #             if node.name == name:
-    #                 return node
-    #         return None
+        def findNodeByName(graph, name):
+            for node in list(graph.nodes.values()):
+                if node.name == name:
+                    return node
+            return None
 
-    #     def findCardByName(graph, name):
-    #         for card in list(graph.cards.values()):
-    #             if card.name == name:
-    #                 return card
-    #         return None
+        def findCardByName(graph, name):
+            for card in list(graph.cards.values()):
+                if card.name == name:
+                    return card
+            return None
 
-    #     for node in list(graph.nodes.values()):
-    #         node_copy = findNodeByName(graph_copy, node.name)
-    #         self.assertIsNotNone(node_copy)
-    #         self.assertNotEqual(node.pk, node_copy.pk)
-    #         self.assertNotEqual(id(node), id(node_copy))
-    #         self.assertEqual(node.is_collector, node_copy.is_collector)
-    #         if node.nodegroup is not None:
-    #             self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
+        for node in list(graph.nodes.values()):
+            node_copy = findNodeByName(graph_copy, node.name)
+            self.assertIsNotNone(node_copy)
+            self.assertNotEqual(node.pk, node_copy.pk)
+            self.assertNotEqual(id(node), id(node_copy))
+            self.assertEqual(node.is_collector, node_copy.is_collector)
+            if node.nodegroup is not None:
+                self.assertNotEqual(node.nodegroup, node_copy.nodegroup)
 
-    #     for card in list(graph.cards.values()):
-    #         card_copy = findCardByName(graph_copy, card.name)
-    #         self.assertIsNotNone(card_copy)
-    #         self.assertNotEqual(card.pk, card_copy.pk)
-    #         self.assertNotEqual(id(card), id(card_copy))
-    #         self.assertNotEqual(card.nodegroup, card_copy.nodegroup)
+        for card in list(graph.cards.values()):
+            card_copy = findCardByName(graph_copy, card.name)
+            self.assertIsNotNone(card_copy)
+            self.assertNotEqual(card.pk, card_copy.pk)
+            self.assertNotEqual(id(card), id(card_copy))
+            self.assertNotEqual(card.nodegroup, card_copy.nodegroup)
 
-    #     for newedge in list(graph_copy.edges.values()):
-    #         self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
-    #         self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
-    #         self.assertEqual(newedge.domainnode, graph_copy.nodes[newedge.domainnode.pk])
-    #         self.assertEqual(newedge.rangenode, graph_copy.nodes[newedge.rangenode.pk])
-    #         with self.assertRaises(KeyError):
-    #             graph.edges[newedge.pk]
+        for newedge in list(graph_copy.edges.values()):
+            self.assertIsNotNone(graph_copy.nodes[newedge.domainnode_id])
+            self.assertIsNotNone(graph_copy.nodes[newedge.rangenode_id])
+            self.assertEqual(newedge.domainnode, graph_copy.nodes[newedge.domainnode.pk])
+            self.assertEqual(newedge.rangenode, graph_copy.nodes[newedge.rangenode.pk])
+            with self.assertRaises(KeyError):
+                graph.edges[newedge.pk]
 
-    def test_update_empty_graph_from_editable_future_graph(self):
-        source_graph = Graph.new(name="TEST RESOURCE")
-        editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
-
-        editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by", graphid=self.NODE_NODETYPE_GRAPHID)
-        editable_future_graph.save()
-
-        updated_source_graph = source_graph.update_from_editable_future_graph()
-
-        serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
-        serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
-
-        for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph['cards']):
-            updated_source_graph_serialized_card = serialized_updated_source_graph['cards'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_card.items():
-                if key not in ['graph_id', 'nodegroup_id', 'name', 'cardid', 'source_identifier_id']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_card[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_card[key])
-
-            # ensures all superflous values relating to `editable_future_graph` have been deleted
-            try:
-                future_card_from_database = models.CardModel.objects.get(pk=editable_future_graph_serialized_card['cardid'])
-                self.assertEqual(str(future_card_from_database.graph_id), updated_source_graph_serialized_card['graph_id'])
-            except models.CardModel.DoesNotExist:
-                pass  # card has been successfully deleted
-
-        for idx, editable_future_graph_serialized_node in enumerate(serialized_editable_future_graph['nodes']):
-            updated_source_graph_serialized_node = serialized_updated_source_graph['nodes'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_node.items():
-                if key not in ['graph_id', 'nodegroup_id', 'nodeid', 'source_identifier_id']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_node[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_node[key])
-
-            # ensures all superflous values relating to `editable_future_graph` have been deleted
-            try:
-                future_node_from_database = models.Node.objects.get(pk=editable_future_graph_serialized_node['nodeid'])
-                self.assertEqual(str(future_node_from_database.graph_id), updated_source_graph_serialized_node['graph_id'])
-            except models.Node.DoesNotExist:
-                pass  # node has been successfully deleted
-
-        for idx, editable_future_graph_serialized_edge in enumerate(serialized_editable_future_graph['edges']):
-            updated_source_graph_serialized_edge = serialized_updated_source_graph['edges'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_edge.items():
-                if key not in ['graph_id', 'domainnode_id', 'rangenode_id', 'edgeid', 'source_identifier_id']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_edge[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_edge[key])
-
-            # ensures all superflous values relating to `editable_future_graph` have been deleted
-            try:
-                future_edge_from_database = models.Edge.objects.get(pk=editable_future_graph_serialized_edge['edgeid'])
-                self.assertEqual(str(future_edge_from_database.graph_id), updated_source_graph_serialized_edge['graph_id'])
-            except models.Edge.DoesNotExist:
-                pass  # edge has been successfully deleted
-
-        for idx, editable_future_graph_serialized_nodegroup in enumerate(serialized_editable_future_graph['nodegroups']):
-            updated_source_graph_serialized_nodegroup = serialized_updated_source_graph['nodegroups'][idx]
-
-            # ensures all relevant values are equal between graphs
-            for key, value in editable_future_graph_serialized_nodegroup.items():
-                if key not in ['parentnodegroup_id', 'nodegroupid', 'legacygroupid']:
-                    if type(value) == 'dict':
-                        self.assertDictEqual(value, updated_source_graph_serialized_nodegroup[key])
-                    else:
-                        self.assertEqual(value, updated_source_graph_serialized_nodegroup[key])
-
-        for key, value in serialized_editable_future_graph.items():
-            if key == 'name':
-                self.assertEqual(value, serialized_updated_source_graph[key] + '__EDITABLE_FUTURE_VERSION')
-            elif key not in ['graphid', 'cards', 'nodes', 'edges', 'nodegroups', 'functions', 'root', 'widgets', 'source_identifier']:
-                if type(value) == 'dict':
-                    self.assertDictEqual(value, serialized_updated_source_graph[key])
-                else:
-                    self.assertEqual(value, serialized_updated_source_graph[key])
-
-    def test_update_graph_from_editable_future_graph_after_node_deletion(self):
-        source_graph = Graph.new(name="TEST RESOURCE")
-
-        source_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
-        source_graph.save()
-
-        self.assertEqual(len(source_graph.nodes), 3)
-
-        editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
-
-        child_node = [node for node in editable_future_graph.nodes.values()][len(editable_future_graph.nodes.values()) - 1]
-        child_node_source_identifier = child_node.source_identifier_id
-        
-        editable_future_graph.delete_node(child_node)
-        editable_future_graph = Graph.objects.get(pk=editable_future_graph.pk)  # updates from DB to refresh node list
-
-        updated_source_graph = source_graph.update_from_editable_future_graph()
-
-        with self.assertRaises(Exception):
-            models.Node.objects.get(pk=child_node_source_identifier)
-
-        self.assertEqual(len(updated_source_graph.nodes), 2)
+        graph.delete()
 
     def test_branch_append_with_ontology(self):
         """
@@ -1176,3 +1069,112 @@ class GraphTests(ArchesTestCase):
 
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
+
+    def test_update_empty_graph_from_editable_future_graph(self):
+        source_graph = Graph.new(name="FOOOOO")
+        editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
+
+        editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/E21_Person", graphid=source_graph.pk)
+        editable_future_graph.save()
+
+        updated_source_graph = source_graph.update_from_editable_future_graph()
+        
+        serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
+        serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
+
+        for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph['cards']):
+            updated_source_graph_serialized_card = serialized_updated_source_graph['cards'][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_card.items():
+                if key not in ['graph_id', 'nodegroup_id', 'name', 'cardid', 'source_identifier_id']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_card[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_card[key])
+
+            # ensures all superflous values relating to `editable_future_graph` have been deleted
+            try:
+                future_card_from_database = models.CardModel.objects.get(pk=editable_future_graph_serialized_card['cardid'])
+                self.assertEqual(str(future_card_from_database.graph_id), updated_source_graph_serialized_card['graph_id'])
+            except models.CardModel.DoesNotExist:
+                pass  # card has been successfully deleted
+
+        for idx, editable_future_graph_serialized_node in enumerate(serialized_editable_future_graph['nodes']):
+            updated_source_graph_serialized_node = serialized_updated_source_graph['nodes'][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_node.items():
+                if key not in ['graph_id', 'nodegroup_id', 'nodeid', 'source_identifier_id']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_node[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_node[key])
+
+            # ensures all superflous values relating to `editable_future_graph` have been deleted
+            try:
+                future_node_from_database = models.Node.objects.get(pk=editable_future_graph_serialized_node['nodeid'])
+                self.assertEqual(str(future_node_from_database.graph_id), updated_source_graph_serialized_node['graph_id'])
+            except models.Node.DoesNotExist:
+                pass  # node has been successfully deleted
+
+        for idx, editable_future_graph_serialized_edge in enumerate(serialized_editable_future_graph['edges']):
+            updated_source_graph_serialized_edge = serialized_updated_source_graph['edges'][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_edge.items():
+                if key not in ['graph_id', 'domainnode_id', 'rangenode_id', 'edgeid', 'source_identifier_id']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_edge[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_edge[key])
+
+            # ensures all superflous values relating to `editable_future_graph` have been deleted
+            try:
+                future_edge_from_database = models.Edge.objects.get(pk=editable_future_graph_serialized_edge['edgeid'])
+                self.assertEqual(str(future_edge_from_database.graph_id), updated_source_graph_serialized_edge['graph_id'])
+            except models.Edge.DoesNotExist:
+                pass  # edge has been successfully deleted
+
+        for idx, editable_future_graph_serialized_nodegroup in enumerate(serialized_editable_future_graph['nodegroups']):
+            updated_source_graph_serialized_nodegroup = serialized_updated_source_graph['nodegroups'][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_nodegroup.items():
+                if key not in ['parentnodegroup_id', 'nodegroupid', 'legacygroupid']:
+                    if type(value) == 'dict':
+                        self.assertDictEqual(value, updated_source_graph_serialized_nodegroup[key])
+                    else:
+                        self.assertEqual(value, updated_source_graph_serialized_nodegroup[key])
+
+        for key, value in serialized_editable_future_graph.items():
+            if key == 'name':
+                self.assertEqual(value, serialized_updated_source_graph[key] + '__EDITABLE_FUTURE_VERSION')
+            elif key not in ['graphid', 'cards', 'nodes', 'edges', 'nodegroups', 'functions', 'root', 'widgets', 'source_identifier']:
+                if type(value) == 'dict':
+                    self.assertDictEqual(value, serialized_updated_source_graph[key])
+                else:
+                    self.assertEqual(value, serialized_updated_source_graph[key])
+
+    def test_update_graph_from_editable_future_graph_after_node_deletion(self):
+        source_graph = Graph.new(name="TEST RESOURCE")
+
+        source_graph.append_branch("http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID)
+        source_graph.save()
+
+        self.assertEqual(len(source_graph.nodes), 3)
+
+        editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
+
+        child_node = [node for node in editable_future_graph.nodes.values()][len(editable_future_graph.nodes.values()) - 1]
+        child_node_source_identifier = child_node.source_identifier_id
+        
+        editable_future_graph.delete_node(child_node)
+        editable_future_graph = Graph.objects.get(pk=editable_future_graph.pk)  # updates from DB to refresh node list
+
+        updated_source_graph = source_graph.update_from_editable_future_graph()
+
+        with self.assertRaises(Exception):
+            models.Node.objects.get(pk=child_node_source_identifier)
+
+        self.assertEqual(len(updated_source_graph.nodes), 2)
