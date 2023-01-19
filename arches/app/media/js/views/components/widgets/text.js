@@ -23,6 +23,7 @@ define([
 
         WidgetViewModel.apply(this, [params]);
         const self = this;
+        console.log(self)
 
         self.card = params.card;
         self.currentLanguage = ko.observable({code: arches.activeLanguage});
