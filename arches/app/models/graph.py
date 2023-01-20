@@ -1739,13 +1739,14 @@ class Graph(models.GraphModel):
         )
         editable_future_graph.source_identifier = self.graphid
 
-        # import pdb; pdb.set_trace()
         editable_future_graph.save()
         return editable_future_graph
 
     def update_from_editable_future_graph(self):
         """
-        Updates the graph with any changes made to the editable future graph
+        Updates the graph with any changes made to the editable future graph,
+        removes the editable future graph and related resources, then creates
+        an editable future graph from the updated graph.
         """
         try:
             editable_future_graph = Graph.objects.get(source_identifier=self.pk)
@@ -1772,7 +1773,6 @@ class Graph(models.GraphModel):
                 _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
 
 
-        # import pdb; pdb.set_trace()
         previous_card_ids = [ str(card.pk) for card in self.cards.values() ]
         previous_node_ids = [ str(node.pk) for node in self.nodes.values() ]
         previous_edge_ids = [ str(edge.pk) for edge in self.edges.values() ]
@@ -1781,7 +1781,12 @@ class Graph(models.GraphModel):
         self.nodes = {}
         self.edges = {}
 
-        # Updates cards
+        # BEGIN iterate related resources
+        # Iterates over cards, nodes, and edges of the editable_future_graph. If the item
+        # has a `source_identifier` attribute, it represents an item related to the source
+        # graph ( the graph mapped to `self` ); we iterate over the item attributes and map
+        # them to source item. If the item does not have a `source_identifier` attribute, it
+        # has been newly created; we update the `graph_id` to match the source graph. 
         for future_card in list(editable_future_graph.cards.values()):
             future_card_nodegroup_node = models.Node.objects.get(pk=future_card.nodegroup.pk)
 
@@ -1806,7 +1811,6 @@ class Graph(models.GraphModel):
 
             _update_source_nodegroup_hierarchy(future_card.nodegroup)
 
-        # Updates nodes
         for future_node in list(editable_future_graph.nodes.values()):
             future_node_nodegroup_node = models.Node.objects.get(pk=future_node.nodegroup.pk)
 
@@ -1831,7 +1835,6 @@ class Graph(models.GraphModel):
 
             _update_source_nodegroup_hierarchy(future_node.nodegroup)
 
-        # Updates edges
         for future_edge in list(editable_future_graph.edges.values()):
             if future_edge.source_identifier_id:
                 source_edge = future_edge.source_identifier
@@ -1856,15 +1859,18 @@ class Graph(models.GraphModel):
        
         self.root = editable_future_graph.root.source_identifier
         self.save()
+        # END iterate related resources
 
-        # manually deletes `card`, `node`, and `edge` objects that have been deleted in the `editable_future_graph` 
+        # BEGIN delete superflous related resources
+        # Compares UUIDs between resources related to the source graph and resources related to 
+        # the editable_future_graph. If the item related to the source graph exists, but the item
+        # related to the editable_future_graph does not exist, the item related to the source graph
+        # should be deleted.
         updated_card_ids = [ str(card.source_identifier_id) for card in editable_future_graph.cards.values() ]
         updated_node_ids = [ str(node.source_identifier_id) for node in editable_future_graph.nodes.values() ]
         updated_edge_ids = [ str(edge.source_identifier_id) for edge in editable_future_graph.edges.values() ]
 
         updated_node_ids.append(str(self.root.pk))
-
-        # import pdb; pdb.set_trace()
 
         for previous_card_id in previous_card_ids:
             if previous_card_id not in updated_card_ids:
@@ -1874,7 +1880,6 @@ class Graph(models.GraphModel):
                 except ObjectDoesNotExist:  # already deleted
                     pass
 
-        # import pdb; pdb.set_trace()
         for previous_node_id in previous_node_ids:
             if previous_node_id not in updated_node_ids:
                 try:
@@ -1898,6 +1903,7 @@ class Graph(models.GraphModel):
         editable_future_graph.edges = {}
 
         editable_future_graph.delete()
+        # END delete superflous related resources
 
         graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
         graph_from_database.create_editable_future_graph()
@@ -1909,7 +1915,6 @@ class Graph(models.GraphModel):
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
-        # self.consolidate_with_source_graph()
         with transaction.atomic():
             try:
                 publication = models.GraphXPublishedGraph.objects.create(
