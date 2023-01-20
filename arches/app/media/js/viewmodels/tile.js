@@ -290,7 +290,11 @@ define([
                                 self.data[nodeId](defaultValue);
                             } else if (typeof self.data[nodeId] === 'object') {
                                 if(typeof self.data[nodeId]?.[arches.activeLanguage]?.["value"] === 'function') {
-                                    self.data[nodeId][arches.activeLanguage]["value"](defaultValue);
+                                    if(defaultValue?.[arches.activeLanguage]?.value) {
+                                        self.data[nodeId][arches.activeLanguage].value(ko.unwrap(defaultValue[arches.activeLanguage].value));
+                                    } else {
+                                        self.data[nodeId][arches.activeLanguage].value(defaultValue);
+                                    }
                                 }
                             }
                             _tileDataTemp[nodeId] = defaultValue;
