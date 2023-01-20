@@ -1719,7 +1719,7 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def create_editable_future_graph(self, foo=None):
+    def create_editable_future_graph(self):
         """
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """

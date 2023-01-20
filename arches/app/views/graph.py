@@ -485,7 +485,6 @@ class GraphPublicationView(View):
                 data = JSONDeserializer().deserialize(request.body)
                 notes = data.get("notes")
 
-            # import pdb; pdb.set_trace()
             if self.action == "publish":
                 try:
                     graph.publish(notes=notes, user=request.user)
