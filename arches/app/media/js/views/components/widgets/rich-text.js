@@ -1,12 +1,12 @@
 define([
     'jquery',
-    'knockout', 
+    'knockout',
     'knockout-mapping',
-    'underscore', 
-    'viewmodels/widget', 
-    'arches', 
+    'underscore',
+    'viewmodels/widget',
+    'arches',
     'templates/views/components/widgets/rich-text.htm',
-    'bindings/ckeditor', 
+    'bindings/ckeditor',
     'bindings/chosen'
 ], function($, ko, koMapping, _, WidgetViewModel, arches, richTextWidgetTemplate) {
     /**
@@ -18,15 +18,16 @@ define([
     */
 
     const viewModel = function(params) {
-        params.configKeys = ['displayfullvalue'];
+        params.configKeys = ['placeholder', 'displayfullvalue'];
         const self = this;
-         
+        self.card = params.card;
+
         WidgetViewModel.apply(self, [params]);
         const initialCurrent = {};
         self.showi18nOptions = ko.observable(false);
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
         const currentLanguage = {"code": arches.activeLanguage};
-        let currentValue = koMapping.toJS(self.value);
+        let currentValue = koMapping.toJS(self.value) || initialCurrent;
         self.currentLanguage = ko.observable(currentLanguage);
 
         if(self.form){
@@ -55,10 +56,20 @@ define([
         });
 
         self.strippedValue();
+
+        self.defaultText = ko.observable();
+        self.defaultText.subscribe(newValue => {
+            const config = self.config();
+            config.placeholder = newValue;
+            self.config(config);
+        });
+
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
+
             currentValue[currentLanguage.code].value = newValue;
+
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
@@ -68,7 +79,9 @@ define([
         self.currentDirection.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
+
             currentValue[currentLanguage.code].direction = newValue;
+
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
@@ -82,7 +95,7 @@ define([
             const currentLanguage = self.currentLanguage();
 
             self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
-            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);            
+            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
         });
 
         this.displayfullvalue(params.displayfullvalue);
