@@ -398,8 +398,6 @@ class GraphTests(ArchesTestCase):
             with self.assertRaises(KeyError):
                 graph.edges[newedge.pk]
 
-        graph.delete()
-
     def test_branch_append_with_ontology(self):
         """
         test if a branch is properly appended to a graph that defines an ontology
@@ -1071,7 +1069,7 @@ class GraphTests(ArchesTestCase):
             graph.save()
 
     def test_update_empty_graph_from_editable_future_graph(self):
-        source_graph = Graph.new(name="FOOOOO")
+        source_graph = Graph.new(name="TEST RESOURCE")
         editable_future_graph = source_graph.create_editable_future_graph()  #TODO: replace with db lookup after 9114 signal work
 
         editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/E21_Person", graphid=source_graph.pk)
