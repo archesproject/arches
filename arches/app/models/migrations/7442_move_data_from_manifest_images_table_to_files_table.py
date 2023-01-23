@@ -22,8 +22,8 @@ class Migration(migrations.Migration):
         for file in file_model.objects.all():
             # not guaranteed accurate but should work for most cases,
             # ManifestImage does not have tile data
-            if not file.tileid:
-                manifest_image = manifest_image_model.create(
+            if not file.tile_id:
+                manifest_image = manifest_image_model.objects.create(
                     imageid=file.fileid,
                     image=file.path,
                 )

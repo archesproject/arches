@@ -1,6 +1,7 @@
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from arches.app.models import models
@@ -22,6 +23,7 @@ from io import StringIO
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
+logger = logging.getLogger(__name__)
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
@@ -165,7 +167,13 @@ class ConceptDataType(BaseConceptDataType):
             uuid.UUID(stripped)
             value = stripped
         except ValueError:
-            value = self.lookup_labelid_from_label(value, kwargs)
+            if value == "":
+                value = None
+            else:
+                try:
+                    value = self.lookup_labelid_from_label(value, kwargs)
+                except:
+                    logger.warn(_("Unable to convert {0} to concept label".format(value)))
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -295,13 +303,21 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_value_for_tile(self, value, **kwargs):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
+            lines = [line for line in val]
+            for v in lines:
                 try:
                     stripped = v.strip()
                     uuid.UUID(stripped)
                     ret.append(stripped)
                 except ValueError:
-                    ret.append(self.lookup_labelid_from_label(v, kwargs))
+                    if v == "":
+                        continue
+                    else:
+                        try:
+                            ret.append(self.lookup_labelid_from_label(v, kwargs))
+                        except:
+                            ret.append(v)
+                            logger.warn(_("Unable to convert {0} to concept label".format(v)))
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):
