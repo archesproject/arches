@@ -4397,7 +4397,7 @@ div.dropdown-menu.open {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 999;
+    z-index: 9999;
     transition: all 0.3s;
     cursor: pointer;
 }
@@ -4408,6 +4408,7 @@ div.dropdown-menu.open {
     margin: 15% auto;
     max-width: 600px;
     padding: 18px;
+    z-index: 9999;
     border: 1px solid #ddd;
     border-radius: 5px;
     width: 70%;

@@ -81,7 +81,6 @@ class Graph(models.GraphModel):
 
         if args:
             if isinstance(args[0], dict):
-
                 for key, value in args[0].items():
                     if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable", "publication"):
                         setattr(self, key, value)
@@ -118,7 +117,6 @@ class Graph(models.GraphModel):
                 if "publication" in args[0] and args[0]["publication"] is not None:
                     publication_data = args[0]["publication"]
                     self.publication = models.GraphXPublishedGraph(**publication_data)
-
             else:
                 if len(args) == 1 and (isinstance(args[0], str) or isinstance(args[0], uuid.UUID)):
                     for key, value in models.GraphModel.objects.get(pk=args[0]).__dict__.items():
@@ -188,23 +186,19 @@ class Graph(models.GraphModel):
                     cards = self.cardmodel_set.all()
 
                 edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
-
                 for card in cards:
                     widgets = list(card.cardxnodexwidget_set.all())
                     for widget in widgets:
                         self.widgets[widget.pk] = widget
-
                 node_lookup = {}
                 for node in nodes:
                     self.add_node(node)
                     node_lookup[str(node.nodeid)] = node
-
                 for edge in edges:
                     edge_dict = edge_lookup[str(edge.edgeid)]
                     edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
                     edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
                     self.add_edge(edge)
-
                 for card in cards:
                     self.add_card(card)
 
@@ -276,7 +270,6 @@ class Graph(models.GraphModel):
         )
 
         graph = Graph.objects.get(pk=graph_model.graphid)
-        graph.create_editable_future_graph()
 
         return graph
 
@@ -538,6 +531,12 @@ class Graph(models.GraphModel):
     def delete(self):
         if self.is_editable() is True:
             with transaction.atomic():
+                try:
+                    editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+                    editable_future_graph.delete()
+                except models.GraphModel.DoesNotExist:
+                    pass  # no editable future graph to delete
+
                 for nodegroup in self.get_nodegroups():
                     nodegroup.delete()
 
@@ -776,7 +775,7 @@ class Graph(models.GraphModel):
             function_copy = models.FunctionXGraph(function=function_x_graph.function, config=config_copy, graph=self)
             function_copy.save()
 
-    def copy(self, root=None):
+    def copy(self, root=None, set_source=False):
         """
         returns an unsaved copy of self
 
@@ -833,6 +832,8 @@ class Graph(models.GraphModel):
                 copy_of_self.root = node
             node.graph = copy_of_self
             is_collector = node.is_collector
+            if set_source:
+                node.source_identifier_id = node.pk
             node.pk = uuid.uuid1()
             node_map[node_id] = node.pk
 
@@ -844,6 +845,8 @@ class Graph(models.GraphModel):
                 for card in copy_of_self.cards.values():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
                         new_id = uuid.uuid1()
+                        if set_source:
+                            card.source_identifier_id = card.pk
                         card_map[card.pk] = new_id
                         card.pk = new_id
                         card.nodegroup = node.nodegroup
@@ -862,6 +865,8 @@ class Graph(models.GraphModel):
         copy_of_self.nodes = {node.pk: node for node_id, node in copy_of_self.nodes.items()}
 
         for edge_id, edge in copy_of_self.edges.items():
+            if set_source:
+                edge.source_identifier_id = edge.pk
             edge.pk = uuid.uuid1()
             edge.graph = copy_of_self
             copied_domainnode = edge.domainnode
@@ -1726,7 +1731,7 @@ class Graph(models.GraphModel):
         if previous_editable_future_graph:
             previous_editable_future_graph.delete()
 
-        graph_copy = self.copy()
+        graph_copy = self.copy(set_source=True)
 
         editable_future_graph = graph_copy["copy"]
         editable_future_graph.name = I18n_String(
@@ -1737,16 +1742,196 @@ class Graph(models.GraphModel):
         editable_future_graph.save()
         return editable_future_graph
 
-    def consolidate_current_graph_with_editable_future_graph(self):
-        editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+    def update_from_editable_future_graph(self):
+        """
+        Updates the graph with any changes made to the editable future graph,
+        removes the editable future graph and related resources, then creates
+        an editable future graph from the updated graph.
+        """
+        try:
+            editable_future_graph = Graph.objects.get(source_identifier=self.pk)
+        except:
+            raise Exception(_("No identifiable future Graph"))
 
-        if not editable_future_graph:
-            return None
+        def _update_source_nodegroup_hierarchy(nodegroup):
+            node = models.Node.objects.get(pk=nodegroup.pk)
+            if node.source_identifier_id:
+                source_nodegroup = models.NodeGroup.objects.get(pk=node.source_identifier_id)
 
-        # TODO: Diff current graph and editable future graph, resolving differences to the current graph.
-        # A complexity here is that any nodes created in the future graph should retain their identifiers when
-        # moved to the current graph
-        pass
+                source_nodegroup.cardinality = nodegroup.cardinality
+                source_nodegroup.legacygroupid = nodegroup.legacygroupid
+
+                if nodegroup.parentnodegroup_id:
+                    nodegroup_parent_node = models.Node.objects.get(pk=nodegroup.parentnodegroup_id)
+
+                    if nodegroup_parent_node.source_identifier_id:
+                        source_nodegroup.parentnodegroup_id = nodegroup_parent_node.source_identifier_id
+
+                source_nodegroup.save()
+
+            if nodegroup.parentnodegroup:
+                _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
+
+        previous_card_ids = [str(card.pk) for card in self.cards.values()]
+        previous_node_ids = [str(node.pk) for node in self.nodes.values()]
+        previous_edge_ids = [str(edge.pk) for edge in self.edges.values()]
+
+        self.cards = {}
+        self.nodes = {}
+        self.edges = {}
+
+        # BEGIN iterate related resources
+        # Iterates over cards, nodes, and edges of the editable_future_graph. If the item
+        # has a `source_identifier` attribute, it represents an item related to the source
+        # graph ( the graph mapped to `self` ); we iterate over the item attributes and map
+        # them to source item. If the item does not have a `source_identifier` attribute, it
+        # has been newly created; we update the `graph_id` to match the source graph.
+        for future_card in list(editable_future_graph.cards.values()):
+            future_card_nodegroup_node = models.Node.objects.get(pk=future_card.nodegroup.pk)
+
+            if future_card.source_identifier:
+                source_card = future_card.source_identifier
+                self.cards[source_card.pk] = source_card
+
+                serialized_card = JSONDeserializer().deserialize(JSONSerializer().serialize(source_card))
+                for key in serialized_card.keys():
+                    if key not in ["graph_id", "cardid", "nodegroup_id", "source_identifier_id"]:
+                        setattr(source_card, key, getattr(future_card, key))
+
+                source_card.nodegroup_id = (
+                    future_card_nodegroup_node.source_identifier_id
+                    if future_card_nodegroup_node.source_identifier_id
+                    else source_card.nodegroup_id
+                )
+                source_card.save()
+            else:  # newly-created card
+                self.cards[future_card.pk] = future_card
+                del editable_future_graph.cards[future_card.pk]
+
+                future_card.graph_id = self.pk
+                future_card.nodegroup_id = (
+                    future_card_nodegroup_node.source_identifier_id
+                    if future_card_nodegroup_node.source_identifier_id
+                    else future_card.nodegroup_id
+                )
+                future_card.save()
+
+            _update_source_nodegroup_hierarchy(future_card.nodegroup)
+
+        for future_node in list(editable_future_graph.nodes.values()):
+            future_node_nodegroup_node = models.Node.objects.get(pk=future_node.nodegroup.pk)
+
+            if future_node.source_identifier:
+                source_node = future_node.source_identifier
+                self.nodes[source_node.pk] = source_node
+
+                serialized_node = JSONDeserializer().deserialize(JSONSerializer().serialize(source_node))
+                for key in serialized_node.keys():
+                    if key not in ["graph_id", "nodeid", "nodegroup_id", "source_identifier_id", "is_collector"]:
+                        setattr(source_node, key, getattr(future_node, key))
+
+                source_node.nodegroup_id = (
+                    future_node_nodegroup_node.source_identifier_id
+                    if future_node_nodegroup_node.source_identifier_id
+                    else future_node.nodegroup_id
+                )
+                source_node.save()
+            else:  # newly-created node
+                self.nodes[future_node.pk] = future_node
+                del editable_future_graph.nodes[future_node.pk]
+
+                future_node.graph_id = self.pk
+                future_node.nodegroup_id = (
+                    future_node_nodegroup_node.source_identifier_id
+                    if future_node_nodegroup_node.source_identifier_id
+                    else future_node.nodegroup_id
+                )
+                future_node.save()
+
+            _update_source_nodegroup_hierarchy(future_node.nodegroup)
+
+        for future_edge in list(editable_future_graph.edges.values()):
+            if future_edge.source_identifier_id:
+                source_edge = future_edge.source_identifier
+                self.edges[source_edge.pk] = source_edge
+
+                serialized_edge = JSONDeserializer().deserialize(JSONSerializer().serialize(source_edge))
+                for key in serialized_edge.keys():
+                    if key not in ["domainnode_id", "edgeid", "graph_id", "rangenode_id", "source_identifier_id"]:
+                        setattr(source_edge, key, getattr(future_edge, key))
+
+                source_edge.domainnode_id = (
+                    future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
+                )
+                source_edge.rangenode_id = (
+                    future_edge.rangenode.source_identifier.pk if future_edge.rangenode.source_identifier else future_edge.rangenode_id
+                )
+                source_edge.save()
+            else:  # newly-created edge
+                self.edges[future_edge.pk] = future_edge
+                del editable_future_graph.edges[future_edge.pk]
+
+                future_edge.graph_id = self.pk
+                future_edge.domainnode_id = (
+                    future_edge.domainnode.source_identifier.pk if future_edge.domainnode.source_identifier else future_edge.domainnode_id
+                )
+                future_edge.rangenode_id = (
+                    future_edge.rangenode.source_identifier.pk if future_edge.rangenode.source_identifier else future_edge.rangenode_id
+                )
+                future_edge.save()
+
+        self.root = editable_future_graph.root.source_identifier
+        self.save()
+        # END iterate related resources
+
+        # BEGIN delete superflous related resources
+        # Compares UUIDs between resources related to the source graph and resources related to
+        # the editable_future_graph. If the item related to the source graph exists, but the item
+        # related to the editable_future_graph does not exist, the item related to the source graph
+        # should be deleted.
+        updated_card_ids = [str(card.source_identifier_id) for card in editable_future_graph.cards.values()]
+        updated_node_ids = [str(node.source_identifier_id) for node in editable_future_graph.nodes.values()]
+        updated_edge_ids = [str(edge.source_identifier_id) for edge in editable_future_graph.edges.values()]
+
+        updated_node_ids.append(str(self.root.pk))
+
+        for previous_card_id in previous_card_ids:
+            if previous_card_id not in updated_card_ids:
+                try:
+                    card = models.CardModel.objects.get(pk=previous_card_id)
+                    card.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
+
+        for previous_node_id in previous_node_ids:
+            if previous_node_id not in updated_node_ids:
+                try:
+                    node = models.Node.objects.get(pk=previous_node_id)
+                    node.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
+
+        for previous_edge_id in previous_edge_ids:
+            if previous_edge_id not in updated_edge_ids:
+                try:
+                    edge = models.Edge.objects.get(pk=previous_edge_id)
+                    edge.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
+
+        # This ensures essential objects that have been re-assigned to the `source_graph`
+        # are NOT deleted via waterfall deletion when the `editable_future_graph` is deleted.
+        editable_future_graph.cards = {}
+        editable_future_graph.nodes = {}
+        editable_future_graph.edges = {}
+
+        editable_future_graph.delete()
+        # END delete superflous related resources
+
+        graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
+        graph_from_database.create_editable_future_graph()
+
+        return graph_from_database
 
     def publish(self, user, notes=None):
         """
