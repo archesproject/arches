@@ -196,6 +196,8 @@ def import_graph(graphs, overwrite_graphs=True):
             except:
                 pass
 
+            graph.create_editable_future_graph()
+
         return errors, reporter
 
 

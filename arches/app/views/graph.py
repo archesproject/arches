@@ -177,7 +177,11 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
+        try:
+            self.graph = Graph.objects.get(source_identifier=graphid)
+        except Graph.DoesNotExist:
+            raise Exception(_("Graph does not have a source identifier."))
+
         serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
         datatypes = models.DDataType.objects.all()
@@ -347,6 +351,8 @@ class GraphDataView(View):
                     name = _("New Resource Model") if isresource else _("New Branch")
                     author = request.user.first_name + " " + request.user.last_name
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
+                    ret.save()
+                    ret.create_editable_future_graph()
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
@@ -399,6 +405,7 @@ class GraphDataView(View):
                     ret = clone_data["copy"]
                     ret.slug = None
                     ret.save()
+                    ret.create_editable_future_graph()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
