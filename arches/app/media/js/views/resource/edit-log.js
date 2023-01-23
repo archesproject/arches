@@ -29,15 +29,6 @@ require([
                 }
             };
 
-            var handleChildCards = function(card) {
-                if (card.cards.length > 0) {
-                    _.each(card.cards, function(subCard) {
-                        _.each(_.where(edits, { nodegroupid: subCard.nodegroup_id }), function(match) { match.card = subCard; match.cardContainerName = card.name; });
-                        handleChildCards(subCard);
-                    }, this);
-                }
-            };
-
             var assignCards = function(){
                 _.each(cards, function(card) {
                     _.each(_.where(edits, {nodegroupid: card.nodegroup_id}), function(match){match.card = card; match.cardContainerName = null;});
