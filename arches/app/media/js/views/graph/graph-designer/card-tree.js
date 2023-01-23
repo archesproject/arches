@@ -138,7 +138,12 @@ define([
             nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
             graphid: params.graph.graphid,
             graphname: ko.computed(() => {
-                return params.graph.name().endsWith("EDITABLE_FUTURE_VERSION") ? params.graph.name().slice(0,-25) : params.graph.name();
+                if (params.graph.name().endsWith("EDITABLE_FUTURE_VERSION")) {
+                    return params.graph.name(params.graph.name().replace('__EDITABLE_FUTURE_VERSION', ''));
+                }
+                else {
+                    return params.graph.name();
+                }
             }),
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
