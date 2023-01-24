@@ -23,7 +23,7 @@ pyotp>=2.6.0
 qrcode>=7.3.1
 pyshp==2.1.2
 requests[security]>=2.18.1
-python-slugify==4.0.0
+python-slugify==7.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
 openpyxl==3.0.7
