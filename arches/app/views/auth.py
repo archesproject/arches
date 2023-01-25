@@ -54,6 +54,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from django.core.exceptions import ValidationError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -88,7 +89,7 @@ class LoginView(View):
         if username is not None and password is None:
             try:
                 domain = username.split("@")[1]
-                if domain == settings.EXTERNAL_OAUTH_CONFIGURATION["user_domain"]:
+                if domain in settings.EXTERNAL_OAUTH_CONFIGURATION["user_domains"]:
                     oauth_url = reverse("external_oauth_start")
                     redirect_url = f"{oauth_url}?username={username}"
                     return redirect(redirect_url)

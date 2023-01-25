@@ -73,7 +73,9 @@ define([
             });
 
             this.updateMetadata = function(){
-                this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                if (!!self.metadataLabel() || !!self.metadataValues()) {
+                    this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                }
                 self.metadataLabel(null);
                 self.metadataValues(null);
             };
@@ -208,6 +210,7 @@ define([
             };
 
             this.updateManifest = function() {
+                self.updateMetadata();
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("manifest_attribution", ko.unwrap(self.manifestAttribution));

@@ -466,7 +466,7 @@ USER_SIGNUP_GROUP = "Crowdsource Editor"
 # external oauth configuration
 EXTERNAL_OAUTH_CONFIGURATION = {
     "default_user_groups": [],
-    "user_domain": "",
+    "user_domains": [],
     "uid_claim": "",
     "app_id": "",
     "app_secret": "",

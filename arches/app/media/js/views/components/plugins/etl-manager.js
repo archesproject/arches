@@ -16,7 +16,7 @@ define([
             this.loading(true);
             this.selectedModule = ko.observable();
             this.activeTab = ko.observable();
-            this.isImport = ko.observable(true);
+            this.activeModules = ko.observable('import');
             this.loadEvents = ko.observable();
             this.selectedLoadEvent = ko.observable();
             this.validated = ko.observable();
