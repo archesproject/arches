@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="loadErrors",
+            name="LoadErrors",
             fields=[
                 ("type", models.TextField(blank=True, null=True)),
                 ("value", models.TextField(blank=True, null=True)),

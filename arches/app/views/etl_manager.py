@@ -49,7 +49,7 @@ class ETLManagerView(View):
             rows = self.dictfetchall(cursor)
         return {"success": True, "data": rows}
 
-    def errorReport(self, loadid):
+    def error_report(self, loadid):
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
@@ -69,12 +69,12 @@ class ETLManagerView(View):
             rows = self.dictfetchall(cursor)
         return {"success": True, "data": rows}
 
-    def nodeError(self, loadid, nodeid, error):
+    def node_error(self, loadid, nodeid, error):
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
         """
-        print(loadid, nodeid, error)
+
         with connection.cursor() as cursor:
             cursor.execute(
                 """
@@ -138,9 +138,9 @@ class ETLManagerView(View):
         elif action == "cleanEvent" and loadid:
             response = self.clean_load_event(loadid)
         elif action == "nodeError" and loadid:
-            response = self.nodeError(loadid, nodeid, error)
+            response = self.node_error(loadid, nodeid, error)
         elif action == "errorReport" and loadid:
-            return JSONResponse(self.errorReport(loadid)["data"], indent=2)
+            return JSONResponse(self.error_report(loadid)["data"], indent=2)
         return JSONResponse(response)
 
     def post(self, request):
