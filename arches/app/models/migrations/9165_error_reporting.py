@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9075_external_oauth"),
+        ("models", "9188_feature_annotation_type"),
     ]
 
     operations = [
