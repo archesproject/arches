@@ -124,14 +124,25 @@ define([
 
         });
 
+        const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
+        valueLeaf?.subscribe(newValue => {
+            const currentLanguage = self.currentLanguage();
+            if(!currentLanguage) { return; }
+            self.currentText(newValue);
+        });
+
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
             currentValue[currentLanguage.code].value = newValue;
-            if (ko.isObservable(self.value)) {
-                self.value(currentValue);
-            } else {
-                self.value[currentLanguage.code].value(newValue);
+
+            currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code]?.value || newValue;
+            if(currentValue != self.value()){
+                if (ko.isObservable(self.value)) {
+                    self.value(currentValue?.[currentLanguage.code]?.value || currentValue);
+                } else {
+                    self.value[currentLanguage.code].value(newValue?.[currentLanguage.code]?.value || newValue);
+                }
             }
         });
 
