@@ -2332,7 +2332,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 return ast.literal_eval(value)
             except:
-                return None
+                return value
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
