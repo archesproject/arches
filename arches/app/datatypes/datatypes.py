@@ -2223,8 +2223,8 @@ class ResourceInstanceDataType(BaseDataType):
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
             for resourceXresourceId in resourceXresourceIds:
-                resourceid = resourceXresourceId["resourceId"]
                 try:
+                    resourceid = resourceXresourceId["resourceId"]
                     uuid.UUID(resourceid)
                     if strict:
                         try:
@@ -2253,10 +2253,12 @@ class ResourceInstanceDataType(BaseDataType):
                         except ObjectDoesNotExist:
                             message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
                             errors.append({"type": "ERROR", "message": message})
-                except ValueError:
-                    message = _("The related resource with id '{0}' is not a valid uuid.".format(resourceid))
-                    error_type = "ERROR"
-                    errors.append({"type": error_type, "message": message})
+                except (ValueError, TypeError):
+                    message = _("The related resource with id '{0}' is not a valid uuid.".format(str(value)))
+                    title = _("Invalid Resource Instance Datatype")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
+                    errors.append(error_message)
+
         return errors
 
     def post_tile_save(self, tile, nodeid, request):
@@ -2330,7 +2332,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 return ast.literal_eval(value)
             except:
-                return None
+                return value
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
