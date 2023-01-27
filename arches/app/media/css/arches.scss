@@ -8680,6 +8680,20 @@ a.mega-dropdown-toggle.disabled {
     white-space: nowrap;
 }
 
+.rr-table-tabs {
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.rr-table-tab {
+    padding: 0px 10px;
+}
+
+.rr-table-tab.active {
+    border-bottom: 1px solid;
+    font-weight: bold;
+}
+
 .create-resource-instance-card-component {
     position: fixed;
     background: #fcfcfc;

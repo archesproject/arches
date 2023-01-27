@@ -35,7 +35,13 @@
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
-                    <div class="row">
+                    <nav>
+                        <div class="rr-table-tabs">
+                            <span class="rr-table-tab" data-bind="click: function(){$parent.activeTab('ontology')}, css: {active: $parent.activeTab() === 'ontology'}, text: 'Ontology'"></span>
+                            <span class="rr-table-tab" data-bind="click: function(){$parent.activeTab('concept')}, css: {active: $parent.activeTab() === 'concept'}, text: 'Relationship Concept'"></span>
+                        </div>
+                    </nav>
+                    <div class="row" data-bind="if: $parent.activeTab() === 'ontology'">
                         <div class="row" style="margin-bottom: 10px;">
                             <label class="col-xs-12" style="font-weight: bold;">
                                 <span data-bind="text: $root.translations.defaultRelationshipTo"></span>
@@ -99,6 +105,38 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row" data-bind="if: $parent.activeTab() === 'concept'">
+                        <div class="row">
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: $root.translations.defaultInverseRelationshipTo"></span> <!--"Relationship To The Resource"-->
+                            </label>
+                            <div class="row">
+                                <div data-bind="component: {
+                                    name: 'concept-select-widget',
+                                    params: {
+                                        node: {'config': {'rdmCollection': '00000000-0000-0000-0000-000000000005'}},
+                                        value: $data.relationshipConcept,
+                                    }
+                                }"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: $root.translations.defaultInverseRelationshipTo"></span> <!--"Inverse Relationship To The Resource"-->
+                            </label>
+                            <div class="row">
+                                <div data-bind="component: {
+                                    name: 'concept-select-widget',
+                                    params: {
+                                        node: {'config': {'rdmCollection': '00000000-0000-0000-0000-000000000005'}},
+                                        value: $data.inverseRelationshipConcept,
+                                    }
+                                }"></div>
+                            </div>
+                        </div>
+                    </div> 
                 </div>
             </div>
         </div>
