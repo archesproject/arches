@@ -26,6 +26,7 @@ from arches.app.search.search_term import SearchTerm
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from django.utils.translation import ugettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -76,19 +77,10 @@ class URLDataType(BaseDataType):
                     if url_test is None:
                         raise FailRegexURLMatch
             except FailRegexURLMatch:
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
-                            self.datatype_model.datatype,
-                            value,
-                            source,
-                            row_number,
-                            "this is not a valid HTTP/HTTPS URL",
-                            "This data was not imported.",
-                        ),
-                    }
-                )
+                message = _("This is not a valid HTTP/HTTPS URL")
+                title = _("Invalid HTTP/HTTPS URL")
+                error_message = self.create_error_message(value, source, row_number, message, title)
+                errors.append(error_message)
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
