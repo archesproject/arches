@@ -35,13 +35,19 @@
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
-                    <nav>
-                        <div class="rr-table-tabs">
-                            <span class="rr-table-tab" data-bind="click: function(){$parent.activeTab('ontology')}, css: {active: $parent.activeTab() === 'ontology'}, text: 'Ontology'"></span>
-                            <span class="rr-table-tab" data-bind="click: function(){$parent.activeTab('concept')}, css: {active: $parent.activeTab() === 'concept'}, text: 'Relationship Concept'"></span>
+                    <div>
+                        <div class="rr-table-tabs" style="display:flex; flex-direction:row;">
+                            <span class="rr-table-tab" data-bind="click: function(){$data.useOntologyRelationship(false)}, css: {active: !$data.useOntologyRelationship()}, text: 'Relationship Concept'"></span>
+                            <span data-bind="component: {
+                                name: 'views/components/simple-switch',
+                                params: {
+                                    value: $data.useOntologyRelationship,
+                                }
+                            }"></span>
+                            <span class="rr-table-tab" data-bind="click: function(){$data.useOntologyRelationship(true)}, css: {active: $data.useOntologyRelationship()}, text: 'Ontology'"></span>
                         </div>
-                    </nav>
-                    <div class="row" data-bind="if: $parent.activeTab() === 'ontology'">
+                    </div>
+                    <div class="row" data-bind="if: $data.useOntologyRelationship">
                         <div class="row" style="margin-bottom: 10px;">
                             <label class="col-xs-12" style="font-weight: bold;">
                                 <span data-bind="text: $root.translations.defaultRelationshipTo"></span>
@@ -106,7 +112,7 @@
                         </div>
                     </div>
 
-                    <div class="row" data-bind="if: $parent.activeTab() === 'concept'">
+                    <div class="row" data-bind="ifnot: $data.useOntologyRelationship">
                         <div class="row">
                             <label class="col-xs-12" style="font-weight: bold;">
                                 <span data-bind="text: $root.translations.relationshipConcept"></span>

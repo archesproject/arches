@@ -13,7 +13,6 @@ define([
 
 
         this.search = params.search;
-        this.activeTab = ko.observable("ontology");
         this.resourceModels = [{
             graphid: null,
             name: ''
@@ -71,6 +70,7 @@ define([
                 graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
                 graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || 'ac41d9be-79db-4256-b368-2f4559cfbe55');
                 graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || 'ac41d9be-79db-4256-b368-2f4559cfbe55'));
+                graph.useOntologyRelationship = ko.observable(false);
                 graph.removeRelationship = function(graph){
                     self.config.graphs.remove(graph);
                 };
@@ -107,6 +107,7 @@ define([
                     graph.inverseOntologyProperty.subscribe(triggerDirtyState);
                     graph.relationshipConcept.subscribe(triggerDirtyState);
                     graph.inverseRelationshipConcept.subscribe(triggerDirtyState);
+                    graph.useOntologyRelationship.subscribe(triggerDirtyState);
                 }else{
                     Object.defineProperty(graph, 'name', {
                         value: arches.translations.modelDoesNotExist
