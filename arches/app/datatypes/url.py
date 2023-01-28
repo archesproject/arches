@@ -15,6 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import ast
 import re
 import json
 from arches.app.models.system_settings import settings
@@ -92,17 +93,20 @@ class URLDataType(BaseDataType):
         a json string like '{"url": "", "url_label": ""}'
         """
 
-        ret = {"url": "", "url_label": ""}
-
         try:
-            ret = json.loads(value)
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            try:
+                return ast.literal_eval(value)
+            except:
+                #this will probably fail validation, but that is ok. We need the error to report the value.
+                return value
         except BaseException:
             if isinstance(value, dict):
-                ret = value
+                return value
             else:
-                ret["url"] = value
-
-        return ret
+                return {"url": value, "url_label": ""}
 
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
