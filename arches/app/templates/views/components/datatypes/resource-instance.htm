@@ -36,15 +36,14 @@
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
                     <div>
-                        <div class="rr-table-tabs" style="display:flex; flex-direction:row;">
-                            <span class="rr-table-tab" data-bind="click: function(){$data.useOntologyRelationship(false)}, css: {active: !$data.useOntologyRelationship()}, text: 'Relationship Concept'"></span>
+                        <div class="rr-table-ontology-selector">
                             <span data-bind="component: {
                                 name: 'views/components/simple-switch',
                                 params: {
                                     value: $data.useOntologyRelationship,
+                                    config: {label: $root.translations.useOntology}
                                 }
                             }"></span>
-                            <span class="rr-table-tab" data-bind="click: function(){$data.useOntologyRelationship(true)}, css: {active: $data.useOntologyRelationship()}, text: 'Ontology'"></span>
                         </div>
                     </div>
                     <div class="row" data-bind="if: $data.useOntologyRelationship">
