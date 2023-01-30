@@ -299,9 +299,10 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
-            if node.hascustomalias:
+            if node.hascustomalias or nodeobj.get("alias", False) is not False:
                 node.alias = nodeobj.get("alias", "")
-            self.create_node_alias(node)
+            else:
+                self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 

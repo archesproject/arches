@@ -76,7 +76,7 @@ define([
         }
 
         allBindings()?.attr?.disabled?.subscribe(disabled => {
-            if(CKEDITOR.currentInstance && disabled === true || disabled === false) {
+            if(!!editor?.editable() && (disabled === true || disabled === false)) {
                 editor?.setReadOnly(disabled);
             }
         });
