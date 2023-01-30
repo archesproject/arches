@@ -644,7 +644,11 @@ class Graph(models.GraphModel):
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
+            aliases = [n.alias for n in self.nodes.values()]
+
             for node in branch_copy.nodes.values():
+                if node.alias and node.alias in aliases:
+                    node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
             for card in branch_copy.get_cards():
                 self.add_card(card)
