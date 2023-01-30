@@ -647,7 +647,7 @@ class Graph(models.GraphModel):
             aliases = [n.alias for n in self.nodes.values()]
 
             for node in branch_copy.nodes.values():
-                if node.alias in aliases:
+                if node.alias and node.alias in aliases:
                     node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
             for card in branch_copy.get_cards():
