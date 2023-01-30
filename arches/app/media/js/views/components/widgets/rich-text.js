@@ -69,7 +69,7 @@ define([
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
-            if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(self.value()))){
+            if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
                 self.currentText(newValue?.[currentLanguage.code]?.value || newValue);
             }
         });
