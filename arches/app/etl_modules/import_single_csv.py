@@ -230,6 +230,7 @@ class ImportSingleCsv(BaseImportModule):
                             datatype_instance = self.datatype_factory.get_instance(datatype)
                             source_value = row[key]
                             config = current_node.config
+                            config["nodeid"] = node
                             if datatype == "file-list":
                                 config["path"] = temp_dir
                                 value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
