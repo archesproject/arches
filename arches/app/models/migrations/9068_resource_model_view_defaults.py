@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9188_feature_annotation_type"),
+        ("models", "9147_get_tile_cardinality_violations_i18n"),
     ]
 
     operations = [
