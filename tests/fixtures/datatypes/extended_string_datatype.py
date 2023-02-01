@@ -9,7 +9,7 @@ details = {
     "modulename": "extended_string_datatype.py",
     "classname": "ExtendedStringDataType",
     "defaultwidget": string_widget,
-    "defaultconfig": {"pgDataType": "jsonb"},
+    "defaultconfig": {"pgDatatype": "jsonb"},
     "configcomponent": "views/components/datatypes/string",
     "configname": "string-datatype-config",
     "isgeometric": False,

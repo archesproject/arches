@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
                 datatype text = 'text';
             begin
                 select_sql = format(select_sql, node.nodeid);
-                if (node.config->>'pgDataType' is not null) then
-                    datatype = node.config->>'pgDataType';
+                if (node.config->>'pgDatatype' is not null) then
+                    datatype = node.config->>'pgDatatype';
                 else
                     case node.datatype
                         when 'geojson-feature-collection' then datatype = 'geometry';
