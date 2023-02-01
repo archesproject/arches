@@ -137,7 +137,7 @@
                 {
                     "alias": "extended_string_datatype",
                     "config": {
-                        "pgDataType": "jsonb"
+                        "pgDatatype": "jsonb"
                     },
                     "datatype": "extended-string-datatype",
                     "description": "Custom datatype that extends the String datatype for testing of Postgres type in Relational Data Model Views",

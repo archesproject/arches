@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9141_bulk_editing_module"),
+        ("models", "9188_feature_annotation_type"),
     ]
 
     operations = [
