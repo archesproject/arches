@@ -87,7 +87,7 @@
                 <tr>
                 <!-- ko foreach: { data: fieldMapping, as: 'mapping', noChildContext: true } -->
                     <!-- ko if: nodes() -->
-                    <th style="border-bottom: 1px solid #ddd;">
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
                         <select data-bind="
                             value: mapping.node,
                             options: nodes,
@@ -97,6 +97,14 @@
                             valueAllowUnset: true,
                             chosen: {width: '100%'}"
                         ></select>
+                        <!-- ko if: stringNodes.includes(mapping.node()) -->
+                        <select id="lang_dd" style="flex:1" name="language" data-bind="
+                            value: mapping.language,
+                            options: languages,
+                            optionsText: function(item){return item.name + ' (' + item.code + ')'},
+                            chosen: {width: '100%'}"
+                        ></select>
+                        <!-- /ko -->
                     </th>
                     <!-- /ko -->
                 <!-- /ko -->
