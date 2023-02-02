@@ -1910,11 +1910,12 @@ class BaseDomainDataType(BaseDataType):
         return True
 
     def lookup_domainid_by_value(self, value, nodeid):
+        language = get_language()
         if nodeid not in self.value_lookup:
             config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
-                options[val["text"]] = val["id"]
+                options[val["text"][language]] = val["id"]
             self.value_lookup[nodeid] = options
         return self.value_lookup[nodeid][value]
 
@@ -1945,7 +1946,7 @@ class DomainDataType(BaseDomainDataType):
             except ValueError:
                 try:
                     value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
-                except Exception:
+                except KeyError:
                     value = value
         return value
 
