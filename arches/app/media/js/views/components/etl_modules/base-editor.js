@@ -5,12 +5,12 @@ define([
     'uuid',
     'arches',
     'viewmodels/alert-json',
-    'templates/views/components/etl_modules/bulk-data-editor.htm',
+    'templates/views/components/etl_modules/base-editor.htm',
     'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, uuid, arches, JsonErrorAlertViewModel, bulkDataEditorTemplate) {
+], function(ko, koMapping, $, uuid, arches, JsonErrorAlertViewModel, baseEditorTemplate) {
     const viewModel = function(params) {
         const self = this;
 
@@ -68,7 +68,6 @@ define([
         });
         this.selectedNode.subscribe(value=>console.log(value, value));
 
-        // this.resourceids(['cde6aa45-8013-433e-b1f1-9040ca011d7d', '08d547ab-16a9-4a66-b7ec-2e33bf9cd510']);
         this.write = function() {
             self.formData.append('operation', self.operation());
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
@@ -115,7 +114,7 @@ define([
     };
     ko.components.register('bulk-data-editor', {
         viewModel: viewModel,
-        template: bulkDataEditorTemplate,
+        template: baseEditorTemplate,
     });
     return viewModel;
 });

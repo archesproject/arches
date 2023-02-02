@@ -15,7 +15,6 @@ define([
     const viewModel = function(params) {
         const self = this;
 
-
         this.load_details = params.load_details;
         this.state = params.state;
         this.loading = params.loading || ko.observable();

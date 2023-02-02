@@ -27,7 +27,6 @@
             <span data-bind="text: $root.translations.importDetails"></span>
         </h4>
         <!-- ko if: nodes() -->
-        <span data-bind="text: console.log(nodes())"></span>
         <select data-bind="
             value: selectedNode,
             options: nodes,
@@ -47,23 +46,6 @@
                 optionsText: function(item){return item.name + ' (' + item.code + ')'},
                 value: selectedLanguage,
                 chosen: {width:'100%'}
-            "
-        ></select>
-    </div>
-    <div>
-        <label>Operation</label>
-        <select data-bind="
-                value: operation, 
-                chosen: {width: '100%', disable_search_threshold: 15},
-                optionsText: 'text',
-                optionsValue: 'value',
-                options: [
-                    { text: 'trim', value: 'trim' },
-                    { text: 'replace', value: 'replace' },
-                    { text: 'capitalize', value: 'capitalize' },
-                    { text: 'upper', value: 'upper' },
-                    { text: 'lower', value: 'lower' },
-                ],
             "
         ></select>
     </div>
