@@ -30,12 +30,12 @@
                         </button>
                     </div>
                     <div class="rr-table-column" style="flex-grow: 1; padding-left: 10px;"
-                       data-bind="click: function() { if(self.graphIsSemantic && $parent.isEditable !== false){self.toggleSelectedResource($data)}; }, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;">
+                       data-bind="click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; }, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;">
                         <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
-                    <div>
+                    <div data-bind="if: self.graphIsSemantic">
                         <div class="rr-table-ontology-selector">
                             <span data-bind="component: {
                                 name: 'views/components/simple-switch',
