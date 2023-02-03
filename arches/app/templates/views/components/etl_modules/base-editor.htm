@@ -69,4 +69,25 @@
 {% endblock task_details %}
 
 {% block etl_status %}
+<div>
+    <h4>
+        <span data-bind="text: $root.translations.bulkDataEditDetails"></span>
+    </h4>
+    <!-- ko if: load_details -->
+    <!-- ko ifnot: loading() -->
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.operation"></span>
+    </div>
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEditied + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
+    </div>
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameEdited + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.node"></span>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+</div>
 {% endblock etl_status %}

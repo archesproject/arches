@@ -27,6 +27,7 @@ define([
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
         this.selectedNode = ko.observable();
+        self.selectedNodeName = ko.observable();
         this.operation = ko.observable();
         this.oldText = ko.observable();
         this.newText = ko.observable();
@@ -55,6 +56,8 @@ define([
             return graph?.name;
         };
 
+        this.selectedNode.subscribe(nodeid => { self.selectedNodeName(self.nodes().find(node => node.nodeid === nodeid).name); });
+
         this.selectedGraph.subscribe(function(graph){
             if (graph){
                 self.loading(true);
@@ -66,11 +69,11 @@ define([
                 });
             }
         });
-        this.selectedNode.subscribe(value=>console.log(value, value));
 
         this.write = function() {
             self.formData.append('operation', self.operation());
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
+            if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
             if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
             if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
             if (self.oldText()) { self.formData.append('old_text', self.oldText()); }

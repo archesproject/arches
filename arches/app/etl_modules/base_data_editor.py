@@ -45,12 +45,13 @@ class BaseDataEditor(BaseImportModule):
             self.node_lookup[graphid] = Node.objects.filter(graph_id=graphid)
         return self.node_lookup[graphid]
 
-    def create_load_event(self, cursor):
+    def create_load_event(self, cursor, load_details):
         result = {"success": False}
+        load_details_json = json.dumps(load_details)
         try:
             cursor.execute(
-                """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, self.moduleid, load_details_json, False, "running", datetime.now(), self.userid),
             )
             result["success"] = True
         except Exception as e:
@@ -98,18 +99,20 @@ class BaseDataEditor(BaseImportModule):
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
+        node_name = request.POST.get("node_name", None)
         operation = request.POST.get("operation", None)
         language_code = request.POST.get("language_code", None)
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         use_celery_bulk_edit = True
+        load_details = { "graph": graph_id, "node": node_name, "operation": operation }
 
         if resourceids:
             resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
 
         with connection.cursor() as cursor:
-            event_created = self.create_load_event(cursor)
+            event_created = self.create_load_event(cursor, load_details)
             if event_created["success"]:
                 if use_celery_bulk_edit:
                     response = self.load_data_async(request)
