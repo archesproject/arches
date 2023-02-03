@@ -106,7 +106,10 @@ class BaseDataEditor(BaseImportModule):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         use_celery_bulk_edit = True
-        load_details = { "graph": graph_id, "node": node_name, "operation": operation }
+        if operation == 'replace':
+            operation_details = "{} -> {}".format(old_text, new_text)
+
+        load_details = { "graph": graph_id, "node": node_name, "operation": operation, "details": operation_details }
 
         if resourceids:
             resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]

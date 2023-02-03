@@ -79,6 +79,12 @@
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: load_details.operation"></span>
     </div>
+    <!-- ko if: load_details -->
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.details + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.details"></span>
+    </div>
+    <!-- /ko -->
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEditied + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
