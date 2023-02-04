@@ -61,6 +61,12 @@ class RdfWriter(Writer):
         self.logger = logging.getLogger(__name__)
         super(RdfWriter, self).__init__(**kwargs)
 
+    def is_semantic_node(self, graph_node):
+        ret = self.datatype_factory.datatypes[graph_node.datatype].defaultwidget is None
+        print(ret)
+        print(graph_node.datatype)
+        return ret
+
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
@@ -188,6 +194,8 @@ class RdfWriter(Writer):
                 # both are single, 1 * 1
                 graph += rng_dt.to_rdf(pkg, edge)
 
+        blankNamespace = Namespace("_:")
+
         for resourceinstanceid, tiles in self.resourceinstances.items():
             graph_info = get_graph_parts(self.graph_id)
 
@@ -195,6 +203,10 @@ class RdfWriter(Writer):
             for edge in graph_cache[self.graph_id]["rootedges"]:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
+                # if self.is_semantic_node(edge.rangenode):
+                #     rangenode = blankNamespace[rangenode]
+                # if self.is_semantic_node(edge.domainnode):
+                #     domainnode = blankNamespace[domainnode]
                 add_edge_to_graph(g, domainnode, rangenode, edge, None, graph_info)
 
             for tile in tiles:
@@ -202,6 +214,12 @@ class RdfWriter(Writer):
                 for edge in graph_info["subgraphs"][tile.nodegroup]["edges"]:
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                    # if self.is_semantic_node(edge.rangenode):
+                    #     rangenode = blankNamespace[rangenode]
+                    # print(rangenode)
+                    # if self.is_semantic_node(edge.domainnode):
+                    #     domainnode = blankNamespace[domainnode]
+                    # print(domainnode)
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
@@ -212,7 +230,13 @@ class RdfWriter(Writer):
                         domainnode = archesproject[reverse("resources", args=[resourceinstanceid]).lstrip("/")]
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
+                        # if self.is_semantic_node(edge.domainnode):
+                        #     domainnode = blankNamespace[domainnode]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                    # if self.is_semantic_node(edge.rangenode):
+                    #     rangenode = blankNamespace[rangenode]
+                    # print(rangenode)
+                    # print(domainnode)
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
@@ -221,6 +245,12 @@ class RdfWriter(Writer):
                     edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                    # if self.is_semantic_node(edge.rangenode):
+                    #     rangenode = blankNamespace[rangenode]
+                    # print(rangenode)
+                    # if self.is_semantic_node(edge.domainnode):
+                    #     domainnode = blankNamespace[domainnode]
+                    # print(domainnode)
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
         return g
 
@@ -290,6 +320,7 @@ class JsonLdReader(Reader):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             self.root_ontologyclass_lookup[str(graph.pk)] = node.ontologyclass
         self.logger.info("Initialized JsonLdReader")
+        self.required_nodeids_by_nodegroup = {}
 
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
@@ -305,6 +336,7 @@ class JsonLdReader(Reader):
         root_node = None
         nodes = {}
         graph = GraphProxy.objects.get(graphid=graphid)
+        node_groups = graph.get_nodegroups()
         for nodeid, n in graph.nodes.items():
             node = {}
             if n.istopnode:
@@ -334,12 +366,46 @@ class JsonLdReader(Reader):
             node["out_edges"] = []
             node["children"] = {}
             nodes[str(n.nodeid)] = node
+            
+            if node["required"]: 
+                if node["nodegroup_id"] not in self.required_nodeids_by_nodegroup:
+                    self.required_nodeids_by_nodegroup[node["nodegroup_id"]] = []
+                self.required_nodeids_by_nodegroup[node["nodegroup_id"]].append(
+                    node["node_id"])
 
         for edegid, e in graph.edges.items():
             dn = e.domainnode_id
             rng = e.rangenode_id
             prop = e.ontologyproperty
             nodes[str(dn)]["out_edges"].append({"range": str(rng), "prop": str(prop)})
+
+        # gather up all the required nodes in a given node group and append those nodes 
+        # onto the "node" object for when matching branches that have required node data
+        # for node_group in node_groups:
+        #     required_nodes_in_nodegroup = []
+        #     for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
+        #         node = nodes[str(nodeid)]
+        #         node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
+        #         if node["required"]:
+        #             required_nodes_in_nodegroup.append(node)
+
+        # for node_group in node_groups:
+        #     required_nodes_in_nodegroup = {"datatype": "", "children": {}}
+        #     for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
+        #         node = nodes[str(nodeid)]
+        #         node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
+        #         node["required_nodes_in_nodegroup"]["datatype"] = node["datatype"]
+        #         # if node["required"]:
+        #         #     required_nodes_in_nodegroup["children"].append(node)
+    
+        for node_group in node_groups:
+            required_nodes_in_nodegroup = {"datatype": "", "children": {}}
+            for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
+                node = nodes[str(nodeid)]
+                node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
+                node["required_nodes_in_nodegroup"]["datatype"] = node["datatype"]
+                # if node["required"]:
+                #     required_nodes_in_nodegroup["children"].append(node)
 
         def model_walk(node, nodes):
             for e in node["out_edges"]:
@@ -350,10 +416,14 @@ class JsonLdReader(Reader):
                         node["children"][key].append(rng)
                     else:
                         node["children"][key] = [rng]
+                    
+                    if rng["required"]:
+                        node["required_nodes_in_nodegroup"]["children"][key] = node["children"][key]
                 model_walk(rng, nodes)
             del node["out_edges"]
 
         model_walk(root_node, nodes)
+
         return root_node
 
     def get_resource_id(self, value):
@@ -381,6 +451,8 @@ class JsonLdReader(Reader):
         self.resources = []
         self.resource = None
         self.use_ids = use_ids
+        self.jsonld_doc_node_to_tile_lookup = {}
+        
         if not isinstance(data, list):
             data = [data]
         # Force use_ids if there is more than one record being passed in
@@ -396,6 +468,9 @@ class JsonLdReader(Reader):
         for jsonld_document in data:
             if expand_data:  # this should always be true, we set this to false just for some unit tests
                 jsonld_document = expand(jsonld_document)[0]
+
+            with open('output.json', 'w') as file:
+                file.write(json.dumps(jsonld_document))
 
             # Possibly bail very early
             if jsonld_document["@type"][0] != self.graphtree["class"]:
@@ -425,6 +500,99 @@ class JsonLdReader(Reader):
             self.root_json_document = jsonld_document
             try:
                 self.data_walk(jsonld_document, self.graphtree, result)
+                x = JSONSerializer().serialize(self.jsonld_doc_node_to_tile_lookup)
+
+                def find_parent_tile(searchedtile):
+                    for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
+                        for tile in jsonld_node["tiles"]:
+                            if str(tile.tileid) == str(searchedtile.parenttile_id):
+                                # if the parent tile is associated with a json-ld node
+                                # that has no other tiles, then the searched tile 
+                                # is where multiple node matches were found
+                                if len(jsonld_node["tiles"]) == 1:
+                                    return searchedtile
+                                else:
+                                    return find_parent_tile(tile)
+                
+                def get_all_child_tiles(searchedtile, foundtiles):
+                    for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
+                        for tile in jsonld_node["tiles"]:
+                            if str(tile.parenttile_id) == str(searchedtile.tileid):
+                                foundtiles.append(tile)
+                                get_all_child_tiles(tile, foundtiles)
+                                # if the parent tile is associated with a json-ld node
+                                # that has no other tiles, then the searched tile
+                                # is where multiple node matches were found
+                                if len(jsonld_node["tiles"]) == 1:
+                                    return searchedtile
+                                else:
+                                    find_parent_tile(tile)
+
+
+                # the data_walk method and json-ld doc can create multiple matched paths to teh graph
+                # that result in extra tiles being created.  There is the possibility to remove those
+                # extra tiles based on if a node in one of those tiles is required.  If it is required,
+                # but not supplied in the incomming json-ld data, then that data can't match that branch
+                # in the graph and those tiles need to be removed.  If there are still multiple matches
+                # for a given json-ld node the we need to reject the json-ld file as being ambiguous.
+                tile_dict = {}
+                tiles_wo_required_node_data = []
+                if len(self.required_nodeids_by_nodegroup) > 0:
+                    for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
+                        for tile in jsonld_node["tiles"]:
+                            tile_dict[str(tile.tileid)] = tile
+                            nodegroup_id = str(tile.nodegroup_id)
+                            if nodegroup_id in self.required_nodeids_by_nodegroup:
+                                # this node group has required nodes, check to see if we supplied values
+                                for required_nodeid in self.required_nodeids_by_nodegroup[nodegroup_id]:
+                                    if required_nodeid not in tile.data or tile.data[required_nodeid] is None:
+                                        # this tile is invalid and needs to be removed and all child tiles as well
+                                        # import ipdb; ipdb.sset_trace()
+                                        # self.resource.tiles.remove(tile)
+                                        tiles_wo_required_node_data.append(tile)
+                                        print("CALCULATED TILE TO REMOVE: %s", tile)
+
+                if len(tiles_wo_required_node_data) > 1:
+                    tiles_to_remove = []
+                    # build tile heirarchy
+                    for tileid, tile in tile_dict.items():
+                        if tile.parenttile_id:
+                            parenttile = tile_dict[str(tile.parenttile_id)]
+                            parenttile.tiles.append(tile)
+
+                    def gather_child_tiles(tile, tilelist):
+                        tilelist.append(tile)
+                        for childtile in tile.tiles:
+                            gather_child_tiles(childtile, tilelist)
+
+                    # gather all the tiles that need to be removed from the resource
+                    for tile in tiles_wo_required_node_data:
+                        parenttile = find_parent_tile(tile)
+                        parenttile = tile if parenttile is None else parenttile
+                        gather_child_tiles(parenttile, tiles_to_remove)
+                    
+                    print(tiles_to_remove)
+                    for tile in tiles_to_remove:
+                        self.resource.tiles.remove(tile)
+
+
+                    # do a final check, once we've removed any extra tiles, 
+                    # that we only have 1 tile per json-ld node, any more than one
+                    # means that we have multiple branches per node and so the match
+                    # was ambiguous
+                    for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
+                        if len(set(jsonld_node["tiles"])-set(tiles_to_remove)) > 1:
+                            raise ValueError(
+                                f"""Even after considering child branches, at least one of the 
+                                incoming json-ld nodes still matches more than one branch 
+                                in the graph: {jsonld_node}"""
+                            )
+
+                # if we don't remove all child tiles then those will get 
+                # saved too and it will include tiles we just deleted above
+                for tile in self.resource.tiles:
+                    tile.tiles = []
+
             except Exception as e:
                 err_msg_fail = f"FAILED to completely load resource with id: {self.resource.pk}\n"
                 self.logger.debug(err_msg_fail)
@@ -448,6 +616,16 @@ class JsonLdReader(Reader):
         pcs.append(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
         for p in pcs:
             if uri.startswith(p):
+                return True
+        return False
+    
+    def is_reference_entity(self, uri):
+        legacy_jsonld_arches_node_ids = re.compile(r".*/tile/%s/node/%s" % (settings.UUID_REGEX, settings.UUID_REGEX))
+        if legacy_jsonld_arches_node_ids.match(uri):
+            return False
+        for datatype in self.datatype_factory.datatypes.keys():
+            instance = self.datatype_factory.get_instance(datatype)
+            if instance.accepts_rdf_uri(uri):
                 return True
         return False
 
@@ -484,20 +662,212 @@ class JsonLdReader(Reader):
         if self.verbosity > 2:
             print(prefix + text)
 
-    def data_walk(self, data_node, tree_node, result, tile=None, indent=0):
+    def find_matching_branch(self, k, v, tree_node, result, tile=None, indent=0):
         my_tiles = []
+        branch = None
         self.printline("Walk down non-literal branches in the data", indent, newline=True)
         self.printline(f"---" * 20, indent)
         # self.printline(tree_node["name"], indent)
         # self.printline(f"tile={tile}", indent)
 
+        if k in ["@id", "@type"]:
+            return
+
+        # extract all @values for the current node
+        values = [
+            {
+                "value": vi["@value"],
+                "clss": vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal"),
+                "language": vi.get("@language", None),
+            }
+            for vi in v
+            if "@value" in vi
+            and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal") == "http://www.w3.org/2000/01/rdf-schema#Literal"
+        ]
+
+        # always a list
+        for vi in v:
+            if "@value" in vi:
+                value = vi["@value"]
+                uri = None
+                clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+                is_literal = True
+            else:
+                # We're an entity
+                uri = vi.get("@id", "")
+                try:
+                    clss = vi["@type"][0]
+                except:
+                    # {"@id": "http://something/.../"}
+                    # with no @type. This is typically an external concept URI reference to a resource instance
+                    # Look for it in the children of current node or in the entire document itself (if it's a resource instance ref)
+                    possible_cls = []
+                    for tn in tree_node["children"]:
+                        if tn.startswith(k):
+                            possible_cls.append(tn.replace(k, "")[1:])
+                    if len(possible_cls) == 1:
+                        clss = possible_cls[0]
+                    else:
+                        try:
+                            # this may be a reference to an entity already defined elsewhere in the json document
+                            # this can happen when there are more than 1 reference to the same resource instance
+                            clss = self.get_cached_reference(uri)
+                            vi["@type"] = clss
+                        except:
+                            raise ValueError(f"Multiple possible branches and no @type given: {vi}")
+
+                value = None
+                is_literal = False
+
+            node_has_a_value = is_literal or self.is_reference_entity(uri) or self.is_concept_node(uri)
+
+            # Here we try and find a possible match between the node_tree and data_tree
+            # we're matching "key" which equals the concatentaion of property and class
+            # at the same level in the trees
+            # Find precomputed possible branches by prop/class combination
+            key = f"{k} {clss}"
+            if key in tree_node["datatype"].ignore_keys():
+                # these are handled by the datatype itself
+                continue
+            elif not key in tree_node["children"] and is_literal:
+                # grumble grumble
+                # model has xsd:string, default is rdfs:Literal
+                key = f"{k} http://www.w3.org/2001/XMLSchema#string"
+                if not key in tree_node["children"]:
+                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
+            elif not key in tree_node["children"]:
+                raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
+
+            # if we made it this far then it means that we've found at least 1 match
+            options = tree_node["children"][key]
+            possible = []
+
+            # options is a list of potential matches in the graph tree
+            # based on property/class combination
+
+            
+
+            self.printline(f"Trying to match data value:  '{value or uri}'", indent, newline=True)
+            self.printline(f"That has type:  '{k}'", indent)
+            for o in options:
+                self.printline(f"Considering match to graph node: '{o['name']}'", indent + 1, newline=True)
+                self.printline(f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1)
+                self.printline(f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
+                # potential_tile = None
+                # if o["node_id"] == o["nodegroup_id"]:
+                #     # self.printline("--- getting potential tile  ---?", indent + 1)
+                #     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
+                #     parenttile_id = result["tile"].tileid if "tile" in result else None
+                #     potential_tile = Tile(
+                #         tileid=uuid.uuid4(),
+                #         resourceinstance_id=self.resource.pk,
+                #         parenttile_id=parenttile_id,
+                #         nodegroup_id=o["nodegroup_id"],
+                #         data={},
+                #     )
+
+                if is_literal and o["datatype"].is_a_literal_in_rdf():
+                    # import each value separately if there are no languages in the values and this is card n string
+                    if o["datatype"].is_multilingual_rdf(values):
+                        if len(o["datatype"].validate_from_rdf(values)) == 0:
+                            possible.append([o, values])
+                        else:
+                            self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
+                    else:
+                        if len(o["datatype"].validate_from_rdf(value)) == 0:
+                            possible.append([o, value])
+                        else:
+                            self.printline(f"Could not validate {value} as a {o['datatype']}", indent + 1)
+                elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
+                    if self.is_concept_node(uri):
+                        self.printline("This is a concept node, so we'll test if the incoming data can fit here", indent + 1)
+                        collid = o["config"]["collection_id"]
+                        try:
+                            if self.validate_concept_in_collection(uri, collid):
+                                possible.append([o, uri])
+                                self.printline(f"POSSIBLE match found.", indent + 1)
+                            else:
+                                self.printline(
+                                    f"Match REJECTED!! Incoming concept URI {uri} not found in the nodes Collection {collid}",
+                                    indent + 1,
+                                )
+                        except:
+                            self.printline(f"Errored testing concept {uri} in collection {collid}", indent + 1)
+                    elif o["datatype"].accepts_rdf_uri(uri):
+                        # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
+                        possible.append([o, uri])
+                    elif self.is_semantic_node(o):# and not node_has_a_value:
+                        #if uri == "" or uri.startswith("_:"):
+                        possible.append([o, ""])
+                    else:
+                        # This is when the current option doesn't match, but could be
+                        # non-ambiguous resource-instance vs semantic node
+                        continue
+            # print(f"Possible is: {[x[0]['name'] for x in possible]}")
+
+
+            if not possible:
+                # self.printline(f"Tried: {options}")
+                raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
+            elif len(possible) > 1:
+                # descend into data to check if there are further clarifying features
+                possible2 = []
+                for p in possible:
+                    # self.printline(f"\n---SECOND TIER: {p[0]['name']}", indent + 1)
+                    try:
+                        # self.printline("Don't really create data, so pass anonymous result dict", indent + 1)
+                        # if p[2] is not None:
+                        #     tile = p[2]
+                        self.printline("Found multiple matches!", indent)
+                        # if this doesn't throw an error then keep the possible branch "p"
+                        for k, v in vi.items():
+                            matched_branch = self.find_matching_branch(
+                                k, v, p[0], {}, tile, indent + 1)
+                        possible2.append(p)
+                    except Exception as e:
+                        self.printline(f"Failed due to {e}", indent + 1)
+                        # Not an option
+                        pass
+                if not possible2:
+                    raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
+                elif len(possible2) > 1:
+                    branch = possible2
+                    #check for reuired nodes in any possbile match
+                    # import ipdb; ipdb.sset_trace()
+                    # if not (skip_required_nodes_check or is_literal):
+                    #     for p in possible2.copy():
+                    #         if not self.has_all_required_nodes(vi, p):
+                    #             possible2.remove(p)
+                    # raise ValueError(
+                    #     f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}"
+                    # )
+                else:
+                    branch = possible2
+            else:
+                branch = possible
+
+        # Finally, after processing all of the branches for this node, check required nodes are present
+        # for path in tree_node["children"].values():
+        #     for kid in path:
+        #         if kid["required"] and not f"{kid['node_id']}" in result:
+        #             raise ValueError(
+        #                 f"Required field not present: {kid['name']}")
+        # import ipdb; ipdb.sset_trace()
+          
+        return branch
+
+    def data_walk(self, data_node, tree_node, result, tile=None, indent=0):
+        my_tiles = []
+
         # pre-seed as much of the cache as we can during the data-walk
         if "@id" in data_node and "@type" in data_node:
-            dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
+            dataType = data_node["@type"][0] if isinstance(
+                data_node["@type"], list) else data_node["@type"]
             self.idcache[data_node["@id"]] = dataType
+
         for k, v in data_node.items():
-            # self.printline(f"k: {k}", indent + 1)
-            # self.printline(f"v: {v}", indent + 1)
+            self.printline(f"k: {k}", indent + 1)
+            self.printline(f"v: {v}", indent + 1)
             # k is a ontology property like
             # "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
             # or "http://www.w3.org/2000/01/rdf-schema#label"
@@ -518,10 +888,13 @@ class JsonLdReader(Reader):
 
             # always a list
             for vi in v:
+                if id(vi) not in self.jsonld_doc_node_to_tile_lookup:
+                    self.jsonld_doc_node_to_tile_lookup[id(vi)] = {"vi": vi, "tiles": []}
                 if "@value" in vi:
                     value = vi["@value"]
                     uri = None
-                    clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+                    clss = vi.get(
+                        "@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
                     is_literal = True
                 else:
                     # We're an entity
@@ -545,243 +918,168 @@ class JsonLdReader(Reader):
                                 clss = self.get_cached_reference(uri)
                                 vi["@type"] = clss
                             except:
-                                raise ValueError(f"Multiple possible branches and no @type given: {vi}")
+                                raise ValueError(
+                                    f"Multiple possible branches and no @type given: {vi}")
 
                     value = None
                     is_literal = False
 
-                # Here we try and find a possible match between the node_tree and data_tree
-                # we're matching "key" which equals the concatentaion of property and class
-                # at the same level in the trees
-                # Find precomputed possible branches by prop/class combination
-                key = f"{k} {clss}"
-                if key in tree_node["datatype"].ignore_keys():
-                    # these are handled by the datatype itself
+
+                branches = self.find_matching_branch(
+                    k, [vi], tree_node, result, None, indent=0)
+
+                if k == 'http://www.w3.org/2000/01/rdf-schema#label' and branches is None:
                     continue
-                elif not key in tree_node["children"] and is_literal:
-                    # grumble grumble
-                    # model has xsd:string, default is rdfs:Literal
-                    key = f"{k} http://www.w3.org/2001/XMLSchema#string"
-                    if not key in tree_node["children"]:
-                        raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
-                elif not key in tree_node["children"]:
-                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
 
-                # if we made it this far then it means that we've found at least 1 match
-                options = tree_node["children"][key]
-                possible = []
+                x = result.copy()   
+                for branch in branches:
+                    result = x.copy()
 
-                # options is a list of potential matches in the graph tree
-                # based on property/class combination
+                    if not self.is_semantic_node(branch[0]):
+                        graph_node = branch[0]
+                        if graph_node["datatype"].is_multilingual_rdf(values):
+                            node_value = graph_node["datatype"].from_rdf(values)
+                        else:
+                            node_value = graph_node["datatype"].from_rdf(vi)
+                        # node_value might be None if the validation of the datatype fails
+                        # XXX Should we check this here, or raise in the datatype?
 
-                self.printline(f"Trying to match data value:  '{value or uri}'", indent, newline=True)
-                self.printline(f"That has type:  '{k}'", indent)
-                for o in options:
-                    self.printline(f"Considering match to graph node: '{o['name']}'", indent + 1, newline=True)
-                    self.printline(f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1)
-                    self.printline(f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
-                    potential_tile = None
-                    if o["node_id"] == o["nodegroup_id"]:
-                        # self.printline("--- getting potential tile  ---?", indent + 1)
+                        # For resource-instances, the datatype doesn't know the ontology prop config
+                        if graph_node["datatype"].references_resource_type():
+                            if "graphs" in branch[0]["config"]:
+                                gs = branch[0]["config"]["graphs"]
+                                if len(gs) == 1:
+                                    # just select it
+                                    if "ontologyProperty" in gs[0]:
+                                        node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
+                                    if "inverseOntologyProperty" in gs[0]:
+                                        node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]
+                                else:
+                                    for g in gs:
+                                        # Now test current node's class against graph's class
+                                        # This isn't a guarantee, but close enough
+                                        if vi["@type"][0] == g["rootclass"]:
+                                            if "ontologyProperty" in g:
+                                                node_value[0]["ontologyProperty"] = g["ontologyProperty"]
+                                            if "inverseOntologyProperty" in g:
+                                                node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
+                                            break
+                    else:
+                        # Might get checked in a cardinality n branch that shouldn't be repeated
+                        node_value = None
+
+                    self.printline(f"A matching branch has been found and the value can be saved.", indent + 1)
+
+                    # We know now that it can go into the branch
+                    # Determine if we can collapse the data into a -list or not
+                    bnodeid = branch[0]["node_id"]
+
+                    # if node_value == ['b83cab06-1cfe-4aeb-9653-cb9f0cc45595']:
+                    # if bnodeid == branch[0]["nodegroup_id"]:
+                    #     print('found professional activity root node')
+                    #     import ipdb; ipdb.sset_trace()
+                    
+                        
+
+                    # This is going to be the result passed down if we recurse
+                    bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
+
+                    if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
+                        # iterating through a root node *-list type
+                        pass
+                    elif bnodeid == branch[0]["nodegroup_id"] and not (branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result):
                         # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                         parenttile_id = result["tile"].tileid if "tile" in result else None
-                        potential_tile = Tile(
+                        if parenttile_id == None and branch[0]["parent_nodegroup"] != "None":
+                            continue
+                        tile = Tile(
                             tileid=uuid.uuid4(),
                             resourceinstance_id=self.resource.pk,
                             parenttile_id=parenttile_id,
-                            nodegroup_id=o["nodegroup_id"],
+                            nodegroup_id=branch[0]["nodegroup_id"],
                             data={},
                         )
-                    if is_literal and o["datatype"].is_a_literal_in_rdf():
-                        # import each value separately if there are no languages in the values and this is card n string
-                        if o["datatype"].is_multilingual_rdf(values):
-                            if len(o["datatype"].validate_from_rdf(values)) == 0:
-                                possible.append([o, values, potential_tile])
+                        self.resource.tiles.append(tile)
+                        my_tiles.append(tile)
+                        self.jsonld_doc_node_to_tile_lookup[id(vi)]["tiles"].append(tile)
+                    elif "tile" in result and result["tile"]:
+                        tile = result["tile"]
+
+                    if not hasattr(tile, "_json_ld"):
+                        tile._json_ld = vi
+
+                    bnode["tile"] = tile
+                    if bnodeid in result:
+                        if branch[0]["datatype"].collects_multiple_values():
+                            # append to previous tile
+                            if type(node_value) != list:
+                                node_value = [node_value]
+                            bnode = result[bnodeid][0]
+                            bnode["data"].append(branch[1])
+                            if not self.is_semantic_node(branch[0]):
+                                try:
+                                    n = bnode["tile"].data[bnodeid]
+                                except:
+                                    n = []
+                                    bnode["tile"].data[bnodeid] = n
+                                if type(n) != list:
+                                    bnode["tile"].data[bnodeid] = [n]
+                                bnode["tile"].data[bnodeid].extend(node_value)
+                        elif branch[0]["cardinality"] != "n":
+                            bnode = result[bnodeid][0]
+                            if bnodeid in bnode["tile"].data and node_value == bnode["tile"].data[bnodeid]:
+                                # No-op, attempt to readd same value
+                                pass
                             else:
-                                self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
+                                raise ValueError(f"Attempt to add a value to cardinality 1, non-list node {k} {clss}:\n {vi}")
                         else:
-                            if len(o["datatype"].validate_from_rdf(value)) == 0:
-                                possible.append([o, value, potential_tile])
-                            else:
-                                self.printline(f"Could not validate {value} as a {o['datatype']}", indent + 1)
-                    elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
-                        if self.is_concept_node(uri):
-                            self.printline("This is a concept node, so we'll test if the incoming data can fit here", indent + 1)
-                            collid = o["config"]["collection_id"]
-                            try:
-                                if self.validate_concept_in_collection(uri, collid):
-                                    possible.append([o, uri, potential_tile])
-                                    self.printline(f"POSSIBLE match found.", indent + 1)
-                                else:
-                                    self.printline(
-                                        f"Match REJECTED!! Incoming concept URI {uri} not found in the nodes Collection {collid}",
-                                        indent + 1,
-                                    )
-                            except:
-                                self.printline(f"Errored testing concept {uri} in collection {collid}", indent + 1)
-                        elif self.is_semantic_node(o):
-                            possible.append([o, "", potential_tile])
-                        elif o["datatype"].accepts_rdf_uri(uri):
-                            # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
-                            possible.append([o, uri, potential_tile])
-                        else:
-                            # This is when the current option doesn't match, but could be
-                            # non-ambiguous resource-instance vs semantic node
-                            continue
-                # print(f"Possible is: {[x[0]['name'] for x in possible]}")
-
-                if not possible:
-                    # self.printline(f"Tried: {options}")
-                    raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
-                elif len(possible) > 1:
-                    # descend into data to check if there are further clarifying features
-                    possible2 = []
-                    for p in possible:
-                        # self.printline(f"\n---SECOND TIER: {p[0]['name']}", indent + 1)
-                        try:
-                            # self.printline("Don't really create data, so pass anonymous result dict", indent + 1)
-                            if p[2] is not None:
-                                tile = p[2]
-                            self.printline("Found multiple matches!", indent)
-                            self.data_walk(vi, p[0], {}, tile, indent + 1)
-                            possible2.append(p)
-                        except Exception as e:
-                            self.printline(f"Failed due to {e}", indent + 1)
-                            # Not an option
-                            pass
-                    if not possible2:
-                        raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
-                    elif len(possible2) > 1:
-                        raise ValueError(
-                            f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}"
-                        )
+                            bnode["data"].append(branch[1])
+                            if not self.is_semantic_node(branch[0]):
+                                tile.data[bnodeid] = node_value
+                            result[bnodeid].append(bnode)
                     else:
-                        branch = possible2[0]
-                else:
-                    branch = possible[0]
-
-                if not self.is_semantic_node(branch[0]):
-                    graph_node = branch[0]
-                    if graph_node["datatype"].is_multilingual_rdf(values):
-                        node_value = graph_node["datatype"].from_rdf(values)
-                    else:
-                        node_value = graph_node["datatype"].from_rdf(vi)
-                    # node_value might be None if the validation of the datatype fails
-                    # XXX Should we check this here, or raise in the datatype?
-
-                    # For resource-instances, the datatype doesn't know the ontology prop config
-                    if graph_node["datatype"].references_resource_type():
-                        if "graphs" in branch[0]["config"]:
-                            gs = branch[0]["config"]["graphs"]
-                            if len(gs) == 1:
-                                # just select it
-                                if "ontologyProperty" in gs[0]:
-                                    node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
-                                if "inverseOntologyProperty" in gs[0]:
-                                    node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]
-                            else:
-                                for g in gs:
-                                    # Now test current node's class against graph's class
-                                    # This isn't a guarantee, but close enough
-                                    if vi["@type"][0] == g["rootclass"]:
-                                        if "ontologyProperty" in g:
-                                            node_value[0]["ontologyProperty"] = g["ontologyProperty"]
-                                        if "inverseOntologyProperty" in g:
-                                            node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
-                                        break
-                else:
-                    # Might get checked in a cardinality n branch that shouldn't be repeated
-                    node_value = None
-
-                self.printline(f"A matching branch has been found and the value can be saved.", indent + 1)
-
-                # We know now that it can go into the branch
-                # Determine if we can collapse the data into a -list or not
-                bnodeid = branch[0]["node_id"]
-
-                # This is going to be the result passed down if we recurse
-                bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
-
-                if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
-                    # iterating through a root node *-list type
-                    pass
-                elif bnodeid == branch[0]["nodegroup_id"] and not (branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result):
-                    # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
-                    parenttile_id = result["tile"].tileid if "tile" in result else None
-                    if parenttile_id == None and branch[0]["parent_nodegroup"] != "None":
-                        continue
-                    tile = Tile(
-                        tileid=uuid.uuid4(),
-                        resourceinstance_id=self.resource.pk,
-                        parenttile_id=parenttile_id,
-                        nodegroup_id=branch[0]["nodegroup_id"],
-                        data={},
-                    )
-                    self.resource.tiles.append(tile)
-                    my_tiles.append(tile)
-                elif "tile" in result and result["tile"]:
-                    tile = result["tile"]
-
-                if not hasattr(tile, "_json_ld"):
-                    tile._json_ld = vi
-
-                bnode["tile"] = tile
-                if bnodeid in result:
-                    if branch[0]["datatype"].collects_multiple_values():
-                        # append to previous tile
-                        if type(node_value) != list:
-                            node_value = [node_value]
-                        bnode = result[bnodeid][0]
-                        bnode["data"].append(branch[1])
-                        if not self.is_semantic_node(branch[0]):
-                            try:
-                                n = bnode["tile"].data[bnodeid]
-                            except:
-                                n = []
-                                bnode["tile"].data[bnodeid] = n
-                            if type(n) != list:
-                                bnode["tile"].data[bnodeid] = [n]
-                            bnode["tile"].data[bnodeid].extend(node_value)
-                    elif branch[0]["cardinality"] != "n":
-                        bnode = result[bnodeid][0]
-                        if bnodeid in bnode["tile"].data and node_value == bnode["tile"].data[bnodeid]:
-                            # No-op, attempt to readd same value
-                            pass
-                        else:
-                            raise ValueError(f"Attempt to add a value to cardinality 1, non-list node {k} {clss}:\n {vi}")
-                    else:
-                        bnode["data"].append(branch[1])
                         if not self.is_semantic_node(branch[0]):
                             tile.data[bnodeid] = node_value
-                        result[bnodeid].append(bnode)
-                else:
-                    if not self.is_semantic_node(branch[0]):
-                        tile.data[bnodeid] = node_value
-                    bnode["data"].append(branch[1])
-                    result[bnodeid] = [bnode]
+                        bnode["data"].append(branch[1])
+                        result[bnodeid] = [bnode]
 
-                self.printline(f"Tile.data = {tile.data}", indent + 1)
-                if not is_literal:
-                    self.data_walk(vi, branch[0], bnode, tile, indent + 1)
+                    self.printline(f"Tile.data = {tile.data}", indent + 1)
+                    # if 'bdab00aa-b4b4-11ea-84f7-3af9d3b32b71' in tile.data:
+                    #     import ipdb; ipdb.sset_trace()
+                        
+                    if not is_literal:
+                        self.data_walk(vi, branch[0], bnode, tile, indent + 1)
 
-        if self.shouldSortTiles:
-            sortfuncs = settings.JSON_LD_SORT_FUNCTIONS
-            if my_tiles:
-                tile_ng_hash = {}
-                for t in my_tiles:
-                    try:
-                        tile_ng_hash[t.nodegroup_id].append(t)
-                    except KeyError:
-                        tile_ng_hash[t.nodegroup_id] = [t]
-                for (k, v) in tile_ng_hash.items():
-                    if len(v) > 1:
-                        for func in sortfuncs:
-                            v.sort(key=func)
-                        for t, i in zip(v, range(len(v))):
-                            t.sortorder = i
+        # print(self.jsonld_doc_node_to_tile_lookup)
+        # import ipdb; ipdb.sset_trace()
+
+
+       
+        # for tile in my_tiles:
+        #     print(tile.data)
+        # import ipdb; ipdb.sset_trace()
+        
+
+        # if self.shouldSortTiles:
+        #     sortfuncs = settings.JSON_LD_SORT_FUNCTIONS
+        #     if my_tiles:
+        #         tile_ng_hash = {}
+        #         for t in my_tiles:
+        #             try:
+        #                 tile_ng_hash[t.nodegroup_id].append(t)
+        #             except KeyError:
+        #                 tile_ng_hash[t.nodegroup_id] = [t]
+        #         for (k, v) in tile_ng_hash.items():
+        #             if len(v) > 1:
+        #                 for func in sortfuncs:
+        #                     v.sort(key=func)
+        #                 for t, i in zip(v, range(len(v))):
+        #                     t.sortorder = i
 
         # Finally, after processing all of the branches for this node, check required nodes are present
-        for path in tree_node["children"].values():
-            for kid in path:
-                if kid["required"] and not f"{kid['node_id']}" in result:
-                    raise ValueError(f"Required field not present: {kid['name']}")
+        # for path in tree_node["children"].values():
+        #     for kid in path:
+        #         # breakpoint()
+        #         if kid["required"] and not f"{kid['node_id']}" in result:
+        #             print("NEED TO REMOVE TILE: %s", result['tile'])
+        #             # raise ValueError(f"Required field not present: {kid['name']}")
