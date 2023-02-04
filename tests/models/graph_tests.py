@@ -707,10 +707,10 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodes_count_after - nodes_count_before, 2)  # one for new graph, one for editable_future_graph 
+        self.assertEqual(nodes_count_after - nodes_count_before, 2)  # one for new graph, one for editable_future_graph
         self.assertEqual(edges_count_after - edges_count_before, 0)
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)  # one for new graph, one for editable_future_graph 
-        self.assertEqual(card_count_after - card_count_before, 2)  # one for new graph, one for editable_future_graph 
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)  # one for new graph, one for editable_future_graph
+        self.assertEqual(card_count_after - card_count_before, 2)  # one for new graph, one for editable_future_graph
 
         # test that data is persisited propertly during an append opertation
         graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by", graphid=self.NODE_NODETYPE_GRAPHID)
