@@ -707,10 +707,10 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodes_count_after - nodes_count_before, 1)
+        self.assertEqual(nodes_count_after - nodes_count_before, 2)  # one for new graph, one for editable_future_graph 
         self.assertEqual(edges_count_after - edges_count_before, 0)
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 1)
-        self.assertEqual(card_count_after - card_count_before, 1)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)  # one for new graph, one for editable_future_graph 
+        self.assertEqual(card_count_after - card_count_before, 2)  # one for new graph, one for editable_future_graph 
 
         # test that data is persisited propertly during an append opertation
         graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by", graphid=self.NODE_NODETYPE_GRAPHID)
@@ -721,10 +721,10 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodes_count_after - nodes_count_before, 3)
+        self.assertEqual(nodes_count_after - nodes_count_before, 4)
         self.assertEqual(edges_count_after - edges_count_before, 2)
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)
-        self.assertEqual(card_count_after - card_count_before, 2)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 3)
+        self.assertEqual(card_count_after - card_count_before, 3)
 
         # test that removing a node group by setting it to None, removes it from the db
         node_to_update = None
@@ -740,8 +740,8 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 1)
-        self.assertEqual(card_count_after - card_count_before, 1)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)
+        self.assertEqual(card_count_after - card_count_before, 2)
 
         # test that adding back a node group adds it back to the db
         node_to_update["nodegroup_id"] = node_to_update["nodeid"]
@@ -751,8 +751,8 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)
-        self.assertEqual(card_count_after - card_count_before, 2)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 3)
+        self.assertEqual(card_count_after - card_count_before, 3)
 
     def test_delete_graph(self):
         """

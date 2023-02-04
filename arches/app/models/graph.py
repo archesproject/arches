@@ -271,6 +271,11 @@ class Graph(models.GraphModel):
 
         graph = Graph.objects.get(pk=graph_model.graphid)
 
+        try:
+            Graph.objects.get(source_identifier=graph_model.graphid)
+        except ObjectDoesNotExist:
+            graph.create_editable_future_graph()
+
         return graph
 
     def add_node(self, node, nodegroups=None):

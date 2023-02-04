@@ -35,6 +35,7 @@ from arches.app.models.models import (
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils import translation
 from arches.app.models.system_settings import settings
@@ -146,6 +147,12 @@ def import_graph(graphs, overwrite_graphs=True):
                 with transaction.atomic():
                     # saves graph publication with serialized graph
                     graph = Graph.objects.get(pk=graph.graphid)  # retrieve graph using the ORM to ensure strings are I18n_Strings
+
+                    try:
+                        Graph.objects.get(source_identifier=graph.graphid)
+                    except ObjectDoesNotExist:
+                        graph.create_editable_future_graph()
+
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
                             publicationid=publication_data["publicationid"],
@@ -195,8 +202,6 @@ def import_graph(graphs, overwrite_graphs=True):
                         resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
             except:
                 pass
-
-            graph.create_editable_future_graph()
 
         return errors, reporter
 
