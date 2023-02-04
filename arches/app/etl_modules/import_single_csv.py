@@ -163,7 +163,8 @@ class ImportSingleCsv(BaseImportModule):
 
         validation = self.validate()
         if len(validation["data"]) == 0:
-            self.save_to_tiles(loadid, multiprocessing=False)
+            response = self.save_to_tiles(loadid, multiprocessing=False)
+            return response
         else:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -231,13 +232,10 @@ class ImportSingleCsv(BaseImportModule):
                             source_value = row[key]
                             config = current_node.config
                             config["nodeid"] = node
-                            if datatype == "file-list":
-                                config["path"] = temp_dir
-                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
-                                errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
-                            else:
-                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
-                                errors = datatype_instance.validate(value, nodeid=node)
+                            config["path"] = temp_dir
+
+                            value, errors = self.prepare_data_for_loading(datatype_instance, source_value, config)
+
                             valid = True if len(errors) == 0 else False
                             error_message = ""
                             for error in errors:

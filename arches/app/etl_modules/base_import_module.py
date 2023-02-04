@@ -112,3 +112,18 @@ class BaseImportModule(object):
             cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
             rows = cursor.fetchall()
         return rows
+
+
+    def prepare_data_for_loading(self, datatype_instance, source_value, config):
+        try:
+            value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
+        except:
+            value = source_value
+        try:
+            errors = datatype_instance.validate(value, **config)
+        except:
+            message = "Unexpected Error Occurred"
+            title = "Invalid {} Format".format(datatype_instance.datatype_name)
+            errors = [datatype_instance.create_error_message(value, "", "", message, title)]
+
+        return value, errors
