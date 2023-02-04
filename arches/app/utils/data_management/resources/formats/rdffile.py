@@ -536,6 +536,7 @@ class JsonLdReader(Reader):
                 # in the graph and those tiles need to be removed.  If there are still multiple matches
                 # for a given json-ld node the we need to reject the json-ld file as being ambiguous.
                 tile_dict = {}
+                tiles_to_remove = []
                 tiles_wo_required_node_data = []
                 if len(self.required_nodeids_by_nodegroup) > 0:
                     for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
@@ -552,8 +553,7 @@ class JsonLdReader(Reader):
                                         tiles_wo_required_node_data.append(tile)
                                         print("CALCULATED TILE TO REMOVE: %s", tile)
 
-                if len(tiles_wo_required_node_data) > 1:
-                    tiles_to_remove = []
+                if len(tiles_wo_required_node_data) > 0:
                     # build tile heirarchy
                     for tileid, tile in tile_dict.items():
                         if tile.parenttile_id:
@@ -571,27 +571,26 @@ class JsonLdReader(Reader):
                         parenttile = tile if parenttile is None else parenttile
                         gather_child_tiles(parenttile, tiles_to_remove)
                     
-                    print(tiles_to_remove)
                     for tile in tiles_to_remove:
                         self.resource.tiles.remove(tile)
 
+                    # if we don't remove all child tiles then those will get 
+                    # saved too and it will include tiles we just deleted above
+                    for tile in self.resource.tiles:
+                        tile.tiles = []
 
-                    # do a final check, once we've removed any extra tiles, 
-                    # that we only have 1 tile per json-ld node, any more than one
-                    # means that we have multiple branches per node and so the match
-                    # was ambiguous
-                    for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
-                        if len(set(jsonld_node["tiles"])-set(tiles_to_remove)) > 1:
-                            raise ValueError(
-                                f"""Even after considering child branches, at least one of the 
-                                incoming json-ld nodes still matches more than one branch 
-                                in the graph: {jsonld_node}"""
-                            )
+                # do a final check, once we've removed any extra tiles, 
+                # that we only have 1 tile per json-ld node, any more than one
+                # means that we have multiple branches per node and so the match
+                # was ambiguous
+                for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
+                    if len(set(jsonld_node["tiles"])-set(tiles_to_remove)) > 1:
+                        raise ValueError(
+                            f"""Even after considering child branches, at least one of the 
+                            incoming json-ld nodes still matches more than one branch 
+                            in the graph: {jsonld_node}"""
+                        )
 
-                # if we don't remove all child tiles then those will get 
-                # saved too and it will include tiles we just deleted above
-                for tile in self.resource.tiles:
-                    tile.tiles = []
 
             except Exception as e:
                 err_msg_fail = f"FAILED to completely load resource with id: {self.resource.pk}\n"
@@ -652,6 +651,31 @@ class JsonLdReader(Reader):
             except:
                 raise ("Local reference not found")
 
+    def has_all_required_nodes(self, json_data, node):
+        print("checking for missing required nodes")
+        matches = []
+        # for key, node in node[0]['children'].items():
+        #     if node['required']:
+        #         print(key)
+        # for required_node in node[0]["required_nodes_in_nodegroup"].values():
+        # import ipdb; ipdb.sset_trace()
+        for k, v in json_data.items():
+            if k in ["@id", "@type", "@value"]:
+                continue
+            try:
+                match = self.find_matching_branch(
+                    k, v, node[0]["required_nodes_in_nodegroup"], {}, skip_required_nodes_check=True)
+                if match is not None:
+                    matches.append(match)
+                    # import ipdb; ipdb.sset_trace()
+                    print(match)
+            except: 
+                pass
+        if len(matches) == 2:
+            import ipdb; ipdb.sset_trace()
+            
+        return len(matches) == len(node[0]["required_nodes_in_nodegroup"]["children"])
+
     def printline(self, text, indent=0, newline=False):
         prefix = ""
         if newline:
@@ -662,7 +686,7 @@ class JsonLdReader(Reader):
         if self.verbosity > 2:
             print(prefix + text)
 
-    def find_matching_branch(self, k, v, tree_node, result, tile=None, indent=0):
+    def find_matching_branch(self, k, v, tree_node, result, tile=None, indent=0, skip_required_nodes_check=False):
         my_tiles = []
         branch = None
         self.printline("Walk down non-literal branches in the data", indent, newline=True)
@@ -670,6 +694,16 @@ class JsonLdReader(Reader):
         # self.printline(tree_node["name"], indent)
         # self.printline(f"tile={tile}", indent)
 
+        # # pre-seed as much of the cache as we can during the data-walk
+        # if "@id" in data_node and "@type" in data_node:
+        #     dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
+        #     self.idcache[data_node["@id"]] = dataType
+        # for k, v in data_node.items():
+        #     self.printline(f"k: {k}", indent + 1)
+        #     self.printline(f"v: {v}", indent + 1)
+        #     # k is a ontology property like
+        #     # "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        #     # or "http://www.w3.org/2000/01/rdf-schema#label"
         if k in ["@id", "@type"]:
             return
 
@@ -695,6 +729,8 @@ class JsonLdReader(Reader):
             else:
                 # We're an entity
                 uri = vi.get("@id", "")
+                if uri == "urn:uuid:7fe864cb-dba2-3ebd-aa52-9c9c6a8d4aaa":
+                    breakpoint()
                 try:
                     clss = vi["@type"][0]
                 except:
