@@ -113,7 +113,6 @@ class BaseImportModule(object):
             rows = cursor.fetchall()
         return rows
 
-
     def prepare_data_for_loading(self, datatype_instance, source_value, config):
         try:
             value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
