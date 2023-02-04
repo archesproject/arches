@@ -1543,16 +1543,27 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertEqual(len(tiles),4)
 
-        # js = response.json()
-        # if type(js) == list:
-        #     js = js[0]
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
 
-        # # print(f"Got JSON for test 7: {js}")
-        # self.assertTrue("@id" in js)
-        # self.assertTrue(
-        #     js["@id"] == "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b")
+        # print(f"Got JSON for test 7: {js}")
+        self.assertTrue("@id" in js)
+        self.assertTrue(
+            js["@id"] == "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b")
 
-        # lo = js["http://www.cidoc-crm.org/cidoc-crm/L54_is_same-as"]
-        # self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in lo)
-        # self.assertTrue(
-        #     lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "Test Content")
+        l1 = "http://www.cidoc-crm.org/cidoc-crm/P116i_is_started_by"
+        l2 = "http://www.cidoc-crm.org/cidoc-crm/P117i_includes"
+        l3 = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        l3a = "http://www.w3.org/2000/01/rdf-schema#label"
+        l4 = "http://www.cidoc-crm.org/cidoc-crm/P102_has_title"
+        l5 = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+        
+        self.assertTrue(l1 in js)
+        self.assertTrue(l2 in js[l1])
+        self.assertTrue(l3 in js[l1][l2])
+        self.assertTrue(l3a in js[l1][l2])
+        self.assertEqual(js[l1][l2][l3a],  "material a")
+        self.assertTrue(l4 in js[l1][l2][l3])
+        self.assertTrue(l5 in js[l1][l2][l3][l4])
+        self.assertEqual(js[l1][l2][l3][l4][l5]["@value"],  "taco")
