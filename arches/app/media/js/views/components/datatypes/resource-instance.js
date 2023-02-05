@@ -11,7 +11,7 @@ define([
     const viewModel = function(params) {
         var self = this;
 
-
+        const defaultRelationshipConceptValue= 'ac41d9be-79db-4256-b368-2f4559cfbe55';
         this.search = params.search;
         this.resourceModels = [{
             graphid: null,
@@ -68,8 +68,8 @@ define([
                 });
                 graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
                 graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
-                graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || 'ac41d9be-79db-4256-b368-2f4559cfbe55');
-                graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || 'ac41d9be-79db-4256-b368-2f4559cfbe55'));
+                graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || defaultRelationshipConceptValue);
+                graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || defaultRelationshipConceptValue));
                 graph.useOntologyRelationship = ko.observable(false);
                 graph.removeRelationship = function(graph){
                     self.config.graphs.remove(graph);
