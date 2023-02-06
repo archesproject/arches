@@ -469,6 +469,13 @@ class GraphDataView(View):
                     graph.delete_instances()
                     graph.publication = None
                     graph.save(validate=False)
+
+                try:
+                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier)
+                    source_graph.delete()
+                except models.GraphModel.DoesNotExist:
+                    pass  # no sourcee graph to delete
+
                 graph.delete()
                 return JSONResponse({"success": True})
             except GraphValidationError as e:
