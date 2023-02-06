@@ -137,7 +137,14 @@ define([
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
             nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
             graphid: params.graph.graphid,
-            graphname: params.graph.name,
+            graphname: ko.computed(() => {
+                if (params.graph.name().endsWith("__EDITABLE_FUTURE_VERSION")) {
+                    return params.graph.name().replace('__EDITABLE_FUTURE_VERSION', '');
+                }
+                else {
+                    return params.graph.name();
+                }
+            }),
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
             graphModel: params.graphModel,

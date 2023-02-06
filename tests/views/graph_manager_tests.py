@@ -158,7 +158,12 @@ class GraphManagerViewTests(ArchesTestCase):
             }
             Edge.objects.create(**edges_dict).save()
 
-        graph = Graph.new()
+        source_graph = Graph.new()
+        source_graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
+        source_graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
+        source_graph.save()
+
+        graph = Graph.objects.get(source_identifier=source_graph.pk)
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
         graph.author = "Arches"
@@ -183,8 +188,10 @@ class GraphManagerViewTests(ArchesTestCase):
         )
         graph.save()
 
-        self.ROOT_ID = graph.root.nodeid
-        self.GRAPH_ID = str(graph.pk)
+        source_graph.update_from_editable_future_graph()
+
+        self.ROOT_ID = source_graph.root.nodeid
+        self.GRAPH_ID = str(source_graph.pk)
         self.NODE_COUNT = 5
 
         self.client = Client()

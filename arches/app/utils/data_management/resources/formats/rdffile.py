@@ -311,6 +311,7 @@ class JsonLdReader(Reader):
                 root_node = node
             node["datatype"] = self.datatype_factory.get_instance(n.datatype)
             node["datatype_type"] = n.datatype
+            node["parent_nodegroup"] = str(n.nodegroup.parentnodegroup_id) if n.nodegroup is not None else None
             node["extra_class"] = []
             if node["datatype"].references_resource_type():
                 if "graphs" in n.config and n.config["graphs"]:
@@ -707,6 +708,8 @@ class JsonLdReader(Reader):
                 elif bnodeid == branch[0]["nodegroup_id"] and not (branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result):
                     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                     parenttile_id = result["tile"].tileid if "tile" in result else None
+                    if parenttile_id == None and branch[0]["parent_nodegroup"] != "None":
+                        continue
                     tile = Tile(
                         tileid=uuid.uuid4(),
                         resourceinstance_id=self.resource.pk,
