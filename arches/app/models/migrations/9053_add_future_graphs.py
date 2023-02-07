@@ -14,7 +14,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="graphmodel",
             name="source_identifier",
-            field=models.UUIDField(blank=True, null=True),
+            field=models.ForeignKey(
+                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.graphmodel"
+            )
         ),
         migrations.AddField(
             model_name="cardmodel",

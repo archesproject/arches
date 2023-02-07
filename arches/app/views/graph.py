@@ -470,13 +470,14 @@ class GraphDataView(View):
                     graph.publication = None
                     graph.save(validate=False)
 
+                graph.delete()
+
                 try:
                     source_graph = models.GraphModel.objects.get(pk=graph.source_identifier)
                     source_graph.delete()
                 except models.GraphModel.DoesNotExist:
                     pass  # no sourcee graph to delete
 
-                graph.delete()
                 return JSONResponse({"success": True})
             except GraphValidationError as e:
                 return JSONErrorResponse(e.title, e.message)
@@ -488,7 +489,10 @@ class GraphPublicationView(View):
     action = None
 
     def post(self, request, graphid):
+        # import pdb; pdb.set_trace()
         graph = Graph.objects.get(pk=graphid)
+        # source_graph = Graph.objects.get(pk=graph.source_identifier)
+        # source_graph.update_from_editable_future_graph()
 
         try:
             notes = None

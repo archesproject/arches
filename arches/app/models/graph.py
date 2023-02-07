@@ -1759,6 +1759,9 @@ class Graph(models.GraphModel):
             raise Exception(_("No identifiable future Graph"))
 
         def _update_source_nodegroup_hierarchy(nodegroup):
+            if not nodegroup:
+                return None
+
             node = models.Node.objects.get(pk=nodegroup.pk)
             if node.source_identifier_id:
                 source_nodegroup = models.NodeGroup.objects.get(pk=node.source_identifier_id)
@@ -1824,7 +1827,7 @@ class Graph(models.GraphModel):
             _update_source_nodegroup_hierarchy(future_card.nodegroup)
 
         for future_node in list(editable_future_graph.nodes.values()):
-            future_node_nodegroup_node = models.Node.objects.get(pk=future_node.nodegroup.pk)
+            future_node_nodegroup_node = models.Node.objects.get(pk=future_node.nodegroup.pk) if future_node.nodegroup else None
 
             if future_node.source_identifier:
                 source_node = future_node.source_identifier
@@ -1835,22 +1838,21 @@ class Graph(models.GraphModel):
                     if key not in ["graph_id", "nodeid", "nodegroup_id", "source_identifier_id", "is_collector"]:
                         setattr(source_node, key, getattr(future_node, key))
 
-                source_node.nodegroup_id = (
-                    future_node_nodegroup_node.source_identifier_id
-                    if future_node_nodegroup_node.source_identifier_id
-                    else future_node.nodegroup_id
-                )
+                if future_node_nodegroup_node and future_node_nodegroup_node.source_identifier_id:
+                    source_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
+                else:
+                    source_node.nodegroup_id = future_node.nodegroup_id
+
                 source_node.save()
             else:  # newly-created node
                 self.nodes[future_node.pk] = future_node
                 del editable_future_graph.nodes[future_node.pk]
 
                 future_node.graph_id = self.pk
-                future_node.nodegroup_id = (
-                    future_node_nodegroup_node.source_identifier_id
-                    if future_node_nodegroup_node.source_identifier_id
-                    else future_node.nodegroup_id
-                )
+
+                if future_node_nodegroup_node and future_node_nodegroup_node.source_identifier_id:
+                    future_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
+
                 future_node.save()
 
             _update_source_nodegroup_hierarchy(future_node.nodegroup)
@@ -1886,6 +1888,11 @@ class Graph(models.GraphModel):
                 future_edge.save()
 
         self.root = editable_future_graph.root.source_identifier
+        self.name.raw_value = editable_future_graph.name.raw_value
+
+        for key, value in self.name.raw_value.items():
+            self.name.raw_value[key] = value.replace('__EDITABLE_FUTURE_VERSION', '')
+
         self.save()
         # END iterate related resources
 
