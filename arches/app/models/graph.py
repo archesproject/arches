@@ -1891,7 +1891,7 @@ class Graph(models.GraphModel):
         self.name.raw_value = editable_future_graph.name.raw_value
 
         for key, value in self.name.raw_value.items():
-            self.name.raw_value[key] = value.replace('__EDITABLE_FUTURE_VERSION', '')
+            self.name.raw_value[key] = value.replace("__EDITABLE_FUTURE_VERSION", "")
 
         self.save()
         # END iterate related resources
