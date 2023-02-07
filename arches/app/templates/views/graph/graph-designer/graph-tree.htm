@@ -50,7 +50,7 @@
             <!-- /ko -->
             <span class="" data-bind="{text: graphTree.getDisplayName(node)}"></span>
             <!-- ko if: graphTree.showIds -->
-            <span style="font-weight:bold;" data-bind="text: ': ' + graphTree.getNodeIdentifier(node)()"></span>
+            <span style="font-weight:bold;" data-bind="text: ': ' + graphTree.getNodeIdentifier(node)"></span>
             <!-- /ko -->
             <span class="spacer"></span>
             <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->

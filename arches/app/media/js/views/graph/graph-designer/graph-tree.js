@@ -103,10 +103,8 @@ define([
         * @param {object} node - a node in the tree
         */
         getNodeIdentifier: function(node) {
-            return ko.computed(function(){
-                var nodeIdentifier = node.sourceIdentifierId() ? node.sourceIdentifierId() : node.nodeid;
-                return nodeIdentifier;
-            }, this)
+            var nodeIdentifier = node.sourceIdentifierId() ? node.sourceIdentifierId() : node.nodeid;
+            return nodeIdentifier;
         },
 
         /**

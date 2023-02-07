@@ -177,6 +177,9 @@ class GraphTests(ArchesTestCase):
         self.rootNode = graph.root
 
     def tearDown(self):
+        editable_future_graph = Graph.objects.get(source_identifier=self.rootNode.graph_id)
+        editable_future_graph.delete()
+
         self.deleteGraph(self.rootNode.graph_id)
 
     def test_new_graph(self):
