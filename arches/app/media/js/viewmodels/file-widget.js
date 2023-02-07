@@ -139,7 +139,7 @@ define([
         });
 
         this.getFileUrl = function(url){
-            var url = ko.unwrap(url);
+            url = ko.unwrap(url);
             var httpRegex = /^https?:\/\//;
             // test whether the url is external (starts with http(s), if it is just return it)
             if (httpRegex.test(url)){
