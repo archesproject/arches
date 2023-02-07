@@ -396,7 +396,8 @@ class Graph(models.GraphModel):
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
             card.config = cardobj.get("config", None)
             constraints = cardobj.get("constraints", "")
-            for constraint in constraints:
+            constraints_with_nodes = [c for c in constraints if len(c['nodes'])]
+            for constraint in constraints_with_nodes:
                 self.add_card_contraint(constraint, card)
 
         card.graph = self
