@@ -491,24 +491,24 @@ class GraphPublicationView(View):
     def post(self, request, graphid):
         # import pdb; pdb.set_trace()
         graph = Graph.objects.get(pk=graphid)
-        # source_graph = Graph.objects.get(pk=graph.source_identifier)
-        # source_graph.update_from_editable_future_graph()
+        source_graph = Graph.objects.get(pk=graph.source_identifier)
+        source_graph.update_from_editable_future_graph()
 
-        try:
-            notes = None
-            if request.body:
-                data = JSONDeserializer().deserialize(request.body)
-                notes = data.get("notes")
+        # try:
+        #     notes = None
+        #     if request.body:
+        #         data = JSONDeserializer().deserialize(request.body)
+        #         notes = data.get("notes")
 
-            if self.action == "publish":
-                try:
-                    graph.publish(notes=notes, user=request.user)
-                except UnpublishedModelError as e:
-                    return JSONErrorResponse(e.title, e.message)
-            elif self.action == "unpublish":
-                graph.unpublish()
-        except Exception as e:
-            return JSONErrorResponse(e)
+        #     if self.action == "publish":
+        #         try:
+        #             graph.publish(notes=notes, user=request.user)
+        #         except UnpublishedModelError as e:
+        #             return JSONErrorResponse(e.title, e.message)
+        #     elif self.action == "unpublish":
+        #         graph.unpublish()
+        # except Exception as e:
+        #     return JSONErrorResponse(e)
 
         return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
 

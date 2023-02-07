@@ -189,7 +189,6 @@ define([
                     exportable: self.exportable,
                     alias: self.alias,
                     hascustomalias: self.hasCustomAlias,
-                    sourceidentifierid: self.sourceIdentifierId
                 });
                 return JSON.stringify(_.extend(JSON.parse(self._node()), jsObj));
             });
