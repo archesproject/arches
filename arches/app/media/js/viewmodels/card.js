@@ -97,7 +97,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
                 nodegroup: nodegroup,
-                constraints: params.constraints
+                constraints: params.constraints || emptyConstraint
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
