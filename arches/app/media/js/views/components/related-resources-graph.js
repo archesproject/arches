@@ -136,7 +136,7 @@ define([
         WorkbenchViewmodel.apply(this, [params]);
 
         var getResourceRelations = function(resourceId) {
-            var url = arches.urls.related_resources + resourceId + '?paginate=false';
+            var url = `${arches.urls.related_resources}${resourceId}?paginate=false&lang=${arches.activeLanguage}`;
             return window.fetch(url);
         };
         var resourceTypeLookup = {};
