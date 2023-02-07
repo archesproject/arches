@@ -864,7 +864,7 @@ class RelatedResourcesView(BaseManagerView):
             ret = {str(node.graph_id) for node in nodes}
 
         else:
-            lang = request.GET.get("lang", settings.LANGUAGE_CODE)
+            lang = request.GET.get("lang", request.LANGUAGE_CODE)
             resourceinstance_graphid = request.GET.get("resourceinstance_graphid")
             paginate = strtobool(request.GET.get("paginate", "true"))  # default to true
             resource = Resource.objects.get(pk=resourceid)
