@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name="source_identifier",
             field=models.ForeignKey(
                 blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.graphmodel"
-            )
+            ),
         ),
         migrations.AddField(
             model_name="cardmodel",
