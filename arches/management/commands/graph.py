@@ -81,9 +81,10 @@ class Command(BaseCommand):
         print("\nPublishing ...")
         graphids = []
         for graph in self.graphs:
-            print(graph.name)
-            graph.publish(user)
-            graphids.append(str(graph.pk))
+            if not graph.source_identifier:
+                print(graph.name)
+                graph.publish(user)
+                graphids.append(str(graph.pk))
         if self.update_instances:
             graphids = tuple(graphids)
             with connection.cursor() as cursor:
