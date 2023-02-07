@@ -98,6 +98,16 @@ define([
         },
 
         /**
+        * Returns a knockout computed used to calculate nodeidentifier of the node
+        * @memberof GraphTree.prototype
+        * @param {object} node - a node in the tree
+        */
+        getNodeIdentifier: function(node) {
+            var nodeIdentifier = node.sourceIdentifierId() ? node.sourceIdentifierId() : node.nodeid;
+            return nodeIdentifier;
+        },
+
+        /**
          * Returns a boolean to indicate whether this node participates in descriptor function
          * @param {object} node - a node in the tree
          */

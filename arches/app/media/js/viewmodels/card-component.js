@@ -64,6 +64,15 @@ define([
                 });
             }
 
+            self.cardIdentifier = ko.computed(function() {
+                var cardIdentifier = self.card.model.attributes.source_identifier_id ? self.card.model.attributes.source_identifier_id : self.card.model.nodegroup_id();
+                return cardIdentifier;
+            });
+
+            self.widgetNodeIdentifier = function(widget) {
+                return ko.unwrap(widget.node.sourceIdentifierId) ? ko.unwrap(widget.node.sourceIdentifierId) : widget.node.id;
+            };
+
             self.dirty = ko.computed(function() {
                 if (!ko.unwrap(self.tiles)) {
                     return true;

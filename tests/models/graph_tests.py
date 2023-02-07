@@ -1072,7 +1072,7 @@ class GraphTests(ArchesTestCase):
         source_graph = Graph.new(name="TEST RESOURCE")
         editable_future_graph = source_graph.create_editable_future_graph()  # TODO: replace with db lookup after 9114 signal work
 
-        editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/E21_Person", graphid=source_graph.pk)
+        editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/E1_Entity", graphid=source_graph.pk)
         editable_future_graph.save()
 
         updated_source_graph = source_graph.update_from_editable_future_graph()
