@@ -1074,10 +1074,9 @@ class GraphTests(ArchesTestCase):
 
         editable_future_graph.append_branch("http://www.cidoc-crm.org/cidoc-crm/E1_Entity", graphid=source_graph.pk)
         editable_future_graph.save()
+        serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
 
         updated_source_graph = source_graph.update_from_editable_future_graph()
-
-        serialized_editable_future_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(editable_future_graph))
         serialized_updated_source_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(updated_source_graph))
 
         for idx, editable_future_graph_serialized_card in enumerate(serialized_editable_future_graph["cards"]):
