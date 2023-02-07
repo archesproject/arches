@@ -104,9 +104,6 @@ define([
 
             viewModel.shouldShowPublishModal = ko.observable(false);
 
-            viewModel.displayUnpublishWarning = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', _('Unpublish the graph?'), _('This will make the graph inaccessible to other users.'), function() {}, viewModel.unpublishGraph));
-            };
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
 
@@ -124,25 +121,6 @@ define([
                         }
                         
                         viewModel.graphPublicationNotes(null);
-                        viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
-                    }
-                });
-            };
-            viewModel.unpublishGraph = function() {
-                viewModel.loading(true);
-
-                $.ajax({
-                    type: "POST",
-                    url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
-                    complete: function(response, status) {
-                        if (status === 'success') {
-                            viewModel.isGraphPublished(false);
-                        }
-                        else {
-                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
-                        }
-
                         viewModel.shouldShowPublishModal(false);
                         viewModel.loading(false);
                     }

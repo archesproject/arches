@@ -89,12 +89,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
                 <span style="align-self: flex-end;">
                     <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">
-                        <!-- ko ifnot: $data.isGraphPublished() -->
                         <span>{% trans "Publish" %}</span>
-                        <!-- /ko -->
-                        <!-- ko if: $data.isGraphPublished() -->
-                        <span>{% trans "Update" %}</span>
-                        <!-- /ko -->
                     </button>
                 </span>
             <!-- /ko -->
@@ -156,23 +151,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </span>
             <!-- /ko -->
-            
-            <!-- ko if: $data.isGraphPublished() -->
-                <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
-                    <span>{% trans "Update Published Graph" %}</span>
-                </button>
-                <button class="btn btn-md btn-danger btn-labeled fa fa-exclamation" data-bind="click: $data.displayUnpublishWarning">
-                    <span>{% trans "Unpublish Graph" %}</span>
-                </button>
-                <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko ifnot: $data.isGraphPublished() -->
-                <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
-                    <span>{% trans "Publish Graph" %}</span>
-                </button>
-                <!-- /ko -->
+
+            <!-- ko if: $data.shouldShowGraphPublishButtons() -->
+            <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
+                <span>{% trans "Publish Graph" %}</span>
+            </button>
             <!-- /ko -->
 
             <a class="btn btn-md btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="

@@ -1979,14 +1979,6 @@ class Graph(models.GraphModel):
             except Exception as e:
                 raise UnpublishedModelError(e)
 
-    def unpublish(self):
-        """
-        Unassigns GraphXPublishedGraph id from Graph
-        """
-        self.publication = None
-        self.save(validate=False)
-
-
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Graph Validation Error")

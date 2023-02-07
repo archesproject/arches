@@ -34,13 +34,11 @@ class Command(BaseCommand):
             nargs="?",
             choices=[
                 "publish",
-                "unpublish",
             ],
             help="""
             Operation Type
               'publish' publishes resource models indicated using the --graphs arg.
-              'unpublish' unpublishes resource models indicated using the --graphs arg.
-               Both publish and unpublish apply to all resource models if a --graphs value is not provided",
+               Publish applies to all resource models if a --graphs value is not provided",
             """,
         )
         parser.add_argument(
@@ -78,9 +76,6 @@ class Command(BaseCommand):
         if options["operation"] == "publish":
             self.publish(options["username"])
 
-        if options["operation"] == "unpublish":
-            self.unpublish()
-
     def publish(self, username):
         user = User.objects.get(username=username)
         print("\nPublishing ...")
@@ -96,9 +91,3 @@ class Command(BaseCommand):
                     "update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;",
                     (graphids,),
                 )
-
-    def unpublish(self):
-        print("Unpublishing...")
-        for graph in self.graphs:
-            print(graph.name)
-            graph.unpublish()

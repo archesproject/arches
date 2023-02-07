@@ -183,7 +183,6 @@ urlpatterns = [
         name="get_domain_connections",
     ),
     url(r"^graph/(?P<graphid>%s)/publish$" % uuid_regex, GraphPublicationView.as_view(action="publish"), name="publish_graph"),
-    url(r"^graph/(?P<graphid>%s)/unpublish$" % uuid_regex, GraphPublicationView.as_view(action="unpublish"), name="unpublish_graph"),
     url(r"^graph/(?P<graphid>%s)/function_manager$" % uuid_regex, FunctionManagerView.as_view(), name="function_manager"),
     url(r"^graph/(?P<graphid>%s)/apply_functions$" % uuid_regex, FunctionManagerView.as_view(), name="apply_functions"),
     url(r"^graph/(?P<graphid>%s)/remove_functions$" % uuid_regex, FunctionManagerView.as_view(), name="remove_functions"),
