@@ -268,7 +268,7 @@ define([
             self.exportable(source.exportable);
             self.alias(source.alias);
             self.hasCustomAlias(source.hascustomalias);
-            self.sourceIdentifierId(source.source_identifier_id)
+            self.sourceIdentifierId(source.source_identifier_id);
 
             if (source.config) {
                 self.setupConfig(source.config);

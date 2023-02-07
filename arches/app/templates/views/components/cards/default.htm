@@ -113,7 +113,7 @@
                     <strong style="margin-right: 10px;" >
                         <span data-bind="text: !!(widget.label()) ? widget.label() : widget.node.name"></span>
                         <!-- ko if: $parent.showIds -->
-                        <span style="font-weight:bold" data-bind="text: ': ' + (!!(widget.label()) ? widget.node.nodeid : '')"></span>
+                        <span style="font-weight:bold" data-bind="text: ': ' + (!!(widget.label()) ? $parent.widgetNodeIdentifier(widget) : '')"></span>
                         <!-- /ko -->
                     </strong>
                 </a>
