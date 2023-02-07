@@ -248,7 +248,6 @@ class Graph(models.GraphModel):
         return edge
 
     def add_card_contraint(self, constraint, card):
-        unique_to_all = constraint.get("uniquetoallinstances", False)
         constraint_model = models.ConstraintModel()
         constraint_model.constraintid = constraint.get("constraintid", None)
         constraint_model.uniquetoallinstances = constraint.get("uniquetoallinstances", False)
