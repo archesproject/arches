@@ -320,7 +320,6 @@ class JsonLdReader(Reader):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
             self.root_ontologyclass_lookup[str(graph.pk)] = node.ontologyclass
         self.logger.info("Initialized JsonLdReader")
-        self.required_nodeids_by_nodegroup = {}
 
     def validate_concept_in_collection(self, value, collection):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
@@ -366,12 +365,6 @@ class JsonLdReader(Reader):
             node["out_edges"] = []
             node["children"] = {}
             nodes[str(n.nodeid)] = node
-            
-            if node["required"]: 
-                if node["nodegroup_id"] not in self.required_nodeids_by_nodegroup:
-                    self.required_nodeids_by_nodegroup[node["nodegroup_id"]] = []
-                self.required_nodeids_by_nodegroup[node["nodegroup_id"]].append(
-                    node["node_id"])
 
         for edegid, e in graph.edges.items():
             dn = e.domainnode_id
@@ -452,6 +445,7 @@ class JsonLdReader(Reader):
         self.resource = None
         self.use_ids = use_ids
         self.jsonld_doc_node_to_tile_lookup = {}
+        self.tiles_wo_required_node_data = []
         
         if not isinstance(data, list):
             data = [data]
@@ -519,24 +513,14 @@ class JsonLdReader(Reader):
                 # but not supplied in the incomming json-ld data, then that data can't match that branch
                 # in the graph and those tiles need to be removed.  If there are still multiple matches
                 # for a given json-ld node the we need to reject the json-ld file as being ambiguous.
-                tile_dict = {}
+
                 tiles_to_remove = []
-                tiles_wo_required_node_data = []
-                if len(self.required_nodeids_by_nodegroup) > 0:
+                if len(self.tiles_wo_required_node_data) > 0:
+                    # build tile heirarchy
+                    tile_dict = {}
                     for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
                         for tile in jsonld_node["tiles"]:
                             tile_dict[str(tile.tileid)] = tile
-                            nodegroup_id = str(tile.nodegroup_id)
-                            if nodegroup_id in self.required_nodeids_by_nodegroup:
-                                # this node group has required nodes, check to see if we supplied values
-                                for required_nodeid in self.required_nodeids_by_nodegroup[nodegroup_id]:
-                                    if required_nodeid not in tile.data or tile.data[required_nodeid] is None:
-                                        # this tile is invalid and needs to be removed and all child tiles as well
-                                        tiles_wo_required_node_data.append(tile)
-                                        print("CALCULATED TILE TO REMOVE: %s", tile)
-
-                if len(tiles_wo_required_node_data) > 0:
-                    # build tile heirarchy
                     for tileid, tile in tile_dict.items():
                         if tile.parenttile_id:
                             parenttile = tile_dict[str(tile.parenttile_id)]
@@ -548,7 +532,7 @@ class JsonLdReader(Reader):
                             gather_child_tiles(childtile, tilelist)
 
                     # gather all the tiles that need to be removed from the resource
-                    for tile in tiles_wo_required_node_data:
+                    for tile in self.tiles_wo_required_node_data:
                         parenttile = find_parent_tile(tile)
                         parenttile = tile if parenttile is None else parenttile
                         gather_child_tiles(parenttile, tiles_to_remove)
@@ -988,7 +972,5 @@ class JsonLdReader(Reader):
         # Finally, after processing all of the branches for this node, check required nodes are present
         for path in tree_node["children"].values():
             for kid in path:
-                # breakpoint()
                 if kid["required"] and not f"{kid['node_id']}" in result:
-                    print("NEED TO REMOVE TILE: %s", result['tile'])
-                    # raise ValueError(f"Required field not present: {kid['name']}")
+                    self.tiles_wo_required_node_data.append(result['tile'])
