@@ -78,8 +78,15 @@ define([
             uniquetoallinstances: false,
             nodes:[],
             cardid: params.card.cardid,
-            constraintid:  uuid.generate()
+            constraintid: uuid.generate()
         }];
+
+        let cardConstraints;
+        if (params.card.constraints?.length) {
+            cardConstraints = params.card.constraints;
+        } else {
+            cardConstraints = emptyConstraint;
+        }
 
         var appliedFunctions = params.appliedFunctions;
         var primaryDescriptorFunction = params.primaryDescriptorFunction;
@@ -97,7 +104,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
                 nodegroup: nodegroup,
-                constraints: params.card.constraints || emptyConstraint
+                constraints: cardConstraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
