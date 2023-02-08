@@ -82,7 +82,7 @@ define([
         var emptyConstraint = [{
             uniquetoallinstances: false,
             nodes:[],
-            cardid: self.cardid,
+            cardid: params.card.cardid,
             constraintid:  uuid.generate()
         }];
 
@@ -102,7 +102,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
                 nodegroup: nodegroup,
-                constraints: params.constraints || emptyConstraint
+                constraints: params.card.constraints || emptyConstraint
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
