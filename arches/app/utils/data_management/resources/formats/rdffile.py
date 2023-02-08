@@ -500,7 +500,6 @@ class JsonLdReader(Reader):
             self.root_json_document = jsonld_document
             try:
                 self.data_walk(jsonld_document, self.graphtree, result)
-                x = JSONSerializer().serialize(self.jsonld_doc_node_to_tile_lookup)
 
                 def find_parent_tile(searchedtile):
                     for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
@@ -513,24 +512,9 @@ class JsonLdReader(Reader):
                                     return searchedtile
                                 else:
                                     return find_parent_tile(tile)
-                
-                def get_all_child_tiles(searchedtile, foundtiles):
-                    for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
-                        for tile in jsonld_node["tiles"]:
-                            if str(tile.parenttile_id) == str(searchedtile.tileid):
-                                foundtiles.append(tile)
-                                get_all_child_tiles(tile, foundtiles)
-                                # if the parent tile is associated with a json-ld node
-                                # that has no other tiles, then the searched tile
-                                # is where multiple node matches were found
-                                if len(jsonld_node["tiles"]) == 1:
-                                    return searchedtile
-                                else:
-                                    find_parent_tile(tile)
 
-
-                # the data_walk method and json-ld doc can create multiple matched paths to teh graph
-                # that result in extra tiles being created.  There is the possibility to remove those
+                # the data_walk method along with the json-ld doc can create multiple matched paths to the
+                # graph that result in extra tiles being created.  There is the possibility to remove those
                 # extra tiles based on if a node in one of those tiles is required.  If it is required,
                 # but not supplied in the incomming json-ld data, then that data can't match that branch
                 # in the graph and those tiles need to be removed.  If there are still multiple matches
@@ -548,8 +532,6 @@ class JsonLdReader(Reader):
                                 for required_nodeid in self.required_nodeids_by_nodegroup[nodegroup_id]:
                                     if required_nodeid not in tile.data or tile.data[required_nodeid] is None:
                                         # this tile is invalid and needs to be removed and all child tiles as well
-                                        # import ipdb; ipdb.sset_trace()
-                                        # self.resource.tiles.remove(tile)
                                         tiles_wo_required_node_data.append(tile)
                                         print("CALCULATED TILE TO REMOVE: %s", tile)
 
@@ -591,7 +573,6 @@ class JsonLdReader(Reader):
                             in the graph: {jsonld_node}"""
                         )
 
-
             except Exception as e:
                 err_msg_fail = f"FAILED to completely load resource with id: {self.resource.pk}\n"
                 self.logger.debug(err_msg_fail)
@@ -606,7 +587,6 @@ class JsonLdReader(Reader):
                 if not self.ignore_errors:
                     raise
 
-
     def is_semantic_node(self, graph_node):
         return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
 
@@ -615,16 +595,6 @@ class JsonLdReader(Reader):
         pcs.append(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "concepts/")
         for p in pcs:
             if uri.startswith(p):
-                return True
-        return False
-    
-    def is_reference_entity(self, uri):
-        legacy_jsonld_arches_node_ids = re.compile(r".*/tile/%s/node/%s" % (settings.UUID_REGEX, settings.UUID_REGEX))
-        if legacy_jsonld_arches_node_ids.match(uri):
-            return False
-        for datatype in self.datatype_factory.datatypes.keys():
-            instance = self.datatype_factory.get_instance(datatype)
-            if instance.accepts_rdf_uri(uri):
                 return True
         return False
 
@@ -651,31 +621,6 @@ class JsonLdReader(Reader):
             except:
                 raise ("Local reference not found")
 
-    def has_all_required_nodes(self, json_data, node):
-        print("checking for missing required nodes")
-        matches = []
-        # for key, node in node[0]['children'].items():
-        #     if node['required']:
-        #         print(key)
-        # for required_node in node[0]["required_nodes_in_nodegroup"].values():
-        # import ipdb; ipdb.sset_trace()
-        for k, v in json_data.items():
-            if k in ["@id", "@type", "@value"]:
-                continue
-            try:
-                match = self.find_matching_branch(
-                    k, v, node[0]["required_nodes_in_nodegroup"], {}, skip_required_nodes_check=True)
-                if match is not None:
-                    matches.append(match)
-                    # import ipdb; ipdb.sset_trace()
-                    print(match)
-            except: 
-                pass
-        if len(matches) == 2:
-            import ipdb; ipdb.sset_trace()
-            
-        return len(matches) == len(node[0]["required_nodes_in_nodegroup"]["children"])
-
     def printline(self, text, indent=0, newline=False):
         prefix = ""
         if newline:
@@ -686,24 +631,13 @@ class JsonLdReader(Reader):
         if self.verbosity > 2:
             print(prefix + text)
 
-    def find_matching_branch(self, k, v, tree_node, result, tile=None, indent=0, skip_required_nodes_check=False):
-        my_tiles = []
+    def find_matching_branch(self, k, v, tree_node, result, tile=None, indent=0):
         branch = None
         self.printline("Walk down non-literal branches in the data", indent, newline=True)
         self.printline(f"---" * 20, indent)
         # self.printline(tree_node["name"], indent)
         # self.printline(f"tile={tile}", indent)
 
-        # # pre-seed as much of the cache as we can during the data-walk
-        # if "@id" in data_node and "@type" in data_node:
-        #     dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
-        #     self.idcache[data_node["@id"]] = dataType
-        # for k, v in data_node.items():
-        #     self.printline(f"k: {k}", indent + 1)
-        #     self.printline(f"v: {v}", indent + 1)
-        #     # k is a ontology property like
-        #     # "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
-        #     # or "http://www.w3.org/2000/01/rdf-schema#label"
         if k in ["@id", "@type"]:
             return
 
@@ -729,8 +663,6 @@ class JsonLdReader(Reader):
             else:
                 # We're an entity
                 uri = vi.get("@id", "")
-                if uri == "urn:uuid:7fe864cb-dba2-3ebd-aa52-9c9c6a8d4aaa":
-                    breakpoint()
                 try:
                     clss = vi["@type"][0]
                 except:
@@ -755,8 +687,6 @@ class JsonLdReader(Reader):
                 value = None
                 is_literal = False
 
-            node_has_a_value = is_literal or self.is_reference_entity(uri) or self.is_concept_node(uri)
-
             # Here we try and find a possible match between the node_tree and data_tree
             # we're matching "key" which equals the concatentaion of property and class
             # at the same level in the trees
@@ -775,13 +705,10 @@ class JsonLdReader(Reader):
                 raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
 
             # if we made it this far then it means that we've found at least 1 match
+            # options is a list of potential matches in the graph tree 
+            # based on property/class combination
             options = tree_node["children"][key]
             possible = []
-
-            # options is a list of potential matches in the graph tree
-            # based on property/class combination
-
-            
 
             self.printline(f"Trying to match data value:  '{value or uri}'", indent, newline=True)
             self.printline(f"That has type:  '{k}'", indent)
@@ -789,18 +716,6 @@ class JsonLdReader(Reader):
                 self.printline(f"Considering match to graph node: '{o['name']}'", indent + 1, newline=True)
                 self.printline(f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1)
                 self.printline(f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
-                # potential_tile = None
-                # if o["node_id"] == o["nodegroup_id"]:
-                #     # self.printline("--- getting potential tile  ---?", indent + 1)
-                #     # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
-                #     parenttile_id = result["tile"].tileid if "tile" in result else None
-                #     potential_tile = Tile(
-                #         tileid=uuid.uuid4(),
-                #         resourceinstance_id=self.resource.pk,
-                #         parenttile_id=parenttile_id,
-                #         nodegroup_id=o["nodegroup_id"],
-                #         data={},
-                #     )
 
                 if is_literal and o["datatype"].is_a_literal_in_rdf():
                     # import each value separately if there are no languages in the values and this is card n string
@@ -832,15 +747,16 @@ class JsonLdReader(Reader):
                     elif o["datatype"].accepts_rdf_uri(uri):
                         # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
                         possible.append([o, uri])
-                    elif self.is_semantic_node(o):# and not node_has_a_value:
-                        #if uri == "" or uri.startswith("_:"):
+                    elif self.is_semantic_node(o):
+                        # it would be great if we could understand if the incoming json-ld node 
+                        # was semantic and or coledted an actual value
+                        # I don't think semantic nodes should have @id values
+                        # if uri == "" or uri.startswith("_:"):
                         possible.append([o, ""])
                     else:
                         # This is when the current option doesn't match, but could be
                         # non-ambiguous resource-instance vs semantic node
                         continue
-            # print(f"Possible is: {[x[0]['name'] for x in possible]}")
-
 
             if not possible:
                 # self.printline(f"Tried: {options}")
@@ -851,9 +767,6 @@ class JsonLdReader(Reader):
                 for p in possible:
                     # self.printline(f"\n---SECOND TIER: {p[0]['name']}", indent + 1)
                     try:
-                        # self.printline("Don't really create data, so pass anonymous result dict", indent + 1)
-                        # if p[2] is not None:
-                        #     tile = p[2]
                         self.printline("Found multiple matches!", indent)
                         # if this doesn't throw an error then keep the possible branch "p"
                         for k, v in vi.items():
@@ -862,33 +775,13 @@ class JsonLdReader(Reader):
                         possible2.append(p)
                     except Exception as e:
                         self.printline(f"Failed due to {e}", indent + 1)
-                        # Not an option
                         pass
                 if not possible2:
                     raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
-                elif len(possible2) > 1:
-                    branch = possible2
-                    #check for reuired nodes in any possbile match
-                    # import ipdb; ipdb.sset_trace()
-                    # if not (skip_required_nodes_check or is_literal):
-                    #     for p in possible2.copy():
-                    #         if not self.has_all_required_nodes(vi, p):
-                    #             possible2.remove(p)
-                    # raise ValueError(
-                    #     f"Even after considering branches, data still matches more than one node: {[x[0]['name'] for x in possible2]}"
-                    # )
                 else:
                     branch = possible2
             else:
                 branch = possible
-
-        # Finally, after processing all of the branches for this node, check required nodes are present
-        # for path in tree_node["children"].values():
-        #     for kid in path:
-        #         if kid["required"] and not f"{kid['node_id']}" in result:
-        #             raise ValueError(
-        #                 f"Required field not present: {kid['name']}")
-        # import ipdb; ipdb.sset_trace()
           
         return branch
 
@@ -960,7 +853,6 @@ class JsonLdReader(Reader):
                     value = None
                     is_literal = False
 
-
                 branches = self.find_matching_branch(
                     k, [vi], tree_node, result, None, indent=0)
 
@@ -1009,13 +901,6 @@ class JsonLdReader(Reader):
                     # We know now that it can go into the branch
                     # Determine if we can collapse the data into a -list or not
                     bnodeid = branch[0]["node_id"]
-
-                    # if node_value == ['b83cab06-1cfe-4aeb-9653-cb9f0cc45595']:
-                    # if bnodeid == branch[0]["nodegroup_id"]:
-                    #     print('found professional activity root node')
-                    #     import ipdb; ipdb.sset_trace()
-                    
-                        
 
                     # This is going to be the result passed down if we recurse
                     bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
@@ -1080,42 +965,30 @@ class JsonLdReader(Reader):
                         result[bnodeid] = [bnode]
 
                     self.printline(f"Tile.data = {tile.data}", indent + 1)
-                    # if 'bdab00aa-b4b4-11ea-84f7-3af9d3b32b71' in tile.data:
-                    #     import ipdb; ipdb.sset_trace()
-                        
+
                     if not is_literal:
                         self.data_walk(vi, branch[0], bnode, tile, indent + 1)
 
-        # print(self.jsonld_doc_node_to_tile_lookup)
-        # import ipdb; ipdb.sset_trace()
-
-
-       
-        # for tile in my_tiles:
-        #     print(tile.data)
-        # import ipdb; ipdb.sset_trace()
-        
-
-        # if self.shouldSortTiles:
-        #     sortfuncs = settings.JSON_LD_SORT_FUNCTIONS
-        #     if my_tiles:
-        #         tile_ng_hash = {}
-        #         for t in my_tiles:
-        #             try:
-        #                 tile_ng_hash[t.nodegroup_id].append(t)
-        #             except KeyError:
-        #                 tile_ng_hash[t.nodegroup_id] = [t]
-        #         for (k, v) in tile_ng_hash.items():
-        #             if len(v) > 1:
-        #                 for func in sortfuncs:
-        #                     v.sort(key=func)
-        #                 for t, i in zip(v, range(len(v))):
-        #                     t.sortorder = i
+        if self.shouldSortTiles:
+            sortfuncs = settings.JSON_LD_SORT_FUNCTIONS
+            if my_tiles:
+                tile_ng_hash = {}
+                for t in my_tiles:
+                    try:
+                        tile_ng_hash[t.nodegroup_id].append(t)
+                    except KeyError:
+                        tile_ng_hash[t.nodegroup_id] = [t]
+                for (k, v) in tile_ng_hash.items():
+                    if len(v) > 1:
+                        for func in sortfuncs:
+                            v.sort(key=func)
+                        for t, i in zip(v, range(len(v))):
+                            t.sortorder = i
 
         # Finally, after processing all of the branches for this node, check required nodes are present
-        # for path in tree_node["children"].values():
-        #     for kid in path:
-        #         # breakpoint()
-        #         if kid["required"] and not f"{kid['node_id']}" in result:
-        #             print("NEED TO REMOVE TILE: %s", result['tile'])
-        #             # raise ValueError(f"Required field not present: {kid['name']}")
+        for path in tree_node["children"].values():
+            for kid in path:
+                # breakpoint()
+                if kid["required"] and not f"{kid['node_id']}" in result:
+                    print("NEED TO REMOVE TILE: %s", result['tile'])
+                    # raise ValueError(f"Required field not present: {kid['name']}")
