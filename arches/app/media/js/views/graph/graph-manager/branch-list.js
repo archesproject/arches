@@ -44,7 +44,7 @@ define([
 
             this.filtered_items = ko.pureComputed(function() {
                 var filtered_items = _.filter(this.items(), function(item){ 
-                    return !item.filtered(); 
+                    return !item.filtered() && !item.source_identifier; 
                 }, this);
                 filtered_items.sort(function(a,b) {
                     return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});

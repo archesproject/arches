@@ -69,10 +69,10 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
-                return graph.isresource;
+                return graph.isresource && !graph.source_identifier;
             });
             var graphs = ko.utils.arrayFilter(viewData.graphs, function(graph) {
-                return !graph.isresource;
+                return !graph.isresource && !graph.source_identifier;
             });
 
             var newGraph = function(url, data) {
