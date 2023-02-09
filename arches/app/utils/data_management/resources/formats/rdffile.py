@@ -305,7 +305,6 @@ class JsonLdReader(Reader):
         root_node = None
         nodes = {}
         graph = GraphProxy.objects.get(graphid=graphid)
-        node_groups = graph.get_nodegroups()
         for nodeid, n in graph.nodes.items():
             node = {}
             if n.istopnode:
