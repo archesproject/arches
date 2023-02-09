@@ -401,9 +401,6 @@ class JsonLdReader(Reader):
             if expand_data:  # this should always be true, we set this to false just for some unit tests
                 jsonld_document = expand(jsonld_document)[0]
 
-            with open("output.json", "w") as file:
-                file.write(json.dumps(jsonld_document))
-
             # Possibly bail very early
             if jsonld_document["@type"][0] != self.graphtree["class"]:
                 raise ValueError("Instance does not have same top level class as model")
