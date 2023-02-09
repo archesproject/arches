@@ -342,34 +342,6 @@ class JsonLdReader(Reader):
             prop = e.ontologyproperty
             nodes[str(dn)]["out_edges"].append({"range": str(rng), "prop": str(prop)})
 
-        # gather up all the required nodes in a given node group and append those nodes 
-        # onto the "node" object for when matching branches that have required node data
-        # for node_group in node_groups:
-        #     required_nodes_in_nodegroup = []
-        #     for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
-        #         node = nodes[str(nodeid)]
-        #         node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
-        #         if node["required"]:
-        #             required_nodes_in_nodegroup.append(node)
-
-        # for node_group in node_groups:
-        #     required_nodes_in_nodegroup = {"datatype": "", "children": {}}
-        #     for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
-        #         node = nodes[str(nodeid)]
-        #         node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
-        #         node["required_nodes_in_nodegroup"]["datatype"] = node["datatype"]
-        #         # if node["required"]:
-        #         #     required_nodes_in_nodegroup["children"].append(node)
-    
-        for node_group in node_groups:
-            required_nodes_in_nodegroup = {"datatype": "", "children": {}}
-            for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
-                node = nodes[str(nodeid)]
-                node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
-                node["required_nodes_in_nodegroup"]["datatype"] = node["datatype"]
-                # if node["required"]:
-                #     required_nodes_in_nodegroup["children"].append(node)
-
         def model_walk(node, nodes):
             for e in node["out_edges"]:
                 rng = nodes[e["range"]]
@@ -379,9 +351,6 @@ class JsonLdReader(Reader):
                         node["children"][key].append(rng)
                     else:
                         node["children"][key] = [rng]
-                    
-                    if rng["required"]:
-                        node["required_nodes_in_nodegroup"]["children"][key] = node["children"][key]
                 model_walk(rng, nodes)
             del node["out_edges"]
 
