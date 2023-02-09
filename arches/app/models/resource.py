@@ -85,7 +85,7 @@ class Resource(models.ResourceInstance):
                 return self.descriptors[language][descriptor]
             except KeyError:
                 return None
-            
+
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
