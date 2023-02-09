@@ -342,7 +342,7 @@ class JsonLdReader(Reader):
             prop = e.ontologyproperty
             nodes[str(dn)]["out_edges"].append({"range": str(rng), "prop": str(prop)})
 
-        # gather up all the required nodes in a given node group and append those nodes 
+        # gather up all the required nodes in a given node group and append those nodes
         # onto the "node" object for when matching branches that have required node data
         # for node_group in node_groups:
         #     required_nodes_in_nodegroup = []
@@ -360,10 +360,10 @@ class JsonLdReader(Reader):
         #         node["required_nodes_in_nodegroup"]["datatype"] = node["datatype"]
         #         # if node["required"]:
         #         #     required_nodes_in_nodegroup["children"].append(node)
-    
+
         for node_group in node_groups:
             required_nodes_in_nodegroup = {"datatype": "", "children": {}}
-            for nodeid in node_group.node_set.all().values_list('nodeid', flat=True):
+            for nodeid in node_group.node_set.all().values_list("nodeid", flat=True):
                 node = nodes[str(nodeid)]
                 node["required_nodes_in_nodegroup"] = required_nodes_in_nodegroup
                 node["required_nodes_in_nodegroup"]["datatype"] = node["datatype"]
@@ -379,7 +379,7 @@ class JsonLdReader(Reader):
                         node["children"][key].append(rng)
                     else:
                         node["children"][key] = [rng]
-                    
+
                     if rng["required"]:
                         node["required_nodes_in_nodegroup"]["children"][key] = node["children"][key]
                 model_walk(rng, nodes)
@@ -416,7 +416,7 @@ class JsonLdReader(Reader):
         self.use_ids = use_ids
         self.jsonld_doc_node_to_tile_lookup = {}
         self.tiles_wo_required_node_data = []
-        
+
         if not isinstance(data, list):
             data = [data]
         # Force use_ids if there is more than one record being passed in
@@ -433,7 +433,7 @@ class JsonLdReader(Reader):
             if expand_data:  # this should always be true, we set this to false just for some unit tests
                 jsonld_document = expand(jsonld_document)[0]
 
-            with open('output.json', 'w') as file:
+            with open("output.json", "w") as file:
                 file.write(json.dumps(jsonld_document))
 
             # Possibly bail very early
@@ -470,7 +470,7 @@ class JsonLdReader(Reader):
                         for tile in jsonld_node["tiles"]:
                             if str(tile.tileid) == str(searchedtile.parenttile_id):
                                 # if the parent tile is associated with a json-ld node
-                                # that has no other tiles, then the searched tile 
+                                # that has no other tiles, then the searched tile
                                 # is where multiple node matches were found
                                 if len(jsonld_node["tiles"]) == 1:
                                     return searchedtile
@@ -506,21 +506,21 @@ class JsonLdReader(Reader):
                         parenttile = find_parent_tile(tile)
                         parenttile = tile if parenttile is None else parenttile
                         gather_child_tiles(parenttile, tiles_to_remove)
-                    
+
                     for tile in tiles_to_remove:
                         self.resource.tiles.remove(tile)
 
-                    # if we don't remove all child tiles then those will get 
+                    # if we don't remove all child tiles then those will get
                     # saved too and it will include tiles we just deleted above
                     for tile in self.resource.tiles:
                         tile.tiles = []
 
-                # do a final check, once we've removed any extra tiles, 
+                # do a final check, once we've removed any extra tiles,
                 # that we only have 1 tile per json-ld node, any more than one
                 # means that we have multiple branches per node and so the match
                 # was ambiguous
                 for jsonld_node in self.jsonld_doc_node_to_tile_lookup.values():
-                    if len(set(jsonld_node["tiles"])-set(tiles_to_remove)) > 1:
+                    if len(set(jsonld_node["tiles"]) - set(tiles_to_remove)) > 1:
                         raise ValueError(
                             f"""Even after considering child branches, at least one of the 
                             incoming json-ld nodes still matches more than one branch 
@@ -659,7 +659,7 @@ class JsonLdReader(Reader):
                 raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
 
             # if we made it this far then it means that we've found at least 1 match
-            # options is a list of potential matches in the graph tree 
+            # options is a list of potential matches in the graph tree
             # based on property/class combination
             options = tree_node["children"][key]
             possible = []
@@ -702,7 +702,7 @@ class JsonLdReader(Reader):
                         # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
                         possible.append([o, uri])
                     elif self.is_semantic_node(o):
-                        # it would be great if we could understand if the incoming json-ld node 
+                        # it would be great if we could understand if the incoming json-ld node
                         # was semantic and or coledted an actual value
                         # I don't think semantic nodes should have @id values
                         # if uri == "" or uri.startswith("_:"):
@@ -724,8 +724,7 @@ class JsonLdReader(Reader):
                         self.printline("Found multiple matches!", indent)
                         # if this doesn't throw an error then keep the possible branch "p"
                         for k, v in vi.items():
-                            matched_branch = self.find_matching_branch(
-                                k, v, p[0], {}, tile, indent + 1)
+                            matched_branch = self.find_matching_branch(k, v, p[0], {}, tile, indent + 1)
                         possible2.append(p)
                     except Exception as e:
                         self.printline(f"Failed due to {e}", indent + 1)
@@ -736,7 +735,7 @@ class JsonLdReader(Reader):
                     branch = possible2
             else:
                 branch = possible
-          
+
         return branch
 
     def data_walk(self, data_node, tree_node, result, tile=None, indent=0):
@@ -744,8 +743,7 @@ class JsonLdReader(Reader):
 
         # pre-seed as much of the cache as we can during the data-walk
         if "@id" in data_node and "@type" in data_node:
-            dataType = data_node["@type"][0] if isinstance(
-                data_node["@type"], list) else data_node["@type"]
+            dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
             self.idcache[data_node["@id"]] = dataType
 
         for k, v in data_node.items():
@@ -776,8 +774,7 @@ class JsonLdReader(Reader):
                 if "@value" in vi:
                     value = vi["@value"]
                     uri = None
-                    clss = vi.get(
-                        "@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+                    clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
                     is_literal = True
                 else:
                     # We're an entity
@@ -801,19 +798,17 @@ class JsonLdReader(Reader):
                                 clss = self.get_cached_reference(uri)
                                 vi["@type"] = clss
                             except:
-                                raise ValueError(
-                                    f"Multiple possible branches and no @type given: {vi}")
+                                raise ValueError(f"Multiple possible branches and no @type given: {vi}")
 
                     value = None
                     is_literal = False
 
-                branches = self.find_matching_branch(
-                    k, [vi], tree_node, result, None, indent=0)
+                branches = self.find_matching_branch(k, [vi], tree_node, result, None, indent=0)
 
-                if k == 'http://www.w3.org/2000/01/rdf-schema#label' and branches is None:
+                if k == "http://www.w3.org/2000/01/rdf-schema#label" and branches is None:
                     continue
 
-                x = result.copy()   
+                x = result.copy()
                 for branch in branches:
                     result = x.copy()
 
@@ -862,7 +857,9 @@ class JsonLdReader(Reader):
                     if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
                         # iterating through a root node *-list type
                         pass
-                    elif bnodeid == branch[0]["nodegroup_id"] and not (branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result):
+                    elif bnodeid == branch[0]["nodegroup_id"] and not (
+                        branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result
+                    ):
                         # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
                         parenttile_id = result["tile"].tileid if "tile" in result else None
                         if parenttile_id == None and branch[0]["parent_nodegroup"] != "None":
@@ -943,4 +940,4 @@ class JsonLdReader(Reader):
         for path in tree_node["children"].values():
             for kid in path:
                 if kid["required"] and not f"{kid['node_id']}" in result:
-                    self.tiles_wo_required_node_data.append(result['tile'])
+                    self.tiles_wo_required_node_data.append(result["tile"])

@@ -1252,77 +1252,56 @@ class JsonLDImportTests(ArchesTestCase):
                     else:
                         ret.append(tile)
             return ret
-        
+
         def get_tile_by_id(tiles, tileid):
             for tile in tiles:
                 if tile.tileid == tileid:
                     return tile
 
-        tiles = TileModel.objects.filter(
-            resourceinstance_id="c3b693cc-1542-11ea-b353-acde48001122")
+        tiles = TileModel.objects.filter(resourceinstance_id="c3b693cc-1542-11ea-b353-acde48001122")
 
         self.assertEqual(len(tiles), 11)
 
-        tile1 = get_tiles_by_nodegroup(
-            tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 6)
+        tile1 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 6)
         tile1_parent = get_tile_by_id(tiles, tile1.parenttile_id)
-        
+
         self.assertEqual(tile1_parent.data, {})
         tile1_grandparent = get_tile_by_id(tiles, tile1_parent.parenttile_id)
-        self.assertEqual(
-            tile1_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {
-                "direction": "ltr",
-                "value": "second part"
-            })
+        self.assertEqual(tile1_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "second part"})
 
-        tile2 = get_tiles_by_nodegroup(
-            tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 1)
+        tile2 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 1)
         tile2_parent = get_tile_by_id(tiles, tile2.parenttile_id)
-        self.assertEqual(tile2_parent.data, {
-            "d155a4c0-1540-11ea-b353-acde48001122": "2019-12-03",
-            "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-05"
-        })
+        self.assertEqual(
+            tile2_parent.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-03", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-05"}
+        )
         tile2_grandparent = get_tile_by_id(tiles, tile2_parent.parenttile_id)
+        self.assertEqual(tile2_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "asdf"})
         self.assertEqual(
-            tile2_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {
-                "direction": "ltr",
-                "value": "asdf"
-            })
-        self.assertEqual(
-            tile2_grandparent.data["26927e22-1541-11ea-b353-acde48001122"][0]["resourceId"], 
-            "5e9baff0-109b-11ea-957a-acde48001122")
+            tile2_grandparent.data["26927e22-1541-11ea-b353-acde48001122"][0]["resourceId"], "5e9baff0-109b-11ea-957a-acde48001122"
+        )
         tile2_greatgrandparent = get_tile_by_id(tiles, tile2_grandparent.parenttile_id)
         self.assertEqual(tile2_greatgrandparent.data, {})
 
-        tile1_greatgrandparent = get_tile_by_id(
-            tiles, tile1_grandparent.parenttile_id)
+        tile1_greatgrandparent = get_tile_by_id(tiles, tile1_grandparent.parenttile_id)
         self.assertEqual(tile2_greatgrandparent, tile1_greatgrandparent)
 
-        tile3 = get_tiles_by_nodegroup(
-            tiles, "c5a9174c-1540-11ea-b353-acde48001122", "d155a4c0-1540-11ea-b353-acde48001122", "2019-12-07")
-        self.assertEqual(tile3.data, {
-            "d155a4c0-1540-11ea-b353-acde48001122": "2019-12-07",
-            "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-08"
-        })
-        tile3_parent = get_tile_by_id(tiles, tile3.parenttile_id)
+        tile3 = get_tiles_by_nodegroup(tiles, "c5a9174c-1540-11ea-b353-acde48001122", "d155a4c0-1540-11ea-b353-acde48001122", "2019-12-07")
         self.assertEqual(
-            tile3_parent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {
-                "direction": "ltr",
-                "value": "bar"
-            })
-        tile3_grandparent = get_tile_by_id(
-            tiles, tile3_parent.parenttile_id)
+            tile3.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-07", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-08"}
+        )
+        tile3_parent = get_tile_by_id(tiles, tile3.parenttile_id)
+        self.assertEqual(tile3_parent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "bar"})
+        tile3_grandparent = get_tile_by_id(tiles, tile3_parent.parenttile_id)
         self.assertEqual(tile3_grandparent.data, {})
 
-        tile4 = get_tiles_by_nodegroup(
-            tiles, "48f3ab3a-1541-11ea-b353-acde48001122")[0]
-        self.assertEqual(tile4.data, {
-            "54272cd4-1541-11ea-b353-acde48001122": [
-                "d2908ab9-19a6-4a82-953d-5ebe8d164e85"
-            ],
-            "8e08a496-1541-11ea-b353-acde48001122": None
-        })
-
+        tile4 = get_tiles_by_nodegroup(tiles, "48f3ab3a-1541-11ea-b353-acde48001122")[0]
+        self.assertEqual(
+            tile4.data,
+            {
+                "54272cd4-1541-11ea-b353-acde48001122": ["d2908ab9-19a6-4a82-953d-5ebe8d164e85"],
+                "8e08a496-1541-11ea-b353-acde48001122": None,
+            },
+        )
 
     def test_g_6235_parenttile(self):
 
@@ -1534,14 +1513,13 @@ class JsonLDImportTests(ArchesTestCase):
             resource_id="09f1d360-4271-49ea-b799-f1fdb57b634b",
         )
 
-        response = self.client.put(
-            url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
- 
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
         self.assertTrue(response.status_code == 201)
 
         tiles = TileModel.objects.filter(resourceinstance_id="09f1d360-4271-49ea-b799-f1fdb57b634b")
 
-        self.assertEqual(len(tiles),4)
+        self.assertEqual(len(tiles), 4)
 
         js = response.json()
         if type(js) == list:
@@ -1549,8 +1527,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         # print(f"Got JSON for test 7: {js}")
         self.assertTrue("@id" in js)
-        self.assertTrue(
-            js["@id"] == "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b")
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b")
 
         l1 = "http://www.cidoc-crm.org/cidoc-crm/P116i_is_started_by"
         l2 = "http://www.cidoc-crm.org/cidoc-crm/P117i_includes"
@@ -1558,12 +1535,12 @@ class JsonLDImportTests(ArchesTestCase):
         l3a = "http://www.w3.org/2000/01/rdf-schema#label"
         l4 = "http://www.cidoc-crm.org/cidoc-crm/P102_has_title"
         l5 = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
-        
+
         self.assertTrue(l1 in js)
         self.assertTrue(l2 in js[l1])
         self.assertTrue(l3 in js[l1][l2])
         self.assertTrue(l3a in js[l1][l2])
-        self.assertEqual(js[l1][l2][l3a],  "material a")
+        self.assertEqual(js[l1][l2][l3a], "material a")
         self.assertTrue(l4 in js[l1][l2][l3])
         self.assertTrue(l5 in js[l1][l2][l3][l4])
-        self.assertEqual(js[l1][l2][l3][l4][l5]["@value"],  "taco")
+        self.assertEqual(js[l1][l2][l3][l4][l5]["@value"], "taco")
