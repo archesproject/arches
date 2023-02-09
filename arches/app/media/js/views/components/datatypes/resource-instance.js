@@ -11,7 +11,7 @@ define([
     const viewModel = function(params) {
         var self = this;
 
-         
+        const defaultRelationshipConceptValue= 'ac41d9be-79db-4256-b368-2f4559cfbe55';
         this.search = params.search;
         this.resourceModels = [{
             graphid: null,
@@ -51,7 +51,7 @@ define([
                     self.selectedResourceModel([]);
                 }
             });
-            
+
             this.selectedResourceType = ko.observable(null);
             this.toggleSelectedResource = function(resourceRelationship) {
                 if (self.selectedResourceType() === resourceRelationship) {
@@ -68,6 +68,9 @@ define([
                 });
                 graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
                 graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
+                graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || defaultRelationshipConceptValue);
+                graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || defaultRelationshipConceptValue));
+                graph.useOntologyRelationship = ko.observable(false);
                 graph.removeRelationship = function(graph){
                     self.config.graphs.remove(graph);
                 };
@@ -102,6 +105,9 @@ define([
                     };
                     graph.ontologyProperty.subscribe(triggerDirtyState);
                     graph.inverseOntologyProperty.subscribe(triggerDirtyState);
+                    graph.relationshipConcept.subscribe(triggerDirtyState);
+                    graph.inverseRelationshipConcept.subscribe(triggerDirtyState);
+                    graph.useOntologyRelationship.subscribe(triggerDirtyState);
                 }else{
                     Object.defineProperty(graph, 'name', {
                         value: arches.translations.modelDoesNotExist

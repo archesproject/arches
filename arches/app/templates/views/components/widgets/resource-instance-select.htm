@@ -76,11 +76,20 @@
                                 <i class="fa fa-info-circle"></i>
                             </button>
                         </div>
+                        <!-- ko if: self.node.config.graphs()[0].useOntologyRelationship -->
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
                             <div class="rr-table-instance-label" style="padding-left: 10px;">
                                 <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
                             </div>
                         </div>
+                        <!-- /ko -->
+                        <!-- ko ifnot: self.node.config.graphs()[0].useOntologyRelationship -->
+                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;">
+                            <div class="rr-table-instance-label" style="padding-left: 10px;">
+                                <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
+                            </div>
+                        </div>
+                        <!-- /ko -->
                     </div>
                     <div class="rr-table-row-panel"
                         data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
