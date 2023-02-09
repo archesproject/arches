@@ -61,12 +61,6 @@ class RdfWriter(Writer):
         self.logger = logging.getLogger(__name__)
         super(RdfWriter, self).__init__(**kwargs)
 
-    def is_semantic_node(self, graph_node):
-        ret = self.datatype_factory.datatypes[graph_node.datatype].defaultwidget is None
-        print(ret)
-        print(graph_node.datatype)
-        return ret
-
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
         super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
@@ -194,8 +188,6 @@ class RdfWriter(Writer):
                 # both are single, 1 * 1
                 graph += rng_dt.to_rdf(pkg, edge)
 
-        blankNamespace = Namespace("_:")
-
         for resourceinstanceid, tiles in self.resourceinstances.items():
             graph_info = get_graph_parts(self.graph_id)
 
@@ -203,10 +195,6 @@ class RdfWriter(Writer):
             for edge in graph_cache[self.graph_id]["rootedges"]:
                 domainnode = archesproject[str(edge.domainnode.pk)]
                 rangenode = archesproject[str(edge.rangenode.pk)]
-                # if self.is_semantic_node(edge.rangenode):
-                #     rangenode = blankNamespace[rangenode]
-                # if self.is_semantic_node(edge.domainnode):
-                #     domainnode = blankNamespace[domainnode]
                 add_edge_to_graph(g, domainnode, rangenode, edge, None, graph_info)
 
             for tile in tiles:
@@ -214,12 +202,6 @@ class RdfWriter(Writer):
                 for edge in graph_info["subgraphs"][tile.nodegroup]["edges"]:
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    # if self.is_semantic_node(edge.rangenode):
-                    #     rangenode = blankNamespace[rangenode]
-                    # print(rangenode)
-                    # if self.is_semantic_node(edge.domainnode):
-                    #     domainnode = blankNamespace[domainnode]
-                    # print(domainnode)
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
@@ -230,13 +212,7 @@ class RdfWriter(Writer):
                         domainnode = archesproject[reverse("resources", args=[resourceinstanceid]).lstrip("/")]
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
-                        # if self.is_semantic_node(edge.domainnode):
-                        #     domainnode = blankNamespace[domainnode]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    # if self.is_semantic_node(edge.rangenode):
-                    #     rangenode = blankNamespace[rangenode]
-                    # print(rangenode)
-                    # print(domainnode)
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
@@ -245,12 +221,6 @@ class RdfWriter(Writer):
                     edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
                     domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
                     rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
-                    # if self.is_semantic_node(edge.rangenode):
-                    #     rangenode = blankNamespace[rangenode]
-                    # print(rangenode)
-                    # if self.is_semantic_node(edge.domainnode):
-                    #     domainnode = blankNamespace[domainnode]
-                    # print(domainnode)
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
         return g
 
