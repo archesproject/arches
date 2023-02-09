@@ -74,6 +74,18 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor, context):
+
+        requested_language = None
+        if context and "language" in context:
+            requested_language = context["language"]
+        language = requested_language or get_language()
+
+        if self.name and self.descriptors:
+            try:
+                return self.descriptors[language][descriptor]
+            except KeyError:
+                return None
+            
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
@@ -83,11 +95,6 @@ class Resource(models.ResourceInstance):
 
         if self.name is None:
             self.name = {}
-
-        requested_language = None
-        if context is not None and "language" in context:
-            requested_language = context["language"]
-        language = requested_language or get_language()
 
         if language not in self.descriptors:
             self.descriptors[language] = {}
