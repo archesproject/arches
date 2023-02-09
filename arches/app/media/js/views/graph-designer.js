@@ -43,7 +43,7 @@ define([
             viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
 
-            console.log(viewModel.graph, viewModel.sourceGraph)
+            console.log(ko.toJSON(viewModel.graph))
 
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;
@@ -67,9 +67,11 @@ define([
                         shouldShowGraphPublishButtons = false;
                     }
                 }
+                
                 else if (ko.toJSON(viewModel.graph) === ko.toJSON(viewModel.sourceGraph)) {
                     shouldShowGraphPublishButtons = false;
                 }
+                console.log(ko.toJSON(viewModel.graph))
                 
                 return shouldShowGraphPublishButtons;
             });

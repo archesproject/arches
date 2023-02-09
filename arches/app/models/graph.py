@@ -273,8 +273,9 @@ class Graph(models.GraphModel):
 
         try:
             Graph.objects.get(source_identifier=graph_model.graphid)
-        except ObjectDoesNotExist:
+        except Graph.DoesNotExist:
             graph.create_editable_future_graph()
+            graph.publish()
 
         return graph
 
@@ -1741,7 +1742,7 @@ class Graph(models.GraphModel):
         editable_future_graph = graph_copy["copy"]
         editable_future_graph.source_identifier = self.graphid
         editable_future_graph.save()
-        
+
         return editable_future_graph
 
     def update_from_editable_future_graph(self):
@@ -1939,12 +1940,15 @@ class Graph(models.GraphModel):
 
         return graph_from_database
 
-    def publish(self, user, notes=None):
+    def publish(self, user=None, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
         with transaction.atomic():
+            self.publication = None
+            self.update_from_editable_future_graph()
+
             try:
                 publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,

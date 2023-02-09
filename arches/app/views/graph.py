@@ -247,20 +247,6 @@ class GraphDesignerView(GraphBaseView):
             graph_models, exclude=["functions"]
         )  # returns empty array when called in 'get_context_data'
 
-        # reduces load sent to frontend
-        if serialized_graph.get("functions"):
-            serialized_graph["functions"] = None
-        if serialized_graph.get("cards"):
-            serialized_graph["cards"] = None
-        if serialized_graph.get("deploymentfile"):
-            serialized_graph["deploymentfile"] = None
-        if serialized_graph.get("deploymentdate"):
-            serialized_graph["deploymentdate"] = None
-        if serialized_graph.get("_nodegroups_to_delete"):
-            serialized_graph["_nodegroups_to_delete"] = None
-        if serialized_graph.get("_functions"):
-            serialized_graph["_functions"] = None
-
         context["graph"] = JSONSerializer().serialize(serialized_graph)
         context["source_graph"] = JSONSerializer().serialize(serialized_source_graph)
 
@@ -496,22 +482,16 @@ class GraphPublicationView(View):
         graph = Graph.objects.get(pk=graphid)
         source_graph = Graph.objects.get(pk=graph.source_identifier)
 
-        if source_graph.publication:
-            source_graph.publication = None
-
-        source_graph.update_from_editable_future_graph()
-
         try:
             notes = None
             if request.body:
                 data = JSONDeserializer().deserialize(request.body)
                 notes = data.get("notes")
 
-            if self.action == "publish":
-                try:
-                    source_graph.publish(notes=notes, user=request.user)
-                except UnpublishedModelError as e:
-                    return JSONErrorResponse(e.title, e.message)
+            try:
+                source_graph.publish(notes=notes, user=request.user)
+            except UnpublishedModelError as e:
+                return JSONErrorResponse(e.title, e.message)
         except Exception as e:
             return JSONErrorResponse(e)
 
