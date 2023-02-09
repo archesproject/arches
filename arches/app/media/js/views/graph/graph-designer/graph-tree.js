@@ -90,9 +90,6 @@ define([
                 if (node.ontologyclass_friendlyname() != "") {
                     name = name + ' (' + node.ontologyclass_friendlyname().split('_')[0] + ')';
                 }
-                if (name.endsWith("__EDITABLE_FUTURE_VERSION")) {
-                    name = name.replace('__EDITABLE_FUTURE_VERSION', '');
-                }
                 return name;
             }, this);
         },

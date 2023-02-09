@@ -23,17 +23,8 @@ define([
         self.designerViewModel = params.designerViewModel;
         self.graph = params.graph;
         self.graph.name.subscribe(function(val){
-            self.graph.root.name(val.replace('__EDITABLE_FUTURE_VERSION', ''));
-            self.rootnode.name(val.replace('__EDITABLE_FUTURE_VERSION', ''));
-        });
-
-        self.graph.originalName = ko.computed({
-            read: function() {
-                return self.graph.name().replace('__EDITABLE_FUTURE_VERSION', '');
-            },
-            write: function(newValue) {
-                self.graph.name(newValue + "__EDITABLE_FUTURE_VERSION");
-            }
+            self.graph.root.name(val);
+            self.rootnode.name(val);
         });
 
         self.graph.root.datatype.subscribe(function(val){

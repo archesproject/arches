@@ -1739,12 +1739,9 @@ class Graph(models.GraphModel):
         graph_copy = self.copy(set_source=True)
 
         editable_future_graph = graph_copy["copy"]
-        editable_future_graph.name = I18n_String(
-            value={key: value + "__EDITABLE_FUTURE_VERSION" for key, value in editable_future_graph.name.raw_value.items()}
-        )
         editable_future_graph.source_identifier = self.graphid
-
         editable_future_graph.save()
+        
         return editable_future_graph
 
     def update_from_editable_future_graph(self):
@@ -1889,9 +1886,6 @@ class Graph(models.GraphModel):
 
         self.root = editable_future_graph.root.source_identifier
         self.name.raw_value = editable_future_graph.name.raw_value
-
-        for key, value in self.name.raw_value.items():
-            self.name.raw_value[key] = value.replace("__EDITABLE_FUTURE_VERSION", "")
 
         self.save()
         # END iterate related resources

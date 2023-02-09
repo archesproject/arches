@@ -34,6 +34,7 @@ define([
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
+            viewModel.sourceGraph = koMapping.fromJS(data['source_graph']);
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
@@ -41,6 +42,9 @@ define([
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
+
+            console.log(viewModel.graph, viewModel.sourceGraph)
+
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;
 
@@ -62,6 +66,9 @@ define([
                     else if (selection.card && selection.card.dirty()) {
                         shouldShowGraphPublishButtons = false;
                     }
+                }
+                else if (ko.toJSON(viewModel.graph) === ko.toJSON(viewModel.sourceGraph)) {
+                    shouldShowGraphPublishButtons = false;
                 }
                 
                 return shouldShowGraphPublishButtons;

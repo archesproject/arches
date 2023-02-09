@@ -6,7 +6,7 @@
 
         <div class="settings-panel-heading">
             <div class="graph-designer-title">
-                <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.originalName'></div>
+                <i data-bind='css: graph.iconclass'></i><div class="name" data-bind='text: graph.name'></div>
                 <span class="graph-crm-class" data-bind="if: graph.ontology()">
                     (
                     <span data-bind="text: graph.ontology().name"></span>,
@@ -33,7 +33,7 @@
                             </div>
 
                             <div class="col-xs-12">
-                                <input placeholder="{% trans "Name" %}" class="form-control input-md widget-input" data-bind="value:graph.originalName, valueUpdate: 'keyup'">
+                                <input placeholder="{% trans "Name" %}" class="form-control input-md widget-input" data-bind="value:graph.name, valueUpdate: 'keyup'">
                             </div>
                         </div>
                     </div>
