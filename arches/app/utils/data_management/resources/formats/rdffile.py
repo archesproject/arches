@@ -712,8 +712,8 @@ class JsonLdReader(Reader):
             self.idcache[data_node["@id"]] = dataType
 
         for k, v in data_node.items():
-            self.printline(f"k: {k}", indent + 1)
-            self.printline(f"v: {v}", indent + 1)
+            # self.printline(f"k: {k}", indent + 1)
+            # self.printline(f"v: {v}", indent + 1)
             # k is a ontology property like
             # "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
             # or "http://www.w3.org/2000/01/rdf-schema#label"
