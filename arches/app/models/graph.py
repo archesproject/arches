@@ -1741,6 +1741,8 @@ class Graph(models.GraphModel):
 
         editable_future_graph = graph_copy["copy"]
         editable_future_graph.source_identifier = self.graphid
+
+        editable_future_graph.copy_functions(other_graph=self)
         editable_future_graph.save()
 
         return editable_future_graph
