@@ -115,6 +115,10 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
+        with open(os.path.join("tests/fixtures/jsonld_base/models/required_ambiguous_nodes.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
     def setUp(self):
         pass
 
@@ -801,7 +805,7 @@ class JsonLDImportTests(ArchesTestCase):
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
 
         self.assertTrue(rtb in js)
-        self.assertTrue(len(js[rtb]) == 3)
+        self.assertEqual(len(js[rtb]), 3)
 
         for r in js[rtb]:
             hasnote = note in r
@@ -1145,7 +1149,7 @@ class JsonLDImportTests(ArchesTestCase):
         rtb = "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
         self.assertTrue(rtb in js)
-        self.assertTrue(len(js[rtb]) == 2)
+        self.assertEqual(len(js[rtb]), 2)
         rtb1 = js[rtb][0]
         rtb2 = js[rtb][1]
         if note in rtb1:
@@ -1156,78 +1160,79 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_f_big_nest_mess(self):
 
-        data = """{
+        data = """
+        {
             "@id": "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
             "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": [
                 {
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": [
-                    {
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by": {
-                        "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122",
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
-                    },
-                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "asdf",
-                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
-                        "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-03"
+                    "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": [
+                        {
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                            "http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by": {
+                                "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
+                            },
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "asdf",
+                            "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                                "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                    "@value": "2019-12-03"
+                                },
+                                "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
+                                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                    "@value": "2019-12-05"
+                                },
+                                "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
+                                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
+                                    "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 1
+                                }
+                            }
                         },
-                        "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-05"
-                        },
-                        "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
-                        "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 1
+                        {
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "second part",
+                            "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                                "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
+                                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
+                                    "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 6
+                                }
+                            }
                         }
-                    }
-                    },
-                    {
-                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "second part",
-                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
-                        "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
-                        "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 6
-                        }
-                    }
-                    }
-                ]
+                    ]
                 },
                 {
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": {
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "bar",
-                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
-                    "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-07"
-                    },
-                    "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-08"
+                    "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": {
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "bar",
+                        "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                            "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                "@value": "2019-12-07"
+                            },
+                            "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                "@value": "2019-12-08"
+                            }
+                        }
                     }
-                    }
-                }
                 }
             ],
             "http://www.cidoc-crm.org/cidoc-crm/P138i_has_representation": {
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E36_Visual_Item",
                 "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
-                "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                "http://www.w3.org/2000/01/rdf-schema#label": "material a"
+                    "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                    "http://www.w3.org/2000/01/rdf-schema#label": "material a"
                 }
             }
-            }
-            """
+        }
+        """
 
         url = self._create_url(
             graph_id="9b596906-1540-11ea-b353-acde48001122",
@@ -1238,14 +1243,65 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertEqual(response.status_code, 201)
 
-        js = response.json()
-        if type(js) == list:
-            js = js[0]
+        def get_tiles_by_nodegroup(tiles, nodegroupid, nodeid=None, nodevalue=None):
+            ret = []
+            for tile in tiles:
+                if str(tile.nodegroup_id) == str(nodegroupid):
+                    if nodeid in tile.data and tile.data[nodeid] == nodevalue:
+                        return tile
+                    else:
+                        ret.append(tile)
+            return ret
 
-        self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122")
+        def get_tile_by_id(tiles, tileid):
+            for tile in tiles:
+                if tile.tileid == tileid:
+                    return tile
 
-        # TODO - more asserts to make sure data is saved correctly
+        tiles = TileModel.objects.filter(resourceinstance_id="c3b693cc-1542-11ea-b353-acde48001122")
+
+        self.assertEqual(len(tiles), 11)
+
+        tile1 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 6)
+        tile1_parent = get_tile_by_id(tiles, tile1.parenttile_id)
+
+        self.assertEqual(tile1_parent.data, {})
+        tile1_grandparent = get_tile_by_id(tiles, tile1_parent.parenttile_id)
+        self.assertEqual(tile1_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "second part"})
+
+        tile2 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 1)
+        tile2_parent = get_tile_by_id(tiles, tile2.parenttile_id)
+        self.assertEqual(
+            tile2_parent.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-03", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-05"}
+        )
+        tile2_grandparent = get_tile_by_id(tiles, tile2_parent.parenttile_id)
+        self.assertEqual(tile2_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "asdf"})
+        self.assertEqual(
+            tile2_grandparent.data["26927e22-1541-11ea-b353-acde48001122"][0]["resourceId"], "5e9baff0-109b-11ea-957a-acde48001122"
+        )
+        tile2_greatgrandparent = get_tile_by_id(tiles, tile2_grandparent.parenttile_id)
+        self.assertEqual(tile2_greatgrandparent.data, {})
+
+        tile1_greatgrandparent = get_tile_by_id(tiles, tile1_grandparent.parenttile_id)
+        self.assertEqual(tile2_greatgrandparent, tile1_greatgrandparent)
+
+        tile3 = get_tiles_by_nodegroup(tiles, "c5a9174c-1540-11ea-b353-acde48001122", "d155a4c0-1540-11ea-b353-acde48001122", "2019-12-07")
+        self.assertEqual(
+            tile3.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-07", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-08"}
+        )
+        tile3_parent = get_tile_by_id(tiles, tile3.parenttile_id)
+        self.assertEqual(tile3_parent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "bar"})
+        tile3_grandparent = get_tile_by_id(tiles, tile3_parent.parenttile_id)
+        self.assertEqual(tile3_grandparent.data, {})
+
+        tile4 = get_tiles_by_nodegroup(tiles, "48f3ab3a-1541-11ea-b353-acde48001122")[0]
+        self.assertEqual(
+            tile4.data,
+            {
+                "54272cd4-1541-11ea-b353-acde48001122": ["d2908ab9-19a6-4a82-953d-5ebe8d164e85"],
+                "8e08a496-1541-11ea-b353-acde48001122": None,
+            },
+        )
 
     def test_g_6235_parenttile(self):
 
@@ -1419,3 +1475,72 @@ class JsonLDImportTests(ArchesTestCase):
             },
         ]
         self.assertCountEqual(actual_tiledata, expected_tiledata)
+
+    def test_required_ambiguous_nodes(self):
+        data = """
+           {
+            "@id": "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State",
+            "http://www.cidoc-crm.org/cidoc-crm/P116i_is_started_by": {
+                "@id": "http://localhost:8000/tile/30b5a44e-83dc-4393-ab71-a04b2b62bb8d/node/c10201c0-a1b7-11ed-86f1-faffc210b420",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period",
+                "http://www.cidoc-crm.org/cidoc-crm/P117i_includes": {
+                    "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E5_Event",
+                    "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
+                        "@id": "http://localhost:8000/tile/4cc161a3-b695-4dbf-a855-b08c65904f7a/node/98948e54-a1b9-11ed-86f1-faffc210b420",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                        "http://www.cidoc-crm.org/cidoc-crm/P102_has_title": {
+                            "@id": "http://localhost:8000/concepts/babcafca-138f-43e6-b32e-22050d482304",
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E35_Title",
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                                {
+                                    "@language": "en",
+                                    "@value": "taco"
+                                }
+                            ],
+                            "http://www.w3.org/2000/01/rdf-schema#label": "spoken"
+                        }
+                    },
+                    "http://www.w3.org/2000/01/rdf-schema#label": "material a"
+                }
+            }
+        }
+        """
+
+        url = self._create_url(
+            graph_id="9e4f9e7a-27de-4683-b156-b3e0de9169c6",
+            resource_id="09f1d360-4271-49ea-b799-f1fdb57b634b",
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
+        self.assertTrue(response.status_code == 201)
+
+        tiles = TileModel.objects.filter(resourceinstance_id="09f1d360-4271-49ea-b799-f1fdb57b634b")
+
+        self.assertEqual(len(tiles), 4)
+
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        # print(f"Got JSON for test 7: {js}")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b")
+
+        l1 = "http://www.cidoc-crm.org/cidoc-crm/P116i_is_started_by"
+        l2 = "http://www.cidoc-crm.org/cidoc-crm/P117i_includes"
+        l3 = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        l3a = "http://www.w3.org/2000/01/rdf-schema#label"
+        l4 = "http://www.cidoc-crm.org/cidoc-crm/P102_has_title"
+        l5 = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+
+        self.assertTrue(l1 in js)
+        self.assertTrue(l2 in js[l1])
+        self.assertTrue(l3 in js[l1][l2])
+        self.assertTrue(l3a in js[l1][l2])
+        self.assertEqual(js[l1][l2][l3a], "material a")
+        self.assertTrue(l4 in js[l1][l2][l3])
+        self.assertTrue(l5 in js[l1][l2][l3][l4])
+        self.assertEqual(js[l1][l2][l3][l4][l5]["@value"], "taco")
