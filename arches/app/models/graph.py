@@ -1304,12 +1304,12 @@ class Graph(models.GraphModel):
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
         return ret
 
-    def get_nodegroups(self):
+    def get_nodegroups(self, force_recalculation=False):
         """
         get the nodegroups associated with this graph
 
         """
-        if self.serialized_graph:
+        if self.serialized_graph and not force_recalculation:
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
@@ -1461,7 +1461,7 @@ class Graph(models.GraphModel):
 
             if "widgets" not in exclude:
                 ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
-            ret["nodegroups"] = self.get_nodegroups() if "nodegroups" not in exclude else ret.pop("nodegroups", None)
+            ret["nodegroups"] = self.get_nodegroups(force_recalculation=force_recalculation) if "nodegroups" not in exclude else ret.pop("nodegroups", None)
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
             )
@@ -1947,7 +1947,9 @@ class Graph(models.GraphModel):
         """
         with transaction.atomic():
             self.publication = None
-            self.update_from_editable_future_graph()
+
+            if not self.source_identifier:
+                self.update_from_editable_future_graph()
 
             try:
                 publication = models.GraphXPublishedGraph.objects.create(
