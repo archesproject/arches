@@ -249,6 +249,7 @@ class GraphDesignerView(GraphBaseView):
 
         context["graph"] = JSONSerializer().serialize(serialized_graph)
         context["source_graph"] = JSONSerializer().serialize(serialized_source_graph)
+        context["source_graph_id"] = source_graph.pk
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True
