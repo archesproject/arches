@@ -24,6 +24,7 @@ import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
@@ -183,9 +184,7 @@ class GraphDesignerView(GraphBaseView):
             raise Exception(_("Graph does not have a source identifier."))
 
         serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
-
         source_graph = Graph.objects.get(pk=graphid)
-        serialized_source_graph = source_graph.serialize(force_recalculation=True)
 
         datatypes = models.DDataType.objects.all()
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
@@ -248,8 +247,12 @@ class GraphDesignerView(GraphBaseView):
         )  # returns empty array when called in 'get_context_data'
 
         context["graph"] = JSONSerializer().serialize(serialized_graph)
-        context["source_graph"] = JSONSerializer().serialize(serialized_source_graph)
         context["source_graph_id"] = source_graph.pk
+
+        user_language = translation.get_language()
+        published_graph = models.PublishedGraph.objects.get(publication=self.graph.publication, language=user_language)
+        published_graph = Graph(published_graph.serialized_graph)
+        context['published_graph'] = JSONSerializer().serialize(published_graph.serialize())
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True

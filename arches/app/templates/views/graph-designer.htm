@@ -152,7 +152,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </span>
             <!-- /ko -->
 
-            <!-- ko if: $data.shouldShowGraphPublishButtons() -->
+            <!-- ko if: $data.shouldShowGraphPublishButtons -->
             <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
                 <span>{% trans "Publish Graph" %}</span>
             </button>
@@ -377,7 +377,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "ontologies": {{ontologies}},
         "datatypes": {{datatypes_json}},
         "graph": {{graph}},
-        "source_graph": {{source_graph}},
+        "published_graph": {{published_graph}},
         "ontology_namespaces": "{{ontology_namespaces}}",
         "branches": {{branches}},
         "cards": {{cards}},

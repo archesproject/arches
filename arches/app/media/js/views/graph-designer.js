@@ -34,7 +34,8 @@ define([
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
-            viewModel.sourceGraph = koMapping.fromJS(data['source_graph']);
+            viewModel._graph = ko.observable(data['graph']);
+            viewModel.publishedGraph = data['published_graph'];
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
@@ -43,36 +44,52 @@ define([
             viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
 
-            console.log(ko.toJSON(viewModel.graph))
+            function normalizeParsedGraph(obj) {
+                delete obj['updated_values'];
+                delete obj['default_card_name'];
+
+                for (const entry of Object.entries(obj)) {
+                    if (entry[1] instanceof Array) { 
+                        obj[entry[0]] = entry[1].map(data => normalizeParsedGraph(data));
+                    }
+                    else if (entry[1] instanceof Object) { 
+                        obj[entry[0]] = normalizeParsedGraph(entry[1]);
+                    }
+                    else {
+                        if (['source_identifier_id', 'alias'].includes(entry[0])) {
+                            obj[entry[0]] = null;
+                        }
+                    }
+                }
+
+                return obj;
+            };
 
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;
-
-                if (viewModel.dirty()) {
+   
+                if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     shouldShowGraphPublishButtons = false;
                 }
-                else if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
+                if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
                     shouldShowGraphPublishButtons = false;
                 }
-                else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
-                    shouldShowGraphPublishButtons = false;
-                }
-                else if (ko.unwrap(viewModel.cardTree.selection)) {
+                if (ko.unwrap(viewModel.cardTree.selection)) {
                     var selection = ko.unwrap(viewModel.cardTree.selection);
 
                     if (selection.model && selection.model.dirty()) {
                         shouldShowGraphPublishButtons = false;
                     }
-                    else if (selection.card && selection.card.dirty()) {
+                    if (selection.card && selection.card.dirty()) {
                         shouldShowGraphPublishButtons = false;
                     }
                 }
-                
-                else if (ko.toJSON(viewModel.graph) === ko.toJSON(viewModel.sourceGraph)) {
+                if (
+                    JSON.stringify(normalizeParsedGraph(viewModel._graph())) === JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph))
+                ) {
                     shouldShowGraphPublishButtons = false;
                 }
-                console.log(ko.toJSON(viewModel.graph))
-                
+
                 return shouldShowGraphPublishButtons;
             });
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
@@ -251,6 +268,11 @@ define([
             viewModel.datatypes = _.keys(viewModel.graphModel.get('datatypelookup'));
 
             viewModel.graphModel.on('changed', function(model, response) {
+                require(['views/graph-designer-data'], function(data) {
+                    viewModel._graph(data['graph']);
+                });
+
+                viewModel.shouldShowGraphPublishButtons()
                 viewModel.alert(null);
                 // viewModel.loading(false);  // TODO: @cbyrd 8842 disable page refresh on branch append
                 if (response.status !== 200) {
@@ -276,6 +298,8 @@ define([
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                         }
+
+                        viewModel._graph(data.responseJSON);
                         viewModel.loading(false);
                     });
                 }
@@ -368,6 +392,9 @@ define([
                     if (viewModel.report.get('template_id')() !== graph["template_id"]) {
                         viewModel.report.get('template_id')(graph["template_id"]);
                     }
+                },
+                onSave: function() {
+                    viewModel._graph(koMapping.toJS(viewModel.graphSettingsViewModel.graph))
                 }
             });
 

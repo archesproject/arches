@@ -95,6 +95,10 @@ define([
                 .done(function(response) {
                     self.jsonCache(self.jsonData());
                     self.rootnode._node(JSON.stringify(self.rootnode));
+
+                    if (params.onSave && typeof params.onSave === 'function') {
+                        params.onSave();
+                    }
                 })
                 .fail(function(response) {
                     self.designerViewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));

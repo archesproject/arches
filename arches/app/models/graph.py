@@ -128,7 +128,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if not has_deferred_args and self.publication:
+                if  self.publication and not self.source_identifier and not has_deferred_args:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     node_slugs = []
@@ -1424,7 +1424,7 @@ class Graph(models.GraphModel):
         """
         exclude = [] if exclude is None else exclude
 
-        if self.publication and not force_recalculation:
+        if self.publication and not self.source_identifier and not force_recalculation:
             try:
                 user_language = translation.get_language()
                 published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
@@ -1746,6 +1746,7 @@ class Graph(models.GraphModel):
 
         editable_future_graph.copy_functions(other_graph=self)
         editable_future_graph.save()
+        editable_future_graph.publish()
 
         return editable_future_graph
 
