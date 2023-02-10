@@ -74,9 +74,11 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor, context):
-        graph_function = models.FunctionXGraph.objects.filter(
-            graph_id=self.graph_id, function__functiontype="primarydescriptors"
-        ).select_related("function")
+
+        requested_language = None
+        if context and "language" in context:
+            requested_language = context["language"]
+        language = requested_language or get_language()
 
         if self.descriptors is None:
             self.descriptors = {}
@@ -84,13 +86,17 @@ class Resource(models.ResourceInstance):
         if self.name is None:
             self.name = {}
 
-        requested_language = None
-        if context is not None and "language" in context:
-            requested_language = context["language"]
-        language = requested_language or get_language()
-
         if language not in self.descriptors:
             self.descriptors[language] = {}
+
+        try:
+            return self.descriptors[language][descriptor]
+        except KeyError:
+            pass
+
+        graph_function = models.FunctionXGraph.objects.filter(
+            graph_id=self.graph_id, function__functiontype="primarydescriptors"
+        ).select_related("function")
 
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
