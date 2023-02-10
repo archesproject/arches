@@ -252,7 +252,7 @@ class GraphDesignerView(GraphBaseView):
         user_language = translation.get_language()
         published_graph = models.PublishedGraph.objects.get(publication=self.graph.publication, language=user_language)
         published_graph = Graph(published_graph.serialized_graph)
-        context['published_graph'] = JSONSerializer().serialize(published_graph.serialize())
+        context["published_graph"] = JSONSerializer().serialize(published_graph.serialize())
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True
