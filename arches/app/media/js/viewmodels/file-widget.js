@@ -139,7 +139,15 @@ define([
         });
 
         this.getFileUrl = function(url){
-            return (arches.urls.url_subpath + ko.unwrap(url)).replace('//', '/');
+            url = ko.unwrap(url);
+            var httpRegex = /^https?:\/\//;
+            // test whether the url is external (starts with http(s), if it is just return it)
+            if (httpRegex.test(url)){
+                return url;
+            }else{
+                return (arches.urls.url_subpath + url).replace('//', '/');
+            }
+
         };
 
         if (Array.isArray(self.value())) {
