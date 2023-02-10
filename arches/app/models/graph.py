@@ -1461,7 +1461,9 @@ class Graph(models.GraphModel):
 
             if "widgets" not in exclude:
                 ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
-            ret["nodegroups"] = self.get_nodegroups(force_recalculation=force_recalculation) if "nodegroups" not in exclude else ret.pop("nodegroups", None)
+            ret["nodegroups"] = (
+                self.get_nodegroups(force_recalculation=force_recalculation) if "nodegroups" not in exclude else ret.pop("nodegroups", None)
+            )
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
             )
