@@ -129,7 +129,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if  self.publication and not self.source_identifier and not has_deferred_args:
+                if self.publication and not self.source_identifier and not has_deferred_args:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     node_slugs = []
