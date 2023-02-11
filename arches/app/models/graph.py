@@ -272,9 +272,7 @@ class Graph(models.GraphModel):
 
         graph = Graph.objects.get(pk=graph_model.graphid)
 
-        try:
-            Graph.objects.get(source_identifier=graph_model.graphid)
-        except Graph.DoesNotExist:
+        if not graph.source_identifier:
             graph.create_editable_future_graph()
             graph.publish()
 
@@ -862,8 +860,6 @@ class Graph(models.GraphModel):
             else:
                 node.nodegroup = None
 
-        # import pdb; pdb.set_trace()  
-
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
             widget.node_id = node_map[widget.node_id]
@@ -1313,7 +1309,7 @@ class Graph(models.GraphModel):
         get the nodegroups associated with this graph
 
         """
-        if self.serialized_graph and not force_recalculation:
+        if self.serialized_graph and not self.source_identifier and not force_recalculation:
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
@@ -1915,9 +1911,6 @@ class Graph(models.GraphModel):
             # future_widget.save()
             widgets[future_widget.pk] = future_widget
         
-
-        
-
         for key, value in vars(editable_future_graph).items():
             if key not in [
                 '_state',
@@ -2001,36 +1994,29 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             self.publication = None
 
-
             if not self.source_identifier:
                 self.update_from_editable_future_graph()
 
-            try:
-                publication = models.GraphXPublishedGraph.objects.create(graph=self,notes=notes,user=user,)
+            publication = models.GraphXPublishedGraph.objects.create(graph=self,notes=notes,user=user,)
+            publication.save()
 
-                publication.save()
+            self.publication = publication
+            self.save(validate=False)
 
-                self.publication = publication
-                self.save(validate=False)
+            for language_tuple in settings.LANGUAGES:
+                language = models.Language.objects.get(code=language_tuple[0])
 
+                translation.activate(language=language_tuple[0])
 
+                published_graph = models.PublishedGraph.objects.create(
+                    publication=publication,
+                    serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                    language=language,
+                )
 
-                for language_tuple in settings.LANGUAGES:
-                    language = models.Language.objects.get(code=language_tuple[0])
+                published_graph.save()
 
-                    translation.activate(language=language_tuple[0])
-
-                    published_graph = models.PublishedGraph.objects.create(
-                        publication=publication,
-                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
-                        language=language,
-                    )
-
-                    published_graph.save()
-
-                translation.deactivate()
-            except Exception as e:
-                raise UnpublishedModelError(e)
+            translation.deactivate()
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):

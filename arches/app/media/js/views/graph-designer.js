@@ -87,8 +87,8 @@ define([
                     }
                 }
 
-                console.log(JSON.stringify(normalizeParsedGraph(viewModel._graph())))
-                console.log(JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph)))
+                // console.log(JSON.stringify(normalizeParsedGraph(viewModel._graph())))
+                // console.log(JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph)))
                 if (
                     JSON.stringify(normalizeParsedGraph(viewModel._graph())) === JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph))
                 ) {
