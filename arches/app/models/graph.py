@@ -26,6 +26,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
+from arches.app.models.card import Card
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
@@ -861,10 +862,13 @@ class Graph(models.GraphModel):
             else:
                 node.nodegroup = None
 
+        # import pdb; pdb.set_trace()  
+
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
+
 
         copy_of_self.populate_null_nodegroups()
 
@@ -1791,6 +1795,8 @@ class Graph(models.GraphModel):
         self.nodes = {}
         self.edges = {}
 
+        widgets = {}
+
         # BEGIN iterate related resources
         # Iterates over cards, nodes, and edges of the editable_future_graph. If the item
         # has a `source_identifier` attribute, it represents an item related to the source
@@ -1890,8 +1896,48 @@ class Graph(models.GraphModel):
                 )
                 future_edge.save()
 
+
+        for future_widget in list(editable_future_graph.widgets.values()):
+            # deep handling of card and noe have already happened in above iterations
+            if future_widget.card.source_identifier_id:
+                card = Card.objects.get(pk=future_widget.card.source_identifier_id)
+                future_widget.card = card
+                # models.CardXNodeXWidget.objects.update_or_create(
+                #     card=card
+                # )
+            if future_widget.node.source_identifier_id:
+                node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
+                future_widget.node = node
+                # models.CardXNodeXWidget.objects.update_or_create(
+                #     node=node
+                # )
+            # import pdb; pdb.set_trace()
+            # future_widget.save()
+            widgets[future_widget.pk] = future_widget
+        
+
+        
+
+        for key, value in vars(editable_future_graph).items():
+            if key not in [
+                '_state',
+                'graphid',
+                'cards', 
+                'nodes', 
+                'edges', 
+                'widgets',
+                'root',
+                'source_identifier',
+                'publication_id',
+                '_nodegroups_to_delete', 
+                '_functions', 
+                '_card_constraints', 
+                '_constraints_x_nodes'
+                'serialized_graph'
+            ]:
+                setattr(self, key, value)
+
         self.root = editable_future_graph.root.source_identifier
-        self.name.raw_value = editable_future_graph.name.raw_value
 
         self.save()
         # END iterate related resources
@@ -1936,11 +1982,13 @@ class Graph(models.GraphModel):
         editable_future_graph.cards = {}
         editable_future_graph.nodes = {}
         editable_future_graph.edges = {}
+        editable_future_graph.widgets = {}
 
         editable_future_graph.delete()
         # END delete superflous related resources
 
         graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
+        graph_from_database.widgets = widgets
         graph_from_database.create_editable_future_graph()
 
         return graph_from_database
@@ -1953,19 +2001,19 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             self.publication = None
 
+
             if not self.source_identifier:
                 self.update_from_editable_future_graph()
 
             try:
-                publication = models.GraphXPublishedGraph.objects.create(
-                    graph=self,
-                    notes=notes,
-                    user=user,
-                )
+                publication = models.GraphXPublishedGraph.objects.create(graph=self,notes=notes,user=user,)
+
                 publication.save()
 
                 self.publication = publication
                 self.save(validate=False)
+
+
 
                 for language_tuple in settings.LANGUAGES:
                     language = models.Language.objects.get(code=language_tuple[0])

@@ -45,6 +45,8 @@ define([
             viewModel.graphPublicationNotes = ko.observable();
 
             function normalizeParsedGraph(obj) {
+                if (!obj) { return null; }
+                
                 delete obj['updated_values'];
                 delete obj['default_card_name'];
 
@@ -84,6 +86,9 @@ define([
                         shouldShowGraphPublishButtons = false;
                     }
                 }
+
+                console.log(JSON.stringify(normalizeParsedGraph(viewModel._graph())))
+                console.log(JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph)))
                 if (
                     JSON.stringify(normalizeParsedGraph(viewModel._graph())) === JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph))
                 ) {
@@ -269,6 +274,7 @@ define([
 
             viewModel.graphModel.on('changed', function(model, response) {
                 require(['views/graph-designer-data'], function(data) {
+                    viewModel.publishedGraph = data['published_graph'];
                     viewModel._graph(data['graph']);
                 });
 
@@ -299,7 +305,9 @@ define([
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                         }
 
+                        viewModel.publishedGraph = data['published_graph'];
                         viewModel._graph(data.responseJSON);
+
                         viewModel.loading(false);
                     });
                 }

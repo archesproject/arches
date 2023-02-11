@@ -252,6 +252,10 @@ class GraphDesignerView(GraphBaseView):
         user_language = translation.get_language()
         published_graph = models.PublishedGraph.objects.get(publication=self.graph.publication, language=user_language)
         published_graph = Graph(published_graph.serialized_graph)
+        published_graph.widgets = {
+            uuid.UUID(widget['id']): models.CardXNodeXWidget.objects.get(pk=widget['id'])
+            for widget in published_graph.widgets
+        }
         context['published_graph'] = JSONSerializer().serialize(published_graph.serialize())
 
         context["nav"]["title"] = self.graph.name
@@ -484,19 +488,15 @@ class GraphPublicationView(View):
     def post(self, request, graphid):
         graph = Graph.objects.get(pk=graphid)
         source_graph = Graph.objects.get(pk=graph.source_identifier)
+        notes = None
+        if request.body:
+            data = JSONDeserializer().deserialize(request.body)
+            notes = data.get("notes")
 
         try:
-            notes = None
-            if request.body:
-                data = JSONDeserializer().deserialize(request.body)
-                notes = data.get("notes")
-
-            try:
-                source_graph.publish(notes=notes, user=request.user)
-            except UnpublishedModelError as e:
-                return JSONErrorResponse(e.title, e.message)
-        except Exception as e:
-            return JSONErrorResponse(e)
+            source_graph.publish(notes=notes, user=request.user)
+        except UnpublishedModelError as e:
+            return JSONErrorResponse(e.title, e.message)
 
         return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
 
