@@ -253,10 +253,9 @@ class GraphDesignerView(GraphBaseView):
         published_graph = models.PublishedGraph.objects.get(publication=self.graph.publication, language=user_language)
         published_graph = Graph(published_graph.serialized_graph)
         published_graph.widgets = {
-            uuid.UUID(widget['id']): models.CardXNodeXWidget.objects.get(pk=widget['id'])
-            for widget in published_graph.widgets
+            uuid.UUID(widget["id"]): models.CardXNodeXWidget.objects.get(pk=widget["id"]) for widget in published_graph.widgets
         }
-        context['published_graph'] = JSONSerializer().serialize(published_graph.serialize())
+        context["published_graph"] = JSONSerializer().serialize(published_graph.serialize())
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True

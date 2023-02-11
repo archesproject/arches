@@ -862,13 +862,12 @@ class Graph(models.GraphModel):
             else:
                 node.nodegroup = None
 
-        # import pdb; pdb.set_trace()  
+        # import pdb; pdb.set_trace()
 
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
-
 
         copy_of_self.populate_null_nodegroups()
 
@@ -1896,7 +1895,6 @@ class Graph(models.GraphModel):
                 )
                 future_edge.save()
 
-
         for future_widget in list(editable_future_graph.widgets.values()):
             # deep handling of card and noe have already happened in above iterations
             if future_widget.card.source_identifier_id:
@@ -1914,26 +1912,22 @@ class Graph(models.GraphModel):
             # import pdb; pdb.set_trace()
             # future_widget.save()
             widgets[future_widget.pk] = future_widget
-        
-
-        
 
         for key, value in vars(editable_future_graph).items():
             if key not in [
-                '_state',
-                'graphid',
-                'cards', 
-                'nodes', 
-                'edges', 
-                'widgets',
-                'root',
-                'source_identifier',
-                'publication_id',
-                '_nodegroups_to_delete', 
-                '_functions', 
-                '_card_constraints', 
-                '_constraints_x_nodes'
-                'serialized_graph'
+                "_state",
+                "graphid",
+                "cards",
+                "nodes",
+                "edges",
+                "widgets",
+                "root",
+                "source_identifier",
+                "publication_id",
+                "_nodegroups_to_delete",
+                "_functions",
+                "_card_constraints",
+                "_constraints_x_nodes" "serialized_graph",
             ]:
                 setattr(self, key, value)
 
@@ -2001,19 +1995,20 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             self.publication = None
 
-
             if not self.source_identifier:
                 self.update_from_editable_future_graph()
 
             try:
-                publication = models.GraphXPublishedGraph.objects.create(graph=self,notes=notes,user=user,)
+                publication = models.GraphXPublishedGraph.objects.create(
+                    graph=self,
+                    notes=notes,
+                    user=user,
+                )
 
                 publication.save()
 
                 self.publication = publication
                 self.save(validate=False)
-
-
 
                 for language_tuple in settings.LANGUAGES:
                     language = models.Language.objects.get(code=language_tuple[0])
