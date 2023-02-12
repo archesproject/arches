@@ -41,7 +41,6 @@ define([
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
-            viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
 
             function normalizeParsedGraph(obj) {
@@ -144,8 +143,21 @@ define([
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         if (status === 'success') {
-                            viewModel.isGraphPublished(true);
-                            viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                            viewModel.publishedGraph = data['published_graph'];
+                            viewModel._graph(data['graph']);
+
+                            const alert = new AlertViewModel(
+                                'ep-alert-blue', 
+                                response.responseJSON.title, 
+                                response.responseJSON.message,
+                                null,
+                                function(){},
+                            )
+                            // must reload window since this editable_future_graph has been deleted
+                            alert.active.subscribe(function() {
+                                window.location.reload()
+                            });
+                            viewModel.alert(alert);
                         }
                         else {
                             viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
@@ -601,6 +613,18 @@ define([
 
             viewModel.graphModel.on('select-node', function(node) {
                 viewModel.graphTree.expandParentNode(node);
+            });
+
+            document.addEventListener('deleteNode', () => {
+                viewModel.loading(true);
+
+                setTimeout(function(){  // need a 0 timeout to reset the UI long enough to show/hide the publish buttons
+                    require(['views/graph-designer-data'], function(data) {
+                        viewModel.publishedGraph = data['published_graph'];
+                        viewModel._graph(null);
+                        viewModel.loading(false);
+                    });
+                }, 0);
             });
 
             BaseManagerView.prototype.initialize.apply(this, arguments);
