@@ -257,12 +257,12 @@ class GraphDesignerView(GraphBaseView):
         widgets = {}
         for widget in published_graph.widgets:
             try:
-                widgets[uuid.UUID(widget['id'])] = models.CardXNodeXWidget.objects.get(pk=widget['id'])
+                widgets[uuid.UUID(widget["id"])] = models.CardXNodeXWidget.objects.get(pk=widget["id"])
             except models.CardXNodeXWidget.DoesNotExist:
                 pass
         published_graph.widgets = widgets
 
-        context['published_graph'] = JSONSerializer().serialize(published_graph.serialize())
+        context["published_graph"] = JSONSerializer().serialize(published_graph.serialize())
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True

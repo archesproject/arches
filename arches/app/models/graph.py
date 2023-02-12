@@ -1908,7 +1908,7 @@ class Graph(models.GraphModel):
             # import pdb; pdb.set_trace()
             # future_widget.save()
             widgets[future_widget.pk] = future_widget
-        
+
         for key, value in vars(editable_future_graph).items():
             if key not in [
                 "_state",
@@ -1994,7 +1994,11 @@ class Graph(models.GraphModel):
             if not self.source_identifier:
                 self.update_from_editable_future_graph()
 
-            publication = models.GraphXPublishedGraph.objects.create(graph=self,notes=notes,user=user,)
+            publication = models.GraphXPublishedGraph.objects.create(
+                graph=self,
+                notes=notes,
+                user=user,
+            )
             publication.save()
 
             self.publication = publication
