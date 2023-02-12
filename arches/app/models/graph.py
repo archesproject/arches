@@ -1455,7 +1455,7 @@ class Graph(models.GraphModel):
 
             if "cards" not in exclude:
                 cards = self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
-                ret["cards"] = sorted(cards, key=lambda k: (k['sortorder'], k['cardid']))
+                ret["cards"] = sorted(cards, key=lambda k: (k["sortorder"], k["cardid"]))
             else:
                 ret.pop("cards", None)
 
@@ -1463,8 +1463,8 @@ class Graph(models.GraphModel):
                 ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
 
             if "nodegroups" not in exclude:
-                nodegroups = self.get_nodegroups(force_recalculation=force_recalculation) 
-                ret['nodegroups'] = sorted(nodegroups, key=lambda k: k.pk)
+                nodegroups = self.get_nodegroups(force_recalculation=force_recalculation)
+                ret["nodegroups"] = sorted(nodegroups, key=lambda k: k.pk)
             else:
                 ret.pop("nodegroups", None)
 
@@ -1488,7 +1488,7 @@ class Graph(models.GraphModel):
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
                     nodes.append(nodeobj)
-                ret['nodes'] = sorted(nodes, key=lambda k: (k['sortorder'], k['nodeid']))
+                ret["nodes"] = sorted(nodes, key=lambda k: (k["sortorder"], k["nodeid"]))
             else:
                 ret.pop("nodes", None)
 
