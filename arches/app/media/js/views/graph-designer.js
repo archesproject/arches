@@ -86,8 +86,8 @@ define([
                     }
                 }
 
-                // console.log(JSON.stringify(normalizeParsedGraph(viewModel._graph())))
-                // console.log(JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph)))
+                console.log(JSON.stringify(normalizeParsedGraph(viewModel._graph())))
+                console.log(JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph)))
                 if (
                     JSON.stringify(normalizeParsedGraph(viewModel._graph())) === JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph))
                 ) {
@@ -615,18 +615,18 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
-            document.addEventListener('deleteNode', () => {
+            function forceShowGraphPublishButtons() {
                 viewModel.loading(true);
 
                 setTimeout(function(){  // need a 0 timeout to reset the UI long enough to show/hide the publish buttons
-                    require(['views/graph-designer-data'], function(data) {
-                        viewModel.publishedGraph = data['published_graph'];
                         viewModel._graph(null);
                         viewModel.loading(false);
-                    });
                 }, 0);
-            });
-
+            };
+            
+            document.addEventListener('deleteNode', forceShowGraphPublishButtons);
+            document.addEventListener('reorderNodes', forceShowGraphPublishButtons);
+            
             BaseManagerView.prototype.initialize.apply(this, arguments);
         }
     });

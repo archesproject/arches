@@ -237,6 +237,11 @@ define([
                 }),
                 url: arches.urls.reorder_nodes,
                 complete: function() {
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('reorderNodes')
+                    );
+                    console.log("()()()")
                     loading(false);
                 }
             });

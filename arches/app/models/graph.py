@@ -1452,17 +1452,22 @@ class Graph(models.GraphModel):
 
             check_if_editable = "is_editable" not in exclude
             ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
-            ret["cards"] = (
-                self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
-                if "cards" not in exclude
-                else ret.pop("cards", None)
-            )
+
+            if "cards" not in exclude:
+                cards = self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
+                ret["cards"] = sorted(cards, key=lambda k: (k['sortorder'], k['cardid']))
+            else:
+                ret.pop("cards", None)
 
             if "widgets" not in exclude:
                 ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
-            ret["nodegroups"] = (
-                self.get_nodegroups(force_recalculation=force_recalculation) if "nodegroups" not in exclude else ret.pop("nodegroups", None)
-            )
+
+            if "nodegroups" not in exclude:
+                nodegroups = self.get_nodegroups(force_recalculation=force_recalculation) 
+                ret['nodegroups'] = sorted(nodegroups, key=lambda k: k.pk)
+            else:
+                ret.pop("nodegroups", None)
+
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
             )
@@ -1478,11 +1483,12 @@ class Graph(models.GraphModel):
             ret["edges"] = [edge for key, edge in self.edges.items()] if "edges" not in exclude else ret.pop("edges", None)
 
             if "nodes" not in exclude:
-                ret["nodes"] = []
+                nodes = []
                 for key, node in self.nodes.items():
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
-                    ret["nodes"].append(nodeobj)
+                    nodes.append(nodeobj)
+                ret['nodes'] = sorted(nodes, key=lambda k: (k['sortorder'], k['nodeid']))
             else:
                 ret.pop("nodes", None)
 
@@ -2008,7 +2014,6 @@ class Graph(models.GraphModel):
                 language = models.Language.objects.get(code=language_tuple[0])
 
                 translation.activate(language=language_tuple[0])
-
                 published_graph = models.PublishedGraph.objects.create(
                     publication=publication,
                     serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
