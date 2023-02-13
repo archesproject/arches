@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 'views/components/etl_modules/bulk-trim-editor',
                 'bulk-trim-editor',
                 'base_data_editor.py',
-                'BaseDataEDitor',
+                'BaseDataEditor',
                 '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
                 'fa fa-edit',
                 'bulk-trim-editor'
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 'views/components/etl_modules/bulk-capitalize-editor',
                 'bulk-capitalize-editor',
                 'base_data_editor.py',
-                'BaseDataEDitor',
+                'BaseDataEditor',
                 '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
                 'fa fa-edit',
                 'bulk-capitalize-editor'
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 'views/components/etl_modules/bulk-uppercase-editor',
                 'bulk-uppercase-editor',
                 'base_data_editor.py',
-                'BaseDataEDitor',
+                'BaseDataEditor',
                 '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
                 'fa fa-edit',
                 'bulk-uppercase-editor'
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 'views/components/etl_modules/bulk-lowercase-editor',
                 'bulk-lowercase-editor',
                 'base_data_editor.py',
-                'BaseDataEDitor',
+                'BaseDataEditor',
                 '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
                 'fa fa-edit',
                 'bulk-lowercase-editor'
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
                 'views/components/etl_modules/bulk-replace-editor',
                 'bulk-replace-editor',
                 'base_data_editor.py',
-                'BaseDataEDitor',
+                'BaseDataEditor',
                 '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
                 'fa fa-edit',
                 'bulk-replace-editor'
