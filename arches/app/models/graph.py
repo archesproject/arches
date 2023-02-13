@@ -1900,15 +1900,11 @@ class Graph(models.GraphModel):
             if future_widget.card.source_identifier_id:
                 card = Card.objects.get(pk=future_widget.card.source_identifier_id)
                 future_widget.card = card
-                models.CardXNodeXWidget.objects.update_or_create(
-                    card=card
-                )
+                models.CardXNodeXWidget.objects.update_or_create(card=card)
             if future_widget.node.source_identifier_id:
                 node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
                 future_widget.node = node
-                models.CardXNodeXWidget.objects.update_or_create(
-                    node=node
-                )
+                models.CardXNodeXWidget.objects.update_or_create(node=node)
             # import pdb; pdb.set_trace()
             # future_widget.save()
             widgets[future_widget.pk] = future_widget
@@ -2021,6 +2017,7 @@ class Graph(models.GraphModel):
                 published_graph.save()
 
             translation.deactivate()
+
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
