@@ -98,9 +98,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <a style="flex: 1" href="#" data-bind="click:function(){ $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }">
                     <div class="resource-grid-main-container" data-bind="hover: hover, css: {active: hover}, event: {mouseleave: $parent.leaveDropdown}">
                         <div class="resource-grid-main">
-                            <h1 class="page-header text-overflow resource-grid-title">
-                                <i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> 
-                                <span data-bind="text: name"></span></h1>
+                            <div style="display: flex;">
+                                <h1 class="page-header text-overflow resource-grid-title">
+                                    <i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> 
+                                    <span data-bind="text: name"></span>
+                                </h1>
+                                <!-- ko ifnot: $data.matchesMostRecentPublishedVersion -->
+                                <div style="display: flex; align-items: center; color: darkred;">( {% trans "Has unpublished changes" %} )</div>
+                                <!-- /ko -->
+                            </div>
                             <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
                         </div>
                     </div>
@@ -150,7 +156,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     id="graphManagerData"
     style="display: none;"
     graphManagerData='{
-        "root_nodes": {{ root_nodes }}
+        "root_nodes": {{ root_nodes }},
+        "publishedGraphs": {{ published_graphs }},
+        "graphs": {{ graphs }},
+        "serializedGraphs": {{ serialized_graphs }},
     }'
 ></div>
 <script>

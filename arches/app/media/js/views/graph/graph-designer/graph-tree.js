@@ -241,7 +241,6 @@ define([
                     document.dispatchEvent(
                         new Event('reorderNodes')
                     );
-                    console.log("()()()")
                     loading(false);
                 }
             });

@@ -2,6 +2,7 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'knockout-mapping',
     'arches',
     'views/graph-manager-data',
     'views/base-manager',
@@ -11,7 +12,7 @@ require([
     'bindings/hover',
     'bindings/chosen',
     'utils/set-csrf-token',
-], function($, _, ko, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
+], function($, _, ko, koMapping, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
     var GraphView = BaseManager.extend({
         /**
         * Initializes an instance of BaseManager, optionally using a passed in view
@@ -136,17 +137,25 @@ require([
                 showFind: ko.observable(false),
                 currentList: ko.computed(function() {
                     if (self.viewModel.showResources()) {
-                        return self.viewModel.resources().reduce(
-                            (acc, currentGraph) => {
-                                if (currentGraph.source_identifier === null) {
-                                    const futureGraph = self.viewModel.resources().find(resource => resource.source_identifier === currentGraph.graphid);
-                                    currentGraph.name(futureGraph.name());
-                                    acc.push(currentGraph);
+                        const resources = self.viewModel.resources();
+
+                        return resources.reduce((acc, resource) => {
+                            if (resource.source_identifier && resource.publication_id) {
+                                const publishedGraph = graphManagerData['publishedGraphs'].find(graph => graph.publication_id === resource.publication_id);
+                                const serializedGraphs = graphManagerData['serializedGraphs'].find(graph => graph.graphid === resource.graphid);
+                                const sourceGraph = resources.find(sourceGraph => sourceGraph.graphid === resource.source_identifier);
+ 
+                                if (sourceGraph) {
+                                    sourceGraph['matchesMostRecentPublishedVersion'] = false;
+                                    sourceGraph.name(resource.name());
+                                    if (publishedGraph && serializedGraphs) {
+                                        sourceGraph['matchesMostRecentPublishedVersion'] = koMapping.toJSON(serializedGraphs) === koMapping.toJSON(publishedGraph.serialized_graph);
+                                    }
+                                    acc.push(sourceGraph);
                                 }
-                                return acc;
-                            }, 
-                            []
-                        );
+                            }
+                            return acc;
+                        }, []);
                     } else {
                         return self.viewModel.graphs() ;
                     }
