@@ -258,9 +258,7 @@ class GraphDesignerView(GraphBaseView):
         for widget in published_graph["widgets"]:
             try:
                 widgets.append(
-                    JSONDeserializer().deserialize(
-                        JSONSerializer().serialize(models.CardXNodeXWidget.objects.get(pk=widget["id"]))
-                    )
+                    JSONDeserializer().deserialize(JSONSerializer().serialize(models.CardXNodeXWidget.objects.get(pk=widget["id"])))
                 )
             except models.CardXNodeXWidget.DoesNotExist:
                 pass
