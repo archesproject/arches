@@ -108,7 +108,8 @@ class BaseDataEditor(BaseImportModule):
         use_celery_bulk_edit = True
         if operation == 'replace':
             operation_details = "{} -> {}".format(old_text, new_text)
-
+        else:
+            operation_details = 'NA'
         load_details = { "graph": graph_id, "node": node_name, "operation": operation, "details": operation_details }
 
         if resourceids:
