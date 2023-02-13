@@ -136,7 +136,17 @@ require([
                 showFind: ko.observable(false),
                 currentList: ko.computed(function() {
                     if (self.viewModel.showResources()) {
-                        return self.viewModel.resources().filter(currentGraph => currentGraph.source_identifier === null);
+                        return self.viewModel.resources().reduce(
+                            (acc, currentGraph) => {
+                                if (currentGraph.source_identifier === null) {
+                                    const futureGraph = self.viewModel.resources().find(resource => resource.source_identifier === currentGraph.graphid);
+                                    currentGraph.name(futureGraph.name());
+                                    acc.push(currentGraph);
+                                }
+                                return acc;
+                            }, 
+                            []
+                        );
                     } else {
                         return self.viewModel.graphs() ;
                     }

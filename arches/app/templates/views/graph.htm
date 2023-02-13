@@ -98,7 +98,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <a style="flex: 1" href="#" data-bind="click:function(){ $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }">
                     <div class="resource-grid-main-container" data-bind="hover: hover, css: {active: hover}, event: {mouseleave: $parent.leaveDropdown}">
                         <div class="resource-grid-main">
-                            <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
+                            <h1 class="page-header text-overflow resource-grid-title">
+                                <i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> 
+                                <span data-bind="text: name"></span></h1>
                             <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
                         </div>
                     </div>
