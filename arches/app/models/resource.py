@@ -72,6 +72,14 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor, context):
+        try:
+            return self.descriptors[descriptor]
+        except KeyError:
+            self.set_descriptors(context)
+            return self.descriptors[descriptor]
+    
+    def set_descriptors(self, context):
+        descriptors = ("description", "map_popup", "name")
         graph_function = models.FunctionXGraph.objects.filter(
             graph_id=self.graph_id, function__functiontype="primarydescriptors"
         ).select_related("function")
@@ -79,16 +87,14 @@ class Resource(models.ResourceInstance):
         if self.descriptors is None:
             self.descriptors = {}
 
-        if len(graph_function) == 1:
-            module = graph_function[0].function.get_class_module()()
-
-            self.descriptors[descriptor] = module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"][descriptor], context
-            )
-        else:
-            self.descriptors[descriptor] = "undefined"
-
-        return self.descriptors[descriptor]
+        for descriptor in descriptors:
+            if len(graph_function) == 1:
+                module = graph_function[0].function.get_class_module()()
+                self.descriptors[descriptor] = module.get_primary_descriptor_from_nodes(
+                    self, graph_function[0].config["descriptor_types"][descriptor], context
+                )
+            else:
+                self.descriptors[descriptor] = "undefined"
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -251,6 +257,7 @@ class Resource(models.ResourceInstance):
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+            self.set_descriptors(context)
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
