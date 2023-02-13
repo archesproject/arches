@@ -156,6 +156,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
                 <span>{% trans "Publish Graph" %}</span>
             </button>
+            <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showReverseGraphAlert">
+                <span>{% trans "Revert Graph" %}</span>
+            </button>
             <!-- /ko -->
 
             <a class="btn btn-md btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="

@@ -495,17 +495,26 @@ class GraphPublicationView(View):
     def post(self, request, graphid):
         graph = Graph.objects.get(pk=graphid)
         source_graph = Graph.objects.get(pk=graph.source_identifier)
-        notes = None
-        if request.body:
-            data = JSONDeserializer().deserialize(request.body)
-            notes = data.get("notes")
 
-        try:
-            source_graph.publish(notes=notes, user=request.user)
-        except UnpublishedModelError as e:
-            return JSONErrorResponse(e.title, e.message)
+        if self.action == "publish":
+            notes = None
 
-        return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+            if request.body:
+                data = JSONDeserializer().deserialize(request.body)
+                notes = data.get("notes")
+
+            try:
+                source_graph.publish(notes=notes, user=request.user)
+                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+            except Exception as e:
+                return JSONErrorResponse(e.title, e.message)
+
+        elif self.action == "revert":
+            try:
+                source_graph.create_editable_future_graph()
+                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+            except Exception as e:
+                return JSONErrorResponse(e.title, e.message)
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")

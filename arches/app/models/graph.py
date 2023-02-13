@@ -1738,11 +1738,9 @@ class Graph(models.GraphModel):
         """
         try:
             previous_editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+            previous_editable_future_graph.delete()
         except models.GraphModel.DoesNotExist:
             previous_editable_future_graph = None
-
-        if previous_editable_future_graph:
-            previous_editable_future_graph.delete()
 
         graph_copy = self.copy(set_source=True)
 
@@ -1902,15 +1900,15 @@ class Graph(models.GraphModel):
             if future_widget.card.source_identifier_id:
                 card = Card.objects.get(pk=future_widget.card.source_identifier_id)
                 future_widget.card = card
-                # models.CardXNodeXWidget.objects.update_or_create(
-                #     card=card
-                # )
+                models.CardXNodeXWidget.objects.update_or_create(
+                    card=card
+                )
             if future_widget.node.source_identifier_id:
                 node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
                 future_widget.node = node
-                # models.CardXNodeXWidget.objects.update_or_create(
-                #     node=node
-                # )
+                models.CardXNodeXWidget.objects.update_or_create(
+                    node=node
+                )
             # import pdb; pdb.set_trace()
             # future_widget.save()
             widgets[future_widget.pk] = future_widget

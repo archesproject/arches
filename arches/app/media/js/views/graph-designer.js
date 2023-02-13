@@ -170,6 +170,31 @@ define([
                 });
             };
 
+            viewModel.showReverseGraphAlert = function() {
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmGraphRevert.title, 
+                    arches.translations.confirmGraphRevert.text,
+                    function() {}, 
+                    viewModel.revertGraph,
+                ));
+            };
+
+            viewModel.revertGraph = function() {
+                viewModel.loading(true);
+
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.revert_graph(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        if (status === 'success') { window.location.reload(); }
+                        else {
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+                    }
+                });
+            };
+
             viewModel.deleteGraph = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 
