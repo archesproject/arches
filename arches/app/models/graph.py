@@ -2000,7 +2000,6 @@ class Graph(models.GraphModel):
         """
         self.publication = None
 
-
         if not self.source_identifier:
             self.update_from_editable_future_graph()
 
