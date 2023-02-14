@@ -1789,10 +1789,12 @@ class Graph(models.GraphModel):
         previous_card_ids = [str(card.pk) for card in self.cards.values()]
         previous_node_ids = [str(node.pk) for node in self.nodes.values()]
         previous_edge_ids = [str(edge.pk) for edge in self.edges.values()]
+        previous_widget_ids = [str(widget.pk) for widget in self.widgets.values()]
 
         self.cards = {}
         self.nodes = {}
         self.edges = {}
+        self.widgets = {}
 
         widgets = {}
 
@@ -1900,13 +1902,11 @@ class Graph(models.GraphModel):
             if future_widget.card.source_identifier_id:
                 card = Card.objects.get(pk=future_widget.card.source_identifier_id)
                 future_widget.card = card
-                models.CardXNodeXWidget.objects.update_or_create(card=card)
             if future_widget.node.source_identifier_id:
                 node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
                 future_widget.node = node
-                models.CardXNodeXWidget.objects.update_or_create(node=node)
-            # import pdb; pdb.set_trace()
-            # future_widget.save()
+
+            future_widget.save()
             widgets[future_widget.pk] = future_widget
 
         for key, value in vars(editable_future_graph).items():
@@ -1923,7 +1923,8 @@ class Graph(models.GraphModel):
                 "_nodegroups_to_delete",
                 "_functions",
                 "_card_constraints",
-                "_constraints_x_nodes" "serialized_graph",
+                "_constraints_x_nodes",
+                "serialized_graph",
             ]:
                 setattr(self, key, value)
 
@@ -1940,8 +1941,19 @@ class Graph(models.GraphModel):
         updated_card_ids = [str(card.source_identifier_id) for card in editable_future_graph.cards.values()]
         updated_node_ids = [str(node.source_identifier_id) for node in editable_future_graph.nodes.values()]
         updated_edge_ids = [str(edge.source_identifier_id) for edge in editable_future_graph.edges.values()]
+        updated_widget_ids = [str(widget.pk) for widget in editable_future_graph.widgets.values()]
 
         updated_node_ids.append(str(self.root.pk))
+
+        import pdb; pdb.set_trace()
+
+        for previous_widget_id in previous_widget_ids:
+            if previous_widget_id not in updated_widget_ids:
+                try:
+                    widget = models.CardXNodeXWidget.objects.get(pk=previous_widget_id)
+                    widget.delete()
+                except ObjectDoesNotExist:  # already deleted
+                    pass
 
         for previous_card_id in previous_card_ids:
             if previous_card_id not in updated_card_ids:
@@ -1988,17 +2000,14 @@ class Graph(models.GraphModel):
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
+        self.publication = None
+
+
+        if not self.source_identifier:
+            self.update_from_editable_future_graph()
+
         with transaction.atomic():
-            self.publication = None
-
-            if not self.source_identifier:
-                self.update_from_editable_future_graph()
-
-            publication = models.GraphXPublishedGraph.objects.create(
-                graph=self,
-                notes=notes,
-                user=user,
-            )
+            publication = models.GraphXPublishedGraph.objects.create(graph=self, notes=notes, user=user)
             publication.save()
 
             self.publication = publication
@@ -2008,6 +2017,7 @@ class Graph(models.GraphModel):
                 language = models.Language.objects.get(code=language_tuple[0])
 
                 translation.activate(language=language_tuple[0])
+
                 published_graph = models.PublishedGraph.objects.create(
                     publication=publication,
                     serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),

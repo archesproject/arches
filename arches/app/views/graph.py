@@ -519,11 +519,14 @@ class GraphPublicationView(View):
                 data = JSONDeserializer().deserialize(request.body)
                 notes = data.get("notes")
 
-            try:
-                source_graph.publish(notes=notes, user=request.user)
-                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
-            except Exception as e:
-                return JSONErrorResponse(e.title, e.message)
+            # try:
+            source_graph.publish(notes=notes, user=request.user)
+            return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+            # except Exception as e:
+            #     if isinstance(e, IntegrityError):
+            #         return JSONErrorResponse("Integrity Error", e.args)
+            #     else:
+            #         return JSONErrorResponse(e.title, e.message)
 
         elif self.action == "revert":
             try:
