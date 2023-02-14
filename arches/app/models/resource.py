@@ -72,6 +72,9 @@ class Resource(models.ResourceInstance):
         self.tiles = []
 
     def get_descriptor(self, descriptor, context):
+        if self.descriptors is None:
+            self.descriptors = {}
+
         try:
             return self.descriptors[descriptor]
         except KeyError:
