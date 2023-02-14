@@ -1945,7 +1945,9 @@ class Graph(models.GraphModel):
 
         updated_node_ids.append(str(self.root.pk))
 
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
 
         for previous_widget_id in previous_widget_ids:
             if previous_widget_id not in updated_widget_ids:
@@ -2001,7 +2003,6 @@ class Graph(models.GraphModel):
         and creates a PublishedGraph entry for every active language
         """
         self.publication = None
-
 
         if not self.source_identifier:
             self.update_from_editable_future_graph()
