@@ -1455,7 +1455,7 @@ class Graph(models.GraphModel):
 
             if "cards" not in exclude:
                 cards = self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
-                ret["cards"] = sorted(cards, key=lambda k: (k["sortorder"], k["cardid"]))
+                ret["cards"] = sorted(cards, key=lambda k: (k["sortorder"] or 0, k["cardid"] or 0))
             else:
                 ret.pop("cards", None)
 
@@ -1900,11 +1900,15 @@ class Graph(models.GraphModel):
         for future_widget in list(editable_future_graph.widgets.values()):
             # deep handling of card and noe have already happened in above iterations
             if future_widget.card.source_identifier_id:
-                card = Card.objects.get(pk=future_widget.card.source_identifier_id)
-                future_widget.card = card
+                future_widget.card = Card.objects.get(pk=future_widget.card.source_identifier_id)
             if future_widget.node.source_identifier_id:
-                node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
-                future_widget.node = node
+                future_widget.node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
+
+            try:
+                widget_from_database = models.CardXNodeXWidget.objects.get(card_id=future_widget.card_id, node_id=future_widget.node_id, widget_id=future_widget.widget_id)
+                widget_from_database.delete()
+            except:
+                pass
 
             future_widget.save()
             widgets[future_widget.pk] = future_widget
