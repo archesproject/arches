@@ -142,26 +142,33 @@ define([
                     data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        if (status === 'success') {
-                            viewModel.publishedGraph = data['published_graph'];
-                            viewModel._graph(data['graph']);
+                        let alert;
 
-                            const alert = new AlertViewModel(
+                        if (status === 'success') {
+                            viewModel._graph(response.responseJSON['graph']);
+
+                            alert = new AlertViewModel(
                                 'ep-alert-blue', 
                                 response.responseJSON.title, 
                                 response.responseJSON.message,
                                 null,
                                 function(){},
-                            )
-                            // must reload window since this editable_future_graph has been deleted
-                            alert.active.subscribe(function() {
-                                window.location.reload()
-                            });
-                            viewModel.alert(alert);
+                            );
                         }
                         else {
-                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                            alert = new JsonErrorAlertViewModel(
+                                'ep-alert-red', 
+                                response.responseJSON,
+                                null,
+                                function(){},
+                            );
                         }
+
+                        // must reload window since this editable_future_graph has been deleted
+                        alert.active.subscribe(function() {
+                            window.location.reload()
+                        });
+                        viewModel.alert(alert);
                         
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);

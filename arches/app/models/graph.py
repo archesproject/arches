@@ -1945,8 +1945,6 @@ class Graph(models.GraphModel):
 
         updated_node_ids.append(str(self.root.pk))
 
-        import pdb; pdb.set_trace()
-
         for previous_widget_id in previous_widget_ids:
             if previous_widget_id not in updated_widget_ids:
                 try:
