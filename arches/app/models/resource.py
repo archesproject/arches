@@ -80,7 +80,7 @@ class Resource(models.ResourceInstance):
         except KeyError:
             self.set_descriptors(context)
             return self.descriptors[descriptor]
-    
+
     def set_descriptors(self, context):
         descriptors = ("description", "map_popup", "name")
         graph_function = models.FunctionXGraph.objects.filter(
