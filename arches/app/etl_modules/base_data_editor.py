@@ -96,6 +96,56 @@ class BaseDataEditor(BaseImportModule):
     def validate(self, request):
         return {"success": True, "data": {}}
 
+    def preview(self, request):
+        def get_first_five_values(graph_id, node_id, language_code):
+            # if language_code is None:
+            #     language_code = 'en'
+            # graph_query = ''
+            # if graph_id is not None:
+            #     graph_query = "n.graphid = '{}'".format(graph_id)
+            # else:
+
+            # print(graph_id, node_id, language_code)
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT t.tiledata -> %s -> %s ->> 'value' FROM tiles t, nodes n
+                    WHERE t.nodegroupid = n.nodegroupid
+                    AND n.graphid = %s AND n.nodeid = %s
+                    LIMIT 5;""", [node_id, language_code, graph_id, node_id])
+                row = [value[0] for value in cursor.fetchall()]
+            return row
+
+        graph_id = request.POST.get("graph_id", None)
+        node_id = request.POST.get("node_id", None)
+        operation = request.POST.get("operation", None)
+        language_code = request.POST.get("language_code", None)
+        old_text = request.POST.get("old_text", None)
+        new_text = request.POST.get("new_text", None)
+        resourceids = request.POST.get("resourceids", None)
+        first_five_values = get_first_five_values(graph_id, node_id, language_code)
+        return_list = []
+        with connection.cursor() as cursor:
+            for value in first_five_values:
+                if operation == 'replace':
+                    cursor.execute("""SELECT * FROM REPLACE(%s, %s, %s);""", [value, old_text, new_text])
+                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'trim':
+                    cursor.execute("""SELECT * FROM TRIM(%s);""", [value])
+                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'capitalize':
+                    cursor.execute("""SELECT * FROM INITCAP(%s);""", [value])
+                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'upper':
+                    cursor.execute("""SELECT * FROM UPPER(%s);""", [value])
+                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'lower':
+                    cursor.execute("""SELECT * FROM LOWER(%s);""", [value])
+                    transformed_value = cursor.fetchone()[0]
+                return_list.append([value, transformed_value])
+
+        return {"success": True, "data": return_list}
+
+
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
@@ -109,7 +159,7 @@ class BaseDataEditor(BaseImportModule):
         if operation == 'replace':
             operation_details = "{} -> {}".format(old_text, new_text)
         else:
-            operation_details = 'NA'
+            operation_details = 'N/A'
         load_details = { "graph": graph_id, "node": node_name, "operation": operation, "details": operation_details }
 
         if resourceids:

@@ -10,21 +10,21 @@
     </h3>
     <div class="etl-module-component etl-module-mapping">
         <h4>
-            <span data-bind="text: $root.translations.targetModel"></span>
+            <span data-bind="text: $root.translations.selectAResourceModel"></span>
         </h4>
         <select data-bind="
             value: selectedGraph,
             options: graphs,
             optionsText: 'name',
             optionsValue: 'graphid',
-            optionsCaption: $root.translations.selectAResourceModel + '...',
+            optionsCaption: $root.translations.select + '...',
             valueAllowUnset: true,
             chosen: {width: '500px'}"
         ></select>
     </div>
     <div class="etl-module-component etl-module-mapping">
         <h4>
-            <span data-bind="text: $root.translations.importDetails"></span>
+            <span data-bind="text: $root.translations.selectANode"></span>
         </h4>
         <!-- ko if: nodes() -->
         <select data-bind="
@@ -39,7 +39,9 @@
         <!-- /ko -->
     </div>
     <div>
-        <label>Laguages</label>
+        <h4>
+            <span data-bind="text: $root.translations.language"></span>
+        </h4>
         <select data-bind="
                 options: languages,
                 optionsCaption: $root.translations.select + '...',
@@ -50,18 +52,47 @@
         ></select>
     </div>
     <div data-bind="if: operation() === 'replace'">
-        <label>Old Text:</label>
+        <h4>
+            <span data-bind="text: $root.translations.from"></span>
+        </h4>
         <input type="text" class="form-control" placeholder="Old Text" data-bind="value: oldText">
-        <label>New Text:</label>
+        <h4>
+            <span data-bind="text: $root.translations.to"></span>
+        </h4>
         <input type="text" class="form-control" placeholder="New Text" data-bind="value: newText">
     </div>
+    <button style="margin: 25px 8px;" data-bind="click: preview" class="btn btn-success">
+        <span data-bind="text: $root.translations.preview"></span>
+    </button>
+    <!-- ko if: showPreview-->
+    <div>
+        <table class="table table-striped csv-mapping-table">
+            <thead>
+                <tr>
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">Before</th>
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">After</th>
+                </tr>
+            </thead>
+            <tbody data-bind="value: console.log(previewValue())">
+                <!-- ko foreach: { data: previewValue(), as: "row" } -->
+                <!-- ko if: row[0] -->
+                <tr>
+                    <td style="vertical-align: text-top;" data-bind="html: row[0]"></td>
+                    <td style="vertical-align: text-top;" data-bind="html: row[1]"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- /ko -->
+            </tbody>
+        </table>
+    </div>
+    <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
     <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
-        <span data-bind="text: $root.translations.importData"></span>
+        <span data-bind="text: $root.translations.start"></span>
     </button>
     <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
-        <span data-bind="text: $root.translations.cancelFileImport"></span>
+        <span data-bind="text: $root.translations.cancelEditing"></span>
     </button>
 </div>
 </div>

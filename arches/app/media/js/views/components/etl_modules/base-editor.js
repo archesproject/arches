@@ -4,13 +4,14 @@ define([
     'jquery',
     'uuid',
     'arches',
+    'viewmodels/alert',
     'viewmodels/alert-json',
     'templates/views/components/etl_modules/base-editor.htm',
     'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, uuid, arches, JsonErrorAlertViewModel, baseEditorTemplate) {
+], function(ko, koMapping, $, uuid, arches, AlertViewModel, JsonErrorAlertViewModel, baseEditorTemplate) {
     const viewModel = function(params) {
         const self = this;
 
@@ -36,6 +37,8 @@ define([
         this.formData = new window.FormData();
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
+        this.previewValue = ko.observable();
+        this.showPreview = ko.observable(false);
 
         this.getGraphs = function(){
             self.loading(true);
@@ -70,7 +73,56 @@ define([
             }
         });
 
+        this.preview = function() {
+            if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
+                self.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        "",
+                        "The old and new texts should be provided to replace texts",
+                        null,
+                        function(){}
+                    )
+                );
+                return;
+            }
+            self.formData.append('operation', self.operation());
+            if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
+            if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
+            if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
+            if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
+            if (self.newText()) { self.formData.append('new_text', self.newText()); }
+            if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
+            self.submit('preview').then(data => {
+                console.log(data.result);
+                self.previewValue(data.result);
+                self.showPreview(true);
+            }).fail(function(err) {
+                console.log(err);
+            }).always(function() {
+                self.formData.delete('operation');
+                self.formData.delete('node_id');
+                self.formData.delete('graph_id');
+                self.formData.delete('language_code');
+                self.formData.delete('old_text');
+                self.formData.delete('new_text');
+                self.formData.delete('resourceids');    
+            });
+        };
+
         this.write = function() {
+            if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
+                self.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        "",
+                        "The old and new texts should be provided to replace texts",
+                        null,
+                        function(){}
+                    )
+                );
+                return;
+            }
             self.formData.append('operation', self.operation());
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
             if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
@@ -80,6 +132,7 @@ define([
             if (self.newText()) { self.formData.append('new_text', self.newText()); }
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
             self.loading(true);
+            params.activeTab("import");
             self.submit('write').then(data => {
                 params.activeTab("import");
                 console.log(data.result);
