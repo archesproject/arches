@@ -843,8 +843,6 @@ class Graph(models.GraphModel):
             node_map[node_id] = node.pk
 
             if is_collector:
-                # import pdb; pdb.set_trace()
-
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
                 if old_nodegroup_id not in nodegroup_map:
@@ -1399,12 +1397,12 @@ class Graph(models.GraphModel):
             cards.append(card_dict)
         return cards
 
-    def get_widgets(self, use_raw_i18n_json=False):
+    def get_widgets(self, use_raw_i18n_json=False, force_recalculation=False):
         """
         get the widget data (if any) associated with this graph
 
         """
-        if self.serialized_graph:
+        if self.serialized_graph and not self.source_identifier and not force_recalculation:
             return self.serialized_graph["widgets"]
         else:
             widgets = []
@@ -1424,7 +1422,6 @@ class Graph(models.GraphModel):
 
         """
         exclude = [] if exclude is None else exclude
-
         if self.publication and not self.source_identifier and not force_recalculation:
             try:
                 user_language = translation.get_language()
@@ -1462,7 +1459,7 @@ class Graph(models.GraphModel):
                 ret.pop("cards", None)
 
             if "widgets" not in exclude:
-                ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
+                ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json, force_recalculation=force_recalculation)
 
             if "nodegroups" not in exclude:
                 nodegroups = self.get_nodegroups(force_recalculation=force_recalculation)
@@ -1744,11 +1741,11 @@ class Graph(models.GraphModel):
         except models.GraphModel.DoesNotExist:
             previous_editable_future_graph = None
 
-        # import pdb; pdb.set_trace()
         graph_copy = self.copy(set_source=True)
 
         editable_future_graph = graph_copy["copy"]
         editable_future_graph.source_identifier = self.graphid
+
 
         editable_future_graph.copy_functions(other_graph=self)
         editable_future_graph.save()
@@ -1860,7 +1857,6 @@ class Graph(models.GraphModel):
             else:  # newly-created node
                 self.nodes[future_node.pk] = future_node
                 del editable_future_graph.nodes[future_node.pk]
-                # import pdb; pdb.set_trace()
 
                 future_node.graph_id = self.pk
 

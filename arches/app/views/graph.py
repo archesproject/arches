@@ -266,6 +266,7 @@ class GraphDesignerView(GraphBaseView):
         context["source_graph_id"] = source_graph.pk
 
         user_language = translation.get_language()
+
         published_graph = models.PublishedGraph.objects.get(publication=self.graph.publication, language=user_language)
         published_graph = published_graph.serialized_graph
 
