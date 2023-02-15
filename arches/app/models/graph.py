@@ -1912,7 +1912,9 @@ class Graph(models.GraphModel):
                 future_widget.node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
 
             try:
-                widget_from_database = models.CardXNodeXWidget.objects.get(card_id=future_widget.card_id, node_id=future_widget.node_id, widget_id=future_widget.widget_id)
+                widget_from_database = models.CardXNodeXWidget.objects.get(
+                    card_id=future_widget.card_id, node_id=future_widget.node_id, widget_id=future_widget.widget_id
+                )
                 widget_from_database.delete()
             except:
                 pass
