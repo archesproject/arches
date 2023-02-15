@@ -843,6 +843,8 @@ class Graph(models.GraphModel):
             node_map[node_id] = node.pk
 
             if is_collector:
+                # import pdb; pdb.set_trace()
+
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(pk=node.pk, cardinality=node.nodegroup.cardinality)
                 if old_nodegroup_id not in nodegroup_map:
@@ -859,6 +861,7 @@ class Graph(models.GraphModel):
 
             else:
                 node.nodegroup = None
+
 
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
@@ -1742,6 +1745,8 @@ class Graph(models.GraphModel):
         except models.GraphModel.DoesNotExist:
             previous_editable_future_graph = None
 
+
+        # import pdb; pdb.set_trace()
         graph_copy = self.copy(set_source=True)
 
         editable_future_graph = graph_copy["copy"]
@@ -1819,7 +1824,7 @@ class Graph(models.GraphModel):
                 source_card.nodegroup_id = (
                     future_card_nodegroup_node.source_identifier_id
                     if future_card_nodegroup_node.source_identifier_id
-                    else source_card.nodegroup_id
+                    else future_card_nodegroup_node.nodegroup_id
                 )
                 source_card.save()
             else:  # newly-created card
@@ -1830,7 +1835,7 @@ class Graph(models.GraphModel):
                 future_card.nodegroup_id = (
                     future_card_nodegroup_node.source_identifier_id
                     if future_card_nodegroup_node.source_identifier_id
-                    else future_card.nodegroup_id
+                    else future_card_nodegroup_node.nodegroup_id
                 )
                 future_card.save()
 
@@ -1848,6 +1853,7 @@ class Graph(models.GraphModel):
                     if key not in ["graph_id", "nodeid", "nodegroup_id", "source_identifier_id", "is_collector"]:
                         setattr(source_node, key, getattr(future_node, key))
 
+
                 if future_node_nodegroup_node and future_node_nodegroup_node.source_identifier_id:
                     source_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
                 else:
@@ -1857,6 +1863,7 @@ class Graph(models.GraphModel):
             else:  # newly-created node
                 self.nodes[future_node.pk] = future_node
                 del editable_future_graph.nodes[future_node.pk]
+                # import pdb; pdb.set_trace()
 
                 future_node.graph_id = self.pk
 
