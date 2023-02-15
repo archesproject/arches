@@ -862,7 +862,6 @@ class Graph(models.GraphModel):
             else:
                 node.nodegroup = None
 
-
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
             widget.node_id = node_map[widget.node_id]
@@ -1745,7 +1744,6 @@ class Graph(models.GraphModel):
         except models.GraphModel.DoesNotExist:
             previous_editable_future_graph = None
 
-
         # import pdb; pdb.set_trace()
         graph_copy = self.copy(set_source=True)
 
@@ -1852,7 +1850,6 @@ class Graph(models.GraphModel):
                 for key in serialized_node.keys():
                     if key not in ["graph_id", "nodeid", "nodegroup_id", "source_identifier_id", "is_collector"]:
                         setattr(source_node, key, getattr(future_node, key))
-
 
                 if future_node_nodegroup_node and future_node_nodegroup_node.source_identifier_id:
                     source_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
