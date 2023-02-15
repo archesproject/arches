@@ -195,6 +195,11 @@ define([
                         this.cardTree.addCard(response.responseJSON);
                         this.permissionTree.addCard(response.responseJSON);
                     }
+
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('addChildNode')
+                    );
                 }
             }, this);
         },

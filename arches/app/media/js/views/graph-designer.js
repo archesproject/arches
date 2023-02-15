@@ -177,7 +177,7 @@ define([
                 });
             };
 
-            viewModel.showReverseGraphAlert = function() {
+            viewModel.showRevertGraphAlert = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 
                     arches.translations.confirmGraphRevert.title, 
@@ -361,6 +361,11 @@ define([
                 if (viewModel.selectedNode()) {
                     viewModel.saveNode(viewModel.selectedNode());
                 }
+            };
+
+            viewModel.saveCardEdits = function(obj) {
+                obj.save();
+                forceShowGraphPublishButtons();
             };
 
             viewModel.cardTree = new CardTreeViewModel({
@@ -656,6 +661,7 @@ define([
                 }, 0);
             };
             
+            document.addEventListener('addChildNode', forceShowGraphPublishButtons);
             document.addEventListener('deleteNode', forceShowGraphPublishButtons);
             document.addEventListener('reorderNodes', forceShowGraphPublishButtons);
             
