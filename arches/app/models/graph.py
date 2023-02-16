@@ -1498,7 +1498,7 @@ class Graph(models.GraphModel):
                     unpermitted_node_edits = find_unpermitted_edits(
                         db_node,
                         self.nodes[db_node.nodeid],
-                        ["name", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable"],
+                        ["name", "alias", "hascustomalias", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable", "config"],
                         "node",
                     )
                     if unpermitted_node_edits is not None:
