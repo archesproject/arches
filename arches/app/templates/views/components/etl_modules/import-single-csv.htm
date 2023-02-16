@@ -76,6 +76,7 @@
             chosen: {width: '500px'}"
         ></select>
     </div>
+    <!-- ko if: selectedGraph -->
     <div class="etl-module-component">
         <h4>
             <span data-bind="text: $root.translations.importDetails"></span>
@@ -127,6 +128,7 @@
         <div data-bind="text: $root.translations.showingAll + ' ' + csvExample().length + $root.translations.rows"></div>
         <!-- /ko -->
     </div>
+    <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
     <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
