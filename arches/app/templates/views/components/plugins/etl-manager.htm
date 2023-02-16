@@ -137,6 +137,11 @@
                                         <span data-bind="text: $root.translations.indexing"></span>
                                     </button>
                                     <!-- /ko -->
+                                    <!-- ko if: event.status == "validated" -->
+                                    <button class="btn btn-warning" style="width:150px;">
+                                        <span data-bind="text: $root.translations.running"></span>
+                                    </button>
+                                    <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
                                     <button class="btn btn-success" style="width:150px;">
                                         <span data-bind="text: $root.translations.completed"></span>
@@ -149,7 +154,7 @@
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "running" -->
                                     <button class="btn btn-warning" style="width:150px;">
-                                        <span data-bind="text: $root.translations.running"></span>
+                                        <span data-bind="text: $root.translations.validating"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "reversing" -->
@@ -209,7 +214,8 @@
                             <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                                 <thead>
                                     <tr>
-                                        <th>{% trans "Location" %}</th>
+                                        <th>{% trans "Column Name" %}</th>
+                                        <th>{% trans "Node Alias" %}</th>
                                         <th>{% trans "Error" %}</th>
                                         <th>{% trans "Datatype" %}</th>
                                         <th>{% trans "Count" %}</th>
@@ -228,6 +234,7 @@
                                     <!-- ko foreach: validationErrors -->
                                     <tr>
                                         <td data-bind="text: $data.source"></td>
+                                        <td data-bind="text: $data.nodeAlias"></td>
                                         <td data-bind="text: $data.error"></td>
                                         <td data-bind="text: $data.datatype"></td>
                                         <td data-bind="text: $data.count"></td>
@@ -237,7 +244,9 @@
                                                 click: function(){
                                                     $data.showDetails(!$data.showDetails());
                                                     $parent.getNodeError($parent.selectedLoadEvent().loadid, $data);
-                                                }">{% trans "Show 1st Five" %}</td>
+                                                }">
+                                            <span data-bind="text: $data.showDetails() ? $root.translations.hide : $root.translations.show"></span>
+                                        </td>
                                     </tr>
                                         <!-- ko if: $data.showDetails -->
                                         <tr>

@@ -163,6 +163,11 @@ class ImportSingleCsv(BaseImportModule):
 
         validation = self.validate()
         if len(validation["data"]) == 0:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("validated", loadid),
+                )
             response = self.save_to_tiles(loadid, multiprocessing=False)
             return response
         else:
