@@ -82,7 +82,7 @@ class Resource(models.ResourceInstance):
             any key:value pairs needed to control the behavior of a custom descriptor function
 
         """
-        
+
         if self.descriptors is None:
             self.descriptors = {}
 
@@ -96,9 +96,9 @@ class Resource(models.ResourceInstance):
 
         if language not in self.descriptors:
             self.descriptors[language] = {}
-        
+
         return language
-        
+
     def get_descriptor(self, descriptor, context):
         """
         descriptor -- string descriptor type: "name", "description", "map_popup"
@@ -136,16 +136,17 @@ class Resource(models.ResourceInstance):
             self.descriptor_function = models.FunctionXGraph.objects.filter(
                 graph_id=self.graph_id, function__functiontype="primarydescriptors"
             ).select_related("function")
-        
-        for descriptor in descriptors:          
+
+        for descriptor in descriptors:
             if len(self.descriptor_function) == 1:
                 module = self.descriptor_function[0].function.get_class_module()()
-                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(self, self.descriptor_function[0].config["descriptor_types"][descriptor], context)
+                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
+                )
                 if descriptor == "name" and self.descriptors[language][descriptor] is not None:
                     self.name[language] = self.descriptors[language][descriptor]
             else:
                 self.descriptors[language][descriptor] = None
-
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -300,7 +301,7 @@ class Resource(models.ResourceInstance):
 
         """
 
-        if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):     
+        if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             for lang in settings.LANGUAGES:
                 if context is None:
                     context = {}
