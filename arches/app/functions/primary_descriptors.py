@@ -36,7 +36,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
 
         datatype_factory = None
         language = None
-        result = ""
+        result = config["string_template"]
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
                 tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
@@ -63,7 +63,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                             value = datatype.get_display_value(tile, node, language=language)
                             if value is None:
                                 value = ""
-                            result = config["string_template"].replace("<%s>" % node.name, str(value))
+                            result = result.replace("<%s>" % node.name, str(value))
         except ValueError:
             logger.error(_("Invalid nodegroupid, {0}, participating in descriptor function.").format(config["nodegroup_id"]))
         if result.strip() == "":
