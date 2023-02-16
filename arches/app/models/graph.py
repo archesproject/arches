@@ -1818,7 +1818,7 @@ class Graph(models.GraphModel):
                     source_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
                 else:
                     source_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
-                    
+
                 source_card.save()
             else:  # newly-created card
                 self.cards[future_card.pk] = future_card
@@ -1828,9 +1828,9 @@ class Graph(models.GraphModel):
 
                 if future_card_nodegroup_node.source_identifier_id:
                     future_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
-                else: 
+                else:
                     future_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
-                    
+
                 future_card.save()
 
             _update_source_nodegroup_hierarchy(future_card.nodegroup)
@@ -1875,12 +1875,12 @@ class Graph(models.GraphModel):
                         setattr(source_edge, key, getattr(future_edge, key))
 
                 if future_edge.domainnode.source_identifier:
-                    source_edge.domainnode_id = future_edge.domainnode.source_identifier.pk  
-                else: 
+                    source_edge.domainnode_id = future_edge.domainnode.source_identifier.pk
+                else:
                     source_edge.domainnode_id = future_edge.domainnode_id
-                
+
                 if future_edge.rangenode.source_identifier:
-                    source_edge.rangenode_id = future_edge.rangenode.source_identifier.pk 
+                    source_edge.rangenode_id = future_edge.rangenode.source_identifier.pk
                 else:
                     source_edge.rangenode_id = future_edge.rangenode_id
 
@@ -1892,10 +1892,10 @@ class Graph(models.GraphModel):
                 future_edge.graph_id = self.pk
 
                 if future_edge.domainnode.source_identifier:
-                    future_edge.domainnode_id = future_edge.domainnode.source_identifier.pk 
+                    future_edge.domainnode_id = future_edge.domainnode.source_identifier.pk
 
                 if future_edge.rangenode.source_identifier:
-                    future_edge.rangenode_id = future_edge.rangenode.source_identifier.pk 
+                    future_edge.rangenode_id = future_edge.rangenode.source_identifier.pk
 
                 future_edge.save()
 
