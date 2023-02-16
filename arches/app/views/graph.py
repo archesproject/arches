@@ -426,8 +426,8 @@ class GraphDataView(View):
                     ret = clone_data["copy"]
                     ret.slug = None
                     ret.save()
-                    ret.create_editable_future_graph()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
+                    ret.create_editable_future_graph()
 
                 elif self.action == "reorder_nodes":
                     json = request.body
@@ -520,21 +520,18 @@ class GraphPublicationView(View):
                 data = JSONDeserializer().deserialize(request.body)
                 notes = data.get("notes")
 
-            # try:
-            source_graph.publish(notes=notes, user=request.user)
-            return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
-            # except Exception as e:
-            #     if isinstance(e, IntegrityError):
-            #         return JSONErrorResponse("Integrity Error", e.args)
-            #     else:
-            #         return JSONErrorResponse(e.title, e.message)
+            try:
+                source_graph.publish(notes=notes, user=request.user)
+                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+            except Exception as e:
+                return JSONErrorResponse(e)
 
         elif self.action == "revert":
             try:
                 source_graph.create_editable_future_graph()
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
-                return JSONErrorResponse(e.title, e.message)
+                return JSONErrorResponse(e)
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
