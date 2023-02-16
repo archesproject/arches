@@ -84,6 +84,8 @@ define([
         let cardConstraints;
         if (params.card.constraints?.length) {
             cardConstraints = params.card.constraints;
+        } else if (params.constraints?.length) {
+            cardConstraints = params.constraints
         } else {
             cardConstraints = emptyConstraint;
         }
