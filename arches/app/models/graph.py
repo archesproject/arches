@@ -1411,7 +1411,7 @@ class Graph(models.GraphModel):
                     widget_dict = JSONSerializer().serializeToPython(widget, use_raw_i18n_json=use_raw_i18n_json)
                     widgets.append(widget_dict)
 
-            return sorted(widgets, key=lambda k: k['id'])
+            return sorted(widgets, key=lambda k: k["id"])
 
     def serialize(self, fields=None, exclude=None, force_recalculation=False, use_raw_i18n_json=False, **kwargs):
         """
@@ -1481,7 +1481,7 @@ class Graph(models.GraphModel):
 
             if "edges" not in exclude:
                 ret["edges"] = sorted([edge for edge in self.edges.values()], key=lambda k: k.edgeid)
-            else: 
+            else:
                 ret.pop("edges", None)
 
             if "nodes" not in exclude:
