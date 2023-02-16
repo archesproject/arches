@@ -60,6 +60,9 @@ define([
                         if (['source_identifier_id', 'alias'].includes(entry[0])) {
                             obj[entry[0]] = null;
                         }
+                        if (entry[0] === 'config' && obj[entry[0]] === null) {
+                            obj[entry[0]] = {};
+                        }
                     }
                 }
 
@@ -86,8 +89,6 @@ define([
                     }
                 }
 
-                console.log(JSON.stringify(normalizeParsedGraph(viewModel._graph())))
-                console.log(JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph)))
                 if (
                     JSON.stringify(normalizeParsedGraph(viewModel._graph())) === JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph))
                 ) {

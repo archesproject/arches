@@ -20,6 +20,7 @@ from datetime import timedelta
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.db.models import JSONField
@@ -624,6 +625,14 @@ class Node(models.Model):
             if new_id not in old_ids:
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
+
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, **kwargs)
+
+        if ret['config'].get('options'):
+            ret['config']['options'] = sorted(ret['config']['options'], key=lambda k: k['id'])
+
+        return ret
 
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
