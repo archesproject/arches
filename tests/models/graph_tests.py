@@ -1147,7 +1147,18 @@ class GraphTests(ArchesTestCase):
         for key, value in serialized_editable_future_graph.items():
             if key == "name":
                 self.assertEqual(value, serialized_updated_source_graph[key])
-            elif key not in ["graphid", "cards", "nodes", "edges", "nodegroups", "functions", "root", "widgets", "source_identifier", 'publication_id']:
+            elif key not in [
+                "graphid",
+                "cards",
+                "nodes",
+                "edges",
+                "nodegroups",
+                "functions",
+                "root",
+                "widgets",
+                "source_identifier",
+                "publication_id",
+            ]:
                 if type(value) == "dict":
                     self.assertDictEqual(value, serialized_updated_source_graph[key])
                 else:
