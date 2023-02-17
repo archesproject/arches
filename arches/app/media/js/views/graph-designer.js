@@ -100,10 +100,10 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
-                return graph.isresource && !graph.source_identifier;
+                return graph.isresource && !graph.source_identifier_id;
             });
             var graphs = ko.utils.arrayFilter(viewData.graphs, function(graph) {
-                return !graph.isresource && !graph.source_identifier;
+                return !graph.isresource && !graph.source_identifier_id;
             });
 
             var newGraph = function(url, data) {
@@ -166,7 +166,9 @@ define([
                         }
 
                         // must reload window since this editable_future_graph has been deleted
-                        alert.active.subscribe(window.location.reload);
+                        alert.active.subscribe(function() {
+                            window.location.reload()
+                        });
                         viewModel.alert(alert);
                         
                         viewModel.graphPublicationNotes(null);

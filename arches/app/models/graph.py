@@ -129,7 +129,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if self.publication and not self.source_identifier and not has_deferred_args:
+                if self.publication and not self.source_identifier_id and not has_deferred_args:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     node_slugs = []
@@ -272,7 +272,7 @@ class Graph(models.GraphModel):
 
         graph = Graph.objects.get(pk=graph_model.graphid)
 
-        if not graph.source_identifier:
+        if not graph.source_identifier_id:
             graph.create_editable_future_graph()
 
         return graph
@@ -536,7 +536,7 @@ class Graph(models.GraphModel):
         if self.is_editable() is True:
             with transaction.atomic():
                 try:
-                    editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+                    editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
                     editable_future_graph.delete()
                 except models.GraphModel.DoesNotExist:
                     pass  # no editable future graph to delete
@@ -1306,7 +1306,7 @@ class Graph(models.GraphModel):
         get the nodegroups associated with this graph
 
         """
-        if self.serialized_graph and not self.source_identifier and not force_recalculation:
+        if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
@@ -1400,7 +1400,7 @@ class Graph(models.GraphModel):
         get the widget data (if any) associated with this graph
 
         """
-        if self.serialized_graph and not self.source_identifier and not force_recalculation:
+        if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
             return self.serialized_graph["widgets"]
         else:
             widgets = []
@@ -1420,7 +1420,7 @@ class Graph(models.GraphModel):
 
         """
         exclude = [] if exclude is None else exclude
-        if self.publication and not self.source_identifier and not force_recalculation:
+        if self.publication and not self.source_identifier_id and not force_recalculation:
             try:
                 user_language = translation.get_language()
                 published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
@@ -1737,7 +1737,7 @@ class Graph(models.GraphModel):
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
         try:
-            previous_editable_future_graph = models.GraphModel.objects.get(source_identifier=self.graphid)
+            previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
             previous_editable_future_graph.delete()
         except models.GraphModel.DoesNotExist:
             previous_editable_future_graph = None
@@ -1745,7 +1745,7 @@ class Graph(models.GraphModel):
         graph_copy = self.copy(set_source=True)
 
         editable_future_graph = graph_copy["copy"]
-        editable_future_graph.source_identifier = self.graphid
+        editable_future_graph.source_identifier_id = self.graphid
 
         editable_future_graph.save()
         editable_future_graph.publish()
@@ -1759,7 +1759,7 @@ class Graph(models.GraphModel):
         an editable future graph from the updated graph.
         """
         try:
-            editable_future_graph = Graph.objects.get(source_identifier=self.pk)
+            editable_future_graph = Graph.objects.get(source_identifier_id=self.pk)
         except:
             raise Exception(_("No identifiable future Graph"))
 
@@ -1928,6 +1928,7 @@ class Graph(models.GraphModel):
                 "widgets",
                 "root",
                 "source_identifier",
+                "source_identifier_id",
                 "publication_id",
                 "_nodegroups_to_delete",
                 "_functions",

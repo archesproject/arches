@@ -431,7 +431,9 @@ class GraphModel(models.Model):
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
-    source_identifier = models.UUIDField(blank=True, null=True)
+    source_identifier = models.ForeignKey(
+        blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
+    )
 
     @property
     def disable_instance_creation(self):
@@ -562,7 +564,7 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
-    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.DO_NOTHING)
 
     def get_child_nodes_and_edges(self):
         """

@@ -140,10 +140,10 @@ require([
                         const resources = self.viewModel.resources();
 
                         return resources.reduce((acc, resource) => {
-                            if (resource.source_identifier && resource.publication_id) {
+                            if (resource.source_identifier_id && resource.publication_id) {
                                 const publishedGraph = graphManagerData['publishedGraphs'].find(graph => graph.publication_id === resource.publication_id);
                                 const serializedGraphs = graphManagerData['serializedGraphs'].find(graph => graph.graphid === resource.graphid);
-                                const sourceGraph = resources.find(sourceGraph => sourceGraph.graphid === resource.source_identifier);
+                                const sourceGraph = resources.find(sourceGraph => sourceGraph.graphid === resource.source_identifier_id);
  
                                 if (sourceGraph) {
                                     sourceGraph['matchesMostRecentPublishedVersion'] = false;

@@ -164,7 +164,7 @@ class GraphManagerViewTests(ArchesTestCase):
         source_graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         source_graph.save()
 
-        graph = Graph.objects.get(source_identifier=source_graph.pk)
+        graph = Graph.objects.get(source_identifier_id=source_graph.pk)
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
         graph.author = "Arches"
@@ -199,7 +199,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
     def tearDown(self):
         try:
-            graph = Graph.objects.get(source_identifier=self.GRAPH_ID)
+            graph = Graph.objects.get(source_identifier_id=self.GRAPH_ID)
             graph.delete()
         except:
             pass

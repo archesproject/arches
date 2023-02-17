@@ -154,12 +154,12 @@ class GraphManagerView(GraphBaseView):
             context["serialized_graphs"] = JSONSerializer().serialize(
                 Graph.objects.all()
                 .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(source_identifier=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(source_identifier_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 
             publication_ids = []
             for resource_model in JSONDeserializer().deserialize(context["serialized_graphs"]):
-                if resource_model["source_identifier"]:
+                if resource_model["source_identifier_id"]:
                     publication_ids.append(resource_model["publication_id"])
 
             context["published_graphs"] = JSONSerializer().serialize(
@@ -195,7 +195,7 @@ class GraphDesignerView(GraphBaseView):
 
     def get(self, request, graphid):
         try:
-            self.graph = Graph.objects.get(source_identifier=graphid)
+            self.graph = Graph.objects.get(source_identifier_id=graphid)
         except Graph.DoesNotExist:
             raise Exception(_("Graph does not have a source identifier."))
 
@@ -494,7 +494,7 @@ class GraphDataView(View):
                 graph.delete()
 
                 try:
-                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier)
+                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier_id)
                     source_graph.delete()
                 except models.GraphModel.DoesNotExist:
                     pass  # no sourcee graph to delete
@@ -511,7 +511,7 @@ class GraphPublicationView(View):
 
     def post(self, request, graphid):
         graph = Graph.objects.get(pk=graphid)
-        source_graph = Graph.objects.get(pk=graph.source_identifier)
+        source_graph = Graph.objects.get(pk=graph.source_identifier_id)
 
         if self.action == "publish":
             notes = None

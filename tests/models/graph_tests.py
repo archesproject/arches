@@ -1157,6 +1157,7 @@ class GraphTests(ArchesTestCase):
                 "root",
                 "widgets",
                 "source_identifier",
+                "source_identifier_id",
                 "publication_id",
             ]:
                 if type(value) == "dict":
