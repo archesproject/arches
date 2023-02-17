@@ -130,9 +130,7 @@ def get_graphs_for_export(graphids=None):
     graphs = {}
     graphs["graph"] = []
     if graphids is None or graphids[0] == "all" or graphids == [""]:
-        resource_graphs = (
-            Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).filter(source_identifier__isnull=False)
-        )
+        resource_graphs = Graph.objects.all().exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).filter(source_identifier__isnull=False)
     elif graphids[0] == "resource_models":
         resource_graphs = (
             Graph.objects.filter(isresource=True)
