@@ -1294,8 +1294,11 @@ def create_permissions_for_new_users(sender, instance, created, **kwargs):
             resourceInstanceId = uuid.UUID(resourceInstanceId)
         resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
         assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource in resources:
-            Resource(resource.resourceinstanceid).index()
+        for resource_instance in resources:
+            resource = Resource(resource_instance.resourceinstanceid)
+            resource.graph_id = resource_instance.graph_id
+            resource.createdtime = resource_instance.createdtime
+            resource.index()
 
 
 class UserXTask(models.Model):
