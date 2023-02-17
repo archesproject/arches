@@ -657,8 +657,8 @@ define([
                 setTimeout(function(){  // need a 0 timeout to reset the UI long enough to show/hide the publish buttons
                     viewModel._graph(null);
                     viewModel.loading(false);
-                }, 0)
-            };
+                }, 0);
+            }
             
             document.addEventListener('addChildNode', forceShowGraphPublishButtons);
             document.addEventListener('deleteNode', forceShowGraphPublishButtons);
