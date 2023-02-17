@@ -507,7 +507,7 @@ class v3Importer:
 
         self.dt_converter = dt_converter
 
-        self.v4_graph = Graph.objects.get(name=v4_graph_name)
+        self.v4_graph = Graph.objects.get(name=v4_graph_name, source_identifier=None)
         self.v4_graph_name = v4_graph_name
         self.v4_nodes = Node.objects.filter(graph=self.v4_graph)
 
