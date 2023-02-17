@@ -67,7 +67,7 @@ define([
                 }
 
                 return obj;
-            };
+            }
 
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;
@@ -166,9 +166,7 @@ define([
                         }
 
                         // must reload window since this editable_future_graph has been deleted
-                        alert.active.subscribe(function() {
-                            window.location.reload()
-                        });
+                        alert.active.subscribe(window.location.reload);
                         viewModel.alert(alert);
                         
                         viewModel.graphPublicationNotes(null);
@@ -323,7 +321,7 @@ define([
                     viewModel._graph(data['graph']);
                 });
 
-                viewModel.shouldShowGraphPublishButtons()
+                viewModel.shouldShowGraphPublishButtons();
                 viewModel.alert(null);
                 // viewModel.loading(false);  // TODO: @cbyrd 8842 disable page refresh on branch append
                 if (response.status !== 200) {
@@ -452,7 +450,7 @@ define([
                     }
                 },
                 onSave: function() {
-                    viewModel._graph(koMapping.toJS(viewModel.graphSettingsViewModel.graph))
+                    viewModel._graph(koMapping.toJS(viewModel.graphSettingsViewModel.graph));
                 }
             });
 
@@ -657,9 +655,9 @@ define([
                 viewModel.loading(true);
 
                 setTimeout(function(){  // need a 0 timeout to reset the UI long enough to show/hide the publish buttons
-                        viewModel._graph(null);
-                        viewModel.loading(false);
-                }, 0);
+                    viewModel._graph(null);
+                    viewModel.loading(false);
+                }, 0)
             };
             
             document.addEventListener('addChildNode', forceShowGraphPublishButtons);
