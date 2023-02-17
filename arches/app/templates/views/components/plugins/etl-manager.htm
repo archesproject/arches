@@ -214,9 +214,9 @@
                             <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                                 <thead>
                                     <tr>
+                                        <th>{% trans "Error" %}</th>
                                         <th>{% trans "Column Name" %}</th>
                                         <th>{% trans "Node Alias" %}</th>
-                                        <th>{% trans "Error" %}</th>
                                         <th>{% trans "Datatype" %}</th>
                                         <th>{% trans "Count" %}</th>
                                         <th>{% trans "Details" %}</th>
@@ -233,9 +233,9 @@
                                 <tbody>
                                     <!-- ko foreach: validationErrors -->
                                     <tr>
+                                        <td data-bind="text: $data.error"></td>
                                         <td data-bind="text: $data.source"></td>
                                         <td data-bind="text: $data.nodeAlias"></td>
-                                        <td data-bind="text: $data.error"></td>
                                         <td data-bind="text: $data.datatype"></td>
                                         <td data-bind="text: $data.count"></td>
                                         <td class='etl-error-report-link'
@@ -248,20 +248,36 @@
                                             <span data-bind="text: $data.showDetails() ? $root.translations.hide : $root.translations.show"></span>
                                         </td>
                                     </tr>
-                                        <!-- ko if: $data.showDetails -->
-                                        <tr>
-                                            <td><em>{% trans "Value" %}</em></td>
-                                            <td><em>{% trans "Source" %}</em></td>
-                                            <td><em>{% trans "Description" %}</em></td>
-                                        </tr>
-                                            <!-- ko foreach: { data: $data.details, as: "details" } -->
-                                            <tr>
-                                                <td data-bind="text: details.value"></td>
-                                                <td data-bind="text: details.source"></td>
-                                                <td data-bind="text: details.message"></td>
-                                            </tr>
+                                    <!-- ko if: $data.showDetails -->
+                                    <tr>
+                                        <td style="text-align: right; vertical-align: top">
+                                            <i class="fa fa-2xl fa-folder-open"></i>
+                                        </td>
+                                        <td colspan="5">
+                                            <!-- ko if: $data.count > 5 -->
+                                            <span data-bind="text: $root.translations.firstFiveShown"></span>
                                             <!-- /ko -->
-                                        <!-- /ko -->
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>{% trans "Description" %}</th>
+                                                        <th>{% trans "Value" %}</th>
+                                                        <th>{% trans "Source" %}</th>
+                                                    </tr>    
+                                                </thead>
+                                                <tbody>
+                                                    <!-- ko foreach: { data: $data.details, as: "details" } -->
+                                                    <tr>
+                                                        <td data-bind="text: details.message"></td>
+                                                        <td style="min-width:80px" data-bind="text: details.value"></td>
+                                                        <td data-bind="text: details.source"></td>
+                                                    </tr>
+                                                    <!-- /ko -->
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- /ko -->    
                                     <!-- /ko -->
                                     <tr>
                                         <td class='etl-error-report-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
