@@ -36,6 +36,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
         cls.loadOntology()
 
     def setUp(self):
@@ -195,11 +196,11 @@ class GraphManagerViewTests(ArchesTestCase):
         self.NODE_COUNT = 5
 
         self.client = Client()
-        LanguageSynchronizer.synchronize_settings_with_db()
 
     def tearDown(self):
         try:
-            self.deleteGraph(self.GRAPH_ID)
+            graph = Graph.objects.get(source_identifier=self.GRAPH_ID)
+            graph.delete()
         except:
             pass
 

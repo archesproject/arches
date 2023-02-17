@@ -786,7 +786,6 @@ class Graph(models.GraphModel):
         """
 
         nodegroup_map = {}
-
         copy_of_self = deepcopy(self)
 
         if root is not None:

@@ -426,8 +426,8 @@ class GraphDataView(View):
                     ret = clone_data["copy"]
                     ret.slug = None
                     ret.save()
-                    ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
                     ret.create_editable_future_graph()
+                    ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
                     json = request.body
