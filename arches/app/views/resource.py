@@ -410,7 +410,9 @@ class ResourcePermissionDataView(View):
 
     def make_instance_public(self, resourceinstanceid, graphid=None):
         resource = Resource(resourceinstanceid)
-        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
+        resource.createdtime = resource_instance.createdtime
         resource.remove_resource_instance_permissions()
         return self.get_instance_permissions(resource)
 
