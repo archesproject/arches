@@ -125,7 +125,7 @@ class Command(BaseCommand):
             else:
                 for rm in resource_models:
                     try:
-                        graph = Graph.objects.get(name=rm)
+                        graph = Graph.objects.get(name=rm, source_identifier=None)
                     except Graph.DoesNotExist:
                         print("invalid resource model name: {}".format(rm))
                         exit()
