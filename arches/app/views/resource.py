@@ -398,7 +398,9 @@ class ResourcePermissionDataView(View):
 
     def make_instance_private(self, resourceinstanceid, graphid=None):
         resource = Resource(resourceinstanceid)
-        resource.graph_id = graphid if graphid else str(models.ResourceInstance.objects.get(pk=resourceinstanceid).graph_id)
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceinstanceid)
+        resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
+        resource.createdtime = resource_instance.createdtime
         resource.add_permission_to_all("no_access_to_resourceinstance")
         instance_creator = get_instance_creator(resource)
         user = User.objects.get(pk=instance_creator["creatorid"])
