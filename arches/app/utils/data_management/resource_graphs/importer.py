@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-import sys
 import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
@@ -35,7 +34,6 @@ from arches.app.models.models import (
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils import translation
 from arches.app.models.system_settings import settings

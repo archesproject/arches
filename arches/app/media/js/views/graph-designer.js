@@ -364,8 +364,8 @@ define([
                 }
             };
 
-            viewModel.saveCardEdits = function(obj) {
-                obj.save();
+            viewModel.saveCardEdits = function(card) {
+                card.save();
                 forceShowGraphPublishButtons();
             };
 

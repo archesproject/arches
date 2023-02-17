@@ -790,13 +790,3 @@ class PublishedModelError(Exception):
 
     def __str__(self):
         return repr(self.message)
-
-
-class UnpublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Unpublished Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)

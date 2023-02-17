@@ -27,8 +27,7 @@ from django.db import transaction, connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.models.fields.i18n import I18n_String
-from arches.app.models.resource import Resource, UnpublishedModelError
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
