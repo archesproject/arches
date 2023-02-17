@@ -167,7 +167,7 @@ define([
 
                         // must reload window since this editable_future_graph has been deleted
                         alert.active.subscribe(function() {
-                            window.location.reload()
+                            window.location.reload();
                         });
                         viewModel.alert(alert);
                         

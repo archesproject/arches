@@ -1735,21 +1735,22 @@ class Graph(models.GraphModel):
         """
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
-        try:
-            previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
-            previous_editable_future_graph.delete()
-        except models.GraphModel.DoesNotExist:
-            previous_editable_future_graph = None
+        with transaction.atomic():
+            try:
+                previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
+                previous_editable_future_graph.delete()
+            except models.GraphModel.DoesNotExist:
+                previous_editable_future_graph = None
 
-        graph_copy = self.copy(set_source=True)
+            graph_copy = self.copy(set_source=True)
 
-        editable_future_graph = graph_copy["copy"]
-        editable_future_graph.source_identifier_id = self.graphid
+            editable_future_graph = graph_copy["copy"]
+            editable_future_graph.source_identifier_id = self.graphid
 
-        editable_future_graph.save()
-        editable_future_graph.publish()
+            editable_future_graph.save()
+            editable_future_graph.publish()
 
-        return editable_future_graph
+            return editable_future_graph
 
     def update_from_editable_future_graph(self):
         """
