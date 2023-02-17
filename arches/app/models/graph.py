@@ -274,7 +274,6 @@ class Graph(models.GraphModel):
 
         if not graph.source_identifier:
             graph.create_editable_future_graph()
-            graph.publish()
 
         return graph
 

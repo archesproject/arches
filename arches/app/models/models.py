@@ -629,7 +629,7 @@ class Node(models.Model):
     def serialize(self, fields=None, exclude=None, **kwargs):
         ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, **kwargs)
 
-        if ret["config"].get("options"):
+        if ret["config"] and ret['config'].get("options"):
             ret["config"]["options"] = sorted(ret["config"]["options"], key=lambda k: k["id"])
 
         return ret
