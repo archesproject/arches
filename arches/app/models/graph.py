@@ -2009,10 +2009,10 @@ class Graph(models.GraphModel):
         """
         self.publication = None
 
-        if not self.source_identifier:
-            self.update_from_editable_future_graph()
-
         with transaction.atomic():
+            if not self.source_identifier:
+                self.update_from_editable_future_graph()
+
             publication = models.GraphXPublishedGraph.objects.create(graph=self, notes=notes, user=user)
             publication.save()
 
