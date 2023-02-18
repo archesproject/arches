@@ -77,9 +77,18 @@ define([
         var emptyConstraint = [{
             uniquetoallinstances: false,
             nodes:[],
-            cardid: self.cardid,
-            constraintid:  uuid.generate()
+            cardid: params.card.cardid,
+            constraintid: uuid.generate()
         }];
+
+        let cardConstraints;
+        if (params.card.constraints?.length) {
+            cardConstraints = params.card.constraints;
+        } else if (params.constraints?.length) {
+            cardConstraints = params.constraints
+        } else {
+            cardConstraints = emptyConstraint;
+        }
 
         var appliedFunctions = params.appliedFunctions;
         var primaryDescriptorFunction = params.primaryDescriptorFunction;
@@ -97,7 +106,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
                 nodegroup: nodegroup,
-                constraints: params.constraints
+                constraints: cardConstraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });

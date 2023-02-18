@@ -248,7 +248,6 @@ class Graph(models.GraphModel):
         return edge
 
     def add_card_contraint(self, constraint, card):
-        unique_to_all = constraint.get("uniquetoallinstances", False)
         constraint_model = models.ConstraintModel()
         constraint_model.constraintid = constraint.get("constraintid", None)
         constraint_model.uniquetoallinstances = constraint.get("uniquetoallinstances", False)
@@ -285,7 +284,8 @@ class Graph(models.GraphModel):
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
             card.config = cardobj.get("config", None)
             constraints = cardobj.get("constraints", "")
-            for constraint in constraints:
+            constraints_with_nodes = [c for c in constraints if len(c["nodes"])]
+            for constraint in constraints_with_nodes:
                 self.add_card_contraint(constraint, card)
 
         card.graph = self
@@ -536,7 +536,11 @@ class Graph(models.GraphModel):
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
+            aliases = [n.alias for n in self.nodes.values()]
+
             for node in branch_copy.nodes.values():
+                if node.alias and node.alias in aliases:
+                    node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
             for card in branch_copy.get_cards():
                 self.add_card(card)
