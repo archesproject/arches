@@ -1825,6 +1825,7 @@ class Graph(models.GraphModel):
                 del editable_future_graph.cards[future_card.pk]
 
                 future_card.graph_id = self.pk
+                future_card.source_identifier_id = None
 
                 if future_card_nodegroup_node.source_identifier_id:
                     future_card.nodegroup_id = future_card_nodegroup_node.source_identifier_id
@@ -1857,6 +1858,7 @@ class Graph(models.GraphModel):
                 del editable_future_graph.nodes[future_node.pk]
 
                 future_node.graph_id = self.pk
+                future_node.source_identifier_id = None
 
                 if future_node_nodegroup_node and future_node_nodegroup_node.source_identifier_id:
                     future_node.nodegroup_id = future_node_nodegroup_node.source_identifier_id
@@ -1890,6 +1892,7 @@ class Graph(models.GraphModel):
                 del editable_future_graph.edges[future_edge.pk]
 
                 future_edge.graph_id = self.pk
+                future_edge.source_identfier_id = None
 
                 if future_edge.domainnode.source_identifier:
                     future_edge.domainnode_id = future_edge.domainnode.source_identifier.pk
@@ -1906,6 +1909,7 @@ class Graph(models.GraphModel):
             if future_widget.node.source_identifier_id:
                 future_widget.node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
 
+            # need to delete old widget before saving new/current one. Otherwise constraint violations are thrown.
             try:
                 widget_from_database = models.CardXNodeXWidget.objects.get(
                     card_id=future_widget.card_id, node_id=future_widget.node_id, widget_id=future_widget.widget_id
@@ -1938,7 +1942,8 @@ class Graph(models.GraphModel):
             ]:
                 setattr(self, key, value)
 
-        self.root = editable_future_graph.root.source_identifier
+        self.root = models.Node.objects.get(pk=editable_future_graph.root.source_identifier_id)  # refresh from db
+        self.root.source_identifier = None
         self.save()
         # END copy attrs from editable_future_graph to source_graph
 
