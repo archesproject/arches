@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from types import SimpleNamespace
 import uuid
 import importlib
 import datetime
@@ -105,6 +106,10 @@ class Tile(models.TileModel):
                         tile = Tile(tile_obj)
                         tile.parenttile = self
                         self.tiles.append(tile)
+        try:
+            self.serialized_graph = models.PublishedGraph.objects.filter(publication=self.resourceinstance.graph.publication.publicationid,language=settings.LANGUAGE_CODE).first().serialized_graph
+        except:
+            self.serialized_graph = None
 
     def save_edit(
         self,
@@ -284,10 +289,18 @@ class Tile(models.TileModel):
         missing_nodes = []
         for nodeid, value in self.data.items():
             try:
-                node = models.Node.objects.get(nodeid=nodeid)
+                try:
+                    node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+                except:
+                    node = models.Node.objects.get(nodeid=nodeid)
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
                 if self.data[nodeid] is None and node.isrequired is True:
+                    try: 
+                        node.cardxnodexwidget_set.all()
+                    except:
+                        node = models.Node.objects.get(nodeid=nodeid)
+
                     if len(node.cardxnodexwidget_set.all()) > 0:
                         missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
                     else:
@@ -356,7 +369,10 @@ class Tile(models.TileModel):
 
         tile_data = self.get_tile_data(userid)
         for nodeid in tile_data.keys():
-            node = models.Node.objects.get(nodeid=nodeid)
+            try:
+                node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+            except:
+                node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.post_tile_save(self, nodeid, request)
 
@@ -373,18 +389,21 @@ class Tile(models.TileModel):
         newprovisionalvalue = None
         oldprovisionalvalue = None
 
+        if(not self.serialized_graph):
+            self.serialized_graph = models.PublishedGraph.objects.filter(publication=self.resourceinstance.graph.publication.publicationid,language=settings.LANGUAGE_CODE).first().serialized_graph
+
         try:
             if user is None and request is not None:
                 user = request.user
             user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user - probably importing data
             user = None
-
+   
         with transaction.atomic():
             for nodeid in self.data.keys():
-                node = models.Node.objects.get(nodeid=nodeid)
-                datatype = self.datatype_factory.get_instance(node.datatype)
-                datatype.pre_tile_save(self, nodeid)
+                node = next(item for item in self.serialized_graph['nodes'] if item["nodeid"] == nodeid)
+                datatype = self.datatype_factory.get_instance(node['datatype'])
+                datatype.pre_tile_save(self, nodeid, node=SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None)))
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
