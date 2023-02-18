@@ -450,7 +450,7 @@ class NumberDataType(BaseDataType):
             pass
         return value
 
-    def pre_tile_save(self, tile, nodeid):
+    def pre_tile_save(self, tile, nodeid, **kwargs):
         try:
             if tile.data[nodeid] == "":
                 tile.data[nodeid] = None
@@ -678,7 +678,7 @@ class DateDataType(BaseDataType):
         else:
             return value
 
-    def pre_tile_save(self, tile, nodeid):
+    def pre_tile_save(self, tile, nodeid, **kwargs):
         if tile.data[nodeid]:
             tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
 
@@ -756,7 +756,7 @@ class EDTFDataType(BaseDataType):
             return value
         return str(transformed_value.edtf)
 
-    def pre_tile_save(self, tile, nodeid):
+    def pre_tile_save(self, tile, nodeid, **kwargs):
         tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
@@ -1705,7 +1705,7 @@ class FileListDataType(BaseDataType):
             tile_data.append(tile_file)
         return json.loads(json.dumps(tile_data))
 
-    def pre_tile_save(self, tile, nodeid):
+    def pre_tile_save(self, tile, nodeid, **kwargs):
         # TODO If possible this method should probably replace 'handle request'
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
@@ -2234,6 +2234,22 @@ class ResourceInstanceDataType(BaseDataType):
                     error_type = "ERROR"
                     errors.append({"type": error_type, "message": message})
         return errors
+
+    def pre_tile_save(self, tile, nodeid, **kwargs):
+        node = kwargs.pop("node", None)
+
+        if not node:
+            node = models.Node.objects.get(pk=nodeid)
+        
+        if node.datatype not in ['resource-instance-list', 'resource-instance']:
+            return
+        
+        relationships = tile.data[nodeid]
+        try:
+            for relationship in relationships:
+                relationship['resourceXresourceId'] = str(uuid.uuid4())
+        except:
+            pass
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False

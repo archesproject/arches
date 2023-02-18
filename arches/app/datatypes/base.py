@@ -284,7 +284,7 @@ class BaseDataType(object):
             base_query.must(null_query)
         query.must(base_query)
 
-    def pre_tile_save(self, tile, nodeid):
+    def pre_tile_save(self, tile, nodeid, **kwargs):
         """
         Called during tile.save operation but before the tile is actually saved to the database
 
