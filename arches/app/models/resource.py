@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from types import SimpleNamespace
 import uuid
 import importlib
 import datetime
@@ -24,6 +25,7 @@ from time import time
 from uuid import UUID
 from django.db import transaction
 from django.db.models import Q
+from django.core.cache import cache
 from django.contrib.auth.models import User, Group, Permission
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -73,6 +75,11 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
         self.descriptor_function = None
+        try:
+            self.serialized_graph = models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid,language=settings.LANGUAGE_CODE).first().serialized_graph
+        except:
+            self.serialized_graph = None
+
 
     def get_descriptor_language(self, context):
         """
@@ -184,6 +191,9 @@ class Resource(models.ResourceInstance):
 
         """
         # TODO: 7783 cbyrd throw error if graph is unpublished
+        if not self.serialized_graph:
+            self.serialized_graph = models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid,language=settings.LANGUAGE_CODE).first().serialized_graph
+
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -215,9 +225,13 @@ class Resource(models.ResourceInstance):
 
         """
         root_ontology_class = None
-        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
-        if len(graph_nodes) > 0:
-            root_ontology_class = graph_nodes[0].ontologyclass
+        try:
+            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] == True), None))
+        except:
+            graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
+
+        if graph_node:
+            root_ontology_class = graph_node.ontologyclass
 
         return root_ontology_class
 
@@ -237,6 +251,46 @@ class Resource(models.ResourceInstance):
         for tile in self.tiles:
             tiles.extend(tile.get_flattened_tiles())
         return tiles
+
+    @staticmethod
+    def bulk_update(resources, transaction_id=None):
+        """
+        Saves and indexes a list of resources
+
+        Arguments:
+        resources -- a list of resource models
+
+        Keyword Arguments:
+        transaction_id -- a uuid identifing the save of these instances as belonging to a collective load or process
+
+        """
+
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        tiles = []
+        documents = []
+        term_list = []
+
+        for resource in resources:
+            resource.tiles = resource.get_flattened_tiles()
+            tiles.extend(resource.tiles)
+
+        # need to save the models first before getting the documents for index
+        for tile in tiles:
+            TileModel.objects.update_or_create(tile)
+
+        for resource in resources:
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+            )
+
+            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+
+            for term in terms:
+                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
 
     @staticmethod
     def bulk_save(resources, transaction_id=None):
@@ -292,13 +346,13 @@ class Resource(models.ResourceInstance):
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
-    def index(self, context=None):
+    def index(self, context=None, df=None):
         """
         Indexes all the nessesary items values of a resource to support search
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
-
+        df -- a datatype factory
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -307,8 +361,15 @@ class Resource(models.ResourceInstance):
                     context = {}
                 context["language"] = lang[0]
                 self.calculate_descriptors(context=context)
+
+        if df is not None:
+            datatype_factory = df
+        else:
             datatype_factory = DataTypeFactory()
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+
+
+        if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+            node_datatypes = {str(nodeid): datatype for nodeid, datatype in ((k['nodeid'], k['datatype']) for k in self.serialized_graph['nodes'])}
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
