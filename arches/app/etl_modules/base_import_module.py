@@ -50,6 +50,7 @@ class BaseImportModule(object):
         self.loadid = loadid
         with connection.cursor() as cursor:
             try:
+                cursor.execute("""CALL __arches_prepare_bulk_load();""")
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
             except (IntegrityError, ProgrammingError) as e:
@@ -64,6 +65,9 @@ class BaseImportModule(object):
                     "title": _("Failed to complete load"),
                     "message": _("Unable to insert record into staging table"),
                 }
+            finally:
+                cursor.execute("""CALL __arches_complete_bulk_load();""")
+
             if row[0][0]:
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
