@@ -427,7 +427,7 @@ class GraphDataView(View):
                 elif self.action == "clone_graph":
                     if graph.source_identifier:
                         graph = Graph.objects.get(pk=graph.source_identifier_id)
-                        
+
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = None
