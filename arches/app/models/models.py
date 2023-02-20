@@ -87,6 +87,11 @@ class CardModel(models.Model):
         if isinstance(self.cardid, str):
             self.cardid = uuid.UUID(self.cardid)
 
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(CardModel, self).save()
+
     class Meta:
         managed = True
         db_table = "cards"
@@ -249,6 +254,11 @@ class Edge(models.Model):
             self.edgeid = uuid.uuid4()
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Edge, self).save()
 
     class Meta:
         managed = True
@@ -640,6 +650,11 @@ class Node(models.Model):
         super(Node, self).__init__(*args, **kwargs)
         if not self.nodeid:
             self.nodeid = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Node, self).save()
 
     class Meta:
         managed = True
