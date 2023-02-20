@@ -55,11 +55,13 @@ define([
                             if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
                                 node.label = self.cardNameDict[node.nodegroup_id];
                             } else if (node.nodeid !== node.nodegroup_id && self.widgetLookup[node.nodeid]) {
-                                node.label = self.widgetLookup[node.nodeid].label;
+                                const widget = self.widgetLookup[node.nodeid];
+                                node.label = widget.label;
+                                node.sortorder = widget.sortorder;
                             } else {
                                 node.label = node.name;
                             }
-                        });
+                        }).sort((a, b) => a.sortorder - b.sortorder);
                         self.newFacet(card);
                     };
                 }, this);
