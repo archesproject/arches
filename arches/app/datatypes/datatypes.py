@@ -211,9 +211,16 @@ class StringDataType(BaseDataType):
         g = Graph()
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            try:
+                null_code = settings.NULL_LANGUAGE_CODE
+            except:
+                null_code = 'zxx'
             for key in edge_info["range_tile_data"].keys():
                 if edge_info["range_tile_data"][key]["value"]:
-                    g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
+                    if key != null_code:
+                        g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
+                    else:
+                        g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"])))
         return g
 
     def transform_value_for_tile(self, value, **kwargs):

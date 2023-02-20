@@ -621,7 +621,8 @@ class Resources(APIBase):
                 except models.ResourceInstance.DoesNotExist:
                     return JSONResponse(status=404)
                 except Exception as e:
-                    return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
+                    raise
+                    return JSONResponse({"error": f"resource data could not be saved - {e}"}, status=500, reason=e)
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
         indent = request.POST.get("indent", None)
@@ -686,7 +687,7 @@ class Resources(APIBase):
                 formatted = traceback.format_exception(exc_type, exc_value, exc_traceback)
                 if len(formatted):
                     for message in formatted:
-                        print(message)
+                        print(message)                      
             return JSONResponse({"error": "resource data could not be saved: %s" % e}, status=500, reason=e)
 
     def delete(self, request, resourceid, slug=None, graphid=None):
