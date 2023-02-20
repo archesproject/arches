@@ -72,7 +72,7 @@ class CardModel(models.Model):
         "CardComponent", db_column="componentid", default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"), on_delete=models.SET_DEFAULT
     )
     config = JSONField(blank=True, null=True, db_column="config")
-    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.DO_NOTHING)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
@@ -564,7 +564,7 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
-    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.DO_NOTHING)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def get_child_nodes_and_edges(self):
         """
