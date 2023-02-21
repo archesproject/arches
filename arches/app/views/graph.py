@@ -537,7 +537,7 @@ class GraphPublicationView(View):
                 source_graph.create_editable_future_graph()
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
-                return JSONErrorResponse(e)
+                return JSONErrorResponse(str(e))
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
