@@ -2240,14 +2240,14 @@ class ResourceInstanceDataType(BaseDataType):
 
         if not node:
             node = models.Node.objects.get(pk=nodeid)
-        
-        if node.datatype not in ['resource-instance-list', 'resource-instance']:
+
+        if node.datatype not in ["resource-instance-list", "resource-instance"]:
             return
-        
+
         relationships = tile.data[nodeid]
         try:
             for relationship in relationships:
-                relationship['resourceXresourceId'] = str(uuid.uuid4())
+                relationship["resourceXresourceId"] = str(uuid.uuid4())
         except:
             pass
 

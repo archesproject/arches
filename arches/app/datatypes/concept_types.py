@@ -83,7 +83,7 @@ class BaseConceptDataType(BaseDataType):
     def get_concept_dates(self, concept):
         result = None
         date_range = {}
-        cache_value = cache.get('value-' + str(concept.conceptid), "no result")
+        cache_value = cache.get("value-" + str(concept.conceptid), "no result")
         if cache_value == "no result":
             values = models.Value.objects.filter(concept=concept)
             for value in values:
@@ -91,11 +91,11 @@ class BaseConceptDataType(BaseDataType):
                     date_range[value.valuetype.valuetype] = value.value
             if "min_year" in date_range and "max_year" in date_range:
                 result = date_range
-            cache.set('value-' + str(concept.conceptid), result, 500)
+            cache.set("value-" + str(concept.conceptid), result, 500)
             cache_value = result
         else:
             return cache_value
-        
+
         return cache_value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):

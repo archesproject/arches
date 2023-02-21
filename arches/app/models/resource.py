@@ -76,10 +76,13 @@ class Resource(models.ResourceInstance):
         self.tiles = []
         self.descriptor_function = None
         try:
-            self.serialized_graph = models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid,language=settings.LANGUAGE_CODE).first().serialized_graph
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
         except:
             self.serialized_graph = None
-
 
     def get_descriptor_language(self, context):
         """
@@ -192,7 +195,11 @@ class Resource(models.ResourceInstance):
         """
         # TODO: 7783 cbyrd throw error if graph is unpublished
         if not self.serialized_graph:
-            self.serialized_graph = models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid,language=settings.LANGUAGE_CODE).first().serialized_graph
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
 
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
@@ -367,9 +374,10 @@ class Resource(models.ResourceInstance):
         else:
             datatype_factory = DataTypeFactory()
 
-
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in ((k['nodeid'], k['datatype']) for k in self.serialized_graph['nodes'])}
+            node_datatypes = {
+                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
+            }
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
