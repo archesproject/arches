@@ -530,7 +530,7 @@ class GraphPublicationView(View):
                 source_graph.publish(notes=notes, user=request.user)
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
             except Exception as e:
-                return JSONErrorResponse(e)
+                return JSONErrorResponse(str(e))
 
         elif self.action == "revert":
             try:
