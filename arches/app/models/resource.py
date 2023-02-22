@@ -233,7 +233,7 @@ class Resource(models.ResourceInstance):
         """
         root_ontology_class = None
         try:
-            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] == True), None))
+            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] is True), None))
         except:
             graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
 
