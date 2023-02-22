@@ -227,8 +227,8 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note":
                 [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
             }"""
-        
-        graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
+
+        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
         url = self._create_url(
             graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
@@ -311,7 +311,7 @@ class JsonLDImportTests(ArchesTestCase):
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
-        graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
+        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
         url = self._create_url(
             graph_id=graph_id,
             resource_id="",
