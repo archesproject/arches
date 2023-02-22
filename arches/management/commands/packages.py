@@ -825,8 +825,6 @@ class Command(BaseCommand):
 
         def load_card_components(package_dir):
             load_extensions(package_dir, "card_components", "card_component")
-
-        def load_card_components(package_dir):
             load_extensions(package_dir, "cards", "card_component")
 
         def load_search_components(package_dir):
