@@ -1409,18 +1409,21 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
-
-            serialized_graph = None
-            if published_graph:
+            try:
+                user_language = translation.get_language()
+                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
                 serialized_graph = published_graph.serialized_graph
+                for key in exclude:
+                    if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                        serialized_graph[key] = None
 
-            for key in exclude:
-                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
-                    serialized_graph[key] = None
+                return serialized_graph
+            except:
+                self.refresh_from_database()
+                return self.serialize(
+                    fields=fields, exclude=exclude, force_recalculation=True, use_raw_i18n_json=use_raw_i18n_json, **kwargs
+                )
 
-            return serialized_graph
         else:
             ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, use_raw_i18n_json=use_raw_i18n_json)
             ret["root"] = self.root

@@ -316,7 +316,20 @@ define([
                             }
                         });
 
-                        self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
+                        self.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
+                            if (!(savedData instanceof Array)) { savedData = [savedData]; }
+
+                            self.card().getNewTile();
+            
+                            self.savedData(savedData.map(function(savedDatum) {
+                                return {
+                                    tileData: savedDatum._tileData(),
+                                    tileId: savedDatum.tileid,
+                                    nodegroupId: savedDatum.nodegroup_id,
+                                    resourceInstanceId: savedDatum.resourceinstance_id,
+                                };
+                            }));
+
                             self.componentData.parameters.dirty(false);
                             self.card().selected(true);
                             self.dirty(false);
@@ -685,12 +698,21 @@ define([
                 self.componentData['parameters']['renderContext'] = 'workflow';
             }
 
-
-
             if (self.componentData.componentType === 'card') {
+                const previouslySavedValue = self.getFromLocalStorage('value');
+                let previouslySavedResourceInstanceId;
+    
+                if (previouslySavedValue) {
+                    if (!(previouslySavedValue instanceof Array)) { previouslySavedValue = [previouslySavedValue]; }
+    
+                    if (previouslySavedValue[0]['resourceInstanceId']) {
+                        previouslySavedResourceInstanceId = previouslySavedValue[0]['resourceInstanceId'];
+                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId
+                    }
+                }
+
                 AbstractCardAdapter.apply(self);
             }
-
 
             else if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);

@@ -1,3 +1,4 @@
+
 # Arches [![Build Status](https://travis-ci.org/archesproject/arches.svg?branch=master)](https://travis-ci.org/archesproject/arches) [![Coverage Status](https://coveralls.io/repos/github/archesproject/arches/badge.svg?branch=master)](https://coveralls.io/github/archesproject/arches?branch=master)
 
 Arches is a web-based, geospatial information system for cultural heritage inventory and management. Arches is purpose-built for the international cultural heritage field, and designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts. For more information and background on the Arches project, please visit [archesproject.org](http://archesproject.org/).
@@ -12,7 +13,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.2.1 release notes](https://github.com/archesproject/arches/blob/dev/7.2.x/releases/7.2.1.md)
+[Version 7.3.0 release notes](https://github.com/archesproject/arches/blob/dev/7.3.x/releases/7.3.0.md)
 
 #### Quick Install
 
@@ -57,3 +58,4 @@ Our general release cycle will typically be a functional release (either major i
 ##### Support for previous releases
 
 Functional releases will be supported until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+

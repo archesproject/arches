@@ -27,7 +27,20 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.i18n import get_localized_value
-from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Dsl,
+    Exists,
+    Match,
+    Query,
+    Range,
+    RangeDSLException,
+    Term,
+    Terms,
+    Wildcard,
+    Prefix,
+    Nested,
+)
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -183,16 +196,104 @@ class StringDataType(BaseDataType):
                     pass
         return terms
 
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that have not been populated or are empty strings
+        """
+        base_query = Bool()
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
+        data_exists = Bool()
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value")
+        nested_query = Nested(path="tiles", query=data_exists_query)
+        data_exists.must(nested_query)
+
+        if value["op"] == "not_null":
+            query.must(base_query)
+            query.must(data_exists)
+            non_blank_string_query = Wildcard(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
+            query.must(Nested(path="tiles", query=non_blank_string_query))
+
+        if value["op"] == "null":
+            # search for resources that could have tiles with that data but don't
+            exists_query = Bool()
+            exists_query.must_not(data_exists)
+            base_query.should(exists_query)
+
+            # search for tiles that do exist, but that have null, [], or "" as values
+            func_query = Dsl()
+            func_query.dsl = {
+                "function_score": {
+                    "min_score": 1,
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": """
+                                    int null_docs = 0;
+                                    for(tile in params._source.tiles){
+                                        if(tile.data.containsKey(params.node_id)){
+                                            if(tile.data.get(params.node_id).containsKey(params.lang)){
+                                                def val = tile.data.get(params.node_id).get(params.lang).value;
+                                                if (val == null || (val instanceof List && val.length==0) || val == "") {
+                                                    null_docs++;
+                                                    break;
+                                                }
+                                            }
+                                            else{
+                                                null_docs++;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    return null_docs;
+                                """,
+                                    "lang": "painless",
+                                    "params": {"node_id": f"{str(node.pk)}", "lang": f"{value['lang']}"},
+                                }
+                            }
+                        }
+                    ],
+                    "score_mode": "max",
+                    "boost": 1,
+                    "boost_mode": "replace",
+                }
+            }
+            base_query.should(func_query)
+            query.must(base_query)
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
                 match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                if value["lang"]:
-                    match_query = Match(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type)
+                exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
+                if exact_terms:
+                    if "~" in value["op"]:
+                        match_query = Wildcard(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=f"*{exact_terms.group('search_string')}*",
+                            case_insensitive=False,
+                        )
+                    else:
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=exact_terms.group("search_string"),
+                            type=match_type,
+                        )
+                elif "?" in value["val"] or "*" in value["val"]:
+                    match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
                 else:
-                    match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                    if "~" in value["op"]:
+                        match_query = Bool()
+                        for word in value["val"].split(" "):
+                            match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
+                    else:
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type
+                        )
 
                 if "!" in value["op"]:
                     query.must_not(match_query)
