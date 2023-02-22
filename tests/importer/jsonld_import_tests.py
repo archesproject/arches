@@ -227,11 +227,15 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note":
                 [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
             }"""
-
+        
+        graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
         url = self._create_url(
             graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
         )
+
+        graph = Graph.objects.get(pk=graph_id)
+        graph.publish(user=User.objects.get(pk=1))
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
@@ -307,11 +311,14 @@ class JsonLDImportTests(ArchesTestCase):
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
-
+        graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
         url = self._create_url(
-            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            graph_id=graph_id,
             resource_id="",
         )
+
+        graph = Graph.objects.get(pk=graph_id)
+        graph.publish(user=User.objects.get(pk=1))
 
         response = self.client.post(url, data=data, content_type="application/json", HTTP_AUTHORIZATION=f"Bearer {self.token}")
 

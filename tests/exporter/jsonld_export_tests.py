@@ -4,6 +4,8 @@ import os
 import json
 import csv
 from io import BytesIO
+from arches.app.models.graph import Graph
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from operator import itemgetter
 from django.core import management
@@ -31,6 +33,8 @@ class JsonLDExportTests(ArchesTestCase):
 
         #cls.client.login(username='admin', password='admin')
         #cls.user = User.objects.get(username='anonymous')
+        LanguageSynchronizer.synchronize_settings_with_db()
+
 
         skos = SKOSReader()
         rdf = skos.read_file('tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml')
