@@ -32,9 +32,11 @@ define([
 
         if(self.form){
             self.form.on('tile-reset', (x) => {
-                currentValue = koMapping.toJS(self.value);
-                self.currentText(currentValue[self.currentLanguage().code]?.value);
-                self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                if (ko.unwrap(self.value)) {
+                    currentValue = koMapping.toJS(self.value);
+                    self.currentText(currentValue[self.currentLanguage().code]?.value);
+                    self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                }
             });
         }
 
