@@ -442,7 +442,7 @@ class CsvReader(Reader):
             errors.append(
                 {
                     "type": "WARNING",
-                    "message": f"No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
+                    "message": f"No tiles to save; no resource created for legacyid: {legacyid} resourceid: {resourceinstanceid}. Make sure there is data to be imported \
                     for this resource and it is mapped properly in your mapping file.",
                 }
             )
