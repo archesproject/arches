@@ -18,6 +18,7 @@ class JSONResponse(HttpResponse):
         sort_keys = kwargs.pop("sort_keys", None)
         use_natural_keys = kwargs.pop("use_natural_keys", None)
         geom_format = kwargs.pop("geom_format", None)
+        force_recalculation = kwargs.pop("force_recalculation", None)
 
         super(HttpResponse, self).__init__(*args, **kwargs)
 
@@ -40,6 +41,8 @@ class JSONResponse(HttpResponse):
             options["use_natural_keys"] = use_natural_keys
         if geom_format is not None:
             options["geom_format"] = geom_format
+        if force_recalculation is not None:
+            options["force_recalculation"] = force_recalculation
 
         # Content is a bytestring. See the `content` property methods.
         self.content = JSONSerializer().serialize(content, **options)
