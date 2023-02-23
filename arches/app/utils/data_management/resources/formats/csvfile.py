@@ -1393,8 +1393,8 @@ class CsvReader(Reader):
                         if "COMP_SORTORDER" in row and row["COMP_SORTORDER"] and row["COMP_SORTORDER"] != "":
                             sort_str = row["COMP_SORTORDER"]
 
-                        if sort_str and "DETAILS" in sort_str:  # TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
-                            continue
+                        # if sort_str and "DETAILS" in sort_str:  # TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
+                        #     continue
 
                         if (
                             (str(target_tile.nodegroup_id) in eval_nodegroups or str(target_tile.nodegroup_id) == component_nodegroupid)
