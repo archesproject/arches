@@ -879,12 +879,14 @@ class Graph(models.GraphModel):
         copy_of_self.edges = {edge.pk: edge for edge_id, edge in copy_of_self.edges.items()}
 
         for copied_card in copy_of_self.cards.values():
-            if str(copied_card.component_id) == '2f9054d8-de57-45cd-8a9c-58bbb1619030':  # grouping card
-                grouped_card_ids = [ str(card_map[uuid.UUID(grouped_card_id)]) for grouped_card_id in copied_card.config['groupedCardIds'] ]
-                copied_card.config['groupedCardIds'] = grouped_card_ids
+            if str(copied_card.component_id) == "2f9054d8-de57-45cd-8a9c-58bbb1619030":  # grouping card
+                grouped_card_ids = [str(card_map[uuid.UUID(grouped_card_id)]) for grouped_card_id in copied_card.config["groupedCardIds"]]
+                copied_card.config["groupedCardIds"] = grouped_card_ids
 
-                sorted_widget_ids = [ str(node_map[uuid.UUID(sorted_widget_id)]) for sorted_widget_id in copied_card.config['sortedWidgetIds'] ]
-                copied_card.config['sortedWidgetIds'] = sorted_widget_ids
+                sorted_widget_ids = [
+                    str(node_map[uuid.UUID(sorted_widget_id)]) for sorted_widget_id in copied_card.config["sortedWidgetIds"]
+                ]
+                copied_card.config["sortedWidgetIds"] = sorted_widget_ids
 
         return {"copy": copy_of_self, "cards": card_map, "nodes": node_map, "nodegroups": nodegroup_map}
 
