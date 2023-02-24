@@ -251,7 +251,7 @@ class ConceptDataType(BaseConceptDataType):
             else:
                 print("ERROR: Multiple hits for {0} external identifier in RDM:".format(concept_uri))
                 for hit in hits:
-                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.conceptid, hit.value))
+                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.concept_id, hit.value))
                 # Just try the first one and hope
                 concept_id = hits[0].concept_id
 

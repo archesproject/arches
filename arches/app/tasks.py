@@ -222,14 +222,14 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
 
 
 @shared_task
-def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
     from arches.app.etl_modules import import_single_csv
 
     logger = logging.getLogger(__name__)
 
     try:
         ImportSingleCsv = import_single_csv.ImportSingleCsv()
-        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
