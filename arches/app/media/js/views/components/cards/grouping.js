@@ -9,13 +9,13 @@ define([
     'chosen',
 ], function(_, $, ko, arches, CardComponentViewModel, AlertViewModel, groupingCardTemplate) {
     var flattenTree = function(parents, flatList) {
-        _.each(ko.unwrap(parents), function(parent) {
+        for (const parent of ko.unwrap(parents)) {
             flatList.push(parent);
             flattenTree(
-                ko.unwrap(parent.cards),
+                parent.cards,
                 flatList
             );
-        }, this);
+        }
         return flatList;
     };
 
@@ -48,7 +48,7 @@ define([
         this.subscriptions = {};
         this.siblingCards = ko.observableArray();
 
-        _.each(cards, function(card) {
+        for (const card of cards) {
             this.cardLookup[card.model.id] = card;
             if (card.parentCard === params.card.parentCard &&
                 card.model.cardinality() === '1' &&
@@ -56,30 +56,31 @@ define([
                 card.cards().length === 0) {
                 this.siblingCards.push({'name': card.model.name(), 'id': card.model.id});
             }
-        }, this);
+        }
 
         this.groupedCards = ko.computed(function(){
-            var gc = _.map([this.card.model.id].concat(this.groupedCardIds()), function(cardid) {
+            var gc = [this.card.model.id].concat(ko.toJS(this.groupedCardIds())).map(cardid => {
                 var card = this.cardLookup[cardid]; 
-                var subscription = card.model.cardinality.subscribe(function(cardinality){
-                    if (cardinality !== '1') {
-                        card.model.cardinality('1');
-                        var errorTitle = arches.translations.groupingErrorTitle;
-                        var errorMesssage = arches.translations.groupingErrorMessage.replace(/\$\{cardName\}/g, self.card.model.name());
-                        params.pageVm.alert(new AlertViewModel('ep-alert-red', errorTitle, errorMesssage, function(){}, function(){
-                            var newgroup = _.filter(self.groupedCardIds(), function(cardid) {
-                                return cardid !== card.model.id;
-                            });
-                            self.groupedCardIds(newgroup);
-                            self.subscriptions[cardid].dispose();
-                            card.model.cardinality('n');
-                            self.card.model.save();
-                        }));
-                    }
-                }, this);
-                this.subscriptions[cardid] = subscription;
+
+                if (card) {
+                    var subscription = card.model.cardinality.subscribe(function(cardinality){
+                        if (cardinality !== '1') {
+                            card.model.cardinality('1');
+                            var errorTitle = arches.translations.groupingErrorTitle;
+                            var errorMesssage = arches.translations.groupingErrorMessage.replace(/\$\{cardName\}/g, self.card.model.name());
+                            params.pageVm.alert(new AlertViewModel('ep-alert-red', errorTitle, errorMesssage, function(){}, function(){
+                                var newgroup = ko.toJS(self.groupedCardIds()).filter(cardid => cardid !== card.model.id);
+                                self.groupedCardIds(newgroup);
+                                self.subscriptions[cardid].dispose();
+                                card.model.cardinality('n');
+                                self.card.model.save();
+                            }));
+                        }
+                    }, this);
+                    this.subscriptions[cardid] = subscription;
+                }
                 return card;
-            }, this);
+            });
 
             return gc;
         }, this);
@@ -87,14 +88,16 @@ define([
         var updatedSortedWidgetsList = function(cards) {
             this.widgetInstanceDataLookup = {};
 
-            var sortedWidgetIds = this.sortedWidgetIds();
+            var sortedWidgetIds = ko.toJS(this.sortedWidgetIds);
             var widgetNodeIdList = [];
 
             cards.forEach(function(card){
-                card.widgets().forEach(function(widget) {
-                    this.widgetInstanceDataLookup[widget.node_id()] = widget;
-                    widgetNodeIdList.push(widget.node_id());
-                }, this);
+                if (card) {
+                    card.widgets().forEach(function(widget) {
+                        this.widgetInstanceDataLookup[widget.node_id()] = widget;
+                        widgetNodeIdList.push(widget.node_id());
+                    }, this);
+                }
             }, this);
 
             _.each(this.widgetInstanceDataLookup, function(widget, widgetid) {
@@ -115,21 +118,25 @@ define([
         }, this);
 
         _.each(this.groupedCards(), function(card) {
-            card.widgets.subscribe(function() {
-                updatedSortedWidgetsList.call(this, this.groupedCards());
-            }, this);
+            if (card) {
+                card.widgets.subscribe(function() {
+                    updatedSortedWidgetsList.call(this, this.groupedCards());
+                }, this);
+            }
         }, this);
 
         if (!!params.preview) {
             _.each(this.groupedCards(), function(card) {
-                if (card.tiles().length === 0) {
-                    card.tiles.push(card.getNewTile());
+                if (card) {
+                    if (card.tiles().length === 0) {
+                        card.tiles.push(card.getNewTile());
+                    }
+                    // we do this so that when you select a grouped widget
+                    // the selectedCard remains the same and doesn't jump to it's true card
+                    _.each(card.widgets(), function(widget) {
+                        widget.parent = self.card;
+                    });
                 }
-                // we do this so that when you select a grouped widget
-                // the selectedCard remains the same and doesn't jump to it's true card
-                _.each(card.widgets(), function(widget) {
-                    widget.parent = self.card;
-                });
             }, this);
         }
 
@@ -139,10 +146,12 @@ define([
             } else {
                 var tiles = [];
                 _.each(this.groupedCards(), function(card) {
-                    if (card.tiles().length > 0) {
-                        tiles.push(card.tiles()[0]);
-                    } else {
-                        tiles.push(card.getNewTile());
+                    if (card) {
+                        if (card.tiles().length > 0) {
+                            tiles.push(card.tiles()[0]);
+                        } else {
+                            tiles.push(card.getNewTile());
+                        }
                     }
                 }, this);
                 this.tiles = tiles;
@@ -159,7 +168,7 @@ define([
 
         this.hasTiles = ko.computed(function() {
             return _.some(this.groupedCards(), function(card) {
-                return card.tiles().length > 0;
+                return card && card.tiles().length > 0;
             }, this);
         }, this);
 
