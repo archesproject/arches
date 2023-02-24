@@ -76,7 +76,7 @@ class Resource(models.ResourceInstance):
                 .first()
                 .serialized_graph
             )
-        except:
+        except AttributeError:
             self.serialized_graph = None
 
     def get_descriptor_language(self, context):
@@ -308,7 +308,7 @@ class Resource(models.ResourceInstance):
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
-    def index(self, context=None, df=None):
+    def index(self, context=None):
         """
         Indexes all the nessesary items values of a resource to support search
 
@@ -324,10 +324,7 @@ class Resource(models.ResourceInstance):
                 context["language"] = lang[0]
                 self.calculate_descriptors(context=context)
 
-        if df is not None:
-            datatype_factory = df
-        else:
-            datatype_factory = DataTypeFactory()
+        datatype_factory = DataTypeFactory()
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
             node_datatypes = {
