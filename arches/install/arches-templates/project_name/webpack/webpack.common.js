@@ -201,6 +201,7 @@ module.exports = () => {
                                                     '\x1b[33m%s\x1b[0m',  // yellow
                                                     `"${templatePath}" has failed to load. Retrying (${failureCount} / 5)...`
                                                 );
+                                                await new Promise(r => setTimeout(r, 2000));
                                                 return await renderTemplate(failureCount=failureCount);
                                             }
                                         }
