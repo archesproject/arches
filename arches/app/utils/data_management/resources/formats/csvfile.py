@@ -1319,7 +1319,7 @@ class CsvReader(Reader):
                             elif char == ")":
                                 counter -= 1
                         if counter != 0:
-                            print(f"ERROR at {legacyid}")
+                            print(f"Spatial Geometry incomplete at {resourceinstanceid} - {legacyid} -- Not importing Spatial Geom")
                             row["SPATIAL_GEO"] = ""
                     source_data = column_names_to_targetids(row, mapping, row_number)
                     group_no = False
