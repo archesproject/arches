@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9188_feature_annotation_type"),
+        ("models", "9068_resource_model_view_defaults"),
     ]
 
     operations = [
