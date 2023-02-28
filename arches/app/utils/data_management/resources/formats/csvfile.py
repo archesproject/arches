@@ -614,10 +614,10 @@ class CsvReader(Reader):
 
                 for row_number, row in enumerate(business_data):
                     # Check contiguousness of csv file.
-                    # if row["ResourceID"] != previous_row_for_validation and row["ResourceID"] in resourceids:
-                    #     non_contiguous_resource_ids.append(row["ResourceID"])
-                    # else:
-                    #     resourceids.add(row["ResourceID"])
+                    if row["ResourceID"] != previous_row_for_validation and row["ResourceID"] in resourceids:
+                        non_contiguous_resource_ids.append(row["ResourceID"])
+                    else:
+                        resourceids.add(row["ResourceID"])
                     previous_row_for_validation = row["ResourceID"]
 
                     if create_concepts == True:
