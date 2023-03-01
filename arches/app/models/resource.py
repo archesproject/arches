@@ -322,9 +322,9 @@ class Resource(models.ResourceInstance):
                     context = {}
                 context["language"] = lang[0]
                 self.calculate_descriptors(context=context)
-            
+
             datatype_factory = DataTypeFactory()
-            
+
             node_datatypes = {
                 str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
             }

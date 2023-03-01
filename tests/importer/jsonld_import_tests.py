@@ -121,9 +121,11 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        for graph_id in ["bf734b4e-f6b5-11e9-8f09-a4d18cec433a", 
-        "f13f8a92-3e76-11ec-9a49-faffc210b420", 
-        "37b50648-78ef-11ec-9508-faffc210b420"]:
+        for graph_id in [
+            "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            "f13f8a92-3e76-11ec-9a49-faffc210b420",
+            "37b50648-78ef-11ec-9508-faffc210b420",
+        ]:
             graph = Graph.objects.get(pk=graph_id)
             graph.publish(user=User.objects.get(pk=1))
 
