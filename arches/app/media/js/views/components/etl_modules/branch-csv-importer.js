@@ -48,7 +48,7 @@ define([
             }
 
             this.downloadTemplate = async() => {
-                const url = `/etl-manager`;
+                const url = arches.urls.etl_manager;
                 const formData = new window.FormData();
                 formData.append("id", ko.unwrap(this.selectedTemplate));
                 formData.append("format", "xls");
