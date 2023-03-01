@@ -16,11 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from types import SimpleNamespace
 import datetime
 import logging
 from time import time
 from uuid import UUID
+from types import SimpleNamespace
 from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth.models import User, Group
@@ -314,7 +314,6 @@ class Resource(models.ResourceInstance):
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
-        df -- a datatype factory
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -323,10 +322,9 @@ class Resource(models.ResourceInstance):
                     context = {}
                 context["language"] = lang[0]
                 self.calculate_descriptors(context=context)
-
-        datatype_factory = DataTypeFactory()
-
-        if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+            
+            datatype_factory = DataTypeFactory()
+            
             node_datatypes = {
                 str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
             }

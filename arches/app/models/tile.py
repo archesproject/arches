@@ -16,13 +16,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from types import SimpleNamespace
 import uuid
 import importlib
 import datetime
 import json
 import pytz
 import logging
+from types import SimpleNamespace
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError

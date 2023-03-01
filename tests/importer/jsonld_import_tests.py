@@ -1,15 +1,15 @@
 import os
 import datetime
 
+from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory, Client
 from django.urls import reverse
 from django.db import connection
-from django.contrib.auth.models import User
-from arches.app.models.graph import Graph
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
+from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
@@ -121,6 +121,12 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
+        for graph_id in ["bf734b4e-f6b5-11e9-8f09-a4d18cec433a", 
+        "f13f8a92-3e76-11ec-9a49-faffc210b420", 
+        "37b50648-78ef-11ec-9508-faffc210b420"]:
+            graph = Graph.objects.get(pk=graph_id)
+            graph.publish(user=User.objects.get(pk=1))
+
     def setUp(self):
         pass
 
@@ -198,14 +204,10 @@ class JsonLDImportTests(ArchesTestCase):
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
 
-        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
         url = self._create_url(
-            graph_id=graph_id,
+            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
         )
-
-        graph = Graph.objects.get(pk=graph_id)
-        graph.publish(user=User.objects.get(pk=1))
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
@@ -228,14 +230,10 @@ class JsonLDImportTests(ArchesTestCase):
                 [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
             }"""
 
-        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
         url = self._create_url(
             graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
         )
-
-        graph = Graph.objects.get(pk=graph_id)
-        graph.publish(user=User.objects.get(pk=1))
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
@@ -275,14 +273,10 @@ class JsonLDImportTests(ArchesTestCase):
             ]
         }"""
 
-        graph_id = "37b50648-78ef-11ec-9508-faffc210b420"
         url = self._create_url(
-            graph_id=graph_id,
+            graph_id="37b50648-78ef-11ec-9508-faffc210b420",
             resource_id="b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
         )
-
-        graph = Graph.objects.get(pk=graph_id)
-        graph.publish(user=User.objects.get(pk=1))
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         self.assertEqual(response.status_code, 201)
@@ -311,14 +305,11 @@ class JsonLDImportTests(ArchesTestCase):
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
             "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "test!"
             }"""
-        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
+
         url = self._create_url(
-            graph_id=graph_id,
+            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
             resource_id="",
         )
-
-        graph = Graph.objects.get(pk=graph_id)
-        graph.publish(user=User.objects.get(pk=1))
 
         response = self.client.post(url, data=data, content_type="application/json", HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
@@ -1402,8 +1393,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         graph_id = "f13f8a92-3e76-11ec-9a49-faffc210b420"
         resource_id = "0b0e214d-4601-3f73-bdc9-f27c8ad9e0de"
-        graph = Graph.objects.get(pk=graph_id)
-        graph.publish(user=User.objects.get(pk=1))
+
         reader = JsonLdReader()
         reader.read_resource(data, resourceid=resource_id, graphid=graph_id, expand_data=False)
 
@@ -1467,9 +1457,6 @@ class JsonLDImportTests(ArchesTestCase):
 
         graph_id = "f13f8a92-3e76-11ec-9a49-faffc210b420"
         resource_id = "0b0e214d-4601-3f73-bdc9-f27c8ad9e0de"
-
-        graph = Graph.objects.get(pk=graph_id)
-        graph.publish(user=User.objects.get(pk=1))
 
         reader = JsonLdReader()
         reader.read_resource(data, resourceid=resource_id, graphid=graph_id, expand_data=False)
