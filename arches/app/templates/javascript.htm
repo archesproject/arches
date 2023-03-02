@@ -102,7 +102,7 @@
 
     <!-- consumed by media/js/arches.js -->
     {% block arches_translations %}
-    <div 
+    <div
         class='arches-translations'
         confirm-all-resource-delete='{
             "title": "{% trans "Delete All Resources Associated with this Graph?" %}",
@@ -125,7 +125,7 @@
             "text": "{% jsescaped_trans "Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
         }'
         graph-import-failed='{
-            "title": "{% jsescaped_trans "Graph import failed." %}" 
+            "title": "{% jsescaped_trans "Graph import failed." %}"
         }'
         request-failed='{
             "title": "{% jsescaped_trans "Request Failed..." as requestfailed %} {{requestfailed|escapejs}}",
@@ -669,7 +669,7 @@
         service-description='{% trans "Service Description" as serviceDescription %} "{{ serviceDescription|escapejs }}"'
         metadata-label='{% trans "Metadata Label" as metadataLabel %} "{{ metadataLabel|escapejs }}"'
         metadata-value='{% trans "Metadata Value" as metadataValue %} "{{ metadataValue|escapejs }}"'
-        image-caption='{% trans "Image Caption" as imageCaption %} "{{ imageCaption|escapejs }}"'        
+        image-caption='{% trans "Image Caption" as imageCaption %} "{{ imageCaption|escapejs }}"'
         upload-csv-zip-file='{% trans "Upload .csv or .zip File" as uploadCsvZipFile %} "{{ uploadCsvZipFile|escapejs }}"'
         dropzone-file-upload-caption='{% trans "Drag & Drop your file onto this area to upload" as dropzoneFileUploadCaption %} "{{ dropzoneFileUploadCaption|escapejs }}"'
         select-file='{% trans "Select File" as selectFile %} "{{ selectFile|escapejs }}"'
@@ -761,7 +761,7 @@
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
-    <div 
+    <div
         class='arches-urls'
         root="{% url 'root' %}"
         home="{% url 'home' %}"
@@ -852,7 +852,7 @@
         help_template="{% url 'help_templates' %}"
         graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         api_card='"{% url "api_card" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
-        api_tiles='(tileid)=>{ 
+        api_tiles='(tileid)=>{
             return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);
         }'
         api_nodegroup='(nodegroupid)=>{
@@ -881,7 +881,7 @@
     ></div>
     {% endblock arches_urls %}
     {% block arches_data %}
-    <div 
+    <div
         class='arches-data'
         celery-running="{{celery_running}}"
         concept-collections='[{% for concept_collection in concept_collections %}{
@@ -923,7 +923,8 @@
             "is_resource_layer": false,
             "centerx": {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
             "centery": {{ map_layer.centery|default_if_none:"null"|unlocalize }},
-            "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
+            "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }},
+            "sortorder": {{ map_layer.sortorder }}
         },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
             "maplayerid": "{{ resource_map_layer.nodeid }}",
             "name": "{{ resource_map_layer.name }}",
@@ -963,7 +964,7 @@
 
 
     <!-- consumed by media/js/card-components.js -->
-    <div 
+    <div
         id="cardComponentData"
         style="display: none;"
         cardComponents='{{% for component in card_components %}
@@ -977,7 +978,7 @@
 
 
     <!-- consumed by media/js/datatype-config-components.js -->
-    <div 
+    <div
         id="datatypeConfigComponentData"
         style="display: none;"
         datatypeConfigComponents='{{% for datatype in datatypes %}
@@ -1000,7 +1001,7 @@
 
 
     <!-- consumed by media/js/file-renderers.js -->
-    <div 
+    <div
         id="fileRendererData"
         style="display: none;"
         fileRenderers='{{% for renderer in app_settings.RENDERERS  %}
@@ -1021,7 +1022,7 @@
 
 
     <!-- consumed by media/js/function-templates.js -->
-    <div 
+    <div
         id="functionTemplateData"
         style="display: none;"
         functionTemplates='{{% for template in function_templates  %}
@@ -1039,7 +1040,7 @@
 
 
     <!-- consumed by media/js/geocoder-templates.js -->
-    <div 
+    <div
         id="geocoderTemplateData"
         style="display: none;"
         geocoderTemplates='{{% for provider in geocoding_providers %}
@@ -1061,7 +1062,7 @@
 
 
     <!-- consumed by media/js/resource-types.js -->
-    <div 
+    <div
         id="resourceTypeData"
         style="display: none;"
         resourceTypes='{{% for type, type_data in resource_types %}
@@ -1085,7 +1086,7 @@
 
 
     <!-- consumed by media/js/report-templates.js -->
-    <div 
+    <div
         id="reportTemplateData"
         style="display: none;"
         reportTemplates='{{% for template in report_templates %}
@@ -1101,7 +1102,7 @@
 
 
     <!-- consumed by media/js/search-components.js -->
-    <div 
+    <div
         id="searchComponentData"
         style="display: none;"
         searchComponents='{{% for component in search_components %}
@@ -1111,7 +1112,7 @@
 
 
     <!-- consumed by media/js/widgets.js -->
-    <div 
+    <div
         id="widgetData"
         style="display: none;"
         widgets='{{% for widget in widgets %}

@@ -16,6 +16,7 @@ define([
     'datatype-config-components',
     'views/components/icon-selector',
     'views/components/datatypes/geojson-feature-collection',
+    'views/components/widgets/number',
 ], function($, ko, _, arches, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data) {
     var vm = {
         map: null,
@@ -47,6 +48,7 @@ define([
         layer.centerX = ko.observable(layer.centerx);
         layer.centerY = ko.observable(layer.centery);
         layer.zoom = ko.observable(layer.zoom);
+        layer.sortOrder = ko.observable(layer.sortorder);
         layer.toJSON = ko.computed(function() {
             var layers;
             try {
@@ -68,6 +70,7 @@ define([
                 "is_resource_layer": false,
                 "centerx": layer.centerX(),
                 "centery": layer.centerY(),
+                "sortorder": layer.sortOrder(),
                 "zoom": layer.zoom()
             });
         });
@@ -115,14 +118,15 @@ define([
             layer.centerX(_layer.centerx);
             layer.centerY(_layer.centery);
             layer.zoom(_layer.zoom);
+            layer.sortOrder(_layer.sortorder);
             layer.legend(_layer.legend);
             layer.searchonly(_layer.searchonly);
         };
         layer.delete = function() {
             pageView.viewModel.alert(new AlertViewModel(
-                'ep-alert-red', 
-                arches.translations.confirmMaplayerDelete.title, 
-                arches.translations.confirmMaplayerDelete.text, 
+                'ep-alert-red',
+                arches.translations.confirmMaplayerDelete.title,
+                arches.translations.confirmMaplayerDelete.text,
                 function() {
                     return;
                 }, function(){
