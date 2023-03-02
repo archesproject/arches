@@ -187,10 +187,10 @@ class Resource(models.ResourceInstance):
 
         # need to save the models first before getting the documents for index
         # need to handle if the bulk load is appending tiles to existing resources/
-        existing_resources_ids = list(
-            Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]).values_list(
+        existing_resources_ids = set(
+            list(Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]).values_list(
                 "resourceinstanceid", flat=True
-            )
+            ))
         )
 
         resources_to_update = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
@@ -201,18 +201,25 @@ class Resource(models.ResourceInstance):
 
         for resource in resources_to_update:
             resource.save_edit(edit_type="append", transaction_id=transaction_id)
-
-        for resource in resources_to_create:
-            resource.save_edit(edit_type="create", transaction_id=transaction_id)
-            if resource.legacyid is not None and str(resource.pk) != str(resource.legacyid):
-                logger.info(f"{str(resource.pk)} saved for legacyid: {resource.legacyid}")
-
-        for resource in resources:
             try:
                 resource.tiles[0].save_edit(
                     note=f"Bulk created: {len(resource.tiles)} for resourceid {resource.resourceinstanceid} ",
                     edit_type="bulk_create",
                     transaction_id=transaction_id,
+                )
+            except:
+                pass
+
+        for resource in resources_to_create:
+            resource.save_edit(edit_type="create", transaction_id=transaction_id)
+            if resource.legacyid is not None and str(resource.pk) != str(resource.legacyid):
+                logger.info(f"{str(resource.pk)} saved for legacyid: {resource.legacyid}")
+            try:
+                resource.tiles[0].save_edit(
+                    note=f"Bulk created: {len(resource.tiles)} for resourceid {resource.resourceinstanceid} ",
+                    edit_type="bulk_create",
+                    transaction_id=transaction_id,
+                    new_resource_created=True,
                 )
             except:
                 pass

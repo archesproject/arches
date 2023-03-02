@@ -462,7 +462,7 @@ class CsvReader(Reader):
         create_concepts=False,
         create_collections=False,
         prevent_indexing=False,
-        transaction_id=None,
+        transaction_id=uuid.uuid4(),
     ):
         # errors = businessDataValidator(self.business_data)
         celery_worker_running = task_management.check_if_celery_available()

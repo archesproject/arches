@@ -145,6 +145,7 @@ class Tile(models.TileModel):
         edit.oldvalue = old_value
         edit.newvalue = new_value
         edit.timestamp = timestamp
+        edit.note = note
         edit.edittype = edit_type
         edit.newprovisionalvalue = newprovisionalvalue
         edit.oldprovisionalvalue = oldprovisionalvalue
