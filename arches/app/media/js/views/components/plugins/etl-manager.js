@@ -161,7 +161,7 @@ define([
                     errors.map(error => {
                         error.showDetails = ko.observable(false);
                         error.details = ko.observable();
-                        error.nodeAlias = self.selectedLoadEvent().load_details.mapping.find( (x) => x.field.trim() == error.source.trim())?.node;
+                        error.nodeAlias = self.selectedLoadEvent()?.load_details?.mapping?.find( (x) => x.field.trim() == error.source.trim())?.node;
                     });
                     self.validationErrors(errors);
                 });
