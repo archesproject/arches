@@ -1384,7 +1384,7 @@ class CsvReader(Reader):
                         # if row['COMP_SORTORDER']
                         # nodegroup_type = 'other'
                         preexisting_tile_for_resource_group_nodegroup = False
-                        preexisting_parenttile = False
+                        preexisting_eval_parenttile = False
                         sort_str = False
 
                         last_prefix = None
@@ -1405,27 +1405,26 @@ class CsvReader(Reader):
                                 if group_no not in group_no_to_tileids:
                                     group_no_to_tileids[group_no] = {}
                                 # checks for whether a parent tile exists since get_blank_tile starts out getting parent
-                                preexisting_parenttile_for_resource_group_nodegroup = (
+                                preexisting_parenttile_created_for_resource_group_nodegroup = (
                                     group_no in group_no_to_tileids and str(target_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                 )
-                                if preexisting_parenttile_for_resource_group_nodegroup:
-                                    preexisting_parenttile = get_preexisting_tile(
+                                if preexisting_parenttile_created_for_resource_group_nodegroup:
+                                    preexisting_eval_parenttile = get_preexisting_tile(
                                         target_tile,
                                         populated_tiles,
                                         resourceinstanceid,
                                         tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"],
                                     )
                                     # we know theres a parenttile for this group already
-                                if preexisting_parenttile:  # lets see if theres a child for our source_data's nodegroup
+                                if preexisting_eval_parenttile:  # lets see if theres a child for our source_data's nodegroup
                                     prototype_child_tile = get_blank_tile(source_data, child_only=True)
 
                                     # we could also ask if a tile exists for this group in the group dict
                                     # {group_no: {nodegroupid: {tileid: tileid, parenttileid: parenttileid } } }
-                                    preexisting_childtile_for_resource_group_nodegroup = (
-                                        group_no in group_no_to_tileids
-                                        and str(prototype_child_tile.nodegroup_id) in group_no_to_tileids[group_no]
+                                    preexisting_childtile_created_for_resource_group_nodegroup = (
+                                        str(prototype_child_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                     )
-                                    if preexisting_childtile_for_resource_group_nodegroup:
+                                    if preexisting_childtile_created_for_resource_group_nodegroup:
                                         test_tile = get_preexisting_tile(
                                             target_tile,
                                             populated_tiles,
@@ -1437,7 +1436,7 @@ class CsvReader(Reader):
                                     else:
                                         target_tile = prototype_child_tile
                                         target_tile.tileid = uuid.uuid4()
-                                        target_tile.parenttile = preexisting_parenttile
+                                        target_tile.parenttile = preexisting_eval_parenttile
                                         group_no_to_tileids[group_no][str(target_tile.nodegroup_id)] = {}
                                         group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"] = str(target_tile.tileid)
                                         try:
@@ -1485,7 +1484,7 @@ class CsvReader(Reader):
                         # mock_request_object = HttpRequest()
 
                         # identify whether a tile for this nodegroup on this resource already exists
-                        if not preexisting_tile_for_nodegroup and not preexisting_parenttile:
+                        if not preexisting_tile_for_nodegroup and not preexisting_eval_parenttile:
                             preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid)
 
                         # aggregates a tile of the nodegroup associated with source_data (via get_blank_tile)
