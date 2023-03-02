@@ -93,7 +93,7 @@ class BranchCsvImporter(BaseImportModule):
         return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
-        nodegroup_alias = cell_values[1].split(' ')[0].strip()
+        nodegroup_alias = cell_values[1].split(" ")[0].strip()
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
         tile_valid = True
@@ -118,9 +118,7 @@ class BranchCsvImporter(BaseImportModule):
                     tile_valid = False
                 error_message = ""
                 for error in validation_errors:
-                    error_message = (
-                        "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
-                    )
+                    error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
                     cursor.execute(
                         """
                         INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
@@ -146,13 +144,13 @@ class BranchCsvImporter(BaseImportModule):
                 continue
             resourceid = cell_values[0]
             if str(resourceid).strip() in ("--", "resource_id"):
-                nodegroup_alias = cell_values[1][0:-4].split(' ')[0].strip()
+                nodegroup_alias = cell_values[1][0:-4].split(" ")[0].strip()
                 data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
             elif cell_values[1] is not None:
                 node_values = cell_values[2:]
                 try:
                     row_count += 1
-                    nodegroup_alias = cell_values[1].split(' ')[0].strip()
+                    nodegroup_alias = cell_values[1].split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
                     tileid = uuid.uuid4()
