@@ -335,15 +335,16 @@ class Resource(models.ResourceInstance):
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
-            celery_worker_running = task_management.check_if_celery_available()
+            if len(settings.ELASTICSEARCH_CUSTOM_INDEXES) > 0:
+                celery_worker_running = task_management.check_if_celery_available()
 
-            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                if celery_worker_running and index.get("should_update_asynchronously"):
-                    index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
-                else:
-                    es_index = import_class_from_string(index["module"])(index["name"])
-                    doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
-                    es_index.index_document(document=doc, id=doc_id)
+                for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                    if celery_worker_running and index.get("should_update_asynchronously"):
+                        index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
+                    else:
+                        es_index = import_class_from_string(index["module"])(index["name"])
+                        doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                        es_index.index_document(document=doc, id=doc_id)
 
             super(Resource, self).save()
 
