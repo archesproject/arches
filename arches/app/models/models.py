@@ -1261,7 +1261,7 @@ class MapLayer(models.Model):
 
     class Meta:
         managed = True
-        ordering = ('sortorder', 'name')
+        ordering = ("sortorder", "name")
         db_table = "map_layers"
 
 
