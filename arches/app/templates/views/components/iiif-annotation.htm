@@ -1,4 +1,5 @@
 {% extends "views/components/iiif-viewer.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block tabs %}
@@ -9,7 +10,7 @@
     'active': activeTab() === 'editor', 'disabled': !canvas() || expandGallery()
 }">
     <i class="fa fa-pencil"></i>
-    <span class="map-sidebar-text">{% trans "Edit" %}</span>
+    <span class="map-sidebar-text" data-bind="text: $root.translations.edit"></span>
 </div>
 <!-- /ko -->
 {{ block.super }}
@@ -25,20 +26,24 @@
     <div data-bind="css: card.model.cssclass">
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container">
-            <span>{% trans 'Showing edits by' %}</span>
+            <span data-bind="text: $root.translations.showingEditsBy"></span>
             <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-            <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+            <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
+                <span data-bind="text: $root.translations.returnToApprovedEdits"></span>
+            </a>
             <!-- /ko-->
             <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-            <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+            <span data-bind="text: $root.translations.newProvisionalContribution"></span>
             <!-- /ko-->
         </div>
         <!-- /ko-->
 
         <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
         <div class="edit-message-container approved">
-            <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+            <div>
+                <span data-bind="text: $root.translations.showingRecentApprovedEdits"></span>
+            </div>
         </div>
         <!-- /ko-->
 
@@ -49,10 +54,14 @@
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
             <div class='new-provisional-edits-list'>
                 <div class='new-provisional-edits-header'>
-                    <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
+                    <div class='new-provisional-edits-title'>
+                        <span data-bind="text: $root.translations.provisionalEdits"></span>
+                    </div>
                     <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){
                             provisionalTileViewModel.deleteAllProvisionalEdits();
-                        }">{% trans 'Delete all edits' %}</div>
+                        }">
+                        <span data-bind="text: $root.translations.deleteAllEdits"></span>
+                    </div>
                 </div>
                 <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
                 <div class='new-provisional-edit-entry' data-bind="css: {
@@ -85,7 +94,7 @@
                     <a class="pull-right card-help help editable-help" data-bind="click: function () {
                         card.model.get('helpactive')(true)
                     }" style="cursor:pointer;">
-                        {% trans "Help" %}
+                        <span data-bind="text: $root.translations.help"></span>
                         <i class="fa fa-question-circle"></i>
                     </a>
                 </span>
@@ -108,7 +117,7 @@
                                     <div class="style-tools-collapser" data-bind=" click: function() {
                                         self.showStylingTools(!self.showStylingTools());
                                     }">
-                                        <span data-bind="text: self.showStylingTools() ? '{% trans "Hide Style Tools" %}' : '{% trans "Show Style Tools" %}'"></span>
+                                        <span data-bind="text: self.showStylingTools() ? $root.translations.hideStyleTools : $root.translations.showStyleTools"></span>
                                         <i class="fa" data-bind="{
                                             css: {
                                                 'fa-caret-down' : !self.showStylingTools(),
@@ -119,43 +128,67 @@
                                     <div class="form-horizontal" data-bind="if: self.showStylingTools">
                                         <div class="style-tools-panel">
                                             <div class="form-group">
-                                                <label class="col-sm-4 control-label">{% trans "Line Color" %}</label>
+                                                <label class="col-sm-4 control-label">
+                                                    <span data-bind="text: $root.translations.lineColor"></span>
+                                                </label>
                                                 <div class="col-sm-8">
                                                     <div class="colorpicker-component input-group">
-                                                        <input placeholder="{% trans "Line Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: self.lineColor, format:'hex'}">
+                                                        <input 
+                                                            class="form-control input-md widget-input" 
+                                                            data-bind="
+                                                                attr: {placeholder: $root.translations.lineColor},
+                                                                colorPicker: {color: self.lineColor, format:'hex'}
+                                                            "
+                                                        >
                                                         <span class="input-group-addon style-tools-color-visualizer" data-bind="style: {background: self.lineColor}"></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-sm-4 control-label">{% trans "Fill color" %}</label>
+                                                <label class="col-sm-4 control-label">
+                                                    <span data-bind="text: $root.translations.fillColor"></span>
+                                                </label>
                                                 <div class="col-sm-8">
                                                     <div class="colorpicker-component input-group">
-                                                        <input placeholder="{% trans "Fill Color " %}" class="form-control input-md widget-input" data-bind="colorPicker: {color: self.fillColor, format:'hex'}">
+                                                        <input 
+                                                            class="form-control input-md widget-input" 
+                                                            data-bind="
+                                                                attr: {placeholder: $root.translations.fillColor},
+                                                                colorPicker: {color: self.fillColor, format:'hex'}
+                                                            "
+                                                        >
                                                         <span class="input-group-addon style-tools-color-visualizer" data-bind="style: {background: self.fillColor}"></span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-sm-4 control-label">{% trans "Line Width" %}</label>
+                                                <label class="col-sm-4 control-label">
+                                                    <span data-bind="text: $root.translations.lineWidth"></span>
+                                                </label>
                                                 <div class="col-sm-8">
                                                     <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineWidth">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-sm-4 control-label">{% trans "Line Opacity" %}</label>
+                                                <label class="col-sm-4 control-label">
+                                                    <span data-bind="text: $root.translations.lineOpacity"></span>
+                                                </label>
                                                 <div class="col-sm-8">
                                                     <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.lineOpacity">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-sm-4 control-label">{% trans "Point Radius" %}</label>
+                                                <label class="col-sm-4 control-label">
+                                                    <span data-bind="text: $root.translations.pointRadius"></span>
+                                                </label>
                                                 <div class="col-sm-8">
                                                     <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.pointRadius">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-sm-4 control-label">{% trans "Fill Opacity" %}</label>
+                                                <label class="col-sm-4 control-label">
+                                                    <span data-bind="text: $root.translations.fillOpacity"></span>
+                                                </label>
                                                 <div class="col-sm-8">
                                                     <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: self.fillOpacity">
                                                 </div>
@@ -164,67 +197,73 @@
                                     </div>
                                     <div class="map-card-feature-list">
                                         <div class="add-new-feature" data-bind="visible: !self.disableDrawing()">
-                                            <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
-                                                value: self.featureLookup[widget.node_id()].selectedTool,
-                                                valueAllowUnset: true,
-                                                options: [
-                                                    {
-                                                        value: '',
-                                                        text: ''
-                                                    },
-                                                    {
-                                                        value: 'draw_point',
-                                                        text: 'Add point'
-                                                    },
-                                                    {
-                                                        value: 'draw_line_string',
-                                                        text: 'Add line'
-                                                    },
-                                                    {
-                                                        value: 'draw_polygon',
-                                                        text: 'Add polygon'
+                                            <select 
+                                                data-bind="
+                                                    placeholder: $root.translations.addANewFeature + '...',
+                                                    value: self.featureLookup[widget.node_id()].selectedTool,
+                                                    valueAllowUnset: true,
+                                                    options: [
+                                                        {
+                                                            value: '',
+                                                            text: ''
+                                                        },
+                                                        {
+                                                            value: 'draw_point',
+                                                            text: $root.translations.mapAddPoint
+                                                        },
+                                                        {
+                                                            value: 'draw_line_string',
+                                                            text: $root.translations.mapAddLine
+                                                        },
+                                                        {
+                                                            value: 'draw_polygon',
+                                                            text: $root.translations.mapAddPolygon
+                                                        }
+                                                    ],
+                                                    optionsText: 'text',
+                                                    optionsValue: 'value',
+                                                    chosen: {
+                                                        'width': '100%',
+                                                        'disable_search_threshold': 10,
+                                                        'allow_single_deselect': true
                                                     }
-                                                ],
-                                                optionsText: 'text',
-                                                optionsValue: 'value',
-                                                chosen: {
-                                                    'width': '100%',
-                                                    'disable_search_threshold': 10,
-                                                    'allow_single_deselect': true
-                                                }
-                                            "></select>
+                                                "
+                                            ></select>
                                         </div>
                                         <div class="add-new-feature" data-bind="visible: self.disableDrawing">
-                                            <select data-placeholder="{% trans "Add a new feature..." %}" data-bind="
-                                                value: self.featureLookup[widget.node_id()].selectedTool,
-                                                valueAllowUnset: true,
-                                                options: [
-                                                    {
-                                                        value: '',
-                                                        text: ''
-                                                    },
-                                                    {
-                                                        value: 'draw_point',
-                                                        text: 'Add point'
-                                                    },
-                                                    {
-                                                        value: 'draw_line_string',
-                                                        text: 'Add line'
-                                                    },
-                                                    {
-                                                        value: 'draw_polygon',
-                                                        text: 'Add polygon'
+                                            <select 
+                                                data-bind="
+                                                    placeholder: $root.translations.addANewFeature + '...',
+                                                    value: self.featureLookup[widget.node_id()].selectedTool,
+                                                    valueAllowUnset: true,
+                                                    options: [
+                                                        {
+                                                            value: '',
+                                                            text: ''
+                                                        },
+                                                        {
+                                                            value: 'draw_point',
+                                                            text: $root.translations.mapAddPoint
+                                                        },
+                                                        {
+                                                            value: 'draw_line_string',
+                                                            text: $root.translations.mapAddLine
+                                                        },
+                                                        {
+                                                            value: 'draw_polygon',
+                                                            text: $root.translations.mapAddPolygon
+                                                        }
+                                                    ],
+                                                    optionsText: 'text',
+                                                    optionsValue: 'value',
+                                                    chosen: {
+                                                        disabled: true,
+                                                        'width': '100%',
+                                                        'disable_search_threshold': 10,
+                                                        'allow_single_deselect': true
                                                     }
-                                                ],
-                                                optionsText: 'text',
-                                                optionsValue: 'value',
-                                                chosen: {
-                                                    disabled: true,
-                                                    'width': '100%',
-                                                    'disable_search_threshold': 10,
-                                                    'allow_single_deselect': true
-                                                }
-                                            "></select>
+                                                "
+                                            ></select>
                                         </div>
                                     </div>
                                     <table class="table">
@@ -237,13 +276,13 @@
                                                 <td class="map-card-feature-tool">
                                                     <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature); }, clickBubble: false">
                                                         <i class="fa fa-pencil map-card-feature-edit"></i>
-                                                        {% trans "Edit" %}
+                                                        <span data-bind="text: $root.translations.edit"></span>
                                                     </a>
                                                 </td>
                                                 <td class="map-card-feature-tool">
                                                     <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature); }, clickBubble: false">
                                                         <i class="fa fa-trash map-card-feature-delete"></i>
-                                                        {% trans "Delete" %}
+                                                        <span data-bind="text: $root.translations.delete"></span>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -295,24 +334,32 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: self.deleteTile, css: {
                         disabled: !card.isWritable && !self.preview,
                         'btn-warning': card.isWritable
-                    }">{% trans 'Delete' %}</button>
+                    }">
+                        <span data-bind="text: $root.translations.delete"></span>
+                    </button>
                     <!-- /ko -->
                     <!-- ko if: tile.dirty() -->
                         <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">{% trans 'Cancel' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: tile.reset">
+                            <span data-bind="text: $root.translations.cancel"></span>
+                        </button>
                         <!-- /ko -->
                         <!-- ko if: tile.tileid -->
                         <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                             disabled: !card.isWritable && !self.preview,
                             'btn-mint': card.isWritable
-                        }">{% trans 'Save' %}</button>
+                        }">
+                            <span data-bind="text: $root.translations.save"></span>
+                        </button>
                         <!-- /ko -->
                     <!-- /ko -->
                     <!-- ko if: !tile.tileid -->
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {
                         disabled: !card.isWritable && !self.preview,
                         'btn-mint': card.isWritable
-                    }">{% trans 'Add'  %}</button>
+                    }">
+                        <span data-bind="text: $root.translations.add"></span>
+                    </button>
                     <!-- /ko -->
                 </div>
                 {% endblock form_buttons %}

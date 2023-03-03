@@ -1,37 +1,52 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko if: $data.layer -->
-<div class="row map-service-container relative">
+<div class="map-service-container">
 
-    <!-- Save/discard edits buttons (for convenience) -->
-    <!-- ko if: node.dirty() -->
-    <div class="resource-service-buttons-heading">
-        <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">{% trans "Save Edits" %}</button>
-        <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">{% trans "Discard Edits" %}</button>
-    </div>
-    <!-- /ko -->
 
-    <h3 class="config-title" style="margin-top: -10px; margin-bottom: 0px;"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %} <span class="service-url text-semibold" data-bind="text: serviceURL"></span></h3>
+    <div class="flex">
+        <h3 class="config-title"><i class="fa fa-binoculars"></i>
+            <span data-bind="text: $root.translations.layerPreview"></span> 
+            <span class="service-url text-semibold" data-bind="text: serviceURL"></span>
+        </h3>
+        
+        <!-- Save/discard edits buttons (for convenience) -->
+        <!-- ko if: node.dirty() -->
+        <div class="resource-service-buttons-heading">
+            <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">
+                <span data-bind="text: $root.translations.saveEdits"></span> 
+            </button>
+            <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">
+                <span data-bind="text: $root.translations.discardEdits"></span> 
+            </button>
+        </div>
+        <!-- /ko -->
 
-    <div class="map-service-manage-buttons">
-        <div class="form-group">
-            <label class="control-label text-semibold">{% trans "Activated:" %}</label>
-            <span class="switch switch-small" data-bind="css: {
-                    'on': config.layerActivated()
-                }, click: function () {
-                    config.layerActivated(!config.layerActivated());
-                }">
-                <small></small>
-            </span>
+        <div class="map-service-manage-buttons">
+            <div class="form-group">
+                <label class="control-label text-semibold">
+                    <span data-bind="text: $root.translations.activated + ':'"></span> 
+                </label>
+                <span class="switch switch-small" data-bind="css: {
+                        'on': config.layerActivated()
+                    }, click: function () {
+                        config.layerActivated(!config.layerActivated());
+                    }">
+                    <small></small>
+                </span>
+            </div>
+        </div>
+        <div class="btn-group map-server-basemap-button">
+            <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <!-- ko foreach: basemaps -->
+                <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
+                <!-- /ko -->
+            </ul>
         </div>
     </div>
-    <div class="btn-group map-server-basemap-button">
-        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
-        <ul class="dropdown-menu dropdown-menu-right">
-            <!-- ko foreach: basemaps -->
-            <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
-            <!-- /ko -->
-        </ul>
-    </div>
+    
     <!-- ko if: !loading() -->
     <div class="map-service-preview" style="padding:0;" data-bind="mapboxgl: {
             mapOptions: {
@@ -56,23 +71,35 @@
     <!-- /ko -->
 
     <!-- Service Styling -->
-    <div class="row map-service-container" style="padding-left: 13px; padding-right: 13px;">
-        <div class="">
-            <div class="tab-base map-service-tabs" style="">
+    <div class="map-service-container">
+        <div class="flex" style="width:100%">
+            <div class="tab-base map-service-tabs">
 
                 <!-- Resource Styling Tabs -->
                 <ul class="nav nav-tabs map-service-nav-tabs">
                     <li class="active">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false">
+                            <i class="ion-ios-settings-strong"></i>
+                            <span data-bind="text: $root.translations.settings"></span> 
+                        </a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> {% trans "Service Styling" %}</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false">
+                            <i class="ion-image"></i>
+                            <span data-bind="text: $root.translations.serviceStyling"></span> 
+                        </a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false"><i class="ion-ios-pie"></i> {% trans "Clustering" %}</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false">
+                            <i class="ion-ios-pie"></i>
+                            <span data-bind="text: $root.translations.clustering"></span> 
+                        </a>
                     </li>
                     <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true"><i class="ion-ios-color-wand"></i> {% trans "Permissions" %}</a>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true">
+                            <i class="ion-ios-color-wand"></i>
+                            <span data-bind="text: $root.translations.permissions"></span> 
+                        </a>
                     </li>
                 </ul>
 
@@ -82,16 +109,20 @@
                         <div class="row service-widget-container">
                             <div class="form-horizontal">
                                 <div class="panel-body">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{% trans "Layer Name:" %}</label>
+                                    <div class="form-group map-service-manage-layer-name">
+                                        <label class="col-sm-3 map-service-manage-control-label">
+                                            <span data-bind="text: $root.translations.layerName + ':'"></span> 
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{% trans "Add to search map by default:" %}</label>
+                                    <div class="form-group map-service-manage-layer-name">
+                                        <label class="col-sm-3 map-service-manage-control-label">
+                                            <span data-bind="text: $root.translations.addSearchMapDefault"></span> 
+                                        </label>
                                         <div class="col-sm-9">
-                                            <span class="switch switch-small service-switch-shim" data-bind="css: {
+                                            <span class="switch switch-small" data-bind="css: {
                                                     'on': config.addToMap()
                                                 }, click: function () {
                                                     config.addToMap(!config.addToMap());
@@ -101,42 +132,21 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <!-- Icon search -->
-                                        <div style="padding-left: 10px;">
-                                            <div class="relative" style="padding: 10px 0px;">
-
-                                                <div>
-                                                    {% trans "Layer icon:" %}
-                                                    <button data-bind="css: 'btn btn-default btn-icon icon-lg ' + (config.layerIcon() || layer.icon), click: function() {}" style="height: 35px; width: 35px;"></button>
-                                                </div>
-
-                                                <div style="position: absolute; left: 110px; top: 10px;">
-                                                    <input type="text" class="form-control" style="width: 366px; height: 36px;" placeholder="{% trans "Find an icon" %}" data-bind="value:iconFilter, valueUpdate: 'keyup'">
-
-                                                    <!-- ko if: iconFilter() !== '' -->
-                                                    <span class="clear-search" style="position: absolute; left: 345px; top: 5px; color: #123; font-size: 17px;" data-bind="click: function () { iconFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                                    <!-- /ko -->
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Icon List -->
-                                        <div style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;">
-                                            <div class="row">
-
-                                                <!-- ko foreach: icons -->
-                                                <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font" data-bind="css: {'selected': (cssclass === ($parent.config.layerIcon() || $parent.layer.icon))}, click: function() { $parent.config.layerIcon(cssclass) }">
-                                                    <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
-                                                </div>
-                                                <!-- /ko -->
-
-                                            </div>
+                                        <div data-bind="component: {
+                                            name: 'views/components/icon-selector',
+                                            params: {
+                                                selectedIconObservable: config.layerIcon,
+                                                iconFilter: iconFilter,
+                                                iconList: icons,
+                                                label: $root.translations.layerIcon
+                                            }
+                                        }">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div style="padding:15px;">
                                             <div class="row" style="padding-bottom: 10px;">
-                                                {% trans "Legend content:" %}
+                                                <span data-bind="text: $root.translations.legendContent + ':'"></span> 
                                             </div>
                                             <div class="row">
                                                 <textarea rows="10" cols="80" data-bind="ckeditor: config.layerLegend, ckeditorOptions: {},  valueUpdate: 'afterkeydown'"></textarea>
@@ -149,9 +159,11 @@
                     </div>
 
                     <div id="styling-panel" class="tab-pane fade">
-                        <div class="row">
-                            <div class="pull-right advanced-map-style-switch">
-                                <label class="control-label text-semibold">{% trans "Advanced:" %}</label>
+                        <div class="row service-widget-container">
+                            <div class="advanced-map-style-switch">
+                                <label class="control-label text-semibold">
+                                    <span data-bind="text: $root.translations.advanced + ':'"></span> 
+                                </label>
                                 <span class="switch switch-small" data-bind="css: {
                                         'on': config.advancedStyling()
                                     }, click: function () {
@@ -177,42 +189,50 @@
                                         <!-- ko if: count === 0 -->
                                         <div class="map-server-instructions">
                                             <i class="fa fa-warning"></i>
-                                            {% trans "Layer has no data - data on map is for preview purposes.  This layer will not show up in map overlays until data is added." %}
+                                            <span data-bind="text: $root.translations.previewMapWarning"></span> 
                                         </div>
                                         <!-- /ko -->
-                                        <div class="">
+                                        <div class="flex">
                                             <!-- Points -->
                                             <div class="col-sm-6 col-md-4 col-divider">
-                                                <span class="style-title">{% trans "Point Style" %}</span>
+                                                <span class="style-title" data-bind="text: $root.translations.pointStyle"></span> 
 
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Color" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.color"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.color + ' '}, colorPicker: {color: config.pointColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Halo color" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.haloColor"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.pointHaloColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.haloColor + ' '}, colorPicker: {color: config.pointHaloColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointHaloColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Radius" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.radius"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.radius">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Halo radius" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.haloRadius"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloRadius">
                                                             </div>
@@ -223,36 +243,44 @@
 
                                             <!-- Lines -->
                                             <div class="col-sm-6 col-md-4 col-divider">
-                                                <span class="style-title">{% trans "Line Style" %}</span>
+                                                <span class="style-title" data-bind="text: $root.translations.lineStyle"></span>
 
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Color" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.color"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.color + ' '}, colorPicker: {color: config.lineColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Halo color" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.haloColor"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.lineHaloColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.haloColor + ' '}, colorPicker: {color: config.lineHaloColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineHaloColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Weight" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.weight"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.weight">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Halo weight" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.haloWeight"></span> 
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloWeight">
                                                             </div>
@@ -264,30 +292,36 @@
 
                                             <!-- Polygons -->
                                             <div class="col-sm-6 col-md-4">
-                                                <span class="style-title">{% trans "Polygon Style" %}</span>
+                                                <span class="style-title" data-bind="text: $root.translations.polygonStyle"></span>
 
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Fill Color" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.fillColor + ':'"></span>
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.fillColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.fillColor + ' '}, colorPicker: {color: config.fillColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.fillColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Outline color" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.outlineColor + ':'"></span>
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input placeholder="{% trans "Halo Color " %}" class="form-control input-lg widget-input" data-bind="colorPicker: {color: config.outlineColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.outlineColor + ' '}, colorPicker: {color: config.outlineColor, format:'rgba'}">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.outlineColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="col-sm-3 control-label">{% trans "Outline weight" %}</label>
+                                                        <div class="form-group map-style-panel-body-form-group">
+                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                                                <span data-bind="text: $root.translations.outlineWeight + ':'"></span>
+                                                            </label>
                                                             <div class="col-sm-9">
                                                                 <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.outlineWeight">
                                                             </div>
@@ -308,36 +342,44 @@
                         <div class="row service-widget-container">
                             <div class="form-horizontal">
                                 <div class="panel-body">
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{% trans "Cluster Distance:" %}</label>
+                                    <div class="form-group clustering-pane-form-group">
+                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                            <span data-bind="text: $root.translations.clusterDistance + ':'"></span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{% trans "Cluster Max Zoom:" %}</label>
+                                    <div class="form-group clustering-pane-form-group">
+                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                            <span data-bind="text: $root.translations.clusterMaxZoom + ':'"></span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{% trans "Cluster Min Points:" %}</label>
+                                    <div class="form-group clustering-pane-form-group">
+                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                            <span data-bind="text: $root.translations.clusterMinPoints + ':'"></span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-3 control-label">{% trans "Vector Simplification:" %}</label>
+                                    <div class="form-group clustering-pane-form-group">
+                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
+                                            <span data-bind="text: $root.translations.vectorSimplification + ':'"></span>
+                                        </label>
                                         <div class="col-sm-9">
                                             <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.simplification">
                                         </div>
                                     </div>
                                     <div class="map-server-instructions">
-                                        {% trans "Changes to cluster settings will only be reflected after saving." %}
+                                        <span data-bind="text: $root.translations.clusterSettingChangeInfo"></span>
                                         <!-- ko if: count === 0 -->
                                         </br></br>
                                         <i class="fa fa-warning"></i>
-                                        {% trans "Preview map data do not use clustering algorithm.  Add data for this resource model to see real clustered data." %}
+                                        <span data-bind="text: $root.translations.previewMapClusteringWarning"></span>
                                         <!-- /ko -->
                                     </div>
                                 </div>
@@ -351,16 +393,17 @@
 
 
                                 <div class="map-server-instructions">
-                                    <i class="ion-ios-information"></i> {% trans "The following users and groups can view this layer. If you wish to change who can access this layer, please update the permissions on the layer node." %}
+                                    <i class="ion-ios-information"></i>
+                                    <span data-bind="text: $root.translations.layerNodePermissionInfo"></span>
                                 </div>
-                                <dl class="dl-horizontal">
-                                    <dt>{% trans "Users" %}</dt>
+                                <dl class="dl-horizontal permission-user-group-container">
+                                    <dt data-bind="text: $root.translations.users"></dt>
                                     <dd>
                                         <!-- ko foreach: permissions.users -->
                                         <div data-bind="text: $data"></div>
                                         <!-- /ko -->
                                     </dd>
-                                    <dt>{% trans "Groups" %}</dt>
+                                    <dt data-bind="text: $root.translations.groups"></dt>
                                     <dd>
                                         <!-- ko foreach: permissions.groups -->
                                         <div data-bind="text: $data"></div>
@@ -372,10 +415,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ko if: node.dirty() -->
-                <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">{% trans "Save Edits" %}</button>
-                <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">{% trans "Discard Edits" %}</button>
-                <!-- /ko -->
             </div>
         </div>
     </div>

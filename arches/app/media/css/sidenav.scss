@@ -1,0 +1,144 @@
+.sidenav-brand {
+    display: flex;
+    height: 50px;
+    color: #2d3c4b;
+    text-decoration: none;
+    text-decoration-line: none;
+    text-decoration-thickness: 0;
+    text-decoration-style: none;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.4);
+}
+
+.brand-title {
+    display: block;
+    line-height: 48px;
+    font-size: 20px;
+    color: white;
+}
+
+.sidenav-lg {
+    grid-template-columns: 220px auto;
+}
+
+.sidenav-menu {
+    font-size: 11px;
+    font-weight: 600;
+    background-color: #2d3c4b;
+    z-index: 15;
+    ul {
+        list-style:none;
+        padding: 0px;
+        padding-inline-start: 0px;
+
+        > li {
+            padding: 0px 10px;
+        }
+    }
+    > ul {
+        > li {
+            padding: 0px;
+            overflow: hidden;
+
+            ul {
+                padding-bottom: 10px;
+            }
+            > a:hover {
+                box-shadow: inset 4px 0 0 0 #2986b8;
+            }
+        }
+    }
+    i {
+        font-size:1.15em
+    }
+    a {
+        display:block;
+        color:#abb1b7;
+        padding:12px 20px;
+        text-decoration: none;
+        
+        strong{
+            font-weight:600
+        }
+    }
+    a:hover, a:active {
+        color: #fff;
+    }
+    .active-sub {
+        background-color: #394d61;
+
+        > a {
+            color:#fff;
+        }
+    }
+    .arches-menu-item-disabled:hover {
+        cursor: default;
+    }
+    .list-header {
+        padding:10px 16px;
+        text-transform:uppercase;
+        font-weight:bold;
+        color:#828b94;
+        background-color: #00000030;
+    }
+    .link-submenu-item {
+        a {
+            padding: 3px 20px;
+            font-weight: 400;
+        }
+    }
+    .list-divider-dark {
+        height: 0px;
+    }
+}
+
+.sidenav-sm {
+    .brand-title, .list-header, .menu-title {
+        display: none;
+    }
+    .sidenav-menu {
+        font-size: 13px;
+        font-weight: 300;
+        a {
+            height: 40px;
+        }
+        i {
+            font-size:12px;
+        }
+        li:not(.list-divider-dark) {
+            height: 40px;
+        }
+        li > ul {
+            display: none;
+        }
+        li:hover {
+            background-color: #394d61;
+            
+            > ul {
+                display: block;
+                background-color: #394d61;
+                position: absolute;
+                margin: -41px 50px;
+                padding: 50px 0px 0px 0px;
+                max-height: calc(100vh - 150px);
+                overflow-y: auto;
+                
+                > li {
+                    height: 40px;
+                }
+            }
+            
+            .menu-title {
+                display: block;
+                position: absolute;
+                background-color: #394d61;
+                padding: 10px;
+                margin: -31px 30px;
+                z-index: 100;
+                height: 41px;
+            }
+        }
+        .active-sub > a {
+            background-color: #2986b8;
+        }
+    }
+}

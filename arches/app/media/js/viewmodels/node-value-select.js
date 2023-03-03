@@ -2,14 +2,14 @@ define([
     'underscore',
     'knockout',
     'jquery',
-    'viewmodels/widget',
     'arches',
-], function(_, ko, $, WidgetViewModel, arches) {
-
+    'viewmodels/widget',
+], function(_, ko, $, arches, WidgetViewModel) {
     var NodeValueSelectViewModel = function(params) {
         var self = this;
         params.configKeys = ['placeholder','displayOnlySelectedNode'];
         this.multiple = params.multiple || false;
+         
 
         WidgetViewModel.apply(this, [params]);
         this.resourceinstanceid = params.tile ? params.tile.resourceinstance_id : '';
@@ -18,8 +18,16 @@ define([
         this.url = function(){
             var resourceId = ko.unwrap(self.resourceinstanceid);
             if (resourceId === '') {
-                resourceId = window.location.pathname.split('/');
-                resourceId = resourceId[resourceId.length-1];
+                const splitPath = window.location.pathname.split('/');
+
+                /** 
+                 * only assign a resourceId if it exists in the database, certain views have URL patterns that match
+                 * how this component handles Resource logic
+                */
+                const unsupportedViews = ['add-resource','graph_designer'];
+                if (!unsupportedViews.filter(value => splitPath.includes(value)).length) {  
+                    resourceId = splitPath[splitPath.length-1];
+                }
             }
             if (resourceId) {
                 return arches.urls.resource_tiles.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', resourceId);

@@ -1,0 +1,173 @@
+
+.jstree-default {
+    .resource-editor-tree {
+        height: calc(100vh - 125px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: #ecf0f5;
+        padding-bottom: 50px;
+    }
+
+    .add-new-tile {
+        display: none;
+    }
+
+    .jstree-node-action-icon {
+        display: none;
+    }
+
+    a.jstree-anchor {
+        .disabled {
+            color: #ccc;
+        }
+
+        &.permissions-widget {
+            color: #bbb;
+            cursor: default;
+            pointer-events: none;
+        } 
+
+        strong {
+            font-weight: 500;
+        }
+    }
+
+    .jstree-anchor:hover .add-new-tile,
+    .add-new-tile.jstree-clicked {
+        display: inline;
+    }
+
+    &>.header {
+        padding: 10px 13px;
+        background-color: #ecf0f5;
+        border-bottom: 1px solid #ddd;
+        font-size: 11px;
+
+        .tools {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 2px 0;
+        }
+    }
+
+
+    .jstree-icon{
+        background-position: -4px -4px;
+        cursor: pointer;
+    }
+
+
+
+    .jstree-striped > div > .jstree-node, :not(.resource-editor-tree) > .jstree-striped > .jstree-node {
+        background: none;
+    }
+
+    .jstree-anchor {
+        margin: 1px 0;
+        height: auto;
+        line-height: normal;
+        padding: 0 5px;
+        height: 20px;
+
+        .jstree-leading-icon{
+            margin-right: 5px;
+        }
+        span.spacer {
+            padding: 0 2.5px;
+        }
+        span:not(.spacer) {
+            display: inline-block;
+            padding: 2px 0;
+        }
+    }
+    .jstree-anchor,
+    .jstree-animated,
+    .jstree-wholerow {
+        transition: none;
+    }
+
+    .func-node {
+        background: #72D3C9;
+        color: #01766A;
+        border-width: 2px;
+        margin: 0;
+        height: 24px;
+    }
+
+    .card-designer-tree li.jstree-last,
+    .card-designer-tree .jstree-last>li {
+        background: transparent;
+    }
+
+    .jstree-open>.jstree-children {
+        display: block;
+    }
+
+
+    .jstree-node {
+        &.hide-background{
+            background: none;
+        }
+
+        &.jstree-open > .jstree-icon:not(.jstree-ocl) {
+            background-position: -36px -4px;
+        }
+
+        &.jstree-leaf {
+            .jstree-icon:not(.jstree-ocl) {
+                background: none;
+            }
+            &.hide-background {
+                background: none;
+            }
+        }
+    }
+
+    .designer-card-tree .jstree-children div:last-child li.card-treeitem {
+        background: none;
+    }
+
+    .graph-designer-node-tree .jstree-children div li:last-child {
+        background: none;
+    }
+
+    .designer-permission-tree .jstree-children li:last-child{
+        background: none;
+    }
+
+    .resource-editor-tree .jstree-children li:last-child{
+        background: none;
+    }
+
+    .jstree-clicked {
+        background: #25476a;
+        color: #fff;
+        border-radius: 2px;
+        box-shadow: inset 0 0 1px #999999;
+        margin: 0;
+        height: 24px;
+
+        .jstree-node-action-icon {
+            font: normal normal normal 14px/1 FontAwesome;
+            color: white;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            padding: 5px 4px 4px 6px;
+            background-color: #0b2342;
+            border-radius: 2px;
+            margin-right: -2px;
+        }
+    }
+    
+    a.tree-display-tool {
+        margin: 0px;
+        padding: 3px 6px;
+        color: #888;
+        cursor: pointer;
+
+        i {
+            padding: 0px 3px;
+        }
+    }
+}

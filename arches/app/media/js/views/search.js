@@ -7,7 +7,7 @@ define([
     'viewmodels/alert',
     'search-components',
     'views/base-manager',
-    'views/components/simple-switch'
+    'datatype-config-components'
 ], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
@@ -45,10 +45,10 @@ define([
 
     var CommonSearchViewModel = function() {
         this.filters = {};
-        this.filtersList = _.sortBy(SearchComponents, function(filter) {
+        this.filtersList = _.sortBy(Object.values(SearchComponents), function(filter) {
             return filter.sortorder;
         }, this);
-        SearchComponents.forEach(function(component) {
+        Object.values(SearchComponents).forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
         var firstEnabledFilter = _.find(this.filtersList, function(filter) {
@@ -118,6 +118,7 @@ define([
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
+            this.viewModel.sharedStateObject.resources = this.viewModel.resources;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
             this.queryString = ko.computed(function() {
@@ -164,7 +165,7 @@ define([
                 },
                 error: function(response, status, error) {
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseText));
                     }
                 },
                 complete: function(request, status) {
@@ -174,7 +175,6 @@ define([
             });
         }
     });
-
 
     return new SearchView();
 });

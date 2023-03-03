@@ -1,4 +1,9 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetViewModel) {
+define([
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget',
+    'templates/views/components/widgets/radio-boolean.htm',
+], function(ko, _, WidgetViewModel, radioBooleanWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -16,46 +21,50 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config.trueValue - label alongside the true boolean button
     * @param {string} params.config.falseValue - label alongside the false boolean button
     */
-    return ko.components.register('radio-boolean-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['trueLabel', 'falseLabel', 'defaultValue'];
-            WidgetViewModel.apply(this, [params]);
-            var self = this;
-            this.setValue = function (val) {
-                if (ko.unwrap(self.disabled) === false) {
-                    if (val === self.value()) {
-                        self.value(null)
-                    } else {
-                        self.value(val);
-                    }
-                }
-            }
 
-            this.displayValue = ko.computed(function () {
-                if (this.value()===true) {
-                    return this.node.config.trueLabel;
-                }
-                else if (this.value()===false) {
-                    return this.node.config.falseLabel;
-                }
-            }, self)
-
-            this.setDefaultValue = function (val) {
-                if (val === self.defaultValue()) {
-                    self.defaultValue(null)
+    const viewModel = function(params) {
+        params.configKeys = ['trueLabel', 'falseLabel', 'defaultValue'];
+         
+        WidgetViewModel.apply(this, [params]);
+        var self = this;
+        this.setValue = function(val) {
+            if (ko.unwrap(self.disabled) === false) {
+                if (val === self.value()) {
+                    self.value(null);
                 } else {
-                    self.defaultValue(val);
+                    self.value(val);
                 }
             }
+        };
 
-            var defaultValue = ko.unwrap(this.defaultValue)
-            if (self.value() === null && self.defaultValue() !== null) {
-                self.value(self.defaultValue());
+        this.displayValue = ko.computed(function() {
+            if (this.value()===true) {
+                return this.node.config.trueLabel;
             }
-            if (this.tile && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
-                this.value(defaultValue);
+            else if (this.value()===false) {
+                return this.node.config.falseLabel;
             }
-        },
-        template: { require: 'text!widget-templates/radio-boolean' }
+        }, self);
+
+        this.setDefaultValue = function(val) {
+            if (val === self.defaultValue()) {
+                self.defaultValue(null);
+            } else {
+                self.defaultValue(val);
+            }
+        };
+
+        var defaultValue = ko.unwrap(this.defaultValue);
+        if (self.value() === null && self.defaultValue() !== null) {
+            self.value(self.defaultValue());
+        }
+        if (this.tile && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
+            this.value(defaultValue);
+        }
+    };
+
+    return ko.components.register('radio-boolean-widget', {
+        viewModel: viewModel,
+        template: radioBooleanWidgetTemplate,
     });
 });

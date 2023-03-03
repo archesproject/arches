@@ -43,7 +43,7 @@ class PluginView(MapBaseManagerView):
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
         )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
@@ -53,10 +53,12 @@ class PluginView(MapBaseManagerView):
         map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
+        plugins = models.Plugin.objects.all()
 
         context = self.get_context_data(
             plugin=plugin,
             plugin_json=JSONSerializer().serialize(plugin),
+            plugins_json=JSONSerializer().serialize(plugins),
             main_script="views/plugin",
             resource_graphs=resource_graphs,
             widgets=widgets,

@@ -1,4 +1,5 @@
-define(['jquery',
+define([
+    'jquery',
     'underscore',
     'views/components/search/base-filter',
     'bootstrap',
@@ -8,9 +9,10 @@ define(['jquery',
     'knockout-mapping',
     'models/graph',
     'view-data',
+    'templates/views/components/search/search-results.htm',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -24,18 +26,20 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
             initialize: function(options) {
                 options.name = 'Search Results';
+
+                 
                 this.requiredFilters = ['map-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
                 this.relationshipCandidates = ko.observableArray();
                 this.selectedResourceId = ko.observable(null);
-
+                this.language = arches.activeLanguage;
                 this.showRelationships.subscribe(function(res) {
                     this.selectedResourceId(res.resourceinstanceid);
                 }, this);
 
-                this.searchResults.timestamp.subscribe(function(timestamp) {
+                this.searchResults.timestamp.subscribe(function() {
                     this.updateResults();
                 }, this);
 
@@ -52,7 +56,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var self = this;
                     if (tab === 'map-filter') {
                         if (ko.unwrap(this.mapFilter.map)) {
-                            setTimeout(function() { self.mapFilter.map().resize(); }, 1);
+                            self.mapFilter.map().resize();
                         }
                     }
                 }, this);
@@ -181,6 +185,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             displayname: result._source.displayname,
                             resourceinstanceid: result._source.resourceinstanceid,
                             displaydescription: result._source.displaydescription,
+                            alternativelanguage: result._source.displayname_language != arches.activeLanguage,
                             "map_popup": result._source.map_popup,
                             "provisional_resource": result._source.provisional_resource,
                             geometries: ko.observableArray(result._source.geometries),
@@ -227,8 +232,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             zoomToFeature: function(evt){
                 var data = $(evt.currentTarget).data();
                 this.trigger('find_on_map', data.resourceid, data);
-            }
+            },
         }),
-        template: { require: 'text!templates/views/components/search/search-results.htm' }
+        template: searchResultsTemplate
     });
 });

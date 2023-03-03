@@ -18,7 +18,6 @@ addons:
 
 services:
   - postgresql
-  - couchdb
 
 before_install:
   - echo 'ELASTICSEARCH_PREFIX="arches"' > arches/settings_local.py
@@ -40,15 +39,18 @@ cache:
   - apt
   - pip
 
-before_script:
-  - ./arches/install/ci_install/setup_couch.sh
-
 language:
   - python
   - node_js
 
 python: 3.9
-node_js: 10.8
+
+node_js:
+  - 10.8
+  - "lts/*"
+  - "node"
+
+script: npm run build
 
 jobs:
   allow_failures:

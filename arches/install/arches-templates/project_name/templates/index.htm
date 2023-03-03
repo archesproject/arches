@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
+
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
@@ -34,16 +36,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" />
+    <link rel="shortcut icon" href="{% webpack_static 'img/favicon.png' %}" />
 
     <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
 
-    <link href="{% static 'css/unify.css' %}" rel="stylesheet">
+    <link href="{% webpack_static 'css/unify.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link href="{% static 'css/index.css' %}" rel="stylesheet">
+    <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
     {% if app_settings.ACCESSIBILITY_MODE %}
-    <link href="{% static 'css/accessibility.css' %}" rel="stylesheet">
+    <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
     {% endif %}
 </head>
 
@@ -63,7 +65,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <div class="relative nav-brand-container">
                         <div class="navbar-brand-v5-icon-container">
-                            <img class="navbar-brand-v5-icon" src="{% static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
+                            <img class="navbar-brand-v5-icon" src="{% webpack_static 'img/landing/Arches_logo_white.png' %}" alt="Arches Logo">
                         </div>
                         <div class="application-name">
                             <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
@@ -145,11 +147,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
                             </a>
                         </li>
-                        <li>
-                            <a class="vertical-nav-list-link" href="#info-block-4" data-number="5" aria-label="Go to the mobile section">
-                                <span class="vertical-nav-list-ref">{% trans "Mobile" %}</span>
-                            </a>
-                        </li>
                     </ul>
                 </div>
 
@@ -160,7 +157,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <!-- SLIDE 1 -->
                             <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                                 <!-- MAIN IMAGE -->
-                                <img src="{% static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
+                                <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
                                 <!-- LAYERS -->
                                 <!-- NEW LAYER -->
                                 <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
@@ -206,7 +203,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Content -->
                     <div class="splash-img">
-                        <img src="{% static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
+                        <img src="{% webpack_static 'img/landing/imac_designer.png' %}"  alt="Arches Designer">
                     </div>
 
                     <!-- Sub-section -->
@@ -219,7 +216,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="sub-block-description">
                                     {% trans "Arches automatically creates data entry forms based on your data models.  Use Arches' Card Manager to configure the look and feel of your data entry UI." %}
                                 </p>
-                                <img class="sub-block-image" src="{% static 'img/landing/card_manager.png' %}" alt="Card Manager">
+                                <img class="sub-block-image" src="{% webpack_static 'img/landing/card_manager.png' %}" alt="Card Manager">
                             </div>
                         </div>
 
@@ -230,7 +227,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <p class="sub-block-description">
                                     {% trans "Use Arches' Permissions Manager to set up data access rules for all your user groups and individual accounts.  You can define read/write/delete and no-access permissions." %}
                                 </p>
-                                <img class="sub-block-image" src="{% static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
+                                <img class="sub-block-image" src="{% webpack_static 'img/landing/permissions_manager.png' %}" alt="Permissions Manager">
                             </div>
                         </div>
 
@@ -260,7 +257,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Content -->
                     <div class="splash-img">
-                        <img class="sub-block-image" src="{% static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
+                        <img class="sub-block-image" src="{% webpack_static 'img/landing/consultation_workflow.jpg' %}" alt="Arches Workflows">
                     </div>
 
                 </div>
@@ -285,7 +282,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <div class="splash-img">
-                        <img class="sub-block-image" src="{% static 'img/landing/arches_search.png' %}" alt="Arches Search">
+                        <img class="sub-block-image" src="{% webpack_static 'img/landing/arches_search.png' %}" alt="Arches Search">
                     </div>
 
                     <!-- Sub-section -->
@@ -310,36 +307,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
             </section>
             <!-- End Info Block 3 -->
-
-            <!-- Info Block 4 -->
-            <section id="info-block-4" class="app-info-block relative">
-                <div>
-                    <!-- Heading Info -->
-                    <div class="sub-section">
-                    </div>
-                    <!-- Content -->
-                    <div class="row">
-                        <div class="col-md-6 col-lg-4 text-center">
-                            <img class="iphone" src="{% static 'img/landing/IPhone_8_map.png' %}" alt="Arches Designer">
-                        </div>
-                        <div class="col-md-6 col-lg-8">
-                            <div class="mobile-description-container">
-                                <div class="box-highlight">
-                                    <h2 class="app-info-block-title">{% trans "Work on the go..." %}</h2>
-                                    <p>
-                                        {% trans "Arches Collector allows you to create new data and edit existing records when you're away from your computer.  Don't worry if you're out of cell or Wi-Fi range.  Create new records, update information, even add new map locations.  Then synch your changes to your Arches application when you re-establish a network connection." %}
-                                    </p>
-                                    <br>
-                                    <p>
-                                        {% trans "Arches Collector is available for iOS and Android devices.  Download the app from your favorite marketplace." %}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- End Info Block 4 -->
         </article>
     </main>
 
@@ -374,9 +341,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <ul class="splash-link-container">
                                 <li>
                                     <a class="splash-link-address" href="http://https://www.archesproject.org/what-is-arches/" target="_blank">{% trans "What is Arches" %}</a>
-                                </li>
-                                <li>
-                                    <a class="splash-link-address" href="https://www.archesproject.org/collector/" target="_blank">{% trans "Arches Collector" %}</a>
                                 </li>
                                 <li>
                                     <a class="splash-link-address" href="https://www.archesproject.org/implementation-considerations/" target="_blank">{% trans "Implementation Considerations" %}</a>
@@ -441,7 +405,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </footer>
     <!-- End Footer -->
 
-<script src="{% static 'packages/requirejs/require.js' %}"></script>
+<script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
 
 <script>
 
@@ -449,14 +413,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         baseUrl: '{{ STATIC_URL }}js',
         paths: {
             'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
-            'text': '{{ STATIC_URL }}packages/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}packages/jquery/dist/jquery.min',
-            'jquery': '{{ STATIC_URL }}packages/jquery-migrate/dist/jquery-migrate.min',
-            'jquery-ui': '{{ STATIC_URL }}packages/jqueryui/jquery-ui.min',
-            'underscore': '{{ STATIC_URL }}packages/underscore/underscore-min',
-            'chosen': '{{ STATIC_URL }}packages/chosen-js/chosen.jquery.min',
-            'knockout': '{{ STATIC_URL }}packages/knockout/build/output/knockout-latest',
-            'bootstrap': '{{ STATIC_URL }}packages/bootstrap/dist/js/bootstrap.min',
+            'text': '{{ STATIC_URL }}node_modules/requirejs-text/text',
+            'jquery-lib': '{{ STATIC_URL }}node_modules/jquery/dist/jquery.min',
+            'jquery': '{{ STATIC_URL }}node_modules/jquery-migrate/dist/jquery-migrate.min',
+            'jquery-ui': '{{ STATIC_URL }}node_modules/jqueryui/jquery-ui.min',
+            'underscore': '{{ STATIC_URL }}node_modules/underscore/underscore-min',
+            'chosen': '{{ STATIC_URL }}node_modules/chosen-js/chosen.jquery.min',
+            'knockout': '{{ STATIC_URL }}node_modules/knockout/build/output/knockout-latest',
+            'bootstrap': '{{ STATIC_URL }}node_modules/bootstrap/dist/js/bootstrap.min',
             'themepunch-tools': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min',
             'themepunch-revolution': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution',
             'revolution-slider': '{{ STATIC_URL }}plugins/revolution-slider',

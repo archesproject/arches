@@ -1,0 +1,108 @@
+// This file is only imported if the direction of the page is Right-To-Left (RTL)
+// Use this only to override styles that are rtl specific
+
+.sidenav-menu{
+    > ul {
+        > li {
+            > a:hover {
+                box-shadow: inset -4px 0 0 0 #2986b8;
+            }
+        }
+    }
+}
+
+.side-column-crud-container {
+    border-left: 1px solid #ddd;
+    border-right: none;
+    .grid { 
+        .library-card {
+            border-right: 5px solid transparent;
+            &.selected.selected-card {
+                border-right: 5px solid steelblue;
+                border-left: none;
+            }
+            &:hover {
+                border-right: 5px solid steelblue;
+                border-left: none;
+            }
+        }
+    }
+}
+
+.search-type-btn-popup {
+    border-left: none;
+    border-right: 1px solid #BBD1EA; 
+}
+
+.jstree-default{
+    .jstree-anchor {
+        .jstree-leading-icon{
+            margin-left: 5px;
+            margin-right: 0px;
+        }
+    }
+    &.jstree-rtl{
+        .jstree-node {
+            margin: 0 20px;
+            &.jstree-open {
+                > .jstree-icon:not(.jstree-ocl) {
+                    background-position: -36px -36px;
+                }
+            }
+        }
+
+        .jstree-icon{
+            background-position: -4px -36px;
+        }
+    }
+}
+
+.resource-toolbar .dropdown-menu .resource-grid-item .dropdown-menu {
+    right: auto;
+    left: 0;
+}
+
+label.form-checkbox.form-normal{
+    &:before {
+        right: auto;
+        top: auto;
+    }
+
+    &:not(.disabled):hover:after {
+        right: 8px;
+    }
+
+    &.active
+    {
+        &:after {
+            right: 8px;
+        }
+    }
+}
+
+.form-checkbox.form-normal:before{
+    right: 1px;
+}
+
+.add-new-crumb {
+    float: left;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+    padding: 3px 18px 5px 10px;
+
+    .fa-minus {
+        margin: 0px 7px 0px 2px;
+    }
+}
+
+.overlay-listing .overlay-opacity-control {
+    padding: 6px 8px 6px 6px;
+    left: 6px;
+    right: unset;
+}
+
+.overlay-opacity-control .overlay-opacity-slider {
+    left: -8px;
+    right: unset;
+}

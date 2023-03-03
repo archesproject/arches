@@ -36,19 +36,18 @@ def prepare_terms_index(create=False):
     index_settings = {
         "settings": {"analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}}},
         "mappings": {
-            "_doc": {
-                "properties": {
-                    "nodegroupid": {"type": "keyword"},
-                    "tileid": {"type": "keyword"},
-                    "nodeid": {"type": "keyword"},
-                    "resourceinstanceid": {"type": "keyword"},
-                    "provisional": {"type": "boolean"},
-                    "value": {
-                        "analyzer": "standard",
-                        "type": "text",
-                        "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
-                    },
-                }
+            "properties": {
+                "nodegroupid": {"type": "keyword"},
+                "tileid": {"type": "keyword"},
+                "nodeid": {"type": "keyword"},
+                "resourceinstanceid": {"type": "keyword"},
+                "language": {"type": "text"},
+                "provisional": {"type": "boolean"},
+                "value": {
+                    "analyzer": "standard",
+                    "type": "text",
+                    "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
+                },
             }
         },
     }
@@ -69,21 +68,19 @@ def prepare_concepts_index(create=False):
     index_settings = {
         "settings": {"analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}}},
         "mappings": {
-            "_doc": {
-                "properties": {
-                    "top_concept": {"type": "keyword"},
-                    "conceptid": {"type": "keyword"},
-                    "language": {"type": "keyword"},
-                    "id": {"type": "keyword"},
-                    "category": {"type": "keyword"},
-                    "provisional": {"type": "boolean"},
-                    "type": {"type": "keyword"},
-                    "value": {
-                        "analyzer": "standard",
-                        "type": "text",
-                        "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
-                    },
-                }
+            "properties": {
+                "top_concept": {"type": "keyword"},
+                "conceptid": {"type": "keyword"},
+                "language": {"type": "keyword"},
+                "id": {"type": "keyword"},
+                "category": {"type": "keyword"},
+                "provisional": {"type": "boolean"},
+                "type": {"type": "keyword"},
+                "value": {
+                    "analyzer": "standard",
+                    "type": "text",
+                    "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
+                },
             }
         },
     }
@@ -118,124 +115,131 @@ def prepare_search_index(create=False):
             "index.mapping.nested_objects.limit": 50000,
         },
         "mappings": {
-            "_doc": {
-                "properties": {
-                    "graph_id": {"type": "keyword"},
-                    "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
-                    "resourceinstanceid": {"type": "keyword"},
-                    "root_ontology_class": {"type": "keyword"},
-                    "displayname": {"type": "keyword"},
-                    "displaydescription": {"type": "keyword"},
-                    "map_popup": {"type": "keyword"},
-                    "provisional_resource": {"type": "keyword"},
-                    "tiles": {
-                        "type": "nested",
-                        "properties": {
-                            "tiles": {"enabled": False},
-                            "tileid": {"type": "keyword"},
-                            "nodegroup_id": {"type": "keyword"},
-                            "parenttile_id": {"type": "keyword"},
-                            "resourceinstanceid_id": {"type": "keyword"},
-                            "provisionaledits": {"enabled": False},
-                            "data": {"properties": {}},
-                        },
-                    },
-                    "permissions": {
-                        "type": "nested",
-                        "properties": {
-                            "users_without_read_perm": {"type": "integer"},
-                            "users_without_edit_perm": {"type": "integer"},
-                            "users_without_delete_perm": {"type": "integer"},
-                            "users_with_no_access": {"type": "integer"},
-                        },
-                    },
-                    "strings": {
-                        "type": "nested",
-                        "properties": {
-                            "string": {
-                                "type": "text",
-                                "fields": {"raw": {"type": "keyword"}, "folded": {"type": "text", "analyzer": "folding"}},
-                            },
-                            "nodegroup_id": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
-                    "ids": {
-                        "type": "nested",
-                        "properties": {"id": {"type": "keyword"}, "nodegroup_id": {"type": "keyword"}, "provisional": {"type": "boolean"}},
-                    },
-                    "domains": {
-                        "type": "nested",
-                        "properties": {
-                            "value": {"type": "text", "fields": {"raw": {"type": "keyword"}}},
-                            "conceptid": {"type": "keyword"},
-                            "valueid": {"type": "keyword"},
-                            "nodegroup_id": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
-                    "geometries": {
-                        "type": "nested",
-                        "properties": {
-                            "geom": {
-                                "properties": {
-                                    "features": {
-                                        "properties": {
-                                            "geometry": {"type": "geo_shape"},
-                                            "id": {"type": "keyword"},
-                                            "type": {"type": "keyword"},
-                                            "properties": {"enabled": False},
-                                        }
-                                    },
-                                    "type": {"type": "keyword"},
-                                }
-                            },
-                            "nodegroup_id": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
-                    "points": {
-                        "type": "nested",
-                        "properties": {
-                            "point": {"type": "geo_point"},
-                            "nodegroup_id": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
-                    "dates": {
-                        "type": "nested",
-                        "properties": {
-                            "date": {"type": "long"},
-                            "nodegroup_id": {"type": "keyword"},
-                            "nodeid": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
-                    "numbers": {
-                        "type": "nested",
-                        "properties": {
-                            "number": {"type": "double"},
-                            "nodegroup_id": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
-                    "date_ranges": {
-                        "type": "nested",
-                        "properties": {
-                            "date_range": {"type": "long_range"},
-                            "nodegroup_id": {"type": "keyword"},
-                            "provisional": {"type": "boolean"},
-                        },
-                    },
+            "dynamic_templates": [
+                {
+                    "language_values": {
+                        "path_match": "tiles.data.*.*.value",
+                        "mapping": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                    }
                 }
-            }
+            ],
+            "properties": {
+                "graph_id": {"type": "keyword"},
+                "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "resourceinstanceid": {"type": "keyword"},
+                "root_ontology_class": {"type": "keyword"},
+                "displayname": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
+                "displaydescription": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
+                "map_popup": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
+                "provisional_resource": {"type": "keyword"},
+                "tiles": {
+                    "type": "nested",
+                    "properties": {
+                        "tiles": {"enabled": False},
+                        "tileid": {"type": "keyword"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "parenttile_id": {"type": "keyword"},
+                        "resourceinstanceid_id": {"type": "keyword"},
+                        "provisionaledits": {"enabled": False},
+                        "data": {"properties": {}},
+                    },
+                },
+                "permissions": {
+                    "type": "nested",
+                    "properties": {
+                        "users_without_read_perm": {"type": "integer"},
+                        "users_without_edit_perm": {"type": "integer"},
+                        "users_without_delete_perm": {"type": "integer"},
+                        "users_with_no_access": {"type": "integer"},
+                    },
+                },
+                "strings": {
+                    "type": "nested",
+                    "properties": {
+                        "string": {
+                            "type": "text",
+                            "fields": {"raw": {"type": "keyword", "ignore_above": 256}, "folded": {"type": "text", "analyzer": "folding"}},
+                        },
+                        "nodegroup_id": {"type": "keyword"},
+                        "language": {"type": "text"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+                "ids": {
+                    "type": "nested",
+                    "properties": {"id": {"type": "keyword"}, "nodegroup_id": {"type": "keyword"}, "provisional": {"type": "boolean"}},
+                },
+                "domains": {
+                    "type": "nested",
+                    "properties": {
+                        "value": {"type": "text", "fields": {"raw": {"type": "keyword"}}},
+                        "conceptid": {"type": "keyword"},
+                        "valueid": {"type": "keyword"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+                "geometries": {
+                    "type": "nested",
+                    "properties": {
+                        "geom": {
+                            "properties": {
+                                "features": {
+                                    "properties": {
+                                        "geometry": {"type": "geo_shape"},
+                                        "id": {"type": "keyword"},
+                                        "type": {"type": "keyword"},
+                                        "properties": {"enabled": False},
+                                    }
+                                },
+                                "type": {"type": "keyword"},
+                            }
+                        },
+                        "nodegroup_id": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+                "points": {
+                    "type": "nested",
+                    "properties": {
+                        "point": {"type": "geo_point"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+                "dates": {
+                    "type": "nested",
+                    "properties": {
+                        "date": {"type": "long"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "nodeid": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+                "numbers": {
+                    "type": "nested",
+                    "properties": {
+                        "number": {"type": "double"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+                "date_ranges": {
+                    "type": "nested",
+                    "properties": {
+                        "date_range": {"type": "long_range"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
+                },
+            },
         },
     }
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory
 
         datatype_factory = DataTypeFactory()
-        data = index_settings["mappings"]["_doc"]["properties"]["tiles"]["properties"]["data"]["properties"]
+        data = index_settings["mappings"]["properties"]["tiles"]["properties"]["data"]["properties"]
         for node in models.Node.objects.all():
             datatype = datatype_factory.get_instance(node.datatype)
             datatype_mapping = datatype.default_es_mapping()
@@ -254,6 +258,40 @@ def prepare_search_index(create=False):
 def delete_search_index():
     se = SearchEngineFactory().create()
     se.delete_index(index=RESOURCES_INDEX)
+
+
+def prepare_resource_relations_index(create=False):
+    """
+    Creates the settings and mappings in Elasticsearch to support related resources
+
+    """
+
+    index_settings = {
+        "mappings": {
+            "properties": {
+                "resourcexid": {"type": "keyword"},
+                "notes": {"type": "text"},
+                "relationshiptype": {"type": "keyword"},
+                "inverserelationshiptype": {"type": "keyword"},
+                "resourceinstanceidfrom": {"type": "keyword"},
+                "resourceinstancefrom_graphid": {"type": "keyword"},
+                "resourceinstanceidto": {"type": "keyword"},
+                "resourceinstanceto_graphid": {"type": "keyword"},
+                "created": {"type": "keyword"},
+                "modified": {"type": "keyword"},
+                "datestarted": {"type": "date"},
+                "dateended": {"type": "date"},
+                "tileid": {"type": "keyword"},
+                "nodeid": {"type": "keyword"},
+            }
+        }
+    }
+
+    if create:
+        se = SearchEngineFactory().create()
+        se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings)
+
+    return index_settings
 
 
 # the RESOURCE_RELATIONS_INDEX is now deprecated

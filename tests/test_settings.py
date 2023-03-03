@@ -20,6 +20,10 @@ from arches.settings import *
 import os
 import inspect
 
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+    pass
 
 PACKAGE_NAME = "arches"
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -89,14 +93,28 @@ REMOTE_BROWSERS = [
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
-DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
+DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
+ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+LANGUAGES = [
+    ("de", _("German")),
+    ("en", _("English")),
+    ("en-gb", _("British English")),
+    ("es", _("Spanish")),
+    ("ar", _("Arabic")),
+]
 
 try:
     from settings_local import *
 except ImportError:
-    pass
+    try:
+        from settings_docker import *
+    except ImportError:
+        pass

@@ -28,6 +28,7 @@ from django.contrib.auth.models import User, Group, Permission
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
@@ -38,6 +39,7 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
+from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
@@ -70,25 +72,81 @@ class Resource(models.ResourceInstance):
         # self.resourceinstancesecurity
         # end from models.ResourceInstance
         self.tiles = []
+        self.descriptor_function = None
 
-    def get_descriptor(self, descriptor, context):
-        graph_function = models.FunctionXGraph.objects.filter(
-            graph_id=self.graph_id, function__functiontype="primarydescriptors"
-        ).select_related("function")
+    def get_descriptor_language(self, context):
+        """
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
 
         if self.descriptors is None:
             self.descriptors = {}
 
-        if len(graph_function) == 1:
-            module = graph_function[0].function.get_class_module()()
+        if self.name is None:
+            self.name = {}
 
-            self.descriptors[descriptor] = module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"][descriptor], context
-            )
-        else:
-            self.descriptors[descriptor] = "undefined"
+        requested_language = None
+        if context and "language" in context:
+            requested_language = context["language"]
+        language = requested_language or get_language()
 
-        return self.descriptors[descriptor]
+        if language not in self.descriptors:
+            self.descriptors[language] = {}
+
+        return language
+
+    def get_descriptor(self, descriptor, context):
+        """
+        descriptor -- string descriptor type: "name", "description", "map_popup"
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
+
+        language = self.get_descriptor_language(context)
+
+        if self.descriptors:
+            try:
+                return self.descriptors[language][descriptor]
+            except KeyError:
+                pass
+
+        self.calculate_descriptors(context=context)
+        return self.descriptors[language][descriptor]
+
+    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+        """
+        descriptors -- iterator with descriptors to be calculated
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
+
+        language = self.get_descriptor_language(context)
+
+        if not self.descriptor_function:
+            self.descriptor_function = models.FunctionXGraph.objects.filter(
+                graph_id=self.graph_id, function__functiontype="primarydescriptors"
+            ).select_related("function")
+
+        for descriptor in descriptors:
+            if len(self.descriptor_function) == 1:
+                module = self.descriptor_function[0].function.get_class_module()()
+                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
+                )
+                if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                    self.name[language] = self.descriptors[language][descriptor]
+            else:
+                self.descriptors[language][descriptor] = None
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -97,9 +155,7 @@ class Resource(models.ResourceInstance):
         return self.get_descriptor("map_popup", context)
 
     def displayname(self, context=None):
-        descriptor = self.get_descriptor("name", context)
-        self.name = descriptor
-        return descriptor
+        return self.get_descriptor("name", context)
 
     def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
         timestamp = datetime.datetime.now()
@@ -127,10 +183,7 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to save.")
-            raise ModelInactiveError(message)
+        # TODO: 7783 cbyrd throw error if graph is unpublished
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -249,6 +302,11 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+            for lang in settings.LANGUAGES:
+                if context is None:
+                    context = {}
+                context["language"] = lang[0]
+                self.calculate_descriptors(context=context)
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
@@ -291,9 +349,43 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["displayname"] = self.displayname(context)
-        document["displaydescription"] = self.displaydescription(context)
-        document["map_popup"] = self.map_popup(context)
+
+        document["displayname"] = []
+        document["displaydescription"] = []
+        document["map_popup"] = []
+        for lang in settings.LANGUAGES:
+            if context is None:
+                context = {}
+            context["language"] = lang[0]
+            displayname = self.displayname(context)
+            if displayname is not None and displayname != "Undefined":
+                try:
+                    display_name = JSONDeserializer().deserialize(displayname)
+                    for key in display_name.keys():
+                        document["displayname"].append({"value": display_name[key]["value"], "language": key})
+                except:
+                    display_name = {"value": displayname, "language": lang[0]}
+                    document["displayname"].append(display_name)
+
+            displaydescription = self.displaydescription(context)
+            if displaydescription is not None and displaydescription != "Undefined":
+                try:
+                    display_description = JSONDeserializer().deserialize(displaydescription)
+                    for key in display_description.keys():
+                        document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
+                except:
+                    display_description = {"value": displaydescription, "language": lang[0]}
+                    document["displaydescription"].append(display_description)
+
+            mappopup = self.map_popup(context)
+            if mappopup is not None and mappopup != "Undefined":
+                try:
+                    map_popup = JSONDeserializer().deserialize(mappopup)
+                    for key in map_popup.keys():
+                        document["map_popup"].append({"value": map_popup[key]["value"], "language": key})
+                except:
+                    map_popup = {"value": mappopup, "language": lang[0]}
+                    document["map_popup"].append(map_popup)
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
@@ -322,15 +414,17 @@ class Resource(models.ResourceInstance):
                     datatype_instance = datatype_factory.get_instance(datatype)
                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                     for index, term in enumerate(node_terms):
                         terms.append(
                             {
-                                "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
                                 "_source": {
-                                    "value": term,
+                                    "value": term.value,
                                     "nodeid": nodeid,
                                     "nodegroupid": tile.nodegroup_id,
                                     "tileid": tile.tileid,
+                                    "language": term.lang,
                                     "resourceinstanceid": tile.resourceinstance_id,
                                     "provisional": False,
                                 },
@@ -350,21 +444,22 @@ class Resource(models.ResourceInstance):
                                     datatype_instance = datatype_factory.get_instance(datatype)
                                     datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
                                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+
                                     for index, term in enumerate(node_terms):
                                         terms.append(
                                             {
-                                                "_id": str(nodeid) + str(tile.tileid) + str(index),
+                                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
                                                 "_source": {
-                                                    "value": term,
+                                                    "value": term.value,
                                                     "nodeid": nodeid,
                                                     "nodegroupid": tile.nodegroup_id,
                                                     "tileid": tile.tileid,
+                                                    "language": term.lang,
                                                     "resourceinstanceid": tile.resourceinstance_id,
                                                     "provisional": True,
                                                 },
                                             }
                                         )
-
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
@@ -378,10 +473,7 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        graph = models.GraphModel.objects.get(graphid=self.graph_id)
-        if graph.isactive is False:
-            message = _("This model is not yet active; unable to delete.")
-            raise ModelInactiveError(message)
+        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -488,12 +580,24 @@ class Resource(models.ResourceInstance):
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
 
         """
+
+        # TODO This function is very similar to code in search results and the resource view. Needs to be centralized.
+        def get_localized_descriptor(document, descriptor_type):
+            language_codes = (get_language(), settings.LANGUAGE_CODE)
+            descriptor = document["_source"][descriptor_type]
+            result = descriptor[0] if len(descriptor) > 0 else {"value": _("Undefined")}
+            for language_code in language_codes:
+                for entry in descriptor:
+                    if entry["language"] == language_code and entry["value"] != "":
+                        return entry["value"]
+            return result["value"]
+
         if not graphs:
             graphs = list(
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(isactive=False)
+                .exclude(publication=None)
             )
 
         graph_lookup = {
@@ -560,6 +664,7 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
@@ -568,6 +673,14 @@ class Resource(models.ResourceInstance):
                     )
                     if resource["found"]:
                         resource["_source"]["total_relations"] = relations["total"]
+
+                        for descriptor_type in ("displaydescription", "displayname"):
+                            descriptor = get_localized_descriptor(resource, descriptor_type)
+                            if descriptor:
+                                resource["_source"][descriptor_type] = descriptor
+                            else:
+                                resource["_source"][descriptor_type] = _("Undefined")
+
                         ret["related_resources"].append(resource["_source"])
 
         return ret
@@ -607,7 +720,7 @@ class Resource(models.ResourceInstance):
 
         return new_resource
 
-    def serialize(self, fields=None, exclude=None):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         """
         Serialize to a different form then used by the internal class structure
 
@@ -717,9 +830,19 @@ def is_uuid(value_to_test):
         return False
 
 
-class ModelInactiveError(Exception):
+class PublishedModelError(Exception):
     def __init__(self, message, code=None):
-        self.title = _("Model Inactive Error")
+        self.title = _("Published Model Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
+
+
+class UnpublishedModelError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Unpublished Model Error")
         self.message = message
         self.code = code
 

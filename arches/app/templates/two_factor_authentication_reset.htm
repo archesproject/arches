@@ -1,0 +1,80 @@
+{% extends "base.htm" %}
+{% load static %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block body %}
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	<div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="">
+			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
+				<h3 class="login-panel-header arches-signin">{% trans "Update Two-Factor Authentication" %}</h3>
+                
+                <hr style="border-color: #eee;">
+
+                {% if not queried_email_address %}
+                    <p>{% trans 'Please enter an email address below.' %} </p>
+                    <p>{% trans "If it is registered in our system it will receive instructions to update two-factor authentication." %}</p>
+                    
+                    <form action="{% url 'two-factor-authentication-reset' %}" method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group" style="margin-top: 20px;">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="text-lg ion-email"></i></div>
+                                    <input type="text" class="form-control input-lg" placeholder="Email address" name='email' autofocus>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="border-color: #eee;">
+                        
+                        <div>
+                            <button type="submit" class="btn btn-success" style="min-width: 250px;">{% trans 'Submit' %}</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <p 
+                        class="arches-signin" 
+                        style="
+                            color: green;
+                            font-size: 16px;
+                        "
+                    >
+                        {% trans "Success!" %}
+                    </p>
+                    <div class="arches-signin" style="display: flex;">
+                        <div style="margin: 0 10px;">
+                            {% trans "Email address:" %}
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            {{ queried_email_address }}
+                        </div>
+                    </div>
+                    <hr style="border-color: #eee;">
+                    <div class="arches-signin" style="margin-top: 10px;">
+                        {% trans "If this email address is registered, an email has been sent to it containing instructions to enable two-factor authentication." %}
+                    </div>
+                {% endif %}
+
+                <hr style="border-color: #eee;">
+
+                <div class="row account-management" style="border-top: 0;">
+                    <a href="{% url 'auth' %}" class="btn btn-link account-link" style="padding-top: 0">{% trans "Click here to return to login page" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

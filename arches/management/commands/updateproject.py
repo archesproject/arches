@@ -1,84 +1,66 @@
 import arches
-import json
 import os
-import subprocess
-import urllib.request, urllib.parse, urllib.error
-from arches.management.commands import utils
-from arches.app.models import models
+import shutil
+
+from django.core.management.base import BaseCommand
+from django.core import management
+from django.db import connection
 from arches.app.models.system_settings import settings
-from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
     """
-    Commands for managing Arches functions
+    Command for migrating projects between versions
 
     """
 
-    def add_arguments(self, parser):
-        parser.add_argument("operation", nargs="?", help="operation 'livereload' starts livereload for this project on port 35729")
-
     def handle(self, *args, **options):
-        if arches.__version__ == "4.2":
-            self.update_yarn_depenencies("4.2.x")
+        self.update_to_v7()
 
-        if arches.__version__ == "4.3":
-            self.update_yarn_depenencies("4.3.x")
+    def update_to_v7(self):
+        # copy webpack config files to project
+        print("Copying webpack directory to project root directory")
+        project_webpack_path = os.path.join(settings.APP_ROOT, "webpack")
 
-    def overwite_existing_file(self, path, message):
-        write_file = False
-        if os.path.exists(path) is True:
-            if not utils.get_yn_input(message):
-                return write_file
-            else:
-                write_file = True
-        else:
-            write_file = True
-        return write_file
+        if os.path.exists(project_webpack_path):
+            shutil.rmtree(project_webpack_path)
 
-    def update_yarn_depenencies(self, version):
-        packages_path = os.path.join(settings.APP_ROOT, "package.json")
-        yarn_config_path = os.path.join(settings.APP_ROOT, ".yarnrc")
+        shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "webpack"), project_webpack_path)
 
-        if (
-            self.overwite_existing_file(
-                yarn_config_path,
-                "A .yarnrc file already exists. \
-                Would you like to overwrite it with the latest? \
-                If you have not manually modified this file since creating this project, \
-                the answer is probably 'yes'",
+        # copy dotfiles
+        for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json"]:
+            print("Copying {} to project root directory".format(dotfile))
+            shutil.copy2(os.path.join(settings.ROOT_DIR, dotfile), settings.APP_ROOT)
+
+        # ensure project has a `media/img` directory
+        if not os.path.isdir(os.path.join(settings.APP_ROOT, "media", "img")):
+            print("Creating /media/img directory")
+            os.mkdir(os.path.join(settings.APP_ROOT, "media", "img"))
+
+        #  check if temp_graph_status table exists
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT EXISTS (
+                    SELECT FROM 
+                        pg_tables
+                    WHERE 
+                        schemaname = 'public' AND 
+                        tablename  = 'temp_graph_status'
+                );
+                """
             )
-            is True
-        ):
-            with open(yarn_config_path, "w") as f:
-                content = '--install.modules-folder "./media/packages"\n--add.modules-folder "./media/packages"'
-                f.write(content)
+            result = cursor.fetchone()
 
-        if (
-            self.overwite_existing_file(
-                packages_path,
-                "A package.json file already exists. \
-                Would you like to overwrite it with the latest? \
-                If you have not manually modified this file since creating this project,\
-                the answer is probably 'yes'",
-            )
-            is True
-        ):
-            url = "https://raw.githubusercontent.com/archesproject/arches/stable/{0}/package.json".format(version)
-            response = urllib.request.urlopen(url)
-            data = json.loads(response.read())
-            with open(packages_path, "w") as f:
-                json.dump(data, f, indent=4)
-
-        if (
-            utils.get_yn_input(
-                "Would you like to update your javascript packages using yarn? \
-                Yarn v1.5.1 or greater is required"
-            )
-            is True
-        ):
-            try:
-                os.chdir(settings.APP_ROOT)
-                subprocess.call("yarn install", shell=True)
-            except Exception as e:
-                print(e)
+            # publish graphs that were previously active
+            if result[0]:  # parses result from row
+                cursor.execute("select * from temp_graph_status;")
+                rows = cursor.fetchall()
+                graphs = []
+                for row in rows:
+                    graphid = str(row[0])
+                    active = row[1]
+                    if active:
+                        graphs.append(graphid)
+                management.call_command("graph", operation="publish", update_instances=True, graphs=",".join(graphs))
+                cursor.execute("drop table if exists temp_graph_status")

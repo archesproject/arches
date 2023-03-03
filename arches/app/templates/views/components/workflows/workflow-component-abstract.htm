@@ -1,20 +1,22 @@
 {% load i18n %}
 
-<!-- ko with: $data.workflowComponentAbstract -->
 <div style="display: flex; height: 100%;">
+    <!-- ko with: $data.component -->
     <div class="workflow-component" style="width: 100%; height: inherit;">
         <!-- ko if: !loading() && !saving() && isStepActive() -->
-        <div class="workflow-component-element"
-        style="height: inherit; display: unset;"
-        data-bind="component: {
-            name: componentData['componentName'],
-            params: {
-                ...componentData['parameters'],
-                form: $data,
-                pageVm: $root,
-                value: $data.value
-            }
-        }"></div>
+        <div 
+            class="workflow-component-element"
+            style="height: inherit; display: unset;"
+            data-bind="component: {
+                name: componentData['componentName'],
+                params: {
+                    ...componentData['parameters'],
+                    form: $data,
+                    pageVm: $root,
+                    value: $data.value
+                }
+            }"
+        ></div>
         <!-- /ko -->
 
         <!-- ko if: componentData['tilesManaged'] === "many" -->
@@ -25,7 +27,7 @@
                     style="margin-right: 8px;"
                     data-bind="click: clearEditor"
                 >
-                    {% trans "Clear" %}
+                    <span data-bind="text: $root.translations.clear"></span>
                 </button>
 
                 <button 
@@ -40,7 +42,7 @@
         <!-- /ko -->
     </div>
 
-        <!-- ko if: componentData['tilesManaged'] === "many" -->
+    <!-- ko if: componentData['tilesManaged'] === "many" -->
         <div class="wf-step-multi-tile-container">
             
             <h4 data-bind="text: (itemName())"></h4>
@@ -80,15 +82,12 @@
                                     data-bind="click: function(){$parent.removeTile(tile)}"
                                 >
                                     <i class="fa fa-times-circle"></i>
-                                    <span>
-                                        {% trans "Remove" %}
-                                    </span>
+                                    <span data-bind="text: $root.translations.remove"></span>
+
                                 </div>
                                 <div data-bind="click: function(){$parent.loadTileIntoEditor(tile)}">
                                     <i class="fa fa-pencil"></i>
-                                    <span>
-                                        {% trans "Edit" %}
-                                    </span>
+                                    <span data-bind="text: $root.translations.edit"></span>
                                 </div>
                             </div>
                         </div>
@@ -96,6 +95,6 @@
                 </div>
             </div>
         </div>
-        <!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
 </div>
-<!-- /ko -->

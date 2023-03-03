@@ -1,14 +1,16 @@
+{% load template_tags %}
 {% load i18n %}
+
 <!-- ko ifnot: $data.search -->
 <!--ko let: {self: $data} -->
 <div class="node-widget-label concept-label" style="width:540px;">
 
     <div class="control-label">
-        {% trans "Resource Model" %}
+        <span data-bind="text: $root.translations.resourceModel"></span>
     </div>
     <div style="padding-bottom: 10px;">
         <select multiple data-bind="
-            placeholder: 'Select a resource model',
+            placeholder: $root.translations.selectAResourceModel,
             selectedOptions: selectedResourceModel,
             options: resourceModels,
             optionsText: 'name',
@@ -28,14 +30,26 @@
                         </button>
                     </div>
                     <div class="rr-table-column" style="flex-grow: 1; padding-left: 10px;"
-                       data-bind="click: function() { if(self.graphIsSemantic && $parent.isEditable !== false){self.toggleSelectedResource($data)}; }, clickBubble: false, style:{cursor: self.graphIsSemantic ? 'pointer': 'inherit'}" style="cursor: pointer;">
+                       data-bind="click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; }, clickBubble: false" style="cursor: pointer;">
                         <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
-                    <div class="row">
+                    <div data-bind="if: self.graphIsSemantic">
+                        <div class="rr-table-ontology-selector">
+                            <span data-bind="component: {
+                                name: 'views/components/simple-switch',
+                                params: {
+                                    value: $data.useOntologyRelationship,
+                                    config: {label: $root.translations.useOntology}
+                                }
+                            }"></span>
+                        </div>
+                    </div>
+                    <div class="row" data-bind="if: $data.useOntologyRelationship">
                         <div class="row" style="margin-bottom: 10px;">
-                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default relationship to" %}
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: $root.translations.defaultRelationshipTo"></span>
                                 <span data-bind="text: $data.name"></span>
                             </label>
 
@@ -45,11 +59,20 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
-                                        select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.ontologyProperty, self.rootOntologyClass, $data.ontologyClass, '{% trans 'Select an Ontology Property' %}', true)
-                                        }
-                                    ">
+                                    <input 
+                                        style="width:100%; display:inline-block; margin: 3px 0px;" 
+                                        data-bind="
+                                            select2Query: {
+                                                select2Config: self.getSelect2ConfigForOntologyProperties(
+                                                    $data.ontologyProperty, 
+                                                    self.rootOntologyClass, 
+                                                    $data.ontologyClass, 
+                                                    $root.translations.selectAnOntologyProperty, 
+                                                    true
+                                                )
+                                            }
+                                        "
+                                    >
                                 </span>
 
                                 <span class="col-xs-12" data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
@@ -59,7 +82,8 @@
 
 
                         <div class="row">
-                            <label class="col-xs-12" style="font-weight: bold;">{% trans "Default inverse relationship to" %}
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: $root.translations.defaultInverseRelationshipTo"></span>
                                 <span data-bind="text: $data.name"></span>
                             </label>
 
@@ -71,7 +95,13 @@
                                 <span class="col-xs-12">
                                     <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
-                                            select2Config: self.getSelect2ConfigForOntologyProperties($data.inverseOntologyProperty, $data.ontologyClass, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}', true)
+                                            select2Config: self.getSelect2ConfigForOntologyProperties(
+                                                $data.inverseOntologyProperty, 
+                                                $data.ontologyClass, 
+                                                self.rootOntologyClass, 
+                                                $root.translations.selectAnOntologyProperty, 
+                                                true
+                                            )
                                         }
                                     ">
                                 </span>
@@ -80,6 +110,38 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row" data-bind="ifnot: $data.useOntologyRelationship">
+                        <div class="row">
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: $root.translations.relationshipConcept"></span>
+                            </label>
+                            <div class="row">
+                                <div data-bind="component: {
+                                    name: 'concept-select-widget',
+                                    params: {
+                                        node: {'config': {'rdmCollection': '00000000-0000-0000-0000-000000000005'}},
+                                        value: $data.relationshipConcept,
+                                    }
+                                }"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label class="col-xs-12" style="font-weight: bold;">
+                                <span data-bind="text: $root.translations.inverseRelationshipConcept"></span>
+                            </label>
+                            <div class="row">
+                                <div data-bind="component: {
+                                    name: 'concept-select-widget',
+                                    params: {
+                                        node: {'config': {'rdmCollection': '00000000-0000-0000-0000-000000000005'}},
+                                        value: $data.inverseRelationshipConcept,
+                                    }
+                                }"></div>
+                            </div>
+                        </div>
+                    </div> 
                 </div>
             </div>
         </div>
@@ -87,14 +149,28 @@
 
     <div class="relative">
         <label class="col-xs-12 control-label widget-input-label">
-            {% trans "Search String - use to filter resources displayed" %} <i class="fa fa-eye" style="cursor: pointer;" data-bind="click: openSearch"
-                title="{% trans " View search string..." %}"></i>
+            <span data-bind="text: $root.translations.searchStringText"></span>
+            
+            <i 
+                class="fa fa-eye" 
+                style="cursor: pointer;" 
+                data-bind="
+                    attr: {title: $root.translations.viewSearchString},
+                    click: openSearch
+                "
+            ></i>
         </label>
     </div>
     
     <div class="col-xs-12" style="padding-bottom: 10px;">
-        <input type="text" placeholder="{% trans " Enter Search String here..." %}" class="form-control" style=""
-            data-bind="textInput: config.searchString">
+        <input 
+            type="text" 
+            class="form-control" style=""
+            data-bind="
+                attr: {placeholder: $root.translations.enterSearchStringHere + '...'},
+                textInput: config.searchString
+            "
+        >
     </div>
 
 </div>
@@ -103,19 +179,28 @@
 
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="">{% trans "References" %}</option>
-        <option value="!">{% trans "Does not reference" %}</option>
-        <option value="null">{% trans "Has no value" %}</option>
-        <option value="not_null">{% trans "Has any value" %}</option>
-    </select>
+    <select 
+        class="resources" 
+        data-bind="
+            value: op, 
+            chosen: {width: '100%', disable_search_threshold: 15},
+            optionsText: 'text',
+            optionsValue: 'value',
+            options: [
+                { text: $root.translations.references, value: '' },
+                { text: $root.translations.doesNotReference, value: '!' },
+                { text: $root.translations.hasNoValue, value: 'null' },
+                { text: $root.translations.hasAnyValue, value: 'not_null' },
+            ],
+        "
+    ></select>
 </div>
 <div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <!-- ko component: {
         name:  datatype.datatype.includes('list') ? 'resource-instance-multiselect-widget' : 'resource-instance-select-widget',
         params: {
             config: {
-                placeholder: '{% trans "Select a resource" %}'
+                placeholder: $root.translations.selectAResource,
             },
             label: '',
             value: searchValue,

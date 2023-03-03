@@ -1,4 +1,8 @@
-{% load static %} {% load i18n %} {% load template_tags %}
+{% load static %} 
+{% load i18n %} 
+{% load template_tags %}
+{% load webpack_static from webpack_loader %}
+
 
 <!--ko let: {self: $data} -->
 <!--ko if: resourceEditorContext && displaySplash()-->
@@ -6,31 +10,39 @@
 
     <!-- Image -->
     <div class="img-lg img-circle rr-splash-img-container">
-        <img class="rr-splash-img" src="{% static 'img/Workflow.png'%}" alt="Resource Editor">
+        <img class="rr-splash-img" src="{% webpack_static 'img/Workflow.png' %}" alt="Resource Editor">
     </div>
 
     <!-- Splash Title -->
-    <div class="rr-splash-title">{% trans "Related Resources Editor" %}</div>
+    <div class="rr-splash-title">
+        <span data-bind="text: $root.translations.relatedResourcesEditor"></span>
+    </div>
 
 
-    <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}">{% trans 'Add Related Resources' %}</button>
+    <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){displaySplash(false)}">
+        <span data-bind="text: $root.translations.addRelatedResources"></span>
+    </button>
 
     <!-- Splash Instructions -->
-    <div class="rr-splash-description">{% trans "Arches allows you to define relationships between resources so you can better understand the context and interplay" %}</div>
-    <div class="rr-splash-description">{% trans "between physical objects, events, activities, people and documents." %}</div>
-    <div class="rr-splash-description">{% trans "Relating resources lets you build a network of relationships for your data objects." %}</div>
-
+    <div class="rr-splash-description">
+        <span data-bind="text: $root.translations.relatedResourcesEditorDesc"></span>
+    </div>
 
     <!-- Help Hyperlink -->
-    <div class="rr-splash-help-link" data-bind="click: function(){$parent.helpTemplate('report-manager-help'); $parent.helpOpen(true);}">{% trans "Show Me How" %}</div>
+    <div class="rr-splash-help-link" data-bind="click: function(){$parent.helpTemplate('report-manager-help'); $parent.helpOpen(true);}">
+        <span data-bind="text: $root.translations.showMeHow"></span>
+    </div>
 </div>
 <!--/ko-->
 
 <div class="create-resource-instance-card-component rr-table-pop"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
-    <div class="create-instance-header" style="display: flex; justify-content: space-between;">{% trans "Related Resource Summary" %}
+    <div class="create-instance-header" style="display: flex; justify-content: space-between;">
+        <span data-bind="text: $root.translations.addRelatedResources"></span>
         <div data-bind="click: function(){reportResourceId(null)}, clickBubble: false" class="close-new-step">
-            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">{% trans "Return" %}</button>
+            <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary">
+                <span data-bind="text: $root.translations.return"></span>
+            </button>
         </div>
     </div>
     <div class="create-instance-panel" data-bind="component: {
@@ -48,12 +60,12 @@
     <div class="rr-viewer-selector-title" data-bind="click: function () { showGraph(false); },
         css: {'selected': !showGraph(), 'disabled': showGraph()
     }">
-        <span>{% trans "Table" %}</span>
+        <span data-bind="text: $root.translations.table"></span>
     </div>
     <div class="rr-viewer-selector-title" data-bind="click: function () { if (currentResource()){showGraph(true)}; },
         css: {'selected': showGraph(), 'disabled': !showGraph()
     }">
-        <span>{% trans "Visualization" %}</span>
+        <span data-bind="text: $root.translations.visualization"></span>
     </div>
 </div>
 {% endblock tabs %}
@@ -68,8 +80,12 @@
 
             <div class="editor-elements">
                 <div class="">
-                    <h2 class="">{% trans "Related Resources" %}</h2>
-                    <h3 class="">{% trans "Select resources and relate it to this one" %}</h3>
+                    <h2 class="">                        
+                        <span data-bind="text: $root.translations.relatedResources"></span>
+                    </h2>
+                    <h3 class="">
+                        <span data-bind="text: $root.translations.addRelationshipInstruction"></span>
+                    </h3>
                     <div style="min-width: 300px;">
                         <input style="display:inline-block;" data-bind="
                             select2Query: {
@@ -86,13 +102,20 @@
         <div data-bind="hidden: showGraph()">
             <!--ko if: resourceRelationships().length > 0 -->
             <div class="rr-table-border" style="padding: 3px; display: flex; border-bottom: none; background: #f2f2f2; height: 40px; padding-top: 5px; padding-left: 5px;">
-                <div class="relative">
-                    <input type="text" class="form-control" style="width: 300px; height: 28px" placeholder="{% trans 'e.g.: .txt' %}"
-                        data-bind="textInput: filter"></input>
-                    <span class="clear-node-search" style="top: 5px;" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
+                <div class="list-filter">
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        style="width: 300px; height: 28px"
+                        data-bind="
+                            attr: { placeholder: $root.translations.egText }, 
+                            textInput: filter
+                        "
+                    ></input>
+                    <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter('');}"><i class="fa fa-times-circle"></i></span>
                 </div>
                 <span style="padding: 4px;" data-bind="if: totalRelationships() > 1">
-                    <span style="font-size: 13px;" class='file-workbench-filecount' data-bind='text: totalRelationships() + "{% trans ' resource relations' %}"'></span>
+                    <span style="font-size: 13px;" class='file-workbench-filecount' data-bind="text: totalRelationships() + ' ' + $root.translations.resourceRelations"></span>
                 </span>
             </div>
 
@@ -121,13 +144,14 @@
                         </div>
                         <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
                             <div data-bind="if: !!relationship.tileid()">
-                                <div>{% trans "This is a Node to Resource Instance relationship" %}</div>
+                                <div data-bind="text: $root.translations.nodeResourceRelationshipText"></div>
                                 <div class="widget-container" style="padding-left: 0px;">
                                     <!--ko if: self.graphIsSemantic -->
                                     <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidfrom() -->
                                     <div class="row">
-                                        <label class="col-sm-12" style="font-weight: bold;"><span class=""
-                                            data-bind="text: self.currentResource().displayname"></span>{% trans "'s relationship to" %} <span                                   data-bind="text: resource.displayname"></span></label>
+                                        <label class="col-sm-12" style="font-weight: bold;">
+                                            <span class="" data-bind="text: self.currentResource().displayname + $root.translations.relationshipText + ' ' + resource.displayname"></span>
+                                        </label>
                                     </div>
                                     <div class="row">
                                         <span class="col-sm-4" style="padding-right: 5px;text-align: right;"
@@ -135,7 +159,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.select-ontology-property)
                                                 }
                                             ">
                                         </span>
@@ -143,8 +167,9 @@
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                     </div>
                                     <div class="row" style="margin-top: 20px;">
-                                        <label class="col-sm-12" style="font-weight: bold;"><span
-                                                data-bind="text: resource.displayname"></span>{% trans "'s relationship to " %} <span class=""                            data-bind="text: self.currentResource().displayname"></span></label>
+                                        <label class="col-sm-12" style="font-weight: bold;">
+                                            <span data-bind="text: resource.displayname + $root.translations.relationshipText + ' ' + self.currentResource().displayname"></span>
+                                        </label>
                                     </div>
                                     <div class="row">
                                         <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
@@ -152,7 +177,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.select-ontology-property)
                                                 }
                                             ">
                                         </span>
@@ -162,8 +187,8 @@
                                     <!-- /ko -->
                                     <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidto() -->
                                     <div class="row">
-                                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Relationship to" %} <span
-                                                data-bind="text: resource.displayname"></span></label>
+                                        <label class="col-sm-12" style="font-weight: bold;">
+                                            <span data-bind="text: $root.translations.inverseRelationshipTo + ' ' + resource.displayname"></span></label>
                                     </div>
                                     <div class="row">
                                         <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
@@ -171,7 +196,7 @@
                                         <span class="col-sm-4">
                                             <input style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, '{% trans 'Select an Ontology Property' %}')
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.select-ontology-property)
                                                 }
                                             ">
                                         </span>
@@ -179,8 +204,9 @@
                                         data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                     </div>
                                     <div class="row" style="margin-top: 20px;">
-                                        <label class="col-sm-12" style="font-weight: bold;">{% trans "Inverse Relationship to" %} <span
-                                            data-bind="text: resource.displayname"></span></label>
+                                        <label class="col-sm-12" style="font-weight: bold;">
+                                            <span data-bind="text: $root.translations.inverseRelationshipTo + ' ' + resource.displayname"></span>
+                                        </label>
                                         </div>
                                         <div class="row">
                                             <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
@@ -188,7 +214,7 @@
                                             <span class="col-sm-4">
                                                 <input style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, '{% trans 'Select an Ontology Property' %}')
+                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.select-ontology-property)
                                                     }
                                                 ">
                                             </span>
@@ -200,20 +226,27 @@
                                 </div>
                                 <div class="relation-properties-button">
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-trash"
-                                        data-bind="click:self.updateTile.bind(self, {'delete':true})">{% trans "Delete this entry" %}</button>
+                                        data-bind="click:self.updateTile.bind(self, {'delete':true})">
+                                        <span data-bind="text: $root.translations.deleteThisEntry"></span>
+                                    </button>
                                     <!--ko if: self.graphIsSemantic -->
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-times"
-                                        data-bind="click:relationship.reset, visible: relationship.dirty">{% trans "Cancel Edit" %}</button>
+                                        data-bind="click:relationship.reset, visible: relationship.dirty">
+                                        <span data-bind="text: $root.translations.cancelEdit"></span>
+                                    </button>
                                     <button class="btn btn-mint btn-labeled btn-lg fa fa-cloud"
-                                        data-bind="click:self.updateTile.bind(self, {'delete':false}), visible: relationship.dirty">{% trans "Save" %}</button>
+                                        data-bind="click:self.updateTile.bind(self, {'delete':false}), visible: relationship.dirty">
+                                        <span data-bind="text: $root.translations.save"></span>
+                                    </button>
                                     <!-- /ko -->
                                 </div>
                             </div>
                             <div data-bind="ifnot: !!relationship.tileid()">
-                                <div>{% trans "This is a Resource Instance to Resource Instance relationship" %}</div>
+                                <div data-bind="text: $root.translations.relationshipDesc"></div>
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
-                                        <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Relationship" %}
+                                        <label class="col-xs-12 control-label widget-input-label" for="">
+                                            <span data-bind="text: $root.translations.relationship"></span>
                                             <i class="ion-ios-checkmark-outline"></i></label>
                                         <div class="col-xs-12">
                                             <input style="width:30%; display:inline-block;" data-bind="select2: {
@@ -233,11 +266,13 @@
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
                                         <div class="relative">
-                                            <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "From Date" %} <i
-                                                    class="ion-ios-checkmark-outline"></i>
+                                            <label class="col-xs-6 control-label widget-input-label" for="">
+                                                <span data-bind="text: $root.translations.fromDate"></span>
+                                                <i class="ion-ios-checkmark-outline"></i>
                                             </label>
-                                            <label class="col-xs-6 control-label widget-input-label" for=""> {% trans "To Date" %} <i
-                                                    class="ion-ios-checkmark-outline"></i>
+                                            <label class="col-xs-6 control-label widget-input-label" for="">
+                                                <span data-bind="text: $root.translations.toDate"></span>
+                                                <i class="ion-ios-checkmark-outline"></i>
                                             </label>
                                         </div>
 
@@ -257,8 +292,10 @@
                                 <div class="row widget-container" style="padding-left: 0px;">
                                     <div class="form-group">
                                         <div class="relative">
-                                            <label class="col-xs-12 control-label widget-input-label" for="">{% trans "Description" %} <i
-                                                    class="ion-ios-checkmark-outline"></i></label>
+                                            <label class="col-xs-12 control-label widget-input-label" for="">
+                                                <span data-bind="text: $root.translations.description"></span>
+                                                <i class="ion-ios-checkmark-outline"></i>
+                                            </label>
                                         </div>
 
                                         <div class="col-xs-12">
@@ -271,11 +308,17 @@
 
                                 <div class="relation-properties-button">
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-trash"
-                                        data-bind="click:self.deleteRelationships.bind(self)">{% trans "Delete this entry" %}</button>
+                                        data-bind="click:self.deleteRelationships.bind(self)">
+                                        <span data-bind="text: $root.translations.deleteThisEntry"></span>
+                                    </button>
                                     <button class="btn btn-danger btn-labeled btn-lg fa fa-times"
-                                        data-bind="click:relationship.reset, visible: relationship.dirty">{% trans "Cancel Edit" %}</button>
+                                        data-bind="click:relationship.reset, visible: relationship.dirty">
+                                        <span data-bind="text: $root.translations.cancelEdit"></span>
+                                    </button>
                                     <button class="btn btn-mint btn-labeled btn-lg fa fa-cloud"
-                                        data-bind="click:self.saveRelationship.bind(self), visible: relationship.dirty">{% trans "Save" %}</button>
+                                        data-bind="click:self.saveRelationship.bind(self), visible: relationship.dirty">
+                                        <span data-bind="text: $root.translations.save"></span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -309,7 +352,9 @@
             <!--/ko -->
 
             <!--ko if: resourceRelationships().length === 0 -->
-            <div class="rr-panel-note">{%trans "This resource is not related to any other resources" %}</div>
+            <div class="rr-panel-note">
+                <span data-bind="text: $root.translations.noRelatedResourceText"></span>
+            </div>
             <!--/ko-->
         </div>
 
@@ -318,16 +363,18 @@
         <div id="rr-splash" class="rr-splash" style="margin: 50px 310px 0px 40px;">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="{% static 'img/Workflow.png' %}" alt="Saved Search">
+                <img class="rr-splash-img" src="{% webpack_static 'img/Workflow.png' %}" alt="Saved Search">
             </div>
 
             <!-- Splash Title -->
-            <div class="rr-splash-title">{% trans "Related Resources" %}</div>
+            <div class="rr-splash-title">
+                <span data-bind="text: $root.translations.relatedResources"></span>
+            </div>
 
             <!-- Splash Instructions -->
-            <div class="rr-splash-description">{% trans 'Arches keeps track of how resources are related. Click the "related resources" link' %}</div>
-            <div class="rr-splash-description">{% trans 'on a search result from the list on the left' %}</div>
-            <div class="rr-splash-description">{% trans "to see its relatives displayed in an interactive graph" %}</div>
+            <div class="rr-splash-description">
+                <span data-bind="text: $root.translations.relatedResourcesFilterText"></span>
+            </div>
         </div>
         <!--/ko-->
     </div>

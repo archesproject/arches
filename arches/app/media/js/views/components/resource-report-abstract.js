@@ -1,17 +1,19 @@
 define([
-    'arches',
     'jquery',
     'underscore',
     'knockout',
+    'arches',
     'report-templates',
     'models/report',
     'models/graph',
-    'viewmodels/card'
-], function(arches, $, _, ko, reportLookup, ReportModel, GraphModel) {
+    'templates/views/components/resource-report-abstract.htm',
+    'viewmodels/card',
+], function($, _, ko, arches, reportLookup, ReportModel, GraphModel, resourceReportAbstractTemplate) {
     var ResourceReportAbstract = function(params) {
         var self = this;
         var CardViewModel = require('viewmodels/card');
 
+         
         this.loading = ko.observable(true);
 
         this.version = arches.version;
@@ -70,9 +72,8 @@ define([
                             'template': responseJson.template,
                             'report_json': responseJson.report_json,
                         });
+                        self.loading(false);
                     }
-        
-                    self.loading(false);
                 });
 
             }
@@ -89,7 +90,17 @@ define([
             });
         };
         
-        this.preloadResourceData = function(responseJson) {            
+        this.preloadResourceData = function(responseJson) {
+            const displayName = (() => {
+                try{
+                    return JSON.parse(responseJson.displayname)?.[arches.activeLanguage]?.value;
+                } catch (e){
+                    return responseJson.displayname;
+                }
+            })();
+
+            responseJson.displayname = displayName;
+
             var graphModel = new GraphModel({
                 data: responseJson.graph,
                 datatypes: responseJson.datatypes,
@@ -131,13 +142,16 @@ define([
             report['report_json'] = responseJson.report_json;
 
             self.report(report);
+            self.loading(false);
         };
 
         self.initialize();
     };
+
     ko.components.register('resource-report-abstract', {
         viewModel: ResourceReportAbstract,
-        template: { require: 'text!templates/views/components/resource-report-abstract.htm' }
+        template: resourceReportAbstractTemplate,
     });
+
     return ResourceReportAbstract;
 });

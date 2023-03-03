@@ -1,22 +1,27 @@
+{% load template_tags %}
 {% load i18n %}
 
 <!-- ko if: bufferNodeId() -->
 <div class="card">
     <div class="add-buffer-feature-header">
-        {% trans 'Add Buffer Feature' %}
+        <span data-bind="text: $root.translations.addBufferFeature"></span>
     </div>
     <div class="add-buffer-feature-input">
-        <div>{% trans 'Distance:' %}</div>
+        <div>
+            <span data-bind="text: $root.translations.distance"></span>
+        </div>
         <input type="number" step="any" class="form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: bufferDistance"></input>
     </div>
     <div class="add-buffer-feature-input">
-        <div>{% trans 'Units:' %}</div>
+        <div>
+            <span data-bind="text: $root.translations.units"></span>
+        </div>
         <select data-bind="
             options: [{
-                text: '{% trans 'meters' %}',
+                text: $root.translations.meters,
                 value: 'm'
             }, {
-                text: '{% trans 'feet' %}',
+                text: $root.translations.feet,
                 value: 'ft'
             }],
             optionsText: 'text',
@@ -33,14 +38,22 @@
     <!-- ko if: allowAddNew -->
     <div class="add-buffer-feature-input">
         <input type="checkbox" data-bind="checked: bufferAddNew">
-        <span class="add-buffer-as-new-label">{% trans 'Add as new ' %}"<span data-bind="text: card.model.get('name')"></span>"?</span>
+        <span class="add-buffer-as-new-label">
+            <span data-bind="text: $root.translations.addAsNew"></span>
+            <span data-bind="text: card.model.get('name')"></span>
+            <span>?</span>
+        </span>
     </div>
     <!-- /ko-->
     <div class="map-coordinate-editor-button-container">
         <button class="btn btn-shim btn-labeled btn-lg fa fa-search btn-mint" data-bind="click: function() {
             bufferNodeId(null);
-        }">{% trans 'Cancel' %}</button>
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: addBufferResult">{% trans 'Add Feature' %}</button>
+        }">
+            <span data-bind="text: $root.translations.cancel"></span>
+        </button>
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" data-bind="click: addBufferResult">
+            <span data-bind="text: $root.translations.addFeature"></span>
+        </button>
     </div>
 </div>
 <!-- /ko-->

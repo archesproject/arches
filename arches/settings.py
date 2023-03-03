@@ -16,8 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import inspect
+import json
+import os
+import sys
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -51,16 +53,20 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PG_SUPERUSER = ""
 PG_SUPERUSER_PW = ""
 
-COUCHDB_URL = "http://admin:admin@localhost:5984"  # defaults to localhost:5984
-
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
-ELASTICSEARCH_HOSTS = [{"host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+
+# Comment out this line for a development setup after running the ubuntu_setup.sh script
 ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
+
+# Uncomment this line for a development setup after running the ubuntu_setup.sh script (do not use in production)
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
 
@@ -186,7 +192,7 @@ TIME_ZONE = "America/Chicago"
 USE_TZ = False
 
 
-# see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
+# see https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
 # (make sure to check your accept headers as they will override the LANGUAGE_CODE setting!)
 # also see get_language_from_request in django.utils.translation.trans_real.py
@@ -258,11 +264,11 @@ MEDIA_URL = "/files/"
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ""
+STATIC_ROOT = os.path.join(ROOT_DIR, "staticfiles")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = "/media/"
+STATIC_URL = "/static/"
 
 # when hosting Arches under a sub path set this value to the sub path eg : "/{sub_path}/"
 FORCE_SCRIPT_NAME = None
@@ -277,6 +283,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(ROOT_DIR, "app", "media", "build"),
     os.path.join(ROOT_DIR, "app", "media"),
 )
 
@@ -301,14 +308,7 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
-MOBILE_OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
-MOBILE_DEFAULT_ONLINE_BASEMAP = {"default": "mapbox://styles/mapbox/streets-v9"}
-MOBILE_IMAGE_SIZE_LIMITS = {
-    # These limits are meant to be approximates. Expect to see uploaded sizes range +/- 20%
-    # Not to exceed the limit defined in DATA_UPLOAD_MAX_MEMORY_SIZE
-    "full": min(1500000, DATA_UPLOAD_MAX_MEMORY_SIZE),  # ~1.5 Mb
-    "thumb": 400,  # max width/height in pixels, this will maintain the aspect ratio of the original image
-}
+OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 
 TEMPLATES = [
     {
@@ -345,9 +345,11 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
     "arches.app.utils.permission_backend.PermissionBackend",
     "guardian.backends.ObjectPermissionBackend",
+    "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
 INSTALLED_APPS = (
+    "webpack_loader",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -383,18 +385,25 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "STATS_FILE": os.path.join(ROOT_DIR, "webpack/webpack-stats.json"),
+    },
+}
+
+WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
+
 ROOT_URLCONF = "arches.urls"
 
 WSGI_APPLICATION = "arches.wsgi.application"
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 try:
     CORS_ALLOW_HEADERS = list(default_headers) + [
         "x-authorization",
     ]
 except Exception as e:
-    print(e)
+    if __name__ == "__main__":
+        print(e)
 
 LOGGING = {
     "version": 1,
@@ -453,6 +462,20 @@ if DEBUG is True:
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
+
+# external oauth configuration
+EXTERNAL_OAUTH_CONFIGURATION = {
+    "default_user_groups": [],
+    "user_domains": [],
+    "uid_claim": "",
+    "app_id": "",
+    "app_secret": "",
+    "scopes": [],
+    "authorization_endpoint": "",
+    "validate_id_token": True,  # AVOID setting this to False
+    "token_endpoint": "",
+    "jwks_uri": "",
+}
 
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
@@ -607,6 +630,12 @@ MAP_MAX_ZOOM = 20
 # causing your application to break.
 OVERRIDE_RESOURCE_MODEL_LOCK = False
 
+# If True, allows users to selectively enable two-factor authentication
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+
+# If True, users cannot log in unless they have enabled two-factor authentication
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # bounds for search results hex binning fabric (search grid).
 # a smaller bbox will give you less distortion in hexes and better performance
 DEFAULT_BOUNDS = {
@@ -735,3 +764,18 @@ except ImportError as e:
         from arches.settings_local import *
     except ImportError as e:
         pass
+
+# # returns an output that can be read by NODEJS
+if __name__ == "__main__":
+    print(
+        json.dumps(
+            {
+                "ARCHES_NAMESPACE_FOR_DATA_EXPORT": ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                "STATIC_URL": STATIC_URL,
+                "ROOT_DIR": ROOT_DIR,
+                "APP_ROOT": ROOT_DIR + "/app",
+                "WEBPACK_DEVELOPMENT_SERVER_PORT": WEBPACK_DEVELOPMENT_SERVER_PORT,
+            }
+        )
+    )
+    sys.stdout.flush()

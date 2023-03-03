@@ -27,7 +27,7 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
@@ -63,7 +63,7 @@ class SearchView(MapBaseManagerView):
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
@@ -136,6 +136,10 @@ def search_terms(request):
     for index in ["terms", "concepts"]:
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
+
+        if lang != "*":
+            boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
+
         boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(
@@ -359,6 +363,28 @@ def search_results(request, returnDsl=False):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
+
+        def get_localized_descriptor(resource, descriptor_type, language_codes):
+            descriptor = resource["_source"][descriptor_type]
+            result = descriptor[0] if len(descriptor) > 0 else None
+            for language_code in language_codes:
+                for entry in descriptor:
+                    if entry["language"] == language_code and entry["value"] != "":
+                        return entry
+            return result
+
+        descriptor_types = ("displaydescription", "displayname")
+        active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
+
+        for resource in results["hits"]["hits"]:
+            for descriptor_type in descriptor_types:
+                descriptor = get_localized_descriptor(resource, descriptor_type, active_and_default_language_codes)
+                if descriptor:
+                    resource["_source"][descriptor_type] = descriptor["value"]
+                    if descriptor_type == "displayname":
+                        resource["_source"]["displayname_language"] = descriptor["language"]
+                else:
+                    resource["_source"][descriptor_type] = _("Undefined")
 
         ret["results"] = results
 

@@ -24,7 +24,7 @@ import uuid
 import arches.app.utils.zip as arches_zip
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.resource import Resource, ModelInactiveError
+from arches.app.models.resource import Resource, PublishedModelError
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -120,12 +120,12 @@ class TileData(View):
                         resource.save(user=request.user, transaction_id=transaction_id)
                         data["resourceinstance_id"] = resource.pk
                         resource.index()
-                    except ModelInactiveError as e:
-                        message = _("Unable to save. Please verify the model status is active")
+                    except PublishedModelError as e:
+                        message = _("Unable to save. Please verify the model is currently unpublished.")
                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
-                is_active = resource_instance.graph.isactive
+                is_active = resource_instance.graph.publication is not None
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
@@ -147,8 +147,8 @@ class TileData(View):
                                             Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
                                         title = _("Unable to save. Please verify your input is valid")
                                         return self.handle_save_error(e, tile_id, title=title)
-                                    except ModelInactiveError as e:
-                                        message = _("Unable to save. Please verify the model status is active")
+                                    except PublishedModelError as e:
+                                        message = _("Unable to save. Please verify the model is not currently published.")
                                         return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                                     except Exception as e:
                                         title = _("Unable to save.")
@@ -225,19 +225,17 @@ class TileData(View):
     def delete(self, request):
         json = request.body
         if json is not None:
-            ret = []
             data = JSONDeserializer().deserialize(json)
             with transaction.atomic():
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
                     resource_instance = tile.resourceinstance
-                    is_active = resource_instance.graph.isactive
+                    is_active = resource_instance.graph.publication_id is not None
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
                 user_is_reviewer = user_is_resource_reviewer(request.user)
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):
-                        nodegroup = models.NodeGroup.objects.get(pk=tile.nodegroup_id)
                         if tile.is_provisional() is True and len(list(tile.provisionaledits.keys())) == 1:
                             provisional_editor_id = list(tile.provisionaledits.keys())[0]
                             edit = tile.provisionaledits[provisional_editor_id]

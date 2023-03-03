@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^', include('arches.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.SHOW_LANGUAGE_SWITCH is True:
-    urlpatterns = i18n_patterns(*urlpatterns)
+# if settings.SHOW_LANGUAGE_SWITCH is True:
+#     urlpatterns = i18n_patterns(*urlpatterns)

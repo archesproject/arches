@@ -83,12 +83,6 @@ class BaseDataType(object):
         """
         return None
 
-    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
-        """
-        Transforms data from a mobile device to an Arches friendly format
-        """
-        return None
-
     def get_map_layer(self, node=None):
         """
         Gets the array of map layers to add to the map for a given node
@@ -209,7 +203,7 @@ class BaseDataType(object):
             logger.exception(_("Tile has no authoritative or provisional data"))
 
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         """
         Returns a list of concept values for a given node
         """
@@ -223,7 +217,7 @@ class BaseDataType(object):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
-        Returns a nodevalue if it qualifies as a search term
+        Returns an array of arches.app.search_term.SearchTerm objects
         """
         return []
 
@@ -242,7 +236,7 @@ class BaseDataType(object):
         base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
         null_query = Bool()
-        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}")
         nested_query = Nested(path="tiles", query=data_exists_query)
         null_query.must(nested_query)
         if value["op"] == "null":
@@ -275,7 +269,7 @@ class BaseDataType(object):
                                     return null_docs;
                                 """,
                                     "lang": "painless",
-                                    "params": {"node_id": "%s" % (str(node.pk))},
+                                    "params": {"node_id": f"{str(node.pk)}"},
                                 }
                             }
                         }
@@ -297,6 +291,12 @@ class BaseDataType(object):
         """
         pass
 
+    def get_default_language_value_from_localized_node(self, tile, nodeid):
+        """
+        If value is internationalized, return only the first value in the i18n object
+        """
+        return tile.data[str(nodeid)]
+
     def post_tile_save(self, tile, nodeid, request):
         """
         Called after the tile is saved to the database
@@ -310,6 +310,12 @@ class BaseDataType(object):
 
         """
         pass
+
+    def is_multilingual_rdf(self, rdf):
+        """
+        Determines if the rdf snippet contains multiple languages that can be processed by a given datatype
+        """
+        return False
 
     def is_a_literal_in_rdf(self):
         """
@@ -436,3 +442,22 @@ class BaseDataType(object):
         ret = {"@display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
+
+    def has_multicolumn_data(self):
+        """
+        Used primarily for csv exports - true if data
+        for a node can span multiple columns
+        """
+        return False
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        return node["file_field_name"]
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        """
+        Adds properties to a tile necessary for some clients, but not essential to the tile
+        """
+        pass

@@ -1,0 +1,90 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+<div class="etl-module-component-container">
+<div class="etl-module-body">
+    <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">
+        <span data-bind="text: $root.translations.etlSingleCSVTitle"></span>
+    </h3>
+    <div class="etl-module-component etl-module-mapping">
+        <h4>
+            <span data-bind="text: $root.translations.targetModel"></span>
+        </h4>
+        <select data-bind="
+            value: selectedGraph,
+            options: graphs,
+            optionsText: 'name',
+            optionsValue: 'graphid',
+            optionsCaption: $root.translations.selectAResourceModel + '...',
+            valueAllowUnset: true,
+            chosen: {width: '500px'}"
+        ></select>
+    </div>
+    <div class="etl-module-component etl-module-mapping">
+        <h4>
+            <span data-bind="text: $root.translations.importDetails"></span>
+        </h4>
+        <!-- ko if: nodes() -->
+        <span data-bind="text: console.log(nodes())"></span>
+        <select data-bind="
+            value: selectedNode,
+            options: nodes,
+            optionsText: 'label',
+            optionsCaption: $root.translations.select + '...',
+            optionsValue: 'nodeid',
+            valueAllowUnset: true,
+            chosen: {width: '100%'}"
+        ></select>
+        <!-- /ko -->
+    </div>
+    <div>
+        <label>Laguages</label>
+        <select data-bind="
+                options: languages,
+                optionsCaption: $root.translations.select + '...',
+                optionsText: function(item){return item.name + ' (' + item.code + ')'},
+                value: selectedLanguage,
+                chosen: {width:'100%'}
+            "
+        ></select>
+    </div>
+    <div>
+        <label>Operation</label>
+        <select data-bind="
+                value: operation, 
+                chosen: {width: '100%', disable_search_threshold: 15},
+                optionsText: 'text',
+                optionsValue: 'value',
+                options: [
+                    { text: 'trim', value: 'trim' },
+                    { text: 'replace', value: 'replace' },
+                    { text: 'capitalize', value: 'capitalize' },
+                    { text: 'upper', value: 'upper' },
+                    { text: 'lower', value: 'lower' },
+                ],
+            "
+        ></select>
+    </div>
+    <div data-bind="if: operation() === 'replace'">
+        <label>Old Text:</label>
+        <input type="text" class="form-control" placeholder="Old Text" data-bind="value: oldText">
+        <label>New Text:</label>
+        <input type="text" class="form-control" placeholder="New Text" data-bind="value: newText">
+    </div>
+</div>
+<div class="tabbed-workflow-footer, etl-module-footer">
+    <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
+        <span data-bind="text: $root.translations.importData"></span>
+    </button>
+    <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
+        <span data-bind="text: $root.translations.cancelFileImport"></span>
+    </button>
+</div>
+</div>
+<!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+{% endblock etl_status %}

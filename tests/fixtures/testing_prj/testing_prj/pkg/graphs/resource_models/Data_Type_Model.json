@@ -906,9 +906,15 @@
                 }
             ],
             "graphid": "330802c5-95bd-11e8-b7ac-acde48001122",
+            "publication": {
+                "graph_id": "330802c5-95bd-11e8-b7ac-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "d5419599-fece-4dd6-8fb7-89df264ba7bc",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Data Type Testing Model",

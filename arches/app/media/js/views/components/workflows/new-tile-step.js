@@ -1,14 +1,15 @@
 define([
     'underscore',
     'jquery',
-    'arches',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
-    'viewmodels/alert'
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel) {
+    'viewmodels/alert',
+    'templates/views/components/workflows/new-tile-step.htm'
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, newTileStepTemplate) {
     function viewModel(params) {
         var self = this;
 
@@ -284,9 +285,7 @@ define([
     }
     ko.components.register('new-tile-step', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/workflows/new-tile-step.htm'
-        }
+        template: newTileStepTemplate,
     });
     return viewModel;
 });

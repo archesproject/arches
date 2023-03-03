@@ -1,20 +1,15 @@
 import os
-import json
-import csv
-import base64
 import datetime
-from io import BytesIO
-from tests import test_settings
-from operator import itemgetter
+
 from django.core import management
 from django.test.client import RequestFactory, Client
-from django.contrib.auth.models import User, Group, AnonymousUser
 from django.urls import reverse
 from django.db import connection
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.models import TileModel, ResourceInstance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.models import TileModel
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter as BusinessDataExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -38,6 +33,7 @@ class JsonLDImportTests(ArchesTestCase):
         sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
         cursor = connection.cursor()
         cursor.execute(sql_str)
+        LanguageSynchronizer.synchronize_settings_with_db()
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
@@ -57,6 +53,10 @@ class JsonLDImportTests(ArchesTestCase):
 
         # Load up the models and data only once
         with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object_cardinality_n.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -115,11 +115,11 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-    def setUp(self):
-        pass
+        with open(os.path.join("tests/fixtures/jsonld_base/models/required_ambiguous_nodes.json"), "rU") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
 
-    @classmethod
-    def tearDownClass(cls):
+    def setUp(self):
         pass
 
     def tearDown(self):
@@ -169,7 +169,27 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(rdffile.docCache[data["@context"]]["expires"] > datetime.datetime.now())
         self.assertTrue(data["@context"] in rdffile.docCache)
 
+    def test_literal_cardinality_failure(self):
+        """Multiple literals without language should fail to import to card 1 node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": ["test!", "prueba!"]
+            }"""
+
+        graph_id = "bf734b4e-f6b5-11e9-8f09-a4d18cec433a"
+        resource_id = "221d1154-fa8e-11e9-9cbb-3af9d3b32b71"
+
+        with self.assertRaises(ValueError):
+            data = JSONDeserializer().deserialize(data)
+            reader = JsonLdReader()
+            # import ipdb; ipdb.sset_trace()
+            reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
+
+            print(reader)
+
     def test_1_basic_import(self):
+        """Plain string should import and be automatically converted to i18n string of default language"""
         data = """{
             "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
@@ -182,17 +202,95 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-
         self.assertEqual(response.status_code, 201)
 
         js = response.json()
-        if type(js) == list:
+        if isinstance(js, list):
             js = js[0]
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "test!")
+
+    def test_1_basic_import_with_language(self):
+        """Add language values to jsonld and test import with a cardinality 1 node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note":
+                [{"@value": "test!", "@language": "en"}, {"@value": "prueba!", "@language": "es"}]
+            }"""
+
+        url = self._create_url(
+            graph_id="bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            resource_id="221d1154-fa8e-11e9-9cbb-3af9d3b32b71",
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+
+        js = response.json()
+        if isinstance(js, list):
+            js = js[0]
+
+        self.assertTrue("@id" in js)
+        self.assertEqual(js["@id"], "http://localhost:8000/resources/221d1154-fa8e-11e9-9cbb-3af9d3b32b71")
+        self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
+        self.assertEqual(set(note["@language"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["en", "es"]))
+        self.assertEqual(set(note["@value"] for note in js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]), set(["prueba!", "test!"]))
+
+    def test_1_basic_import_with_language_cardinality_n(self):
+        """Add language values to jsonld and test import with a cardinality n node."""
+        data = """{
+            "@id": "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+            "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": [
+                {
+                    "@id": "http://localhost:8000/tile/4d788140-cefe-4856-9266-4d7e75cefceb/node/abd41efa-7968-11ec-80f9-faffc210b420",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                        {"@language": "es","@value": "Azul"},
+                        {"@language": "en","@value": "Blue"}
+                    ]
+                },
+                {
+                    "@id": "http://localhost:8000/tile/610cb383-222b-47e0-906f-8b303bb1b20b/node/abd41efa-7968-11ec-80f9-faffc210b420",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                        {"@language": "es", "@value": "Blanco"},
+                        {"@language": "en", "@value": "White"}
+                    ]
+                }
+            ]
+        }"""
+
+        url = self._create_url(
+            graph_id="37b50648-78ef-11ec-9508-faffc210b420",
+            resource_id="b94b8bc3-ab26-4b0a-8080-9e8bde2979b4",
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        self.assertEqual(response.status_code, 201)
+
+        js = response.json()
+        if isinstance(js, list):
+            js = js[0]
+
+        P1_is_identified = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        P3_has_note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+
+        self.assertTrue("@id" in js)
+        self.assertEqual(js["@id"], "http://localhost:8000/resources/b94b8bc3-ab26-4b0a-8080-9e8bde2979b4")
+        languages = set()
+        values = set()
+        for identifier in js[P1_is_identified]:
+            self.assertTrue(isinstance(identifier[P3_has_note], list))
+            for note in identifier[P3_has_note]:
+                languages.add(note["@language"])
+                values.add(note["@value"])
+        self.assertEqual(languages, set(["en", "es"]))
+        self.assertEqual(values, set(["White", "Blanco", "Azul", "Blue"]))
 
     def test_1b_basic_post(self):
         data = """{
@@ -215,7 +313,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue("@id" in js)
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in js)
-        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "test!")
+        self.assertTrue(js["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "test!")
 
     def test_2_complex_import_data(self):
         # Note that this tests #5136, as the P101 -> P2 is a concept with a concept
@@ -296,9 +394,9 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(temp in js)
         proj = js[temp]
         self.assertTrue(qual in proj)
-        self.assertTrue(proj[qual] == "example")
+        self.assertTrue(proj[qual]["@value"] == "example")
         self.assertTrue(note in js)
-        self.assertTrue(js[note] == "Test Data")
+        self.assertTrue(js[note]["@value"] == "Test Data")
         self.assertTrue(pts in js)
         self.assertTrue(js[pts] == 12)
 
@@ -392,13 +490,13 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(pts in js)
         self.assertTrue(set(js[pts]) == set([1, 2]))
         self.assertTrue(note in js)
-        self.assertTrue(set(js[note]) == set(["asdfasdfa", "1903-10-21"]))
+        self.assertTrue(set(x["@value"] for x in js[note]) == set(["asdfasdfa", "1903-10-21"]))
         self.assertTrue(temp in js)
         temps = js[temp]
         self.assertTrue(len(temps) == 4)
         for t in temps:
             if qual in t:
-                self.assertTrue(t[qual] in ["example", "example 2"])
+                self.assertTrue(t[qual]["@value"] in ["example", "example 2"])
             if botb in t:
                 self.assertTrue(t[botb]["@value"] in ["2019-11-15", "1903-10-28"])
 
@@ -439,7 +537,7 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
-        print(f"Got JSON for test 3: {js}")
+        # print(f"Got JSON for test 3: {js}")
 
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/0b4439a8-beca-11e9-b4dc-0242ac160002")
@@ -482,7 +580,7 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 4: {response.content}")
+        # print(f"Test 4: {response.content}")
 
         self.assertEqual(response.status_code, 201)
 
@@ -560,7 +658,7 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
-        print(f"Got json for test 5: {js}")
+        # print(f"Got json for test 5: {js}")
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/7fffffff-faa1-11e9-84de-3af9d3b32b71")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by" in js)
@@ -601,7 +699,7 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 6 response: {response.content}")
+        # print(f"Test 6 response: {response.content}")
 
         self.assertTrue(response.status_code == 201)
 
@@ -609,7 +707,7 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
-        print(f"Got JSON for test 6: {js}")
+        # print(f"Got JSON for test 6: {js}")
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/69a4af50-c055-11e9-b4dc-0242ac160002")
 
@@ -642,20 +740,20 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 7 response: {response.content}")
+        # print(f"Test 7 response: {response.content}")
 
         self.assertTrue(response.status_code == 201)
         js = response.json()
         if type(js) == list:
             js = js[0]
 
-        print(f"Got JSON for test 7: {js}")
+        # print(f"Got JSON for test 7: {js}")
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/87654321-c000-1100-b400-0242ac160002")
 
         lo = js["http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"]
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P3_has_note" in lo)
-        self.assertTrue(lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"] == "Test Content")
+        self.assertTrue(lo["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]["@value"] == "Test Content")
 
     def test_7b_5121_branches(self):
 
@@ -695,7 +793,7 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 7b response: {response.content}")
+        # print(f"Test 7b response: {response.content}")
 
         self.assertTrue(response.status_code == 201)
 
@@ -707,7 +805,7 @@ class JsonLDImportTests(ArchesTestCase):
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
 
         self.assertTrue(rtb in js)
-        self.assertTrue(len(js[rtb]) == 3)
+        self.assertEqual(len(js[rtb]), 3)
 
         for r in js[rtb]:
             hasnote = note in r
@@ -761,7 +859,7 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 8 response: {response.content}")
+        # print(f"Test 8 response: {response.content}")
 
         # this does not currently work
         self.assertTrue(response.status_code == 201)
@@ -769,7 +867,7 @@ class JsonLDImportTests(ArchesTestCase):
         if type(js) == list:
             js = js[0]
 
-        print(f"Got JSON for test 8: {js}")
+        # print(f"Got JSON for test 8: {js}")
         self.assertTrue("@id" in js)
         self.assertTrue(js["@id"] == "http://localhost:8000/resources/940a2c82-bfa8-11e9-bd39-0242ac160002")
         self.assertTrue("http://www.cidoc-crm.org/cidoc-crm/P51_has_former_or_current_owner" in js)
@@ -796,9 +894,9 @@ class JsonLDImportTests(ArchesTestCase):
         """
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 9 response: {response.content}")
+        # print(f"Test 9 response: {response.content}")
 
-        self.assertTrue(response.status_code == 201)
+        self.assertEqual(response.status_code, 201)
 
         js = response.json()
         if type(js) == list:
@@ -812,7 +910,7 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(prod in js)
         prodjs = js[prod]
         self.assertTrue(note in prodjs)
-        self.assertTrue(prodjs[note] == "Production")
+        self.assertTrue(prodjs[note]["@value"] == "Production")
         self.assertTrue(note in js)
         self.assertTrue(js[note] == "#ff00ff")
 
@@ -849,7 +947,7 @@ class JsonLDImportTests(ArchesTestCase):
         """
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"Test 9 response: {response.content}")
+        # print(f"Test 9 response: {response.content}")
 
         self.assertTrue(response.status_code == 201)
 
@@ -870,12 +968,12 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertTrue(len(contl) == 2)
         if note in contl[0]:
-            print(f"note data: {contl[0]}")
-            self.assertTrue(contl[0][note] == "Import Note")
+            # print(f"note data: {contl[0]}")
+            self.assertTrue(contl[0][note]["@value"] == "Import Note")
             jsts = contl[1][ts]
         else:
-            print(f"note data: {contl[1]}")
-            self.assertTrue(contl[1][note] == "Import Note")
+            # print(f"note data: {contl[1]}")
+            self.assertTrue(contl[1][note]["@value"] == "Import Note")
             jsts = contl[0][ts]
         self.assertTrue(jsts[botb]["@value"] == "2018-01-01")
 
@@ -913,7 +1011,7 @@ class JsonLDImportTests(ArchesTestCase):
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
 
-        print(f"\n\n\nTest b response: {response.content}")
+        # print(f"\n\n\nTest b response: {response.content}")
         self.assertTrue(response.status_code == 201)
 
         js = response.json()
@@ -958,7 +1056,7 @@ class JsonLDImportTests(ArchesTestCase):
         )
 
         response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
-        print(f"\n\n\nTest c response: {response.content}")
+        # print(f"\n\n\nTest c response: {response.content}")
 
         self.assertTrue(response.status_code == 201)
 
@@ -975,7 +1073,13 @@ class JsonLDImportTests(ArchesTestCase):
         results = []
         for note in js[idby]:
             results.append(note["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"])
-        self.assertCountEqual(["remy", "babo pour la russie"], results)
+            # result = note["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"]
+            # if "remy" in result:
+            #     self.assertDictEqual(result, {'@language': 'en', '@value': 'remy'})
+            # else:
+            #     self.assertDictEqual(result, {'@language': 'en', '@value': 'babo pour la russie'})
+        #     results.append(note["http://www.cidoc-crm.org/cidoc-crm/P3_has_note"])
+        self.assertCountEqual([{"@language": "en", "@value": "remy"}, {"@language": "en", "@value": "babo pour la russie"}], results)
 
     def test_d_path_with_array_2(self):
         data = """
@@ -1045,7 +1149,7 @@ class JsonLDImportTests(ArchesTestCase):
         rtb = "http://www.cidoc-crm.org/cidoc-crm/P67i_is_referred_to_by"
         note = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
         self.assertTrue(rtb in js)
-        self.assertTrue(len(js[rtb]) == 2)
+        self.assertEqual(len(js[rtb]), 2)
         rtb1 = js[rtb][0]
         rtb2 = js[rtb][1]
         if note in rtb1:
@@ -1056,78 +1160,79 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_f_big_nest_mess(self):
 
-        data = """{
+        data = """
+        {
             "@id": "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122",
             "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
             "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": [
                 {
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": [
-                    {
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by": {
-                        "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122",
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
-                    },
-                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "asdf",
-                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
-                        "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-03"
+                    "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": [
+                        {
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                            "http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by": {
+                                "@id": "http://localhost:8000/resources/5e9baff0-109b-11ea-957a-acde48001122",
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E21_Person"
+                            },
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "asdf",
+                            "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                                "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                    "@value": "2019-12-03"
+                                },
+                                "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
+                                    "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                    "@value": "2019-12-05"
+                                },
+                                "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
+                                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
+                                    "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 1
+                                }
+                            }
                         },
-                        "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-05"
-                        },
-                        "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
-                        "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 1
+                        {
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "second part",
+                            "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                                "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                                "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
+                                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
+                                    "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 6
+                                }
+                            }
                         }
-                    }
-                    },
-                    {
-                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "second part",
-                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
-                        "http://www.cidoc-crm.org/cidoc-crm/P83_had_at_least_duration": {
-                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E54_Dimension",
-                        "http://www.cidoc-crm.org/cidoc-crm/P90_has_value": 6
-                        }
-                    }
-                    }
-                ]
+                    ]
                 },
                 {
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": {
                     "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
-                    "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "bar",
-                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
-                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
-                    "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-07"
-                    },
-                    "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
-                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
-                        "@value": "2019-12-08"
+                    "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within": {
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                        "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "bar",
+                        "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": {
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                            "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                "@value": "2019-12-07"
+                            },
+                            "http://www.cidoc-crm.org/cidoc-crm/P82b_end_of_the_end": {
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                                "@value": "2019-12-08"
+                            }
+                        }
                     }
-                    }
-                }
                 }
             ],
             "http://www.cidoc-crm.org/cidoc-crm/P138i_has_representation": {
                 "@type": "http://www.cidoc-crm.org/cidoc-crm/E36_Visual_Item",
                 "http://www.cidoc-crm.org/cidoc-crm/P2_has_type": {
-                "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
-                "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
-                "http://www.w3.org/2000/01/rdf-schema#label": "material a"
+                    "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E55_Type",
+                    "http://www.w3.org/2000/01/rdf-schema#label": "material a"
                 }
             }
-            }
-            """
+        }
+        """
 
         url = self._create_url(
             graph_id="9b596906-1540-11ea-b353-acde48001122",
@@ -1138,14 +1243,65 @@ class JsonLDImportTests(ArchesTestCase):
 
         self.assertEqual(response.status_code, 201)
 
-        js = response.json()
-        if type(js) == list:
-            js = js[0]
+        def get_tiles_by_nodegroup(tiles, nodegroupid, nodeid=None, nodevalue=None):
+            ret = []
+            for tile in tiles:
+                if str(tile.nodegroup_id) == str(nodegroupid):
+                    if nodeid in tile.data and tile.data[nodeid] == nodevalue:
+                        return tile
+                    else:
+                        ret.append(tile)
+            return ret
 
-        self.assertTrue("@id" in js)
-        self.assertTrue(js["@id"] == "http://localhost:8000/resources/c3b693cc-1542-11ea-b353-acde48001122")
+        def get_tile_by_id(tiles, tileid):
+            for tile in tiles:
+                if tile.tileid == tileid:
+                    return tile
 
-        # TODO - more asserts to make sure data is saved correctly
+        tiles = TileModel.objects.filter(resourceinstance_id="c3b693cc-1542-11ea-b353-acde48001122")
+
+        self.assertEqual(len(tiles), 11)
+
+        tile1 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 6)
+        tile1_parent = get_tile_by_id(tiles, tile1.parenttile_id)
+
+        self.assertEqual(tile1_parent.data, {})
+        tile1_grandparent = get_tile_by_id(tiles, tile1_parent.parenttile_id)
+        self.assertEqual(tile1_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "second part"})
+
+        tile2 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 1)
+        tile2_parent = get_tile_by_id(tiles, tile2.parenttile_id)
+        self.assertEqual(
+            tile2_parent.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-03", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-05"}
+        )
+        tile2_grandparent = get_tile_by_id(tiles, tile2_parent.parenttile_id)
+        self.assertEqual(tile2_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "asdf"})
+        self.assertEqual(
+            tile2_grandparent.data["26927e22-1541-11ea-b353-acde48001122"][0]["resourceId"], "5e9baff0-109b-11ea-957a-acde48001122"
+        )
+        tile2_greatgrandparent = get_tile_by_id(tiles, tile2_grandparent.parenttile_id)
+        self.assertEqual(tile2_greatgrandparent.data, {})
+
+        tile1_greatgrandparent = get_tile_by_id(tiles, tile1_grandparent.parenttile_id)
+        self.assertEqual(tile2_greatgrandparent, tile1_greatgrandparent)
+
+        tile3 = get_tiles_by_nodegroup(tiles, "c5a9174c-1540-11ea-b353-acde48001122", "d155a4c0-1540-11ea-b353-acde48001122", "2019-12-07")
+        self.assertEqual(
+            tile3.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-07", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-08"}
+        )
+        tile3_parent = get_tile_by_id(tiles, tile3.parenttile_id)
+        self.assertEqual(tile3_parent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "bar"})
+        tile3_grandparent = get_tile_by_id(tiles, tile3_parent.parenttile_id)
+        self.assertEqual(tile3_grandparent.data, {})
+
+        tile4 = get_tiles_by_nodegroup(tiles, "48f3ab3a-1541-11ea-b353-acde48001122")[0]
+        self.assertEqual(
+            tile4.data,
+            {
+                "54272cd4-1541-11ea-b353-acde48001122": ["d2908ab9-19a6-4a82-953d-5ebe8d164e85"],
+                "8e08a496-1541-11ea-b353-acde48001122": None,
+            },
+        )
 
     def test_g_6235_parenttile(self):
 
@@ -1242,7 +1398,7 @@ class JsonLDImportTests(ArchesTestCase):
             actual_tiledata.append(tile.data)
 
         expected_tiledata = [
-            {"f13ffd9c-3e76-11ec-9a49-faffc210b420": "ALLAN, DAVID"},
+            {"f13ffd9c-3e76-11ec-9a49-faffc210b420": {"en": {"value": "ALLAN, DAVID", "direction": "ltr"}}},
             {
                 "f1420740-3e76-11ec-9a49-faffc210b420": None,
                 "f1420f92-3e76-11ec-9a49-faffc210b420": None,
@@ -1306,7 +1462,7 @@ class JsonLDImportTests(ArchesTestCase):
             actual_tiledata.append(tile.data)
 
         expected_tiledata = [
-            {"f13ffd9c-3e76-11ec-9a49-faffc210b420": "ALLAN, DAVID"},
+            {"f13ffd9c-3e76-11ec-9a49-faffc210b420": {"en": {"value": "ALLAN, DAVID", "direction": "ltr"}}},
             {
                 "f1420740-3e76-11ec-9a49-faffc210b420": None,
                 "f1420f92-3e76-11ec-9a49-faffc210b420": None,
@@ -1319,3 +1475,72 @@ class JsonLDImportTests(ArchesTestCase):
             },
         ]
         self.assertCountEqual(actual_tiledata, expected_tiledata)
+
+    def test_required_ambiguous_nodes(self):
+        data = """
+           {
+            "@id": "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b",
+            "@type": "http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State",
+            "http://www.cidoc-crm.org/cidoc-crm/P116i_is_started_by": {
+                "@id": "http://localhost:8000/tile/30b5a44e-83dc-4393-ab71-a04b2b62bb8d/node/c10201c0-a1b7-11ed-86f1-faffc210b420",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E4_Period",
+                "http://www.cidoc-crm.org/cidoc-crm/P117i_includes": {
+                    "@id": "http://localhost:8000/concepts/36c8d7a3-32e7-49e4-bd4c-2169a06b240a",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E5_Event",
+                    "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by": {
+                        "@id": "http://localhost:8000/tile/4cc161a3-b695-4dbf-a855-b08c65904f7a/node/98948e54-a1b9-11ed-86f1-faffc210b420",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E41_Appellation",
+                        "http://www.cidoc-crm.org/cidoc-crm/P102_has_title": {
+                            "@id": "http://localhost:8000/concepts/babcafca-138f-43e6-b32e-22050d482304",
+                            "@type": "http://www.cidoc-crm.org/cidoc-crm/E35_Title",
+                            "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": [
+                                {
+                                    "@language": "en",
+                                    "@value": "taco"
+                                }
+                            ],
+                            "http://www.w3.org/2000/01/rdf-schema#label": "spoken"
+                        }
+                    },
+                    "http://www.w3.org/2000/01/rdf-schema#label": "material a"
+                }
+            }
+        }
+        """
+
+        url = self._create_url(
+            graph_id="9e4f9e7a-27de-4683-b156-b3e0de9169c6",
+            resource_id="09f1d360-4271-49ea-b799-f1fdb57b634b",
+        )
+
+        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
+        self.assertTrue(response.status_code == 201)
+
+        tiles = TileModel.objects.filter(resourceinstance_id="09f1d360-4271-49ea-b799-f1fdb57b634b")
+
+        self.assertEqual(len(tiles), 4)
+
+        js = response.json()
+        if type(js) == list:
+            js = js[0]
+
+        # print(f"Got JSON for test 7: {js}")
+        self.assertTrue("@id" in js)
+        self.assertTrue(js["@id"] == "http://localhost:8000/resources/09f1d360-4271-49ea-b799-f1fdb57b634b")
+
+        l1 = "http://www.cidoc-crm.org/cidoc-crm/P116i_is_started_by"
+        l2 = "http://www.cidoc-crm.org/cidoc-crm/P117i_includes"
+        l3 = "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by"
+        l3a = "http://www.w3.org/2000/01/rdf-schema#label"
+        l4 = "http://www.cidoc-crm.org/cidoc-crm/P102_has_title"
+        l5 = "http://www.cidoc-crm.org/cidoc-crm/P3_has_note"
+
+        self.assertTrue(l1 in js)
+        self.assertTrue(l2 in js[l1])
+        self.assertTrue(l3 in js[l1][l2])
+        self.assertTrue(l3a in js[l1][l2])
+        self.assertEqual(js[l1][l2][l3a], "material a")
+        self.assertTrue(l4 in js[l1][l2][l3])
+        self.assertTrue(l5 in js[l1][l2][l3][l4])
+        self.assertEqual(js[l1][l2][l3][l4][l5]["@value"], "taco")

@@ -26,16 +26,21 @@
 {% block config_form %}
 <div>
     <div class="control-label">
-        {% trans "Placeholder" %}
+        <span data-bind="text: $root.translations.placeholder"></span>
     </div>
     <div class="col-xs-12 pad-no crud-widget-container">
-        <input placeholder="{% trans "Placeholder" %}"
+        <input 
             class="form-control input-md widget-input"
-            data-bind="value: placeholder, valueUpdate: 'keyup'">
+            data-bind="
+                attr: {placeholder: $root.translations.placeholder},
+                value: placeholder, 
+                valueUpdate: 'keyup'
+            "
+        >
     </div>
 </div>
 <div class="control-label">
-    {% trans "Default Value" %}
+    <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="row widget-wrapper">
     <div class="form-group">
@@ -59,6 +64,8 @@
     </dd>
 <!-- /ko -->
 <!-- ko if: valueObjects().length === 0 -->
-<dd>{% trans "None" %}</dd>
+<dd>
+    <span data-bind="text: $root.translations.none"></span>
+</dd>
 <!-- /ko -->
 {% endblock report %}

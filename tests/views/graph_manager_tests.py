@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
@@ -50,7 +51,6 @@ class GraphManagerViewTests(ArchesTestCase):
                 "description": "Represents a single node in a graph",
                 "graphid": "22000000-0000-0000-0000-000000000000",
                 "iconclass": "fa fa-circle",
-                "isactive": True,
                 "isresource": False,
                 "name": "Node",
                 "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -83,7 +83,6 @@ class GraphManagerViewTests(ArchesTestCase):
                 "description": "Represents a node and node type pairing",
                 "graphid": "22000000-0000-0000-0000-000000000001",
                 "iconclass": "fa fa-angle-double-down",
-                "isactive": True,
                 "isresource": False,
                 "name": "Node/Node Type",
                 "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -166,7 +165,6 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.description = "ARCHES TEST GRAPH"
         graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
         graph.version = "v1.0.0"
-        graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
         graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
@@ -190,6 +188,7 @@ class GraphManagerViewTests(ArchesTestCase):
         self.NODE_COUNT = 5
 
         self.client = Client()
+        LanguageSynchronizer.synchronize_settings_with_db()
 
     def tearDown(self):
         try:

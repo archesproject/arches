@@ -1,9 +1,9 @@
 define([
     'underscore',
     'knockout',
+    'arches',
     'models/abstract',
-    'arches'
-], function(_, ko, AbstractModel, arches) {
+], function(_, ko, arches, AbstractModel) {
     return AbstractModel.extend({
         /**
          * A backbone model representing a single node in a graph
@@ -285,7 +285,7 @@ define([
             if (datatypeRecord && datatypeRecord.defaultconfig && config) {
                 var defaultConfig = datatypeRecord.defaultconfig;
                 _.each(defaultConfig, function(value, key) {
-                    if (!config.hasOwnProperty(key)) {
+                    if (!Object.prototype.hasOwnProperty.call(config, key)) {
                         config[key] = value;
                     }
                 });

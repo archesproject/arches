@@ -19,14 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import json
 import csv
-from io import BytesIO
-from tests import test_settings
+from arches.app.utils.data_management.resources.formats.csvfile import CsvWriter, MissingConfigException
+from arches.app.utils.i18n import LanguageSynchronizer
 from operator import itemgetter
-from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.models import TileModel, ResourceInstance
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter as BusinessDataExporter
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -50,16 +48,23 @@ class BusinessDataExportTests(ArchesTestCase):
 
         with open(os.path.join("tests/fixtures/resource_graphs/resource_export_test.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
+        LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
 
     @classmethod
     def tearDownClass(cls):
         pass
 
+    def test_invalid_writer_config(self):
+        with self.assertRaises(MissingConfigException):
+            CsvWriter()
+
     def test_csv_export(self):
         BusinessDataImporter("tests/fixtures/data/csv/resource_export_test.csv").import_business_data()
 
-        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export()
+        export = BusinessDataExporter("csv", configs="tests/fixtures/data/csv/resource_export_test.mapping", single_file=True).export(
+            languages="en"
+        )
 
         csv_output = list(csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n")))[0]
         csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
@@ -98,5 +103,10 @@ class BusinessDataExportTests(ArchesTestCase):
 
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
         json_truth = deep_sort(json.load(open("tests/fixtures/data/json/resource_export_business_data_truth.json")))
+
+        # removes generated graph_publication_id
+        for resource_data in json_export["business_data"]["resources"]:
+            if resource_data["resourceinstance"]["graph_publication_id"]:
+                del resource_data["resourceinstance"]["graph_publication_id"]
 
         self.assertDictEqual(json_export, json_truth)

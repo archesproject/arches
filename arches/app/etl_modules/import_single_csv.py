@@ -9,7 +9,6 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.db.models.functions import Lower
-from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup
@@ -17,9 +16,7 @@ from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
-from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.etl_modules.base_import_module import BaseImportModule
-import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +32,13 @@ class ImportSingleCsv(BaseImportModule):
         self.blank_tile_lookup = {}
 
     def get_graphs(self, request):
+        graph_name_i18n = "name__" + settings.LANGUAGE_CODE
         graphs = (
             GraphModel.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
-            .order_by(Lower("name"))
+            .exclude(publication_id__isnull=True)
+            .order_by(graph_name_i18n)
         )
         return {"success": True, "data": graphs}
 
@@ -119,10 +117,7 @@ class ImportSingleCsv(BaseImportModule):
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
         """
-
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
-            rows = cursor.fetchall()
+        rows = self.get_validation_result()
         return {"success": True, "data": rows}
 
     def write(self, request):
@@ -133,6 +128,9 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames").split(",")
+        csv_mapping = request.POST.get("fieldMapping")
+        if csv_mapping:
+            csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
@@ -156,78 +154,41 @@ class ImportSingleCsv(BaseImportModule):
         use_celery_threshold = 500  # 500 bytes
 
         if csv_size > use_celery_threshold:
-            if task_management.check_if_celery_available():
-                logger.info(_("Delegating load to Celery task"))
-                tasks.load_single_csv.apply_async(
-                    (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label),
-                )
-                result = _("delegated_to_celery")
-                return {"success": True, "data": result}
-            else:
-                err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), self.loadid),
-                    )
-                return {"success": False, "data": {"title": _("Error"), "message": err}}
-
+            response = self.load_data_async(request)
         else:
-            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         return response
 
-    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
 
-        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         validation = self.validate()
-        if len(validation["data"]) != 0:
+        if len(validation["data"]) == 0:
+            response = self.save_to_tiles(loadid, multiprocessing=False)
+            return response
+        else:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), loadid),
                 )
             return {"success": False, "data": "failed"}
-        else:
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
-                    row = cursor.fetchall()
-            except (IntegrityError, ProgrammingError) as e:
-                logger.error(e)
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), loadid),
-                    )
-                return {
-                    "status": 400,
-                    "success": False,
-                    "title": _("Failed to complete load"),
-                    "message": _("Unable to insert record into staging table"),
-                }
 
-        if row[0][0]:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                    ("completed", datetime.now(), loadid),
-                )
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, loadid),
-                )
-            return {"success": True, "data": "success"}
-        else:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), loadid),
-                )
-            return {"success": False, "data": "failed"}
+    def run_load_task_async(self, request):
+        graphid = request.POST.get("graphid")
+        has_headers = request.POST.get("hasHeaders")
+        fieldnames = request.POST.get("fieldnames").split(",")
+        csv_mapping = request.POST.get("fieldMapping")
+        if csv_mapping:
+            csv_mapping = json.loads(csv_mapping)
+        csv_file_name = request.POST.get("csvFileName")
+        id_label = "resourceid"
+
+        tasks.load_single_csv.apply_async(
+            (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label),
+        )
 
     def start(self, request):
         graphid = request.POST.get("graphid")
@@ -241,50 +202,58 @@ class ImportSingleCsv(BaseImportModule):
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
-
+    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
         temp_dir = os.path.join("uploadedfiles", "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
-
         with default_storage.open(csv_file_path, mode="r") as csvfile:
-            reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+            reader = csv.reader(csvfile)  # if there is a duplicate field, DictReader will not work
 
             if has_headers:
                 next(reader)
 
             with connection.cursor() as cursor:
                 for row in reader:
-                    if id_label in row:
+                    if id_label in fieldnames:
+                        id_index = fieldnames.index(id_label)
                         try:
-                            resourceid = uuid.UUID(row[id_label])
+                            resourceid = uuid.UUID(row[id_index])
                             legacyid = None
                         except (AttributeError, ValueError):
                             resourceid = uuid.uuid4()
-                            legacyid = row[id_label]
+                            legacyid = row[id_index]
                     else:
                         resourceid = uuid.uuid4()
                         legacyid = None
 
                     dict_by_nodegroup = {}
 
-                    for key in row:
-                        if key != "" and key != id_label:
-                            current_node = self.get_node_lookup(graphid).get(alias=key)
+                    for i in range(len(fieldnames)):
+                        if fieldnames[i] != "" and fieldnames[i] != id_label:
+                            current_node = self.get_node_lookup(graphid).get(alias=fieldnames[i])
                             nodegroupid = str(current_node.nodegroup_id)
                             node = str(current_node.nodeid)
                             datatype = self.node_lookup[graphid].get(nodeid=node).datatype
                             datatype_instance = self.datatype_factory.get_instance(datatype)
-                            source_value = row[key]
+                            source_value = row[i]
+                            config = current_node.config
                             if datatype == "file-list":
-                                config = current_node.config
                                 config["path"] = temp_dir
-                                value = (
-                                    datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
-                                )
+                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
                                 errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
+                            elif datatype == "string":
+                                try:
+                                    code = csv_mapping[i]["language"]["code"]
+                                    direction = csv_mapping[i]["language"]["default_direction"]
+                                    transformed_value = {code: {"value": row[i], "direction": direction}}
+                                except:
+                                    transformed_value = source_value
+                                value = (
+                                    datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
+                                )
+                                errors = datatype_instance.validate(value, nodeid=node)
                             else:
-                                value = datatype_instance.transform_value_for_tile(source_value) if source_value is not None else None
-                                errors = datatype_instance.validate(value)
+                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
+                                errors = datatype_instance.validate(value, nodeid=node)
                             valid = True if len(errors) == 0 else False
                             error_message = ""
                             for error in errors:
@@ -293,36 +262,47 @@ class ImportSingleCsv(BaseImportModule):
                                 )
 
                             if nodegroupid in dict_by_nodegroup:
-                                dict_by_nodegroup[nodegroupid].append(
-                                    {
-                                        node: {
-                                            "value": value,
-                                            "valid": valid,
-                                            "source": source_value,
-                                            "notes": error_message,
-                                            "datatype": datatype,
+                                if value:
+                                    dict_by_nodegroup[nodegroupid].append(
+                                        {
+                                            node: {
+                                                "value": value,
+                                                "valid": valid,
+                                                "source": source_value,
+                                                "notes": error_message,
+                                                "datatype": datatype,
+                                            }
                                         }
-                                    }
-                                )
+                                    )
                             else:
-                                dict_by_nodegroup[nodegroupid] = [
-                                    {
-                                        node: {
-                                            "value": value,
-                                            "valid": valid,
-                                            "source": source_value,
-                                            "notes": error_message,
-                                            "datatype": datatype,
+                                if value:
+                                    dict_by_nodegroup[nodegroupid] = [
+                                        {
+                                            node: {
+                                                "value": value,
+                                                "valid": valid,
+                                                "source": source_value,
+                                                "notes": error_message,
+                                                "datatype": datatype,
+                                            }
                                         }
-                                    }
-                                ]
+                                    ]
 
                     for nodegroup in dict_by_nodegroup:
                         tile_data = self.get_blank_tile_lookup(nodegroup)
                         passes_validation = True
+                        for key in tile_data:
+                            tile_data[key] = None
                         for node in dict_by_nodegroup[nodegroup]:
                             for key in node:
-                                tile_data[key] = node[key]
+                                if tile_data[key]:
+                                    if tile_data[key]["datatype"] == "string":
+                                        tile_data[key]["value"].update(node[key]["value"])
+                                        tile_data[key]["source"] += " | " + node[key]["source"]
+                                        tile_data[key]["notes"] = " | ".join([tile_data[key]["notes"], node[key]["notes"]])
+                                        tile_data[key]["valid"] = tile_data[key]["valid"] and node[key]["valid"]
+                                else:
+                                    tile_data[key] = node[key]
                                 if node[key]["valid"] is False:
                                     passes_validation = False
 
@@ -362,16 +342,6 @@ class ImportSingleCsv(BaseImportModule):
 
         message = "staging table populated"
         return {"success": True, "data": message}
-
-    def delete_from_default_storage(self, directory):
-        dirs, files = default_storage.listdir(directory)
-        for dir in dirs:
-            dir_path = os.path.join(directory, dir)
-            self.delete_from_default_storage(dir_path)
-        for file in files:
-            file_path = os.path.join(directory, file)
-            default_storage.delete(file_path)
-        default_storage.delete(directory)
 
     def get_blank_tile_lookup(self, nodegroupid):
         if nodegroupid not in self.blank_tile_lookup.keys():

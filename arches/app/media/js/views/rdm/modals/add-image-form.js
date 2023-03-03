@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'dropzone', 'arches', 'js-cookie', 'bootstrap'], function ($, Backbone, dropzone, arches, Cookies) {
+define(['jquery', 'arches', 'backbone', 'dropzone', 'js-cookie', 'bootstrap'], function($, arches, Backbone, dropzone, Cookies) {
     return Backbone.View.extend({
         events: {
             'click button': 'close'
@@ -24,11 +24,11 @@ define(['jquery', 'backbone', 'dropzone', 'arches', 'js-cookie', 'bootstrap'], f
 
             this.$el.find('.modal').modal('show');
         },
-        close: function () {
+        close: function() {
             var self = this,
-                modal = this.$el.find('.modal')
+                modal = this.$el.find('.modal');
             if (this.changed) {
-                modal.on('hidden.bs.modal', function () {
+                modal.on('hidden.bs.modal', function() {
                     self.trigger('dataChanged');
                 });
             }

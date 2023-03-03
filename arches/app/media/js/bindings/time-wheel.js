@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
+    'regenerator-runtime',
     'd3',
-    'arches'
-], function($, _, ko, d3, arches) {
+], function($, _, ko, arches, regeneratorRuntime, d3) {
     var width = 300;
     var height = 300;
     var radius = Math.min(width, height) / 8;
@@ -48,10 +49,10 @@ define([
                 if (!d) {
                     clearHighlight();
                 }
-            })
+            });
 
             var g = ko.utils.domData.get(element, 'vis');
-            g.on("mouseleave", function (event) {
+            g.on("mouseleave", function(event) {
                 var d = selectedPeriod();
                 if (d) {
                     highlightPeriod(event, d);
@@ -72,9 +73,8 @@ define([
                     });
                 depth = root.height + 1;
                 return d3.partition()
-                    .size([2 * Math.PI, root.height + 1])
-                    (root);
-            }
+                    .size([2 * Math.PI, root.height + 1])(root);
+            };
 
             var d3ClickManager = function() {
                 // we want to a distinguish single/double click
@@ -109,7 +109,7 @@ define([
                             }
                         }
                     });
-                };
+                }
                 // Copies a variable number of methods from source to target.
                 var d3rebind = function(target, source) {
                     var i = 1, n = arguments.length, method;
@@ -122,22 +122,22 @@ define([
                 // If passed with arguments, sets the value and returns the target.
                 function d3_rebind(target, source, method) {
                     return function() {
-                    var value = method.apply(source, arguments);
-                    return value === source ? target : value;
+                        var value = method.apply(source, arguments);
+                        return value === source ? target : value;
                     };
                 }
                 return d3rebind(cc, dispatcher, 'on');
-            }
+            };
             var clickmanager = d3ClickManager();
             clickmanager.on("click", function(event, d) {
                 selectedPeriod(d);
             })
-            .on("dblclick", function(event, d) {
-                dblclick(d);
-            });
+                .on("dblclick", function(event, d) {
+                    dblclick(d); // eslint-disable-line no-undef
+                });
 
             function highlightPeriod(event, d) {
-                count = d.data.size;
+                let count = d.data.size;
                 if (d.data.size < 1) {
                     count = "< 1";
                 }
@@ -152,7 +152,7 @@ define([
                     current = current.parent;
                 }
 
-                sequenceArray.push(count + ' hits')
+                sequenceArray.push(count + ' hits');
 
                 breadCrumb(sequenceArray.join(' - '));
 
@@ -164,20 +164,20 @@ define([
                 path.filter(function(d) {
                     return (sequenceArray.indexOf(d.data.name) >= 0);
                 })
-                .style("opacity", 1);
+                    .style("opacity", 1);
             }
 
             function clearHighlight(){
                 d3.selectAll("path")
                     .style("opacity", 1);
-                breadCrumb(arches.translations.timeWheelDateMatches.replace("${total}", total))
+                breadCrumb(arches.translations.timeWheelDateMatches.replace("${total}", total));
             }
 
             selectedPeriod.subscribe(function(d) {
                 if (!d) {
                     clearHighlight();
                 }
-            })
+            });
 
             if(!!configJSON){
                 var root = partition(configJSON);
@@ -204,7 +204,7 @@ define([
                     })
                     .outerRadius(function(d) {
                         return Math.max(d.y0 * radius, d.y1 * radius - 1);
-                    })
+                    });
 
                 var path = g.append("g")
                     .selectAll("path")
@@ -217,7 +217,7 @@ define([
                     .call(clickmanager);
     
                 path.filter(d => d.children)
-                    .style("cursor", "pointer")
+                    .style("cursor", "pointer");
 
                 var format = d3.format(",d");
     
@@ -230,15 +230,15 @@ define([
                     .attr("fill", "none")
                     .attr("pointer-events", "all")
                     .call(clickmanager);
-    
+                /* eslint-disable no-inner-declarations */
                 function dblclick(p) {
                     parent.datum(p.parent || root);
     
                     root.each(d => d.target = {
-                    x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-                    x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-                    y0: Math.max(0, d.y0 - p.depth),
-                    y1: Math.max(0, d.y1 - p.depth)
+                        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+                        y0: Math.max(0, d.y0 - p.depth),
+                        y1: Math.max(0, d.y1 - p.depth)
                     });
     
                     var t = g.transition().duration(750);
@@ -260,13 +260,12 @@ define([
                 }
                 
                 function arcVisible(d) {
-                    return true;
                     return d.y1 <= depth && d.y0 >= 1 && d.x1 > d.x0;
                 }
 
             }
 
         }
-    }
+    };
     return ko.bindingHandlers.timeWheel;
 });

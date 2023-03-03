@@ -845,6 +845,13 @@
                 }
             ],
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "publication": {
+                "graph_id": "fd0a5907-e11b-11e8-821b-a4d18cec433a",
+                "notes": "Initial migration.",
+                "publicationid": "a1eb04c3-5f47-4d02-8ac4-619a05f34587",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "relatable_resource_model_ids": [],
             "resource_2_resource_constraints": [],
             "root": {

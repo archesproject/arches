@@ -11,7 +11,10 @@
     'active': activeTab() === 'information'
 }">
     <i class="fa fa-info"></i>
-    <span class="map-sidebar-text">{% trans "Info" %}</span>
+    <span 
+        class="map-sidebar-text"
+        data-bind="text: $root.translations.info"
+    ></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('search');
@@ -19,7 +22,10 @@
     'active': activeTab() === 'search'
 }">
     <i class="fa fa-search"></i>
-    <span class="map-sidebar-text">{% trans "Search" %}</span>
+    <span 
+        class="map-sidebar-text"
+        data-bind="text: $root.translations.search"
+    ></span>
 </div>
 {% comment %} Uncomment this section to show additional tabs...
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
@@ -28,7 +34,10 @@
     'active': activeTab() === 'analyze'
 }">
     <i class="fa fa-line-chart"></i>
-    <span class="map-sidebar-text">{% trans "Analyze" %}</span>
+    <span 
+        class="map-sidebar-text"
+        data-bind="text: $root.translations.analyze"
+    ></span>
 </div>
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
     toggleTab('settings');
@@ -36,7 +45,10 @@
     'active': activeTab() === 'settings'
 }">
     <i class="fa fa-cog"></i>
-    <span class="map-sidebar-text">{% trans "Settings" %}</span>
+    <span 
+        class="map-sidebar-text"
+        data-bind="text: $root.translations.settings"
+    ></span>
 </div>
 {% endcomment %}
 <div class="workbench-card-sidebar-tab" data-bind="click: function() {
@@ -45,14 +57,19 @@
     'active': activeTab() === 'legend'
 }">
     <i class="fa fa-list"></i>
-    <span class="map-sidebar-text">{% trans "Legend" %}</span>
+    <span 
+        class="map-sidebar-text"
+        data-bind="text: $root.translations.legend"
+    ></span>
 </div>
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'information' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Resource Information" %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: $root.translations.resourceInformation"></span>
+    </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 
@@ -87,9 +104,13 @@
             <div></div>
         </div>
         <div class="edge-relationship-details">
-            <div class="edge-relationship-prefix">{% trans "Has relationship" %}</div>
-            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || 'Related to' "></div>
-            <div class="edge-relationship-sufix">{% trans "with" %}</div>
+            <div class="edge-relationship-prefix">
+                <span data-bind="text: $root.translations.hasRelationship"></span>
+            </div>
+            <div class="edge-relationship-label" data-bind="text: $parent.edgeInformation().label || $root.translations.relatedTo "></div>
+            <div class="edge-relationship-sufix">
+                <span data-bind="text: $root.translations.with"></span>
+            </div>
         </div>
     </div>
     <div class="edge-node-information" data-bind="event: {
@@ -118,24 +139,28 @@
             <div class="edge-node-links">
                 <span data-bind="click: $parent.viewInformationNodeReport">
                     <i class="fa fa-info"></i>
-                    {% trans "Report" %}
+                    <span data-bind="text: $root.translations.report"></span>
                 </span>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <span data-bind="click: $parent.editInformationNode">
                     <i class="fa fa-pencil"></i>
-                    {% trans "Edit" %}
+                    <span data-bind="text: $root.translations.edit"></span>
                 </span>
             </div>
         </div>
     </div>
-    <div class="relationships-list-header">{% trans "Relationships" %}</div>
+    <div class="relationships-list-header">
+        <span data-bind="text: $root.translations.relationships"></span>
+    </div>
     <div class="relationships-list-count">
         <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
-        {% trans "relationships shown" %}
+        <span data-bind="text: $root.translations.relationshipsShown"></span>
         <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
         <a href="javascript:void(0);" data-bind="click: function() {
             $parent.expandNode($data);
-        }">{% trans "Load more" %}</a>
+        }">
+            <span data-bind="text: $root.translations.loadMore"></span>
+        </a>
         <!--/ko -->
     </div>
     <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
@@ -172,12 +197,22 @@
 
 <!--ko if: activeTab() === 'search' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Search Network" %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: $root.translations.searchNetwork"></span>
+    </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 <div class="related-resources-search-body">
 <div class="related-reasources-search-container">
-    <input type="text" class="form-control" placeholder="{% trans "Filter..." %}" data-bind="value: nodeSearchFilter, valueUpdate: 'afterkeydown'">
+    <input 
+        type="text" 
+        class="form-control" 
+        data-bind="
+            attr: {placeholder: $root.translations.filter + '...'},
+            value: nodeSearchFilter, 
+            valueUpdate: 'afterkeydown'
+        "
+    >
     <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
 </div>
 <div class="related-reasources-search-list" data-bind="foreach: searchNodes">
@@ -197,11 +232,13 @@
             <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
             <div class="relationships-list-count shim">
                 <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
-                {% trans "relationships shown" %}
+                <span data-bind="text: $root.translations.relationshipsShown"></span>
                 <!--ko if: shownRelationsCount() !== totalRelations -->
                 <a href="javascript:void(0);" data-bind="click: function() {
                     $parent.expandNode($data);
-                }">{% trans "Load more" %}</a>
+                }">
+                    <span data-bind="text: $root.translations.loadMore"></span>
+                </a>
                 <!--/ko -->
             </div>
         </div>
@@ -211,17 +248,23 @@
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Analyze Network" %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: $root.translations.analyzeNetwork"></span>
+    </h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'settings' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Settings" %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: $root.translations.settings"></span>
+    </h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">{% trans "Legend" %}</h4>
+    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <span data-bind="text: $root.translations.legend"></span>
+    </h4>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 <div class="legend-listing-container" data-bind="foreach: legendEntries">
@@ -255,16 +298,16 @@
 </div>
 <div class="related-resources-graph-controls-instructions">
 <!--ko if: selectionMode() === 'information' -->
-{% trans "Click a node/edge for info" %}
+    <span data-bind="text: $root.translations.clickNodeInfo"></span>
 <!--/ko -->
 <!--ko if: selectionMode() === 'expand' -->
-{% trans "Click a node to show more relationships" %}
+    <span data-bind="text: $root.translations.clickNodeRelationships"></span>
 <!--/ko -->
 <!--ko if: selectionMode() === 'focus' -->
-{% trans "Click a node refocus" %}
+    <span data-bind="text: $root.translations.clickNodeRefocus"></span>
 <!--/ko -->
 <!--ko if: selectionMode() === 'delete' -->
-{% trans "Click a node/edge to remove" %}
+    <span data-bind="text: $root.translations.clickNodeRemove"></span>
 <!--/ko -->
 </div>
 <!--ko if: cytoscapeConfig() -->

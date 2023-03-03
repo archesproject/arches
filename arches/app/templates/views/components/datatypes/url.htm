@@ -2,16 +2,32 @@
 
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="~">{% trans "Like" %}</option>
-        <option value="!~">{% trans "Not like" %}</option>
-        <option value="=">{% trans "Equals" %}</option>
-        <option value="!=">{% trans "Not" %}</option>
-    </select>
+    <select 
+        class="resources" 
+        data-bind="
+            value: op, 
+            chosen: {width: '100%', disable_search_threshold: 15},
+            optionsText: 'text',
+            optionsValue: 'value',
+            options: [
+                { text: $root.translations.like, value: '~' },
+                { text: $root.translations.notLike, value: '!~' },
+                { text: $root.translations.equals, value: '' },
+                { text: $root.translations.not, value: '!=' },
+            ],
+        "
+    ></select>
 </div>
 
 <div class="col-md-8 col-lg-9">
-    <input type="text" placeholder='{% trans "Name" %}' class="form-control input-lg" style="height: 36px;"
-        data-bind="textInput: searchValue">
+    <input 
+        type="text"  
+        class="form-control input-lg" 
+        style="height: 36px;"
+        data-bind="
+            attr: {placeholder: $root.translations.name},
+            textInput: searchValue
+        "
+    >
 </div>
 <!-- /ko -->

@@ -1,8 +1,9 @@
 define([
+    'underscore',
     'knockout',
+    'arches',
     'views/list',
-    'arches'
-], function(ko, ListView, arches) {
+], function(_, ko, arches, ListView) {
     var RelatedResourcesNodeList = ListView.extend({
         /**
         * A backbone view to manage a list of graph nodes
@@ -44,8 +45,8 @@ define([
                 if (!item.loadcount) {
                     item.loadcount = ko.observable(0);
                 }
-            }
-            this.items.subscribe(function (items) {
+            };
+            this.items.subscribe(function(items) {
                 items.forEach(initializeItem, this);
             }, this);
             if(this.filterFunction){
@@ -53,21 +54,20 @@ define([
                 this.filter.subscribe(this.filterFunction, this, 'change');
                 this.filterFunction();
             }
-            this.scrollContainerSelector = '.related-resources-nodes'
             this.selectNode = function(e) {
                 _.each(self.selectedItems(), function(item) {
                     if (this.entityid != item.entityid) {
-                        item.selected(false)
+                        item.selected(false);
                     }
                 }, this);
-                e.selected(!e.selected())
+                e.selected(!e.selected());
             };
 
             this.hoverNode = function(e) {
                 if (e.hovered() === false) {
-                    e.hovered(true)
+                    e.hovered(true);
                 } else {
-                    e.hovered(false)
+                    e.hovered(false);
                 }
             };
 

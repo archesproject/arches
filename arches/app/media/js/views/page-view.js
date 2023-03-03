@@ -5,14 +5,15 @@ define([
     'knockout',
     'moment',
     'arches',
+    'view-data',
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
-    'view-data',
     'bindings/scrollTo',
     'bootstrap',
-    'bindings/slide'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData) {
+    'bindings/slide',
+    'jquery-ui',
+], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -67,11 +68,16 @@ define([
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
-                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function() {
-                            self.viewModel.showConfirmNav(false);
-                        }, function() {
-                            self.viewModel.navigate(self.viewModel.navDestination(), true);
-                        }));
+                        self.viewModel.alert(new AlertViewModel(
+                            'ep-alert-blue', 
+                            arches.translations.confirmNav.title, 
+                            arches.translations.confirmNav.text, 
+                            function() {
+                                self.viewModel.showConfirmNav(false);
+                            }, function() {
+                                self.viewModel.navigate(self.viewModel.navDestination(), true);
+                            }
+                        ));
                         return;
                     }
                     self.viewModel.alert(null);
@@ -116,6 +122,8 @@ define([
             self.viewModel.notifsList.items.subscribe(function(list) {
                 self.viewModel.unreadNotifs((list.length > 0));
             });
+
+            self.viewModel.translations = arches.translations;
 
             window.addEventListener('beforeunload', function() {
                 self.viewModel.loading(true);

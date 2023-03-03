@@ -4,13 +4,16 @@ define([
     'viewmodels/base-import-view-model',
     'arches',
     'viewmodels/alert',
+    'templates/views/components/etl_modules/branch-csv-importer.htm',
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, arches, AlertViewModel) {
+], function(_, ko, ImporterViewModel, arches, AlertViewModel, branchCSVImporterTemplate) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
+
+             
             this.loadDetails = params.load_details || ko.observable();
             this.state = params.state;
             this.loading = params.loading || ko.observable();
@@ -44,12 +47,12 @@ define([
                 return decodeURIComponent(xsrfCookies[0].split('=')[1]);
             }
 
-            this.downloadTemplate = async () => {
+            this.downloadTemplate = async() => {
                 const url = `/etl-manager`;
                 const formData = new window.FormData();
                 formData.append("id", ko.unwrap(this.selectedTemplate));
                 formData.append("format", "xls");
-                formData.append("module", ko.unwrap(self.moduleId));;
+                formData.append("module", ko.unwrap(self.moduleId));
                 formData.append("action", "download");
                 
                 const response = await window.fetch(url, {
@@ -140,6 +143,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/etl_modules/branch-csv-importer.htm' }
+        template: branchCSVImporterTemplate,
     });
 });

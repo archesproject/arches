@@ -1,12 +1,13 @@
 define([
     'underscore',
     'knockout',
-    'arches',
     'knockout-mapping',
-    'models/abstract',
+    'arches',
     'widgets',
-    'utils/dispose'
-], function(_, ko, arches, koMapping, AbstractModel, widgets, dispose) {
+    'models/abstract',
+    'utils/dispose',
+    'views/components/datatypes/string'
+], function(_, ko, koMapping, arches, widgets, AbstractModel, dispose) {
     return AbstractModel.extend({
         /**
         * A backbone model to manage cards_x_nodes_x_widgets records
@@ -51,7 +52,7 @@ define([
             }
             if (this.datatype && this.datatype.defaultwidget_id) {
                 defaults.widget_id = this.datatype.defaultwidget_id;
-                defaults.config = JSON.parse(widgets[defaults.widget_id].defaultconfig);
+                defaults.config = widgets[defaults.widget_id].defaultconfig;
             }
             if (this.node) {
                 defaults.node_id = this.node.nodeid;
@@ -139,7 +140,12 @@ define([
                         },
                         write: function(value) {
                             var key;
-                            var defaultConfig = JSON.parse(widgets[value].defaultconfig);
+                            let defaultConfig = ko.unwrap(widgets[value].defaultconfig);
+                            if (
+                                !(defaultConfig instanceof Object)
+                            ) {
+                                defaultConfig = JSON.parse(ko.unwrap(widgets[value].defaultconfig));
+                            }
                             for (key in defaultConfig) {
                                 defaultConfig[key] = ko.observable(defaultConfig[key]);
                             }

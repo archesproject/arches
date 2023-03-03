@@ -39,17 +39,6 @@ def message(arg):
 
 
 @shared_task(bind=True)
-def sync(self, surveyid=None, userid=None, synclogid=None):
-    from arches.app.models.mobile_survey import MobileSurvey
-
-    create_user_task_record(self.request.id, self.name, userid)
-    survey = MobileSurvey.objects.get(id=surveyid)
-    survey._sync(synclogid, userid)
-    response = {"taskid": self.request.id}
-    return response
-
-
-@shared_task(bind=True)
 def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
@@ -58,8 +47,14 @@ def export_search_results(self, userid, request_values, format, report_link):
 
     create_user_task_record(self.request.id, self.name, userid)
     _user = User.objects.get(id=userid)
-    email = request_values["email"]
-    export_name = request_values["exportName"][0]
+    try:
+        email = request_values["email"]
+    except KeyError:
+        email = None
+    try:
+        export_name = request_values["exportName"][0]
+    except KeyError:
+        export_name = None
     new_request = HttpRequest()
     new_request.method = "GET"
     new_request.user = _user
@@ -227,14 +222,14 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
 
 
 @shared_task
-def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_name, id_label):
+def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
     from arches.app.etl_modules import import_single_csv
 
     logger = logging.getLogger(__name__)
 
     try:
         ImportSingleCsv = import_single_csv.ImportSingleCsv()
-        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_file_name, id_label)
+        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -246,6 +241,30 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_file_n
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = _("Failed")
         load_event.save()
+
+
+@shared_task
+def edit_bulk_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+    from arches.app.etl_modules import bulk_data_editor
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        BulkDataEditor = bulk_data_editor.BulkDataEditor(loadid=load_id)
+        print("load_id", load_id)
+        BulkDataEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+        msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = _("Failed")
+        load_event.save()
+
 
 @shared_task
 def reverse_etl_load(loadid):

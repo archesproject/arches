@@ -54,12 +54,18 @@ class ArchesFileWriter(Writer):
         relations = []
         export = {}
         export["business_data"] = {}
+        graph_id_to_publication_id = {}
 
         for resourceinstanceid, tiles in self.resourceinstances.items():
             resourceinstanceid = uuid.UUID(str(resourceinstanceid))
             resource = {}
             resource["tiles"] = tiles
             resource["resourceinstance"] = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
+            graph = resource["resourceinstance"].graph
+
+            if graph.publication_id and not graph_id_to_publication_id.get(graph.pk):
+                graph_id_to_publication_id[str(graph.pk)] = str(graph.publication_id)
+
             resources.append(resource)
 
         export["business_data"]["resources"] = resources
@@ -71,6 +77,13 @@ class ArchesFileWriter(Writer):
 
         dest = StringIO()
         export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(export)))
+
+        for resource_data in export["business_data"]["resources"]:
+            resource_instance_data = resource_data.get("resourceinstance")
+
+            if resource_instance_data:
+                resource_data["resourceinstance"]["publication_id"] = graph_id_to_publication_id.get(resource_instance_data["graph_id"])
+
         json.dump(export, dest, indent=kwargs.get("indent", None))
         json_for_export.append({"name": json_name, "outputfile": dest})
 

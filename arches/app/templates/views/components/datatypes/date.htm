@@ -1,28 +1,59 @@
 {% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select class="resources" tabindex="-1" style="display: none;" data-bind="value: op, chosen: {width: '100%', disable_search_threshold: 15}">
-        <option value="eq"> = </option>
-        <option value="gt"> > </option>
-        <option value="lt"> < </option>
-        <option value="gte"> >= </option>
-        <option value="lte"> <= </option>
-        <option value="null">{% trans "Has no value" %}</option>
-        <option value="not_null">{% trans "Has any value" %}</option>
-    </select>
+    <select 
+        class="resources" 
+        tabindex="-1" 
+        style="display: none;" 
+        data-bind="
+            value: op, 
+            chosen: {width: '100%', disable_search_threshold: 15},
+            optionsText: 'text',
+            optionsValue: 'value',
+            options: [
+                { text: '=', value: 'eq' },
+                { text: '&gt;', value: 'gt' },
+                { text: '&lt;', value: 'lt' },
+                { text: '&ge;', value: 'gte' },
+                { text: '&le;', value: 'lte' },
+                { text: $root.translations.hasNoValue, value: 'null' },
+                { text: $root.translations.hasAnyValue, value: 'not_null' },
+            ],
+        "
+    ></select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input type="" placeholder="{% trans "Date" %}" class="form-control input-md widget-input" data-bind="value: searchValue, datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}">
+    <input 
+        type="" 
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.date},
+            value: searchValue, 
+            datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}
+        "
+    >
 </div>
 <!-- /ko -->
 
 
 <!-- ko ifnot: $data.search -->
 <div class="control-label">
-{% trans "Date Format" %}
+    <span data-bind="text: $root.translations.dateFormat"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-<select type="" id="" placeholder="{% trans " Date Format " %}" data-bind="options:dateFormatOptions, optionsText:'name', optionsValue:'id', event: {change: onDateFormatSelection}, value: dateFormat, chosen: {width: '100%', disable_search: true}"></select>
+    <select 
+        type="" 
+        id="" 
+        data-bind="
+            attr: {placeholder: $root.translations.dateFormat},
+            options:dateFormatOptions, 
+            optionsText:'name', 
+            optionsValue:'id', 
+            event: {change: onDateFormatSelection},
+            value: dateFormat, 
+            chosen: {width: '100%', disable_search: true}
+        "
+    ></select>
 </div>
 <!-- /ko -->

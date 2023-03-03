@@ -654,6 +654,7 @@ a.btn-u-xs {
 /*Button Groups*/
 .btn-group .dropdown-menu > li > a {
    padding: 3px 13px;
+   display: flex;
 }
 
 .btn-group > .btn-u, 

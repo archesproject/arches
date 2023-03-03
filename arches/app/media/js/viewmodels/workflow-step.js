@@ -4,15 +4,19 @@ define([
     'knockout-mapping',
     'uuid',
     'views/components/workflows/workflow-component-abstract',
-], function(ko, _, koMapping, uuid, WorkflowComponentAbstract) {
-    STEPS_LABEL = 'workflow-steps';
-    STEP_ID_LABEL = 'workflow-step-id';
+    'templates/views/components/plugins/workflow-step.htm'
+], function(ko, _, koMapping, uuid, WorkflowComponentAbstract, workflowStepTemplate) {
+    const STEPS_LABEL = 'workflow-steps';
+    const STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
+         
+        
         _.extend(this, config);
 
         var self = this;
 
+         
         this.id = ko.observable();
         this.workflowId = ko.observable(config.workflow ? config.workflow.id : null);
 
@@ -198,7 +202,7 @@ define([
                     resolve(...values);
                 });
             });
-        }
+        };
 
         this.setToLocalStorage = function(key, value) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
@@ -257,13 +261,11 @@ define([
 
         this.initialize();
     };
-    
+
     /* only register template here, params are passed at the workflow level */ 
     ko.components.register('workflow-step', {
-        template: {
-            require: 'text!templates/views/components/plugins/workflow-step.htm'
-        }
+        template: workflowStepTemplate,
     });
-
+    
     return WorkflowStep;
 });

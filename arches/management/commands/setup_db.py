@@ -193,13 +193,7 @@ To create it, use:
         management.call_command("es", operation="setup_indexes")
 
         management.call_command("migrate")
-
-        createcachetable = False
-        for k, v in settings.CACHES.items():
-            if v["BACKEND"] == "django.core.cache.backends.db.DatabaseCache":
-                createcachetable = True
-        if createcachetable:
-            management.call_command("createcachetable")
+        management.call_command("createcachetable")
 
         # import system settings graph and any saved system settings data
         settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")
@@ -212,3 +206,5 @@ To create it, use:
 
         if os.path.isfile(settings_data_local):
             management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
+
+        management.call_command("graph", operation="publish")
