@@ -43,7 +43,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                 )
                 if len(tiles) == 0:
                     tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])).filter(
-                       resourceinstance_id=resource.resourceinstanceid
+                        resourceinstance_id=resource.resourceinstanceid
                     )
                 for tile in tiles:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])):

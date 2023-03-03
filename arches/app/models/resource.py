@@ -94,7 +94,6 @@ class Resource(models.ResourceInstance):
 
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            print(context)
             self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
                 self, graph_function[0].config["descriptor_types"][descriptor], context
             )
@@ -616,6 +615,7 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+
 
                 for resource in related_resources["docs"]:
                     relations = get_relations(
