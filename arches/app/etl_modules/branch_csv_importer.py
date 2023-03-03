@@ -93,7 +93,7 @@ class BranchCsvImporter(BaseImportModule):
         return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
-        nodegroup_alias = cell_values[1].strip()
+        nodegroup_alias = cell_values[1].split(" ")[0].strip()
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
         tile_valid = True
@@ -105,19 +105,14 @@ class BranchCsvImporter(BaseImportModule):
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row_details[key]
                 config = node_details["config"]
-                if datatype == "file-list":
-                    config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
-                    config["loadid"] = self.loadid
+                config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
+                config["loadid"] = self.loadid
                 try:
                     config["nodeid"] = nodeid
                 except TypeError:
                     config = {}
-                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value is not None else None
-                if datatype == "file-list":
-                    validation_errors = datatype_instance.validate(value, nodeid=nodeid, path=self.temp_dir)
-                else:
-                    validation_errors = datatype_instance.validate(value, nodeid=nodeid)
-                validation_errors = [message for message in validation_errors if message["type"] != "WARNING"]
+
+                value, validation_errors = self.prepare_data_for_loading(datatype_instance, source_value, config)
                 valid = True if len(validation_errors) == 0 else False
                 if not valid:
                     tile_valid = False
@@ -126,13 +121,13 @@ class BranchCsvImporter(BaseImportModule):
                     error_message = "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
                     cursor.execute(
                         """
-                        INSERT INTO load_errors (type, value, error, message, datatype, loadid, nodeid)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                        ("node", source_value, error["title"], error["message"], datatype, self.loadid, nodeid),
+                        INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        ("node", source_value, "something here", error["title"], error["message"], datatype, self.loadid, nodeid),
                     )
 
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
-            except KeyError as e:
+            except KeyError:
                 pass
 
         tile_value_json = JSONSerializer().serialize(tile_value)
@@ -149,13 +144,13 @@ class BranchCsvImporter(BaseImportModule):
                 continue
             resourceid = cell_values[0]
             if str(resourceid).strip() in ("--", "resource_id"):
-                nodegroup_alias = cell_values[1][0:-4].strip()
+                nodegroup_alias = cell_values[1][0:-4].split(" ")[0].strip()
                 data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
             elif cell_values[1] is not None:
                 node_values = cell_values[2:]
                 try:
                     row_count += 1
-                    nodegroup_alias = cell_values[1].strip()
+                    nodegroup_alias = cell_values[1].split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
                     tileid = uuid.uuid4()
@@ -185,6 +180,16 @@ class BranchCsvImporter(BaseImportModule):
                     )
                 except KeyError:
                     pass
+        cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
+        cursor.execute(
+            """
+            INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
+            SELECT 'tile', source_description, error_message, loadid, nodegroupid
+            FROM load_staging
+            WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
+            """,
+            [self.loadid],
+        )
         return {"name": worksheet.title, "rows": row_count}
 
     def stage_excel_file(self, file, summary, cursor):

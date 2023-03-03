@@ -38,9 +38,11 @@
                         <span data-bind="text: $root.translations.download"></span>
                     </button>
                     <!-- /ko -->
-                </div>
-                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode" role="button">
-                    <span data-bind="text: $root.translations.uploadZipFile"></span>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode">
+                            <span data-bind="text: $root.translations.uploadZipFile"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div data-bind="dropzone: dropzoneOptions, visible: !downloadMode()">
@@ -72,9 +74,11 @@
                     <h5>
                         <span data-bind="text: $root.translations.etlFileUploadMessage"></span>
                     </h5>
-                </div>
-                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: toggleDownloadMode" role="button">
-                    <span data-bind="text: $root.translations.downloadTemplates"></span>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: toggleDownloadMode">
+                            <span data-bind="text: $root.translations.downloadTemplates"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
