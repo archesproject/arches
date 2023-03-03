@@ -1304,8 +1304,19 @@ class Command(BaseCommand):
                             layer["source"] = layer["source"] + "-" + layer_name
                     for source_name, source_dict in data["sources"].items():
                         map_source = models.MapSource.objects.get_or_create(name=source_name + "-" + layer_name, source=source_dict)
+                    valid_metadata_keys = ["isoverlay", "icon", "addtomap", "centerx", "centery", "zoom", "legend",
+                                           "searchonly", "sortorder",]
+                    layer_metadata = data['layer-metadata'] if 'layer-metadata' in data else {}
+                    if 'icon' not in layer_metadata:
+                        layer_metadata['icon'] = layer_icon
+                    if 'isoverlay' not in layer_metadata:
+                        layer_metadata['isoverlay'] = not is_basemap
+                    invalid_keys = layer_metadata.keys() - valid_metadata_keys
+                    if len(invalid_keys) > 0:
+                        logger.warning("Ignoring invalid layer metadata keys: %s" % str(invalid_keys))
+                    layer_metadata = {key:layer_metadata[key] for key in valid_metadata_keys if key in layer_metadata}
                     map_layer = models.MapLayer(
-                        name=layer_name, layerdefinitions=data["layers"], isoverlay=(not is_basemap), icon=layer_icon
+                        name=layer_name, layerdefinitions=data["layers"], **layer_metadata
                     )
                     try:
                         map_layer.save()
