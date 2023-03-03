@@ -185,7 +185,7 @@ class BusinessDataImporter(object):
                     lines = openf.readlines()
                     if use_multiprocessing is True:
                         pool = Pool(cpu_count())
-                        pool.map(import_one_resource, lines, prevent_indexing=prevent_indexing)
+                        pool.map(import_one_resource, lines)
                         connections.close_all()
                         reader = ArchesFileReader()
                     else:
