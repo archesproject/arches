@@ -26,6 +26,9 @@ define([
             this.loadStatus = ko.observable('ready');
             this.downloadMode = ko.observable(false);
 
+            this.validationErrors = params.validationErrors || ko.observable();
+            this.validated = params.validated || ko.observable();
+
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
                 if (this.downloadMode() && !ko.unwrap(this.templates).length) {
