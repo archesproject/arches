@@ -276,11 +276,11 @@ class StringDataType(BaseDataType):
                             query=f"*{exact_terms.group('search_string')}*",
                             case_insensitive=False,
                         )
-                    else: # "eq" in value["op"]
+                    else:  # "eq" in value["op"]
                         match_query = Match(
                             field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
                             query=exact_terms.group("search_string"),
-                            type="phrase"
+                            type="phrase",
                         )
                 elif "?" in value["val"] or "*" in value["val"]:
                     match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
@@ -289,11 +289,9 @@ class StringDataType(BaseDataType):
                         match_query = Bool()
                         for word in value["val"].split(" "):
                             match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
-                    else: # "eq" in value["op"]
+                    else:  # "eq" in value["op"]
                         match_query = Match(
-                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), 
-                            query=value["val"], 
-                            type="phrase"
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase"
                         )
 
                 if "!" in value["op"]:
