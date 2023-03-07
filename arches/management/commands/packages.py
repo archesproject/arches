@@ -97,6 +97,7 @@ class Command(BaseCommand):
                 "save_system_settings",
                 "add_mapbox_layer",
                 "load_package",
+                "load_foo",
                 "create_package",
                 "update_package",
                 "export_package_configs",
@@ -354,6 +355,10 @@ class Command(BaseCommand):
                 options["dev"],
                 defer_indexing,
             )
+
+        if options["operation"] in ["load_foo"]:
+            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
+            self.load_foo()
 
         if options["operation"] in ["create", "create_package"]:
             self.create_package(options["dest_dir"])
@@ -965,6 +970,21 @@ class Command(BaseCommand):
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
+
+
+    def load_foo(self):
+
+        import site
+
+        site_package_path = site.getsitepackages()
+
+        import pdb; pdb.set_trace()
+        return self.load_package(
+            source=os.path.join(site_package_path[0], settings.INSTALLED_FOO),
+            setup_db=True,
+            dev=True
+        )
+
 
     def setup(self, package_name, es_install_location=None):
         """

@@ -21,11 +21,21 @@ import json
 import os
 import sys
 
+from .settings_utils import *
+
 try:
     from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
 except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
+
+try:
+    from .settings_local import *
+except ImportError:
+    try:
+        from arches.settings_local import *
+    except ImportError:
+        pass
 
 #########################################
 ###          STATIC SETTINGS          ###
@@ -83,6 +93,9 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
+# This should point to the url where you host your site
+# Make sure to use a trailing slash
+PUBLIC_SERVER_ADDRESS = "http://localhost:8000/"
 
 KIBANA_URL = "http://localhost:5601/"
 KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
@@ -126,7 +139,6 @@ ONTOLOGY_NAMESPACES = {
 
 ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
 
-
 # Used in the JSON-LD export for determining which external concept scheme URI
 # to use in preference for the URI of a concept. If there is no match, the default
 # Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
@@ -136,7 +148,7 @@ JSONLD_CONTEXT_CACHE_TIMEOUT = 43800  # in minutes (43800 minutes ~= 1 month)
 # This is the namespace to use for export of data (for RDF/XML for example)
 # Ideally this should point to the url where you host your site
 # Make sure to use a trailing slash
-ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = PUBLIC_SERVER_ADDRESS
 
 # This is used to indicate whether the data in the CSV and SHP exports should be
 # ordered as seen in the resource cards or not.
@@ -278,14 +290,8 @@ FORCE_SCRIPT_NAME = None
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = "/media/admin/"
 
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ROOT_DIR, "app", "media", "build"),
-    os.path.join(ROOT_DIR, "app", "media"),
-)
+STATICFILES_DIRS = build_staticfiles_dirs(root_dir=ROOT_DIR)
+TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -309,35 +315,6 @@ OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 36000}
 # This is the client id you get when you register a new application
 # see https://arches.readthedocs.io/en/stable/api/#authentication
 OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            # insert your TEMPLATE_DIRS here
-            os.path.join(ROOT_DIR, "app", "templates"),
-        ],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
-                # list if you haven't customized them:
-                "django.contrib.auth.context_processors.auth",
-                "django.template.context_processors.debug",
-                "django.template.context_processors.i18n",
-                "django.template.context_processors.media",
-                "django.template.context_processors.static",
-                "django.template.context_processors.tz",
-                "django.template.context_processors.request",
-                "django.contrib.messages.context_processors.messages",
-                "arches.app.utils.context_processors.livereload",
-                "arches.app.utils.context_processors.map_info",
-                "arches.app.utils.context_processors.app_settings",
-            ],
-            "debug": DEBUG,
-        },
-    },
-]
 
 AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
@@ -744,25 +721,12 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
 
-try:
-    from .settings_local import *
-except ImportError as e:
-    try:
-        from arches.settings_local import *
-    except ImportError as e:
-        pass
-
-# # returns an output that can be read by NODEJS
+# returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    print(
-        json.dumps(
-            {
-                "ARCHES_NAMESPACE_FOR_DATA_EXPORT": ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-                "STATIC_URL": STATIC_URL,
-                "ROOT_DIR": ROOT_DIR,
-                "APP_ROOT": ROOT_DIR + "/app",
-                "WEBPACK_DEVELOPMENT_SERVER_PORT": WEBPACK_DEVELOPMENT_SERVER_PORT,
-            }
-        )
+    transmit_webpack_django_config(
+        root_dir=ROOT_DIR,
+        app_root=ROOT_DIR + "/app",
+        public_server_address=PUBLIC_SERVER_ADDRESS,
+        static_url=STATIC_URL,
+        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
     )
-    sys.stdout.flush()

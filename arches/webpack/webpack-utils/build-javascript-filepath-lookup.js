@@ -23,10 +23,15 @@ function buildJavascriptFilepathLookup(path, outerAcc, javascriptDirectoryPath) 
                 pathName = Path.join(parsedPath['dir'], parsedPath['name']);
             }
 
-            return { 
-                ...acc, 
-                [pathName]: { 'import': Path.join(outerPath, subPath), 'filename': Path.join('js', '[name].js') } 
-            };
+            if (pathName.includes('.DS_Store')) {
+                return acc;
+            }
+            else {
+                return { 
+                    ...acc, 
+                    [pathName]: { 'import': Path.join(outerPath, subPath), 'filename': Path.join('js', '[name].js') } 
+                };
+            }
         }
     }, outerAcc);
 };

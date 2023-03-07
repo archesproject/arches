@@ -19,21 +19,28 @@ const _buildTemplateFilePathLookup = function(path, outerAcc, templateDirectoryP
             const parsedPath = Path.parse(subPath);
             const filename = parsedPath['dir'] ? Path.join(parsedPath['dir'], parsedPath['base']) : parsedPath['base'];
 
-            return { 
-                ...acc, 
-                [Path.join('templates', filename)]: Path.resolve(__dirname, Path.join(outerPath, subPath))
-            };
+            if (filename.includes('.DS_Store')) {
+                return acc;
+            }
+            else {
+                return { 
+                    ...acc, 
+                    [Path.join('templates', filename)]: Path.resolve(__dirname, Path.join(outerPath, subPath))
+                };
+            }
         }
     }, outerAcc);
 };
 
-const buildTemplateFilePathLookup = function(archesTemplatePath, projectTemplatePath) {
+const buildTemplateFilePathLookup = function(archesTemplatePath, projectTemplatePath, fooTemplatePath) {
     const coreArchesTemplateFilePathConfiguration = _buildTemplateFilePathLookup(archesTemplatePath, {});
     const projectTemplatePathConfiguration = _buildTemplateFilePathLookup(projectTemplatePath, {});
+    const fooTemplatePathConfiguration = _buildTemplateFilePathLookup(fooTemplatePath, {});
 
     return { 
         ...coreArchesTemplateFilePathConfiguration,
-        ...projectTemplatePathConfiguration 
+        ...projectTemplatePathConfiguration,
+        ...fooTemplatePathConfiguration
     };
 };
 
