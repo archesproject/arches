@@ -70,8 +70,8 @@ define([
                 "is_resource_layer": false,
                 "centerx": layer.centerX(),
                 "centery": layer.centerY(),
-                "sortorder": layer.sortOrder(),
-                "zoom": layer.zoom()
+                "zoom": layer.zoom(),
+                "sortorder": layer.sortOrder()
             });
         });
         layer.dirty = ko.computed(function() {

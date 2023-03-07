@@ -1319,16 +1319,16 @@ class Command(BaseCommand):
                         "searchonly",
                         "sortorder",
                     ]
-                    layer_metadata = data["layer-metadata"] if "layer-metadata" in data else {}
-                    if "icon" not in layer_metadata:
-                        layer_metadata["icon"] = layer_icon
-                    if "isoverlay" not in layer_metadata:
-                        layer_metadata["isoverlay"] = not is_basemap
-                    invalid_keys = layer_metadata.keys() - valid_metadata_keys
+                    arches_metadata = data["arches-metadata"] if "arches-metadata" in data else {}
+                    if "icon" not in arches_metadata:
+                        arches_metadata["icon"] = layer_icon
+                    if "isoverlay" not in arches_metadata:
+                        arches_metadata["isoverlay"] = not is_basemap
+                    invalid_keys = arches_metadata.keys() - valid_metadata_keys
                     if len(invalid_keys) > 0:
                         logger.warning("Ignoring invalid layer metadata keys: %s" % str(invalid_keys))
-                    layer_metadata = {key: layer_metadata[key] for key in valid_metadata_keys if key in layer_metadata}
-                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=data["layers"], **layer_metadata)
+                    arches_metadata = {key: arches_metadata[key] for key in valid_metadata_keys if key in arches_metadata}
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=data["layers"], **arches_metadata)
                     try:
                         map_layer.save()
                     except IntegrityError as e:
