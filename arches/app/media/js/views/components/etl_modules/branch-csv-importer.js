@@ -26,6 +26,7 @@ define([
             this.loadStatus = ko.observable('ready');
             this.downloadMode = ko.observable(false);
 
+            this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
             this.validationErrors = params.validationErrors || ko.observable();
             this.validated = params.validated || ko.observable();
 

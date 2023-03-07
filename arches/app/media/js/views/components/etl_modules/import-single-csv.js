@@ -48,6 +48,10 @@ define([
             return "unique_id_" + self.uniqueId;
         });
 
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.validationErrors = params.validationErrors || ko.observable();
+        this.validated = params.validated || ko.observable();
+
         this.createTableConfig = function(col) {
             return {
                 paging: false,
