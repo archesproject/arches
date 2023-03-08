@@ -232,25 +232,28 @@ class BaseDataType(object):
         """
         Appends the search query dsl to search for fields that have not been populated
         """
-        base_query = Bool()
-        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
-        null_query = Bool()
+        query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
         data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}")
-        nested_query = Nested(path="tiles", query=data_exists_query)
-        null_query.must(nested_query)
-        if value["op"] == "null":
+        tiles_w_node_exists = Nested(path="tiles", query=data_exists_query)
+        if value["op"] == "not_null":
+            query.must(tiles_w_node_exists)
+        elif value["op"] == "null":
             # search for tiles that don't exist
-            exists_query = Bool()
-            exists_query.must_not(null_query)
-            base_query.should(exists_query)
+            null_query = Bool()
+            null_query.must_not(tiles_w_node_exists)
+            query.should(null_query)
 
             # search for tiles that do exist, but that have null or [] as values
+            exists_query = Bool()
+            exists_query.must(tiles_w_node_exists)
+            exists_query.must(Terms(field="graph_id", terms=[str(node.graph_id)]))
             func_query = Dsl()
             func_query.dsl = {
                 "function_score": {
                     "min_score": 1,
-                    "query": {"match_all": {}},
+                    "query": exists_query.dsl,
                     "functions": [
                         {
                             "script_score": {
@@ -258,9 +261,9 @@ class BaseDataType(object):
                                     "source": """
                                     int null_docs = 0;
                                     for(tile in params._source.tiles){
-                                        if(tile.data.containsKey(params.node_id)){
+                                        if(tile.nodegroup_id == params.nodegroup_id ){
                                             def val = tile.data.get(params.node_id);
-                                            if (val == null || (val instanceof List && val.length==0)) {
+                                            if (val == null || val.length == 0) {
                                                 null_docs++;
                                                 break;
                                             }
@@ -269,7 +272,7 @@ class BaseDataType(object):
                                     return null_docs;
                                 """,
                                     "lang": "painless",
-                                    "params": {"node_id": f"{str(node.pk)}"},
+                                    "params": {"node_id": f"{str(node.pk)}", "nodegroup_id": f"{str(node.nodegroup_id)}"}
                                 }
                             }
                         }
@@ -279,10 +282,9 @@ class BaseDataType(object):
                     "boost_mode": "replace",
                 }
             }
-            base_query.should(func_query)
-        elif value["op"] == "not_null":
-            base_query.must(null_query)
-        query.must(base_query)
+            query.should(func_query)
+
+        print(json.dumps(query.dsl, indent=4))
 
     def pre_tile_save(self, tile, nodeid):
         """
