@@ -92,13 +92,13 @@ module.exports = () => {
             }
 
             let parsedInstalledPackagesNodeModulesAliases = {};
-            for (const installedPackage in INSTALLED_PACKAGES) {
+            for (const installedPackage of INSTALLED_PACKAGES) {
                 try {
                     const { installedPackageNodeModuleAliases } = require(
                         Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'webpack', 'webpack-node-modules-aliases.js')
                     );
                     
-                    for (const [alias, executeableString] in Object.entries(JSON.parse(installedPackageNodeModuleAliases))) {
+                    for (const [alias, executeableString] of Object.entries(JSON.parse(installedPackageNodeModuleAliases))) {
                         if (
                             parsedArchesCoreNodeModulesAliases[alias]
                             || parsedProjectNodeModulesAliases[alias]
@@ -183,8 +183,10 @@ module.exports = () => {
                 plugins: [
                     new CleanWebpackPlugin(),
                     new webpack.DefinePlugin({
-                        ARCHES_CORE_DIRECTORY: `'${ROOT_DIR}'`,
-                        APP_ROOT_DIRECTORY: `'${APP_ROOT}'`
+                        ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR),
+                        APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT),
+                        INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH),
+                        INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES)
                     }),
                     new webpack.ProvidePlugin({
                         jquery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
@@ -217,7 +219,7 @@ module.exports = () => {
                         },
                         {
                             test: /\.js$/,
-                            exclude: /node_modules/,
+                            exclude: [/node_modules/, /load-component-dependencies/],
                             loader: Path.join(APP_ROOT, 'media', 'node_modules', 'babel-loader'),
                             options: {
                                 presets: ['@babel/preset-env'],
