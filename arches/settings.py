@@ -29,14 +29,6 @@ try:
 except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
-try:
-    from .settings_local import *
-except ImportError:
-    try:
-        from arches.settings_local import *
-    except ImportError:
-        pass
-
 #########################################
 ###          STATIC SETTINGS          ###
 #########################################
@@ -716,6 +708,14 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
+
+try:
+    from .settings_local import *
+except ImportError:
+    try:
+        from arches.settings_local import *
+    except ImportError:
+        pass
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
