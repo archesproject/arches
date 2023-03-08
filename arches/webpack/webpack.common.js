@@ -174,6 +174,9 @@ module.exports = () => {
                     ...projectEntryPointConfiguration,
                     ...installedPackagesEntrypointConfiguration
                 },
+                devServer: {
+                    port: WEBPACK_DEVELOPMENT_SERVER_PORT,
+                },
                 output: {
                     path: Path.resolve(__dirname, APP_ROOT, 'media', 'build'),
                     publicPath: STATIC_URL,
