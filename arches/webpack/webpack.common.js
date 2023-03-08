@@ -183,15 +183,15 @@ module.exports = () => {
                 plugins: [
                     new CleanWebpackPlugin(),
                     new webpack.DefinePlugin({
-                        ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR),
                         APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT),
-                        INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH),
-                        INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES)
+                        ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR),
+                        INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES),
+                        INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH)
                     }),
                     new webpack.ProvidePlugin({
-                        jquery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
+                        $:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
                         jQuery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
-                        $:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min')
+                        jquery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min')
                     }),
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),

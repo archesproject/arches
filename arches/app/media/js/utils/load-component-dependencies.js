@@ -1,6 +1,5 @@
 define([], function() {
     return function loadComponentDependencies(componentPaths){
-        // console.log("@@@@@@@@@", Path)
         for (const componentPath of componentPaths) {
             try {  // first try to load project path
                 // eslint-disable-next-line no-undef
