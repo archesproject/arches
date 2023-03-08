@@ -256,7 +256,7 @@ module.exports = () => {
                                     if (resourcePath.includes(INSTALLED_PACKAGES_PATH)) {  // installed package component
                                         const packagePath = resourcePath.split(INSTALLED_PACKAGES_PATH)[1];  // first split off installed packages path
                                         const [_emptyValueBeforeFirstSlash, _packageName, ...subPath] = packagePath.split('/') // then split off package name
-                                        templatePath = '/' + subPath;
+                                        templatePath = '/' + subPath.join('/');
                                     }
                                     else if (resourcePath.includes(APP_ROOT)) {  // project-level component
                                         templatePath = resourcePath.split(APP_ROOT)[1];
