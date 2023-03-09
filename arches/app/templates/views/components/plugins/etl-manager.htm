@@ -214,8 +214,8 @@
                             <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
                                 <thead>
                                     <tr>
-                                        <th>{% trans "Error" %}</th>
                                         <th>{% trans "Column Name" %}</th>
+                                        <th>{% trans "Error" %}</th>
                                         <th>{% trans "Node Alias" %}</th>
                                         <th>{% trans "Datatype" %}</th>
                                         <th>{% trans "Count" %}</th>
@@ -233,8 +233,8 @@
                                 <tbody>
                                     <!-- ko foreach: validationErrors -->
                                     <tr>
-                                        <td data-bind="text: $data.error"></td>
                                         <td data-bind="text: $data.source"></td>
+                                        <td data-bind="text: $data.error"></td>
                                         <td data-bind="text: $data.nodeAlias"></td>
                                         <td data-bind="text: $data.datatype"></td>
                                         <td data-bind="text: $data.count"></td>
@@ -250,7 +250,7 @@
                                     </tr>
                                     <!-- ko if: $data.showDetails -->
                                     <tr>
-                                        <td style="text-align: right; vertical-align: top">
+                                        <td style="text-align: right; vertical-align: top" data-bind="click: function(){ $data.showDetails(false); }">
                                             <i class="fa fa-2xl fa-folder-open"></i>
                                         </td>
                                         <td colspan="5">
