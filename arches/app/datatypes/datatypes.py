@@ -226,8 +226,6 @@ class StringDataType(BaseDataType):
                 field=f"tiles.data.{str(node.pk)}.{value['lang']}.value.keyword", query="")
             query.should(Nested(path="tiles", query=non_blank_string_query))
 
-        print(json.dumps(query.dsl, indent=4))
-
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":

@@ -263,7 +263,7 @@ class BaseDataType(object):
                                     for(tile in params._source.tiles){
                                         if(tile.nodegroup_id == params.nodegroup_id ){
                                             def val = tile.data.get(params.node_id);
-                                            if (val == null || val.length == 0) {
+                                            if (val == null || val == "" || (val instanceof List && val.length==0)) {
                                                 null_docs++;
                                                 break;
                                             }
@@ -283,8 +283,6 @@ class BaseDataType(object):
                 }
             }
             query.should(func_query)
-
-        print(json.dumps(query.dsl, indent=4))
 
     def pre_tile_save(self, tile, nodeid):
         """
