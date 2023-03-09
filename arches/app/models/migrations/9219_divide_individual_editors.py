@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9068_resource_model_view_defaults"),
+        ("models", "8928_map_layer_sort_order"),
     ]
 
     add_bulk_data_editor = """
