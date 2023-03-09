@@ -51,6 +51,8 @@ define([
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
         this.validationErrors = params.validationErrors || ko.observable();
         this.validated = params.validated || ko.observable();
+        this.getErrorReport = params.getErrorReport;
+        this.getNodeError = params.getNodeError;
 
         this.createTableConfig = function(col) {
             return {
