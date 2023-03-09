@@ -284,8 +284,13 @@ define([
                     });
 
                     if (ontologyProperties) {
-                        ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
-                        inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                        if (ontologyProperties.useOntologyRelationship) {
+                            ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                            inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;    
+                        } else {
+                            ontologyProperty = ontologyProperties.relationshipConcept;
+                            inverseOntologyProperty = ontologyProperties.inverseRelationshipConcept;    
+                        }
                     }
                 }
             }

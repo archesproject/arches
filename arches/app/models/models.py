@@ -1244,6 +1244,7 @@ class MapLayer(models.Model):
     zoom = models.FloatField(blank=True, null=True)
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
+    sortorder = models.IntegerField(default=0)
 
     @property
     def layer_json(self):
@@ -1260,6 +1261,7 @@ class MapLayer(models.Model):
 
     class Meta:
         managed = True
+        ordering = ("sortorder", "name")
         db_table = "map_layers"
 
 
@@ -1330,8 +1332,11 @@ def create_permissions_for_new_users(sender, instance, created, **kwargs):
             resourceInstanceId = uuid.UUID(resourceInstanceId)
         resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
         assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource in resources:
-            Resource(resource.resourceinstanceid).index()
+        for resource_instance in resources:
+            resource = Resource(resource_instance.resourceinstanceid)
+            resource.graph_id = resource_instance.graph_id
+            resource.createdtime = resource_instance.createdtime
+            resource.index()
 
 
 class UserXTask(models.Model):

@@ -831,8 +831,6 @@ class Command(BaseCommand):
 
         def load_card_components(package_dir):
             load_extensions(package_dir, "card_components", "card_component")
-
-        def load_card_components(package_dir):
             load_extensions(package_dir, "cards", "card_component")
 
         def load_search_components(package_dir):
@@ -1295,7 +1293,11 @@ class Command(BaseCommand):
             sys.exit()
 
     def add_mapbox_layer(
-        self, layer_name=False, mapbox_json_path=False, layer_icon="fa fa-globe", is_basemap=False,
+        self,
+        layer_name=False,
+        mapbox_json_path=False,
+        layer_icon="fa fa-globe",
+        is_basemap=False,
     ):
         if layer_name is not False and mapbox_json_path is not False:
             with open(mapbox_json_path) as data_file:
@@ -1306,9 +1308,27 @@ class Command(BaseCommand):
                             layer["source"] = layer["source"] + "-" + layer_name
                     for source_name, source_dict in data["sources"].items():
                         map_source = models.MapSource.objects.get_or_create(name=source_name + "-" + layer_name, source=source_dict)
-                    map_layer = models.MapLayer(
-                        name=layer_name, layerdefinitions=data["layers"], isoverlay=(not is_basemap), icon=layer_icon
-                    )
+                    valid_metadata_keys = [
+                        "isoverlay",
+                        "icon",
+                        "addtomap",
+                        "centerx",
+                        "centery",
+                        "zoom",
+                        "legend",
+                        "searchonly",
+                        "sortorder",
+                    ]
+                    arches_metadata = data["arches-metadata"] if "arches-metadata" in data else {}
+                    if "icon" not in arches_metadata:
+                        arches_metadata["icon"] = layer_icon
+                    if "isoverlay" not in arches_metadata:
+                        arches_metadata["isoverlay"] = not is_basemap
+                    invalid_keys = arches_metadata.keys() - valid_metadata_keys
+                    if len(invalid_keys) > 0:
+                        logger.warning("Ignoring invalid layer metadata keys: %s" % str(invalid_keys))
+                    arches_metadata = {key: arches_metadata[key] for key in valid_metadata_keys if key in arches_metadata}
+                    map_layer = models.MapLayer(name=layer_name, layerdefinitions=data["layers"], **arches_metadata)
                     try:
                         map_layer.save()
                     except IntegrityError as e:

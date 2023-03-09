@@ -72,11 +72,16 @@ class Resource(models.ResourceInstance):
         # self.resourceinstancesecurity
         # end from models.ResourceInstance
         self.tiles = []
+        self.descriptor_function = None
 
-    def get_descriptor(self, descriptor, context):
-        graph_function = models.FunctionXGraph.objects.filter(
-            graph_id=self.graph_id, function__functiontype="primarydescriptors"
-        ).select_related("function")
+    def get_descriptor_language(self, context):
+        """
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
 
         if self.descriptors is None:
             self.descriptors = {}
@@ -85,24 +90,63 @@ class Resource(models.ResourceInstance):
             self.name = {}
 
         requested_language = None
-        if context is not None and "language" in context:
+        if context and "language" in context:
             requested_language = context["language"]
         language = requested_language or get_language()
 
         if language not in self.descriptors:
             self.descriptors[language] = {}
 
-        if len(graph_function) == 1:
-            module = graph_function[0].function.get_class_module()()
-            self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"][descriptor], context
-            )
-            if descriptor == "name" and self.descriptors[language][descriptor] is not None:
-                self.name[language] = self.descriptors[language][descriptor]
-        else:
-            self.descriptors[language][descriptor] = None
+        return language
 
+    def get_descriptor(self, descriptor, context):
+        """
+        descriptor -- string descriptor type: "name", "description", "map_popup"
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
+
+        language = self.get_descriptor_language(context)
+
+        if self.descriptors:
+            try:
+                return self.descriptors[language][descriptor]
+            except KeyError:
+                pass
+
+        self.calculate_descriptors(context=context)
         return self.descriptors[language][descriptor]
+
+    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+        """
+        descriptors -- iterator with descriptors to be calculated
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
+
+        language = self.get_descriptor_language(context)
+
+        if not self.descriptor_function:
+            self.descriptor_function = models.FunctionXGraph.objects.filter(
+                graph_id=self.graph_id, function__functiontype="primarydescriptors"
+            ).select_related("function")
+
+        for descriptor in descriptors:
+            if len(self.descriptor_function) == 1:
+                module = self.descriptor_function[0].function.get_class_module()()
+                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
+                )
+                if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                    self.name[language] = self.descriptors[language][descriptor]
+            else:
+                self.descriptors[language][descriptor] = None
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -258,6 +302,11 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+            for lang in settings.LANGUAGES:
+                if context is None:
+                    context = {}
+                context["language"] = lang[0]
+                self.calculate_descriptors(context=context)
             datatype_factory = DataTypeFactory()
             node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
@@ -615,7 +664,6 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
-
 
                 for resource in related_resources["docs"]:
                     relations = get_relations(
