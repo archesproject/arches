@@ -56,11 +56,11 @@ define([
                 var graphId = source['graph_id'];
                 var resourceId = source['resourceinstanceid'];
 
-                    if (bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId]) {
-                        self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
-                        self.loading(false);
-                    }
-                };
+                if (bulkResourceReportCache()[graphId] && bulkDisambiguatedResourceInstanceCache()[resourceId]) {
+                    self.createReport(sourceData, bulkResourceReportCache()[graphId], bulkDisambiguatedResourceInstanceCache()[resourceId]);
+                    self.loading(false);
+                }
+            };
 
             this.createReport = function(sourceData, bulkResourceReportCacheData, bulkDisambiguatedResourceInstanceCacheData) {
                 var data = { ...sourceData };
