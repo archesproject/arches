@@ -20,29 +20,29 @@
             <!--/ko-->
 
             <!-- ko if: !!$parent.details -->
-            <a class="search-candidate-link" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
+            <a class="search-candidate-link btn" href="" data-bind="click: showDetails"><i class="fa fa-info-circle"></i> {% trans "Details" %} </a>
             <!-- /ko -->
 
             <!--ko if: canEdit -->
-            <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
+            <a class="search-candidate-link btn" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>
             <!--/ko-->
             
             <!-- ko if: !!$parent.mapFilter -->
-            <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
+            <a class="search-candidate-link btn" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
             <!-- /ko -->
 
             <!--ko ifnot: $root.resourceEditorContext -->
 
                 <!--ko if: !!$parent.relatedResourcesManager && canRead -->
-                <a class="search-candidate-link pull-right" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
+                <a class="search-candidate-link pull-right btn" href="" data-bind="click: showrelated"><i class="fa fa-code-fork"></i> {% trans "Related Resources" %} </a>
                 <!--/ko-->
 
                 <!--ko if: $root.resourceEditorContext -->
                     <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
-                    <a class="search-candidate-link pull-right" href="" data-bind="click: function(val){relationshipcandidacy(val); showrelated()}"><i class="fa fa-code-fork"></i> {% trans "Relate Resource" %} </a>
+                    <a class="search-candidate-link pull-right btn" href="" data-bind="click: function(val){relationshipcandidacy(val); showrelated()}"><i class="fa fa-code-fork"></i> {% trans "Relate Resource" %} </a>
                     <!--/ko-->
                     <!--ko if: relatable == false || $root.editingInstanceId == resourceinstanceid -->
-                    <a class="search-candidate-link unrelatable-search-result pull-right" href=""><i class="fa fa-code-fork"></i> {% trans "Cannot Be Related" %} </a>
+                    <a class="search-candidate-link unrelatable-search-result pull-right btn" href=""><i class="fa fa-code-fork"></i> {% trans "Cannot Be Related" %} </a>
                     <!--/ko-->
                 <!--/ko-->
             <!--/ko-->

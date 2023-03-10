@@ -10625,7 +10625,8 @@ a.search-query-link-captions:focus {
 .search-candidate-title,
 .search-candidate-link {
     color: steelblue;
-    padding-right: 7px;
+    font-size:inherit;
+    padding: 0px 5px 1px;
 }
 
 .search-listing-footer a {
