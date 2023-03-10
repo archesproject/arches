@@ -89,20 +89,36 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 const self = this;
                 const resourceId = result._source.resourceinstanceid;
 
+                const reportDataLoaded = ko.observable(false);
+
                 return function(){
+                    reportDataLoaded(false);
+
                     if (!self.bulkDisambiguatedResourceInstanceCache()[resourceId]) {
                         const url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${resourceId}`;
                         
+                        self.details.loading(true);
+
                         $.getJSON(url, (resp) => {
                             const instanceCache = self.bulkDisambiguatedResourceInstanceCache();
                             Object.keys(resp).forEach(function(resourceId) {
                                 instanceCache[resourceId] = resp[resourceId];
                             });
 
+                            reportDataLoaded(true);
                             self.bulkDisambiguatedResourceInstanceCache(instanceCache);
                         });
-                    }  
-                    self.details.setupReport(result._source, self.bulkResourceReportCache, self.bulkDisambiguatedResourceInstanceCache);
+                    }
+                    else {
+                        reportDataLoaded(true);
+                    }
+                    
+                    reportDataLoaded.subscribe(loaded => {
+                        if (loaded) {
+                            self.details.setupReport(result._source, self.bulkResourceReportCache, self.bulkDisambiguatedResourceInstanceCache);
+                        }
+                    });
+
                     if (self.selectedTab() !== 'search-result-details') {
                         self.selectedTab('search-result-details');
                     }
