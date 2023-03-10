@@ -626,16 +626,17 @@ class Command(BaseCommand):
                 print("Failed to load resource views")
 
         def load_graphs(package_dir):
+            overwrite_graphs = True if yes is True else False
             try:
                 branches = glob.glob(os.path.join(package_dir, "graphs", "branches"))[0]
+                self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
             except IndexError as e:
                 logger.warning("No branches in package")
-                branches = ""
-            resource_models = glob.glob(os.path.join(package_dir, "graphs", "resource_models"))[0]
-            # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'graphs','branches'), overwrite_graphs=False)
-            overwrite_graphs = True if yes is True else False
-            self.import_graphs(branches, overwrite_graphs=overwrite_graphs)
-            self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
+            try:
+                resource_models = glob.glob(os.path.join(package_dir, "graphs", "resource_models"))[0]
+                self.import_graphs(resource_models, overwrite_graphs=overwrite_graphs)
+            except IndexError:
+                logger.warning("No resource models in package")
 
         def load_concepts(package_dir, overwrite, stage, defer_indexing):
             file_types = ["*.xml", "*.rdf"]
