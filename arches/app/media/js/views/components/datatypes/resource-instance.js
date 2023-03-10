@@ -70,7 +70,7 @@ define([
                 graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
                 graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || defaultRelationshipConceptValue);
                 graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || defaultRelationshipConceptValue));
-                graph.useOntologyRelationship = ko.observable(false);
+                graph.useOntologyRelationship = ko.observable(ko.unwrap(graph.useOntologyRelationship || false));
                 graph.removeRelationship = function(graph){
                     self.config.graphs.remove(graph);
                 };

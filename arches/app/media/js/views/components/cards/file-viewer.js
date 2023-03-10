@@ -12,7 +12,7 @@ define([
     'bindings/fadeVisible',
     'bindings/scroll-to-file',
     'dropzone',
-    'bindings/dropzone',
+    'bindings/dropzone'
 ], function($, ko, uuid, arches, fileRenderers, CardComponentViewModel, CardMultiSelectViewModel, WorkbenchComponentViewModel, fileViewerTemplate) {
     const viewModel = function(params) {
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
@@ -48,11 +48,10 @@ define([
         this.fileRenderer = this.card.renderer;
 
         //dynamically require the renderer - since these can be quite large/cumbersome
-        const renderer = fileRenderers[this.fileRenderer.id];
-        if(renderer) {
-            require([`${renderer.component}`], function(component){
-                self.rendererComponentName(renderer.name);
-            });
+        const renderer = fileRenderers[ko.unwrap(this.fileRenderer.id || this.fileRenderer)];
+
+        if(renderer){
+            self.rendererComponentName(renderer.name);
         }
 
         this.managerRenderer = ko.observable();
