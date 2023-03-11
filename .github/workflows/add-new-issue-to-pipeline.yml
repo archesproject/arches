@@ -1,0 +1,15 @@
+name: Add new issues to pipeline project
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to pipeline project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@4756e6330fe1e0a736690d3cfd9f11c9399c2ed4
+        with:
+          project-url: https://github.com/orgs/archesproject/projects/4
+          github-token: ${{ secrets.CH_PROJECT_TOKEN }}
