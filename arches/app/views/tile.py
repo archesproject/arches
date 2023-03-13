@@ -282,10 +282,7 @@ class TileData(View):
             )
 
             file_objects = sum(
-                [
-                    [models.File.objects.get(pk=file["file_id"]).path for file in tile.data[nodeid]]
-                    for tile in tiles
-                ],
+                [[models.File.objects.get(pk=file["file_id"]).path for file in tile.data[nodeid]] for tile in tiles],
                 [],
             )
 
@@ -297,15 +294,15 @@ class TileData(View):
                 num_files += 1
                 last_file = file
                 file_size += file.size
-            
+
             if num_files == 1:
                 try:
                     last_file_url = last_file.url
                     return redirect(last_file_url)
                 except:
                     pass
-            
-            if(file_size < settings.FILE_VIEWER_DOWNLOAD_LIMIT):
+
+            if file_size < settings.FILE_VIEWER_DOWNLOAD_LIMIT:
                 response = arches_zip.zip_response(files, "file-viewer-download.zip")
                 return response
             else:
