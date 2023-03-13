@@ -32,12 +32,13 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import can_edit_resource_instance
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from django.contrib.auth.models import User
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.views.generic import View
 from django.db import transaction
+from django.shortcuts import redirect
 from arches.app.models.resource import EditLog
 
 logger = logging.getLogger(__name__)
@@ -279,8 +280,37 @@ class TileData(View):
                 ],
                 [],
             )
-            response = arches_zip.zip_response(files, "file-viewer-download.zip")
-            return response
+
+            file_objects = sum(
+                [
+                    [models.File.objects.get(pk=file["file_id"]).path for file in tile.data[nodeid]]
+                    for tile in tiles
+                ],
+                [],
+            )
+
+            file_size = 0
+            num_files = 0
+            last_file = None
+
+            for file in file_objects:
+                num_files += 1
+                last_file = file
+                file_size += file.size
+            
+            if num_files == 1:
+                try:
+                    last_file_url = last_file.url
+                    return redirect(last_file_url)
+                except:
+                    pass
+            
+            if(file_size < settings.FILE_VIEWER_DOWNLOAD_LIMIT):
+                response = arches_zip.zip_response(files, "file-viewer-download.zip")
+                return response
+            else:
+                return HttpResponseBadRequest("Too large to be zipped.  Try downloading a single file.")
+
         except TypeError as e:
             logger.error("Tile id array required to download files.")
             return JSONErrorResponse(_("Request Failed"), _(e))
