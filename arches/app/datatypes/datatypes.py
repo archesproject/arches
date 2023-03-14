@@ -1569,7 +1569,7 @@ class FileListDataType(BaseDataType):
         except Exception as e:
             dt = self.datatype_model.datatype
             message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
-            title = _("{0}".format(e))
+            title = _("Unexpected File Error")
             errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 

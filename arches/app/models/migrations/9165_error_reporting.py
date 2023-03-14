@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9068_resource_model_view_defaults"),
+        ("models", "8928_map_layer_sort_order"),
     ]
 
     operations = [
