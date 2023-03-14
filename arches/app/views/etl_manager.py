@@ -1,14 +1,18 @@
+from celery import app
+from datetime import datetime
 import logging
 from django.db import connection
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +39,25 @@ class ETLManagerView(View):
             cursor.execute("""DELETE FROM load_staging WHERE loadid = %s""", [loadid])
             cursor.execute("""DELETE FROM load_event WHERE loadid = %s""", [loadid])
         return {"success": True, "data": ""}
+
+    def stop_loading(self, loadid):
+        if task_management.check_if_celery_available():
+            logger.info(_("Cancel Request sent to Celery"))
+            load_event = LoadEvent.objects.get(loadid=loadid)
+            taskid = load_event.taskid
+            remote_control = app.control.Control()
+            remote_control.revoke(task_id=taskid, terminate=True)
+            # app.control.Control.revoke(task_id=taskid, terminate=True)
+            result = _("Cancel Request sent to Celery")
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("cancelled", datetime.now(), self.loadid),
+                )
+            return {"success": True, "data": result}
+        else:
+            err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
+            return {"success": False, "data": {"title": _("Error"), "message": err}}
 
     def get(self, request):
         action = request.GET.get("action", None)
@@ -77,6 +100,8 @@ class ETLManagerView(View):
             response = self.validate(loadid)
         elif action == "cleanEvent" and loadid:
             response = self.clean_load_event(loadid)
+        elif action == "stop" and loadid:
+            response = self.stop_loading(loadid)
         return JSONResponse(response)
 
     def post(self, request):

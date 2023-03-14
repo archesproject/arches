@@ -130,6 +130,11 @@
                                         <span data-bind="text: $root.translations.removeFromHistory"></span>
                                     </a>
                                     <!-- /ko -->
+                                    <!-- ko if: event.status == "running" -->
+                                    <a data-bind="click: function() { $parent.stopEtl(event.loadid)}">
+                                        <span data-bind="text: $root.translations.stopEtl"></span>
+                                    </a>
+                                    <!-- /ko -->
                                 </div>
                                 <div class="status">
                                     <!-- ko if: event.status == "completed" -->

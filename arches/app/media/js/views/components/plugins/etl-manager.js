@@ -149,6 +149,17 @@ define([
                 });
             };
 
+            this.stopEtl = function(loadid) {
+                const url = arches.urls.etl_manager + "?action=stop&loadid="+loadid;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data);
+                });
+            };
+
             this.fetchValidation = function(loadid){
                 const url = arches.urls.etl_manager + "?action=validate&loadid="+loadid;
                 window.fetch(url).then(function(response){
