@@ -167,6 +167,11 @@
                                         <span data-bind="text: $root.translations.unloaded"></span>
                                     </button>
                                     <!-- /ko -->
+                                    <!-- ko if: event.status == "cancelled" -->
+                                    <button class="btn btn-success" style="width:150px;">
+                                        <span data-bind="text: $root.translations.cancelled"></span>
+                                    </button>
+                                    <!-- /ko -->
                                 </div>
                             </div>
                         </div>
