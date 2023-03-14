@@ -1,4 +1,4 @@
-from celery import app
+from celery import app, Celery
 from datetime import datetime
 import logging
 from django.db import connection
@@ -45,14 +45,15 @@ class ETLManagerView(View):
             logger.info(_("Cancel Request sent to Celery"))
             load_event = LoadEvent.objects.get(loadid=loadid)
             taskid = load_event.taskid
-            remote_control = app.control.Control()
+            celery_app = Celery()
+            remote_control = app.control.Control(app=celery_app)
             remote_control.revoke(task_id=taskid, terminate=True)
             # app.control.Control.revoke(task_id=taskid, terminate=True)
             result = _("Cancel Request sent to Celery")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("cancelled", datetime.now(), self.loadid),
+                    ("cancelled", datetime.now(), loadid),
                 )
             return {"success": True, "data": result}
         else:
