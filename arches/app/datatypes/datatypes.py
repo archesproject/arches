@@ -1616,7 +1616,7 @@ class FileListDataType(BaseDataType):
                 if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
                     original_storage = file_model.path.storage
                     # this temporary storage change _bypasses_ s3 storage temporarily
-                    if(file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]):
+                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
                         file_model.path.storage = FileSystemStorage()
                     file_model.save()
                     file_model.path.storage = original_storage

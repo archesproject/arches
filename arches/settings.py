@@ -92,7 +92,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
-FILE_VIEWER_DOWNLOAD_LIMIT = 1073741824 #limit of file viewer download source files in bytes
+FILE_VIEWER_DOWNLOAD_LIMIT = 1073741824  # limit of file viewer download source files in bytes
 RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
