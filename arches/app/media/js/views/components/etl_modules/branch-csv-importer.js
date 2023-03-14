@@ -26,6 +26,12 @@ define([
             this.loadStatus = ko.observable('ready');
             this.downloadMode = ko.observable(false);
 
+            this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+            this.validationErrors = params.validationErrors || ko.observable();
+            this.validated = params.validated || ko.observable();
+            this.getErrorReport = params.getErrorReport;
+            this.getNodeError = params.getNodeError;
+
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
                 if (this.downloadMode() && !ko.unwrap(this.templates).length) {
@@ -48,7 +54,7 @@ define([
             }
 
             this.downloadTemplate = async() => {
-                const url = `/etl-manager`;
+                const url = arches.urls.etl_manager;
                 const formData = new window.FormData();
                 formData.append("id", ko.unwrap(this.selectedTemplate));
                 formData.append("format", "xls");

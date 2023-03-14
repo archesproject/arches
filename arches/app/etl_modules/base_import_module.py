@@ -50,6 +50,7 @@ class BaseImportModule(object):
         self.loadid = loadid
         with connection.cursor() as cursor:
             try:
+                cursor.execute("""CALL __arches_prepare_bulk_load();""")
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
             except (IntegrityError, ProgrammingError) as e:
@@ -64,6 +65,9 @@ class BaseImportModule(object):
                     "title": _("Failed to complete load"),
                     "message": _("Unable to insert record into staging table"),
                 }
+            finally:
+                cursor.execute("""CALL __arches_complete_bulk_load();""")
+
             if row[0][0]:
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
@@ -112,3 +116,17 @@ class BaseImportModule(object):
             cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
             rows = cursor.fetchall()
         return rows
+
+    def prepare_data_for_loading(self, datatype_instance, source_value, config):
+        try:
+            value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
+        except:
+            value = source_value
+        try:
+            errors = datatype_instance.validate(value, **config)
+        except:
+            message = "Unexpected Error Occurred"
+            title = "Invalid {} Format".format(datatype_instance.datatype_name)
+            errors = [datatype_instance.create_error_message(value, "", "", message, title)]
+
+        return value, errors

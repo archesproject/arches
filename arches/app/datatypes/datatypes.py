@@ -115,7 +115,8 @@ class StringDataType(BaseDataType):
                     isinstance(value[key]["direction"], str)
         except:
             message = _("This is not a string")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid String Format")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
         return errors
 
@@ -427,7 +428,8 @@ class NumberDataType(BaseDataType):
         except Exception:
             dt = self.datatype_model.datatype
             message = _("Not a properly formatted number")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid Number Format")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
         return errors
 
@@ -518,7 +520,8 @@ class BooleanDataType(BaseDataType):
                 type(bool(util.strtobool(str(value)))) is True
         except Exception:
             message = _("Not of type boolean")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid Boolean")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
 
         return errors
@@ -600,7 +603,8 @@ class DateDataType(BaseDataType):
                 message = _(
                     "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
                 )
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Date Format")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -764,7 +768,8 @@ class EDTFDataType(BaseDataType):
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
                 message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid EDTF Format")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -865,36 +870,48 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
-                    message = f"Geometry has too many coordinates for Elasticsearch ({coordinate_count}), \
-                        Please limit to less then {coord_limit} coordinates of 5 digits of precision or less."
+                    message = _(
+                        "Geometry has too many coordinates for Elasticsearch ({0}), \
+                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
+                            coordinate_count, coord_limit
+                        )
+                    )
+                    title = _("Geometry Too Many Coordinates for ES")
                     errors.append(
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
                                 self.datatype_model.datatype, value, source, message, "This data was not imported."
                             ),
+                            "title": title,
                         }
                     )
 
                 if bbox.contains(geom) == False:
-                    message = "Geometry does not fall within the bounding box of the selected coordinate system. \
+                    message = _(
+                        "Geometry does not fall within the bounding box of the selected coordinate system. \
                          Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
+                    )
+                    title = _("Geometry Out Of Bounds")
                     errors.append(
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
                                 self.datatype_model.datatype, value, source, message, "This data was not imported."
                             ),
+                            "title": title,
                         }
                     )
             except Exception:
-                message = "Not a properly formatted geometry"
+                message = _("Not a properly formatted geometry")
+                title = _("Invalid Geometry Format")
                 errors.append(
                     {
                         "type": "ERROR",
                         "message": "datatype: {0} value: {1} {2} - {3}. {4}.".format(
                             self.datatype_model.datatype, value, source, message, "This data was not imported."
                         ),
+                        "title": title,
                     }
                 )
 
@@ -905,7 +922,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     validate_geom(geom, coordinate_count)
                 except Exception:
                     message = _("Unable to serialize some geometry features")
-                    error_message = self.create_error_message(value, source, row_number, message)
+                    title = _("Unable to Serialize Geometry")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
                     errors.append(error_message)
         return errors
 
@@ -1500,7 +1518,8 @@ class FileListDataType(BaseDataType):
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
         if len(file_type_errors) > 0:
-            errors.append({"type": "ERROR", "message": _("File type not permitted")})
+            title = _("Invalid File Type")
+            errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1527,7 +1546,8 @@ class FileListDataType(BaseDataType):
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
-                errors.append({"type": "ERROR", "message": message})
+                title = _("Exceed Maximun Number of Files")
+                errors.append({"type": "ERROR", "message": message, "title": title})
 
             if max_size is not None:
                 formatted_max_size = format_bytes(max_size)
@@ -1538,16 +1558,19 @@ class FileListDataType(BaseDataType):
                                 formatted_max_size
                             )
                         )
-                        errors.append({"type": "ERROR", "message": message})
+                        title = _("Exceed File Size Limit")
+                        errors.append({"type": "ERROR", "message": message, "title": title})
             if path:
                 for file in value:
                     if not default_storage.exists(os.path.join(path, file["name"])):
                         message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], default_storage.path(path)))
-                        errors.append({"type": "ERROR", "message": message})
+                        title = _("File Not Found")
+                        errors.append({"type": "ERROR", "message": message, "title": title})
         except Exception as e:
             dt = self.datatype_model.datatype
             message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
-            errors.append({"type": "ERROR", "message": message})
+            title = _("Unexpected File Error")
+            errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1887,11 +1910,12 @@ class BaseDomainDataType(BaseDataType):
         return True
 
     def lookup_domainid_by_value(self, value, nodeid):
+        language = get_language()
         if nodeid not in self.value_lookup:
             config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
-                options[val["text"]] = val["id"]
+                options[val["text"][language]] = val["id"]
             self.value_lookup[nodeid] = options
         return self.value_lookup[nodeid][value]
 
@@ -1909,7 +1933,8 @@ class DomainDataType(BaseDomainDataType):
 
             if not found_option:
                 message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Domain Id")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -1921,7 +1946,7 @@ class DomainDataType(BaseDomainDataType):
             except ValueError:
                 try:
                     value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
-                except Exception:
+                except KeyError:
                     value = value
         return value
 
@@ -2199,8 +2224,8 @@ class ResourceInstanceDataType(BaseDataType):
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
             for resourceXresourceId in resourceXresourceIds:
-                resourceid = resourceXresourceId["resourceId"]
                 try:
+                    resourceid = resourceXresourceId["resourceId"]
                     uuid.UUID(resourceid)
                     if strict:
                         try:
@@ -2229,10 +2254,12 @@ class ResourceInstanceDataType(BaseDataType):
                         except ObjectDoesNotExist:
                             message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
                             errors.append({"type": "ERROR", "message": message})
-                except ValueError:
-                    message = _("The related resource with id '{0}' is not a valid uuid.".format(resourceid))
-                    error_type = "ERROR"
-                    errors.append({"type": error_type, "message": message})
+                except (ValueError, TypeError):
+                    message = _("The related resource with id '{0}' is not a valid uuid.".format(str(value)))
+                    title = _("Invalid Resource Instance Datatype")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
+                    errors.append(error_message)
+
         return errors
 
     def post_tile_save(self, tile, nodeid, request):
@@ -2306,7 +2333,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 return ast.literal_eval(value)
             except:
-                return None
+                return value
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
@@ -2432,7 +2459,9 @@ class NodeValueDataType(BaseDataType):
             try:
                 models.TileModel.objects.get(tileid=value)
             except ObjectDoesNotExist:
-                errors.append({"type": "ERROR", "message": f"{value} {row_number} is not a valid tile id. This data was not imported."})
+                message = _("{0} {1} is not a valid tile id. This data was not imported.".format(value, row_number))
+                title = _("Invalid Tile Id")
+                errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
     def get_display_value(self, tile, node, **kwargs):

@@ -15,6 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import ast
 import re
 import json
 from arches.app.models.system_settings import settings
@@ -26,6 +27,7 @@ from arches.app.search.search_term import SearchTerm
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from django.utils.translation import ugettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -76,19 +78,10 @@ class URLDataType(BaseDataType):
                     if url_test is None:
                         raise FailRegexURLMatch
             except FailRegexURLMatch:
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
-                            self.datatype_model.datatype,
-                            value,
-                            source,
-                            row_number,
-                            "this is not a valid HTTP/HTTPS URL",
-                            "This data was not imported.",
-                        ),
-                    }
-                )
+                message = _("This is not a valid HTTP/HTTPS URL")
+                title = _("Invalid HTTP/HTTPS URL")
+                error_message = self.create_error_message(value, source, row_number, message, title)
+                errors.append(error_message)
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -100,17 +93,20 @@ class URLDataType(BaseDataType):
         a json string like '{"url": "", "url_label": ""}'
         """
 
-        ret = {"url": "", "url_label": ""}
-
         try:
-            ret = json.loads(value)
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            try:
+                return ast.literal_eval(value)
+            except:
+                # this will probably fail validation, but that is ok. We need the error to report the value.
+                return value
         except BaseException:
             if isinstance(value, dict):
-                ret = value
+                return value
             else:
-                ret["url"] = value
-
-        return ret
+                return {"url": value, "url_label": ""}
 
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
