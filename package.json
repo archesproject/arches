@@ -71,6 +71,7 @@
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "2.0.16",
         "select2": "3.5.1",
+        "select-woo": "^1.0.1",
         "underscore": "1.13.4",
         "uuidjs": "^3.3.0",
         "webpack-bundle-tracker": "^1.4.0"
