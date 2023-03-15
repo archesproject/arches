@@ -1636,7 +1636,12 @@ class FileListDataType(BaseDataType):
                 file_model.path = file_data
                 file_model.tile = tile
                 if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
+                    original_storage = file_model.path.storage
+                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
+                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
+                        file_model.path.storage = FileSystemStorage()
                     file_model.save()
+                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
