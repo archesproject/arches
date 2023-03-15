@@ -1,16 +1,18 @@
 define([
+    'jquery',
     'knockout',
     'underscore',
     'arches',
     'viewmodels/widget',
     'utils/ontology',
+    'select-woo',
     'views/components/resource-report-abstract',
-], function(ko, _, arches, WidgetViewModel, ontologyUtils) {
+], function($, ko, _, arches, WidgetViewModel, ontologyUtils, selectWoo) {
     var resourceLookup = {};
     var graphCache = {};
 
     require(['views/components/related-instance-creator']);
-    
+
     /**
     * A viewmodel used for generic alert messages
     *
@@ -325,6 +327,7 @@ define([
         });
         
         this.select2Config = {
+            escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
             value: self.renderContext === 'search' ? self.value : self.resourceToAdd,
             clickBubble: true,
             disabled: this.disabled,
@@ -399,7 +402,9 @@ define([
                 },
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term, page) {
+                data: function(params) {
+                    let term = params.term || '';
+                    let page = params.page || 1;
                     //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
                     // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                     // var regex = new RegExp(expression);
@@ -451,7 +456,7 @@ define([
                         return queryString.toString();
                     }
                 },
-                results: function(data, page) {
+                processResults: function(data) {
                     if (!data['paging-filter'].paginator.has_next && self.allowInstanceCreation) {
                         self.resourceTypesToDisplayInDropDown().forEach(function(graphid) {
                             var graph = self.graphLookup[graphid];
@@ -466,31 +471,37 @@ define([
                             }
                         });
                     }
+                    data.results.hits.hits.forEach(function(hit){
+                        hit.id = hit._id;
+                    });
                     return {
                         results: data.results.hits.hits,
-                        more: data['paging-filter'].paginator.has_next
+                        pagination: {
+                            more: data['paging-filter'].paginator.has_next
+                        }
                     };
                 }
             },
-            id: function(item) {
-                return item._id;
-            },
-            formatResult: function(item) {
+            templateResult: function(item) {
+                let res = '';
                 if (item._source) {
                     const iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
-                    return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
+                    res = `<span style="cursor:pointer"><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
                 } else {
                     if (self.allowInstanceCreation) {
-                        return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                        res = '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
                     }
                 }
+                return $(res);
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
+                let ret = '';
                 if (item._source) {
-                    return `<i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}`;
+                    ret = `<span><i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
                 } else {
-                    return item.name;
+                    ret = item.name;
                 }
+                return $(ret);
             },
             initSelection: function(ele, callback) {
                 if(self.renderContext === "search" && self.value() !== "" && !self.graphIds().includes(self.value())) {
@@ -516,7 +527,6 @@ define([
            
                         if (resourceInstance) { lookups.push(resourceInstance); }
                     });
-
                     Promise.all(lookups).then(function(arr){
                         if (arr.length) {
                             var ret = arr.map(function(item) {
@@ -533,6 +543,72 @@ define([
                 }
             }
         };
+
+        this.select2Config = {
+            ajax: {
+                url: "https://api.github.com/search/repositories",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                    // parse the results into the format expected by Select2
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data, except to indicate that infinite
+                    // scrolling can be used
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search for a repository',
+            minimumInputLength: 1,
+            templateResult: formatRepo,
+            templateSelection: formatRepoSelection
+        };
+
+        function formatRepo (repo) {
+            if (repo.loading) {
+                return repo.text;
+            }
+
+            // var $container = $(
+            //     "<div class='select2-result-repository clearfix'>" +
+            //     "<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url + "' /></div>" +
+            //     "<div class='select2-result-repository__meta'>" +
+            //         "<div class='select2-result-repository__title'></div>" +
+            //         "<div class='select2-result-repository__description'></div>" +
+            //         "<div class='select2-result-repository__statistics'>" +
+            //         "<div class='select2-result-repository__forks'><i class='fa fa-flash'></i> </div>" +
+            //         "<div class='select2-result-repository__stargazers'><i class='fa fa-star'></i> </div>" +
+            //         "<div class='select2-result-repository__watchers'><i class='fa fa-eye'></i> </div>" +
+            //         "</div>" +
+            //     "</div>" +
+            //     "</div>"
+            // );
+
+            // $container.find(".select2-result-repository__title").text(repo.full_name);
+            // $container.find(".select2-result-repository__description").text(repo.description);
+            // $container.find(".select2-result-repository__forks").append(repo.forks_count + " Forks");
+            // $container.find(".select2-result-repository__stargazers").append(repo.stargazers_count + " Stars");
+            // $container.find(".select2-result-repository__watchers").append(repo.watchers_count + " Watchers");
+
+            return repo.full_name;
+        }
+
+        function formatRepoSelection (repo) {
+            return repo.full_name || repo.text;
+        }
 
         this.deleteRelationship = function(valueToDelete) {
             var newValues = [];
