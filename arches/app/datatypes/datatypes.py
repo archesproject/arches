@@ -269,7 +269,6 @@ class StringDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
                 exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
                 if exact_terms:
                     if "~" in value["op"]:
@@ -278,11 +277,11 @@ class StringDataType(BaseDataType):
                             query=f"*{exact_terms.group('search_string')}*",
                             case_insensitive=False,
                         )
-                    else:
+                    else:  # "eq" in value["op"]
                         match_query = Match(
                             field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
                             query=exact_terms.group("search_string"),
-                            type=match_type,
+                            type="phrase",
                         )
                 elif "?" in value["val"] or "*" in value["val"]:
                     match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
@@ -291,9 +290,9 @@ class StringDataType(BaseDataType):
                         match_query = Bool()
                         for word in value["val"].split(" "):
                             match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
-                    else:
+                    else:  # "eq" in value["op"]
                         match_query = Match(
-                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase"
                         )
 
                 if "!" in value["op"]:
