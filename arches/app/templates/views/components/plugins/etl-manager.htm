@@ -110,22 +110,12 @@
                             </div>
                             <div class="etl-job-task-bar">
                                 <div class="task">
-                                    <!-- ko if: event.status == "completed" -->
+                                    <!-- ko if: event.status == "completed" || event.status == "indexed" -->
                                     <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
                                         <span data-bind="text: $root.translations.undoImport"></span>
                                     </a>
                                     <!-- /ko -->
-                                    <!-- ko if: event.status == "indexed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
-                                        <span data-bind="text: $root.translations.undoImport"></span>
-                                    </a>
-                                    <!-- /ko -->
-                                    <!-- ko if: event.status == "unloaded" -->
-                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">
-                                        <span data-bind="text: $root.translations.removeFromHistory"></span>
-                                    </a>
-                                    <!-- /ko -->
-                                    <!-- ko if: event.status == "failed" -->
+                                    <!-- ko if: event.status == "unloaded" || event.status == "failed" || event.status == "cancelled" -->
                                     <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">
                                         <span data-bind="text: $root.translations.removeFromHistory"></span>
                                     </a>
