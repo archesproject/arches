@@ -3,7 +3,6 @@
 {% load template_tags %}
 {% load i18n %}
 
-
 {% block body %}
 
     <!-- ko if: alert() -->
@@ -21,10 +20,10 @@
 
             <div class="ep-form-alert-buttons">
                 <!-- ko if: alert().cancel -->
-                <button id="" class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel"><span>{% trans "Cancel" %}</span></button>
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel"><span>{% trans "Cancel" %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: alert().ok -->
-                <button id="" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok"><span>{% trans "OK" %}</span></button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok"><span>{% trans "OK" %}</span></button>
                 <!-- /ko -->
             </div>
         </div>
