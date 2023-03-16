@@ -196,6 +196,9 @@ class BaseDataEditor(BaseImportModule):
             )
 
     def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
+        if resourceids:
+            resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
+
         with connection.cursor() as cursor:
             data_staged = self.stage_data(cursor, graph_id, node_id, resourceids)
 
