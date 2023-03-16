@@ -39,12 +39,12 @@ define([
         this.resourceids = ko.observable();
         this.previewValue = ko.observable();
         this.showPreview = ko.observable(false);
+        this.searchUrl = ko.observable();
 
         this.getGraphs = function(){
             self.loading(true);
             self.submit('get_graphs').then(function(response){
                 self.graphs(response.result);
-                self.selectedGraph(self.graphs()[0].graphid);
                 self.loading(false);
             });
         };
@@ -70,6 +70,8 @@ define([
                     self.nodes(nodes);
                     self.loading(false);
                 });
+            } else {
+                self.nodes(null);
             }
         });
 
@@ -110,7 +112,7 @@ define([
             });
         };
 
-        this.write = function() {
+        this.write = async function() {
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -123,6 +125,13 @@ define([
                 );
                 return;
             }
+            if (self.searchUrl()){
+                const searchUrl = new URL(self.searchUrl());
+                const response = await window.fetch(arches.urls.search_results + searchUrl.search);
+                const json = await response.json();
+                self.resourceids(json.results.hits.hits.map(hit => hit._source.resourceinstanceid));
+            }
+
             self.formData.append('operation', self.operation());
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
             if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }

@@ -186,9 +186,14 @@ class BaseDataEditor(BaseImportModule):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
-        tasks.edit_bulk_data.apply_async(
+        edit_task = tasks.edit_bulk_data.apply_async(
             (self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
         )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (edit_task.task_id, self.loadid),
+            )
 
     def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         with connection.cursor() as cursor:

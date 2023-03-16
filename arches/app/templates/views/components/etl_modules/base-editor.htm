@@ -5,65 +5,72 @@
 <!-- ko ifnot: loading() -->
 <div class="etl-module-component-container">
 <div class="etl-module-body">
-    <h3 style="margin-top: 15px; margin-bottom: 5px; font-size: 19px;">
-        <span data-bind="text: $root.translations.etlSingleCSVTitle"></span>
-    </h3>
-    <div class="etl-module-component etl-module-mapping">
-        <h4>
-            <span data-bind="text: $root.translations.selectAResourceModel"></span>
-        </h4>
-        <select data-bind="
-            value: selectedGraph,
-            options: graphs,
-            optionsText: 'name',
-            optionsValue: 'graphid',
-            optionsCaption: $root.translations.select + '...',
-            valueAllowUnset: true,
-            chosen: {width: '500px'}"
-        ></select>
-    </div>
-    <div class="etl-module-component etl-module-mapping">
-        <h4>
-            <span data-bind="text: $root.translations.selectANode"></span>
-        </h4>
+    <div class="etl-module-component">
+        <div>
+            <h4>
+                <span data-bind="text: $root.translations.useSearchUrl"></span>
+            </h4>
+            <textarea 
+                style="min-height: 100px; width: 80%;"
+                class="form-control textarea textarea-resizable" data-bind="textInput: searchUrl"
+            ></textarea>
+        </div>
+        <div>
+            <h4>
+                <span data-bind="text: $root.translations.selectAResourceModel"></span>
+            </h4>
+            <select data-bind="
+                value: selectedGraph,
+                options: graphs,
+                optionsText: 'name',
+                optionsValue: 'graphid',
+                optionsCaption: $root.translations.select + '...',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>    
+        </div>
         <!-- ko if: nodes() -->
-        <select data-bind="
-            value: selectedNode,
-            options: nodes,
-            optionsText: 'label',
-            optionsCaption: $root.translations.select + '...',
-            optionsValue: 'nodeid',
-            valueAllowUnset: true,
-            chosen: {width: '100%'}"
-        ></select>
+        <div>
+            <h4>
+                <span data-bind="text: $root.translations.selectANode"></span>
+            </h4>
+            <select data-bind="
+                value: selectedNode,
+                options: nodes,
+                optionsText: 'label',
+                optionsCaption: $root.translations.select + '...',
+                optionsValue: 'nodeid',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
         <!-- /ko -->
-    </div>
-    <div>
-        <h4>
-            <span data-bind="text: $root.translations.language"></span>
-        </h4>
-        <select data-bind="
+        <div>
+            <h4>
+                <span data-bind="text: $root.translations.language"></span>
+            </h4>
+            <select data-bind="
                 options: languages,
                 optionsCaption: $root.translations.select + '...',
                 optionsText: function(item){return item.name + ' (' + item.code + ')'},
                 value: selectedLanguage,
-                chosen: {width:'100%'}
-            "
-        ></select>
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
+        <div data-bind="if: operation() === 'replace'">
+            <h4>
+                <span data-bind="text: $root.translations.from"></span>
+            </h4>
+            <input type="text" style="width: 500px;" class="form-control" placeholder="Old Text" data-bind="value: oldText">
+            <h4>
+                <span data-bind="text: $root.translations.to"></span>
+            </h4>
+            <input type="text" style="width: 500px;" class="form-control" placeholder="New Text" data-bind="value: newText">
+        </div>
+        <button style="margin: 25px 8px;" data-bind="click: preview" class="btn btn-success">
+            <span data-bind="text: $root.translations.preview"></span>
+        </button>
     </div>
-    <div data-bind="if: operation() === 'replace'">
-        <h4>
-            <span data-bind="text: $root.translations.from"></span>
-        </h4>
-        <input type="text" class="form-control" placeholder="Old Text" data-bind="value: oldText">
-        <h4>
-            <span data-bind="text: $root.translations.to"></span>
-        </h4>
-        <input type="text" class="form-control" placeholder="New Text" data-bind="value: newText">
-    </div>
-    <button style="margin: 25px 8px;" data-bind="click: preview" class="btn btn-success">
-        <span data-bind="text: $root.translations.preview"></span>
-    </button>
     <!-- ko if: showPreview-->
     <div>
         <table class="table table-striped csv-mapping-table">
