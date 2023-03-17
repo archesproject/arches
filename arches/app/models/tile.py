@@ -154,7 +154,7 @@ class Tile(models.TileModel):
         edit.save()
 
     @staticmethod
-    def save_bulk_edits(
+    def bulk_save_edits(
         tiles=[],
         user={},
         note="",
