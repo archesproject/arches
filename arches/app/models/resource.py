@@ -195,7 +195,7 @@ class Resource(models.ResourceInstance):
             # save edits for new tiles on existing resources
             Tile.bulk_save_edits(
                 tiles=tiles,
-                note="Bulk created",
+                note=f"Bulk created - {overwrite}",
                 edit_type="bulk_create",
                 transaction_id=transaction_id,
                 new_resource_created=False
@@ -209,7 +209,7 @@ class Resource(models.ResourceInstance):
             # save edits for new tiles on new resources
             Tile.bulk_save_edits(
                 tiles=tiles,
-                note="Bulk created",
+                note=f"Bulk created - {overwrite}",
                 edit_type="bulk_create",
                 transaction_id=transaction_id,
                 new_resource_created=True
