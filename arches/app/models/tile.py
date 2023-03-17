@@ -201,7 +201,10 @@ class Tile(models.TileModel):
             edit.user_firstname = getattr(user, "first_name", "")
             edit.user_lastname = getattr(user, "last_name", "")
             edit.user_username = getattr(user, "username", "")
-            edit.newvalue = tile.data
+            if "delete" in edit_type:
+                edit.old_value = tile.data
+            else:
+                edit.newvalue = tile.data
             edit.timestamp = timestamp
             edit.note = note
             edit.edittype = edit_type
