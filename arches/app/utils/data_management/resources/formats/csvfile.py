@@ -390,6 +390,7 @@ class CsvReader(Reader):
         save_count,
         row_number,
         prevent_indexing,
+        overwrite,
         transaction_id=None,
     ):
         # create a resource instance only if there are populated_tiles
@@ -409,7 +410,7 @@ class CsvReader(Reader):
             if bulk:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
-                    Resource.bulk_save(resources=resources, flat=True, transaction_id=transaction_id)
+                    Resource.bulk_save(resources=resources, flat=True, overwrite=overwrite, transaction_id=transaction_id)
                     del resources[:]  # clear out the array
             else:
                 try:
@@ -1300,6 +1301,7 @@ class CsvReader(Reader):
                             save_count,
                             row_number,
                             prevent_indexing,
+                            overwrite,
                             transaction_id=transaction_id,
                         )
 
@@ -1662,11 +1664,12 @@ class CsvReader(Reader):
                         save_count,
                         row_number,
                         prevent_indexing,
+                        overwrite,
                         transaction_id=transaction_id,
                     )
 
                 if bulk:
-                    Resource.bulk_save(resources=resources, flat=True, transaction_id=transaction_id)
+                    Resource.bulk_save(resources=resources, flat=True, overwrite=overwrite, transaction_id=transaction_id)
                     del resources[:]  # clear out the array
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
                 save_count = save_count + 1
