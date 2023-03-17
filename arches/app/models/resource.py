@@ -165,12 +165,13 @@ class Resource(models.ResourceInstance):
         return [flat_tile for tile in self.tiles for flat_tile in tile.get_flattened_tiles()]
 
     @staticmethod
-    def bulk_save(resources, flat=False, transaction_id=None):
+    def bulk_save(resources, flat=False, overwrite=None, transaction_id=None):
         """
         Saves and indexes a list of resources
         Arguments:
         resources -- a list of resource models
         """
+        from arches.app.models.tile import Tile
 
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
@@ -186,47 +187,71 @@ class Resource(models.ResourceInstance):
         tiles = sorted(tiles, key=lambda t: t.parenttile is not None, reverse=True)
 
         # need to save the models first before getting the documents for index
-        # need to handle if the bulk load is appending tiles to existing resources/
-        existing_resources_ids = set(
-            list(Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]).values_list(
-                "resourceinstanceid", flat=True
-            ))
-        )
 
-        resources_to_update = [resource for resource in resources if resource.resourceinstanceid in existing_resources_ids]
-        resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
+        if overwrite == "append":
+            TileModel.objects.bulk_create(tiles)
+            fetchTiles = True
 
-        Resource.objects.bulk_create(resources_to_create)
-        TileModel.objects.bulk_create(tiles)
+            # save edits for new tiles on existing resources
+            Tile.bulk_save_edits(
+                tiles=tiles,
+                note="Bulk created",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+                new_resource_created=False
+            )
+            tiles.clear()
+        elif overwrite == "overwrite":
+            Resource.objects.bulk_create(resources)
+            TileModel.objects.bulk_create(tiles)
+            fetchTiles = False
+            
+            # save edits for new tiles on new resources
+            Tile.bulk_save_edits(
+                tiles=tiles,
+                note="Bulk created",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+                new_resource_created=True
+            )
+            tiles.clear()
+        else: # unknown overwrite -- assume mixed
+            existing_resources_ids = set(
+                list(Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]).values_list(
+                    "resourceinstanceid", flat=True
+                ))
+            )
 
-        for resource in resources_to_update:
-            resource.save_edit(edit_type="append", transaction_id=transaction_id)
-            try:
-                resource.tiles[0].save_edit(
-                    note=f"Bulk created: {len(resource.tiles)} for resourceid {resource.resourceinstanceid} ",
-                    edit_type="bulk_create",
-                    transaction_id=transaction_id,
-                )
-            except:
-                pass
+            resources_to_create = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
 
-        for resource in resources_to_create:
-            resource.save_edit(edit_type="create", transaction_id=transaction_id)
-            if resource.legacyid is not None and str(resource.pk) != str(resource.legacyid):
-                logger.info(f"{str(resource.pk)} saved for legacyid: {resource.legacyid}")
-            try:
-                resource.tiles[0].save_edit(
-                    note=f"Bulk created: {len(resource.tiles)} for resourceid {resource.resourceinstanceid} ",
-                    edit_type="bulk_create",
-                    transaction_id=transaction_id,
-                    new_resource_created=True,
-                )
-            except:
-                pass
+            Resource.objects.bulk_create(resources_to_create)
+            TileModel.objects.bulk_create(tiles)
+            new_resource_tiles = [t for t in tiles if uuid.UUID(t.resourceinstance_id) not in existing_resources_ids]
+            existing_resource_tiles = [t for t in tiles if uuid.UUID(t.resourceinstance_id) in existing_resources_ids]
+            tiles.clear()
+
+            # save edits for new tiles on new resources
+            Tile.bulk_save_edits(
+                tiles=new_resource_tiles,
+                note="Bulk created",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+                new_resource_created=True
+            )
+
+            # save edits for new tiles on existing resources
+            Tile.bulk_save_edits(
+                tiles=existing_resource_tiles,
+                note="Bulk created",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+                new_resource_created=False
+            )
 
         # refetch new AND updated resources and index
         for resource in resources:
-            fetchTiles = resource.resourceinstanceid in existing_resources_ids
+            if overwrite is None:
+                fetchTiles = resource.resourceinstanceid in existing_resources_ids
             document, terms = resource.get_documents_to_index(
                 fetchTiles=fetchTiles, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
