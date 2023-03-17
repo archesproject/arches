@@ -153,6 +153,64 @@ class Tile(models.TileModel):
             edit.transactionid = transaction_id
         edit.save()
 
+    @staticmethod
+    def save_bulk_edits(
+        tiles=[],
+        user={},
+        note="",
+        edit_type="",
+        transaction_id=None,
+        new_resource_created=False
+    ):
+        """
+        Accepts a list of Tile objects to save edits for each
+        as well as associated resources
+        Does not support provisional edits
+        """
+        bulk_edits = []
+        resourceids = set()
+        for tile in tiles:
+            timestamp = datetime.datetime.now()
+            if str(tile.resourceinstance.resourceinstanceid) not in resourceids:
+                resourceids.add(str(tile.resourceinstance.resourceinstanceid))
+                resource_edit = EditLog()
+                resource_edit.resourceclassid = tile.resourceinstance.graph_id
+                resource_edit.resourceinstanceid = tile.resourceinstance.resourceinstanceid
+                if new_resource_created:
+                    resource_edit.edittype = "create"
+                else:
+                    resource_edit.edittype = "append"
+                resource_edit.timestamp = timestamp
+                resource_edit.userid = getattr(user, "id", "")
+                resource_edit.user_email = getattr(user, "email", "")
+                resource_edit.user_firstname = getattr(user, "first_name", "")
+                resource_edit.user_lastname = getattr(user, "last_name", "")
+                resource_edit.user_username = getattr(user, "username", "")
+                if transaction_id is not None:
+                    resource_edit.transactionid = transaction_id
+                bulk_edits.append(resource_edit)
+
+            edit = EditLog()
+            edit.resourceclassid = tile.resourceinstance.graph_id
+            edit.resourceinstanceid = tile.resourceinstance.resourceinstanceid
+            edit.resourcedisplayname = tile.resourceinstance.displayname
+            edit.nodegroupid = tile.nodegroup_id
+            edit.tileinstanceid = tile.tileid
+            edit.userid = getattr(user, "id", "")
+            edit.user_email = getattr(user, "email", "")
+            edit.user_firstname = getattr(user, "first_name", "")
+            edit.user_lastname = getattr(user, "last_name", "")
+            edit.user_username = getattr(user, "username", "")
+            edit.newvalue = tile.data
+            edit.timestamp = timestamp
+            edit.note = note
+            edit.edittype = edit_type
+            if transaction_id is not None:
+                edit.transactionid = transaction_id
+            bulk_edits.append(edit)
+        if len(bulk_edits):
+            models.EditLog.objects.bulk_create(bulk_edits)
+
     def tile_collects_data(self):
         result = True
         if self.tiles is not None and len(self.tiles) > 0:
