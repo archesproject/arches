@@ -193,7 +193,7 @@ class Tile(models.TileModel):
             edit = EditLog()
             edit.resourceclassid = tile.resourceinstance.graph_id
             edit.resourceinstanceid = tile.resourceinstance.resourceinstanceid
-            edit.resourcedisplayname = tile.resourceinstance.displayname
+            # edit.resourcedisplayname = Resource.objects.get(resourceinstanceid=self.resourceinstance.resourceinstanceid).displayname # commented due to performance drag
             edit.nodegroupid = tile.nodegroup_id
             edit.tileinstanceid = tile.tileid
             edit.userid = getattr(user, "id", "")
