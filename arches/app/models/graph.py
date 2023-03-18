@@ -1237,7 +1237,7 @@ class Graph(models.GraphModel):
                     res = diff if tile_count > 0 else None  # If your node has no data, you can change any property
             return res
 
-        if self.isresource is True:
+        if self.isresource is True and not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
             if self.is_editable() is False:
                 unpermitted_edits = []
                 db_nodes = models.Node.objects.filter(graph=self)
