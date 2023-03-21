@@ -112,6 +112,13 @@
                     </div>
 
                     <div class="row" data-bind="ifnot: $data.useOntologyRelationship">
+                        <div data-bind='component: {
+                            name: "concept-datatype-config",
+                            params: {
+                                config : {rdmCollection: $data.relationshipCollection },
+                                search: false,
+                            }
+                        }'></div>
                         <div class="row">
                             <label class="col-xs-12" style="font-weight: bold;">
                                 <span data-bind="text: $root.translations.relationshipConcept"></span>
@@ -120,7 +127,7 @@
                                 <div data-bind="component: {
                                     name: 'concept-select-widget',
                                     params: {
-                                        node: {'config': {'rdmCollection': '00000000-0000-0000-0000-000000000005'}},
+                                        node: {'config': {'rdmCollection': $data.relationshipCollection() }},
                                         value: $data.relationshipConcept,
                                     }
                                 }"></div>
@@ -135,7 +142,7 @@
                                 <div data-bind="component: {
                                     name: 'concept-select-widget',
                                     params: {
-                                        node: {'config': {'rdmCollection': '00000000-0000-0000-0000-000000000005'}},
+                                        node: {'config': {'rdmCollection': relationshipCollection()}},
                                         value: $data.inverseRelationshipConcept,
                                     }
                                 }"></div>

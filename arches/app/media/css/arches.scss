@@ -8551,7 +8551,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table {
-    max-height: 400px;
+    max-height: 450px;
     overflow-y: scroll;
     overflow-x: hidden;
     border: 1px solid #ddd;
@@ -8626,6 +8626,15 @@ a.mega-dropdown-toggle.disabled {
     border: none;
     border-top: 1px solid #ddd;
     padding: 20px 30px;
+}
+
+.rr-table-row-panel .control-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rr-table-row-panel .node-config-item {
+    margin: 5px 0px 15px -7.5px;
 }
 
 .rr-table-column {

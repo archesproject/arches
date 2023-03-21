@@ -11,7 +11,8 @@ define([
     const viewModel = function(params) {
         var self = this;
 
-        const defaultRelationshipConceptValue= 'ac41d9be-79db-4256-b368-2f4559cfbe55';
+        const defaultRelationshipCollection = '00000000-0000-0000-0000-000000000005';
+        const defaultRelationshipConceptValue = 'ac41d9be-79db-4256-b368-2f4559cfbe55';
         this.search = params.search;
         this.resourceModels = [{
             graphid: null,
@@ -60,7 +61,7 @@ define([
                     self.selectedResourceType(resourceRelationship);
                 }
             };
-            
+
             var preventSetup = false;
             var setupConfig = function(graph) {
                 var model = _.find(self.resourceModels, function(model){
@@ -68,12 +69,17 @@ define([
                 });
                 graph.ontologyProperty = ko.observable(ko.unwrap(graph.ontologyProperty));
                 graph.inverseOntologyProperty = ko.observable(ko.unwrap(graph.inverseOntologyProperty));
+                graph.relationshipCollection = ko.observable(ko.unwrap(graph.relationshipCollection) || defaultRelationshipCollection);
                 graph.relationshipConcept = ko.observable(ko.unwrap(graph.relationshipConcept) || defaultRelationshipConceptValue);
                 graph.inverseRelationshipConcept = ko.observable(ko.unwrap(graph.inverseRelationshipConcept || defaultRelationshipConceptValue));
                 graph.useOntologyRelationship = ko.observable(ko.unwrap(graph.useOntologyRelationship || false));
                 graph.removeRelationship = function(graph){
                     self.config.graphs.remove(graph);
                 };
+                graph.relationshipCollection.subscribe(()=>{
+                    graph.relationshipConcept(null);
+                    graph.inverseRelationshipConcept(null);
+                });
                 if(!!model){
                     // use this so that graph.name won't get saved back to the node config
                     Object.defineProperty(graph, 'name', {
