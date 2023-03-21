@@ -6350,6 +6350,11 @@ th.notif-type {
     margin: 0;
 }
 
+.ep-toolbar .top-right-nav {
+    display: flex;
+    float: right;
+}
+
 .editor-tools {
     width: 274px;
 }
@@ -6695,11 +6700,11 @@ th.notif-type {
 .ep-tools-login {
     border: none;
     padding-left: 16px;
-    padding-right: 20px;
+    padding-right: 16px;
     vertical-align: middle;
     background: #fff;
     border-left: 1px solid #ddd;
-    height:49px;
+    height: 47px;
 }
 
 .aside-left .ep-tools-login {
@@ -6721,11 +6726,10 @@ th.notif-type {
 }
 
 .ep-graph-title {
-    font-size: 1.6em;
-    padding-top: 5px;
+    font-size: 1.3em;
+    padding: 5px;
     flex-wrap: wrap;
     align-items: center;
-    margin: 0 15px;
 }
 
 .ep-graph-title-icon {
