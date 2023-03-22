@@ -5411,6 +5411,46 @@ div.dropdown-menu.open {
     color: #888;
 }
 
+legend.arches-signin-subtext {
+    font-size: 1em;
+    font-weight: normal;
+    border: none;
+}
+
+.floating-label-input {
+    &::placeholder {
+        color: transparent;
+    }
+    
+}
+
+.floating-label-input:focus {
+    outline: 1;
+    box-shadow: 1;
+    background: transparent;    
+}
+
+.floating-label-input:focus ~ .floating-label, 
+.floating-label-input:valid ~ .floating-label {
+    top: -2em;
+    // left: 4.5em;
+    font-size: 0.8em;   
+}
+
+
+.floating-label {
+    position: absolute;
+    top: 1em;
+    left: 4.5em;
+    pointer-events: none;
+    user-select: none;
+
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition:0.2s ease all;
+}
+
+
 .arches-signin .login-panel {
     border: 1px solid #ddd;
 }

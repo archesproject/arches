@@ -16,27 +16,13 @@
 
      <!-- LOGIN FORM -->
     <div class="cls-content arches-signin">
-         <div class="cls-content-sm panel login-panel" style="width: 350px;">
+         <div class="cls-content-sm panel login-panel" >
             <div class="panel-body">
                 <header>
                     <h1 class="login-panel-header arches-signin">{% trans "Sign In" %}</h1>
                 </header>
-                
-                <main>
-                    {% if not username_entered %}
-                    <p class="arches-signin-subtext">
-                        {% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
-                    </p>
-                    <p class="arches-signin-subtext">
-                        {% trans "Enter your email or username to get started." %}
-                    </p>
-                    {% endif %}
-                    {% if username_entered %}
-                    <p class="arches-signin-subtext">
-                        {% trans "Please enter your password" %}
-                    </p>
-                    {% endif %}
 
+                <main>
                     {% if registration_success %}
                         <hr style="border-color: #eee;">
                         <p style="color: green">
@@ -46,43 +32,56 @@
                     {% endif %}
 
                     <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ next }}" />
-                        {% if not username_entered %}
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-                                <input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
+                        <fieldset>
+                            <legend class="arches-signin-subtext">
+                                {% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}<br>
+                            </legend>
+
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                            {% if not username_entered %}
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                                    <div class="floating-label-group">
+                                        <input type="text" id="username" class="form-control input-lg floating-label-input" name='username' autofocus required>
+                                        <label class="floating-label" for="username">{% trans "Email or Username" %}</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        {% endif %}
-                        {% if username_entered %}
-                        <input type="hidden" name="username" value="{{ username }}" />
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                <input type="password" class="form-control input-lg" placeholder="Password" name='password' autofocus>
+                            {% endif %}
+                            {% if username_entered %}
+                            <input type="hidden" name="username" value="{{ username }}" />
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                    <div class="floating-label-group">
+                                        <input type="password" id="password" class="form-control input-lg floating-label-input" name='password' autofocus required>
+                                        <label class="floating-label" for="password" class="arches-signin-subtext">{% trans "Password" %}</label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        {% endif %}
-                        <div class="form-group">
-                            <div class="arches-signin-btn">
-                                {% if not username_entered %}
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Continue" %}</button>
-                                {% endif %}
-                                {% if username_entered %}
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
-                                {% endif %}
+                            {% endif %}
+                            <div class="form-group">
+                                <div class="arches-signin-btn">
+                                    {% if not username_entered %}
+                                    <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Continue" %}</button>
+                                    {% endif %}
+                                    {% if username_entered %}
+                                    <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">
-                            <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
-                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
-                                <h4>{% trans "Login failed" %}</h4>
-                                <span>{% trans "Invalid username and/or password." %}</span>
+                            <div class="row" style="padding-top:1em; margin: -2em 0 0.5em 0;">
+                                <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" aria-labelledby="login-fail-header login-fail-message"  aria-live="assertive" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+                                    <h2 role="alert" id="login-fail-header" style="font-size: 1.5em;">{% trans "Login failed" %}</h2>
+                                    <span role="alert" id="login-fail-message">{% trans "Invalid username and/or password." %}</span>
+                                </div>
                             </div>
-                        </div>
+                        </fieldset>
                     </form>
+
                     <div class="row account-management">
                         {% if username_entered %}
                             <!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
