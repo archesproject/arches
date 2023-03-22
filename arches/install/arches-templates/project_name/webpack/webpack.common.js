@@ -190,9 +190,6 @@ module.exports = () => {
                                                 if (serverAddress.charAt(serverAddress.length - 1) === '/') {
                                                     serverAddress = serverAddress.slice(0, -1)
                                                 }
-                                                if(process.platform === 'win32'){
-                                                    serverAddress = serverAddress.replace('localhost', '127.0.0.1')
-                                                }
                                                 resp = await fetch(serverAddress + templatePath);
                                             }
                                             catch(e) { 
@@ -201,7 +198,6 @@ module.exports = () => {
                                                     '\x1b[33m%s\x1b[0m',  // yellow
                                                     `"${templatePath}" has failed to load. Retrying (${failureCount} / 5)...`
                                                 );
-                                                await new Promise(r => setTimeout(r, 8000));
                                                 return await renderTemplate(failureCount=failureCount);
                                             }
                                         }
