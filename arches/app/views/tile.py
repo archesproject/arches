@@ -306,7 +306,7 @@ class TileData(View):
                 response = arches_zip.zip_response(files, "file-viewer-download.zip")
                 return response
             else:
-                return HttpResponseBadRequest("Too large to be zipped.  Try downloading a single file.")
+                return HttpResponseBadRequest(_("Too large to be zipped.  Try downloading a single file."))
 
         except TypeError as e:
             logger.error("Tile id array required to download files.")
