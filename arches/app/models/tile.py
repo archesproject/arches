@@ -416,9 +416,7 @@ class Tile(models.TileModel):
             for nodeid in self.data.keys():
                 node = next(item for item in self.serialized_graph["nodes"] if item["nodeid"] == nodeid)
                 datatype = self.datatype_factory.get_instance(node["datatype"])
-                datatype.pre_tile_save(
-                    self, nodeid
-                )
+                datatype.pre_tile_save(self, nodeid)
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
