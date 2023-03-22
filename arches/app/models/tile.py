@@ -302,13 +302,14 @@ class Tile(models.TileModel):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
                 if self.data[nodeid] is None and node.isrequired is True:
+                    cardxnodexwidgets = None
                     try:
-                        node.cardxnodexwidget_set.all()
+                        cardxnodexwidgets = node.cardxnodexwidget_set.all()
                     except:
                         node = models.Node.objects.get(nodeid=nodeid)
 
-                    if len(node.cardxnodexwidget_set.all()) > 0:
-                        missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
+                    if cardxnodexwidgets is not None and len(cardxnodexwidgets) > 0:
+                        missing_nodes.append(cardxnodexwidgets[0].label)
                     else:
                         missing_nodes.append(node.name)
             except Exception:
@@ -416,7 +417,7 @@ class Tile(models.TileModel):
                 node = next(item for item in self.serialized_graph["nodes"] if item["nodeid"] == nodeid)
                 datatype = self.datatype_factory.get_instance(node["datatype"])
                 datatype.pre_tile_save(
-                    self, nodeid, node=SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+                    self, nodeid
                 )
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()

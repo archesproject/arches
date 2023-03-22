@@ -451,7 +451,7 @@ class NumberDataType(BaseDataType):
             pass
         return value
 
-    def pre_tile_save(self, tile, nodeid, **kwargs):
+    def pre_tile_save(self, tile, nodeid):
         try:
             if tile.data[nodeid] == "":
                 tile.data[nodeid] = None
@@ -681,7 +681,7 @@ class DateDataType(BaseDataType):
         else:
             return value
 
-    def pre_tile_save(self, tile, nodeid, **kwargs):
+    def pre_tile_save(self, tile, nodeid):
         if tile.data[nodeid]:
             tile.data[nodeid] = self.add_missing_colon_to_timezone(tile.data[nodeid])
 
@@ -759,7 +759,7 @@ class EDTFDataType(BaseDataType):
             return value
         return str(transformed_value.edtf)
 
-    def pre_tile_save(self, tile, nodeid, **kwargs):
+    def pre_tile_save(self, tile, nodeid):
         tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
@@ -1732,7 +1732,7 @@ class FileListDataType(BaseDataType):
             tile_data.append(tile_file)
         return json.loads(json.dumps(tile_data))
 
-    def pre_tile_save(self, tile, nodeid, **kwargs):
+    def pre_tile_save(self, tile, nodeid):
         # TODO If possible this method should probably replace 'handle request'
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
@@ -2266,15 +2266,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         return errors
 
-    def pre_tile_save(self, tile, nodeid, **kwargs):
-        node = kwargs.pop("node", None)
-
-        if not node:
-            node = models.Node.objects.get(pk=nodeid)
-
-        if node.datatype not in ["resource-instance-list", "resource-instance"]:
-            return
-
+    def pre_tile_save(self, tile, nodeid):
         relationships = tile.data[nodeid]
         if relationships:
             for relationship in relationships:
