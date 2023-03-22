@@ -72,14 +72,10 @@ class RelationalDataModelTests(ArchesTestCase):
             "extended_string_datatype.py",
         )
         custom_string_datatype_name = "extended-string-datatype"
-        custom_string_datatype = DDataType.objects.filter(
-            datatype=custom_string_datatype_name
-        )
+        custom_string_datatype = DDataType.objects.filter(datatype=custom_string_datatype_name)
 
         if custom_string_datatype is None or len(custom_string_datatype) != 1:
-            management.call_command(
-                "datatype", "register", source=cls.custom_string_datatype_filename
-            )
+            management.call_command("datatype", "register", source=cls.custom_string_datatype_filename)
         else:
             cls.custom_string_datatype_existed = True
 
@@ -106,9 +102,7 @@ class RelationalDataModelTests(ArchesTestCase):
             Graph.objects.get(pk=cls.custom_data_type_graphid).delete()
 
         if not cls.custom_string_datatype_existed:
-            management.call_command(
-                "datatype", "unregister", datatype=cls.custom_string_datatype_filename
-            )
+            management.call_command("datatype", "unregister", datatype=cls.custom_string_datatype_filename)
 
     @classmethod
     def setUpTestData(cls):
@@ -119,10 +113,7 @@ class RelationalDataModelTests(ArchesTestCase):
         Test that the generated Postgres datatype is JSON
         """
         # Create the relational data model views
-        sql = (
-            f"select public.__arches_create_resource_model_views('%s'::uuid);"
-            % RelationalDataModelTests.custom_data_type_graphid
-        )
+        sql = f"select public.__arches_create_resource_model_views('%s'::uuid);" % RelationalDataModelTests.custom_data_type_graphid
         cursor = connection.cursor()
         cursor.execute(sql)
         # row = cursor.fetchone()
