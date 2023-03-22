@@ -3,7 +3,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "9068_resource_model_view_defaults"),
+        ("models", "9165_error_reporting"),
     ]
 
     forward_sql = """
