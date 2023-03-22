@@ -9,93 +9,98 @@
 
 <div id="container" class="cls-container arches-login">
 
-	<!-- BACKGROUND IMAGE -->
-	<!--===================================================
-	<div id="bg-overlay" class="bg-img img-login"></div>
-	-->
+    <!-- BACKGROUND IMAGE -->
+    <!--===================================================
+    <div id="bg-overlay" class="bg-img img-login"></div>
+    -->
 
-	 <!-- LOGIN FORM -->
-	<div class="cls-content arches-signin">
-	 	<div class="cls-content-sm panel login-panel" style="width: 350px;">
-			<div class="panel-body">
-				<h3 class="login-panel-header arches-signin">{% trans "Sign In" %}</h3>
-				{% if not username_entered %}
-				<p class="arches-signin-subtext">
-					{% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
-				</p>
-				<p class="arches-signin-subtext">
-					{% trans "Enter your email or username to get started." %}
-				</p>
-				{% endif %}
-				{% if username_entered %}
-				<p class="arches-signin-subtext">
-					{% trans "Please enter your password" %}
-				</p>
-				{% endif %}
+     <!-- LOGIN FORM -->
+    <div class="cls-content arches-signin">
+         <div class="cls-content-sm panel login-panel" style="width: 350px;">
+            <div class="panel-body">
+                <header>
+                    <h1 class="login-panel-header arches-signin">{% trans "Sign In" %}</h1>
+                </header>
+                
+                <main>
+                    {% if not username_entered %}
+                    <p class="arches-signin-subtext">
+                        {% trans "Sign in to Arches to access your data modeling, editing, and discovery tools." %}
+                    </p>
+                    <p class="arches-signin-subtext">
+                        {% trans "Enter your email or username to get started." %}
+                    </p>
+                    {% endif %}
+                    {% if username_entered %}
+                    <p class="arches-signin-subtext">
+                        {% trans "Please enter your password" %}
+                    </p>
+                    {% endif %}
 
-				{% if registration_success %}
-					<hr style="border-color: #eee;">
-					<p style="color: green">
-						{% trans "Your account has been created. Please sign in." %}
-					</p>
-					<hr style="border-color: #eee;">
-				{% endif %}
+                    {% if registration_success %}
+                        <hr style="border-color: #eee;">
+                        <p style="color: green">
+                            {% trans "Your account has been created. Please sign in." %}
+                        </p>
+                        <hr style="border-color: #eee;">
+                    {% endif %}
 
-				<form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
-					{% csrf_token %}
-					<input type="hidden" name="next" value="{{ next }}" />
-					{% if not username_entered %}
-					<div class="form-group">
-						<div class="input-group">
-							<div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-							<input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
-						</div>
-					</div>
-					{% endif %}
-					{% if username_entered %}
-					<input type="hidden" name="username" value="{{ username }}" />
-					<div class="form-group">
-						<div class="input-group">
-							<div class="input-group-addon"><i class="ion-asterisk"></i></div>
-							<input type="password" class="form-control input-lg" placeholder="Password" name='password' autofocus>
-						</div>
-					</div>
-					{% endif %}
-					<div class="form-group">
-                        <div class="arches-signin-btn">
-							{% if not username_entered %}
-                            <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Continue" %}</button>
-							{% endif %}
-							{% if username_entered %}
-							<button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
-							{% endif %}
+                    <form id="login-form" action="?next={{ next }}" method='POST' {% if auth_failed %} autocomplete="off" {% endif %}>
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ next }}" />
+                        {% if not username_entered %}
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                                <input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
+                            </div>
                         </div>
+                        {% endif %}
+                        {% if username_entered %}
+                        <input type="hidden" name="username" value="{{ username }}" />
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="ion-asterisk"></i></div>
+                                <input type="password" class="form-control input-lg" placeholder="Password" name='password' autofocus>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="arches-signin-btn">
+                                {% if not username_entered %}
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Continue" %}</button>
+                                {% endif %}
+                                {% if username_entered %}
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">
+                            <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
+                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+                                <h4>{% trans "Login failed" %}</h4>
+                                <span>{% trans "Invalid username and/or password." %}</span>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row account-management">
+                        {% if username_entered %}
+                            <!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
+                            <a href="{% url 'password_reset' %}" class="btn btn-link account-link">{% trans "Forgot password?" %}</a>
+                        {% endif %}
+
+                        {% if user_signup_enabled %}
+                            <a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
+                        {% endif %}
                     </div>
-					<div class="row" style="padding-top:10px; margin: -20px 0px 5px 0px;">
-						<div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
-							<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
-							<h4>{% trans "Login failed" %}</h4>
-							<span>{% trans "Invalid username and/or password." %}</span>
-						</div>
-					</div>
-				</form>
-				<div class="row account-management">
-					{% if username_entered %}
-						<!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
-						<a href="{% url 'password_reset' %}" class="btn btn-link account-link">{% trans "Forgot password?" %}</a>
-					{% endif %}
+                </main>
+            </div>
 
-					{% if user_signup_enabled %}
-						<a href="{% url 'signup' %}" class="btn btn-link account-link" target="_blank">{% trans "Create a new account" %}</a>
-					{% endif %}
-				</div>
-			</div>
-
-			<div class="panel-footer">
-				{% trans "Learn more about <a href='http://www.archesproject.org'>Arches</a>" %}
-			</div>
-		</div>
-	</div>
+            <footer class="panel-footer">
+                {% trans "Learn more about <a href='http://www.archesproject.org'>Arches</a>" %}
+            </footer>
+        </div>
+    </div>
 </div>
 
 {% endblock body %}
