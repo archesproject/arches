@@ -214,7 +214,7 @@ define([
                         viewModel.loading(true);
                         $.ajax({
                             type: "DELETE",
-                            url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                            url: arches.urls.delete_graph(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()),
                             complete: function(response, status) {
                                 viewModel.loading(false);
                                 if (status === 'success') {
@@ -228,10 +228,10 @@ define([
                 ));
             };
             viewModel.cloneGraph = function() {
-                newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
+                newGraph(arches.urls.clone_graph(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()));
             };
             viewModel.exportGraph = function() {
-                window.open(arches.urls.export_graph(viewModel.graph.graphid()), '_blank');
+                window.open(arches.urls.export_graph(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()), '_blank');
             };
             viewModel.importGraph = function(data, e) {
                 var formData = new FormData();
@@ -278,7 +278,7 @@ define([
                         viewModel.loading(true);
                         $.ajax({
                             type: "DELETE",
-                            url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                            url: arches.urls.delete_instances(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()),
                             complete: function(response, status) {
                                 viewModel.loading(false);
                                 if (status === 'success') {
