@@ -1,0 +1,12 @@
+{
+    "pluginid": "51c84e60-592c-4ef6-b92f-dab49fd883e9",
+    "name": "Survey Unit Foo",
+    "icon": "fa fa-home",
+    "component": "views/components/plugins/survey-unit-foo",
+    "componentname": "survey-unit-foo",
+    "config": {
+        "quitUrl": "/plugins/survey-unit-foo"
+    },
+    "slug": "survey-unit-foo",
+    "sortorder": 0
+}
