@@ -13,9 +13,6 @@
             <div class="panel-body">
                 <header>
                     <h1 class="login-panel-header arches-signin">{% trans "Create Account" %}</h1>
-                    <p class="arches-signin-subtext">
-                        {% trans "Register to access data modeling, editing, and discovery tools." %}
-                    </p>
                 </header>
 
                 <main>
@@ -37,10 +34,17 @@
 
                             {% if showform %}
                                 <fieldset>
-                                    <div class="form-group">
+                                    <legend class="arches-signin-subtext">
+                                        {% trans "Register to access data modeling, editing, and discovery tools." %}
+                                    </legend>
+
+                                    <div class="form-group" style="padding-bottom: 1.2em;">
                                         <div class="input-group">
                                                 <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                                <input type="text" class="form-control input-lg" placeholder="Username" name='username' autofocus value='{{postdata.username}}'>
+                                                <div class="floating-label-group">
+                                                    <input type="text" class="form-control input-lg floating-label-input" id='username' name='username' autofocus required value='{{postdata.username}}'>
+                                                    <label for="username" class="floating-label"> {% trans "Username" %} </label>
+                                                </div>
                                         </div>
                                         {% if form.username.errors %}
                                         {% for error in form.username.errors %}
@@ -49,10 +53,13 @@
                                         {% endif %}
                                     </div>
     
-                                    <div class="form-group">
+                                    <div class="form-group" style="padding-bottom: 1.2em;">
                                         <div class="input-group">
                                                 <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                                <input type="text" class="form-control input-lg" placeholder="First Name" name='first_name' autofocus value='{{postdata.first_name}}'>
+                                                <div class="floating-label-group">
+                                                    <input type="text" class="form-control input-lg floating-label-input"  id='first_name' name='first_name' autofocus required value='{{postdata.first_name}}'>
+                                                    <label for="first_name" class="floating-label"> {% trans "First Name" %} </label>
+                                                </div>
                                         </div>
                                         {% if form.first_name.errors %}
                                         {% for error in form.first_name.errors %}
@@ -61,10 +68,13 @@
                                         {% endif %}
                                     </div>
     
-                                    <div class="form-group">
+                                    <div class="form-group" style="padding-bottom: 1.2em;">
                                         <div class="input-group">
                                                 <div class="input-group-addon"><i class="ion-compose"></i></div>
-                                                <input type="text" class="form-control input-lg" placeholder="Last Name" name='last_name' value='{{postdata.last_name}}'>
+                                                <div class="floating-label-group">
+                                                    <input type="text" class="form-control input-lg floating-label-input"  id='last_name' name='last_name' required value='{{postdata.last_name}}'>
+                                                    <label for="last_name" class="floating-label"> {% trans "Last Name" %} </label>
+                                                </div>
                                         </div>
                                         {% if form.last_name.errors %}
                                         {% for error in form.last_name.errors %}
@@ -73,10 +83,13 @@
                                         {% endif %}
                                     </div>
     
-                                    <div class="form-group">
+                                    <div class="form-group" style="padding-bottom: 1.2em;">
                                         <div class="input-group">
                                                 <div class="input-group-addon"><i class="ion-email"></i></div>
-                                                <input type="text" class="form-control input-lg" placeholder="Email" name='email' value='{{postdata.email}}'>
+                                                <div class="floating-label-group">
+                                                    <input type="text" class="form-control input-lg floating-label-input" id='email' name='email' required value='{{postdata.email}}'>
+                                                    <label for="email" class="floating-label"> {% trans "Email" %} </label>
+                                                </div>
                                         </div>
                                         {% if form.email.errors %}
                                         {% for error in form.email.errors %}
@@ -85,10 +98,13 @@
                                         {% endif %}
                                     </div>
     
-                                    <div class="form-group">
+                                    <div class="form-group" style="padding-bottom: 1.2em;">
                                         <div class="input-group">
                                                 <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                                <input type="password" class="form-control input-lg" placeholder="Password" name='password1'>
+                                                <div class="floating-label-group">
+                                                    <input type="password" class="form-control input-lg floating-label-input" id='password1' name='password1' required>
+                                                    <label for="password1" class="floating-label"> {% trans "Password" %} </label>
+                                                </div>
                                         </div>
                                         {% if form.password1.errors %}
                                         {% for error in form.password1.errors %}
@@ -97,10 +113,13 @@
                                         {% endif %}
                                     </div>
     
-                                    <div class="form-group">
+                                    <div class="form-group" style="padding-bottom: 1.2em;">
                                         <div class="input-group">
                                                 <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                                                <input type="password" class="form-control input-lg" placeholder="Confirm Password" name='password2'>
+                                                <div class="floating-label-group">
+                                                    <input type="password" class="form-control input-lg floating-label-input"  id='password2' name='password2' required>
+                                                    <label for="password2" class="floating-label"> {% trans "Confirm Password" %} </label>
+                                                </div>
                                         </div>
                                         {% if form.password2.errors %}
                                         {% for error in form.password2.errors %}
