@@ -5417,11 +5417,14 @@ legend.arches-signin-subtext {
     border: none;
 }
 
+.floating-label-group {
+    position: relative;
+}
+
 .floating-label-input {
     &::placeholder {
         color: transparent;
     }
-    
 }
 
 .floating-label-input:focus {
@@ -5437,11 +5440,17 @@ legend.arches-signin-subtext {
     font-size: 0.8em;   
 }
 
+.floating-label-input.change-password:focus ~ .floating-label, 
+.floating-label-input.change-password:valid ~ .floating-label {
+    top: -0.75em;
+    // left: 4.5em;
+    font-size: 0.8em;   
+}
 
 .floating-label {
     position: absolute;
     top: 1em;
-    left: 4.5em;
+    left: 1em;
     pointer-events: none;
     user-select: none;
 
@@ -5450,6 +5459,9 @@ legend.arches-signin-subtext {
     -webkit-transition:0.2s ease all;
 }
 
+.floating-label.change-password {
+    top: 2em;
+}
 
 .arches-signin .login-panel {
     border: 1px solid #ddd;
