@@ -22,6 +22,7 @@ import datetime
 import json
 import pytz
 import logging
+from types import SimpleNamespace
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
@@ -105,6 +106,16 @@ class Tile(models.TileModel):
                         tile = Tile(tile_obj)
                         tile.parenttile = self
                         self.tiles.append(tile)
+        try:
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(
+                    publication=self.resourceinstance.graph.publication.publicationid, language=settings.LANGUAGE_CODE
+                )
+                .first()
+                .serialized_graph
+            )
+        except:
+            self.serialized_graph = None
 
     def save_edit(
         self,
@@ -284,12 +295,21 @@ class Tile(models.TileModel):
         missing_nodes = []
         for nodeid, value in self.data.items():
             try:
-                node = models.Node.objects.get(nodeid=nodeid)
+                try:
+                    node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+                except:
+                    node = models.Node.objects.get(nodeid=nodeid)
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
                 if self.data[nodeid] is None and node.isrequired is True:
-                    if len(node.cardxnodexwidget_set.all()) > 0:
-                        missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
+                    cardxnodexwidgets = None
+                    try:
+                        cardxnodexwidgets = node.cardxnodexwidget_set.all()
+                    except:
+                        node = models.Node.objects.get(nodeid=nodeid)
+
+                    if cardxnodexwidgets is not None and len(cardxnodexwidgets) > 0:
+                        missing_nodes.append(cardxnodexwidgets[0].label)
                     else:
                         missing_nodes.append(node.name)
             except Exception:
@@ -356,7 +376,10 @@ class Tile(models.TileModel):
 
         tile_data = self.get_tile_data(userid)
         for nodeid in tile_data.keys():
-            node = models.Node.objects.get(nodeid=nodeid)
+            try:
+                node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+            except:
+                node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.post_tile_save(self, nodeid, request)
 
@@ -373,6 +396,15 @@ class Tile(models.TileModel):
         newprovisionalvalue = None
         oldprovisionalvalue = None
 
+        if not self.serialized_graph:
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(
+                    publication=self.resourceinstance.graph.publication.publicationid, language=settings.LANGUAGE_CODE
+                )
+                .first()
+                .serialized_graph
+            )
+
         try:
             if user is None and request is not None:
                 user = request.user
@@ -382,8 +414,8 @@ class Tile(models.TileModel):
 
         with transaction.atomic():
             for nodeid in self.data.keys():
-                node = models.Node.objects.get(nodeid=nodeid)
-                datatype = self.datatype_factory.get_instance(node.datatype)
+                node = next(item for item in self.serialized_graph["nodes"] if item["nodeid"] == nodeid)
+                datatype = self.datatype_factory.get_instance(node["datatype"])
                 datatype.pre_tile_save(self, nodeid)
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()

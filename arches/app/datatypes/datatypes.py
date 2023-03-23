@@ -2266,6 +2266,12 @@ class ResourceInstanceDataType(BaseDataType):
 
         return errors
 
+    def pre_tile_save(self, tile, nodeid):
+        relationships = tile.data[nodeid]
+        if relationships:
+            for relationship in relationships:
+                relationship["resourceXresourceId"] = str(uuid.uuid4())
+
     def post_tile_save(self, tile, nodeid, request):
         ret = False
         sql = """
