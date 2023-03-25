@@ -122,25 +122,36 @@ class BaseDataEditor(BaseImportModule):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
+        case_insensitive = request.POST.get("case_insensitive", None)
+        also_trim = request.POST.get("also_trim", 'false')
+        if operation == 'replace' and case_insensitive:
+            operation = 'replace_i'
+        if also_trim:
+            operation = operation + "_trim"
+
         first_five_values = get_first_five_values(graph_id, node_id, language_code)
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
                 if operation == 'replace':
                     cursor.execute("""SELECT * FROM REPLACE(%s, %s, %s);""", [value, old_text, new_text])
-                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'replace_i':
+                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'i');""", [value, old_text, new_text])
                 elif operation == 'trim':
                     cursor.execute("""SELECT * FROM TRIM(%s);""", [value])
-                    transformed_value = cursor.fetchone()[0]
                 elif operation == 'capitalize':
                     cursor.execute("""SELECT * FROM INITCAP(%s);""", [value])
-                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'capitalize_trim':
+                    cursor.execute("""SELECT * FROM TRIM(INITCAP(%s));""", [value])
                 elif operation == 'upper':
                     cursor.execute("""SELECT * FROM UPPER(%s);""", [value])
-                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'upper_trim':
+                    cursor.execute("""SELECT * FROM TRIM(UPPER(%s));""", [value])
                 elif operation == 'lower':
                     cursor.execute("""SELECT * FROM LOWER(%s);""", [value])
-                    transformed_value = cursor.fetchone()[0]
+                elif operation == 'lower_trim':
+                    cursor.execute("""SELECT * FROM TRIM(LOWER(%s));""", [value])
+                transformed_value = cursor.fetchone()[0]
                 return_list.append([value, transformed_value])
 
         return {"success": True, "data": return_list}
@@ -155,8 +166,15 @@ class BaseDataEditor(BaseImportModule):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
+        case_insensitive = request.POST.get("case_insensitive", 'false')
+        also_trim = request.POST.get("also_trim", 'false')
+        if case_insensitive == 'true' and operation == 'replace':
+            operation = 'replace_i'
+        if also_trim:
+            operation = operation + "_trim"
+
         use_celery_bulk_edit = True
-        if operation == 'replace':
+        if operation in ['replace', 'replace_i']:
             operation_details = "{} -> {}".format(old_text, new_text)
         else:
             operation_details = 'N/A'
@@ -186,6 +204,13 @@ class BaseDataEditor(BaseImportModule):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
+        case_insensitive = request.POST.get("case_insensitive", None)
+        also_trim = request.POST.get("also_trim", 'false')
+        if case_insensitive == 'true' and operation == 'replace':
+            operation = 'replace_i'
+        if also_trim:
+            operation = operation + "_trim"
+
         edit_task = tasks.edit_bulk_data.apply_async(
             (self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
         )

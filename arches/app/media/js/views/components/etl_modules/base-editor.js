@@ -40,6 +40,8 @@ define([
         this.previewValue = ko.observable();
         this.showPreview = ko.observable(false);
         this.searchUrl = ko.observable();
+        this.caseInsensitive = ko.observable();
+        this.trim = ko.observable();
 
         this.getGraphs = function(){
             self.loading(true);
@@ -58,6 +60,20 @@ define([
             }
             return graph?.name;
         };
+
+        this.createformDataAllProperties = () => {
+            self.formData.append('operation', self.operation());
+            if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
+            if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
+            if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
+            if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
+            if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
+            if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
+            if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
+            if (self.newText()) { self.formData.append('new_text', self.newText()); }
+            if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
+        };
+
 
         this.selectedNode.subscribe(nodeid => { self.selectedNodeName(self.nodes().find(node => node.nodeid === nodeid).name); });
 
@@ -88,15 +104,9 @@ define([
                 );
                 return;
             }
-            self.formData.append('operation', self.operation());
-            if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
-            if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
-            if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
-            if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
-            if (self.newText()) { self.formData.append('new_text', self.newText()); }
-            if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
+
+            self.createformDataAllProperties();
             self.submit('preview').then(data => {
-                console.log(data.result);
                 self.previewValue(data.result);
                 self.showPreview(true);
             }).fail(function(err) {
@@ -132,14 +142,7 @@ define([
                 self.resourceids(json.results.hits.hits.map(hit => hit._source.resourceinstanceid));
             }
 
-            self.formData.append('operation', self.operation());
-            if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
-            if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
-            if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
-            if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
-            if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
-            if (self.newText()) { self.formData.append('new_text', self.newText()); }
-            if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
+            self.createformDataAllProperties();
             self.loading(true);
             params.activeTab("import");
             self.submit('write').then(data => {

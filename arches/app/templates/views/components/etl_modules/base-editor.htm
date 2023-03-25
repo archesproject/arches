@@ -6,6 +6,10 @@
 <div class="etl-module-component-container">
 <div class="etl-module-body">
     <div class="etl-module-component">
+        <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
+            <input type="checkbox" data-bind="checked: trim">
+            <span data-bind="text: $root.translations.removeLeadingTrailingSpaces"></span>
+        </div>
         <div>
             <h4>
                 <span data-bind="text: $root.translations.useSearchUrl"></span>
@@ -62,6 +66,8 @@
                 <span data-bind="text: $root.translations.from"></span>
             </h4>
             <input type="text" style="width: 500px;" class="form-control" placeholder="Old Text" data-bind="value: oldText">
+            <input type="checkbox" data-bind="checked: caseInsensitive">
+            <span data-bind="text: $root.translations.caseInsensitive"></span>
             <h4>
                 <span data-bind="text: $root.translations.to"></span>
             </h4>
@@ -76,8 +82,12 @@
         <table class="table table-striped csv-mapping-table">
             <thead>
                 <tr>
-                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">Before</th>
-                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">After</th>
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
+                        <span data-bind="text: $root.translations.before"></span>
+                    </th>
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
+                        <span data-bind="text: $root.translations.after"></span>
+                    </th>
                 </tr>
             </thead>
             <tbody data-bind="value: console.log(previewValue())">
