@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8928_map_layer_sort_order"),
+        ("models", "9165_error_reporting"),
     ]
 
     divide_bulk_data_editor = """
