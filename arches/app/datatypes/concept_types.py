@@ -140,7 +140,8 @@ class ConceptDataType(BaseConceptDataType):
         if value is not None:
             if type(value) == list:
                 message = _("The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Concept Datatype Widget")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
 
@@ -148,7 +149,8 @@ class ConceptDataType(BaseConceptDataType):
                 uuid.UUID(str(value))
             except ValueError:
                 message = _("This is an invalid concept prefLabel, or an incomplete UUID")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Concept PrefLabel/Uuid")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
 
@@ -156,7 +158,8 @@ class ConceptDataType(BaseConceptDataType):
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
                 message = _("This UUID is not an available concept value")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Concept Id Not Found")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
         return errors
