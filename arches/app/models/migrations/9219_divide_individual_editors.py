@@ -297,7 +297,7 @@ class Migration(migrations.Migration):
                                             WHEN 'capitalize' THEN
                                                 FORMAT('"%s"', INITCAP(updated_value -> language_code ->> 'value'))::jsonb
                                             ELSE
-                                                FORMAT('"%s"', updated_value -> language_code ->> 'value')::jsonb								
+                                                FORMAT('"%s"', updated_value -> language_code ->> 'value')::jsonb
                                         END
                                     );
                                 -- ELSEIF for other datatypes
