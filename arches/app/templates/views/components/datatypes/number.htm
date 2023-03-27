@@ -3,11 +3,12 @@
 <div class="col-md-4 col-lg-3">
     <select 
         class="resources" 
-        tabindex="-1" 
+        tabindex="0"
         style="display: none;" 
         data-bind="
             value: op, 
             chosen: {width: '100%', disable_search_threshold: 15},
+            attr: {'aria-label': '{% trans 'Search Criteria' %}'},
             optionsText: 'text',
             optionsValue: 'value',
             options: [
@@ -24,6 +25,6 @@
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input type="number" placeholder="{% trans "Value" %}" class="form-control input-lg" style="height: 36px;" data-bind="value: searchValue, valueUpdate: 'keyup'">
+    <input type="number" placeholder="{% trans "Value" %}" class="form-control input-lg" style="height: 36px;" aria-label="'{% trans 'Value' %}'" data-bind="value: searchValue, valueUpdate: 'keyup'">
 </div>
 <!-- /ko -->
