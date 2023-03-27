@@ -5,7 +5,7 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" for="number-widget-input" data-bind="text:label"></label>
+        <label class="control-label widget-input-label" data-bind="text:label"></label>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
@@ -15,10 +15,10 @@
             <span class="input-group-addon" data-bind="text: prefix"></span>
             <!-- /ko -->
             <!-- ko if: format -->
-            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input" id="number-widget-input">
+            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable, 'aria-label': label}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko ifnot: format -->
-            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input" id="number-widget-input">
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable, 'aria-label': label}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko if: suffix -->
             <span class="input-group-addon" data-bind="text: suffix"></span>
@@ -51,13 +51,13 @@
 {% endblock report %}
 
 {% block config_form %}
-<div class="control-label">
+<label for="input-placeholder" class="control-label">
     <span data-bind="text: $root.translations.placeholder"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="" 
-        id="" 
+        id="input-placeholder"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.placeholder},
@@ -66,13 +66,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-min" class="control-label">
     <span data-bind="text: $root.translations.min"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="number" 
-        id="" 
+        id="input-min"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.min},
@@ -81,13 +81,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-max" class="control-label">
     <span data-bind="text: $root.translations.max"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="number" 
-        id="" 
+        id="input-max"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.max},
@@ -96,13 +96,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-step" class="control-label">
     <span data-bind="text: $root.translations.increment"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container" >
     <input 
         type="number" 
-        id="" 
+        id="input-step"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.incrementSize},
@@ -112,13 +112,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-precision" class="control-label">
     <span data-bind="text: $root.translations.decimalPlaces"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="number" 
-        id="" 
+        id="input-precision"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.numberOfDecimalPlaces},
@@ -127,13 +127,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-prefix" class="control-label">
     <span data-bind="text: $root.translations.prefix"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="" 
-        id="" 
+        id="input-prefix"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.fieldPrefix},
@@ -142,13 +142,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-suffix" class="control-label">
     <span data-bind="text: $root.translations.suffix"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="" 
-        id="" 
+        id="input-suffix"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.fieldSuffix},
@@ -157,13 +157,13 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-defaultValue" class="control-label">
     <span data-bind="text: $root.translations.defaultValue"></span>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="number" 
-        id="" 
+        id="input-defaultValue"
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.defaultValue},
@@ -172,16 +172,16 @@
         "
     >
 </div>
-<div class="control-label">
+<label for="input-format" class="control-label">
     <span data-bind="text: $root.translations.format"></span> 
     <a href="http://numeraljs.com/#format" target="_blank">
         <span data-bind="text: '(' + $root.translations.viewValidFormats + ')'"></span>
     </a>
-</div>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
   <input 
     type="" 
-    id="" 
+    id="input-format"
     class="form-control input-md widget-input" 
     data-bind="
         attr: {placeholder: $root.translations.format},
