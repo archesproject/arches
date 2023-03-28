@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9259_performance_fixes"),
+        ("models", "9370_concept_relation"),
     ]
 
     divide_bulk_data_editor = """
