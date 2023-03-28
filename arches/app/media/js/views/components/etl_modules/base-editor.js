@@ -23,12 +23,11 @@ define([
         this.loading(true);
         this.languages = ko.observable(arches.languages);
         this.selectedLanguage = ko.observable();
-        // this.selectedLanguage(arches.languages?.find(lang => lang.code == arches.activeLanguage));
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
         this.selectedNode = ko.observable();
-        self.selectedNodeName = ko.observable();
+        this.selectedNodeName = ko.observable();
         this.operation = ko.observable();
         this.oldText = ko.observable();
         this.newText = ko.observable();
@@ -61,21 +60,34 @@ define([
             return graph?.name;
         };
 
-        this.createformDataAllProperties = () => {
+        this.createformDataAllProperties = async() => {
+            if (self.searchUrl()){
+                const searchUrl = new URL(self.searchUrl());
+                const response = await window.fetch(arches.urls.search_results + searchUrl.search + "&export=true");
+                const json = await response.json();
+                self.resourceids(json.results.hits.hits.map(hit => hit._source.resourceinstanceid));
+            } else {
+                self.resourceids(null);
+            }
+
             self.formData.append('operation', self.operation());
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
             if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
             if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
             if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
             if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
-            if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
+            if (self.trim()) { self.formData.append('also_trim', self.trim()); }
             if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
             if (self.newText()) { self.formData.append('new_text', self.newText()); }
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
         };
 
 
-        this.selectedNode.subscribe(nodeid => { self.selectedNodeName(self.nodes().find(node => node.nodeid === nodeid).name); });
+        this.selectedNode.subscribe(nodeid => {
+            if (nodeid) {
+                self.selectedNodeName(self.nodes().find(node => node.nodeid === nodeid).name);
+            }
+        });
 
         this.selectedGraph.subscribe(function(graph){
             if (graph){
@@ -91,7 +103,7 @@ define([
             }
         });
 
-        this.preview = function() {
+        this.preview = async function() {
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -105,7 +117,7 @@ define([
                 return;
             }
 
-            self.createformDataAllProperties();
+            await self.createformDataAllProperties();
             self.submit('preview').then(data => {
                 self.previewValue(data.result);
                 self.showPreview(true);
@@ -135,14 +147,8 @@ define([
                 );
                 return;
             }
-            if (self.searchUrl()){
-                const searchUrl = new URL(self.searchUrl());
-                const response = await window.fetch(arches.urls.search_results + searchUrl.search + "&export=true");
-                const json = await response.json();
-                self.resourceids(json.results.hits.hits.map(hit => hit._source.resourceinstanceid));
-            }
 
-            self.createformDataAllProperties();
+            await self.createformDataAllProperties();
             self.loading(true);
             params.activeTab("import");
             self.submit('write').then(data => {

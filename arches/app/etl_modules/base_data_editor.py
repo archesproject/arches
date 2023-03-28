@@ -97,21 +97,26 @@ class BaseDataEditor(BaseImportModule):
         return {"success": True, "data": {}}
 
     def preview(self, request):
-        def get_first_five_values(graph_id, node_id, language_code):
-            # if language_code is None:
-            #     language_code = 'en'
-            # graph_query = ''
-            # if graph_id is not None:
-            #     graph_query = "n.graphid = '{}'".format(graph_id)
-            # else:
+        def get_first_five_values(graph_id, node_id, resourceids, language_code):
+            node_id_query = ""
+            graph_id_query = ""
+            resourceids_query = ""
+            if node_id:
+                node_id_query = " AND n.nodeid = '{}'".format(node_id)
+            if graph_id:
+                graph_id_query = " AND n.graphid = '{}'".format(graph_id)
+            if resourceids:
+                resourceids_query = " AND t.resourceinstanceid in {}".format(resourceids)
+            if language_code is None:
+                language_code = 'en'
 
-            # print(graph_id, node_id, language_code)
+            sql_query = """
+                SELECT t.tiledata -> '{}' -> '{}' ->> 'value' FROM tiles t, nodes n
+                WHERE t.nodegroupid = n.nodegroupid
+            """.format(node_id, language_code) + node_id_query + graph_id_query + resourceids_query + " LIMIT 5;"
+
             with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT t.tiledata -> %s -> %s ->> 'value' FROM tiles t, nodes n
-                    WHERE t.nodegroupid = n.nodegroupid
-                    AND n.graphid = %s AND n.nodeid = %s
-                    LIMIT 5;""", [node_id, language_code, graph_id, node_id])
+                cursor.execute(sql_query)
                 row = [value[0] for value in cursor.fetchall()]
             return row
 
@@ -128,8 +133,10 @@ class BaseDataEditor(BaseImportModule):
             operation = 'replace_i'
         if also_trim == 'true':
             operation = operation + "_trim"
+        if resourceids:
+            resourceids = tuple(json.loads(resourceids))
 
-        first_five_values = get_first_five_values(graph_id, node_id, language_code)
+        first_five_values = get_first_five_values(graph_id, node_id, resourceids, language_code)
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
