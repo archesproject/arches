@@ -124,9 +124,9 @@ class BaseDataEditor(BaseImportModule):
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
         also_trim = request.POST.get("also_trim", 'false')
-        if operation == 'replace' and case_insensitive:
+        if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
-        if also_trim:
+        if also_trim == 'true':
             operation = operation + "_trim"
 
         first_five_values = get_first_five_values(graph_id, node_id, language_code)
@@ -170,7 +170,7 @@ class BaseDataEditor(BaseImportModule):
         also_trim = request.POST.get("also_trim", 'false')
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
-        if also_trim:
+        if also_trim == 'true':
             operation = operation + "_trim"
 
         use_celery_bulk_edit = True
