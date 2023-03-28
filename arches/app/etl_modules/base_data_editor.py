@@ -108,12 +108,20 @@ class BaseDataEditor(BaseImportModule):
             if resourceids:
                 resourceids_query = " AND t.resourceinstanceid in {}".format(resourceids)
             if language_code is None:
-                language_code = 'en'
+                language_code = "en"
 
-            sql_query = """
+            sql_query = (
+                """
                 SELECT t.tiledata -> '{}' -> '{}' ->> 'value' FROM tiles t, nodes n
                 WHERE t.nodegroupid = n.nodegroupid
-            """.format(node_id, language_code) + node_id_query + graph_id_query + resourceids_query + " LIMIT 5;"
+            """.format(
+                    node_id, language_code
+                )
+                + node_id_query
+                + graph_id_query
+                + resourceids_query
+                + " LIMIT 5;"
+            )
 
             with connection.cursor() as cursor:
                 cursor.execute(sql_query)
@@ -128,10 +136,10 @@ class BaseDataEditor(BaseImportModule):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
-        also_trim = request.POST.get("also_trim", 'false')
-        if case_insensitive == 'true' and operation == 'replace':
-            operation = 'replace_i'
-        if also_trim == 'true':
+        also_trim = request.POST.get("also_trim", "false")
+        if case_insensitive == "true" and operation == "replace":
+            operation = "replace_i"
+        if also_trim == "true":
             operation = operation + "_trim"
         if resourceids:
             resourceids = tuple(json.loads(resourceids))
