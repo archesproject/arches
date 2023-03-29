@@ -137,25 +137,7 @@ require([
                 showFind: ko.observable(false),
                 currentList: ko.computed(function() {
                     if (self.viewModel.showResources()) {
-                        const resources = self.viewModel.resources();
-
-                        return resources.reduce((acc, resource) => {
-                            if (resource.source_identifier_id && resource.publication_id) {
-                                const publishedGraph = graphManagerData['publishedGraphs'].find(graph => graph.publication_id === resource.publication_id);
-                                const serializedGraphs = graphManagerData['serializedGraphs'].find(graph => graph.graphid === resource.graphid);
-                                const sourceGraph = resources.find(sourceGraph => sourceGraph.graphid === resource.source_identifier_id);
- 
-                                if (sourceGraph) {
-                                    sourceGraph['matchesMostRecentPublishedVersion'] = false;
-                                    sourceGraph.name(resource.name());
-                                    if (publishedGraph && serializedGraphs) {
-                                        sourceGraph['matchesMostRecentPublishedVersion'] = koMapping.toJSON(serializedGraphs) === koMapping.toJSON(publishedGraph.serialized_graph);
-                                    }
-                                    acc.push(sourceGraph);
-                                }
-                            }
-                            return acc;
-                        }, []);
+                        return self.viewModel.resources().filter(resource => !resource.source_identifier_id);
                     } else {
                         return self.viewModel.graphs() ;
                     }

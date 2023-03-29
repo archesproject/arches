@@ -151,21 +151,6 @@ class GraphManagerView(GraphBaseView):
             context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
 
-            context["serialized_graphs"] = JSONSerializer().serialize(
-                Graph.objects.all()
-                .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .exclude(source_identifier_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            )
-
-            publication_ids = []
-            for resource_model in JSONDeserializer().deserialize(context["serialized_graphs"]):
-                if resource_model["source_identifier_id"]:
-                    publication_ids.append(resource_model["publication_id"])
-
-            context["published_graphs"] = JSONSerializer().serialize(
-                models.PublishedGraph.objects.filter(publication_id__in=publication_ids)
-            )
-
             context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 

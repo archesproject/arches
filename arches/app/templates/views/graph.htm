@@ -104,7 +104,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <span data-bind="text: name"></span>
                                 </h1>
                                 <!-- ko ifnot: $data.matchesMostRecentPublishedVersion -->
-                                <div style="display: flex; align-items: center; color: darkred;">( {% trans "Has unpublished changes" %} )</div>
+                                <!-- <div style="display: flex; align-items: center; color: darkred;">( {% trans "Has unpublished changes" %} )</div> -->
                                 <!-- /ko -->
                             </div>
                             <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
@@ -157,9 +157,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     style="display: none;"
     graphManagerData='{
         "root_nodes": {{ root_nodes }},
-        "publishedGraphs": {{ published_graphs }},
         "graphs": {{ graphs }},
-        "serializedGraphs": {{ serialized_graphs }},
     }'
 ></div>
 <script>
