@@ -252,23 +252,6 @@ class GraphDesignerView(GraphBaseView):
         context["source_graph"] = JSONSerializer().serialize(source_graph, force_recalculation=True)
         context["source_graph_id"] = source_graph.pk
 
-        user_language = translation.get_language()
-
-        published_graph = models.PublishedGraph.objects.get(publication=self.graph.publication, language=user_language)
-        published_graph = published_graph.serialized_graph
-
-        # it's possible the PublishedGraph references CardXNodeXWidgets that have been deleted
-        widgets = []
-        for widget in published_graph["widgets"]:
-            try:
-                widgets.append(
-                    JSONDeserializer().deserialize(JSONSerializer().serialize(models.CardXNodeXWidget.objects.get(pk=widget["id"])))
-                )
-            except models.CardXNodeXWidget.DoesNotExist:
-                pass
-        published_graph["widgets"] = widgets
-        context["published_graph"] = JSONSerializer().serialize(published_graph)
-
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True
 

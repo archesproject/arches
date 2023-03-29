@@ -43,32 +43,6 @@ define([
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.graphPublicationNotes = ko.observable();
 
-            function normalizeParsedGraph(obj) {
-                if (!obj) { return null; }
-                
-                delete obj['updated_values'];
-                delete obj['default_card_name'];
-
-                for (const entry of Object.entries(obj)) {
-                    if (entry[1] instanceof Array) { 
-                        obj[entry[0]] = entry[1].map(data => normalizeParsedGraph(data));
-                    }
-                    else if (entry[1] instanceof Object) { 
-                        obj[entry[0]] = normalizeParsedGraph(entry[1]);
-                    }
-                    else {
-                        if (['source_identifier_id', 'alias'].includes(entry[0])) {
-                            obj[entry[0]] = null;
-                        }
-                        if (entry[0] === 'config' && obj[entry[0]] === null) {
-                            obj[entry[0]] = {};
-                        }
-                    }
-                }
-
-                return obj;
-            }
-
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;
    
@@ -87,12 +61,6 @@ define([
                     if (selection.card && selection.card.dirty()) {
                         shouldShowGraphPublishButtons = false;
                     }
-                }
-
-                if (
-                    JSON.stringify(normalizeParsedGraph(viewModel._graph())) === JSON.stringify(normalizeParsedGraph(viewModel.publishedGraph))
-                ) {
-                    shouldShowGraphPublishButtons = false;
                 }
 
                 return shouldShowGraphPublishButtons;
