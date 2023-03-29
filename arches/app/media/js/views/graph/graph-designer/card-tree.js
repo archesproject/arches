@@ -388,7 +388,7 @@ define([
 
         this.topCards = ko.observableArray();
 
-        var tc = _.filter(data.cards, function(card) {
+        var tc = _.filter(params.isPermissionTree ? data.source_graph.cards : data.cards, function(card) {
             var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                 return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
             });

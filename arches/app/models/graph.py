@@ -288,6 +288,7 @@ class Graph(models.GraphModel):
             nodeobj = node.copy()
             node = models.Node()
             node.nodeid = nodeobj.get("nodeid", None)
+            node.source_identifier_id = nodeobj.get("source_identifier_id", None)
             node.name = nodeobj.get("name", "")
             node.description = nodeobj.get("description", "")
             node.istopnode = nodeobj.get("istopnode", "")
@@ -949,6 +950,8 @@ class Graph(models.GraphModel):
 
         """
         node["nodeid"] = uuid.UUID(str(node.get("nodeid")))
+        node["source_identifier_id"] = uuid.UUID(str(node.get("source_identifier_id")))
+
         old_node = self.nodes.pop(node["nodeid"])
         new_node = self.add_node(node)
         new_card = None

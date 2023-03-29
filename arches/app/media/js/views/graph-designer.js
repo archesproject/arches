@@ -377,8 +377,9 @@ define([
             });
 
             viewModel.permissionTree = new CardTreeViewModel({
-                graph: viewModel.graph,
+                graph: koMapping.fromJS(data.source_graph),
                 graphModel: viewModel.graphModel,
+                isPermissionTree: true,
                 appliedFunctions: viewModel.appliedFunctions,
                 primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 multiselect: true

@@ -263,6 +263,8 @@ class GraphDesignerView(GraphBaseView):
         )  # returns empty array when called in 'get_context_data'
 
         context["graph"] = JSONSerializer().serialize(serialized_graph)
+
+        context["source_graph"] = JSONSerializer().serialize(source_graph, force_recalculation=True)
         context["source_graph_id"] = source_graph.pk
 
         user_language = translation.get_language()
