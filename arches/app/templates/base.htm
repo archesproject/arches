@@ -47,7 +47,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
         {% endif %}
         {% if app_settings.ACCESSIBILITY_MODE %}
-        <link type="text/x-scss" href="{% static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+        <link type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
         {% endif %}
     	{% endcompress %}
         <link href="{% webpack_static 'css/package.css' %}" rel="stylesheet">
