@@ -950,7 +950,9 @@ class Graph(models.GraphModel):
 
         """
         node["nodeid"] = uuid.UUID(str(node.get("nodeid")))
-        node["source_identifier_id"] = uuid.UUID(str(node.get("source_identifier_id")))
+
+        if node['source_identifier_id']:
+            node["source_identifier_id"] = uuid.UUID(str(node.get("source_identifier_id")))
 
         old_node = self.nodes.pop(node["nodeid"])
         new_node = self.add_node(node)
