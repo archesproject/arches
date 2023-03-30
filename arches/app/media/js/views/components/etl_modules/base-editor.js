@@ -21,10 +21,10 @@ define([
             "replace_i": "Replace (Case Insensitive)",
             "capitalize": "Capitalize",
             "capitalize_trim": "Capitalize (Also, remove leading/trailing spaces)",
-            "uppercase": "Uppercase",
-            "uppercase_trim": "Uppercase (Also, remove leading/trailing spaces)",
-            "lowercase": "Lowercase",
-            "lowercase_trim": "Lowercase (Also, remove leading/trailing spaces)",
+            "upper": "Uppercase",
+            "upper_trim": "Uppercase (Also, remove leading/trailing spaces)",
+            "lower": "Lowercase",
+            "lower_trim": "Lowercase (Also, remove leading/trailing spaces)",
         };
 
         this.load_details = params.load_details;
