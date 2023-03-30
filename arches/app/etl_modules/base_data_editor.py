@@ -1,6 +1,8 @@
 from datetime import datetime
 import json
 import logging
+import requests
+from urllib.parse import urlparse, urlunparse
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
@@ -93,6 +95,13 @@ class BaseDataEditor(BaseImportModule):
             (status, datetime.now(), self.loadid),
         )
 
+    def get_resourceids_from_search_url(self, search_url):
+        parsed_url = urlparse(search_url)
+        search_result_url = urlunparse(parsed_url._replace(path='/search/resources'))
+        response = requests.get(search_result_url + '&export=true')
+        search_results = response.json()['results']['hits']['hits']
+        return [result['_source']['resourceinstanceid'] for result in search_results]
+
     def validate(self, request):
         return {"success": True, "data": {}}
 
@@ -136,10 +145,18 @@ class BaseDataEditor(BaseImportModule):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
-        also_trim = request.POST.get("also_trim", "false")
-        if case_insensitive == "true" and operation == "replace":
-            operation = "replace_i"
-        if also_trim == "true":
+        also_trim = request.POST.get("also_trim", 'false')
+        search_url = request.POST.get("search_url", None)
+
+        if resourceids:
+            resourceids = json.loads(resourceids)
+        if search_url:
+            resourceids = self.get_resourceids_from_search_url(search_url)
+        resourceids = tuple(resourceids)
+
+        if case_insensitive == 'true' and operation == 'replace':
+            operation = 'replace_i'
+        if also_trim == 'true':
             operation = operation + "_trim"
         if resourceids:
             resourceids = tuple(json.loads(resourceids))
@@ -183,20 +200,33 @@ class BaseDataEditor(BaseImportModule):
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", 'false')
         also_trim = request.POST.get("also_trim", 'false')
+        search_url = request.POST.get("search_url", None)
+
+        if resourceids:
+            resourceids = json.loads(resourceids)
+        if search_url:
+            resourceids = self.get_resourceids_from_search_url(search_url)
+        if resourceids:
+            resourceids = [uuid.UUID(id) for id in resourceids]
+
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
         if also_trim == 'true':
             operation = operation + "_trim"
 
         use_celery_bulk_edit = True
-        if operation in ['replace', 'replace_i']:
-            operation_details = "{} -> {}".format(old_text, new_text)
-        else:
-            operation_details = 'N/A'
-        load_details = { "graph": graph_id, "node": node_name, "operation": operation, "details": operation_details }
-
-        if resourceids:
-            resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
+        operation_details = {
+            "old_text": old_text, 
+            "new_text": new_text, 
+        }
+        load_details = {
+            "graph": graph_id,
+            "node": node_name,
+            "operation": operation,
+            "details": operation_details,
+            "search_url": search_url,
+            "language_code": language_code
+        }
 
         with connection.cursor() as cursor:
             event_created = self.create_load_event(cursor, load_details)

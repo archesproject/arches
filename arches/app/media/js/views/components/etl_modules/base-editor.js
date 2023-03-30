@@ -15,6 +15,18 @@ define([
     const viewModel = function(params) {
         const self = this;
 
+        this.operationText = {
+            "trim": "Trim",
+            "replace": "Replace",
+            "replace_i": "Replace (Case Insensitive)",
+            "capitalize": "Capitalize",
+            "capitalize_trim": "Capitalize (Also, remove leading/trailing spaces)",
+            "upper": "Uppercase",
+            "upper_trim": "Uppercase (Also, remove leading/trailing spaces)",
+            "lower": "Lowercase",
+            "lower_trim": "Lowercase (Also, remove leading/trailing spaces)",
+        };
+
         this.load_details = params.load_details;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
@@ -71,6 +83,7 @@ define([
             }
 
             self.formData.append('operation', self.operation());
+            if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
             if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }
             if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
