@@ -135,8 +135,11 @@ class BaseDataEditor(BaseImportModule):
         also_trim = request.POST.get("also_trim", 'false')
         search_url = request.POST.get("search_url", None)
 
+        if resourceids:
+            resourceids = json.loads(resourceids)
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
+        resourceids = tuple(resourceids)
 
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
@@ -184,8 +187,12 @@ class BaseDataEditor(BaseImportModule):
         also_trim = request.POST.get("also_trim", 'false')
         search_url = request.POST.get("search_url", None)
 
+        if resourceids:
+            resourceids = json.loads(resourceids)
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
+        if resourceids:
+            resourceids = [uuid.UUID(id) for id in resourceids]
 
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
@@ -205,9 +212,6 @@ class BaseDataEditor(BaseImportModule):
             "search_url": search_url,
             "language_code": language_code
         }
-
-        if resourceids:
-            resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
 
         with connection.cursor() as cursor:
             event_created = self.create_load_event(cursor, load_details)
