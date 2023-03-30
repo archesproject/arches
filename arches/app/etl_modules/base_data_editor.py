@@ -39,7 +39,25 @@ class BaseDataEditor(BaseImportModule):
 
     def get_nodes(self, request):
         graphid = request.POST.get("graphid")
-        nodes = Node.objects.filter(graph_id=graphid, datatype="string").order_by(Lower("name"))
+
+        def dictfetchall(cursor):
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT n.*, c.name as card_name, w.label as widget_label
+                FROM cards c, nodes n, cards_x_nodes_x_widgets w
+                WHERE n.nodeid = w.nodeid
+                AND w.cardid = c.cardid
+                AND n.datatype = 'string'
+                AND n.graphid = %s
+                ORDER BY w.label;
+            """,
+                [graphid],
+            )
+            nodes = dictfetchall(cursor)
         return {"success": True, "data": nodes}
 
     def get_node_lookup(self, graphid):
