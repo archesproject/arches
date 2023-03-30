@@ -115,10 +115,10 @@ class BaseDataEditor(BaseImportModule):
 
     def get_resourceids_from_search_url(self, search_url):
         parsed_url = urlparse(search_url)
-        search_result_url = urlunparse(parsed_url._replace(path='/search/resources'))
-        response = requests.get(search_result_url + '&export=true')
-        search_results = response.json()['results']['hits']['hits']
-        return [result['_source']['resourceinstanceid'] for result in search_results]
+        search_result_url = urlunparse(parsed_url._replace(path="/search/resources"))
+        response = requests.get(search_result_url + "&export=true")
+        search_results = response.json()["results"]["hits"]["hits"]
+        return [result["_source"]["resourceinstanceid"] for result in search_results]
 
     def validate(self, request):
         return {"success": True, "data": {}}
@@ -163,7 +163,7 @@ class BaseDataEditor(BaseImportModule):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
-        also_trim = request.POST.get("also_trim", 'false')
+        also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
         if resourceids:
@@ -172,9 +172,9 @@ class BaseDataEditor(BaseImportModule):
             resourceids = self.get_resourceids_from_search_url(search_url)
         resourceids = tuple(resourceids)
 
-        if case_insensitive == 'true' and operation == 'replace':
-            operation = 'replace_i'
-        if also_trim == 'true':
+        if case_insensitive == "true" and operation == "replace":
+            operation = "replace_i"
+        if also_trim == "true":
             operation = operation + "_trim"
         if resourceids:
             resourceids = tuple(json.loads(resourceids))
@@ -183,29 +183,28 @@ class BaseDataEditor(BaseImportModule):
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
-                if operation == 'replace':
+                if operation == "replace":
                     cursor.execute("""SELECT * FROM REPLACE(%s, %s, %s);""", [value, old_text, new_text])
-                elif operation == 'replace_i':
+                elif operation == "replace_i":
                     cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'i');""", [value, old_text, new_text])
-                elif operation == 'trim':
+                elif operation == "trim":
                     cursor.execute("""SELECT * FROM TRIM(%s);""", [value])
-                elif operation == 'capitalize':
+                elif operation == "capitalize":
                     cursor.execute("""SELECT * FROM INITCAP(%s);""", [value])
-                elif operation == 'capitalize_trim':
+                elif operation == "capitalize_trim":
                     cursor.execute("""SELECT * FROM TRIM(INITCAP(%s));""", [value])
-                elif operation == 'upper':
+                elif operation == "upper":
                     cursor.execute("""SELECT * FROM UPPER(%s);""", [value])
-                elif operation == 'upper_trim':
+                elif operation == "upper_trim":
                     cursor.execute("""SELECT * FROM TRIM(UPPER(%s));""", [value])
-                elif operation == 'lower':
+                elif operation == "lower":
                     cursor.execute("""SELECT * FROM LOWER(%s);""", [value])
-                elif operation == 'lower_trim':
+                elif operation == "lower_trim":
                     cursor.execute("""SELECT * FROM TRIM(LOWER(%s));""", [value])
                 transformed_value = cursor.fetchone()[0]
                 return_list.append([value, transformed_value])
 
         return {"success": True, "data": return_list}
-
 
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -216,8 +215,8 @@ class BaseDataEditor(BaseImportModule):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
-        case_insensitive = request.POST.get("case_insensitive", 'false')
-        also_trim = request.POST.get("also_trim", 'false')
+        case_insensitive = request.POST.get("case_insensitive", "false")
+        also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
         if resourceids:
@@ -227,15 +226,15 @@ class BaseDataEditor(BaseImportModule):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
 
-        if case_insensitive == 'true' and operation == 'replace':
-            operation = 'replace_i'
-        if also_trim == 'true':
+        if case_insensitive == "true" and operation == "replace":
+            operation = "replace_i"
+        if also_trim == "true":
             operation = operation + "_trim"
 
         use_celery_bulk_edit = True
         operation_details = {
-            "old_text": old_text, 
-            "new_text": new_text, 
+            "old_text": old_text,
+            "new_text": new_text,
         }
         load_details = {
             "graph": graph_id,
@@ -243,7 +242,7 @@ class BaseDataEditor(BaseImportModule):
             "operation": operation,
             "details": operation_details,
             "search_url": search_url,
-            "language_code": language_code
+            "language_code": language_code,
         }
 
         with connection.cursor() as cursor:
@@ -268,9 +267,9 @@ class BaseDataEditor(BaseImportModule):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
-        also_trim = request.POST.get("also_trim", 'false')
-        if case_insensitive == 'true' and operation == 'replace':
-            operation = 'replace_i'
+        also_trim = request.POST.get("also_trim", "false")
+        if case_insensitive == "true" and operation == "replace":
+            operation = "replace_i"
         if also_trim:
             operation = operation + "_trim"
 
