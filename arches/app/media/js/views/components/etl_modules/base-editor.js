@@ -148,12 +148,6 @@ define([
                 );
                 return;
             }
-            if (self.searchUrl()){
-                const searchUrl = new URL(self.searchUrl());
-                const response = await window.fetch(arches.urls.search_results + searchUrl.search + "&export=true");
-                const json = await response.json();
-                self.resourceids(json.results.hits.hits.map(hit => hit._source.resourceinstanceid));
-            }
 
             self.createformDataAllProperties();
             self.loading(true);

@@ -1,6 +1,8 @@
 from datetime import datetime
 import json
 import logging
+import requests
+from urllib.parse import urlparse, urlunparse
 import uuid
 from django.db import connection
 from django.db.models.functions import Lower
@@ -93,6 +95,13 @@ class BaseDataEditor(BaseImportModule):
             (status, datetime.now(), self.loadid),
         )
 
+    def get_resourceids_from_search_url(self, search_url):
+        parsed_url = urlparse(search_url)
+        search_result_url = urlunparse(parsed_url._replace(path='/search/resources'))
+        response = requests.get(search_result_url + '&export=true')
+        search_results = response.json()['results']['hits']['hits']
+        return [result['_source']['resourceinstanceid'] for result in search_results]
+
     def validate(self, request):
         return {"success": True, "data": {}}
 
@@ -124,6 +133,11 @@ class BaseDataEditor(BaseImportModule):
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
         also_trim = request.POST.get("also_trim", 'false')
+        search_url = request.POST.get("search_url", None)
+
+        if search_url:
+            resourceids = self.get_resourceids_from_search_url(search_url)
+
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
         if also_trim == 'true':
@@ -169,6 +183,9 @@ class BaseDataEditor(BaseImportModule):
         case_insensitive = request.POST.get("case_insensitive", 'false')
         also_trim = request.POST.get("also_trim", 'false')
         search_url = request.POST.get("search_url", None)
+
+        if search_url:
+            resourceids = self.get_resourceids_from_search_url(search_url)
 
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
