@@ -168,17 +168,26 @@ class BaseDataEditor(BaseImportModule):
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", 'false')
         also_trim = request.POST.get("also_trim", 'false')
+        search_url = request.POST.get("search_url", None)
+
         if case_insensitive == 'true' and operation == 'replace':
             operation = 'replace_i'
         if also_trim == 'true':
             operation = operation + "_trim"
 
         use_celery_bulk_edit = True
-        if operation in ['replace', 'replace_i']:
-            operation_details = "{} -> {}".format(old_text, new_text)
-        else:
-            operation_details = 'N/A'
-        load_details = { "graph": graph_id, "node": node_name, "operation": operation, "details": operation_details }
+        operation_details = {
+            "old_text": old_text, 
+            "new_text": new_text, 
+        }
+        load_details = {
+            "graph": graph_id,
+            "node": node_name,
+            "operation": operation,
+            "details": operation_details,
+            "search_url": search_url,
+            "language_code": language_code
+        }
 
         if resourceids:
             resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
