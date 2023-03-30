@@ -15,7 +15,7 @@ define([
     const viewModel = function(params) {
         const self = this;
 
-        this.operationText = {
+        this.operationLabel = {
             "trim": "Trim",
             "replace": "Replace",
             "replace_i": "Replace (Case Insensitive)",
@@ -72,16 +72,7 @@ define([
             return graph?.name;
         };
 
-        this.createformDataAllProperties = async() => {
-            if (self.searchUrl()){
-                const searchUrl = new URL(self.searchUrl());
-                const response = await window.fetch(arches.urls.search_results + searchUrl.search + "&export=true");
-                const json = await response.json();
-                self.resourceids(json.results.hits.hits.map(hit => hit._source.resourceinstanceid));
-            } else {
-                self.resourceids(null);
-            }
-
+        this.createformDataAllProperties = () => {
             self.formData.append('operation', self.operation());
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
@@ -119,7 +110,7 @@ define([
             }
         });
 
-        this.preview = async function() {
+        this.preview = function() {
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -133,7 +124,7 @@ define([
                 return;
             }
 
-            await self.createformDataAllProperties();
+            self.createformDataAllProperties();
             self.submit('preview').then(data => {
                 self.previewValue(data.result);
                 self.showPreview(true);
@@ -150,7 +141,7 @@ define([
             });
         };
 
-        this.write = async function() {
+        this.write = function() {
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -164,7 +155,7 @@ define([
                 return;
             }
 
-            await self.createformDataAllProperties();
+            self.createformDataAllProperties();
             self.loading(true);
             params.activeTab("import");
             self.submit('write').then(data => {
