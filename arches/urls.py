@@ -233,6 +233,7 @@ urlpatterns = [
     url(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
     url(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     url(r"^graphs", api.Graphs.as_view(action="get_graph_models"), name="get_graph_models_api"),
+    url(r"^graph_has_unpublished_changes/(?P<graph_id>%s)$" % (uuid_regex), api.GraphHasUnpublishedChanges.as_view(), name="graph_has_unpublished_changes_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),

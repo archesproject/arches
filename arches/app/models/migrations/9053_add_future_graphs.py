@@ -39,4 +39,9 @@ class Migration(migrations.Migration):
                 blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.node"
             ),
         ),
+        migrations.AddField(
+            model_name='graphmodel',
+            name='has_unpublished_changes',
+            field=models.BooleanField(default=False),
+        ),
     ]

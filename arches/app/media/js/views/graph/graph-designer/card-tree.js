@@ -357,6 +357,10 @@ define([
                     }),
                     url: arches.urls.reorder_cards,
                     complete: function() {
+                        // adds event to trigger dirty state in graph-designer
+                        document.dispatchEvent(
+                            new Event('reorderCards')
+                        );
                         loading(false);
                     }
                 });

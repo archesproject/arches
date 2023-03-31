@@ -103,8 +103,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> 
                                     <span data-bind="text: name"></span>
                                 </h1>
-                                <!-- ko ifnot: $data.matchesMostRecentPublishedVersion -->
-                                <!-- <div style="display: flex; align-items: center; color: darkred;">( {% trans "Has unpublished changes" %} )</div> -->
+                                <!-- ko if: $data.has_unpublished_changes -->
+                                <div style="display: flex; align-items: center; color: darkred;">( {% trans "Has unpublished changes" %} )</div>
                                 <!-- /ko -->
                             </div>
                             <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>

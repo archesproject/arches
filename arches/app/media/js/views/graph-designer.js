@@ -34,18 +34,21 @@ define([
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
-            viewModel._graph = ko.observable(data['graph']);
-            viewModel.publishedGraph = data['published_graph'];
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.graphPublicationNotes = ko.observable();
+            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+            viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
 
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;
-   
+
+                if (viewModel.dirty()) {
+                    shouldShowGraphPublishButtons = false;
+                }
                 if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     shouldShowGraphPublishButtons = false;
                 }
@@ -62,10 +65,12 @@ define([
                         shouldShowGraphPublishButtons = false;
                     }
                 }
-
+                if (!viewModel.graphHasUnpublishedChanges()) {
+                    shouldShowGraphPublishButtons = false;
+                }
+                
                 return shouldShowGraphPublishButtons;
             });
-            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource && !graph.source_identifier_id;
@@ -114,8 +119,6 @@ define([
                         let alert;
 
                         if (status === 'success') {
-                            viewModel._graph(response.responseJSON['graph']);
-
                             alert = new AlertViewModel(
                                 'ep-alert-blue', 
                                 response.responseJSON.title, 
@@ -285,21 +288,6 @@ define([
 
             viewModel.datatypes = _.keys(viewModel.graphModel.get('datatypelookup'));
 
-            viewModel.graphModel.on('changed', function(model, response) {
-                require(['views/graph-designer-data'], function(data) {
-                    viewModel.publishedGraph = data['published_graph'];
-                    viewModel._graph(data['graph']);
-                });
-
-                viewModel.shouldShowGraphPublishButtons();
-                viewModel.alert(null);
-                // viewModel.loading(false);  // TODO: @cbyrd 8842 disable page refresh on branch append
-                if (response.status !== 200) {
-                    viewModel.loading(false);
-                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
-                }
-            });
-
             viewModel.graphModel.on('error', function(response) {
                 viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
             });
@@ -318,9 +306,6 @@ define([
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                         }
 
-                        viewModel.publishedGraph = data['published_graph'];
-                        viewModel._graph(data.responseJSON);
-
                         viewModel.loading(false);
                     });
                 }
@@ -334,7 +319,6 @@ define([
 
             viewModel.saveCardEdits = function(card) {
                 card.save();
-                forceShowGraphPublishButtons();
             };
 
             viewModel.cardTree = new CardTreeViewModel({
@@ -421,7 +405,10 @@ define([
                     }
                 },
                 onSave: function() {
-                    viewModel._graph(koMapping.toJS(viewModel.graphSettingsViewModel.graph));
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('graphSettingsSave')
+                    );
                 }
             });
 
@@ -622,18 +609,23 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
-            function forceShowGraphPublishButtons() {
-                viewModel.loading(true);
+            function updateGraphUnpublishedChanges() {
+                viewModel.graphHasUnpublishedChanges(true);
 
-                setTimeout(function(){  // need a 0 timeout to reset the UI long enough to show/hide the publish buttons
-                    viewModel._graph(null);
-                    viewModel.loading(false);
-                }, 0);
-            }
-            
-            document.addEventListener('addChildNode', forceShowGraphPublishButtons);
-            document.addEventListener('deleteNode', forceShowGraphPublishButtons);
-            document.addEventListener('reorderNodes', forceShowGraphPublishButtons);
+                $.ajax({
+                    type: 'POST',
+                    url: arches.urls.graph_has_unpublished_changes_api(data.graphid),
+                    data: {'has_unpublished_changes': true}
+                });
+            };
+
+            document.addEventListener('addChildNode', updateGraphUnpublishedChanges);
+            document.addEventListener('deleteNode', updateGraphUnpublishedChanges);
+            document.addEventListener('reorderNodes', updateGraphUnpublishedChanges);
+            document.addEventListener('reorderCards', updateGraphUnpublishedChanges);
+            document.addEventListener('cardSave', updateGraphUnpublishedChanges);
+            document.addEventListener('nodeSave', updateGraphUnpublishedChanges);
+            document.addEventListener('graphSettingsSave', updateGraphUnpublishedChanges);
             
             BaseManagerView.prototype.initialize.apply(this, arguments);
         }
