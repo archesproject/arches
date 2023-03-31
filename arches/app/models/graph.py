@@ -2016,6 +2016,16 @@ class Graph(models.GraphModel):
 
         return graph_from_database
 
+    def revert(self):
+        """
+        Reverts a Graph's editable_future_graph to represent the source,
+        discarding all changes
+        """
+        self.has_unpublished_changes = False
+        self.save()
+
+        self.create_editable_future_graph()
+
     def publish(self, user=None, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
@@ -2031,6 +2041,8 @@ class Graph(models.GraphModel):
             publication.save()
 
             self.publication = publication
+            self.has_unpublished_changes = False
+
             self.save(validate=False)
 
             for language_tuple in settings.LANGUAGES:

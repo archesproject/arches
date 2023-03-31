@@ -504,7 +504,7 @@ class GraphPublicationView(View):
 
         elif self.action == "revert":
             try:
-                source_graph.create_editable_future_graph()
+                source_graph.revert()
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))

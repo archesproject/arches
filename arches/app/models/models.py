@@ -444,6 +444,7 @@ class GraphModel(models.Model):
     source_identifier = models.ForeignKey(
         blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
     )
+    has_unpublished_changes = models.BooleanField(default=False)
 
     @property
     def disable_instance_creation(self):
