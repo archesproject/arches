@@ -40,8 +40,8 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name='graphmodel',
-            name='has_unpublished_changes',
+            model_name="graphmodel",
+            name="has_unpublished_changes",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -392,8 +392,9 @@ class GraphHasUnpublishedChanges(APIBase):
         if graph.has_unpublished_changes != has_unpublished_changes:
             graph.has_unpublished_changes = has_unpublished_changes
             graph.save()
-        
+
         return JSONResponse(graph.has_unpublished_changes)
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
