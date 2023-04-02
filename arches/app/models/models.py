@@ -1517,12 +1517,21 @@ class Plugin(models.Model):
         managed = True
         db_table = "plugins"
 
+class IIIFManifestValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Image Service Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self)
 
 class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
+    transactionid = models.UUIDField(default=uuid.uuid1)
 
     def __str__(self):
         return self.label
