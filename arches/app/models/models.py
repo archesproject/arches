@@ -1540,6 +1540,27 @@ class IIIFManifest(models.Model):
         managed = True
         db_table = "iiif_manifests"
 
+    def delete(self, *args, **kwargs):
+        def check_canvas_in_use(canvas_id):
+            canvas_ids_in_use = [annotation.canvas for annotation in VwAnnotation.objects.all()]
+            return canvas_id in canvas_ids_in_use
+        canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
+        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        canvases_in_use = []
+        for canvas_id in canvas_ids:
+            if check_canvas_in_use(canvas_id):
+                canvases_in_use.append(canvas_id)
+        if len(canvases_in_use) > 0:
+            canvas_labels_in_use = [
+                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+            ]
+            message = _("This manifest cannot be deleted because the following canvases have resource annotations: {}").format(
+                ", ".join(canvas_labels_in_use)
+            )
+            raise IIIFManifestValidationError(message)
+
+        super(IIIFManifest, self).delete()
+
 
 class GroupMapSettings(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE)
