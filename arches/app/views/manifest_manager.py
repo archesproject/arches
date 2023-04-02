@@ -194,6 +194,7 @@ class ManifestManagerView(View):
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
         metadata = request.POST.get("metadata")
+        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
         selected_canvases = request.POST.get("selected_canvases")
         try:
             metadata = json.loads(request.POST.get("metadata"))
@@ -224,6 +225,7 @@ class ManifestManagerView(View):
             json_url = f"/manifest/{manifest_id}"
             manifest.url = json_url
             manifest.manifest["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
+            manifest.transactionid = transaction_id
 
             manifest.save()
 
