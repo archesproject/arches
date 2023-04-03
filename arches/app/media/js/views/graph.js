@@ -2,6 +2,7 @@ require([
     'jquery',
     'underscore',
     'knockout',
+    'knockout-mapping',
     'arches',
     'views/graph-manager-data',
     'views/base-manager',
@@ -11,7 +12,7 @@ require([
     'bindings/hover',
     'bindings/chosen',
     'utils/set-csrf-token',
-], function($, _, ko, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
+], function($, _, ko, koMapping, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
     var GraphView = BaseManager.extend({
         /**
         * Initializes an instance of BaseManager, optionally using a passed in view
@@ -136,7 +137,15 @@ require([
                 showFind: ko.observable(false),
                 currentList: ko.computed(function() {
                     if (self.viewModel.showResources()) {
-                        return self.viewModel.resources();
+                        return self.viewModel.resources().reduce((acc, resource) => { 
+                            if (!resource.source_identifier_id) {
+                                const editableFutureGraph = self.viewModel.resources().find(graph => graph.source_identifier_id === resource.graphid);
+                                resource['has_unpublished_changes'] = editableFutureGraph['has_unpublished_changes'];
+                                
+                                acc.push(resource);
+                            }
+                            return acc;
+                        }, []);
                     } else {
                         return self.viewModel.graphs() ;
                     }

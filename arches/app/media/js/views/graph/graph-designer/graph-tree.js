@@ -95,6 +95,16 @@ define([
         },
 
         /**
+        * Returns a knockout computed used to calculate nodeidentifier of the node
+        * @memberof GraphTree.prototype
+        * @param {object} node - a node in the tree
+        */
+        getNodeIdentifier: function(node) {
+            var nodeIdentifier = node.sourceIdentifierId() ? node.sourceIdentifierId() : node.nodeid;
+            return nodeIdentifier;
+        },
+
+        /**
          * Returns a boolean to indicate whether this node participates in descriptor function
          * @param {object} node - a node in the tree
          */
@@ -185,6 +195,11 @@ define([
                         this.cardTree.addCard(response.responseJSON);
                         this.permissionTree.addCard(response.responseJSON);
                     }
+
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('addChildNode')
+                    );
                 }
             }, this);
         },
@@ -227,6 +242,10 @@ define([
                 }),
                 url: arches.urls.reorder_nodes,
                 complete: function() {
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('reorderNodes')
+                    );
                     loading(false);
                 }
             });

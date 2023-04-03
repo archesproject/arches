@@ -392,6 +392,11 @@ define([
             return AbstractModel.prototype.save.call(this, function(request, status, self) {
                 if (status === 'success') {
                     this._card(JSON.stringify(this.toJSON()));
+                    
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('cardSave')
+                    );
                 }
                 if (typeof callback === 'function') {
                     callback(request, status, self);

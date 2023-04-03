@@ -380,6 +380,22 @@ class Graphs(APIBase):
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
+class GraphHasUnpublishedChanges(APIBase):
+    def get(self, request, graph_id=None):
+        graph = Graph.objects.get(pk=graph_id)
+        return JSONResponse(graph.has_unpublished_changes)
+
+    def post(self, request, graph_id=None):
+        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes", None))
+        graph = Graph.objects.get(pk=graph_id)
+
+        if graph.has_unpublished_changes != has_unpublished_changes:
+            graph.has_unpublished_changes = has_unpublished_changes
+            graph.save()
+
+        return JSONResponse(graph.has_unpublished_changes)
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
 
