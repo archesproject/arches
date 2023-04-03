@@ -111,10 +111,9 @@ class BaseImportModule(object):
             default_storage.delete(file_path)
         default_storage.delete(directory)
 
-    def get_validation_result(self):
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
-            rows = cursor.fetchall()
+    def get_validation_result(self, cursor):
+        cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [self.loadid])
+        rows = cursor.fetchall()
         return rows
 
     def prepare_data_for_loading(self, datatype_instance, source_value, config):
