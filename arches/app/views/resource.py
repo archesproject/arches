@@ -348,7 +348,7 @@ class ResourceEditorView(MapBaseManagerView):
         if editable_future_graph and editable_future_graph.has_unpublished_changes:
             graph_has_unpublished_changes = True
 
-        context['graph_has_unpublished_changes'] = graph_has_unpublished_changes
+        context["graph_has_unpublished_changes"] = graph_has_unpublished_changes
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
@@ -808,7 +808,7 @@ class ResourceReportView(MapBaseManagerView):
             map_markers=map_markers,
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
-            graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id)
+            graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id),
         )
 
         if graph.iconclass:
