@@ -27,8 +27,8 @@ class ManifestManagerView(View):
         data = JSONDeserializer().deserialize(request.body)
         manifest_url = data.get("manifest")
         manifest = models.IIIFManifest.objects.get(url=manifest_url)
-        try: 
-            manifest.delete()     
+        try:
+            manifest.delete()
             return JSONResponse({"success": True})
         except models.IIIFManifestValidationError as e:
             return JSONErrorResponse(e.title, e.message)

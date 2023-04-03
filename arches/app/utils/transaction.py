@@ -32,6 +32,7 @@ def reverse_edit_log_entries(transaction_id):
 
     return number_of_db_changes
 
+
 def delete_manifests(transaction_id):
     number_of_db_changes = 0
     try:

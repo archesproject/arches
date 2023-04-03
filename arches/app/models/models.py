@@ -1517,6 +1517,7 @@ class Plugin(models.Model):
         managed = True
         db_table = "plugins"
 
+
 class IIIFManifestValidationError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Image Service Validation Error")
@@ -1544,6 +1545,7 @@ class IIIFManifest(models.Model):
         def check_canvas_in_use(canvas_id):
             canvas_ids_in_use = [annotation.canvas for annotation in VwAnnotation.objects.all()]
             return canvas_id in canvas_ids_in_use
+
         canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
         canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
         canvases_in_use = []

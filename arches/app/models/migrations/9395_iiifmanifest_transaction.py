@@ -8,13 +8,13 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9370_concept_relation'),
+        ("models", "9370_concept_relation"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='iiifmanifest',
-            name='transactionid',
+            model_name="iiifmanifest",
+            name="transactionid",
             field=models.UUIDField(default=uuid.uuid1),
         ),
     ]
