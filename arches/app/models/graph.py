@@ -475,7 +475,7 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
@@ -486,9 +486,6 @@ class Graph(models.GraphModel):
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
-                    if node.nodegroup:
-                        node.nodegroup.save()
-
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
@@ -502,9 +499,6 @@ class Graph(models.GraphModel):
             else:
                 for node in self.nodes.values():
                     self.update_es_node_mapping(node, datatype_factory, se)
-
-                    if node.nodegroup:
-                        node.nodegroup.save()
 
                     node.save()
 
@@ -1300,12 +1294,12 @@ class Graph(models.GraphModel):
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
         return ret
 
-    def get_nodegroups(self):
+    def get_nodegroups(self, force_recalculation=False):
         """
         get the nodegroups associated with this graph
 
         """
-        if self.serialized_graph:
+        if self.serialized_graph and not force_recalculation:
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
