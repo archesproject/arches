@@ -25,7 +25,7 @@ function buildJavascriptFilepathLookup(path, outerAcc, javascriptDirectoryPath) 
 
             return { 
                 ...acc, 
-                [pathName]: { 'import': Path.join(outerPath, subPath), 'filename': Path.join('js', '[name].js') } 
+                [pathName.replace(/\\/g, '/')]: { 'import': Path.join(outerPath, subPath), 'filename': Path.join('js', '[name].js') }
             };
         }
     }, outerAcc);
