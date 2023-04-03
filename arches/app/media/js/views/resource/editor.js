@@ -45,6 +45,7 @@ define([
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
     var primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+    var graphHasUnpublishedChanges = ko.observable(data['graph_has_unpublished_changes'] === "True" ? true : false);
     var userIsCreator = data['useriscreator'];
     var creator = data['creator'];
     var selectedTile = ko.computed(function() {
@@ -363,6 +364,18 @@ define([
         }
         return crumbs;
     });
+
+    if (graphHasUnpublishedChanges()) {
+        setTimeout(function() {
+            vm.alert(new AlertViewModel(
+                'ep-alert-red', 
+                arches.translations.resourceGraphHasUnpublishedChanges.title, 
+                arches.translations.resourceGraphHasUnpublishedChanges.text, 
+                null,
+                function(){}
+            ));
+        }, 0); // need setTimeout 0 here to that viewModel has alert observable
+    }
 
     return new BaseManagerView({
         viewModel: vm

@@ -8,7 +8,9 @@ require([
     var View = BaseManagerView.extend({
         initialize: function(options){
             BaseManagerView.prototype.initialize.call(this, options);
-            
+
+            console.log("()()()()", this, options)
+
             if (location.search.indexOf('print') > 0) {
                 this.viewModel.loading(true);
                 setTimeout(
