@@ -137,6 +137,11 @@
                                         <span data-bind="text: $root.translations.indexing"></span>
                                     </button>
                                     <!-- /ko -->
+                                    <!-- ko if: event.status == "validated" -->
+                                    <button class="btn btn-warning" style="width:150px;">
+                                        <span data-bind="text: $root.translations.running"></span>
+                                    </button>
+                                    <!-- /ko -->
                                     <!-- ko if: event.status == "indexed" -->
                                     <button class="btn btn-success" style="width:150px;">
                                         <span data-bind="text: $root.translations.completed"></span>
@@ -149,7 +154,7 @@
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "running" -->
                                     <button class="btn btn-warning" style="width:150px;">
-                                        <span data-bind="text: $root.translations.running"></span>
+                                        <span data-bind="text: $root.translations.validating"></span>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "reversing" -->
@@ -198,50 +203,13 @@
                                         state: 'status',
                                         load_details: selectedLoadEvent().load_details,
                                         ...selectedModule(),
+                                        selectedLoadEvent,
+                                        validationErrors,
+                                        validated,
+                                        getErrorReport,
+                                        getNodeError,
                                     },
                             }">    
-                        </div>
-                        <div class="etl-module-component">
-                            <!-- ko if: validated -->
-                            <h4>
-                                <span data-bind="text: $root.translations.validationErrors"></span>
-                            </h4>
-                            <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
-                                <thead>
-                                    <tr>
-                                        <th data-bind="text: 'Error'"></th>
-                                        <th data-bind="text: 'Source'"></th>
-                                    </tr>
-                                </thead>
-                                <!-- ko if: selectedLoadEvent().error_message -->
-                                <tbody>
-                                    <tr>
-                                        <td colspan="3" data-bind="text: selectedLoadEvent().error_message"></td>
-                                    </tr>
-                                </tbody>
-                                <!-- /ko --> 
-                                <!-- ko if: validationError().length -->
-                                <tbody>
-                                    <!-- ko foreach: validationError -->
-                                    <tr>
-                                        <td data-bind="text: $data[1]"></td>
-                                        <td data-bind="text: $data[0]"></td>
-                                    </tr>
-                                    <!-- /ko -->
-                                </tbody>
-                                <!-- /ko -->
-                                <!-- ko ifnot: validationError().length || selectedLoadEvent().error_message -->
-                                <tbody>
-                                    <tr>
-                                        <span ></span>
-                                        <td colspan="3">
-                                            <span data-bind="text: $root.translations.noErrorFound"></span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <!-- /ko -->            
-                            </table>
-                            <!-- /ko -->
                         </div>
                         <div data-bind="if: selectedLoadEvent()">
                             <h4>

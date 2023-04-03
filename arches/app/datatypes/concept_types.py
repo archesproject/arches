@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models import concept
+from django.core.cache import cache
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
@@ -82,13 +83,20 @@ class BaseConceptDataType(BaseDataType):
     def get_concept_dates(self, concept):
         result = None
         date_range = {}
-        values = models.Value.objects.filter(concept=concept)
-        for value in values:
-            if value.valuetype.valuetype in ("min_year" "max_year"):
-                date_range[value.valuetype.valuetype] = value.value
-        if "min_year" in date_range and "max_year" in date_range:
-            result = date_range
-        return result
+        cache_value = cache.get("concept-" + str(concept.conceptid), "no result")
+        if cache_value == "no result":
+            values = models.Value.objects.filter(concept=concept)
+            for value in values:
+                if value.valuetype.valuetype in ("min_year" "max_year"):
+                    date_range[value.valuetype.valuetype] = value.value
+            if "min_year" in date_range and "max_year" in date_range:
+                result = date_range
+            cache.set("concept-" + str(concept.conceptid), result, 500)
+            cache_value = result
+        else:
+            return cache_value
+
+        return cache_value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
@@ -140,7 +148,8 @@ class ConceptDataType(BaseConceptDataType):
         if value is not None:
             if type(value) == list:
                 message = _("The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Concept Datatype Widget")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
 
@@ -148,7 +157,8 @@ class ConceptDataType(BaseConceptDataType):
                 uuid.UUID(str(value))
             except ValueError:
                 message = _("This is an invalid concept prefLabel, or an incomplete UUID")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Concept PrefLabel/Uuid")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
 
@@ -156,7 +166,8 @@ class ConceptDataType(BaseConceptDataType):
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
                 message = _("This UUID is not an available concept value")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Concept Id Not Found")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
         return errors
