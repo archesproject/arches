@@ -486,6 +486,9 @@ class Graph(models.GraphModel):
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
+                    if node.nodegroup:
+                        node.nodegroup.save()
+
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
