@@ -42,6 +42,7 @@ define([
             viewModel.graphPublicationNotes = ko.observable();
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
+            viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
 
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 var shouldShowGraphPublishButtons = true;

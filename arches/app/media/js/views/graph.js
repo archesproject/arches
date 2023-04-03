@@ -140,7 +140,10 @@ require([
                         return self.viewModel.resources().reduce((acc, resource) => { 
                             if (!resource.source_identifier_id) {
                                 const editableFutureGraph = self.viewModel.resources().find(graph => graph.source_identifier_id === resource.graphid);
-                                resource['has_unpublished_changes'] = editableFutureGraph['has_unpublished_changes'];
+                                
+                                if (editableFutureGraph) {
+                                    resource['has_unpublished_changes'] = editableFutureGraph['has_unpublished_changes'];
+                                }
                                 
                                 acc.push(resource);
                             }

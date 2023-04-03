@@ -60,7 +60,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ></h4>
             </div>
 
-            <h5 style="color: red; padding: 0 50px;">{% trans "Warning! This will save the graph in its current state and make the Resource accessible to permissioned users." %}</h5>
+            <div style="padding: 0 50px;">
+                <h5>{% trans "This will save the graph in its current state and make the Resource accessible to permissioned users." %}</h5>
+                
+                <!-- ko if: $data.publicationResourceInstanceCount() -->
+                <h5 style="color: red;">
+                {% blocktrans count publication_resource_instance_count as publication_resource_instance_count %}
+                    Warning! There is {{ publication_resource_instance_count }} Resource Instance that will be affected by this change.
+                    {% plural %}
+                    Warning! There are {{ publication_resource_instance_count }} Resource Instances that will be affected by this change.
+                {% endblocktrans %}
+                </h5>
+                <!-- /ko -->
+            </div>
+
 
             <div
                 style="
@@ -381,6 +394,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "datatypes": {{datatypes_json}},
         "graph": {{graph}},
         "source_graph": {{source_graph}},
+        "publication_resource_instance_count": {{publication_resource_instance_count}},
         "ontology_namespaces": "{{ontology_namespaces}}",
         "branches": {{branches}},
         "cards": {{cards}},
