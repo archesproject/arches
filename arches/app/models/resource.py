@@ -326,7 +326,7 @@ class Resource(models.ResourceInstance):
         terms = []
 
         for tile in document["tiles"]:
-            for nodeid, nodevalue in tile.data.items():
+            for nodeid, nodevalue in list(tile.data.items()):
                 if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
                     datatype = node_datatypes[nodeid]
                     datatype_instance = datatype_factory.get_instance(datatype)
