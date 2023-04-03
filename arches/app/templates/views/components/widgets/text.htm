@@ -53,7 +53,7 @@
             <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
             <!-- /ko -->
             <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
-                <input type="text" style="flex:1" data-bind="textInput: currentText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDirection}" class="form-control input-lg widget-input">
+                <input type="text" style="flex:1" data-bind="textInput: currentText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, 'aria-label': label, dir: currentDirection}" class="form-control input-lg widget-input">
             </div>
         </div>
     </div>
@@ -62,12 +62,12 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: $root.translations.placeholder"></span>
+    <label class="control-label widget-input-label" for="input-placeholder" data-bind="text: $root.translations.placeholder"></label>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input
         type=""
-        id=""
+        id="input-placeholder"
         class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.placeholder},
@@ -76,12 +76,12 @@
     >
 </div>
 <div class="control-label">
-    <span data-bind="text: $root.translations.maxLength"></span>
+    <label for="input-max-length" data-bind="text: $root.translations.maxLength"></label>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input
         type=""
-        id=""
+        id="input-max-length"
         class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.maxLength},
@@ -94,7 +94,7 @@
     <div class="widget-inline-tools-collapser" data-bind=" click: function() {
         showi18nOptions(!showi18nOptions());
     }">
-        <label class="control-label widget-input-label" for="" data-bind="text: $root.translations.defaultValue"></label>
+        <label class="control-label widget-input-label" for="input-default-value" data-bind="text: $root.translations.defaultValue"></label>
         <span>
             <i class="fa" data-bind="{
                 css: {
@@ -135,13 +135,13 @@
         </div>
     </div>
     <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
-        <input type="text" style="flex:1" data-bind="textInput: currentDefaultText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection}" class="form-control input-lg widget-input">
+        <input type="text" style="flex:1" data-bind="textInput: currentDefaultText, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection}" id="input-default-value" class="form-control input-lg widget-input">
     </div>
     </div>
 </div>
 <div class="node-config-item">
     <div class="control-label">
-        <span data-bind="text: $root.translations.disabled"></span>
+        <label data-bind="text: $root.translations.disabled"></label>
     </div>
     <div class="pad-no">
         <div
