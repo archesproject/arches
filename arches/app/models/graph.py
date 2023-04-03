@@ -499,7 +499,6 @@ class Graph(models.GraphModel):
             else:
                 for node in self.nodes.values():
                     self.update_es_node_mapping(node, datatype_factory, se)
-
                     node.save()
 
             for edge in self.edges.values():
