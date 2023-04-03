@@ -249,7 +249,7 @@ class GraphDesignerView(GraphBaseView):
 
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
-        context['publication_resource_instance_count'] = models.ResourceInstance.objects.filter(
+        context["publication_resource_instance_count"] = models.ResourceInstance.objects.filter(
             graph_id=source_graph.pk, graph_publication_id=source_graph.publication_id
         ).count()
 
