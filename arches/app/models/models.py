@@ -1542,15 +1542,12 @@ class IIIFManifest(models.Model):
         db_table = "iiif_manifests"
 
     def delete(self, *args, **kwargs):
-        def check_canvas_in_use(canvas_id):
-            canvas_ids_in_use = [annotation.canvas for annotation in VwAnnotation.objects.all()]
-            return canvas_id in canvas_ids_in_use
-
+        all_canvases = {annotation.canvas for annotation in VwAnnotation.objects.all()}
         canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
         canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
         canvases_in_use = []
         for canvas_id in canvas_ids:
-            if check_canvas_in_use(canvas_id):
+            if canvas_id in all_canvases:
                 canvases_in_use.append(canvas_id)
         if len(canvases_in_use) > 0:
             canvas_labels_in_use = [
