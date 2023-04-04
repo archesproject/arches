@@ -3,7 +3,7 @@ define([
     'viewmodels/concept-widget',
     'templates/views/components/widgets/checkbox.htm',
     'plugins/knockout-select2',
-    'bindings/on-enter-key-click',
+    'bindings/key-events-click',
 ], function(ko, ConceptWidgetViewModel, conceptCheckboxTemplate) {
     /**
      * registers a select-widget component for use in forms

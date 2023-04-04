@@ -17,6 +17,7 @@
                         'disabled': $parent.disabled
                     },
                     onEnterkeyClick,
+                    onSpaceClick,
                     click: $parent.toggleOptionSelection" tabindex="0">
                     <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
                     <span data-bind="text:text"></span>
@@ -40,6 +41,7 @@
                         'active': $parent.isOptionSelected($data)
                     },
                     onEnterkeyClick,
+                    onSpaceClick,
                     click: $parent.toggleOptionSelection" tabindex="0">
                     <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
                     <span data-bind="text:text"></span>
