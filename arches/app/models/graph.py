@@ -477,7 +477,7 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
