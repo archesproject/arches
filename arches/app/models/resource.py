@@ -252,6 +252,9 @@ class Resource(models.ResourceInstance):
         for resource in resources:
             if overwrite is None:
                 fetchTiles = resource.resourceinstanceid in existing_resources_ids
+            if resource.legacyid is not None and str(resource.pk) != str(resource.legacyid) and not fetchTiles:
+                logger.info(f"{str(resource.pk)} saved for legacyid: {resource.legacyid}")
+                print(f"{str(resource.pk)} saved for legacyid: {resource.legacyid}")
             document, terms = resource.get_documents_to_index(
                 fetchTiles=fetchTiles, datatype_factory=datatype_factory, node_datatypes=node_datatypes
             )
