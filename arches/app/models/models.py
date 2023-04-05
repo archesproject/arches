@@ -878,8 +878,9 @@ class ResourceXResource(models.Model):
             if type(data) != list:
                 data = [data]
             for relatedresourceItem in data:
-                if relatedresourceItem["resourceId"] != str(deletedResourceId):
-                    newTileData.append(relatedresourceItem)
+                if relatedresourceItem:
+                    if relatedresourceItem["resourceId"] != str(deletedResourceId):
+                        newTileData.append(relatedresourceItem)
             self.tileid.data[str(self.nodeid_id)] = newTileData
             self.tileid.save()
 
