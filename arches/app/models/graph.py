@@ -789,7 +789,6 @@ class Graph(models.GraphModel):
         returns an unsaved copy of self
 
         """
-
         nodegroup_map = {}
         copy_of_self = deepcopy(self)
 
@@ -1793,7 +1792,7 @@ class Graph(models.GraphModel):
             editable_future_graph = Graph.objects.get(source_identifier_id=self.pk)
         except:
             raise Exception(_("No identifiable future Graph"))
-
+        
         def _update_source_nodegroup_hierarchy(nodegroup):
             if not nodegroup:
                 return None
@@ -1849,7 +1848,7 @@ class Graph(models.GraphModel):
                 source_card = future_card.source_identifier
 
                 for key in vars(source_card).keys():
-                    if key not in ["graph_id", "cardid", "nodegroup_id", "source_identifier_id"]:
+                    if key not in ["graph_id", "cardid", "nodegroup_id", "source_identifier_id", "config"]:
                         setattr(source_card, key, getattr(future_card, key))
 
                 source_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
