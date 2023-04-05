@@ -176,8 +176,6 @@ class BaseDataEditor(BaseImportModule):
             operation = "replace_i"
         if also_trim == "true":
             operation = operation + "_trim"
-        if resourceids:
-            resourceids = tuple(json.loads(resourceids))
 
         first_five_values = get_first_five_values(graph_id, node_id, resourceids, language_code)
         return_list = []
