@@ -1860,8 +1860,23 @@ class Graph(models.GraphModel):
                 source_card = future_card.source_identifier
 
                 for key in vars(source_card).keys():
-                    if key not in ["graph_id", "cardid", "nodegroup_id", "source_identifier_id", "config"]:
-                        setattr(source_card, key, getattr(future_card, key))
+                    if key not in ["graph_id", "cardid", "nodegroup_id", "source_identifier_id"]:
+                        if key == "config" and str(future_card.component_id) == "2f9054d8-de57-45cd-8a9c-58bbb1619030":  # grouping card
+                            grouped_card_ids = []
+                            for grouped_card_id in future_card.config["groupedCardIds"]:
+                                grouped_card = Card.objects.get(pk=grouped_card_id)
+                                grouped_card_ids.append(str(grouped_card.source_identifier_id))
+
+                            source_card.config['groupedCardIds'] = grouped_card_ids
+
+                            sorted_widget_ids = []
+                            for node_id in future_card.config["sortedWidgetIds"]:
+                                sorted_widget = models.Node.objects.get(pk=node_id)
+                                sorted_widget_ids.append(str(sorted_widget.source_identifier_id))
+
+                            source_card.config['sortedWidgetIds'] = sorted_widget_ids
+                        else:
+                            setattr(source_card, key, getattr(future_card, key))
 
                 source_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
                 if future_card_nodegroup_node.source_identifier_id:
