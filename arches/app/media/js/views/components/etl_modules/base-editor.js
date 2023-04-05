@@ -72,7 +72,7 @@ define([
             return graph?.name;
         };
 
-        this.createformDataAllProperties = () => {
+        this.addAllFormData = () => {
             self.formData.append('operation', self.operation());
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
@@ -86,6 +86,19 @@ define([
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
         };
 
+        self.deleteAllFormData = () => {
+            self.formData.delete('operation');
+            self.formData.delete('search_url');
+            self.formData.delete('node_id');
+            self.formData.delete('node_name');
+            self.formData.delete('graph_id');
+            self.formData.delete('language_code');
+            self.formData.delete('case_insensitive');
+            self.formData.delete('also_trim');
+            self.formData.delete('old_text');
+            self.formData.delete('new_text');
+            self.formData.delete('resourceids');
+        };
 
         this.selectedNode.subscribe(nodeid => {
             if (nodeid) {
@@ -124,20 +137,14 @@ define([
                 return;
             }
 
-            self.createformDataAllProperties();
+            self.addAllFormData();
             self.submit('preview').then(data => {
                 self.previewValue(data.result);
                 self.showPreview(true);
             }).fail(function(err) {
                 console.log(err);
             }).always(function() {
-                self.formData.delete('operation');
-                self.formData.delete('node_id');
-                self.formData.delete('graph_id');
-                self.formData.delete('language_code');
-                self.formData.delete('old_text');
-                self.formData.delete('new_text');
-                self.formData.delete('resourceids');    
+                self.deleteAllFormData();
             });
         };
 
@@ -155,7 +162,7 @@ define([
                 return;
             }
 
-            self.createformDataAllProperties();
+            self.addAllFormData();
             self.loading(true);
             params.activeTab("import");
             self.submit('write').then(data => {
