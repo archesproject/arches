@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9370_concept_relation"),
+        ("models", "9395_iiifmanifest_transaction"),
     ]
 
     operations = [
