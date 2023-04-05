@@ -170,7 +170,8 @@ class BaseDataEditor(BaseImportModule):
             resourceids = json.loads(resourceids)
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
-        resourceids = tuple(resourceids)
+        if resourceids:
+            resourceids = tuple(resourceids)
 
         if case_insensitive == "true" and operation == "replace":
             operation = "replace_i"
@@ -266,9 +267,16 @@ class BaseDataEditor(BaseImportModule):
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", None)
         also_trim = request.POST.get("also_trim", "false")
+        search_url = request.POST.get("search_url", None)
+
+        if resourceids:
+            resourceids = json.loads(resourceids)
+        if search_url:
+            resourceids = self.get_resourceids_from_search_url(search_url)
+
         if case_insensitive == "true" and operation == "replace":
             operation = "replace_i"
-        if also_trim:
+        if also_trim == "true":
             operation = operation + "_trim"
 
         edit_task = tasks.edit_bulk_data.apply_async(
@@ -282,7 +290,7 @@ class BaseDataEditor(BaseImportModule):
 
     def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         if resourceids:
-            resourceids = [uuid.UUID(id) for id in json.loads(resourceids)]
+            resourceids = [uuid.UUID(id) for id in resourceids]
 
         with connection.cursor() as cursor:
             data_staged = self.stage_data(cursor, graph_id, node_id, resourceids)
