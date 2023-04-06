@@ -4178,6 +4178,17 @@ ul.nav.nav-tabs.nav-justified {
     min-width: 468px;
 }
 
+.graph-active-switch-container {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+.graph-active-switch-container .toggle-container {
+    padding: 0 !important;
+    height: 20px;
+    width: 40px;
+}
+
 .function-node-alert {
     display: inline-block;
     background: #A2EAE2;

@@ -443,6 +443,7 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
+    is_active = models.BooleanField(default=False)
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
@@ -910,8 +911,9 @@ class ResourceXResource(models.Model):
             if type(data) != list:
                 data = [data]
             for relatedresourceItem in data:
-                if relatedresourceItem["resourceId"] != str(deletedResourceId):
-                    newTileData.append(relatedresourceItem)
+                if relatedresourceItem:
+                    if relatedresourceItem["resourceId"] != str(deletedResourceId):
+                        newTileData.append(relatedresourceItem)
             self.tileid.data[str(self.nodeid_id)] = newTileData
             self.tileid.save()
 
@@ -1550,11 +1552,21 @@ class Plugin(models.Model):
         db_table = "plugins"
 
 
+class IIIFManifestValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Image Service Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self)
+
 class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
+    transactionid = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
         return self.label
@@ -1562,6 +1574,25 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
+    def delete(self, *args, **kwargs):
+        all_canvases = {annotation.canvas for annotation in VwAnnotation.objects.all()}
+        canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
+        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        canvases_in_use = []
+        for canvas_id in canvas_ids:
+            if canvas_id in all_canvases:
+                canvases_in_use.append(canvas_id)
+        if len(canvases_in_use) > 0:
+            canvas_labels_in_use = [
+                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+            ]
+            message = _("This manifest cannot be deleted because the following canvases have resource annotations: {}").format(
+                ", ".join(canvas_labels_in_use)
+            )
+            raise IIIFManifestValidationError(message)
+
+        super(IIIFManifest, self).delete()
 
 
 class GroupMapSettings(models.Model):

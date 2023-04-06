@@ -43,34 +43,36 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
+            viewModel.isGraphActive = ko.observable(false);
 
-            viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
-                var shouldShowGraphPublishButtons = true;
+            viewModel.isDirty = ko.pureComputed(() => {
+                let isDirty = false;
 
                 if (viewModel.dirty()) {
-                    shouldShowGraphPublishButtons = false;
+                    isDirty = true;
                 }
                 if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
-                    shouldShowGraphPublishButtons = false;
+                    isDirty = true;
                 }
                 if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
-                    shouldShowGraphPublishButtons = false;
+                    isDirty = true;
                 }
                 if (ko.unwrap(viewModel.cardTree.selection)) {
-                    var selection = ko.unwrap(viewModel.cardTree.selection);
+                    const selection = ko.unwrap(viewModel.cardTree.selection);
 
                     if (selection.model && selection.model.dirty()) {
-                        shouldShowGraphPublishButtons = false;
+                        isDirty = true;
                     }
                     if (selection.card && selection.card.dirty()) {
-                        shouldShowGraphPublishButtons = false;
+                        isDirty = true;
                     }
                 }
-                if (!viewModel.graphHasUnpublishedChanges()) {
-                    shouldShowGraphPublishButtons = false;
-                }
-                
-                return shouldShowGraphPublishButtons;
+
+                return isDirty;
+            });
+
+            viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
+                return Boolean(!viewModel.isDirty() && !viewModel.graphHasUnpublishedChanges());
             });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
@@ -79,6 +81,10 @@ define([
             var graphs = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return !graph.isresource && !graph.source_identifier_id;
             });
+
+            function setGraphActiveState(graphId, activeState) {
+                viewModel.isGraphActive(activeState)
+            }
 
             var newGraph = function(url, data) {
                 data = data || {};

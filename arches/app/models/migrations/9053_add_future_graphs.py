@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9370_concept_relation"),
+        ("models", "9395_iiifmanifest_transaction"),
     ]
 
     operations = [
@@ -17,6 +17,16 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.graphmodel"
             ),
+        ),
+        migrations.AddField(
+            model_name="graphmodel",
+            name="has_unpublished_changes",
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name="graphmodel",
+            name="is_active",
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name="cardmodel",
@@ -38,10 +48,5 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.node"
             ),
-        ),
-        migrations.AddField(
-            model_name="graphmodel",
-            name="has_unpublished_changes",
-            field=models.BooleanField(default=False),
         ),
     ]
