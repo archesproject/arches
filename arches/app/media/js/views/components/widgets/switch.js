@@ -4,6 +4,7 @@ define([
     'underscore', 
     'viewmodels/widget',
     'templates/views/components/widgets/switch.htm',
+    'bindings/key-events-click',
 ], function(arches, ko, _, WidgetViewModel, switchWidgetTemplate) {
     /**
     * knockout components namespace used in arches
