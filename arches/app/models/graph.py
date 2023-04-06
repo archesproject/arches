@@ -477,7 +477,7 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
@@ -789,7 +789,6 @@ class Graph(models.GraphModel):
         returns an unsaved copy of self
 
         """
-
         nodegroup_map = {}
         copy_of_self = deepcopy(self)
 
@@ -893,12 +892,24 @@ class Graph(models.GraphModel):
 
         for copied_card in copy_of_self.cards.values():
             if str(copied_card.component_id) == "2f9054d8-de57-45cd-8a9c-58bbb1619030":  # grouping card
-                grouped_card_ids = [str(card_map[uuid.UUID(grouped_card_id)]) for grouped_card_id in copied_card.config["groupedCardIds"]]
+                grouped_card_ids = []
+
+                for copied_grouped_card_id in copied_card.config["groupedCardIds"]:
+                    grouped_card_id = card_map.get(uuid.UUID(copied_grouped_card_id))
+
+                    if grouped_card_id:
+                        grouped_card_ids.append(str(grouped_card_id))
+
                 copied_card.config["groupedCardIds"] = grouped_card_ids
 
-                sorted_widget_ids = [
-                    str(node_map[uuid.UUID(sorted_widget_id)]) for sorted_widget_id in copied_card.config["sortedWidgetIds"]
-                ]
+                sorted_widget_ids = []
+
+                for copied_widget_id in copied_card.config["sortedWidgetIds"]:
+                    widget_id = card_map.get(uuid.UUID(copied_widget_id))
+
+                    if widget_id:
+                        sorted_widget_ids.append(str(widget_id))
+
                 copied_card.config["sortedWidgetIds"] = sorted_widget_ids
 
         return {"copy": copy_of_self, "cards": card_map, "nodes": node_map, "nodegroups": nodegroup_map}
@@ -1760,7 +1771,11 @@ class Graph(models.GraphModel):
         if self.slug is not None:
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
-                raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
+                if self.source_identifier_id:
+                    if self.source_identifier_id != graphs_with_matching_slug[0].graphid:
+                        raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
+                else:
+                    raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
     def create_editable_future_graph(self):
         """
@@ -1777,6 +1792,7 @@ class Graph(models.GraphModel):
 
             editable_future_graph = graph_copy["copy"]
             editable_future_graph.source_identifier_id = self.graphid
+            editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
 
             editable_future_graph.save()
             editable_future_graph.publish()
@@ -1850,7 +1866,22 @@ class Graph(models.GraphModel):
 
                 for key in vars(source_card).keys():
                     if key not in ["graph_id", "cardid", "nodegroup_id", "source_identifier_id"]:
-                        setattr(source_card, key, getattr(future_card, key))
+                        if key == "config" and str(future_card.component_id) == "2f9054d8-de57-45cd-8a9c-58bbb1619030":  # grouping card
+                            grouped_card_ids = []
+                            for grouped_card_id in future_card.config["groupedCardIds"]:
+                                grouped_card = Card.objects.get(pk=grouped_card_id)
+                                grouped_card_ids.append(str(grouped_card.source_identifier_id))
+
+                            source_card.config["groupedCardIds"] = grouped_card_ids
+
+                            sorted_widget_ids = []
+                            for node_id in future_card.config["sortedWidgetIds"]:
+                                sorted_widget = models.Node.objects.get(pk=node_id)
+                                sorted_widget_ids.append(str(sorted_widget.source_identifier_id))
+
+                            source_card.config["sortedWidgetIds"] = sorted_widget_ids
+                        else:
+                            setattr(source_card, key, getattr(future_card, key))
 
                 source_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
                 if future_card_nodegroup_node.source_identifier_id:
@@ -1938,6 +1969,7 @@ class Graph(models.GraphModel):
                 "edges",
                 "widgets",
                 "root",
+                "slug",
                 "source_identifier",
                 "source_identifier_id",
                 "publication_id",
