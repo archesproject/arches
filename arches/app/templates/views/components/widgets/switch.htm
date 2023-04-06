@@ -4,7 +4,7 @@
 {% block form %}
 <div class="toggle-container">
     <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, 
-          onEnterkeyClick, onSpaceClick, click: setvalue" tabindex="0" role="switch" aria-checked="getValue()"><small></small></span>
+          onEnterkeyClick, onSpaceClick, click: setvalue, attr: {'aria-checked': getvalue}" tabindex="0" role="switch"><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label, css: {'disabled': disabled}"></div>
                 <div style="margin-top: -17px;">
