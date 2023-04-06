@@ -20,6 +20,9 @@
                     onSpaceClick,
                     click: function () {
                         $parent.setOptionSelection($data, true);
+                    },
+                    attr: {
+                        'aria-checked': $parent.isOptionSelected($data)
                     }"
                     tabindex="0">
                     <input type="radio" data-bind="checked: $parent.value,
@@ -50,6 +53,9 @@
                 onSpaceClick,
                 click: function () {
                     $parent.setOptionSelection($data, true);
+                },
+                attr: {
+                    'aria-checked': $parent.isOptionSelected($data)
                 }"
                 tabindex="0">
                 <input type="radio" data-bind="checked: $parent.defaultValue,
