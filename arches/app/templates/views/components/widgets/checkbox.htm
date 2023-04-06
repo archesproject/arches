@@ -18,7 +18,11 @@
                     },
                     onEnterkeyClick,
                     onSpaceClick,
-                    click: $parent.toggleOptionSelection" tabindex="0">
+                    click: $parent.toggleOptionSelection,
+                    attr: {
+                        'aria-checked': $parent.isOptionSelected($data)
+                    }"
+                    tabindex="0" role="checkbox">
                     <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
                     <span data-bind="text:text"></span>
                 </label>
@@ -42,7 +46,11 @@
                     },
                     onEnterkeyClick,
                     onSpaceClick,
-                    click: $parent.toggleOptionSelection" tabindex="0">
+                    click: $parent.toggleOptionSelection,
+                    attr: {
+                        'aria-checked': $parent.isOptionSelected($data)
+                    }"
+                    tabindex="0" role="checkbox">
                     <input type="checkbox" data-bind="checked: $parent.isOptionSelected($data)">
                     <span data-bind="text:text"></span>
                 </label>
