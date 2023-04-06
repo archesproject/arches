@@ -1809,7 +1809,7 @@ class Graph(models.GraphModel):
             editable_future_graph = Graph.objects.get(source_identifier_id=self.pk)
         except:
             raise Exception(_("No identifiable future Graph"))
-        
+
         def _update_source_nodegroup_hierarchy(nodegroup):
             if not nodegroup:
                 return None
@@ -1872,14 +1872,14 @@ class Graph(models.GraphModel):
                                 grouped_card = Card.objects.get(pk=grouped_card_id)
                                 grouped_card_ids.append(str(grouped_card.source_identifier_id))
 
-                            source_card.config['groupedCardIds'] = grouped_card_ids
+                            source_card.config["groupedCardIds"] = grouped_card_ids
 
                             sorted_widget_ids = []
                             for node_id in future_card.config["sortedWidgetIds"]:
                                 sorted_widget = models.Node.objects.get(pk=node_id)
                                 sorted_widget_ids.append(str(sorted_widget.source_identifier_id))
 
-                            source_card.config['sortedWidgetIds'] = sorted_widget_ids
+                            source_card.config["sortedWidgetIds"] = sorted_widget_ids
                         else:
                             setattr(source_card, key, getattr(future_card, key))
 
