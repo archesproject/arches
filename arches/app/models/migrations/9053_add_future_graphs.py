@@ -19,6 +19,16 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            model_name="graphmodel",
+            name="has_unpublished_changes",
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name="graphmodel",
+            name="is_active",
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
             model_name="cardmodel",
             name="source_identifier",
             field=models.ForeignKey(
@@ -38,10 +48,5 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.node"
             ),
-        ),
-        migrations.AddField(
-            model_name="graphmodel",
-            name="has_unpublished_changes",
-            field=models.BooleanField(default=False),
         ),
     ]

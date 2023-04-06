@@ -113,7 +113,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Title Block -->
     <div class="ep-form-toolbar">
 
-        <h4 class="ep-form-toolbar-title">
+        <h4 class="ep-form-toolbar-title" style="display: flex;">
             <!-- Menu Item -->
             <div class="graph-selector" data-bind="">
                 <!-- ko if: groupedGraphs -->
@@ -127,6 +127,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </optgroup>
                     <!-- /ko -->
                 </script>
+            </div>
+
+            <div class="graph-active-switch-container">
+                <div 
+                    style="display: flex; justify-content: center;"
+                    data-bind="component: {
+                        name: 'views/components/simple-switch',
+                        params: {
+                            value: $data.isGraphActive,
+                        }
+                    }"
+                ></div>
+                <!-- ko if: $data.isGraphActive() -->
+                    <span style="font-size: 14px;">Graph Active</span>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.isGraphActive() -->
+                    <span style="font-size: 14px;">Graph Inactive</span>
+                <!-- /ko -->
             </div>
         </h4>
 

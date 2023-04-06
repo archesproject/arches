@@ -443,6 +443,7 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
+    is_active = models.BooleanField(default=False)
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
