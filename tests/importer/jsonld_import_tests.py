@@ -127,6 +127,11 @@ class JsonLDImportTests(ArchesTestCase):
             "37b50648-78ef-11ec-9508-faffc210b420",
         ]:
             graph = Graph.objects.get(pk=graph_id)
+
+            editable_future_graph_list = Graph.objects.filter(source_identifier_id=graph.pk)
+            if not len(editable_future_graph_list):
+                graph.create_editable_future_graph()
+                
             graph.publish(user=User.objects.get(pk=1))
 
     def setUp(self):
