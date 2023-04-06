@@ -404,21 +404,21 @@ class GraphIsActive(APIBase):
         return JSONResponse(source_grah.is_active)
 
     def post(self, request, graph_id=None):
-        try: 
-            is_active = bool(request.POST.get("is_active") == 'true')
+        try:
+            is_active = bool(request.POST.get("is_active") == "true")
 
             with transaction.atomic():
                 graph = Graph.objects.get(pk=graph_id)
                 if graph.is_active != is_active:
                     graph.is_active = is_active
                     graph.save()
-                
+
                 source_graph = graph.source_identifier
                 if source_graph.is_active != is_active:
                     source_graph.is_active = is_active
                     source_graph.save()
 
-            return JSONResponse({'is_source_graph_active': source_graph.is_active, 'is_editable_future_graph_active': graph.is_active})
+            return JSONResponse({"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": graph.is_active})
         except:
             return JSONResponse(status=500)
 
