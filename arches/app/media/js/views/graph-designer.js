@@ -43,7 +43,29 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
-            viewModel.isGraphActive = ko.observable(false);
+            viewModel.isGraphActive = ko.observable(data['graph']['is_active']);
+            viewModel.isGraphActive.subscribe(isGraphActive => {
+                $.ajax({
+                    type: 'POST',
+                    url: arches.urls.graph_is_active_api(data.graphid),
+                    data: {'is_active': isGraphActive},
+                    error: function(e) {
+                        const alert = new AlertViewModel(
+                            'ep-alert-red', 
+                            "Could not update Resource Model active state.",
+                            "Please contact your System Administrator.",
+                            null,
+                            function(){},
+                        );
+
+                        viewModel.alert(alert);
+
+                        alert.active.subscribe(function() {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
 
             viewModel.isDirty = ko.pureComputed(() => {
                 let isDirty = false;
@@ -70,9 +92,9 @@ define([
 
                 return isDirty;
             });
-
+            
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
-                return Boolean(!viewModel.isDirty() && !viewModel.graphHasUnpublishedChanges());
+                return Boolean(!viewModel.isDirty() && viewModel.graphHasUnpublishedChanges());
             });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
@@ -81,10 +103,6 @@ define([
             var graphs = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return !graph.isresource && !graph.source_identifier_id;
             });
-
-            function setGraphActiveState(graphId, activeState) {
-                viewModel.isGraphActive(activeState)
-            }
 
             var newGraph = function(url, data) {
                 data = data || {};

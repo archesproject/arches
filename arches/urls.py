@@ -241,6 +241,7 @@ urlpatterns = [
         api.GraphHasUnpublishedChanges.as_view(),
         name="graph_has_unpublished_changes_api",
     ),
+    url(r"^graph_is_active/(?P<graph_id>%s)$" % (uuid_regex),api.GraphIsActive.as_view(),name="graph_is_active_api"),
     url(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     url(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     url(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
