@@ -1774,7 +1774,7 @@ class Graph(models.GraphModel):
                 if self.source_identifier_id:
                     if self.source_identifier_id != graphs_with_matching_slug[0].graphid:
                         raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
-                else: 
+                else:
                     raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
     def create_editable_future_graph(self):
@@ -1792,7 +1792,7 @@ class Graph(models.GraphModel):
 
             editable_future_graph = graph_copy["copy"]
             editable_future_graph.source_identifier_id = self.graphid
-            editable_future_graph.slug = None # workaround to allow editable_future_graph to be saved without conflicts
+            editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
 
             editable_future_graph.save()
             editable_future_graph.publish()

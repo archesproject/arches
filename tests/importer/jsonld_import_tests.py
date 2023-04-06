@@ -131,7 +131,7 @@ class JsonLDImportTests(ArchesTestCase):
             editable_future_graph_list = Graph.objects.filter(source_identifier_id=graph.pk)
             if not len(editable_future_graph_list):
                 graph.create_editable_future_graph()
-                
+
             graph.publish(user=User.objects.get(pk=1))
 
     def setUp(self):
