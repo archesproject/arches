@@ -893,7 +893,6 @@ class Graph(models.GraphModel):
         for copied_card in copy_of_self.cards.values():
             if str(copied_card.component_id) == "2f9054d8-de57-45cd-8a9c-58bbb1619030":  # grouping card
                 grouped_card_ids = []
-
                 for copied_grouped_card_id in copied_card.config["groupedCardIds"]:
                     grouped_card_id = card_map.get(uuid.UUID(copied_grouped_card_id))
 
@@ -903,7 +902,6 @@ class Graph(models.GraphModel):
                 copied_card.config["groupedCardIds"] = grouped_card_ids
 
                 sorted_widget_ids = []
-
                 for copied_widget_id in copied_card.config["sortedWidgetIds"]:
                     widget_id = card_map.get(uuid.UUID(copied_widget_id))
 

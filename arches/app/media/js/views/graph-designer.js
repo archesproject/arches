@@ -52,8 +52,8 @@ define([
                     error: function(e) {
                         const alert = new AlertViewModel(
                             'ep-alert-red', 
-                            "Could not update Resource Model active state.",
-                            "Please contact your System Administrator.",
+                            arches.translations.resourceGraphChangeActiveStatusError.title,
+                            arches.translations.resourceGraphChangeActiveStatusError.text,
                             null,
                             function(){},
                         );
