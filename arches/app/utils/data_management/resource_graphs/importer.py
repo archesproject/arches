@@ -146,11 +146,10 @@ def import_graph(graphs, overwrite_graphs=True):
                     # saves graph publication with serialized graph
                     graph = Graph.objects.get(pk=graph.graphid)  # retrieve graph using the ORM to ensure strings are I18n_Strings
 
-                    if resource["isresource"]:
-                        try:
-                            Graph.objects.get(source_identifier_id=graph.graphid)
-                        except Graph.DoesNotExist:
-                            graph.create_editable_future_graph()
+                    try:
+                        Graph.objects.get(source_identifier_id=graph.graphid)
+                    except Graph.DoesNotExist:
+                        graph.create_editable_future_graph()
 
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
