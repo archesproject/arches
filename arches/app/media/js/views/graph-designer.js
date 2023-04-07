@@ -44,6 +44,9 @@ define([
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
             viewModel.isGraphActive = ko.observable(data['graph']['is_active']);
+
+            viewModel.hasDirtyWidget = ko.observable();
+
             viewModel.isGraphActive.subscribe(isGraphActive => {
                 $.ajax({
                     type: 'POST',
@@ -71,6 +74,9 @@ define([
                 let isDirty = false;
 
                 if (viewModel.dirty()) {
+                    isDirty = true;
+                }
+                if (viewModel.hasDirtyWidget()) {
                     isDirty = true;
                 }
                 if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
