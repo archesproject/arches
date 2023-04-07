@@ -1,0 +1,8 @@
+.ep-help,
+.ep-notifs {
+    width: 100%;
+
+    @include break-at(desktop) {
+        width: 40vw;
+    }
+}
