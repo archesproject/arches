@@ -166,6 +166,8 @@
             "title": "{% jsescaped_trans "This resource is based on an unpublished graph." %}",
             "text": "{% jsescaped_trans "To continue, please ensure the graph is published." %}"
         }'
+        active='{% trans "Active" as active %}  "{{ active|escapejs }}"'
+        inactive='{% trans "Inactive" as inactive %}  "{{ inactive|escapejs }}"'
         please-contact-system-administrator='{% trans "Please contact your system administrator for more details." as pleaseContactSystemAdministrator %}  "{{ pleaseContactSystemAdministrator|escapejs }}"'
         hide-null-values='{% trans "Hide Null Values" as hideNullValues %} "{{ hideNullValues|escapejs }}"'
         load-more='{% trans "Load More" as loadMore %} "{{ loadMore|escapejs }}"'

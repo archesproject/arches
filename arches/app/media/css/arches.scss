@@ -4847,7 +4847,7 @@ div.dropdown-menu.open {
 }
 
 .resource-grid-main-container.active {
-    background: #f6f6f6;
+    background: #f8f8f8;
 }
 
 .resource-grid-icon {
@@ -4889,9 +4889,10 @@ div.dropdown-menu.open {
 
 .resource-grid-item .resource-grid-tools-container {
     flex-direction: column;
-    margin: 15px;
+    padding: 15px;
     display: flex;
-    width: 76px;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
@@ -7637,14 +7638,8 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 0px;
 }
 
-.resource-status {
-    font-size: 13px;
-    font-weight: 600;
-    color: #123;
-    margin-top: 3px;
-}
-
 .resource-status-label {
+    display: flex;
     font-size: 11px;
     float: right;
     color: #555;
