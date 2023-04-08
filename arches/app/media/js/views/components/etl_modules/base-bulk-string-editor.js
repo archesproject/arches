@@ -113,7 +113,7 @@ define([
                 self.submit('get_nodes').then(function(response){
                     const nodes = response.result.map(node => (
                         { ...node,
-                            label: `${JSON.parse(node.widget_label)[arches.activeLanguage]} - ${JSON.parse(node.card_name)[arches.activeLanguage]}` 
+                            label: `${JSON.parse(node.card_name)[arches.activeLanguage]} - ${JSON.parse(node.widget_label)[arches.activeLanguage]}` 
                         }));
                     self.nodes(nodes);
                     self.loading(false);
