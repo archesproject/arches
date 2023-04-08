@@ -102,7 +102,7 @@ define([
 
         this.selectedNode.subscribe(nodeid => {
             if (nodeid) {
-                self.selectedNodeName(self.nodes().find(node => node.nodeid === nodeid).name);
+                self.selectedNodeName(self.nodes().find(node => node.nodeid === nodeid).label);
             }
         });
 
