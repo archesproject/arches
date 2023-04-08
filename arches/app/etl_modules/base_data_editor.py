@@ -17,7 +17,7 @@ from arches.app.utils.index_database import index_resources_by_transaction
 logger = logging.getLogger(__name__)
 
 
-class BaseDataEditor(BaseImportModule):
+class BaseBulkEditor(BaseImportModule):
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -94,19 +94,6 @@ class BaseDataEditor(BaseImportModule):
 
         return result
 
-    def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, old_text, new_text):
-        result = {"success": False}
-        try:
-            cursor.execute(
-                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, language_code, operation, old_text, new_text),
-            )
-            result["success"] = True
-        except Exception as e:
-            logger.error(e)
-            result["message"] = _("Unable to edit staged data: {}").format(str(e))
-        return result
-
     def log_event(self, cursor, status):
         cursor.execute(
             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
@@ -122,6 +109,21 @@ class BaseDataEditor(BaseImportModule):
 
     def validate(self, request):
         return {"success": True, "data": {}}
+
+class BulkStringEditor(BaseBulkEditor):
+
+    def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, old_text, new_text):
+        result = {"success": False}
+        try:
+            cursor.execute(
+                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, language_code, operation, old_text, new_text),
+            )
+            result["success"] = True
+        except Exception as e:
+            logger.error(e)
+            result["message"] = _("Unable to edit staged data: {}").format(str(e))
+        return result
 
     def preview(self, request):
         def get_first_five_values(graph_id, node_id, resourceids, language_code):
@@ -279,7 +281,7 @@ class BaseDataEditor(BaseImportModule):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        edit_task = tasks.edit_bulk_data.apply_async(
+        edit_task = tasks.edit_bulk_string_data.apply_async(
             (self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
         )
         with connection.cursor() as cursor:

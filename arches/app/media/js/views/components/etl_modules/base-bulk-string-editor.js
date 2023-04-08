@@ -6,12 +6,12 @@ define([
     'arches',
     'viewmodels/alert',
     'viewmodels/alert-json',
-    'templates/views/components/etl_modules/base-editor.htm',
+    'templates/views/components/etl_modules/base-bulk-string-editor.htm',
     'views/components/simple-switch',
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, uuid, arches, AlertViewModel, JsonErrorAlertViewModel, baseEditorTemplate) {
+], function(ko, koMapping, $, uuid, arches, AlertViewModel, JsonErrorAlertViewModel, baseStringEditorTemplate) {
     const viewModel = function(params) {
         const self = this;
 
@@ -202,7 +202,7 @@ define([
     };
     ko.components.register('bulk-data-editor', {
         viewModel: viewModel,
-        template: baseEditorTemplate,
+        template: baseStringEditorTemplate,
     });
     return viewModel;
 });
