@@ -5,6 +5,17 @@
 <!-- ko ifnot: loading() -->
 <div class="etl-module-component-container">
 <div class="etl-module-body">
+    <h3>
+        <span data-bind="text:
+            operation() == 'trim' ? $root.translations.bulkStringEditorTrim
+            : operation() == 'capitalize' ? $root.translations.bulkStringEditorCapitalize
+            : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
+            : operation() == 'upper' ? $root.translations.bulkStringEditorUppercase
+            : operation() == 'lower' ? $root.translations.bulkStringEditorLowercase
+            : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
+            : ''
+        "></span>
+    </h3>
     <div class="etl-module-component">
         <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
             <input type="checkbox" data-bind="checked: trim">
