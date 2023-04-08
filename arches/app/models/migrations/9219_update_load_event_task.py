@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9219_divide_individual_editors'),
+        ("models", "9219_divide_individual_editors"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='loadevent',
-            name='taskid',
+            model_name="loadevent",
+            name="taskid",
             field=models.TextField(blank=True, null=True),
         ),
     ]
