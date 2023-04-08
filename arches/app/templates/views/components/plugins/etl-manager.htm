@@ -221,8 +221,12 @@
                                     text:
                                         selectedLoadEvent().status == 'indexed' ? $root.translations.completed
                                         : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
-                                        : selectedLoadEvent().status == 'failed' ? $root.translations.failed 
-                                        : $root.translations.running
+                                        : selectedLoadEvent().status == 'validated' ? $root.translations.running
+                                        : selectedLoadEvent().status == 'running' ? $root.translations.validating
+                                        : selectedLoadEvent().status == 'reversing' ? $root.translations.unloading
+                                        : selectedLoadEvent().status == 'unloaded' ? $root.translations.unloaded
+                                        : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
+                                        : $root.translations.failed
                                 "></span>  
                             </div>
                             <div>
