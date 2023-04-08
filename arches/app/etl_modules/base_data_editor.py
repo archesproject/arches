@@ -110,8 +110,8 @@ class BaseBulkEditor(BaseImportModule):
     def validate(self, request):
         return {"success": True, "data": {}}
 
-class BulkStringEditor(BaseBulkEditor):
 
+class BulkStringEditor(BaseBulkEditor):
     def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, old_text, new_text):
         result = {"success": False}
         try:
