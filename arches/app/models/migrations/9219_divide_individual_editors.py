@@ -326,11 +326,6 @@ class Migration(migrations.Migration):
     """
 
     operations = [
-        migrations.AddField(
-            model_name="loadevent",
-            name="taskid",
-            field=models.TextField(blank=True, null=True),
-        ),
         migrations.RunSQL(
             divide_bulk_data_editor,
             combine_bulk_data_editor,
