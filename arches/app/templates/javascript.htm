@@ -162,9 +162,9 @@
         resource-copy-success='{
             "title": "{% jsescaped_trans "Resource Successfully Copied."%}"
         }'
-        resource-has-unpublished-graph='{
-            "title": "{% jsescaped_trans "This resource is based on an unpublished graph." %}",
-            "text": "{% jsescaped_trans "To continue, please ensure the graph is published." %}"
+        resource-is-not-active='{
+            "title": "{% jsescaped_trans "This resource has not been marked active." %}",
+            "text": "{% jsescaped_trans "To continue, please ensure the graph is marked active." %}"
         }'
         active='{% trans "Active" as active %}  "{{ active|escapejs }}"'
         inactive='{% trans "Inactive" as inactive %}  "{{ inactive|escapejs }}"'

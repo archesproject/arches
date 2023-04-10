@@ -214,11 +214,11 @@ define([
         resourceId: resourceId,
         reportLookup: reportLookup,
         copyResource: function() {
-            if (data.graph && !data.graph.publication_id) {
+            if (data.graph && !data.graph.is_active) {
                 vm.alert(new AlertViewModel(
                     'ep-alert-red', 
-                    arches.translations.resourceHasUnpublishedGraph.title, 
-                    arches.translations.resourceHasUnpublishedGraph.text, 
+                    arches.translations.resourceIsNotActive.title, 
+                    arches.translations.resourceIsNotActive.text, 
                     null, 
                     function(){}
                 ));

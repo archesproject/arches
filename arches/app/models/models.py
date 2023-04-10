@@ -467,8 +467,8 @@ class GraphModel(models.Model):
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        if not self.publication:
-            return _("This Model is currently unpublished and not available for instance creation.")
+        if not self.is_active:
+            return _("This Model is not currently marked as active, and is not available for instance creation.")
         return False
 
     def is_editable(self):

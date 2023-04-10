@@ -52,7 +52,7 @@ define([
                     type: 'POST',
                     url: arches.urls.graph_is_active_api(data.graphid),
                     data: {'is_active': isGraphActive},
-                    error: function(e) {
+                    error: function() {
                         const alert = new AlertViewModel(
                             'ep-alert-red', 
                             arches.translations.resourceGraphChangeActiveStatusError.title,
