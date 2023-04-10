@@ -16,9 +16,9 @@
                         <h2>
                             <span data-bind="text: $root.translations.uploadDocuments"></span>
                         </h2>
-                        <h4>
+                        <h3>
                             <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
-                        </h4>
+                        </h3>
                     </div>
                     <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                         <i class="fa fa-file"></i>
@@ -55,7 +55,7 @@
                     <!--ko if: filesJSON().length > 1-->
                     <input 
                         data-bind="
-                            attr: {placeholder: $root.translations.findAFile + '...'},
+                            attr: {placeholder: $root.translations.findAFile + '...', 'aria-label': $root.translations.findAFile},
                             textInput: filter
                         " 
                         type="text" 
@@ -72,12 +72,14 @@
                     <!-- ko if: (!filter() || filter() == "") -->
                     <span data-bind="text: filesJSON().length + $root.translations.filesUploaded"></span>
                     <!-- /ko -->
-                    <button type="button" class="btn btn-file-upload-reset" data-bind="click: reset">
-                        <span data-bind="text: $root.translations.deleteAllFiles"></span>
-                    </button>
-                    <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
-                        <span data-bind="text: $root.translations.addMoreFiles"></span>
-                    </button>
+                    <div style="float: right">
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
+                            <span data-bind="text: $root.translations.addMoreFiles"></span>
+                        </button>
+                        <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="click: reset">
+                            <span data-bind="text: $root.translations.deleteAllFiles"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
@@ -96,14 +98,14 @@
                                     <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
                                     <!-- /ko -->
                                     <span class="text-sm">
-                                        <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
+                                        <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name, 'aria-label': ($root.translations.download).concat(' ', name)}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
                                             <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
                                         </a>
                                     </span>
                                 </div>
                                 <div class="file-upload-card-detail-right">
                                     <div class="media-right" data-bind="click: $parent.removeFile">
-                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
+                                        <button class="btn btn-xs btn-danger btn-file-cancel" data-bind="attr: {'aria-label': ($root.translations.delete).concat(' ', name)}"><i class="ion ion-close"></i></button>
                                     </div>
                                     <div class="file-size-label">
                                         <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
@@ -139,7 +141,7 @@
                                     <div class="media-right" data-bind="click: $parent.removeFile">
                                         <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
                                     </div>
-                                    <div class="">
+                                    <div>
                                         <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
                                     </div>
                                 </div>
@@ -167,7 +169,7 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: $root.translations.acceptedFileTypes"></span>
+    <span id="accepted-file-types-label" data-bind="text: $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -175,7 +177,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.exampleFileTypes},
+            attr: {placeholder: $root.translations.exampleFileTypes, 'aria-labeledby': 'accepted-file-types-label'},
             value: acceptedFiles, 
             valueUpdate: 'keyup'
         "
@@ -183,7 +185,7 @@
 </div>
 
 <div class="control-label">
-    <span data-bind="text: $root.translations.maxFileSize"></span>
+    <span id="max-file-size-label" data-bind="text: $root.translations.maxFileSize"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
@@ -191,7 +193,7 @@
         id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.maxFileSize},
+            attr: {placeholder: $root.translations.maxFileSize, 'aria-labeledby': 'max-file-size-label'},
             value: maxFilesize
         "
     >
@@ -222,7 +224,7 @@
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
-            <a id="" class="" target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
+            <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
                 <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url), alt: name}">
             </a>
         </div>
