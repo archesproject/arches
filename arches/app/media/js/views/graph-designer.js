@@ -648,7 +648,7 @@ define([
                     url: arches.urls.graph_has_unpublished_changes_api(data.graphid),
                     data: {'has_unpublished_changes': true}
                 });
-            };
+            }
 
             document.addEventListener('addChildNode', updateGraphUnpublishedChanges);
             document.addEventListener('deleteNode', updateGraphUnpublishedChanges);
