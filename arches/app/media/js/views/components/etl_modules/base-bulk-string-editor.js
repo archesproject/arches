@@ -53,6 +53,8 @@ define([
         this.searchUrl = ko.observable();
         this.caseInsensitive = ko.observable();
         this.trim = ko.observable();
+        this.numberOfResources = ko.observable();
+        this.numberOfTiles = ko.observable();
 
         this.getGraphs = function(){
             self.loading(true);
@@ -139,8 +141,10 @@ define([
 
             self.addAllFormData();
             self.submit('preview').then(data => {
-                self.previewValue(data.result);
+                self.previewValue(data.result.value);
                 self.showPreview(true);
+                self.numberOfResources(data.result.number_of_resources);
+                self.numberOfTiles(data.result.number_of_tiles);
             }).fail(function(err) {
                 console.log(err);
             }).always(function() {

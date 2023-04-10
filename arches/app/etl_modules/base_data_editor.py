@@ -152,10 +152,25 @@ class BulkStringEditor(BaseBulkEditor):
                 + " LIMIT 5;"
             )
 
+            count_query = (
+                """
+                SELECT count(t) FROM tiles t, nodes n
+                WHERE t.nodegroupid = n.nodegroupid
+            """.format(
+                    node_id, language_code
+                )
+                + node_id_query
+                + graph_id_query
+                + resourceids_query
+            )
+
             with connection.cursor() as cursor:
                 cursor.execute(sql_query)
                 row = [value[0] for value in cursor.fetchall()]
-            return row
+                cursor.execute(count_query)
+                count = cursor.fetchall()
+                number_of_tile, = count[0]
+            return row, number_of_tile
 
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
@@ -180,7 +195,7 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values = get_first_five_values(graph_id, node_id, resourceids, language_code)
+        first_five_values, number_of_tiles = get_first_five_values(graph_id, node_id, resourceids, language_code)
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -205,7 +220,16 @@ class BulkStringEditor(BaseBulkEditor):
                 transformed_value = cursor.fetchone()[0]
                 return_list.append([value, transformed_value])
 
-        return {"success": True, "data": return_list}
+        number_of_resources = len(resourceids)
+
+        return {
+            "success": True,
+            "data": {
+                "value": return_list,
+                "number_of_tiles": number_of_tiles,
+                "number_of_resources": number_of_resources
+            }
+        }
 
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)
