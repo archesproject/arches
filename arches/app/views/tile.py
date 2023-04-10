@@ -117,10 +117,9 @@ class TileData(View):
                         resource = Resource()
                     graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
                     resource.graph_id = graphid
-                    try:
-                        resource.save(user=request.user, transaction_id=transaction_id)
-                        data["resourceinstance_id"] = resource.pk
-                        resource.index()
+                    resource.save(user=request.user, transaction_id=transaction_id)
+                    data["resourceinstance_id"] = resource.pk
+                    resource.index()
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
                 is_active = resource_instance.graph.is_active
