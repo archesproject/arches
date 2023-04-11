@@ -366,6 +366,7 @@ define([
     });
 
     if (graphHasUnpublishedChanges()) {
+        // need setTimeout 0 here to push logic to bottom of call stack to wait for the viewModel to have the alert observable
         setTimeout(function() {
             vm.alert(new AlertViewModel(
                 'ep-alert-red', 
@@ -374,7 +375,7 @@ define([
                 null,
                 function(){}
             ));
-        }, 0); // need setTimeout 0 here to that viewModel has alert observable
+        }, 0); 
     }
 
     return new BaseManagerView({

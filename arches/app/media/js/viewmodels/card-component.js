@@ -65,8 +65,7 @@ define([
             }
 
             self.cardIdentifier = ko.computed(function() {
-                var cardIdentifier = self.card.model.attributes.source_identifier_id ? self.card.model.attributes.source_identifier_id : self.card.model.nodegroup_id();
-                return cardIdentifier;
+                return self.card.model.attributes.source_identifier_id ? self.card.model.attributes.source_identifier_id : self.card.model.nodegroup_id();
             });
 
             self.widgetNodeIdentifier = function(widget) {

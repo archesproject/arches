@@ -2,7 +2,6 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'knockout-mapping',
     'arches',
     'views/graph-manager-data',
     'views/base-manager',
@@ -12,7 +11,7 @@ require([
     'bindings/hover',
     'bindings/chosen',
     'utils/set-csrf-token',
-], function($, _, ko, koMapping, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
+], function($, _, ko, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
     var GraphView = BaseManager.extend({
         /**
         * Initializes an instance of BaseManager, optionally using a passed in view

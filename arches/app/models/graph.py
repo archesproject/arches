@@ -20,8 +20,7 @@ import json
 import logging
 import pyprind
 import uuid
-from copy import copy, deepcopy
-from django.core.cache import cache
+from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
@@ -39,7 +38,6 @@ from django.utils import translation
 
 
 logger = logging.getLogger(__name__)
-
 
 class Graph(models.GraphModel):
     """

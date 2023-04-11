@@ -100,8 +100,7 @@ define([
         * @param {object} node - a node in the tree
         */
         getNodeIdentifier: function(node) {
-            var nodeIdentifier = node.sourceIdentifierId() ? node.sourceIdentifierId() : node.nodeid;
-            return nodeIdentifier;
+            return node.sourceIdentifierId() ? node.sourceIdentifierId() : node.nodeid;
         },
 
         /**
