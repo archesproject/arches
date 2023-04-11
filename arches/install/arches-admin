@@ -135,14 +135,47 @@ parser_startproject.add_argument(
 # END startproject
 # BEGIN startapp
 
-def command_startapp(args):
-    name = args.name
-    directory = args.directory
-    extensions = args.extensions
-    template = args.template
+class FooCommand(TemplateCommand):
+    help = (
+        "Creates a Django application directory structure for the given "
+        "application name in the current directory or optionally in the "
+        "given directory."
+    )
+    missing_args_message = "You must provide a valid name."
 
-    # call_command('startapp', name, directory=directory, extension=extensions)
-    call_command('startapp', name, directory=directory, extension=extensions, template=template)
+    def handle(self, options):
+        app_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(app_name, "app")
+
+        # Check that the app_name cannot be imported.
+        try:
+            import_module(app_name)
+        except ImportError:
+            pass
+        else:
+            raise CommandError(
+                "%r conflicts with the name of an existing "
+                "Python module and cannot be used as an "
+                "application or project name. Please try "
+                "another name." %
+                app_name
+            )
+
+        super(FooCommand, self).handle('app', app_name, target, **options)
+
+def command_startapp(args):
+    cmd = FooCommand()
+    options = vars(args)
+    cmd.handle(options)
+
+    # proj_name = options['name']
+    # name = args.name
+    # directory = args.directory
+    # extensions = args.extensions
+    # template = args.template
+
+    # # call_command('startapp', name, directory=directory, extension=extensions)
+    # call_command('startapp', name, directory=directory, extension=extensions, template=template)
 
     # yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
     # os.chdir(yarn_path)
@@ -182,6 +215,14 @@ parser_startapp.add_argument(
     help='Specifies which file extensions in the app template should be rendered with the template engine. Defaults to py.',
     type=str,
     default='py'
+)
+
+parser_startapp.add_argument(
+    '-n', '--name',
+    dest='files',
+    help='Specifies which files in the app template (in addition to those matching --extension) should be rendered with the template engine.',
+    type=str,
+    default='',
 )
 # END startapp
 
