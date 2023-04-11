@@ -70,6 +70,7 @@ def app_settings(request=None):
     return {
         "app_settings": {
             "VERSION": __version__,
+            "APP_VERSION_LABEL": settings.APP_VERSION_LABEL,
             "APP_NAME": settings.APP_NAME,
             "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "USE_SEMANTIC_RESOURCE_RELATIONSHIPS": settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS,
