@@ -60,6 +60,9 @@ class ArchesCommand(TemplateCommand):
         elif complete_version[3] == 'beta':
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
 
+        options['arches_major_version'] = arches.VERSION[0]
+        options['arches_minor_version'] = arches.VERSION[1]
+
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
 

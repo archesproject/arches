@@ -18,6 +18,9 @@ APP_NAME = '{{ project_name }}'
 APP_VERSION = (0, 0, 0, "alpha", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
 APP_VERSION_LABEL = arches.setup.get_version(APP_VERSION)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+MIN_ARCHES_VERSION = ({{arches_major_version}}, {{arches_minor_version}})
+MAX_ARCHES_VERSION = ({{arches_major_version}}, {{arches_minor_version}})
+
 STATICFILES_DIRS =  (
     os.path.join(APP_ROOT, 'media', 'build'),
     os.path.join(APP_ROOT, 'media'),
