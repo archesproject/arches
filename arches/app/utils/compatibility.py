@@ -8,9 +8,11 @@ logger = logging.getLogger(__name__)
 def is_arches_compatible(min_arches=settings.MIN_ARCHES_VERSION, max_arches=settings.MAX_ARCHES_VERSION, target="project"):
     """
     Check if the current version of arches falls between a min and max version. 
-    min_arches: a tuple with at least a major version of arches, but may also include a min and patch release e.g. (7,4,0)
-    max_arches: a tuple with at least a major version of arches, but may also include a min and patch release e.g. (7,5,0)
-    target: a description of what is being checked for compatibility
+
+    Keyword arguments
+    min_arches -- A tuple with at least a major version of arches, but may also include a min and patch release e.g. (7,4,0)
+    max_arches -- A tuple with at least a major version of arches, but may also include a min and patch release e.g. (7,5,0)
+    target -- A description of what is being checked for compatibility
 
     """
 
