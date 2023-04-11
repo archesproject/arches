@@ -3,18 +3,16 @@
 import arches
 import argparse
 import codecs
-import django
-import errno
-import imp
 import os
 import sys
 import subprocess
-import shutil
+
 from importlib import import_module
-from django.utils.crypto import get_random_string
+from django.core.management import call_command
 from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.crypto import get_random_string
 from arches import __version__
 from arches.setup import get_complete_version
 from arches.management.commands import utils
@@ -45,8 +43,9 @@ class ArchesCommand(TemplateCommand):
         else:
             raise CommandError(
                 "%r conflicts with the name of an existing "
-                "Python module and cannot be used as a "
-                "project name. Please try another name." %
+                "Python module and cannot be used as an "
+                "application or project name. Please try "
+                "another name." %
                 project_name
             )
 
@@ -86,6 +85,7 @@ def command_startapp(args):
     options = vars(args)
     app_name = options['name']
     cmd.handle(options)
+    import pdb; pdb.set_trace()
     # yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
     # os.chdir(yarn_path)
     # subprocess.call("yarn install", shell=True)
@@ -101,42 +101,39 @@ parser = argparse.ArgumentParser(
     prog='arches',
     description='Manage Arches-based Applications',
     parents=[parent_parser],
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
 
 subparsers = parser.add_subparsers(title='available commands', dest='command')
 subparsers.required = True
 
-parser_start = subparsers.add_parser(
+# BEGIN startproject
+parser_startproject = subparsers.add_parser(
     'startproject',
     help="Create the scaffolding for a new Arches project",
 )
 
-parser_start = subparsers.add_parser(
-    'startapp',
-    help="Create the scaffolding for a new Arches application",
-)
-
-parser_start.add_argument(
+parser_startproject.add_argument(
     'name',
     type=str,
     help='name of your new application or project'
 )
 
-parser_start.add_argument(
+parser_startproject.add_argument(
     '-d', '--directory',
     help='destination directory of your new application or project',
     dest='directory',
     default=None,
 )
 
-parser_start.add_argument(
+parser_startproject.add_argument(
     '-t', '--template',
     help="The path or URL to load the template from.",
     type=str,
     default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates')
 )
 
-parser_start.add_argument(
+parser_startproject.add_argument(
     '-e', '--extension',
     dest='extensions',
     help='The file extension(s) to render (default: py).',
@@ -144,13 +141,52 @@ parser_start.add_argument(
     default=['py', 'txt', 'html', 'js', 'css', 'log', 'json', 'gitignore']
 )
 
-parser_start.add_argument(
+parser_startproject.add_argument(
     '-n', '--name',
     dest='files',
     help='name of your new arches application or project',
     type=str,
     default='',
 )
+# END startproject
+# BEGIN startapp
+parser_startapp = subparsers.add_parser(
+    'startapp',
+    help="Create the scaffolding for a new Arches application",
+)
+
+parser_startapp.add_argument(
+    '-d', '--directory',
+    help='destination directory of your new application or project',
+    dest='directory',
+    default=None,
+)
+
+parser_startapp.add_argument(
+    '-t', '--template',
+    help="The path or URL to load the template from.",
+    type=str,
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates')
+)
+
+parser_startapp.add_argument(
+    '-e', '--extension',
+    dest='extensions',
+    help='The file extension(s) to render (default: py).',
+    type=str,
+    default=['py', 'txt', 'html', 'js', 'css', 'log', 'json', 'gitignore']
+)
+
+parser_startapp.add_argument(
+    '-n', '--name',
+    dest='files',
+    help='name of your new arches application or project',
+    type=str,
+    default='',
+)
+
+# END startapp
+
 
 parser.add_argument(
     '-v', '--verbosity', 
