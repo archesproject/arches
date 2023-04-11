@@ -781,10 +781,16 @@ define([
                 }
             });
 
-            if (self.componentData.tilesManaged === "many"){
-                self.saveMultiTiles();
-            } else {
-                self.save();
+            // only saves updated tiles
+            if (ko.unwrap(self.dirty) || ko.unwrap(self.hasDirtyTiles) || ko.unwrap(self.hasUnsavedData)) {
+                if (self.componentData.tilesManaged === "many"){
+                    self.saveMultiTiles();
+                } else {
+                    self.save();
+                }
+            }
+            else {
+                self.complete(true);
             }
         };
 

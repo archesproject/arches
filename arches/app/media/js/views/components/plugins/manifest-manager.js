@@ -14,6 +14,7 @@ define([
         viewModel: function(params) {
             var self = this;
              
+            this.transactionId = params.transactionId || uuid.generate();
             this.canvasesForDeletion = ko.observableArray([]);
             this.metadataLabel = ko.observable('');
             this.metadataValues = ko.observable('');
@@ -73,7 +74,9 @@ define([
             });
 
             this.updateMetadata = function(){
-                this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                if (!!self.metadataLabel() || !!self.metadataValues()) {
+                    this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                }
                 self.metadataLabel(null);
                 self.metadataValues(null);
             };
@@ -189,6 +192,7 @@ define([
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("operation", "create");
+                self.formData.append("transaction_id", self.transactionId);
                 var onSuccess = function() {
                     self.activeTab('manifest');
                     self.mainMenu(false);
@@ -208,6 +212,7 @@ define([
             };
 
             this.updateManifest = function() {
+                self.updateMetadata();
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("manifest_attribution", ko.unwrap(self.manifestAttribution));

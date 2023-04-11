@@ -30,8 +30,7 @@ class Migration(migrations.Migration):
             WITH updated_tiles as (
                 UPDATE tiles t
                 SET tiledata = ret.result
-                FROM nodes n, 
-                    (SELECT res.tileid, (res.tiledata || jsonb_object_agg(res.nodeid, res.result)) result
+                FROM (SELECT res.tileid, (res.tiledata || jsonb_object_agg(res.nodeid, res.result)) result
                         FROM 
                         nodes n, 
                             (SELECT t.tileid, n.nodeid, t.tiledata, jsonb_agg(jsonb_set(tile_data, array['resourceXresourceId'::text], ('"' || uuid_generate_v4()|| '"')::jsonb, true)) result

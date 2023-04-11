@@ -136,6 +136,11 @@ define([
             }
         });
 
+        this.showLogo = ko.pureComputed(() => {
+            const imageExtenstion = ["bmp", "gif", "jpeg", "jpg", "png", "svg", "tif", "tiff", "webp"]
+            return !!imageExtenstion.find((ext) => self.manifestLogo().endsWith(ext))
+        });
+
         this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
             self.annotationNodes(
                 json.map((node) => {

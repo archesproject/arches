@@ -25,25 +25,31 @@ define([
     ko.bindingHandlers.dataTablesForEach = {
         page: 0,
         init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor());
+            const options = ko.unwrap(valueAccessor());
             ko.unwrap(options.data);
-            if (options.dataTableOptions.paging) {
-                valueAccessor().data.subscribe(function(changes) {
-                    var table = $(element).closest('table').DataTable();
-                    ko.bindingHandlers.dataTablesForEach.page = table.page();
-                    table.destroy();
-                }, null, 'arrayChange');
+            if (options.dataTableOptions.serverSide === true) {
+                const table = $(element).closest('table').DataTable(options.dataTableOptions);
+                table.destroy();
             }
-            var nodes = Array.prototype.slice.call(element.childNodes, 0);
-            ko.utils.arrayForEach(nodes, function(node) {
-                if (node && node.nodeType !== 1) {
-                    node.parentNode.removeChild(node);
+            else {
+                if (options.dataTableOptions.paging) {
+                    valueAccessor().data.subscribe(function(changes) {
+                        const table = $(element).closest('table').DataTable();
+                        ko.bindingHandlers.dataTablesForEach.page = table.page();
+                        table.destroy();
+                    }, null, 'arrayChange');
                 }
-            });
+                const nodes = Array.prototype.slice.call(element.childNodes, 0);
+                ko.utils.arrayForEach(nodes, function(node) {
+                    if (node && node.nodeType !== 1) {
+                        node.parentNode.removeChild(node);
+                    }
+                });
+            }
             return ko.bindingHandlers.foreach.init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
         },
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var options = ko.unwrap(valueAccessor()),
+            const options = ko.unwrap(valueAccessor()),
                 key = 'DataTablesForEach_Initialized';
             ko.unwrap(options.data);
             var table;

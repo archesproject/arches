@@ -1,0 +1,205 @@
+{
+    "graph": [
+        {
+            "author": "Brett Ferguson",
+            "cards": [
+                {
+                    "active": true,
+                    "cardid": "2c5d3930-d739-4d2e-8b77-c133e511658b",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "2c5d3930-d739-4d2e-8b77-c133e511658b",
+                            "constraintid": "48cfa78f-6da9-45b7-8dcc-505ed761cb26",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        },
+                        {
+                            "card_id": "2c5d3930-d739-4d2e-8b77-c133e511658b",
+                            "constraintid": "45d3dd41-eede-4fa4-ac95-94c3fa5c6cd6",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": ""
+                    },
+                    "helptitle": {
+                        "en": ""
+                    },
+                    "instructions": {
+                        "en": ""
+                    },
+                    "is_editable": true,
+                    "name": {
+                        "en": "Custom Datatypes"
+                    },
+                    "nodegroup_id": "80bf3bd0-936d-11ed-be68-5254004d77d3",
+                    "sortorder": null,
+                    "visible": true
+                }
+            ],
+            "cards_x_nodes_x_widgets": [],
+            "color": null,
+            "config": {},
+            "deploymentdate": null,
+            "deploymentfile": null,
+            "description": {
+                "en": "Model for testing Relational Data Model views"
+            },
+            "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "80bf3bd0-936d-11ed-be68-5254004d77d3",
+                    "edgeid": "59b50055-0536-4b82-8ef8-1c27dfe8f23f",
+                    "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                    "name": null,
+                    "ontologyproperty": "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+                    "rangenode_id": "9712762c-936d-11ed-b671-5254004d77d3"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "5681f182-936d-11ed-9d0a-5254004d77d3",
+                    "edgeid": "a0f85b56-aec3-4fd9-8b21-75eda88f48fb",
+                    "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                    "name": null,
+                    "ontologyproperty": "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+                    "rangenode_id": "80bf3bd0-936d-11ed-be68-5254004d77d3"
+                }
+            ],
+            "functions_x_graphs": [],
+            "graphid": "ceed156d-aadf-4a13-b383-c044624c64bb",
+            "iconclass": "",
+            "is_editable": true,
+            "isresource": true,
+            "jsonldcontext": null,
+            "name": {
+                "en": "Relational Data Model Tests"
+            },
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "80bf3bd0-936d-11ed-be68-5254004d77d3",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "nodes": [
+                {
+                    "alias": null,
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "semantic",
+                    "description": "",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": true,
+                    "name": "Relational Data Model Tests",
+                    "nodegroup_id": null,
+                    "nodeid": "5681f182-936d-11ed-9d0a-5254004d77d3",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing",
+                    "parentproperty": "",
+                    "sortorder": 0
+                },
+                {
+                    "alias": "custom_datatypes",
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "semantic",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Custom Datatypes",
+                    "nodegroup_id": "80bf3bd0-936d-11ed-be68-5254004d77d3",
+                    "nodeid": "80bf3bd0-936d-11ed-be68-5254004d77d3",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+                    "parentproperty": "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+                    "sortorder": 0
+                },
+                {
+                    "alias": "extended_string_datatype",
+                    "config": {
+                        "pgDatatype": "jsonb"
+                    },
+                    "datatype": "extended-string-datatype",
+                    "description": "Custom datatype that extends the String datatype for testing of Postgres type in Relational Data Model Views",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Extended String Datatype",
+                    "nodegroup_id": "80bf3bd0-936d-11ed-be68-5254004d77d3",
+                    "nodeid": "9712762c-936d-11ed-b671-5254004d77d3",
+                    "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
+                    "parentproperty": "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+                    "sortorder": 0
+                }
+            ],
+            "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
+            "publication": {
+                "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                "notes": null,
+                "publicationid": "ec316908-9370-11ed-8409-5254004d77d3",
+                "published_time": "2023-01-13T12:34:32.663",
+                "user_id": 1
+            },
+            "relatable_resource_model_ids": [],
+            "resource_2_resource_constraints": [],
+            "root": {
+                "alias": null,
+                "config": {
+                    "en": ""
+                },
+                "datatype": "semantic",
+                "description": "",
+                "exportable": false,
+                "fieldname": null,
+                "graph_id": "ceed156d-aadf-4a13-b383-c044624c64bb",
+                "hascustomalias": false,
+                "is_collector": false,
+                "isrequired": false,
+                "issearchable": true,
+                "istopnode": true,
+                "name": "Relational Data Model Tests",
+                "nodegroup_id": null,
+                "nodeid": "5681f182-936d-11ed-9d0a-5254004d77d3",
+                "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing",
+                "sortorder": 0
+            },
+            "slug": null,
+            "subtitle": {
+                "en": ""
+            },
+            "template_id": "50000000-0000-0000-0000-000000000001",
+            "version": ""
+        }
+    ],
+    "metadata": {
+        "db": "PostgreSQL 12.12 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44), 64-bit",
+        "git hash": "/bin/sh: git: command not found",
+        "os": "Linux",
+        "os version": "3.10.0-1160.76.1.el7.x86_64"
+    }
+}

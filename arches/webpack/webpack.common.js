@@ -186,10 +186,10 @@ module.exports = () => {
                 plugins: [
                     new CleanWebpackPlugin(),
                     new webpack.DefinePlugin({
-                        APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT),
-                        ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR),
+                        APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g ,'/'),
+                        ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g ,'/'),
                         INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES),
-                        INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH)
+                        INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH).replace(/\\/g ,'/')
                     }),
                     new webpack.ProvidePlugin({
                         $:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),

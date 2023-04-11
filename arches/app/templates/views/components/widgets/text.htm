@@ -31,12 +31,12 @@
                         <label class="widget-input-label" for="lang_dir">
                             <span data-bind="text: $root.translations.direction"></span>
                         </label>
-                        <select 
-                            id="lang_dir" 
-                            style="flex:1" 
-                            name="language" 
+                        <select
+                            id="lang_dir"
+                            style="flex:1"
+                            name="language"
                             data-bind="
-                                value: currentDirection, 
+                                value: currentDirection,
                                 chosen: {'width':'100%'},
                                 optionsText: 'text',
                                 optionsValue: 'value',
@@ -65,10 +65,10 @@
     <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="" 
-        id="" 
-        class="form-control input-md widget-input" 
+    <input
+        type=""
+        id=""
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.placeholder},
             textInput: placeholder
@@ -79,10 +79,10 @@
     <span data-bind="text: $root.translations.maxLength"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="" 
-        id="" 
-        class="form-control input-md widget-input" 
+    <input
+        type=""
+        id=""
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.maxLength},
             textInput: maxLength
@@ -116,12 +116,12 @@
                 <label class="widget-input-label" for="lang_dir">
                     <span data-bind="text: $root.translations.direction"></span>
                 </label>
-                <select 
-                    id="lang_dir" 
-                    style="flex:1" 
-                    name="language" 
+                <select
+                    id="lang_dir"
+                    style="flex:1"
+                    name="language"
                     data-bind="
-                        value: currentDefaultDirection, 
+                        value: currentDefaultDirection,
                         chosen: {'width':'100%'},
                         optionsText: 'text',
                         optionsValue: 'value',
@@ -144,12 +144,12 @@
         <span data-bind="text: $root.translations.disabled"></span>
     </div>
     <div class="pad-no">
-        <div 
+        <div
             data-bind="
-                component: { 
-                    name: 'views/components/simple-switch', 
+                component: {
+                    name: 'views/components/simple-switch',
                     params: {
-                        value: uneditable, 
+                        value: uneditable,
                         config:{label: $root.translations.disableEditing, subtitle: $root.translations.preventUsersFromEditingValue}
                     }
                 }
@@ -166,10 +166,10 @@
 <!-- /ko -->
 
 <!-- ko if: !configForm  && state === 'report' -->
-<!-- ko if: !ko.unwrap(hideEmptyNodes) || ko.unwrap(hideEmptyNodes) === true && displayValue() -->
 {% block report %}
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || (ko.unwrap(hideEmptyNodes) === true && !!ko.unwrap(currentText) ) -->
 <dt data-bind="text: label"></dt>
 <dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : $root.translations.none"></dd>
-{% endblock report %}
 <!-- /ko -->
+{% endblock report %}
 <!-- /ko -->

@@ -32,9 +32,11 @@ define([
 
         if(self.form){
             self.form.on('tile-reset', (x) => {
-                currentValue = koMapping.toJS(self.value);
-                self.currentText(currentValue[self.currentLanguage().code]?.value);
-                self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                if (ko.unwrap(self.value)) {
+                    currentValue = koMapping.toJS(self.value);
+                    self.currentText(currentValue[self.currentLanguage().code]?.value);
+                    self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                }
             });
         }
 
@@ -64,12 +66,21 @@ define([
             self.config(config);
         });
 
+        const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
+        valueLeaf?.subscribe(newValue => {
+            const currentLanguage = self.currentLanguage();
+            if(!currentLanguage) { return; }
+
+            if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
+                self.currentText(newValue?.[currentLanguage.code]?.value || newValue);
+            }
+        });
+
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
-            currentValue[currentLanguage.code].value = newValue;
-
+            currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {

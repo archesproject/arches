@@ -4,7 +4,7 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <div class="form-group">        
+    <div class="form-group">
         <div class="widget-inline-tools-collapser" data-bind=" click: function() {
             showi18nOptions(!showi18nOptions());
         }">
@@ -30,12 +30,12 @@
                     <label class="widget-input-label i18n-style-tools-label" for="lang_dir">
                         <span data-bind="text: $root.translations.direction"></span>
                     </label>
-                    <select 
-                        id="lang_dir" 
-                        style="flex:1" 
-                        name="language" 
+                    <select
+                        id="lang_dir"
+                        style="flex:1"
+                        name="language"
                         data-bind="
-                            value: currentDirection, 
+                            value: currentDirection,
                             chosen: {'width':'100%'},
                             optionsText: 'text',
                             optionsValue: 'value',
@@ -92,8 +92,10 @@
 {% endblock config_form %}
 
 {% block report %}
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || (ko.unwrap(hideEmptyNodes) === true && !!ko.unwrap(currentText) ) -->
 <dt data-bind="text: label"></dt>
 <dd data-bind="html: strippedValue || $root.translations.none"></dd>
+<!-- /ko -->
 {% endblock report %}
 
 {% block display_value %}

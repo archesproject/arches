@@ -9,7 +9,7 @@ from django.core.files.storage import default_storage
 from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from django.views.generic import View
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
@@ -23,30 +23,15 @@ logger = logging.getLogger(__name__)
 class ManifestManagerView(View):
     cantaloupe_uri = f"{settings.CANTALOUPE_HTTP_ENDPOINT.rstrip('/')}/iiif"
 
-    def check_canvas_in_use(self, canvas_id):
-        canvas_ids_in_use = [annotation.canvas for annotation in models.VwAnnotation.objects.all()]
-        return canvas_id in canvas_ids_in_use
-
     def delete(self, request):
         data = JSONDeserializer().deserialize(request.body)
         manifest_url = data.get("manifest")
         manifest = models.IIIFManifest.objects.get(url=manifest_url)
-        canvases_in_manifest = manifest.manifest["sequences"][0]["canvases"]
-        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
-        canvases_in_use = []
-        for canvas_id in canvas_ids:
-            if self.check_canvas_in_use(canvas_id):
-                canvases_in_use.append(canvas_id)
-        if len(canvases_in_use) > 0:
-            canvas_labels_in_use = [
-                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
-            ]
-            response = "This manifest cannot be deleted because the following canvases have resource annotations: {}".format(
-                ", ".join(canvas_labels_in_use)
-            )
-            return JSONResponse({"message": response}, status=500)
-        manifest.delete()
-        return JSONResponse({"success": True})
+        try:
+            manifest.delete()
+            return JSONResponse({"success": True})
+        except models.IIIFManifestValidationError as e:
+            return JSONErrorResponse(e.title, e.message)
 
     def post(self, request):
         def create_manifest(name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]):
@@ -81,6 +66,9 @@ class ManifestManagerView(View):
         def create_canvas(image_json, file_url, file_name, image_id):
             canvas_id = f"{self.cantaloupe_uri}/manifest/canvas/{image_id}.json"
             image_id = f"{self.cantaloupe_uri}/manifest/annotation/{image_id}.json"
+            thumbnail_width = 300 if image_json["width"] >= 300 else image_json["width"]
+            thumbnail_height = 300 if image_json["height"] >= 300 else image_json["height"]
+            thumbnail_id = f"{file_url}/full/!{thumbnail_width},{thumbnail_height}/0/default.jpg"
 
             return {
                 "@id": canvas_id,
@@ -110,7 +98,7 @@ class ManifestManagerView(View):
                 "label": f"{file_name}",
                 "license": "TBD",
                 "thumbnail": {
-                    "@id": file_url + "/full/!300,300/0/default.jpg",
+                    "@id": thumbnail_id,
                     "@type": "dctypes:Image",
                     "format": "image/jpeg",
                     "service": {
@@ -192,14 +180,21 @@ class ManifestManagerView(View):
 
         files = request.FILES.getlist("files")
         name = request.POST.get("manifest_title")
+        if name == "null" or name == "undefined":
+            try:
+                name = os.path.splitext(files[0].name)[0]
+            except:
+                pass
+
         attribution = request.POST.get("manifest_attribution", "")
         logo = request.POST.get("manifest_logo", "")
-        desc = request.POST.get("manifest_description")
+        desc = request.POST.get("manifest_description", "")
         operation = request.POST.get("operation")
         manifest_url = request.POST.get("manifest")
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
         metadata = request.POST.get("metadata")
+        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
         selected_canvases = request.POST.get("selected_canvases")
         try:
             metadata = json.loads(request.POST.get("metadata"))
@@ -223,13 +218,14 @@ class ManifestManagerView(View):
                 else:
                     logger.warn("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest(canvases=canvases)
+            pres_dict = create_manifest(name=name, canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
 
             json_url = f"/manifest/{manifest_id}"
             manifest.url = json_url
             manifest.manifest["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
+            manifest.transactionid = transaction_id
 
             manifest.save()
 
@@ -267,8 +263,7 @@ class ManifestManagerView(View):
                 logger.warning("You have to select a manifest to add images")
                 return None
 
-        if metadata:
-            change_manifest_metadata(manifest)
+        change_manifest_metadata(manifest)
 
         manifest.save()
         return JSONResponse(manifest)

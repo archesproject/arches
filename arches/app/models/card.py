@@ -47,25 +47,31 @@ class Card(models.CardModel):
             constraintid = constraint.get("constraintid", None)
             unique_to_all = constraint.get("uniquetoallinstances", False)
             nodeids = constraint.get("nodes", [])
-            try:
-                constraint_model = models.ConstraintModel.objects.get(pk=constraintid)
-                constraint_model.uniquetoallinstances = unique_to_all
-                current_nodeids = {str(i.nodeid) for i in constraint_model.nodes.all()}
-                future_nodeids = set(nodeids)
-                nodes_to_remove = current_nodeids - future_nodeids
-                nodes_to_add = future_nodeids - current_nodeids
-                add_nodeconstraints(nodes_to_add, constraint_model)
-                models.ConstraintXNode.objects.filter(Q(constraint=constraint_model) & Q(node__in=nodes_to_remove)).delete()
-                constraint_model.save()
-            except ObjectDoesNotExist as e:
-                constraint_model = models.ConstraintModel()
-                constraint_model.card = self
-                constraint_model.constraintid = constraintid
-                constraint_model.uniquetoallinstances = unique_to_all
-                constraint_model.save()
-                add_nodeconstraints(nodeids, constraint_model)
-                constraint_model.save()
-            constraint_models.append(constraint_model)
+            if nodeids:
+                try:
+                    constraint_model = models.ConstraintModel.objects.get(pk=constraintid)
+                    constraint_model.uniquetoallinstances = unique_to_all
+                    current_nodeids = {str(i.nodeid) for i in constraint_model.nodes.all()}
+                    future_nodeids = set(nodeids)
+                    nodes_to_remove = current_nodeids - future_nodeids
+                    nodes_to_add = future_nodeids - current_nodeids
+                    add_nodeconstraints(nodes_to_add, constraint_model)
+                    models.ConstraintXNode.objects.filter(Q(constraint=constraint_model) & Q(node__in=nodes_to_remove)).delete()
+                    constraint_model.save()
+                except ObjectDoesNotExist:
+                    constraint_model = models.ConstraintModel()
+                    constraint_model.card = self
+                    constraint_model.constraintid = constraintid
+                    constraint_model.uniquetoallinstances = unique_to_all
+                    constraint_model.save()
+                    add_nodeconstraints(nodeids, constraint_model)
+                    constraint_model.save()
+                constraint_models.append(constraint_model)
+            else:
+                try:
+                    models.ConstraintModel.objects.get(pk=constraintid).delete()
+                except ObjectDoesNotExist:
+                    pass
         self.constraints = constraint_models
 
     def __init__(self, *args, **kwargs):

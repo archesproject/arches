@@ -1,10 +1,12 @@
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from arches.app.models import models
 from arches.app.models import concept
+from django.core.cache import cache
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
@@ -22,6 +24,7 @@ from io import StringIO
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
+logger = logging.getLogger(__name__)
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
@@ -80,13 +83,20 @@ class BaseConceptDataType(BaseDataType):
     def get_concept_dates(self, concept):
         result = None
         date_range = {}
-        values = models.Value.objects.filter(concept=concept)
-        for value in values:
-            if value.valuetype.valuetype in ("min_year" "max_year"):
-                date_range[value.valuetype.valuetype] = value.value
-        if "min_year" in date_range and "max_year" in date_range:
-            result = date_range
-        return result
+        cache_value = cache.get("concept-" + str(concept.conceptid), "no result")
+        if cache_value == "no result":
+            values = models.Value.objects.filter(concept=concept)
+            for value in values:
+                if value.valuetype.valuetype in ("min_year" "max_year"):
+                    date_range[value.valuetype.valuetype] = value.value
+            if "min_year" in date_range and "max_year" in date_range:
+                result = date_range
+            cache.set("concept-" + str(concept.conceptid), result, 500)
+            cache_value = result
+        else:
+            return cache_value
+
+        return cache_value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
@@ -138,7 +148,8 @@ class ConceptDataType(BaseConceptDataType):
         if value is not None:
             if type(value) == list:
                 message = _("The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Concept Datatype Widget")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
 
@@ -146,7 +157,8 @@ class ConceptDataType(BaseConceptDataType):
                 uuid.UUID(str(value))
             except ValueError:
                 message = _("This is an invalid concept prefLabel, or an incomplete UUID")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Concept PrefLabel/Uuid")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
 
@@ -154,7 +166,8 @@ class ConceptDataType(BaseConceptDataType):
                 models.Value.objects.get(pk=value)
             except ObjectDoesNotExist:
                 message = _("This UUID is not an available concept value")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Concept Id Not Found")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
                 return errors
         return errors
@@ -165,7 +178,13 @@ class ConceptDataType(BaseConceptDataType):
             uuid.UUID(stripped)
             value = stripped
         except ValueError:
-            value = self.lookup_labelid_from_label(value, kwargs)
+            if value == "":
+                value = None
+            else:
+                try:
+                    value = self.lookup_labelid_from_label(value, kwargs)
+                except:
+                    logger.warn(_("Unable to convert {0} to concept label".format(value)))
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -240,7 +259,7 @@ class ConceptDataType(BaseConceptDataType):
             else:
                 print("ERROR: Multiple hits for {0} external identifier in RDM:".format(concept_uri))
                 for hit in hits:
-                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.conceptid, hit.value))
+                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.concept_id, hit.value))
                 # Just try the first one and hope
                 concept_id = hits[0].concept_id
 
@@ -295,13 +314,21 @@ class ConceptListDataType(BaseConceptDataType):
     def transform_value_for_tile(self, value, **kwargs):
         ret = []
         for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
+            lines = [line for line in val]
+            for v in lines:
                 try:
                     stripped = v.strip()
                     uuid.UUID(stripped)
                     ret.append(stripped)
                 except ValueError:
-                    ret.append(self.lookup_labelid_from_label(v, kwargs))
+                    if v == "":
+                        continue
+                    else:
+                        try:
+                            ret.append(self.lookup_labelid_from_label(v, kwargs))
+                        except:
+                            ret.append(v)
+                            logger.warn(_("Unable to convert {0} to concept label".format(v)))
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):

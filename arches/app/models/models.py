@@ -14,18 +14,13 @@ import json
 import uuid
 import datetime
 import logging
-import pyotp
-
-from datetime import timedelta
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
-from django.core.files.storage import FileSystemStorage
-from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
@@ -285,6 +280,26 @@ class EditLog(models.Model):
     class Meta:
         managed = True
         db_table = "edit_log"
+
+
+class ExternalOauthToken(models.Model):
+    token_id = models.UUIDField(primary_key=True, serialize=False, unique=True)
+    user = models.ForeignKey(db_column="userid", null=False, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)
+    id_token = models.TextField()
+    access_token_expiration = models.DateTimeField()
+    access_token = models.TextField()
+    refresh_token = models.TextField(null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __init__(self, *args, **kwargs):
+        super(ExternalOauthToken, self).__init__(*args, **kwargs)
+        if not self.token_id:
+            self.token_id = uuid.uuid4()
+
+    class Meta:
+        managed = True
+        db_table = "external_oauth_tokens"
 
 
 class ResourceRevisionLog(models.Model):
@@ -863,8 +878,9 @@ class ResourceXResource(models.Model):
             if type(data) != list:
                 data = [data]
             for relatedresourceItem in data:
-                if relatedresourceItem["resourceId"] != str(deletedResourceId):
-                    newTileData.append(relatedresourceItem)
+                if relatedresourceItem:
+                    if relatedresourceItem["resourceId"] != str(deletedResourceId):
+                        newTileData.append(relatedresourceItem)
             self.tileid.data[str(self.nodeid_id)] = newTileData
             self.tileid.save()
 
@@ -1224,6 +1240,7 @@ class MapLayer(models.Model):
     zoom = models.FloatField(blank=True, null=True)
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
+    sortorder = models.IntegerField(default=0)
 
     @property
     def layer_json(self):
@@ -1240,6 +1257,7 @@ class MapLayer(models.Model):
 
     class Meta:
         managed = True
+        ordering = ("sortorder", "name")
         db_table = "map_layers"
 
 
@@ -1310,8 +1328,11 @@ def create_permissions_for_new_users(sender, instance, created, **kwargs):
             resourceInstanceId = uuid.UUID(resourceInstanceId)
         resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
         assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource in resources:
-            Resource(resource.resourceinstanceid).index()
+        for resource_instance in resources:
+            resource = Resource(resource_instance.resourceinstanceid)
+            resource.graph_id = resource_instance.graph_id
+            resource.createdtime = resource_instance.createdtime
+            resource.index()
 
 
 class UserXTask(models.Model):
@@ -1498,11 +1519,21 @@ class Plugin(models.Model):
         db_table = "plugins"
 
 
+class IIIFManifestValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Image Service Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self)
+
 class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
+    transactionid = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
         return self.label
@@ -1510,6 +1541,25 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
+    def delete(self, *args, **kwargs):
+        all_canvases = {annotation.canvas for annotation in VwAnnotation.objects.all()}
+        canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
+        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        canvases_in_use = []
+        for canvas_id in canvas_ids:
+            if canvas_id in all_canvases:
+                canvases_in_use.append(canvas_id)
+        if len(canvases_in_use) > 0:
+            canvas_labels_in_use = [
+                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+            ]
+            message = _("This manifest cannot be deleted because the following canvases have resource annotations: {}").format(
+                ", ".join(canvas_labels_in_use)
+            )
+            raise IIIFManifestValidationError(message)
+
+        super(IIIFManifest, self).delete()
 
 
 class GroupMapSettings(models.Model):
@@ -1617,6 +1667,21 @@ class LoadStaging(models.Model):
         managed = True
         db_table = "load_staging"
 
+
+class LoadErrors(models.Model):
+    load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
+    nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE)
+    node = models.ForeignKey("Node", db_column="nodeid", null=True, on_delete=models.CASCADE)
+    type = models.TextField(blank=True, null=True)
+    error = models.TextField(blank=True, null=True)
+    source = models.TextField(blank=True, null=True)
+    error = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    datatype = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "load_errors"
 
 class SpatialView(models.Model):
     spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
