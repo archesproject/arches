@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='installed_package_example',
+    name='{{ app_name }}',
     version='0.0.1',    
-    description='foo description',
+    description='',
     url='',
-    author='foo author',
-    author_email='foo@foo.com',
+    author='',
+    author_email='',
     license='GNU AGPL3',
     packages=find_packages(),
     include_package_data=True,

@@ -16,8 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from installed_package_example.views.foo import Foo
 
 urlpatterns = [
-    path('foo/', Foo.as_view()),
 ]

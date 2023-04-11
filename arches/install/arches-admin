@@ -79,27 +79,6 @@ def command_startproject(args):
     open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
     open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
 
-
-def command_startapp(args):
-    cmd = ArchesCommand()
-    options = vars(args)
-    cmd.handle(options)
-
-    name = options['name']
-    template = options['template']
-    extensions = options['extensions']
-
-    import pdb; pdb.set_trace()
-    call_command('startapp', )
-    # yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    # os.chdir(yarn_path)
-    # subprocess.call("yarn install", shell=True)
-    # if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
-    #     os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    # open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
-    # open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
-
-
 parent_parser = argparse.ArgumentParser(add_help=False)
 
 parser = argparse.ArgumentParser(
@@ -121,12 +100,12 @@ parser_startproject = subparsers.add_parser(
 parser_startproject.add_argument(
     'name',
     type=str,
-    help='name of your new application or project'
+    help='name of your new project'
 )
 
 parser_startproject.add_argument(
     '-d', '--directory',
-    help='destination directory of your new application or project',
+    help='destination directory of your new project',
     dest='directory',
     default=None,
 )
@@ -149,12 +128,31 @@ parser_startproject.add_argument(
 parser_startproject.add_argument(
     '-n', '--name',
     dest='files',
-    help='name of your new arches application or project',
+    help='name of your new arches project',
     type=str,
     default='',
 )
 # END startproject
 # BEGIN startapp
+
+def command_startapp(args):
+    name = args.name
+    directory = args.directory
+    extensions = args.extensions
+    template = args.template
+
+    # call_command('startapp', name, directory=directory, extension=extensions)
+    call_command('startapp', name, directory=directory, extension=extensions, template=template)
+
+    # yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
+    # os.chdir(yarn_path)
+    # subprocess.call("yarn install", shell=True)
+    # if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
+    #     os.mkdir(os.path.join(os.getcwd(), 'logs'))
+    # open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+    # open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
+
+
 parser_startapp = subparsers.add_parser(
     'startapp',
     help="Create the scaffolding for a new Arches application",
@@ -163,21 +161,19 @@ parser_startapp = subparsers.add_parser(
 parser_startapp.add_argument(
     'name',
     type=str,
-    help='name of your new application or project'
+    help='name of your new application'
 )
 
 parser_startapp.add_argument(
     '-d', '--directory',
-    help='destination directory of your new application or project',
-    dest='directory',
-    default=None,
+    help='destination directory of your new project',
 )
 
 parser_startapp.add_argument(
     '-t', '--template',
     help="Provides the path to a directory with a custom app template file, or a path to an uncompressed archive, a compressed archive, or a URL containing the app template files.",
     type=str,
-    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates')
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-app-templates')
 )
 
 parser_startapp.add_argument(
@@ -185,17 +181,8 @@ parser_startapp.add_argument(
     dest='extensions',
     help='Specifies which file extensions in the app template should be rendered with the template engine. Defaults to py.',
     type=str,
-    default=['py', 'txt', 'html', 'js', 'css', 'log', 'json', 'gitignore']
+    default='py'
 )
-
-parser_startapp.add_argument(
-    '-n', '--name',
-    dest='files',
-    help='Specifies which files in the app template (in addition to those matching --extension) should be rendered with the template engine.',
-    type=str,
-    default='',
-)
-
 # END startapp
 
 parser.add_argument(
