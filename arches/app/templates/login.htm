@@ -57,7 +57,7 @@
                                     <div class="input-group-addon"><i class="ion-asterisk"></i></div>
                                     <div class="floating-label-group">
                                         <input type="password" id="password" class="form-control input-lg floating-label-input" name='password' autofocus required>
-                                        <label class="floating-label" for="password" class="arches-signin-subtext">{% trans "Password" %}</label>
+                                        <label class="floating-label" for="password">{% trans "Password" %}</label>
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@
             </div>
 
             <footer class="panel-footer">
-                {% trans "Learn more about <a href='http://www.archesproject.org'>Arches</a>" %}
+                {% trans "Learn more about "%}<a href='http://www.archesproject.org'>{% trans "Arches" %}</a> 
             </footer>
         </div>
     </div>
