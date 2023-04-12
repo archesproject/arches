@@ -31,6 +31,8 @@ legend.arches-signin-subtext {
 
 .floating-label-group {
     position: relative;
+    display: flex;
+    align-items: start;
 }
 
 .floating-label-input {
@@ -48,22 +50,20 @@ legend.arches-signin-subtext {
 .floating-label-input:focus ~ .floating-label, 
 .floating-label-input:valid ~ .floating-label {
     top: -2em;
-    // left: 4.5em;
     font-size: 0.8em;   
 }
 
 .floating-label-input.change-password:focus ~ .floating-label, 
 .floating-label-input.change-password:valid ~ .floating-label {
-    top: -0.75em; 
+    top: -0.85em; 
 }
 
 .floating-label {
     position: absolute;
+    padding: 0 0.5em 0 0.5em;
     top: 1em;
-    left: 1em;
     pointer-events: none;
     user-select: none;
-
     transition: 0.2s ease all;
     -moz-transition: 0.2s ease all;
     -webkit-transition:0.2s ease all;
@@ -71,6 +71,7 @@ legend.arches-signin-subtext {
 
 .floating-label.change-password {
     top: 2em;
+    color: #888;
 }
 
 .arches-signin .login-panel {
@@ -129,7 +130,6 @@ legend.arches-signin-subtext {
 .change-password-form.popover {
     display: block;
     margin-top: 65px;
-    font-size: 14px;
     width: 250px;
     border: 1px solid rgba(0, 0, 0, .2);
 }
