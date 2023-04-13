@@ -169,7 +169,7 @@ class BulkStringEditor(BaseBulkEditor):
                 row = [value[0] for value in cursor.fetchall()]
                 cursor.execute(count_query)
                 count = cursor.fetchall()
-                number_of_tile, = count[0]
+                (number_of_tile,) = count[0]
             return row, number_of_tile
 
         graph_id = request.POST.get("graph_id", None)
@@ -224,11 +224,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         return {
             "success": True,
-            "data": {
-                "value": return_list,
-                "number_of_tiles": number_of_tiles,
-                "number_of_resources": number_of_resources
-            }
+            "data": {"value": return_list, "number_of_tiles": number_of_tiles, "number_of_resources": number_of_resources},
         }
 
     def write(self, request):
