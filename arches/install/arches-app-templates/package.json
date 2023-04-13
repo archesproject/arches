@@ -2,6 +2,7 @@
     "name": "{{app_name}}",
     "version": "0.0.1",
     "dependencies": {
+        "simple-test-package": "0.2.2"
     },
     "devDependencies": {
     }

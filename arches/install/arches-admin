@@ -149,6 +149,22 @@ class ArchesProjectCommand(TemplateCommand):
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
 
         super(ArchesProjectCommand, self).handle('project', project_name, target, **options)
+    
+def command_startproject(args):
+    cmd = ArchesProjectCommand()
+    options = vars(args)
+    proj_name = options['name']
+    cmd.handle(options)
+    yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
+    os.chdir(yarn_path)
+    subprocess.call("yarn install", shell=True)
+    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
+        os.mkdir(os.path.join(os.getcwd(), 'logs'))
+    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+    open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
+
+COMMANDS['startproject'] = command_startproject
+
 
 class ArchesAppCommand(TemplateCommand):
     help = (
@@ -178,26 +194,13 @@ class ArchesAppCommand(TemplateCommand):
 
         super(ArchesAppCommand, self).handle('app', app_name, target, **options)
 
-def command_startproject(args):
-    cmd = ArchesProjectCommand()
-    options = vars(args)
-    proj_name = options['name']
-    cmd.handle(options)
-    yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    os.chdir(yarn_path)
-    subprocess.call("yarn install", shell=True)
-    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
-        os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
-    open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
-
 def command_startapp(args):
     cmd = ArchesAppCommand()
     options = vars(args)
     cmd.handle(options)
 
-COMMANDS['startproject'] = command_startproject
 COMMANDS['startapp'] = command_startapp
+
 
 class CommandError(Exception):
     pass
