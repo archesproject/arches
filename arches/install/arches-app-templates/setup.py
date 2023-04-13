@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='{{app_name}}',
-    version='0.0.1',    
-    description='',
-    url='',
-    author='',
-    author_email='',
-    license='GNU AGPL3',
+    name="{{app_name}}",
+    version="0.0.1",
+    description="",
+    url="",
+    author="",
+    author_email="",
+    license="GNU AGPL3",
     packages=find_packages(),
     include_package_data=True,
     classifiers=[
