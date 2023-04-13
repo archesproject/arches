@@ -80,7 +80,8 @@
                                                     $root.translations.selectAnOntologyProperty, 
                                                     true
                                                 )
-                                            }
+                                            }, 
+                                            attr: {'aria-label': $root.translations.defaultRelationshipTo + ' ' + $data.name}
                                         "
                                     >
                                 </span>
@@ -112,7 +113,8 @@
                                                 $root.translations.selectAnOntologyProperty, 
                                                 true
                                             )
-                                        }
+                                        },
+                                        attr: {'aria-label': $root.translations.defaultInverseRelationshipTo + ' ' + $data.name}
                                     ">
                                 </span>
 
