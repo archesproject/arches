@@ -11,6 +11,7 @@ define([], function() {
                     require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
                 }
                 catch(e) {  // if arches-core path fails, look in each installed package for path
+                    // eslint-disable-next-line no-undef
                     for (const installedPackage of INSTALLED_PACKAGES) {
                         // eslint-disable-next-line no-undef
                         require(`${INSTALLED_PACKAGES_DIRECTORY}/${installedPackage}/media/js/${componentPath}`);
