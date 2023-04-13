@@ -11,13 +11,13 @@
             type="text" 
             class="form-control library-search" 
             data-bind="
-                attr: {placeholder: $root.translations.addNewOption + '...'},
+                attr: {placeholder: $root.translations.addNewOption + '...', 'aria-label': $root.translations.addNewOption},
                 disable: !isEditable, 
                 value: newOptionLabel, valueUpdate: 'keyup'
             "
         >
-        <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if(isEditable){addNewOption()}}">
-             <i class="fa fa-plus-circle pull-right"></i>
+        <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if(isEditable){addNewOption()}}, attr: {'aria-label': $root.translations.addNewOption}">
+             <i class="fa fa-plus-circle" style="text-align: start"></i>
         </a>
         <div data-bind="sortable: {data: options}">
             <div class="added-domain-option">
@@ -25,8 +25,8 @@
                     <i class="fa fa-ellipsis-v option-drag-handle" aria-hidden="true">  </i>
                 </span>
                 <input class="domain-input-item"  type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
-                <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
-                     <i class="fa fa-minus-circle pull-right"></i>
+                <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}, attr: {'aria-label': $root.translations.removeOption}">
+                     <i class="fa fa-minus-circle" style="text-align: start"></i>
                 </a>
             </div>
         </div>
@@ -49,6 +49,7 @@
                 { text: $root.translations.hasNoValue, value: 'null' },
                 { text: $root.translations.hasAnyValue, value: 'not_null' },
             ],
+            attr: {'aria-label': $root.translations.searchCriteria}
         "
     ></select>
 </div>
@@ -57,7 +58,7 @@
         type="" 
         class="form-control library-search" 
         data-bind="
-            attr: {placeholder: $root.translations.value},
+            attr: {placeholder: $root.translations.value, 'aria-label': $root.translations.value},
             options: options, 
             optionsText: 'text', 
             optionsValue: 'id', 
