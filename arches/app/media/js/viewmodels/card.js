@@ -423,7 +423,7 @@ define([
             if (selected) this.expanded(true);
         }, this);
         this.expanded.subscribe(function(expanded) {
-            if (expanded && this.parent) this.parent.expanded(true);
+            if (expanded && this.parent?.expanded) this.parent.expanded(true);
         }, this);
 
         this.isChildSelected = ko.computed(function() {
