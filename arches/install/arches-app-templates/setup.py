@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='{{APP_NAME}}',
+    name='{{app_name}}',
     version='0.0.1',    
     description='',
     url='',
