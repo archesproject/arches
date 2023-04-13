@@ -9,6 +9,8 @@ import arches
 import inspect
 from django.utils.translation import gettext_lazy as _
 
+from .settings_utils import *
+
 try:
     from arches.settings import *
 except ImportError:
@@ -16,10 +18,6 @@ except ImportError:
 
 APP_NAME = '{{ project_name }}'
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-STATICFILES_DIRS =  (
-    os.path.join(APP_ROOT, 'media', 'build'),
-    os.path.join(APP_ROOT, 'media'),
-) + STATICFILES_DIRS
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -31,9 +29,6 @@ DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
 FUNCTION_LOCATIONS.append('{{ project_name }}.functions')
 ETL_MODULE_LOCATIONS.append('{{ project_name }}.etl_modules')
 SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
-TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
-TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
-TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 LOCALE_PATHS.append(os.path.join(APP_ROOT, 'locale'))
 
@@ -114,6 +109,8 @@ INSTALLED_APPS = (
     "{{ project_name }}",
 )
 
+INSTALLED_PACKAGES = ()
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -130,6 +127,19 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
     # "silk.middleware.SilkyMiddleware",
 ]
+
+STATICFILES_DIRS =  build_staticfiles_dirs(
+    root_dir=ROOT_DIR,
+    app_root=APP_ROOT,
+    installed_packages=INSTALLED_PACKAGES,
+)
+
+TEMPLATES = build_templates_config(
+    root_dir=ROOT_DIR,
+    debug=DEBUG,
+    app_root=APP_ROOT,
+    installed_packages=INSTALLED_PACKAGES,
+)
 
 ALLOWED_HOSTS = []
 
