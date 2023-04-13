@@ -48,7 +48,7 @@ def index_resources(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE
         q.delete(index=TERMS_INDEX)
 
     resource_types = (
-        models.GraphModel.objects.filter(isresource=True)
+        models.GraphModel.objects.filter(isresource=True, isactive=True)
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .values_list("graphid", flat=True)
     )
