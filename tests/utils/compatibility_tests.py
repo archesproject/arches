@@ -30,31 +30,31 @@ class CompatibilityTests(ArchesTestCase):
         self.assertTrue(is_arches_compatible())
 
     def test_min_patch_version_too_high(self):
-        min_version = (VERSION[0], VERSION[1], VERSION[2] + 1) 
-        max_version = (VERSION[0], VERSION[1], VERSION[2] + 2) 
+        min_version = (VERSION[0], VERSION[1], VERSION[2] + 1)
+        max_version = (VERSION[0], VERSION[1], VERSION[2] + 2)
         self.assertFalse(is_arches_compatible(min_version, max_version))
 
     def test_max_patch_version_too_low(self):
-        min_version = (VERSION[0], VERSION[1], VERSION[2] - 1) 
-        max_version = (VERSION[0], VERSION[1], VERSION[2] - 2) 
+        min_version = (VERSION[0], VERSION[1], VERSION[2] - 1)
+        max_version = (VERSION[0], VERSION[1], VERSION[2] - 2)
         self.assertFalse(is_arches_compatible(min_version, max_version))
 
     def test_min_feature_version_too_high(self):
-        min_version = (VERSION[0], VERSION[1] + 1) 
-        max_version = (VERSION[0], VERSION[1] + 2) 
+        min_version = (VERSION[0], VERSION[1] + 1)
+        max_version = (VERSION[0], VERSION[1] + 2)
         self.assertFalse(is_arches_compatible(min_version, max_version))
 
     def test_max_feature_version_too_low(self):
-        min_version = (VERSION[0], VERSION[1] - 1) 
-        max_version = (VERSION[0], VERSION[1] - 2) 
+        min_version = (VERSION[0], VERSION[1] - 1)
+        max_version = (VERSION[0], VERSION[1] - 2)
         self.assertFalse(is_arches_compatible(min_version, max_version))
 
     def test_major_version_too_high(self):
-        min_version = (VERSION[0] + 1,) 
-        max_version = (VERSION[0] + 2,) 
+        min_version = (VERSION[0] + 1,)
+        max_version = (VERSION[0] + 2,)
         self.assertFalse(is_arches_compatible(min_version, max_version))
 
     def test_major_version_too_low(self):
-        min_version = (VERSION[0] - 1,) 
-        max_version = (VERSION[0] - 2,) 
+        min_version = (VERSION[0] - 1,)
+        max_version = (VERSION[0] - 2,)
         self.assertFalse(is_arches_compatible(min_version, max_version))
