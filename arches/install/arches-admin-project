@@ -8,14 +8,11 @@ import sys
 import subprocess
 
 from importlib import import_module
-from django.core.management import call_command
-from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import CommandError
 from django.utils.crypto import get_random_string
 from arches import __version__
 from arches.setup import get_complete_version
-from arches.management.commands import utils
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
@@ -91,7 +88,6 @@ parser = argparse.ArgumentParser(
 subparsers = parser.add_subparsers(title='available commands', dest='command')
 subparsers.required = True
 
-# BEGIN startproject
 parser_startproject = subparsers.add_parser(
     'startproject',
     help="Create the scaffolding for a new Arches project",
@@ -132,99 +128,6 @@ parser_startproject.add_argument(
     type=str,
     default='',
 )
-# END startproject
-# BEGIN startapp
-
-class FooCommand(TemplateCommand):
-    help = (
-        "Creates a Django application directory structure for the given "
-        "application name in the current directory or optionally in the "
-        "given directory."
-    )
-    missing_args_message = "You must provide a valid name."
-
-    def handle(self, options):
-        app_name, target = options.pop('name'), options.pop('directory')
-        self.validate_name(app_name, "app")
-
-        # Check that the app_name cannot be imported.
-        try:
-            import_module(app_name)
-        except ImportError:
-            pass
-        else:
-            raise CommandError(
-                "%r conflicts with the name of an existing "
-                "Python module and cannot be used as an "
-                "application or project name. Please try "
-                "another name." %
-                app_name
-            )
-
-        super(FooCommand, self).handle('app', app_name, target, **options)
-
-def command_startapp(args):
-    cmd = FooCommand()
-    options = vars(args)
-    cmd.handle(options)
-
-    # proj_name = options['name']
-    # name = args.name
-    # directory = args.directory
-    # extensions = args.extensions
-    # template = args.template
-
-    # # call_command('startapp', name, directory=directory, extension=extensions)
-    # call_command('startapp', name, directory=directory, extension=extensions, template=template)
-
-    # yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    # os.chdir(yarn_path)
-    # subprocess.call("yarn install", shell=True)
-    # if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
-    #     os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    # open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
-    # open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
-
-
-parser_startapp = subparsers.add_parser(
-    'startapp',
-    help="Create the scaffolding for a new Arches application",
-)
-
-parser_startapp.add_argument(
-    'name',
-    type=str,
-    help='name of your new application'
-)
-
-parser_startapp.add_argument(
-    '-d', '--directory',
-    help='destination directory of your new project',
-)
-
-parser_startapp.add_argument(
-    '-t', '--template',
-    help="Provides the path to a directory with a custom app template file, or a path to an uncompressed archive, a compressed archive, or a URL containing the app template files.",
-    type=str,
-    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-app-templates')
-)
-
-parser_startapp.add_argument(
-    '-e', '--extension',
-    dest='extensions',
-    help='Specifies which file extensions in the app template should be rendered with the template engine. Defaults to py.',
-    type=str,
-    default='py'
-)
-
-parser_startapp.add_argument(
-    '-n', '--name',
-    dest='files',
-    help='Specifies which files in the app template (in addition to those matching --extension) should be rendered with the template engine.',
-    type=str,
-    default='',
-)
-# END startapp
 
 parser.add_argument(
     '-v', '--verbosity', 
@@ -250,7 +153,6 @@ class CommandError(Exception):
 
 
 COMMANDS['startproject'] = command_startproject
-COMMANDS['startapp'] = command_startapp
 
 
 def main(argv=None):
