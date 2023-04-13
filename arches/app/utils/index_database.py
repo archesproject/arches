@@ -93,7 +93,7 @@ def index_resources_by_type(resource_types, clear_index=True, batch_size=setting
                     bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
                 for resource in resources:
                     if quiet is False and bar is not None:
-                        bar.update(item_id=resource)
+                        bar.update(item_id=resource.pk)
                     document, terms = resource.get_documents_to_index(
                         fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                     )
