@@ -21,7 +21,13 @@ import json
 import os
 import sys
 
-from .settings_utils import *
+try:
+    from settings_utils import *
+except ModuleNotFoundError:
+    try:
+        from .settings_utils import *
+    except:
+        pass
 
 try:
     from django.utils.translation import gettext_lazy as _

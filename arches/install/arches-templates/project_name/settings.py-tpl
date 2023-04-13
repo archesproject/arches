@@ -9,8 +9,6 @@ import arches
 import inspect
 from django.utils.translation import gettext_lazy as _
 
-from .settings_utils import *
-
 try:
     from arches.settings import *
 except ImportError:
