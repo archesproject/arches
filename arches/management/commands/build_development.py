@@ -47,8 +47,5 @@ class Command(BaseCommand):
                 yarn_path = os.path.join(os.getcwd(), proj_name)
                 os.chdir(yarn_path)
 
-                subprocess.call(
-                    "yarn build_development", 
-                    shell=True
-                )
+                subprocess.call("yarn build_development", shell=True)
                 management.call_command("collectstatic", interactive=False)
