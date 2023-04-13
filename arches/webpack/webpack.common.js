@@ -100,7 +100,7 @@ module.exports = () => {
                     
                     for (const [alias, executeableString] of Object.entries(JSON.parse(installedPackageNodeModuleAliases))) {
                         if (
-                            parsedArchesCoreNodeModulesAliases[alias]
+                            parsedInstalledPackagesNodeModulesAliases[alias]
                             || parsedProjectNodeModulesAliases[alias]
                             || parsedArchesCoreNodeModulesAliases[alias]
                         ) {
