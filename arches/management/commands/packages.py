@@ -97,9 +97,7 @@ class Command(BaseCommand):
                 "save_system_settings",
                 "add_mapbox_layer",
                 "load_package",
-                "load_foo",
                 "create_package",
-                "create_foo",
                 "update_package",
                 "export_package_configs",
                 "import_node_value_data",
@@ -357,13 +355,6 @@ class Command(BaseCommand):
                 defer_indexing,
             )
 
-        if options["operation"] in ["load_foo"]:
-            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
-            self.load_foo()
-
-        if options["operation"] in ["create_foo"]:
-            self.create_foo(options["dest_dir"])
-
         if options["operation"] in ["create", "create_package"]:
             self.create_package(options["dest_dir"])
 
@@ -532,15 +523,6 @@ class Command(BaseCommand):
                 print(e)
                 print("Could not save system settings")
             self.export_package_settings(dest_dir, "true")
-
-
-    def create_foo(self, dest_dir):
-        if os.path.exists(dest_dir):
-            print("Cannot create arches application,", dest_dir, "already exists")
-        else:
-            print("Creating arches_application in", dest_dir)
-            shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-app-templates"), dest_dir)
-
 
     def load_package(
         self,
@@ -982,21 +964,6 @@ class Command(BaseCommand):
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
-
-
-    def load_foo(self):
-
-        import site
-
-        site_package_path = site.getsitepackages()
-
-        import pdb; pdb.set_trace()
-        return self.load_package(
-            source=os.path.join(site_package_path[0], settings.INSTALLED_FOO),
-            setup_db=True,
-            dev=True
-        )
-
 
     def setup(self, package_name, es_install_location=None):
         """
