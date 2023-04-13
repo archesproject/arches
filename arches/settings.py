@@ -26,7 +26,7 @@ try:
 except ModuleNotFoundError:
     try:
         from .settings_utils import *
-    except:
+    except ModuleNotFoundError:
         pass
 
 try:
