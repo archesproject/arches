@@ -194,6 +194,21 @@ class ArchesAppCommand(TemplateCommand):
 
         super(ArchesAppCommand, self).handle('app', app_name, target, **options)
 
+        # need to manually replace instances of {{ app_name }}
+        path_to_project = os.path.join(target, app_name) if target else os.path.join(os.getcwd(), app_name)
+
+        for relative_file_path in ['setup.py', 'package.json']:  # relative to app root directory
+            file = open(os.path.join(path_to_project, relative_file_path),'r')
+            file_data = file.read()
+            file.close()
+
+            updated_file_data = file_data.replace('{{ app_name }}', app_name)
+
+            file = open(os.path.join(path_to_project, relative_file_path),'w')
+            file.write(updated_file_data)
+            file.close()
+
+
 def command_startapp(args):
     cmd = ArchesAppCommand()
     options = vars(args)
