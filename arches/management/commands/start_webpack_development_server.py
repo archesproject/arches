@@ -47,7 +47,4 @@ class Command(BaseCommand):
                 yarn_path = os.path.join(os.getcwd(), proj_name)
                 os.chdir(yarn_path)
 
-                subprocess.call(
-                    "yarn start", 
-                    shell=True
-                )
+                subprocess.call("yarn start", shell=True)
