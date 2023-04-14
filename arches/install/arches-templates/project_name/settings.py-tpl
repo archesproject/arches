@@ -346,14 +346,12 @@ except ImportError as e:
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    print(
-        json.dumps({
-            'ARCHES_NAMESPACE_FOR_DATA_EXPORT': ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-            'STATIC_URL': STATIC_URL,
-            'ROOT_DIR': ROOT_DIR,
-            'APP_ROOT': APP_ROOT,
-            'WEBPACK_DEVELOPMENT_SERVER_PORT': WEBPACK_DEVELOPMENT_SERVER_PORT,
-        })
+    transmit_webpack_django_config(
+        root_dir=ROOT_DIR,
+        app_root=APP_ROOT,
+        installed_packages=INSTALLED_PACKAGES,
+        public_server_address=PUBLIC_SERVER_ADDRESS,
+        static_url=STATIC_URL,
+        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
     )
-    sys.stdout.flush()
 
