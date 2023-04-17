@@ -74,6 +74,14 @@ define([
             return graph?.name;
         };
 
+        this.ready = ko.computed(() => {
+            const ready = !!self.selectedGraph() &&
+                !!self.selectedNode() &&
+                ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
+            console.log(ready);
+            return ready;
+        });
+
         this.addAllFormData = () => {
             self.formData.append('operation', self.operation());
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
@@ -126,6 +134,9 @@ define([
         });
 
         this.preview = function() {
+            if (!self.ready()) {
+                return;
+            }
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -153,6 +164,9 @@ define([
         };
 
         this.write = function() {
+            if (!self.ready()) {
+                return;
+            }
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(

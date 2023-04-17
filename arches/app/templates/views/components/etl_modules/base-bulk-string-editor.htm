@@ -84,7 +84,7 @@
             </h4>
             <input type="text" style="width: 500px;" class="form-control" placeholder="New Text" data-bind="value: newText">
         </div>
-        <button style="margin: 25px 8px;" data-bind="click: preview" class="btn btn-success">
+        <button style="margin: 25px 8px;" data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
         </button>
     </div>
@@ -119,7 +119,7 @@
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !ready()}" class="btn btn-success">
         <span data-bind="text: $root.translations.start"></span>
     </button>
     <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
