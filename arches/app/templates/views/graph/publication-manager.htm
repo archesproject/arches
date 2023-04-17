@@ -36,3 +36,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <span>hello world!</span>
 
 {% endblock content %}
+
+{% block pre_require_js %}
+{{block.super}}
+<div 
+    id="graphPublicationData"
+    style="display: none;"
+    graphPublicationData='{
+        "graphs_x_published_graphs": {{graphs_x_published_graphs}},
+    }'
+></div>
+{% endblock pre_require_js %}

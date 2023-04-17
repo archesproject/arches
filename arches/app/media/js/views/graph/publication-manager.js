@@ -4,13 +4,16 @@ require([
     'knockout',
     'arches',
     'views/graph/graph-page-view',
-], function($, _, ko, arches, GraphPageView) {
+    'views/graph/graph-publication-data',
+], function($, _, ko, arches, GraphPageView, data) {
     /**
     * set up the page view model with the graph model and related sub views
     */
     var viewModel = {
         loading: ko.observable(false),
     };
+
+    console.log(data);
 
     /**
     * a GraphPageView representing the graph manager page

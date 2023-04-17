@@ -544,6 +544,7 @@ class PublicationManagerView(GraphBaseView):
 
         context = self.get_context_data(
             main_script="views/graph/publication-manager",
+            graphs_x_published_graphs = JSONSerializer().serialize(models.GraphXPublishedGraph.objects.filter(graph_id=graphid)),
         )
 
         return render(request, "views/graph/publication-manager.htm", context)
