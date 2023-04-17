@@ -538,6 +538,21 @@ class DatatypeTemplateView(TemplateView):
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
+class PublicationManagerView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        context = self.get_context_data(
+            main_script="views/graph/publication-manager",
+        )
+
+        return render(request, "views/graph/publication-manager.htm", context)
+
+    def post(self, request, graphid):
+        pass
+
+
+@method_decorator(group_required("Graph Editor"), name="dispatch")
 class FunctionManagerView(GraphBaseView):
     action = ""
 
