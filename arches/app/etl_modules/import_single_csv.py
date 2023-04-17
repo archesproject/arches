@@ -112,12 +112,12 @@ class ImportSingleCsv(BaseImportModule):
                 data["config"] = row[0][0]
         return {"success": True, "data": data}
 
-    def validate(self):
+    def validate(self, loadid):
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
         """
-        rows = self.get_validation_result()
+        rows = self.get_validation_result(loadid)
         return {"success": True, "data": rows}
 
     def write(self, request):
@@ -164,7 +164,7 @@ class ImportSingleCsv(BaseImportModule):
 
         self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
-        validation = self.validate()
+        validation = self.validate(loadid)
         if len(validation["data"]) == 0:
             with connection.cursor() as cursor:
                 cursor.execute(

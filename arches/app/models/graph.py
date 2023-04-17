@@ -475,7 +475,7 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
@@ -1303,12 +1303,12 @@ class Graph(models.GraphModel):
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
         return ret
 
-    def get_nodegroups(self):
+    def get_nodegroups(self, force_recalculation=False):
         """
         get the nodegroups associated with this graph
 
         """
-        if self.serialized_graph:
+        if self.serialized_graph and not force_recalculation:
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
