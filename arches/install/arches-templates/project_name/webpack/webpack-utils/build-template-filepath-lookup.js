@@ -21,7 +21,7 @@ const _buildTemplateFilePathLookup = function(path, outerAcc, templateDirectoryP
 
             return { 
                 ...acc, 
-                [Path.join('templates', filename)]: Path.resolve(__dirname, Path.join(outerPath, subPath))
+                [Path.join('templates', filename).replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
             };
         }
     }, outerAcc);
