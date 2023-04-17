@@ -131,11 +131,11 @@ class BulkStringEditor(BaseBulkEditor):
             graph_id_query = ""
             resourceids_query = ""
             if node_id:
-                node_id_query = " AND n.nodeid = '{}'".format(node_id)
+                node_id_query = " AND nodeid = '{}'".format(node_id)
             if graph_id:
-                graph_id_query = " AND n.graphid = '{}'".format(graph_id)
+                graph_id_query = " AND graphid = '{}'".format(graph_id)
             if resourceids:
-                resourceids_query = " AND t.resourceinstanceid in {}".format(resourceids)
+                resourceids_query = " AND resourceinstanceid in {}".format(resourceids)
             if language_code is None:
                 language_code = "en"
 
@@ -152,14 +152,21 @@ class BulkStringEditor(BaseBulkEditor):
                 + " LIMIT 5;"
             )
 
-            count_query = (
+            tile_count_query = (
                 """
-                SELECT count(t) FROM tiles t, nodes n
+                SELECT count(t.tileid) FROM tiles t, nodes n
                 WHERE t.nodegroupid = n.nodegroupid
-            """.format(
-                    node_id, language_code
-                )
+            """
                 + node_id_query
+                + graph_id_query
+                + resourceids_query
+            )
+
+            resource_count_query = (
+                """
+                SELECT count(n.resourceinstanceid) FROM resource_instances n
+                WHERE 0 = 0
+            """
                 + graph_id_query
                 + resourceids_query
             )
@@ -167,10 +174,16 @@ class BulkStringEditor(BaseBulkEditor):
             with connection.cursor() as cursor:
                 cursor.execute(sql_query)
                 row = [value[0] for value in cursor.fetchall()]
-                cursor.execute(count_query)
+
+                cursor.execute(tile_count_query)
                 count = cursor.fetchall()
-                (number_of_tile,) = count[0]
-            return row, number_of_tile
+                (number_of_tiles,) = count[0]
+
+                cursor.execute(resource_count_query)
+                count = cursor.fetchall()
+                (number_of_resources,) = count[0]
+
+            return row, number_of_tiles, number_of_resources
 
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
@@ -195,7 +208,7 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values, number_of_tiles = get_first_five_values(graph_id, node_id, resourceids, language_code)
+        first_five_values, number_of_tiles, number_of_resources = get_first_five_values(graph_id, node_id, resourceids, language_code)
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -219,8 +232,6 @@ class BulkStringEditor(BaseBulkEditor):
                     cursor.execute("""SELECT * FROM TRIM(LOWER(%s));""", [value])
                 transformed_value = cursor.fetchone()[0]
                 return_list.append([value, transformed_value])
-
-        number_of_resources = len(resourceids)
 
         return {
             "success": True,
