@@ -342,7 +342,7 @@ class Graph(models.GraphModel):
         validate -- True to validate the graph before saving, defaults to True
         """
 
-        if validate:
+        if validate and str(self.graphid) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             self.validate()
 
         with transaction.atomic():
