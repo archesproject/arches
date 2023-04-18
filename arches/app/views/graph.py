@@ -21,6 +21,7 @@ import zipfile
 import json
 import uuid
 import logging
+from dateutil import tz
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
@@ -48,6 +49,7 @@ from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_pe
 from io import BytesIO
 from elasticsearch.exceptions import RequestError
 from django.core.cache import cache
+
 
 logger = logging.getLogger(__name__)
 
@@ -542,13 +544,21 @@ class PublicationManagerView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
+        graphs_x_published_graphs = sorted(
+            models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True
+        )
+        
+        for graph_x_published_graph in graphs_x_published_graphs:
+            # changes datetime to human-readable format with local timezone
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d %I:%M %p %Z')
+
         context = self.get_context_data(
             main_script="views/graph/publication-manager",
             graph_publication_id=self.graph.publication_id,
-            graphs_x_published_graphs = JSONSerializer().serialize(
-                sorted(models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True)
-            ),
+            graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
         )
+        context["nav"]["title"] = self.graph.name
+        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
 
         return render(request, "views/graph/publication-manager.htm", context)
 

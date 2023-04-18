@@ -5,20 +5,24 @@ require([
     'arches',
     'views/graph/graph-page-view',
     'views/graph/graph-publication-data',
+    'bindings/hover',
 ], function($, _, ko, arches, GraphPageView, data) {
-    /**
-    * set up the page view model with the graph model and related sub views
-    */
     var viewModel = {
         loading: ko.observable(false),
+        graphPublicationIdFromDatabase: ko.observable(data['graph_publication_id']),
+        graphPublicationId: ko.observable(data['graph_publication_id']),
+        publishedGraphs: ko.observable(data['graphs_x_published_graphs']),
+        foo: function(data) {viewModel.graphPublicationId(data['publicationid']);},
+        cancel: function(){},
+        save: function(){},
+        dirty: ko.observable(false),
     };
 
-    console.log(data);
-
-    /**
-    * a GraphPageView representing the graph manager page
-    */
-    var graphPageView = new GraphPageView({
+    viewModel.graphPublicationId.subscribe((graphPublicationId) => {
+        viewModel.dirty(graphPublicationId !== viewModel.graphPublicationIdFromDatabase());
+    });
+    
+    return new GraphPageView({
         viewModel: viewModel
     });
 });

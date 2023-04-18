@@ -17,10 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "views/graph/graph-base.htm" %}
 {% load static %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block graph_header_title %}
-{% trans "Publication Manager" %}
+{% trans "Published Graphs Manager" %}
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
@@ -32,8 +33,42 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-
-<span>hello world!</span>
+<div style="padding: 20px; width: 100%;">
+    <div style="border-bottom: 1px solid #ddd; padding-bottom: 20px;">
+        <h4>{% trans "Select the active published graph:" %}</h4>
+    </div>
+    
+    <div
+        style=""
+    >
+        <fieldset>
+            <!-- ko foreach: $data.publishedGraphs() -->
+            <div 
+                data-bind="
+                    attr: { 'class': $data['publicationid'] === $parent.graphPublicationId() ? 'publication active-publication' : 'publication' },
+                    click: $parent.foo
+                "
+            >
+                <input 
+                    style="margin: 0px; cursor: pointer; pointer-events: none;" 
+                    type="radio" 
+                    data-bind="
+                        checkedValue: $data['publicationid'], 
+                        checked: $parent.graphPublicationId(),
+                    "
+                />
+                <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
+                    <span>{% trans '( current active version )' %}</span>
+                <!-- /ko -->
+                <span data-bind="text: $data['published_time']"></span>
+                <span data-bind="text: $data['notes'] || {% quoted_trans 'None' %}"></span>
+            </div>
+            <!-- /ko -->
+        </fieldset>
+    </div>
+    
+    <div data-bind="text: console.log($data)"></div>
+</div>
 
 {% endblock content %}
 

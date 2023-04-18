@@ -5166,6 +5166,21 @@ div.dropdown-menu.open {
     z-index: 10;
 }
 
+.publication {
+    cursor: pointer;
+    height: 60px; 
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 8px; 
+}
+
+.active-publication, .publication:hover {
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
 .graph-list-header {
     position: sticky;
     top: 0px;
