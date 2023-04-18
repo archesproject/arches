@@ -49,7 +49,7 @@ legend.arches-signin-subtext {
 
 .floating-label-input:focus ~ .floating-label, 
 .floating-label-input:valid ~ .floating-label {
-    top: -2em;
+    top: -2.5em;
     font-size: 0.8em;   
 }
 
@@ -60,7 +60,7 @@ legend.arches-signin-subtext {
 
 .floating-label {
     position: absolute;
-    padding: 0 0.5em 0 0.5em;
+    padding: 0 0.75em 0 0.75em;
     top: 1em;
     pointer-events: none;
     user-select: none;
@@ -132,6 +132,11 @@ legend.arches-signin-subtext {
     margin-top: 65px;
     width: 250px;
     border: 1px solid rgba(0, 0, 0, .2);
+    left: auto;
+}
+
+.popover.bottom > .arrow:after {
+    left: 50%;
 }
 
 .change-password-form .panel {
@@ -169,7 +174,7 @@ legend.arches-signin-subtext {
 }
 
 .change-password-form .panel-heading {
-    text-align: left;
+    text-align: start;
     position: relative;
     padding: 10px 15px;
     height: 40px;
@@ -185,4 +190,31 @@ legend.arches-signin-subtext {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+}
+
+.password-rules {
+    margin-top: -5px;
+    font-size: 12px;
+    color: #555;
+}
+
+.password-rule {
+    color: #888;
+    font-size: 13px;
+    padding-left: 5px;
+    padding-bottom: 3px;
+    display:flex;
+}
+
+.password-rule span {
+    padding-inline-start: 3px;
+    font-size: 12px;
+}
+
+.password-rule i {
+    font-size: 11px;
+}
+
+.password-rules > .list-unstyled {
+    padding-inline-start: initial;
 }
