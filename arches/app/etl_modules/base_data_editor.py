@@ -135,7 +135,7 @@ class BulkStringEditor(BaseBulkEditor):
             if graph_id:
                 graph_id_query = " AND graphid = '{}'".format(graph_id)
             if resourceids:
-                resourceids_query = " AND resourceinstanceid in {}".format(resourceids)
+                resourceids_query = " AND resourceinstanceid IN {}".format(resourceids)
             if language_code is None:
                 language_code = "en"
 
@@ -202,7 +202,8 @@ class BulkStringEditor(BaseBulkEditor):
             resourceids = self.get_resourceids_from_search_url(search_url)
         if resourceids:
             resourceids = tuple(resourceids)
-
+            if len(resourceids) == 1:
+                resourceids = "('{}')".format(resourceids[0])
         if case_insensitive == "true" and operation == "replace":
             operation = "replace_i"
         if also_trim == "true":
