@@ -26,8 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_buttons %}
 <span style="display: flex" data-bind="if: dirty">
-    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel"><span>{% trans "Discard Edits" %}</span></button>
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Save Edits" %}</span></button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Update Published Version" %}</span></button>
 </span>
 {{ block.super }}
 {% endblock graph_header_buttons %}
@@ -66,7 +65,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div style="margin-right: 12px;">
                 <span><strong>{% trans "Publisher:" %}</strong></span>
-                <span>Chuck Berry</span>
+                <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
+                    <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['first_name']"></span>
+                <!-- /ko -->
+                <!-- ko if: $parent['publishedUserData']()[$data.user_id]['last_name'] -->
+                    <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['last_name']">,</span>
+                <!-- /ko -->
+                <span>|</span>
+                <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['username']"></span>
             </div>
 
             <div style="display: flex; align-items: center; width: 500px;">
@@ -101,9 +107,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </div>
 
-            <div style="">
-                <div style="padding: 8px" class="fa fa-trash fa-lg"></div>
-            </div>
+            <div 
+                style="padding: 8px; width: 75px;" 
+                class=""
+                data-bind="attr: { 'class': $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() && 'fa fa-trash fa-lg' }"
+            ></div>
         </div>
         <!-- /ko -->
     </fieldset>
@@ -119,6 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     graphPublicationData='{
         "graphs_x_published_graphs": {{graphs_x_published_graphs}},
         "graph_publication_id": "{{graph_publication_id}}",
+        "user_ids_to_user_data": {{user_ids_to_user_data}},
     }'
 ></div>
 {% endblock pre_require_js %}

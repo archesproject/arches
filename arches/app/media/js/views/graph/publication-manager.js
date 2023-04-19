@@ -7,13 +7,14 @@ require([
     'views/graph/graph-publication-data',
     'bindings/hover',
 ], function($, _, ko, arches, GraphPageView, data) {
+    console.log(data)
     var viewModel = {
         loading: ko.observable(false),
+        publishedUserData: ko.observable(data['user_ids_to_user_data']),
         graphPublicationIdFromDatabase: ko.observable(data['graph_publication_id']),
         graphPublicationId: ko.observable(data['graph_publication_id']),
         publishedGraphs: ko.observable(data['graphs_x_published_graphs']),
         foo: function(data) {viewModel.graphPublicationId(data['publicationid']);},
-        cancel: function(){},
         save: function(){},
         dirty: ko.observable(false),
     };

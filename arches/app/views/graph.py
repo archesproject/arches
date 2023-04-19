@@ -547,15 +547,26 @@ class PublicationManagerView(GraphBaseView):
         graphs_x_published_graphs = sorted(
             models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True
         )
+
+        user_ids_to_user_data = {}
         
         for graph_x_published_graph in graphs_x_published_graphs:
             # changes datetime to human-readable format with local timezone
             graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d | %I:%M %p %Z')
 
+            if not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
+                user_ids_to_user_data[graph_x_published_graph.user.pk] = {
+                    'username': graph_x_published_graph.user.username,
+                    'first_name': graph_x_published_graph.user.first_name,
+                    'last_name': graph_x_published_graph.user.last_name,
+                }
+
+
         context = self.get_context_data(
             main_script="views/graph/publication-manager",
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
+            user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data)
         )
         context["nav"]["title"] = self.graph.name
         context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
