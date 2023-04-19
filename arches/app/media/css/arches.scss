@@ -5169,13 +5169,21 @@ div.dropdown-menu.open {
 .publication {
     cursor: pointer;
     height: 60px; 
-    display: flex;
+    display: grid;
+    grid-auto-flow: column;
     align-items: center;
     border-bottom: 1px solid #ddd;
     padding: 8px; 
 }
 
-.active-publication, .publication:hover {
+.publication:hover {
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.active-publication {
+    height: 120px;
     background-color: #fff;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
