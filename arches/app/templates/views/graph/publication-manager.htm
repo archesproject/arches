@@ -38,24 +38,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div 
             data-bind="
                 attr: { 'class': $data['publicationid'] === $parent.graphPublicationId() ? 'publication active-publication' : 'publication' },
-                click: $parent.foo
+                click: $parent.selectPublication
             "
         >
-            <div style="display:flex; align-items: center;">
-                <input 
-                    style="margin: 0px; cursor: pointer; pointer-events: none;" 
-                    type="radio" 
-                    data-bind="
-                        checkedValue: $data['publicationid'], 
-                        checked: $parent.graphPublicationId(),
-                    "
-                />
+            <input 
+                style="margin: 0px; cursor: pointer; pointer-events: none;" 
+                type="radio" 
+                data-bind="
+                    checkedValue: $data['publicationid'], 
+                    checked: $parent.graphPublicationId(),
+                "
+            />
 
-                <div style="margin-left: 12px; width: 60px; color: green">
-                    <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
-                        <span><strong>{% trans 'Active' %}</strong></span>
-                    <!-- /ko -->
-                </div>
+            <div style="margin-left: 12px; width: 60px; color: green">
+                <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
+                    <span><strong>{% trans 'Active' %}</strong></span>
+                <!-- /ko -->
             </div>
 
             <div style="margin-right: 12px;">
@@ -87,7 +85,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         "
                     >
                         <textarea 
-                            style="width: 380px; height: 100px; position: absolute; cursor: pointer;" 
+                            style="width: 380px; height: 80px; margin-top: 10px; position: absolute; cursor: pointer;" 
                             data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
                             readonly
                         ></textarea>

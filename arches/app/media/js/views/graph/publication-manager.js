@@ -14,7 +14,7 @@ require([
         graphPublicationIdFromDatabase: ko.observable(data['graph_publication_id']),
         graphPublicationId: ko.observable(data['graph_publication_id']),
         publishedGraphs: ko.observable(data['graphs_x_published_graphs']),
-        foo: function(data) {viewModel.graphPublicationId(data['publicationid']);},
+        selectPublication: function(data) {viewModel.graphPublicationId(data['publicationid']);},
         save: function(){},
         dirty: ko.observable(false),
     };
