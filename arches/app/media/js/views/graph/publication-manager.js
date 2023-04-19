@@ -61,7 +61,7 @@ require([
                     },
                 });
             },
-        ))
+        ));
     }
     
     return new GraphPageView({
