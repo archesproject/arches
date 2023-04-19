@@ -579,9 +579,7 @@ class PublicationManagerView(GraphBaseView):
     def delete(self, request, graphid):
         publication_id = JSONDeserializer().deserialize(request.body)
         publication = models.GraphXPublishedGraph.objects.get(pk=publication_id)
-        # publication.delete()
-
-        raise Exception
+        publication.delete()
 
         graphs_x_published_graphs = sorted(
             models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True
