@@ -8327,7 +8327,7 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
 .input-group .form-control {
     position: relative;
     z-index: 0;
-    float: left;
+    float: inherit;
     width: 100%;
     margin-bottom: 0;
 }
