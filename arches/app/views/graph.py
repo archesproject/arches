@@ -576,6 +576,23 @@ class PublicationManagerView(GraphBaseView):
     def post(self, request, graphid):
         pass
 
+    def delete(self, request, graphid):
+        publication_id = JSONDeserializer().deserialize(request.body)
+        publication = models.GraphXPublishedGraph.objects.get(pk=publication_id)
+        # publication.delete()
+
+        raise Exception
+
+        graphs_x_published_graphs = sorted(
+            models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True
+        )
+
+        for graph_x_published_graph in graphs_x_published_graphs:
+            # changes datetime to human-readable format with local timezone
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d | %I:%M %p %Z')
+
+        return JSONResponse(JSONSerializer().serialize(graphs_x_published_graphs))
+
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
 class FunctionManagerView(GraphBaseView):

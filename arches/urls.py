@@ -189,6 +189,7 @@ urlpatterns = [
     url(r"^graph/(?P<graphid>%s)/publish$" % uuid_regex, GraphPublicationView.as_view(action="publish"), name="publish_graph"),
     url(r"^graph/(?P<graphid>%s)/revert$" % uuid_regex, GraphPublicationView.as_view(action="revert"), name="revert_graph"),
     url(r"^graph/(?P<graphid>%s)/publication_manager$" % uuid_regex, PublicationManagerView.as_view(), name="publication_manager"),
+    url(r"^graph/(?P<graphid>%s)/delete_published_graph$" % uuid_regex, PublicationManagerView.as_view(), name="delete_published_graph"),
     url(r"^graph/(?P<graphid>%s)/function_manager$" % uuid_regex, FunctionManagerView.as_view(), name="function_manager"),
     url(r"^graph/(?P<graphid>%s)/apply_functions$" % uuid_regex, FunctionManagerView.as_view(), name="apply_functions"),
     url(r"^graph/(?P<graphid>%s)/remove_functions$" % uuid_regex, FunctionManagerView.as_view(), name="remove_functions"),

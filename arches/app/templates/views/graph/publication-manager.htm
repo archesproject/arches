@@ -114,7 +114,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div 
                 style="padding: 8px; width: 75px;" 
                 class=""
-                data-bind="attr: { 'class': $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() && 'fa fa-trash fa-lg' }"
+                data-bind="
+                    attr: { 
+                        'class': $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() && 'fa fa-trash fa-lg' 
+                    },
+                    click: function() { $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() && $parent.showDeletePublicationAlert($data['publicationid']); },
+                "
             ></div>
         </div>
         <!-- /ko -->

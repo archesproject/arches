@@ -3,11 +3,11 @@ require([
     'underscore',
     'knockout',
     'arches',
+    'viewmodels/alert',
     'views/graph/graph-page-view',
     'views/graph/graph-publication-data',
     'bindings/hover',
-], function($, _, ko, arches, GraphPageView, data) {
-    console.log(data)
+], function($, _, ko, arches, AlertViewModel, GraphPageView, data) {
     var viewModel = {
         loading: ko.observable(false),
         publishedUserData: ko.observable(data['user_ids_to_user_data']),
@@ -16,12 +16,53 @@ require([
         publishedGraphs: ko.observable(data['graphs_x_published_graphs']),
         selectPublication: function(data) {viewModel.graphPublicationId(data['publicationid']);},
         save: function(){},
+        showDeletePublicationAlert: showDeletePublicationAlert,
         dirty: ko.observable(false),
     };
 
     viewModel.graphPublicationId.subscribe((graphPublicationId) => {
         viewModel.dirty(graphPublicationId !== viewModel.graphPublicationIdFromDatabase());
     });
+
+    function showDeletePublicationAlert(graphPublicationId) {
+        viewModel.alert(new AlertViewModel(
+            'ep-alert-red',
+            arches.translations.confirmGraphPublicationDelete['title'],
+            arches.translations.confirmGraphPublicationDelete['text'],
+            function(){/* cancel */},
+            function(){
+                $.ajax({
+                    type: "DELETE",
+                    url: arches.urls.delete_published_graph.replace('//', '/' + viewModel.graphid() + '/'),
+                    data: JSON.stringify(graphPublicationId),
+                    success: function(_response) {
+                        const alert = new AlertViewModel(
+                            'ep-alert-blue',
+                            arches.translations.graphPublicationDeleteSuccess['title'],
+                            arches.translations.graphPublicationDeleteSuccess['text'],
+                            null,
+                            function(){/* OK */},
+                        );
+
+                        viewModel.alert(alert);
+
+                        alert.active.subscribe(function() {
+                            viewModel.publishedGraphs(_response);
+                        });
+                    },
+                    error: function(_response) {
+                        viewModel.alert(new AlertViewModel(
+                            'ep-alert-red',
+                            arches.translations.graphPublicationDeleteFailure['title'],
+                            arches.translations.graphPublicationDeleteFailure['text'],
+                            null,
+                            function() {/* OK */}
+                        ));
+                    },
+                });
+            },
+        ))
+    }
     
     return new GraphPageView({
         viewModel: viewModel

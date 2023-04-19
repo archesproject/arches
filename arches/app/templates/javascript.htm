@@ -112,6 +112,18 @@
             "title": "{% trans "Delete Branch/Resource Model?" %}",
             "text": "{% trans "Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
         }'
+        confirm-graph-publication-delete='{
+            "title": "{% trans "Delete Published Graph?" %}",
+            "text": "{% trans "Deleting this publication will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-delete-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully deleted." %}"
+        }'
+        graph-publication-delete-failure='{
+            "title": "{% jsescaped_trans "Delete Published Graph Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
         confirm-graph-revert='{
             "title": "{% trans "Revert Branch/Resource Model?" %}",
             "text": "{% trans "This will revert the current branch/resource model to the latest published version.  Are you sure you would like to proceed?" %}"
@@ -844,6 +856,7 @@
         delete_provisional_tile="{% url 'delete_provisional_tile' %}"
         tile_history="{% url 'tile_history' %}"
         download_files="{% url 'download_files' %}"
+        delete_published_graph='"{% url "delete_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         remove_functions='"{% url "remove_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         time_wheel_config="{% url 'time_wheel_config' %}"
