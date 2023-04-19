@@ -550,7 +550,7 @@ class PublicationManagerView(GraphBaseView):
         
         for graph_x_published_graph in graphs_x_published_graphs:
             # changes datetime to human-readable format with local timezone
-            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d %I:%M %p %Z')
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d | %I:%M %p %Z')
 
         context = self.get_context_data(
             main_script="views/graph/publication-manager",
