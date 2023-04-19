@@ -21,7 +21,7 @@ define([
                         if (res.isactive === true) {
                             self.resourceModels.push(res);
                         }
-                    })
+                    });
                 } else {
                     // eslint-disable-next-line no-console
                     console.log('Failed to fetch resource instance list');
