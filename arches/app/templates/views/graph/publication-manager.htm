@@ -26,7 +26,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_header_buttons %}
 <span style="display: flex" data-bind="if: dirty">
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Update Published Version" %}</span></button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Update Published Graph" %}</span></button>
 </span>
 {{ block.super }}
 {% endblock graph_header_buttons %}
@@ -41,36 +41,42 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 click: $parent.selectPublication
             "
         >
-            <input 
-                style="margin: 0px; cursor: pointer; pointer-events: none;" 
-                type="radio" 
-                data-bind="
-                    checkedValue: $data['publicationid'], 
-                    checked: $parent.graphPublicationId(),
-                "
-            />
+            <div style="margin-right: 12px; display: flex; align-items: center;">
+                <input 
+                    style="margin: 0px; cursor: pointer; pointer-events: none;" 
+                    type="radio" 
+                    data-bind="
+                        checkedValue: $data['publicationid'], 
+                        checked: $parent.graphPublicationId(),
+                    "
+                />
+            </div>
 
-            <div style="margin-left: 12px; width: 60px; color: green">
+            <div style="margin-right: 12px; width: 60px; color: green">
                 <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
                     <span><strong>{% trans 'Active' %}</strong></span>
                 <!-- /ko -->
             </div>
 
-            <div style="margin-right: 12px;">
-                <span><strong>{% trans "Published Time:" %}</strong></span>
-                <span data-bind="text: $data['published_time']"></span>
+            <div style="margin-right: 12px; width: 280px; justify-content: center; display: flex;">
+                <div>
+                    <span><strong>{% trans "Published Time:" %}</strong></span>
+                    <span data-bind="text: $data['published_time']"></span>
+                </div>
             </div>
 
-            <div style="margin-right: 12px;">
-                <span><strong>{% trans "Publisher:" %}</strong></span>
-                <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
-                    <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['first_name']"></span>
-                <!-- /ko -->
-                <!-- ko if: $parent['publishedUserData']()[$data.user_id]['last_name'] -->
-                    <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['last_name']">,</span>
-                <!-- /ko -->
-                <span>|</span>
-                <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['username']"></span>
+            <div style="margin-right: 12px; width: 260px; justify-content: center; display: flex;">
+                <div>
+                    <span><strong>{% trans "Publisher:" %}</strong></span>
+                    <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
+                        <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['first_name']"></span>
+                    <!-- /ko -->
+                    <!-- ko if: $parent['publishedUserData']()[$data.user_id]['last_name'] -->
+                        <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['last_name']">,</span>
+                    <!-- /ko -->
+                    <span>|</span>
+                    <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['username']"></span>
+                </div>
             </div>
 
             <div style="display: flex; align-items: center; width: 500px;">
