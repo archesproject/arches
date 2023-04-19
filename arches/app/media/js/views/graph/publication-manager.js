@@ -15,7 +15,7 @@ require([
         graphPublicationId: ko.observable(data['graph_publication_id']),
         publishedGraphs: ko.observable(data['graphs_x_published_graphs']),
         selectPublication: function(data) {viewModel.graphPublicationId(data['publicationid']);},
-        save: function(){},
+        showUpdatePublicationAlert: showUpdatePublicationAlert,
         showDeletePublicationAlert: showDeletePublicationAlert,
         dirty: ko.observable(false),
     };
@@ -23,6 +23,46 @@ require([
     viewModel.graphPublicationId.subscribe((graphPublicationId) => {
         viewModel.dirty(graphPublicationId !== viewModel.graphPublicationIdFromDatabase());
     });
+
+    function showUpdatePublicationAlert(graphPublicationId) {
+        viewModel.alert(new AlertViewModel(
+            'ep-alert-blue',
+            arches.translations.confirmGraphPublicationUpdate['title'],
+            arches.translations.confirmGraphPublicationUpdate['text'],
+            function(){/* cancel */},
+            function(){
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.update_published_graph.replace('//', '/' + viewModel.graphid() + '/'),
+                    data: JSON.stringify(graphPublicationId),
+                    success: function(_response) {
+                        const alert = new AlertViewModel(
+                            'ep-alert-blue',
+                            arches.translations.graphPublicationUpdateSuccess['title'],
+                            arches.translations.graphPublicationUpdateSuccess['text'],
+                            null,
+                            function(){/* OK */},
+                        );
+
+                        viewModel.alert(alert);
+
+                        alert.active.subscribe(function() {
+                            // viewModel.publishedGraphs(_response);
+                        });
+                    },
+                    error: function(_response) {
+                        viewModel.alert(new AlertViewModel(
+                            'ep-alert-red',
+                            arches.translations.graphPublicationUpdateFailure['title'],
+                            arches.translations.graphPublicationUpdateFailure['text'],
+                            null,
+                            function() {/* OK */}
+                        ));
+                    },
+                });
+            },
+        ));
+    }
 
     function showDeletePublicationAlert(graphPublicationId) {
         viewModel.alert(new AlertViewModel(
