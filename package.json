@@ -71,7 +71,7 @@
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "2.0.16",
         "select2": "3.5.1",
-        // we should be able to revert back to the hosted version of selectWoo once jquery 3.7.0 is released
+        "//": "we should be able to revert back to the hosted version of selectWoo once jquery 3.7.0 is released",
         "select-woo": "archesproject/selectWoo#jquery_focus_fix",  
         "underscore": "1.13.4",
         "uuidjs": "^3.3.0",
