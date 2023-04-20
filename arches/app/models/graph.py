@@ -867,8 +867,9 @@ class Graph(models.GraphModel):
                 widget.node_id = node_map[widget.node_id]
                 widget.card_id = card_map[widget.card_id]
             except:
-                import pdb; pdb.set_trace()
+                import pdb
 
+                pdb.set_trace()
 
         copy_of_self.populate_null_nodegroups()
 

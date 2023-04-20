@@ -549,24 +549,25 @@ class PublicationManagerView(GraphBaseView):
         )
 
         user_ids_to_user_data = {}
-        
+
         for graph_x_published_graph in graphs_x_published_graphs:
             # changes datetime to human-readable format with local timezone
-            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d | %I:%M %p %Z')
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
+                "%Y-%m-%d | %I:%M %p %Z"
+            )
 
             if not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
                 user_ids_to_user_data[graph_x_published_graph.user.pk] = {
-                    'username': graph_x_published_graph.user.username,
-                    'first_name': graph_x_published_graph.user.first_name,
-                    'last_name': graph_x_published_graph.user.last_name,
+                    "username": graph_x_published_graph.user.username,
+                    "first_name": graph_x_published_graph.user.first_name,
+                    "last_name": graph_x_published_graph.user.last_name,
                 }
-
 
         context = self.get_context_data(
             main_script="views/graph/publication-manager",
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
-            user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data)
+            user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
         )
         context["nav"]["title"] = self.graph.name
         context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
@@ -583,12 +584,12 @@ class PublicationManagerView(GraphBaseView):
         updated_graph = Graph(serialized_graph)
 
         widget_dict = {}
-        
-        for widget in serialized_graph['widgets']:
-            widget['id'] = uuid.UUID(widget['id'])
-            widget['node_id'] = uuid.UUID(widget['node_id'])
+
+        for widget in serialized_graph["widgets"]:
+            widget["id"] = uuid.UUID(widget["id"])
+            widget["node_id"] = uuid.UUID(widget["node_id"])
             # widget['card_id'] = uuid.UUID(widget['card_id'])
-            widget['widget_id'] = uuid.UUID(widget['widget_id'])
+            widget["widget_id"] = uuid.UUID(widget["widget_id"])
 
             updated_widget = models.CardXNodeXWidget()
 
@@ -596,9 +597,7 @@ class PublicationManagerView(GraphBaseView):
                 setattr(updated_widget, key, widget[key])
 
             # delete database object before save to bypass database constraints
-            models.CardXNodeXWidget.objects.get(
-                node_id=widget['node_id']
-            ).delete()
+            models.CardXNodeXWidget.objects.get(node_id=widget["node_id"]).delete()
 
             updated_widget.save()
 
@@ -609,7 +608,7 @@ class PublicationManagerView(GraphBaseView):
         updated_graph.save()
         updated_graph.create_editable_future_graph()
 
-        return JSONResponse(JSONSerializer().serialize({'success' : True}))
+        return JSONResponse(JSONSerializer().serialize({"success": True}))
 
     def delete(self, request, graphid):
         publication_id = JSONDeserializer().deserialize(request.body)
@@ -622,7 +621,9 @@ class PublicationManagerView(GraphBaseView):
 
         for graph_x_published_graph in graphs_x_published_graphs:
             # changes datetime to human-readable format with local timezone
-            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime('%Y-%m-%d | %I:%M %p %Z')
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
+                "%Y-%m-%d | %I:%M %p %Z"
+            )
 
         return JSONResponse(JSONSerializer().serialize(graphs_x_published_graphs))
 
