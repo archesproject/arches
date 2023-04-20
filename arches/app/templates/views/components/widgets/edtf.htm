@@ -8,11 +8,13 @@
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
     <div class="form-group">
-        <div class="widget-inline-tools-collapser" style="max-width: 600px;" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
-            showEDTFFormats(!showEDTFFormats());
-        }" tabindex="0">
-            <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-            <span>
+        <div class="widget-inline-tools-collapser" style="max-width: 600px;" 
+            data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function() { showEDTFFormats(!showEDTFFormats()); },
+            attr: { 'aria-expanded': showEDTFFormats() }" 
+            tabindex="0" role=""
+        > <span data-bind="console.log(showEDTFFormats())"></span>
+            <span class="control-label widget-input-label" data-bind="text:label"></span><span>
                 <i class="fa" data-bind="{
                     css: {
                         'fa-caret-down' : !showEDTFFormats(),
@@ -108,12 +110,15 @@
               </div>
           </div>
         <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, disabled: disabled}" class="form-control input-lg widget-input">
+            <input type="text" data-bind="
+                textInput: value, 
+                attr: {placeholder: placeholder, disabled: disabled, 'aria-label': label}" 
+                class="form-control input-lg widget-input">
         </div>
         <div class="col-xs-12" data-bind="if: value">
-            <label class="control-label widget-input-label" for="">
+            <span class="control-label widget-input-label">
                 <span data-bind="text: $root.translations.preview"></span>
-            </label>
+            </span>
             <div data-bind="text: transformedEdtf() ? transformedEdtf : $root.translations.notAValidEdtfFormat" style='margin-bottom:2px'>
             </div>
         </div>
