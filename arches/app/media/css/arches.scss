@@ -13330,22 +13330,6 @@ ul.select2-choices:after {
     font-size: 0.9em;
 }
 
-.widget-inline-tools-collapser {
-    cursor: pointer;
-    font-size: 0.9em;
-    display: flex;
-    z-index: 1;
-    margin-bottom: 5px;
-}
-
-.widget-inline-tools-collapser>label {
-    flex-grow: 1;
-}
-
-.widget-inline-tools-collapser>span {
-    padding-inline-end: 12px;
-}
-
 .style-tools-panel {
     background: #fbfbfb;
     border: 1px solid #ddd;

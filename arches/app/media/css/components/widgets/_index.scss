@@ -119,3 +119,19 @@ div.row.widget-wrapper {
     border: 1px solid #ddd;
     border-radius: 2px;
 }
+
+.widget-inline-tools-collapser {
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    z-index: 1;
+    margin-bottom: 5px;
+}
+
+.widget-inline-tools-collapser>.widget-input-label {
+    flex-grow: 1;
+}
+
+.widget-inline-tools-collapser>span {
+    padding-inline-end: 12px;
+}
