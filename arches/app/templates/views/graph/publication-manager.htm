@@ -25,8 +25,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
-<span style="display: flex" data-bind="if: dirty">
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: showUpdatePublicationAlert"><span>{% trans "Update Graph" %}</span></button>
+<span style="display: flex">
+    <button 
+        class="btn btn-sm btn-danger btn-labeled fa fa-trash" 
+        data-bind="
+            attr: { disabled: graphPublicationId() === graphPublicationIdFromDatabase() },
+            click: function() { graphPublicationId() !== graphPublicationIdFromDatabase() && showDeletePublicationAlert(); }
+        "
+    >
+        <span>{% trans "Delete Pusblished Graph" %}</span>
+    </button>
+    <button 
+        class="btn btn-sm btn-primary btn-labeled fa fa-check" 
+        data-bind="
+            attr: { disabled: graphPublicationId() === graphPublicationIdFromDatabase() },
+            click: function() { graphPublicationId() !== graphPublicationIdFromDatabase() && showUpdatePublicationAlert(); }
+        "
+    >
+        <span>{% trans "Update Graph Model from Published Graph" %}</span>
+    </button>
 </span>
 {{ block.super }}
 {% endblock graph_header_buttons %}
@@ -112,17 +129,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 <!-- /ko -->
             </div>
-
-            <div 
-                style="padding: 8px; width: 75px;" 
-                class=""
-                data-bind="
-                    attr: { 
-                        'class': $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() && 'fa fa-trash fa-lg' 
-                    },
-                    click: function() { $data['publicationid'] !== $parent.graphPublicationIdFromDatabase() && $parent.showDeletePublicationAlert($data['publicationid']); },
-                "
-            ></div>
         </div>
         <!-- /ko -->
     </fieldset>

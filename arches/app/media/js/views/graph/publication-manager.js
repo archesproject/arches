@@ -17,12 +17,7 @@ require([
         selectPublication: function(data) {viewModel.graphPublicationId(data['publicationid']);},
         showUpdatePublicationAlert: showUpdatePublicationAlert,
         showDeletePublicationAlert: showDeletePublicationAlert,
-        dirty: ko.observable(false),
     };
-
-    viewModel.graphPublicationId.subscribe((graphPublicationId) => {
-        viewModel.dirty(graphPublicationId !== viewModel.graphPublicationIdFromDatabase());
-    });
 
     function showUpdatePublicationAlert() {
         viewModel.alert(new AlertViewModel(
@@ -38,20 +33,7 @@ require([
                     url: arches.urls.update_published_graph.replace('//', '/' + viewModel.graphid() + '/'),
                     data: JSON.stringify(viewModel.graphPublicationId()),
                     success: function(_response) {
-                        const alert = new AlertViewModel(
-                            'ep-alert-blue',
-                            arches.translations.graphPublicationUpdateSuccess['title'],
-                            arches.translations.graphPublicationUpdateSuccess['text'],
-                            null,
-                            function(){/* OK */},
-                        );
-
-                        viewModel.alert(alert);
-                        viewModel.loading(false);
-
-                        alert.active.subscribe(function() {
-                            window.location.reload();  // reload because Graph label can change
-                        });
+                        window.location.assign(arches.urls.graph_designer(viewModel.graphid()));
                     },
                     error: function(_response) {
                         viewModel.alert(new AlertViewModel(
@@ -67,7 +49,7 @@ require([
         ));
     }
 
-    function showDeletePublicationAlert(graphPublicationId) {
+    function showDeletePublicationAlert() {
         viewModel.alert(new AlertViewModel(
             'ep-alert-red',
             arches.translations.confirmGraphPublicationDelete['title'],
@@ -77,7 +59,7 @@ require([
                 $.ajax({
                     type: "DELETE",
                     url: arches.urls.delete_published_graph.replace('//', '/' + viewModel.graphid() + '/'),
-                    data: JSON.stringify(graphPublicationId),
+                    data: JSON.stringify(viewModel.graphPublicationId()),
                     success: function(_response) {
                         const alert = new AlertViewModel(
                             'ep-alert-blue',
