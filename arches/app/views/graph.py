@@ -574,7 +574,42 @@ class PublicationManagerView(GraphBaseView):
         return render(request, "views/graph/publication-manager.htm", context)
 
     def post(self, request, graphid):
-        pass
+        publication_id = JSONDeserializer().deserialize(request.body)
+
+        user_language = translation.get_language()
+        publication = models.PublishedGraph.objects.get(publication_id=publication_id, language=user_language)
+        serialized_graph = publication.serialized_graph
+
+        updated_graph = Graph(serialized_graph)
+
+        widget_dict = {}
+        
+        for widget in serialized_graph['widgets']:
+            widget['id'] = uuid.UUID(widget['id'])
+            widget['node_id'] = uuid.UUID(widget['node_id'])
+            # widget['card_id'] = uuid.UUID(widget['card_id'])
+            widget['widget_id'] = uuid.UUID(widget['widget_id'])
+
+            updated_widget = models.CardXNodeXWidget()
+
+            for key in widget.keys():
+                setattr(updated_widget, key, widget[key])
+
+            # delete database object before save to bypass database constraints
+            models.CardXNodeXWidget.objects.get(
+                node_id=widget['node_id']
+            ).delete()
+
+            updated_widget.save()
+
+            widget_dict[updated_widget.pk] = updated_widget
+
+        updated_graph.widgets = widget_dict
+
+        updated_graph.save()
+        updated_graph.create_editable_future_graph()
+
+        return JSONResponse(JSONSerializer().serialize({'success' : True}))
 
     def delete(self, request, graphid):
         publication_id = JSONDeserializer().deserialize(request.body)

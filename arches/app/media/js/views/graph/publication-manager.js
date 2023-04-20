@@ -24,17 +24,19 @@ require([
         viewModel.dirty(graphPublicationId !== viewModel.graphPublicationIdFromDatabase());
     });
 
-    function showUpdatePublicationAlert(graphPublicationId) {
+    function showUpdatePublicationAlert() {
         viewModel.alert(new AlertViewModel(
             'ep-alert-blue',
             arches.translations.confirmGraphPublicationUpdate['title'],
             arches.translations.confirmGraphPublicationUpdate['text'],
             function(){/* cancel */},
             function(){
+                viewModel.loading(true);
+
                 $.ajax({
                     type: "POST",
                     url: arches.urls.update_published_graph.replace('//', '/' + viewModel.graphid() + '/'),
-                    data: JSON.stringify(graphPublicationId),
+                    data: JSON.stringify(viewModel.graphPublicationId()),
                     success: function(_response) {
                         const alert = new AlertViewModel(
                             'ep-alert-blue',
@@ -45,9 +47,10 @@ require([
                         );
 
                         viewModel.alert(alert);
+                        viewModel.loading(false);
 
                         alert.active.subscribe(function() {
-                            // viewModel.publishedGraphs(_response);
+                            window.location.reload();  // reload because Graph label can change
                         });
                     },
                     error: function(_response) {
