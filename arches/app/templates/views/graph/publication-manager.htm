@@ -67,7 +67,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 "
             >
                 <div style="display: flex;">
-                    <div style="margin-right: 12px; display: flex; align-items: center;">
+                    <div style="display: flex; align-items: center;">
                         <input 
                             style="margin: 0px; cursor: pointer; pointer-events: none;" 
                             type="radio" 
@@ -78,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         />
                     </div>
     
-                    <div style="margin-right: 12px; width: 60px; color: green">
+                    <div style="width: 60px; color: green; text-align: center;">
                         <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
                             <span><strong>{% trans 'Active' %}</strong></span>
                         <!-- /ko -->
@@ -140,12 +140,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     style="
                         display: flex; 
                         background-color: #fff; 
-                        padding: 20px; 
-                        padding-left: 109px;
-                        padding-top: 0px;
+                        padding: 0px 60px 20px 86px; 
                         border-left: 1px solid #ddd; 
                         border-right: 1px solid #ddd; 
-                        border-bottom: 1px solid #ddd;
                     "
                 >
                     <div style="width: 120px;">
