@@ -307,7 +307,6 @@ class LabelBasedGraph(object):
             # so let's handle errors here instead of nullguarding all models
             try:
                 display_value = datatype.to_json(tile=tile, node=node)
-                print(datatype, display_value)
             except:  # pragma: no cover
                 pass
 
