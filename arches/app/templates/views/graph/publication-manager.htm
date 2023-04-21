@@ -78,21 +78,21 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         />
                     </div>
     
-                    <div style="width: 60px; color: green; text-align: center;">
+                    <div style="width: 60px; color: green; text-align: center; margin-right: 12px;">
                         <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
                             <span><strong>{% trans 'Active' %}</strong></span>
                         <!-- /ko -->
                     </div>
                 </div>
 
-                <div style="margin-right: 12px; width: 280px; justify-content: center; display: flex;">
+                <div style="justify-content: center; display: flex;">
                     <div>
                         <span><strong>{% trans "Published Time:" %}</strong></span>
                         <span data-bind="text: $data['published_time']"></span>
                     </div>
                 </div>
 
-                <div style="margin-right: 12px; width: 260px; justify-content: center; display: flex;">
+                <div style="width: 240px; justify-content: center; display: flex;">
                     <div>
                         <span><strong>{% trans "Publisher:" %}</strong></span>
                         <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
@@ -110,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <!-- ko ifnot: $data['publicationid'] === $parent.graphPublicationId() -->
                     <div style="display: flex; align-items: center; width: 600px;">
-                        <div style='width: 120px'>
+                        <div style='width: 120px; text-align: center;'>
                             <strong>{% trans "Published Notes:" %}</strong>
                         </div>
     
@@ -140,12 +140,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     style="
                         display: flex; 
                         background-color: #fff; 
-                        padding: 0px 60px 20px 86px; 
+                        padding: 0px 60px 20px 89px; 
                         border-left: 1px solid #ddd; 
                         border-right: 1px solid #ddd; 
                     "
                 >
-                    <div style="width: 120px;">
+                    <div style="width: 120px; text-align: center;">
                         <strong>{% trans "Published Notes:" %}</strong>
                     </div>
                     <div 
