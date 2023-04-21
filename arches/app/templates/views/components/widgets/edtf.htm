@@ -8,11 +8,13 @@
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
     <div class="form-group">
-        <div class="widget-inline-tools-collapser" style="max-width: 600px;" data-bind=" click: function() {
-            showEDTFFormats(!showEDTFFormats());
-        }">
-            <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-            <span>
+        <div class="widget-inline-tools-collapser" style="max-width: 600px;" 
+            data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function() { showEDTFFormats(!showEDTFFormats()); },
+            attr: { 'aria-pressed': showEDTFFormats(), 'aria-label': $root.translations.edtfFormats }" 
+            tabindex="0" role="button"
+        > <span data-bind="console.log(showEDTFFormats())"></span>
+            <span class="control-label widget-input-label" data-bind="text:label"></span><span>
                 <i class="fa" data-bind="{
                     css: {
                         'fa-caret-down' : !showEDTFFormats(),
@@ -25,21 +27,21 @@
           <div class="form-horizontal" data-bind="if: showEDTFFormats">
               <div class="edtf-style-tools-panel">
                   <div class="widget-help-panel">
-                    <h2 class="">
+                    <h2>
                         <span data-bind="text: $root.translations.edtfFormatsExpanded"></span>
                     </h2>
-                    <h3 class="">
+                    <h3>
                         <span data-bind="text: $root.translations.edtfFormatDescription"></span>
-                        <a class="" target="_blank" data-bind="attr: { href: 'https://www.loc.gov/standards/datetime'}, click: function() { return true;}, clickBubble: false">
+                        <a target="_blank" data-bind="attr: { href: 'https://www.loc.gov/standards/datetime'}, click: function() { return true;}, clickBubble: false" tabindex="-1">
                             <span data-bind="text: $root.translations.edtfDateSpecification"></span>
                         </a>
                     </h3>
-                    <h3 class="">
+                    <h3>
                         <span data-bind="text: $root.translations.someCommonEncodings"></span>
                     </h3>
 
-                    <dl class="">
-                        <dt class="">
+                    <dl>
+                        <dt>
                             2021-04-12 
                             <span class="text-thin" data-bind="text: $root.translations.dayPrecisionEncoding"></span>
                         </dt>
@@ -47,7 +49,7 @@
                             <span data-bind="text: $root.translations.dayPrecisionEncodingExplanation"></span>
                         </dd>
 
-                        <dt class="">
+                        <dt>
                             2021-04 
                             <span class="text-thin" data-bind="text: $root.translations.monthPrecisionEncoding"></span>
                         </dt>
@@ -55,7 +57,7 @@
                             <span data-bind="text: $root.translations.monthPrecisionEncodingExplanation"></span>
                         </dd>
 
-                        <dt class="">
+                        <dt>
                             2021 
                             <span class="text-thin" data-bind="text: $root.translations.yearPrecisionEncoding"></span>
                         </dt>
@@ -63,42 +65,42 @@
                             <span data-bind="text: $root.translations.yearPrecisionEncodingExplanation"></span>
                         </dd>
 
-                        <dt class="">1964/2008 </dt>
+                        <dt>1964/2008 </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.timeIntervalYearPrecision"></span>
                         </dd>
 
-                        <dt class="">2004-06/2006-08 </dt>
+                        <dt>2004-06/2006-08 </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.timeIntervalMonthPrecision"></span>
                         </dd>
 
-                        <dt class="">2004-02-01/2005 </dt>
+                        <dt>2004-02-01/2005 </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.timeIntervalYearPrecision"></span>
                         </dd>
 
-                        <dt class="">Y-100000 </dt>
+                        <dt>Y-100000 </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.negativeYearExplanation"></span>
                         </dd>
 
-                        <dt class="">2001-21 </dt>
+                        <dt>2001-21 </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.seasonFormatExplanation"></span>
                         </dd>
 
-                        <dt class="">1984? </dt>
+                        <dt>1984? </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.yearUncertain"></span>
                         </dd>
 
-                        <dt class="">2004-06~ </dt>
+                        <dt>2004-06~ </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.yearMonthApproximatea"></span>
                         </dd>
 
-                        <dt class="">2004-06-11% </dt>
+                        <dt>2004-06-11% </dt>
                         <dd class="mar-btm">
                             <span data-bind="text: $root.translations.entireDateApproximate"></span>
                         </dd>
@@ -108,12 +110,15 @@
               </div>
           </div>
         <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, disabled: disabled}" class="form-control input-lg widget-input">
+            <input type="text" data-bind="
+                textInput: value, 
+                attr: {placeholder: placeholder, disabled: disabled, 'aria-label': label}" 
+                class="form-control input-lg widget-input">
         </div>
         <div class="col-xs-12" data-bind="if: value">
-            <label class="control-label widget-input-label" for="">
+            <span class="control-label widget-input-label">
                 <span data-bind="text: $root.translations.preview"></span>
-            </label>
+            </span>
             <div data-bind="text: transformedEdtf() ? transformedEdtf : $root.translations.notAValidEdtfFormat" style='margin-bottom:2px'>
             </div>
         </div>
