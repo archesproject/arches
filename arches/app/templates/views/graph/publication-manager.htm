@@ -129,22 +129,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <div>
                 <!-- ko if: $data['publicationid'] === $parent.graphPublicationId() -->
-                    <div style="display: flex; background-color: #fff; padding: 20px; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">
-                        <div style="width: 10%; display: flex; align-items: center;">
+                    <div 
+                        style="
+                            display: flex; 
+                            background-color: #fff; 
+                            padding: 20px; 
+                            padding-left: 110px;
+                            border-left: 1px solid #ddd; 
+                            border-right: 1px solid #ddd; 
+                            border-bottom: 1px solid #ddd;
+                        "
+                    >
+                        <div style="width: 120px;">
                             <strong>{% trans "Published Notes:" %}</strong>
                         </div>
                         <div 
                             style="
                                 overflow-y: scroll; 
                                 margin-left: 6px;
-                                height: 120px;
+                                max-height: 120px;
                                 width: 90%;
-                                align-items: center;
-                                display: flex;
                             "
                         >
                             <div 
-                                style="white-space: pre-wrap; margin-bottom: auto; margin-top: auto;" 
+                                style="white-space: pre-wrap;" 
                                 data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
                                 readonly
                             ></div>
