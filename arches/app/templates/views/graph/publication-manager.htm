@@ -143,6 +143,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         padding: 0px 60px 20px 89px; 
                         border-left: 1px solid #ddd; 
                         border-right: 1px solid #ddd; 
+                        cursor: pointer;
                     "
                 >
                     <div style="width: 120px; text-align: center;">
@@ -157,7 +158,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         "
                     >
                         <div 
-                            style="white-space: pre-wrap;" 
+                            style="white-space: pre-wrap; cursor: default;" 
                             data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
                             readonly
                         ></div>
