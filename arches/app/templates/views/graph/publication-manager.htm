@@ -78,7 +78,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         />
                     </div>
     
-                    <div style="width: 60px; color: green; text-align: center; margin-right: 12px;">
+                    <div style="width: 80px; color: green; text-align: center;">
                         <!-- ko if: $data['publicationid'] === $parent.graphPublicationIdFromDatabase() -->
                             <span><strong>{% trans 'Active' %}</strong></span>
                         <!-- /ko -->
@@ -109,16 +109,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 <!-- ko ifnot: $data['publicationid'] === $parent.graphPublicationId() -->
-                    <div style="display: flex; align-items: center; width: 600px;">
-                        <div style='width: 120px; text-align: center;'>
+                    <div style="display: flex; align-items: center; width: 100%; overflow-x: hidden; padding-right: 40px;">
+                        <div style='width: 120px; text-align: center; flex: none;'>
                             <strong>{% trans "Published Notes:" %}</strong>
                         </div>
     
                         <div 
                             style="
                                 overflow-y: hidden; 
-                                margin-left: 6px;
-                                width: 480px;
                             "
                         >
                             <div 
@@ -140,21 +138,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     style="
                         display: flex; 
                         background-color: #fff; 
-                        padding: 0px 60px 20px 89px; 
+                        padding: 0px 60px 20px 96px; 
                         border-left: 1px solid #ddd; 
                         border-right: 1px solid #ddd; 
                         cursor: pointer;
                     "
                 >
-                    <div style="width: 120px; text-align: center;">
+                    <div style="width: 120px; text-align: center; flex: none;">
                         <strong>{% trans "Published Notes:" %}</strong>
                     </div>
                     <div 
                         style="
                             overflow-y: scroll; 
-                            margin-left: 6px;
-                            max-height: 120px;
-                            width: 90%;
+                            max-height: 180px;
                         "
                     >
                         <div 
