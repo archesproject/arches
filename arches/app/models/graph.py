@@ -299,7 +299,7 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
-            node.publication_id = nodeobj.get("publication_id", None)
+            node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)
             if node.hascustomalias or nodeobj.get("alias", False) is not False:
                 node.alias = nodeobj.get("alias", "")
             else:
@@ -484,11 +484,11 @@ class Graph(models.GraphModel):
 
             if nodeid is not None:
                 node = self.nodes[nodeid]
-                branch_publication_id = node.publication_id
+                branch_publication_id = node.sourcebranchpublication_id
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
-                    node.publication_id = None
+                    node.sourcebranchpublication_id = None
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
@@ -499,8 +499,8 @@ class Graph(models.GraphModel):
                         message = _('Fail to save node "{0}".'.format(node.name))
                         raise GraphValidationError(message)
                 if branch_publication_id:
-                    for branch_node in models.Node.objects.filter(publication_id=branch_publication_id):
-                        branch_node.publication_id = None
+                    for branch_node in models.Node.objects.filter(publication_id=branch_publication_id, graph=node.graph):
+                        branch_node.sourcebranchpublication_id = None
                         branch_node.save()
 
             else:
@@ -655,7 +655,7 @@ class Graph(models.GraphModel):
             aliases = [n.alias for n in self.nodes.values()]
 
             for node in branch_copy.nodes.values():
-                node.publication_id = branch_publication_id
+                node.sourcebranchpublication_id = branch_publication_id
                 if node.alias and node.alias in aliases:
                     node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
