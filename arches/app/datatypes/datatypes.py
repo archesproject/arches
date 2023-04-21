@@ -27,7 +27,20 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.i18n import get_localized_value
-from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Dsl,
+    Exists,
+    Match,
+    Query,
+    Range,
+    RangeDSLException,
+    Term,
+    Terms,
+    Wildcard,
+    Prefix,
+    Nested,
+)
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -102,7 +115,8 @@ class StringDataType(BaseDataType):
                     isinstance(value[key]["direction"], str)
         except:
             message = _("This is not a string")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid String Format")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
         return errors
 
@@ -183,16 +197,103 @@ class StringDataType(BaseDataType):
                     pass
         return terms
 
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that have not been populated or are empty strings
+        """
+        base_query = Bool()
+        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
+        data_exists = Bool()
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value")
+        nested_query = Nested(path="tiles", query=data_exists_query)
+        data_exists.must(nested_query)
+
+        if value["op"] == "not_null":
+            query.must(base_query)
+            query.must(data_exists)
+            non_blank_string_query = Wildcard(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
+            query.must(Nested(path="tiles", query=non_blank_string_query))
+
+        if value["op"] == "null":
+            # search for resources that could have tiles with that data but don't
+            exists_query = Bool()
+            exists_query.must_not(data_exists)
+            base_query.should(exists_query)
+
+            # search for tiles that do exist, but that have null, [], or "" as values
+            func_query = Dsl()
+            func_query.dsl = {
+                "function_score": {
+                    "min_score": 1,
+                    "query": {"match_all": {}},
+                    "functions": [
+                        {
+                            "script_score": {
+                                "script": {
+                                    "source": """
+                                    int null_docs = 0;
+                                    for(tile in params._source.tiles){
+                                        if(tile.data.containsKey(params.node_id)){
+                                            if(tile.data.get(params.node_id).containsKey(params.lang)){
+                                                def val = tile.data.get(params.node_id).get(params.lang).value;
+                                                if (val == null || (val instanceof List && val.length==0) || val == "") {
+                                                    null_docs++;
+                                                    break;
+                                                }
+                                            }
+                                            else{
+                                                null_docs++;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    return null_docs;
+                                """,
+                                    "lang": "painless",
+                                    "params": {"node_id": f"{str(node.pk)}", "lang": f"{value['lang']}"},
+                                }
+                            }
+                        }
+                    ],
+                    "score_mode": "max",
+                    "boost": 1,
+                    "boost_mode": "replace",
+                }
+            }
+            base_query.should(func_query)
+            query.must(base_query)
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                if value["lang"]:
-                    match_query = Match(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type)
+                exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
+                if exact_terms:
+                    if "~" in value["op"]:
+                        match_query = Wildcard(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=f"*{exact_terms.group('search_string')}*",
+                            case_insensitive=False,
+                        )
+                    else:  # "eq" in value["op"]
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=exact_terms.group("search_string"),
+                            type="phrase",
+                        )
+                elif "?" in value["val"] or "*" in value["val"]:
+                    match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
                 else:
-                    match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                    if "~" in value["op"]:
+                        match_query = Bool()
+                        for word in value["val"].split(" "):
+                            match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
+                    else:  # "eq" in value["op"]
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase"
+                        )
 
                 if "!" in value["op"]:
                     query.must_not(match_query)
@@ -326,7 +427,8 @@ class NumberDataType(BaseDataType):
         except Exception:
             dt = self.datatype_model.datatype
             message = _("Not a properly formatted number")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid Number Format")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
         return errors
 
@@ -417,7 +519,8 @@ class BooleanDataType(BaseDataType):
                 type(bool(util.strtobool(str(value)))) is True
         except Exception:
             message = _("Not of type boolean")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid Boolean")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
 
         return errors
@@ -499,7 +602,8 @@ class DateDataType(BaseDataType):
                 message = _(
                     "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
                 )
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Date Format")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -663,7 +767,8 @@ class EDTFDataType(BaseDataType):
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
                 message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid EDTF Format")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -764,36 +869,48 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
-                    message = f"Geometry has too many coordinates for Elasticsearch ({coordinate_count}), \
-                        Please limit to less then {coord_limit} coordinates of 5 digits of precision or less."
+                    message = _(
+                        "Geometry has too many coordinates for Elasticsearch ({0}), \
+                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
+                            coordinate_count, coord_limit
+                        )
+                    )
+                    title = _("Geometry Too Many Coordinates for ES")
                     errors.append(
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
                                 self.datatype_model.datatype, value, source, message, "This data was not imported."
                             ),
+                            "title": title,
                         }
                     )
 
                 if bbox.contains(geom) == False:
-                    message = "Geometry does not fall within the bounding box of the selected coordinate system. \
+                    message = _(
+                        "Geometry does not fall within the bounding box of the selected coordinate system. \
                          Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
+                    )
+                    title = _("Geometry Out Of Bounds")
                     errors.append(
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
                                 self.datatype_model.datatype, value, source, message, "This data was not imported."
                             ),
+                            "title": title,
                         }
                     )
             except Exception:
-                message = "Not a properly formatted geometry"
+                message = _("Not a properly formatted geometry")
+                title = _("Invalid Geometry Format")
                 errors.append(
                     {
                         "type": "ERROR",
                         "message": "datatype: {0} value: {1} {2} - {3}. {4}.".format(
                             self.datatype_model.datatype, value, source, message, "This data was not imported."
                         ),
+                        "title": title,
                     }
                 )
 
@@ -804,7 +921,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     validate_geom(geom, coordinate_count)
                 except Exception:
                     message = _("Unable to serialize some geometry features")
-                    error_message = self.create_error_message(value, source, row_number, message)
+                    title = _("Unable to Serialize Geometry")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
                     errors.append(error_message)
         return errors
 
@@ -834,22 +952,26 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 arches_geojson = {}
                 arches_geojson["type"] = "FeatureCollection"
                 arches_geojson["features"] = []
-                geometry = GEOSGeometry(value, srid=4326)
-                if geometry.geom_type == "GeometryCollection":
-                    for geom in geometry:
+                try:
+                    geometry = GEOSGeometry(value, srid=4326)
+                    if geometry.geom_type == "GeometryCollection":
+                        for geom in geometry:
+                            arches_json_geometry = {}
+                            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                            arches_json_geometry["type"] = "Feature"
+                            arches_json_geometry["id"] = str(uuid.uuid4())
+                            arches_json_geometry["properties"] = {}
+                            arches_geojson["features"].append(arches_json_geometry)
+                    else:
                         arches_json_geometry = {}
-                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                         arches_json_geometry["type"] = "Feature"
                         arches_json_geometry["id"] = str(uuid.uuid4())
                         arches_json_geometry["properties"] = {}
                         arches_geojson["features"].append(arches_json_geometry)
-                else:
-                    arches_json_geometry = {}
-                    arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
-                    arches_json_geometry["type"] = "Feature"
-                    arches_json_geometry["id"] = str(uuid.uuid4())
-                    arches_json_geometry["properties"] = {}
-                    arches_geojson["features"].append(arches_json_geometry)
+                except ValueError:
+                    if value in ("", None, "None"):
+                        return None
 
         return arches_geojson
 
@@ -1395,7 +1517,8 @@ class FileListDataType(BaseDataType):
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
         if len(file_type_errors) > 0:
-            errors.append({"type": "ERROR", "message": _("File type not permitted")})
+            title = _("Invalid File Type")
+            errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1422,7 +1545,8 @@ class FileListDataType(BaseDataType):
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
-                errors.append({"type": "ERROR", "message": message})
+                title = _("Exceed Maximun Number of Files")
+                errors.append({"type": "ERROR", "message": message, "title": title})
 
             if max_size is not None:
                 formatted_max_size = format_bytes(max_size)
@@ -1433,16 +1557,19 @@ class FileListDataType(BaseDataType):
                                 formatted_max_size
                             )
                         )
-                        errors.append({"type": "ERROR", "message": message})
+                        title = _("Exceed File Size Limit")
+                        errors.append({"type": "ERROR", "message": message, "title": title})
             if path:
                 for file in value:
                     if not default_storage.exists(os.path.join(path, file["name"])):
                         message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], default_storage.path(path)))
-                        errors.append({"type": "ERROR", "message": message})
+                        title = _("File Not Found")
+                        errors.append({"type": "ERROR", "message": message, "title": title})
         except Exception as e:
             dt = self.datatype_model.datatype
             message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
-            errors.append({"type": "ERROR", "message": message})
+            title = _("Unexpected File Error")
+            errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1502,21 +1629,26 @@ class FileListDataType(BaseDataType):
                             except models.File.DoesNotExist:
                                 logger.exception(_("File does not exist"))
 
-            files = request.FILES.getlist("file-list_" + nodeid, [])
+            files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, [])
 
             for file_data in files:
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
                 if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
+                    original_storage = file_model.path.storage
+                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
+                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
+                        file_model.path.storage = FileSystemStorage()
                     file_model.save()
+                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
                     for file_json in current_tile_data[nodeid]:
                         if file_json["name"] == file_data.name and file_json["url"] is None:
                             file_json["file_id"] = str(file_model.pk)
-                            file_json["url"] = "/files/" + str(file_model.fileid)
+                            file_json["url"] = settings.MEDIA_URL + str(file_model.fileid)
                             file_json["status"] = "uploaded"
                             resave_tile = True
                         updated_file_records.append(file_json)
@@ -1592,7 +1724,7 @@ class FileListDataType(BaseDataType):
             else:
                 models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
 
-            tile_file["url"] = "/files/" + tile_file["file_id"]
+            tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
             tile_file["accepted"] = True
             compatible_renderers = self.get_compatible_renderers(tile_file)
             if len(compatible_renderers) == 1:
@@ -1606,7 +1738,7 @@ class FileListDataType(BaseDataType):
             for file in tile.data[nodeid]:
                 try:
                     if file["file_id"]:
-                        if file["url"] == "/files/{}".format(file["file_id"]):
+                        if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
                             file_path = "uploadedfiles/" + file["name"]
                             try:
@@ -1782,11 +1914,12 @@ class BaseDomainDataType(BaseDataType):
         return True
 
     def lookup_domainid_by_value(self, value, nodeid):
+        language = get_language()
         if nodeid not in self.value_lookup:
             config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
-                options[val["text"]] = val["id"]
+                options[val["text"][language]] = val["id"]
             self.value_lookup[nodeid] = options
         return self.value_lookup[nodeid][value]
 
@@ -1804,7 +1937,8 @@ class DomainDataType(BaseDomainDataType):
 
             if not found_option:
                 message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Domain Id")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -2094,37 +2228,49 @@ class ResourceInstanceDataType(BaseDataType):
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
             for resourceXresourceId in resourceXresourceIds:
-                resourceid = resourceXresourceId["resourceId"]
                 try:
-                    if not node:
-                        node = models.Node.objects.get(pk=nodeid)
-                    if node.config["searchString"] != "":
-                        dsl = node.config["searchDsl"]
-                        if dsl:
-                            query = Query(se)
-                            bool_query = Bool()
-                            ri_query = Dsl(dsl)
-                            bool_query.must(ri_query)
-                            ids_query = Dsl({"ids": {"values": [resourceid]}})
-                            bool_query.must(ids_query)
-                            query.add_query(bool_query)
-                            try:
-                                results = query.search(index=RESOURCES_INDEX)
-                                count = results["hits"]["total"]["value"]
-                                assert count == 1
-                            except:
-                                raise ObjectDoesNotExist()
-                    if len(node.config["graphs"]) > 0:
-                        graphids = map(lambda x: x["graphid"], node.config["graphs"])
-                        if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
-                            raise ObjectDoesNotExist()
-                except ObjectDoesNotExist:
-                    message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
-                    error_type = "WARNING"
+                    resourceid = resourceXresourceId["resourceId"]
+                    uuid.UUID(resourceid)
                     if strict:
-                        error_type = "ERROR"
-                    errors.append({"type": error_type, "message": message})
+                        try:
+                            if not node:
+                                node = models.Node.objects.get(pk=nodeid)
+                            if node.config["searchString"] != "":
+                                dsl = node.config["searchDsl"]
+                                if dsl:
+                                    query = Query(se)
+                                    bool_query = Bool()
+                                    ri_query = Dsl(dsl)
+                                    bool_query.must(ri_query)
+                                    ids_query = Dsl({"ids": {"values": [resourceid]}})
+                                    bool_query.must(ids_query)
+                                    query.add_query(bool_query)
+                                    try:
+                                        results = query.search(index=RESOURCES_INDEX)
+                                        count = results["hits"]["total"]["value"]
+                                        assert count == 1
+                                    except:
+                                        raise ObjectDoesNotExist()
+                            if len(node.config["graphs"]) > 0:
+                                graphids = map(lambda x: x["graphid"], node.config["graphs"])
+                                if not models.ResourceInstance.objects.filter(pk=resourceid, graph_id__in=graphids).exists():
+                                    raise ObjectDoesNotExist()
+                        except ObjectDoesNotExist:
+                            message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
+                            errors.append({"type": "ERROR", "message": message})
+                except (ValueError, TypeError):
+                    message = _("The related resource with id '{0}' is not a valid uuid.".format(str(value)))
+                    title = _("Invalid Resource Instance Datatype")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
+                    errors.append(error_message)
+
         return errors
+
+    def pre_tile_save(self, tile, nodeid):
+        relationships = tile.data[nodeid]
+        if relationships:
+            for relationship in relationships:
+                relationship["resourceXresourceId"] = str(uuid.uuid4())
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False
@@ -2194,7 +2340,10 @@ class ResourceInstanceDataType(BaseDataType):
             return json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
-            return ast.literal_eval(value)
+            try:
+                return ast.literal_eval(value)
+            except:
+                return value
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
@@ -2320,7 +2469,9 @@ class NodeValueDataType(BaseDataType):
             try:
                 models.TileModel.objects.get(tileid=value)
             except ObjectDoesNotExist:
-                errors.append({"type": "ERROR", "message": f"{value} {row_number} is not a valid tile id. This data was not imported."})
+                message = _("{0} {1} is not a valid tile id. This data was not imported.".format(value, row_number))
+                title = _("Invalid Tile Id")
+                errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
     def get_display_value(self, tile, node, **kwargs):
@@ -2362,7 +2513,10 @@ class AnnotationDataType(BaseDataType):
             return json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
-            return ast.literal_eval(value)
+            try:
+                return ast.literal_eval(value)
+            except:
+                return None
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):

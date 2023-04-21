@@ -77,13 +77,21 @@ define([
         var nodegroups = params.graphModel.get('nodegroups');
         var multiselect = params.multiselect || false;
         var isWritable = params.card.is_writable || false;
+        this.params = params;
         var selection;
         var emptyConstraint = [{
             uniquetoallinstances: false,
             nodes:[],
-            cardid: self.cardid,
-            constraintid:  uuid.generate()
+            cardid: params.card.cardid,
+            constraintid: uuid.generate()
         }];
+
+        let cardConstraints;
+        if (params.card.constraints?.length) {
+            cardConstraints = params.card.constraints;
+        } else {
+            cardConstraints = emptyConstraint;
+        }
 
         var appliedFunctions = params.appliedFunctions;
         var primaryDescriptorFunction = params.primaryDescriptorFunction;
@@ -101,7 +109,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
                 nodegroup: nodegroup,
-                constraints: params.constraints
+                constraints: cardConstraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
@@ -415,7 +423,7 @@ define([
             if (selected) this.expanded(true);
         }, this);
         this.expanded.subscribe(function(expanded) {
-            if (expanded && this.parent) this.parent.expanded(true);
+            if (expanded && this.parent?.expanded) this.parent.expanded(true);
         }, this);
 
         this.isChildSelected = ko.computed(function() {

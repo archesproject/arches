@@ -1,9 +1,9 @@
 define([
-    'knockout', 
+    'knockout',
     'knockout-mapping',
-    'underscore', 
-    'viewmodels/widget', 
-    'arches', 
+    'underscore',
+    'viewmodels/widget',
+    'arches',
     'templates/views/components/widgets/text.htm',
     'bindings/chosen'
 ], function(ko, koMapping, _, WidgetViewModel, arches, textWidgetTemplate) {
@@ -20,7 +20,7 @@ define([
 
     const viewModel = function(params) {
         params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
-         
+
         WidgetViewModel.apply(this, [params]);
         const self = this;
 
@@ -40,13 +40,15 @@ define([
         initialDefault[arches.activeLanguage] = {value: '', direction: 'ltr'};
         initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
         let currentDefaultValue = ko.unwrap(self.defaultValue) || initialDefault;
-        let currentValue = koMapping.toJS(self.value);
+        let currentValue = koMapping.toJS(self.value) || initialCurrent;
 
         if(self.form){
             self.form.on('tile-reset', (x) => {
-                currentValue = koMapping.toJS(self.value);
-                self.currentText(currentValue[self.currentLanguage().code]?.value);
-                self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                if (ko.unwrap(self.value)) {
+                    currentValue = koMapping.toJS(self.value);
+                    self.currentText(currentValue[self.currentLanguage().code]?.value);
+                    self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                }
             });
         }
 
@@ -63,7 +65,7 @@ define([
             } else if (!currentLanguage?.code) {
                 self.currentText('');
                 self.currentDirection('ltr');
-            } else {
+            } else if (currentValue) {
                 self.currentText('');
                 self.currentDirection('ltr');
                 currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
@@ -75,7 +77,7 @@ define([
             } else if (!currentLanguage?.code) {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
-            } else {
+            } else if (currentDefaultValue) {
                 self.currentDefaultText('');
                 self.currentDefaultDirection('ltr');
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
@@ -85,7 +87,7 @@ define([
         init();
 
         self.disable = ko.computed(() => {
-            return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 
+            return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable);
         }, self);
 
         self.currentDefaultText.subscribe(newValue => {
@@ -121,18 +123,29 @@ define([
 
             self.currentDefaultText(self.defaultValue()?.[currentLanguage.code]?.value);
             self.currentDefaultDirection(self.defaultValue()?.[currentLanguage.code]?.direction);
-            
+
+        });
+
+        const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
+        valueLeaf?.subscribe(newValue => {
+            const currentLanguage = self.currentLanguage();
+            if(!currentLanguage) { return; }
+            if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
+                self.currentText(newValue?.[currentLanguage.code]?.value || newValue);
+            }
         });
 
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
-            currentValue[currentLanguage.code].value = newValue;       
+            currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
+            
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
                 self.value[currentLanguage.code].value(newValue);
             }
+            
         });
 
         self.currentDirection.subscribe(newValue => {
@@ -156,7 +169,7 @@ define([
 
             self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
             self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
-        
+
         });
 
     };

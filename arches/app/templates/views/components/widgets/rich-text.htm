@@ -4,7 +4,7 @@
 
 {% block form %}
 <div class="row widget-wrapper">
-    <div class="form-group">        
+    <div class="form-group">
         <div class="widget-inline-tools-collapser" data-bind=" click: function() {
             showi18nOptions(!showi18nOptions());
         }">
@@ -30,12 +30,12 @@
                     <label class="widget-input-label i18n-style-tools-label" for="lang_dir">
                         <span data-bind="text: $root.translations.direction"></span>
                     </label>
-                    <select 
-                        id="lang_dir" 
-                        style="flex:1" 
-                        name="language" 
+                    <select
+                        id="lang_dir"
+                        style="flex:1"
+                        name="language"
                         data-bind="
-                            value: currentDirection, 
+                            value: currentDirection,
                             chosen: {'width':'100%'},
                             optionsText: 'text',
                             optionsValue: 'value',
@@ -52,15 +52,50 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <textarea rows="10" cols="80" data-bind="ckeditor: currentText, language: currentLanguage.code, direction: currentDirection, ckeditorOptions: {},  valueUpdate: 'afterkeydown', attr: {disabled: disabled}"></textarea>
+            <textarea 
+                rows="10" 
+                cols="80" 
+                data-bind="
+                    ckeditor: currentText, 
+                    language: currentLanguage.code, 
+                    direction: currentDirection, 
+                    placeholder: placeholder, 
+                    ckeditorOptions: {},  
+                    valueUpdate: 'afterkeydown', 
+                    attr: {disabled: disabled}
+                "></textarea>
         </div>
     </div>
 </div>
 {% endblock form %}
 
+{% block config_form %}
+<div class="control-label">
+    <span data-bind="text: $root.translations.placeholder"></span>
+</div>
+
+<textarea 
+    rows="10" 
+    cols="80" 
+    class="form-control input-md widget-input" 
+    data-bind="
+        ckeditor: defaultText, 
+        isConfigForm: true,
+        language: currentLanguage.code, 
+        direction: currentDirection,
+        placeholder: placeholder,
+        ckeditorOptions: {},  
+        valueUpdate: 'afterkeydown', 
+        attr: {disabled: disabled}
+    "
+></textarea>
+{% endblock config_form %}
+
 {% block report %}
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || (ko.unwrap(hideEmptyNodes) === true && !!ko.unwrap(currentText) ) -->
 <dt data-bind="text: label"></dt>
 <dd data-bind="html: strippedValue || $root.translations.none"></dd>
+<!-- /ko -->
 {% endblock report %}
 
 {% block display_value %}

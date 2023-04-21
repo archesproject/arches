@@ -92,7 +92,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
-
+FILE_VIEWER_DOWNLOAD_LIMIT = 1073741824  # limit of file viewer download source files in bytes
 RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
@@ -345,6 +345,7 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",  # this is default
     "arches.app.utils.permission_backend.PermissionBackend",
     "guardian.backends.ObjectPermissionBackend",
+    "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
 INSTALLED_APPS = (
@@ -395,8 +396,6 @@ WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
 ROOT_URLCONF = "arches.urls"
 
 WSGI_APPLICATION = "arches.wsgi.application"
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 try:
     CORS_ALLOW_HEADERS = list(default_headers) + [
@@ -463,6 +462,20 @@ if DEBUG is True:
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
+
+# external oauth configuration
+EXTERNAL_OAUTH_CONFIGURATION = {
+    "default_user_groups": [],
+    "user_domains": [],
+    "uid_claim": "",
+    "app_id": "",
+    "app_secret": "",
+    "scopes": [],
+    "authorization_endpoint": "",
+    "validate_id_token": True,  # AVOID setting this to False
+    "token_endpoint": "",
+    "jwks_uri": "",
+}
 
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},

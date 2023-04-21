@@ -204,7 +204,7 @@ define([
             if (resourceLookup[resourceid]) {
                 return Promise.resolve(resourceLookup[resourceid]);
             } else {
-                return window.fetch(arches.urls.search_results + "?id=" + resourceid)
+                return window.fetch(`${arches.urls.search_results}?id=${resourceid}&tiles=true`)
                     .then(function(response){
                         if(response.ok) {
                             return response.json();
@@ -284,8 +284,13 @@ define([
                     });
 
                     if (ontologyProperties) {
-                        ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
-                        inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;
+                        if (ontologyProperties.useOntologyRelationship) {
+                            ontologyProperty = ontologyProperty || ontologyProperties.ontologyProperty;
+                            inverseOntologyProperty = inverseOntologyProperty || ontologyProperties.inverseOntologyProperty;    
+                        } else {
+                            ontologyProperty = ontologyProperties.relationshipConcept;
+                            inverseOntologyProperty = ontologyProperties.inverseRelationshipConcept;    
+                        }
                     }
                 }
             }

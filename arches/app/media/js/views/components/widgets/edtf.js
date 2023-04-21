@@ -38,7 +38,7 @@ define([
             });
         };
         
-        this.getEdtf(params.value());
+        this.getEdtf(ko.unwrap(params.value));
         if (params.state !== 'report') {
             params.value.subscribe(val => {
                 self.getEdtf(val);

@@ -35,8 +35,8 @@
             beforeMove: self.beforeMove,
             afterMove: card.reorderTiles
         }">
-            <li role="treeitem" class="jstree-node" style="user-select: none;" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0, 'hide-background': !showGrid()}, event: {'dragstart': function () { console.log('dragging...') }}, event: { auxclick: $parent.card.stageTile, contextmenu: function(a, e){e.preventDefault}}">
-                <i class="jstree-icon" role="presentation" data-bind="click: function(){expanded(!expanded())}, css: {'jstree-ocl': showGrid}"></i>
+            <li role="treeitem" class="jstree-node" style="user-select: none;" data-bind="css: {'jstree-open': (cards.length > 0 && expanded), 'jstree-closed' : (cards.length > 0 && !expanded()), 'jstree-leaf': cards.length === 0, 'hide-background': !self.showGrid()}, event: {'dragstart': function () { console.log('dragging...') }}, event: { auxclick: $parent.card.stageTile, contextmenu: function(a, e){e.preventDefault}}">
+                <i class="jstree-icon" role="presentation" data-bind="click: function(){expanded(!expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { self.form.selection($data);}, css:{'staged': $parent.staging.indexOf($data.tileid) > -1, 'jstree-clicked': selected, 'child-selected': isChildSelected(), 'filtered-leaf': card.highlight(), 'unsaved-edit': !!$data.dirty()}">
                     <i class="fa " role="presentation" data-bind="css:{'has-provisional-edits': doesChildHaveProvisionalEdits() || $data.hasprovisionaledits(),'fa-pencil':$data.dirty()===true,'fa-file':!$data.dirty()}"></i>
                     <strong style="margin-right: 10px;">

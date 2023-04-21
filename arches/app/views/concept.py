@@ -380,8 +380,7 @@ def dropdown(request):
 
 def paged_dropdown(request):
     conceptid = request.GET.get("conceptid")
-    query = request.GET.get("query", None)
-    query = None if query == "" else query
+    query = request.GET.get("query", "")
     page = int(request.GET.get("page", 1))
     limit = 50
     offset = (page - 1) * limit
@@ -405,25 +404,25 @@ def paged_dropdown(request):
                     found = True
                     break
             if not found:
-                sql = """
-                    SELECT value, valueid
-                    FROM 
-                    (
-                        SELECT *, CASE WHEN LOWER(languageid) = '{languageid}' THEN 10
-                        WHEN LOWER(languageid) like '{short_languageid}%' THEN 5
-                        ELSE 0
-                        END score
-                        FROM values
-                    ) as vals
-                    WHERE LOWER(value)='{query}' AND score > 0
-                    AND valuetype in ('prefLabel')
-                    ORDER BY score desc limit 1
-                """
-
                 languageid = get_language().lower()
-                sql = sql.format(query=query.lower(), languageid=languageid, short_languageid=languageid.split("-")[0])
                 cursor = connection.cursor()
-                cursor.execute(sql)
+                cursor.execute(
+                    """
+                        SELECT value, valueid
+                        FROM
+                        (
+                            SELECT *, CASE WHEN LOWER(languageid) = %(languageid)s THEN 10
+                            WHEN LOWER(languageid) like %(short_languageid)s THEN 5
+                            ELSE 0
+                            END score
+                            FROM values
+                        ) as vals
+                        WHERE LOWER(value)=%(query)s AND score > 0
+                        AND valuetype in ('prefLabel')
+                        ORDER BY score desc limit 1
+                    """,
+                    {"languageid": languageid, "short_languageid": languageid.split("-")[0] + "%", "query": query.lower()},
+                )
                 rows = cursor.fetchall()
 
                 if len(rows) == 1:

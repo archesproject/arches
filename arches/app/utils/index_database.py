@@ -399,7 +399,7 @@ def index_resources_by_transaction(
     logger.info("Indexing transaction '{0}'".format(transaction_id))
 
     with connection.cursor() as cursor:
-        cursor.execute("""SELECT resourceinstanceid FROM edit_log WHERE transactionid = %s AND edittype = 'create';""", [transaction_id])
+        cursor.execute("""SELECT DISTINCT resourceinstanceid FROM edit_log WHERE transactionid = %s;""", [transaction_id])
         rows = cursor.fetchall()
     resourceids = [id for (id,) in rows]
 

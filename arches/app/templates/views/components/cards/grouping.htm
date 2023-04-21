@@ -199,7 +199,7 @@
             </div>
             <h5 data-bind="text: card.model.instructions"></h5>
             {% endblock form_header %}
-            <!-- ko if: card.widgets().length > 0 -->
+            <!-- ko if: card.widgets().length > 0 && !saving() -->
             {% block form_widgets %}
             <div data-bind="foreach: {data: sortedWidgetIds, as: 'nodeId'}">
                 <form class="widgets" style="margin-bottom: 20px;">

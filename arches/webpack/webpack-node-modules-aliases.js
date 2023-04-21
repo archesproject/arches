@@ -1,4 +1,7 @@
 module.exports = {
+    outout: {
+        globalObject: 'this'
+    },
     ARCHES_CORE_NODE_MODULES_ALIASES: JSON.stringify({
         "plugins/knockout-select2": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'knockout-select2.js')",
         "nifty": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'nifty')",
@@ -17,8 +20,8 @@ module.exports = {
         "jquery-validate": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/jquery-validation/dist/jquery.validate.min`)",
         "d3": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/d3/dist/d3.min`)",
         "dropzone": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/dropzone/dist/min/dropzone-amd-module.min`)",
-        "ckeditor": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor/ckeditor`)",
-        "ckeditor-jquery": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor/adapters/jquery`)",
+        "ckeditor4": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor4/ckeditor`)",
+        "ckeditor-jquery": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/ckeditor4/adapters/jquery`)",
         "knockout": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/knockout/build/output/knockout-latest`)",
         "knockout-mapping": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/knockout-mapping/dist/knockout.mapping.min`)",
         "moment": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/moment/moment.js`)",
@@ -55,7 +58,7 @@ module.exports = {
         "jqtree": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/jqtree/tree.jquery`)",
         "dom-4": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/dom4/build/dom4`)",
         "numeral": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/numeral/numeral`)",
-        "togeojson": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/@tmcw/togeojson/dist/togeojson.umd`)",
+        "togeojson": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/@tmcw/togeojson/dist/togeojson.es`)",
         "cytoscape": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/cytoscape/dist/cytoscape.min`)",
         "cytoscape-cola": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/cytoscape-cola/cytoscape-cola`)",
         "webcola": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/webcola/WebCola/cola.min`)"

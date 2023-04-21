@@ -315,21 +315,26 @@ class SimpleQueryString(Dsl):
     """
 
     def __init__(self, **kwargs):
-        self.field = kwargs.pop("field", "_all")  # can be a list of fields
+        self.field = kwargs.pop("field", "_all")
         self.query = kwargs.pop("query", "")
         self.operator = kwargs.pop("operator", "or")
         self.analyzer = kwargs.pop("analyzer", "snowball")
         self.flags = kwargs.pop("flags", "OR|AND|PREFIX")
+        self.analyze_wildcard = kwargs.pop("analyze_wildcard", False)
         # The available flags are: ALL, NONE, AND, OR, PREFIX, PHRASE, PRECEDENCE, ESCAPE, WHITESPACE, FUZZY, NEAR, and SLOP.
 
-        # if not isinstance(self.field, list):
-        #     self.field = [self.field]
+        if not isinstance(self.field, list):
+            self.field = [self.field]
 
         self.dsl = {
-            "simple_query_string": {"fields": self.field, "query": self.query, "default_operator": self.operator, "flags": self.flags}
+            "simple_query_string": {
+                "fields": self.field,
+                "query": self.query,
+                "default_operator": self.operator,
+                "flags": self.flags,
+                "analyze_wildcard": self.analyze_wildcard,
+            }
         }
-
-        self.dsl = {"prefix": {self.field: self.query}}
 
 
 class Exists(Dsl):
@@ -357,6 +362,34 @@ class Ids(Dsl):
         if not isinstance(self.ids, list):
             self.ids = [self.ids]
         self.dsl = {"ids": {"values": self.ids}}
+
+
+class Wildcard(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
+
+        self.dsl = {"wildcard": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
+
+
+class Prefix(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
+
+        self.dsl = {"prefix": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
 
 
 class Aggregation(Dsl):

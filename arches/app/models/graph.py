@@ -300,9 +300,10 @@ class Graph(models.GraphModel):
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
             node.publication_id = nodeobj.get("publication_id", None)
-            if node.hascustomalias:
+            if node.hascustomalias or nodeobj.get("alias", False) is not False:
                 node.alias = nodeobj.get("alias", "")
-            self.create_node_alias(node)
+            else:
+                self.create_node_alias(node)
 
             node.nodeid = uuid.UUID(str(node.nodeid))
 
@@ -360,7 +361,6 @@ class Graph(models.GraphModel):
         return edge
 
     def add_card_contraint(self, constraint, card):
-        unique_to_all = constraint.get("uniquetoallinstances", False)
         constraint_model = models.ConstraintModel()
         constraint_model.constraintid = constraint.get("constraintid", None)
         constraint_model.uniquetoallinstances = constraint.get("uniquetoallinstances", False)
@@ -397,7 +397,8 @@ class Graph(models.GraphModel):
             card.nodegroup = self.get_or_create_nodegroup(nodegroupid=card.nodegroup_id)
             card.config = cardobj.get("config", None)
             constraints = cardobj.get("constraints", "")
-            for constraint in constraints:
+            constraints_with_nodes = [c for c in constraints if len(c["nodes"])]
+            for constraint in constraints_with_nodes:
                 self.add_card_contraint(constraint, card)
 
         card.graph = self
@@ -475,7 +476,7 @@ class Graph(models.GraphModel):
 
         with transaction.atomic():
             super(Graph, self).save()
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
@@ -651,8 +652,12 @@ class Graph(models.GraphModel):
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
+            aliases = [n.alias for n in self.nodes.values()]
+
             for node in branch_copy.nodes.values():
                 node.publication_id = branch_publication_id
+                if node.alias and node.alias in aliases:
+                    node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
             for card in branch_copy.get_cards():
                 self.add_card(card)
@@ -881,6 +886,16 @@ class Graph(models.GraphModel):
             edge.rangenode = copied_rangenode
 
         copy_of_self.edges = {edge.pk: edge for edge_id, edge in copy_of_self.edges.items()}
+
+        for copied_card in copy_of_self.cards.values():
+            if str(copied_card.component_id) == "2f9054d8-de57-45cd-8a9c-58bbb1619030":  # grouping card
+                grouped_card_ids = [str(card_map[uuid.UUID(grouped_card_id)]) for grouped_card_id in copied_card.config["groupedCardIds"]]
+                copied_card.config["groupedCardIds"] = grouped_card_ids
+
+                sorted_widget_ids = [
+                    str(node_map[uuid.UUID(sorted_widget_id)]) for sorted_widget_id in copied_card.config["sortedWidgetIds"]
+                ]
+                copied_card.config["sortedWidgetIds"] = sorted_widget_ids
 
         return {"copy": copy_of_self, "cards": card_map, "nodes": node_map, "nodegroups": nodegroup_map}
 
@@ -1297,12 +1312,12 @@ class Graph(models.GraphModel):
                     ret = [{"ontology_property": "", "ontology_classes": list(ontology_classes)}]
         return ret
 
-    def get_nodegroups(self):
+    def get_nodegroups(self, force_recalculation=False):
         """
         get the nodegroups associated with this graph
 
         """
-        if self.serialized_graph:
+        if self.serialized_graph and not force_recalculation:
             nodegroups = self.serialized_graph["nodegroups"]
             for nodegroup in nodegroups:
                 if isinstance(nodegroup["nodegroupid"], str):
@@ -1418,18 +1433,21 @@ class Graph(models.GraphModel):
         exclude = [] if exclude is None else exclude
 
         if self.publication and not force_recalculation:
-            user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
-
-            serialized_graph = None
-            if published_graph:
+            try:
+                user_language = translation.get_language()
+                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
                 serialized_graph = published_graph.serialized_graph
+                for key in exclude:
+                    if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
+                        serialized_graph[key] = None
 
-            for key in exclude:
-                if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
-                    serialized_graph[key] = None
+                return serialized_graph
+            except:
+                self.refresh_from_database()
+                return self.serialize(
+                    fields=fields, exclude=exclude, force_recalculation=True, use_raw_i18n_json=use_raw_i18n_json, **kwargs
+                )
 
-            return serialized_graph
         else:
             ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, use_raw_i18n_json=use_raw_i18n_json)
             ret["root"] = self.root
@@ -1499,7 +1517,18 @@ class Graph(models.GraphModel):
                     unpermitted_node_edits = find_unpermitted_edits(
                         db_node,
                         self.nodes[db_node.nodeid],
-                        ["name", "issearchable", "ontologyclass", "description", "isrequired", "fieldname", "exportable"],
+                        [
+                            "name",
+                            "alias",
+                            "hascustomalias",
+                            "issearchable",
+                            "ontologyclass",
+                            "description",
+                            "isrequired",
+                            "fieldname",
+                            "exportable",
+                            "config",
+                        ],
                         "node",
                     )
                     if unpermitted_node_edits is not None:

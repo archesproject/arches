@@ -93,8 +93,8 @@ module.exports = () => {
                 plugins: [
                     new CleanWebpackPlugin(),
                     new webpack.DefinePlugin({
-                        ARCHES_CORE_DIRECTORY: `'${ROOT_DIR}'`,
-                        APP_ROOT_DIRECTORY: `'${APP_ROOT}'`
+                        ARCHES_CORE_DIRECTORY: `'${ROOT_DIR.replace(/\\/g ,'/')}'`,
+                        APP_ROOT_DIRECTORY: `'${APP_ROOT.replace(/\\/g ,'/')}'`
                     }),
                     new webpack.ProvidePlugin({
                         jquery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),

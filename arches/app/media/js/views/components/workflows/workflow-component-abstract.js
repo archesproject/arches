@@ -294,7 +294,9 @@ define([
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
 
-                $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                const resourceInstanceOrGraphId = self.componentData.parameters['resourceid'] || self.componentData.parameters['graphid'];
+
+                $.getJSON(( arches.urls.resource + `/${resourceInstanceOrGraphId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
                     if (self.cardinality() === '1') {
                         if (data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
@@ -314,7 +316,20 @@ define([
                             }
                         });
 
-                        self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
+                        self.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
+                            if (!(savedData instanceof Array)) { savedData = [savedData]; }
+
+                            self.card().getNewTile();
+            
+                            self.savedData(savedData.map(function(savedDatum) {
+                                return {
+                                    tileData: savedDatum._tileData(),
+                                    tileId: savedDatum.tileid,
+                                    nodegroupId: savedDatum.nodegroup_id,
+                                    resourceInstanceId: savedDatum.resourceinstance_id,
+                                };
+                            }));
+
                             self.componentData.parameters.dirty(false);
                             self.card().selected(true);
                             self.dirty(false);
@@ -683,12 +698,21 @@ define([
                 self.componentData['parameters']['renderContext'] = 'workflow';
             }
 
-
-
             if (self.componentData.componentType === 'card') {
+                const previouslySavedValue = self.getFromLocalStorage('value');
+                let previouslySavedResourceInstanceId;
+    
+                if (previouslySavedValue) {
+                    if (!(previouslySavedValue instanceof Array)) { previouslySavedValue = [previouslySavedValue]; }
+    
+                    if (previouslySavedValue[0]['resourceInstanceId']) {
+                        previouslySavedResourceInstanceId = previouslySavedValue[0]['resourceInstanceId'];
+                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId
+                    }
+                }
+
                 AbstractCardAdapter.apply(self);
             }
-
 
             else if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
@@ -757,10 +781,16 @@ define([
                 }
             });
 
-            if (self.componentData.tilesManaged === "many"){
-                self.saveMultiTiles();
-            } else {
-                self.save();
+            // only saves updated tiles
+            if (ko.unwrap(self.dirty) || ko.unwrap(self.hasDirtyTiles) || ko.unwrap(self.hasUnsavedData)) {
+                if (self.componentData.tilesManaged === "many"){
+                    self.saveMultiTiles();
+                } else {
+                    self.save();
+                }
+            }
+            else {
+                self.complete(true);
             }
         };
 

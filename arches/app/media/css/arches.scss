@@ -2310,7 +2310,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel div .new-provisional-edit-card-container {
-    padding-left: 5px;
+    padding-left: 10px;
 }
 
 .workbench-card-sidepanel .new-provisional-edit-card-container {
@@ -3188,6 +3188,12 @@ a.select2-search-choice-close {
         background: #eee;
     }
 }
+
+.iiif-canvas-filter {
+    height: 28px;
+    margin: 0px 5px;
+}
+
 
 .key {
     margin-top: 98px;
@@ -4415,7 +4421,7 @@ div.dropdown-menu.open {
 
 .loading-mask {
     position: fixed;
-    background-color: grey;
+    background-color: #fafafa;
     top: 0;
     bottom: 0;
     left: 0;
@@ -4458,7 +4464,7 @@ div.dropdown-menu.open {
 
 .workflow-step-loading-mask {
     position: absolute;
-    top: 94px;
+    top: 95px;
     bottom: 58px;
     opacity: 1;
 }
@@ -7647,6 +7653,13 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     }
 }
 
+.iiif-clear-search.clear-node-search {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    font-size: 14px;
+}
+
 .new-card.disabled {
     background-color: #ccc;
 }
@@ -8538,7 +8551,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table {
-    max-height: 400px;
+    max-height: 450px;
     overflow-y: scroll;
     overflow-x: hidden;
     border: 1px solid #ddd;
@@ -8613,6 +8626,15 @@ a.mega-dropdown-toggle.disabled {
     border: none;
     border-top: 1px solid #ddd;
     padding: 20px 30px;
+}
+
+.rr-table-row-panel .control-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rr-table-row-panel .node-config-item {
+    margin: 5px 0px 15px -7.5px;
 }
 
 .rr-table-column {
@@ -12848,6 +12870,7 @@ ul.select2-choices:after {
     width: 100%;
     height: 108px;
     padding: 5px;
+    background: #fafbfb;
 }
 
 .iiif-gallery-content .panel-controls .mode-selector-buttons {
@@ -13197,6 +13220,7 @@ ul.select2-choices:after {
     display: inline-block;
     white-space: nowrap;
     vertical-align: top;
+    background: #fafbfb;
 }
 .iiif-gallery-sequence-canvases {
     height: 108px;
@@ -14577,6 +14601,11 @@ ul.select2-choices:after {
 .etl-job-task-bar .task a{
     padding: 7px;
     text-decoration: none;
+    color: steelblue;
+    cursor: pointer;
+}
+
+.etl-error-report-link {
     color: steelblue;
     cursor: pointer;
 }

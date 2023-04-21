@@ -16,15 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import uuid
-import importlib
 import datetime
 import logging
 from time import time
 from uuid import UUID
+from types import SimpleNamespace
 from django.db import transaction
 from django.db.models import Q
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
@@ -39,7 +38,6 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
-from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
@@ -51,7 +49,6 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_users_for_object,
     get_restricted_users,
     get_restricted_instances,
 )
@@ -72,11 +69,24 @@ class Resource(models.ResourceInstance):
         # self.resourceinstancesecurity
         # end from models.ResourceInstance
         self.tiles = []
+        self.descriptor_function = None
+        try:
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
+        except AttributeError:
+            self.serialized_graph = None
 
-    def get_descriptor(self, descriptor, context):
-        graph_function = models.FunctionXGraph.objects.filter(
-            graph_id=self.graph_id, function__functiontype="primarydescriptors"
-        ).select_related("function")
+    def get_descriptor_language(self, context):
+        """
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
 
         if self.descriptors is None:
             self.descriptors = {}
@@ -85,24 +95,63 @@ class Resource(models.ResourceInstance):
             self.name = {}
 
         requested_language = None
-        if context is not None and "language" in context:
+        if context and "language" in context:
             requested_language = context["language"]
         language = requested_language or get_language()
 
         if language not in self.descriptors:
             self.descriptors[language] = {}
 
-        if len(graph_function) == 1:
-            module = graph_function[0].function.get_class_module()()
-            self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                self, graph_function[0].config["descriptor_types"][descriptor], context
-            )
-            if descriptor == "name" and self.descriptors[language][descriptor] is not None:
-                self.name[language] = self.descriptors[language][descriptor]
-        else:
-            self.descriptors[language][descriptor] = None
+        return language
 
+    def get_descriptor(self, descriptor, context):
+        """
+        descriptor -- string descriptor type: "name", "description", "map_popup"
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
+
+        language = self.get_descriptor_language(context)
+
+        if self.descriptors:
+            try:
+                return self.descriptors[language][descriptor]
+            except KeyError:
+                pass
+
+        self.calculate_descriptors(context=context)
         return self.descriptors[language][descriptor]
+
+    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+        """
+        descriptors -- iterator with descriptors to be calculated
+        context -- Dictionary which may have:
+            language -- Language code in which the descriptor should be returned (e.g. 'en').
+                This occurs when handling concept values.
+            any key:value pairs needed to control the behavior of a custom descriptor function
+
+        """
+
+        language = self.get_descriptor_language(context)
+
+        if not self.descriptor_function:
+            self.descriptor_function = models.FunctionXGraph.objects.filter(
+                graph_id=self.graph_id, function__functiontype="primarydescriptors"
+            ).select_related("function")
+
+        for descriptor in descriptors:
+            if len(self.descriptor_function) == 1:
+                module = self.descriptor_function[0].function.get_class_module()()
+                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
+                )
+                if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                    self.name[language] = self.descriptors[language][descriptor]
+            else:
+                self.descriptors[language][descriptor] = None
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -140,6 +189,13 @@ class Resource(models.ResourceInstance):
 
         """
         # TODO: 7783 cbyrd throw error if graph is unpublished
+        if not self.serialized_graph:
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
+
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -171,9 +227,13 @@ class Resource(models.ResourceInstance):
 
         """
         root_ontology_class = None
-        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
-        if len(graph_nodes) > 0:
-            root_ontology_class = graph_nodes[0].ontologyclass
+        try:
+            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] is True), None))
+        except:
+            graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
+
+        if graph_node:
+            root_ontology_class = graph_node.ontologyclass
 
         return root_ontology_class
 
@@ -254,12 +314,20 @@ class Resource(models.ResourceInstance):
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
-
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+            for lang in settings.LANGUAGES:
+                if context is None:
+                    context = {}
+                context["language"] = lang[0]
+                self.calculate_descriptors(context=context)
+
             datatype_factory = DataTypeFactory()
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+
+            node_datatypes = {
+                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
+            }
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
@@ -267,15 +335,16 @@ class Resource(models.ResourceInstance):
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
-            celery_worker_running = task_management.check_if_celery_available()
+            if len(settings.ELASTICSEARCH_CUSTOM_INDEXES) > 0:
+                celery_worker_running = task_management.check_if_celery_available()
 
-            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                if celery_worker_running and index.get("should_update_asynchronously"):
-                    index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
-                else:
-                    es_index = import_class_from_string(index["module"])(index["name"])
-                    doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
-                    es_index.index_document(document=doc, id=doc_id)
+                for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                    if celery_worker_running and index.get("should_update_asynchronously"):
+                        index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
+                    else:
+                        es_index = import_class_from_string(index["module"])(index["name"])
+                        doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                        es_index.index_document(document=doc, id=doc_id)
 
             super(Resource, self).save()
 
@@ -615,7 +684,6 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
-
 
                 for resource in related_resources["docs"]:
                     relations = get_relations(

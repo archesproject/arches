@@ -8,7 +8,7 @@
 
 {% block require_config %}
 <script>
-    var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor/' %}";
+    var CKEDITOR_BASEPATH = "{% webpack_static 'node_modules/ckeditor4/' %}";
     window.CKEDITOR_BASEPATH = CKEDITOR_BASEPATH;
     require.config({
         baseUrl: "{% webpack_static 'build/js' %}",
@@ -91,13 +91,7 @@
             },
             'leaflet-fullscreen': {
                 deps: ['leaflet']
-            },
-            'ckeditor': {
-                deps: ['jquery']
-            },
-            'ckeditor-jquery': {
-                deps: ['jquery', 'ckeditor']
-            },
+            }
             {% block shim %}{% endblock shim %}
         }
     });
@@ -108,7 +102,7 @@
 
     <!-- consumed by media/js/arches.js -->
     {% block arches_translations %}
-    <div 
+    <div
         class='arches-translations'
         confirm-all-resource-delete='{
             "title": "{% trans "Delete All Resources Associated with this Graph?" %}",
@@ -131,7 +125,7 @@
             "text": "{% jsescaped_trans "Deleting this resource will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
         }'
         graph-import-failed='{
-            "title": "{% jsescaped_trans "Graph import failed." %}" 
+            "title": "{% jsescaped_trans "Graph import failed." %}"
         }'
         request-failed='{
             "title": "{% jsescaped_trans "Request Failed..." as requestfailed %} {{requestfailed|escapejs}}",
@@ -516,6 +510,9 @@
         url-label-placeholder='{% trans "URL Label Placeholder" as urlLabelPlaceholder %} "{{ urlLabelPlaceholder|escapejs }}"'
         default-relationship-to='{% trans "Default relationship to" as defaultRelationshipTo %} "{{ defaultRelationshipTo|escapejs }}"'
         default-inverse-relationship-to='{% trans "Default inverse relationship to" as defaultInverseRelationshipTo %} "{{ defaultInverseRelationshipTo|escapejs }}"'
+        relationship-concept='{% trans "Relationship Concept" as relationshipConcept %} "{{ relationshipConcept|escapejs }}"'
+        inverse-relationship-concept='{% trans "Inverse Relationship Concept" as inverseRelationshipConcept %} "{{ inverseRelationshipConcept|escapejs }}"'
+        use-ontology='{% trans "Define Relationship using Ontology Property" as useOntology %} "{{ useOntology|escapejs }}"'
         references='{% trans "References" as references %} "{{ references|escapejs }}"'
         does-not-reference='{% trans "Does not reference" as doesNotReference %} "{{ doesNotReference|escapejs }}"'
         legend='{% trans "Legend" as legend %} "{{ legend|escapejs }}"'
@@ -577,6 +574,7 @@
         card-constraints-placeholder='{% trans "Select Widgets" as cardConstraintsPlaceholder %} "{{ cardConstraintsPlaceholder|escapejs }}"'
         card-function-node-desc='{% trans "(This card data will define the resource description.)" as cardFunctionNodeDesc %} "{{ cardFunctionNodeDesc|escapejs }}"'
         card-function-node-name='{% trans "(This card data will define the resource name.)" as cardFunctionNodeName %} "{{ cardFunctionNodeName|escapejs }}"'
+        choose-a-sibling-card='{% trans "Choose a sibling card" as chooseASiblingCard %} "{{ chooseASiblingCard|escapejs }}"'
         grouping-error-title='{% trans "Settings Conflict: Remove this card from grouped card?" as groupingErrorTitle %} "{{ groupingErrorTitle|escapejs }}"'
         grouping-error-message='{% trans "The cardinality of this card cannot be changed until you remove it from being grouped with the ${cardName} card.  Do you want to remove this card from being grouped with the ${cardName} card" as groupingErrorMessage %} "{{ groupingErrorMessage|escapejs }}"'
         model-does-not-exist='{% trans "!! Referenced model does not exist -- Delete and select a new model !!" as modelDoesNotExist %} "{{ modelDoesNotExist|escapejs }}"'
@@ -671,7 +669,7 @@
         service-description='{% trans "Service Description" as serviceDescription %} "{{ serviceDescription|escapejs }}"'
         metadata-label='{% trans "Metadata Label" as metadataLabel %} "{{ metadataLabel|escapejs }}"'
         metadata-value='{% trans "Metadata Value" as metadataValue %} "{{ metadataValue|escapejs }}"'
-        image-caption='{% trans "Image Caption" as imageCaption %} "{{ imageCaption|escapejs }}"'        
+        image-caption='{% trans "Image Caption" as imageCaption %} "{{ imageCaption|escapejs }}"'
         upload-csv-zip-file='{% trans "Upload .csv or .zip File" as uploadCsvZipFile %} "{{ uploadCsvZipFile|escapejs }}"'
         dropzone-file-upload-caption='{% trans "Drag & Drop your file onto this area to upload" as dropzoneFileUploadCaption %} "{{ dropzoneFileUploadCaption|escapejs }}"'
         select-file='{% trans "Select File" as selectFile %} "{{ selectFile|escapejs }}"'
@@ -718,11 +716,15 @@
         undo-import='{% trans "undo import" as undoImport %} "{{ undoImport|escapejs }}"'
         remove-from-history='{% trans "remove from history" as removeFromHistory %} "{{ removeFromHistory|escapejs }}"'
         indexing='{% trans "indexing" as indexing %} "{{ indexing|escapejs }}"'
+        validating='{% trans "validating" as validating %} "{{ validating|escapejs }}"'
         completed='{% trans "completed" as completed %} "{{ completed|escapejs }}"'
         failed='{% trans "failed" as failed %} "{{ failed|escapejs }}"'
         running='{% trans "running" as running %} "{{ running|escapejs }}"'
         unloading='{% trans "unloading" as unloading %} "{{ unloading|escapejs }}"'
         unloaded='{% trans "unloaded" as unloaded %} "{{ unloaded|escapejs }}"'
+        show='{% trans "show" as show %} "{{ show|escapejs }}"'
+        hide='{% trans "hide" as hide %} "{{ hide|escapejs }}"'
+        first-five-shown='{% trans "First 5 errors are shown" as firstFiveShown %} "{{ firstFiveShown|escapejs }}"'
         validation-errors='{% trans "Validation Errors" as validationErrors %} "{{ validationErrors|escapejs }}"'
         no-error-found='{% trans "No Error Found" as noErrorFound %} "{{ noErrorFound|escapejs }}"'
         loading-data='{% trans "Loading data" as loadingData %} "{{ loadingData|escapejs }}"'
@@ -763,7 +765,7 @@
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
-    <div 
+    <div
         class='arches-urls'
         root="{% url 'root' %}"
         home="{% url 'home' %}"
@@ -854,7 +856,7 @@
         help_template="{% url 'help_templates' %}"
         graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         api_card='"{% url "api_card" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
-        api_tiles='(tileid)=>{ 
+        api_tiles='(tileid)=>{
             return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);
         }'
         api_nodegroup='(nodegroupid)=>{
@@ -883,7 +885,7 @@
     ></div>
     {% endblock arches_urls %}
     {% block arches_data %}
-    <div 
+    <div
         class='arches-data'
         celery-running="{{celery_running}}"
         concept-collections='[{% for concept_collection in concept_collections %}{
@@ -925,7 +927,8 @@
             "is_resource_layer": false,
             "centerx": {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
             "centery": {{ map_layer.centery|default_if_none:"null"|unlocalize }},
-            "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }}
+            "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }},
+            "sortorder": {{ map_layer.sortorder }}
         },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
             "maplayerid": "{{ resource_map_layer.nodeid }}",
             "name": "{{ resource_map_layer.name }}",
@@ -965,7 +968,7 @@
 
 
     <!-- consumed by media/js/card-components.js -->
-    <div 
+    <div
         id="cardComponentData"
         style="display: none;"
         cardComponents='{{% for component in card_components %}
@@ -979,7 +982,7 @@
 
 
     <!-- consumed by media/js/datatype-config-components.js -->
-    <div 
+    <div
         id="datatypeConfigComponentData"
         style="display: none;"
         datatypeConfigComponents='{{% for datatype in datatypes %}
@@ -1002,7 +1005,7 @@
 
 
     <!-- consumed by media/js/file-renderers.js -->
-    <div 
+    <div
         id="fileRendererData"
         style="display: none;"
         fileRenderers='{{% for renderer in app_settings.RENDERERS  %}
@@ -1023,7 +1026,7 @@
 
 
     <!-- consumed by media/js/function-templates.js -->
-    <div 
+    <div
         id="functionTemplateData"
         style="display: none;"
         functionTemplates='{{% for template in function_templates  %}
@@ -1041,7 +1044,7 @@
 
 
     <!-- consumed by media/js/geocoder-templates.js -->
-    <div 
+    <div
         id="geocoderTemplateData"
         style="display: none;"
         geocoderTemplates='{{% for provider in geocoding_providers %}
@@ -1063,7 +1066,7 @@
 
 
     <!-- consumed by media/js/resource-types.js -->
-    <div 
+    <div
         id="resourceTypeData"
         style="display: none;"
         resourceTypes='{{% for type, type_data in resource_types %}
@@ -1087,7 +1090,7 @@
 
 
     <!-- consumed by media/js/report-templates.js -->
-    <div 
+    <div
         id="reportTemplateData"
         style="display: none;"
         reportTemplates='{{% for template in report_templates %}
@@ -1103,7 +1106,7 @@
 
 
     <!-- consumed by media/js/search-components.js -->
-    <div 
+    <div
         id="searchComponentData"
         style="display: none;"
         searchComponents='{{% for component in search_components %}
@@ -1113,7 +1116,7 @@
 
 
     <!-- consumed by media/js/widgets.js -->
-    <div 
+    <div
         id="widgetData"
         style="display: none;"
         widgets='{{% for widget in widgets %}
