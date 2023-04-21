@@ -1,5 +1,7 @@
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
+from django.utils import translation
+
 
 RESOURCE_ID_KEY = "@resource_id"
 NODE_ID_KEY = "@node_id"
@@ -113,6 +115,7 @@ class LabelBasedGraph(object):
         node_cache=None,
         compact=False,
         hide_empty_nodes=False,
+        serialized_graph=None,
         as_json=True,
     ):
         """
@@ -124,12 +127,16 @@ class LabelBasedGraph(object):
         if node_cache is None:  # need explicit None comparison
             node_cache = {}
 
-        nodegroup_id = tile.nodegroup_id
-
-        node = node_cache.get(nodegroup_id)
+        node = node_cache.get(tile.nodegroup_id)
         if not node:
-            node = models.Node.objects.get(pk=nodegroup_id)
-            node_cache[nodegroup_id] = node
+            node = models.Node.objects.get(pk=tile.nodegroup_id)
+            node_cache[tile.nodegroup_id] = node
+
+        if not serialized_graph:
+            user_language = translation.get_language()
+            published_graph = models.PublishedGraph.objects.get(publication=node.graph.publication, language=user_language)
+
+            serialized_graph = published_graph.serialized_graph
 
         graph = cls._build_graph(
             input_node=node,
@@ -138,6 +145,7 @@ class LabelBasedGraph(object):
             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
             node_cache=node_cache,
+            serialized_graph=serialized_graph,
             datatype_factory=datatype_factory,
         )
 
@@ -173,6 +181,9 @@ class LabelBasedGraph(object):
             nodegroup_cardinality_reference,
         ) = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
 
+        user_language = translation.get_language()
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph.publication, language=user_language)
+
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
         for tile in resource.tiles:
@@ -184,6 +195,7 @@ class LabelBasedGraph(object):
                 node_cache=node_cache,
                 compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
+                serialized_graph=published_graph.serialized_graph,
                 as_json=False,
             )
 
@@ -262,7 +274,15 @@ class LabelBasedGraph(object):
 
     @classmethod
     def _build_graph(
-        cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
+        cls, 
+        input_node, 
+        input_tile, 
+        parent_tree, 
+        node_ids_to_tiles_reference,
+        nodegroup_cardinality_reference, 
+        node_cache, 
+        serialized_graph,
+        datatype_factory
     ):
         def is_valid_semantic_node(node, tile):
             if node.datatype == "semantic":
@@ -312,6 +332,7 @@ class LabelBasedGraph(object):
                             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
                             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
                             node_cache=node_cache,
+                            serialized_graph=serialized_graph,
                             datatype_factory=datatype_factory,
                         )
 
