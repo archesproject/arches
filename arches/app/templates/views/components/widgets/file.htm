@@ -52,27 +52,29 @@
                     <span data-bind="text: $root.translations.uploadedFiles"></span>
                 </h4>
                 <div class="file-upload-options">
+                    <div class="file-upload-options-grow">
                     <!--ko if: filesJSON().length > 1-->
-                    <input 
-                        data-bind="
-                            attr: {placeholder: $root.translations.findAFile + '...', 'aria-label': $root.translations.findAFile},
-                            textInput: filter
-                        " 
-                        type="text" 
-                        class="file-upload-filter"
-                    >
-                    <!-- /ko -->
+                    
+                        <input 
+                            data-bind="
+                                attr: {placeholder: $root.translations.findAFile + '...'},
+                                textInput: filter
+                            " 
+                            type="text" 
+                            class="file-upload-filter"
+                        >
+                        <!-- Clear Search -->
+                        <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        <!-- /ko -->
 
-                    <!-- Clear Search -->
-                    <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
-
-                    <!-- ko if: filter() -->
-                    <span data-bind="text: filteredList().length+' out of '+filesJSON().length+' files match filter'"></span>
-                    <!-- /ko -->
-                    <!-- ko if: (!filter() || filter() == "") -->
-                    <span data-bind="text: filesJSON().length + $root.translations.filesUploaded"></span>
-                    <!-- /ko -->
-                    <div style="float: right">
+                        <!-- ko if: filter() -->
+                        <span data-bind="text: filteredList().length +' '+ $root.translations.outOf +' '+ filesJSON().length +' '+ $root.translations.filesMatchFilter"></span>
+                        <!-- /ko -->
+                        <!-- ko if: (!filter() || filter() == "") -->
+                        <span data-bind="text: filesJSON().length +' '+ $root.translations.filesUploaded"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div >
                         <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
                             <span data-bind="text: $root.translations.addMoreFiles"></span>
                         </button>

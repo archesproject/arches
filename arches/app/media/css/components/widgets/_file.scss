@@ -22,15 +22,12 @@
 
 .file-upload-filter {
     /* margin-right: 5px; */
-    padding: 5px 10px;
+    padding: 0.5em 1em;
     width: 250px;
 }
 
 span.file-upload-clear-filter {
-    position: absolute;
-    left: 238px;
-    top: 37px;
-    z-index: 25;
+    position: relative;
 }
 
 .dz-previews .file-upload-card {
@@ -47,7 +44,12 @@ span.file-upload-clear-filter {
 }
 
 .file-upload-options {
-    padding-bottom: 8px;
+    padding-bottom: 0.75em;
+    display: flex;
+}
+
+.file-upload-options-grow{
+    flex-grow: 1;
 }
 
 .file-size-label {
@@ -58,7 +60,6 @@ span.file-upload-clear-filter {
 .btn-file-upload-reset {
     color: #489EED;
     font-size: 12px;
-    float: right;
 }
 
 .file-upload-card-detail-right {
