@@ -112,6 +112,8 @@ class LabelBasedGraph(object):
         node_ids_to_tiles_reference,
         nodegroup_cardinality_reference=None,
         datatype_factory=None,
+        node_ids_to_serialized_nodes=None,
+        edge_domain_node_ids_to_serialized_edges=None,
         hide_empty_nodes=False,
         serialized_graph=None,
         as_json=True,
@@ -122,26 +124,29 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        # node = node_cache.get(tile.nodegroup_id)
-        # if not node:
-        #     import pdb; pdb.set_trace()
-        node = models.Node.objects.get(pk=tile.nodegroup_id)
-        #     node_cache[tile.nodegroup_id] = node
-
         if not serialized_graph:
+            node = models.Node.objects.get(pk=tile.nodegroup_id)
+            graph_x_published_graph = models.GraphXPublishedGraph.objects.get(graph_id=node.graph_id)
+
             user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(publication=node.graph.publication, language=user_language)
+            published_graph = models.PublishedGraph.objects.get(publication_id=graph_x_published_graph.publicationid, language=user_language)
 
             serialized_graph = published_graph.serialized_graph
 
+        if not node_ids_to_serialized_nodes or not edge_domain_node_ids_to_serialized_edges:
+            node_ids_to_serialized_nodes = { serialized_node['nodeid']: serialized_node for serialized_node in serialized_graph['nodes'] }
+            edge_domain_node_ids_to_serialized_edges = { serialized_edge['domainnode_id']: serialized_edge for serialized_edge in serialized_graph['edges'] }
+
         graph = cls._build_graph(
-            input_node=node,
+            input_node=node_ids_to_serialized_nodes[str(tile.nodegroup_id)],
             input_tile=tile,
             parent_tree=None,
             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
             serialized_graph=serialized_graph,
             datatype_factory=datatype_factory,
+            node_ids_to_serialized_nodes=node_ids_to_serialized_nodes,
+            edge_domain_node_ids_to_serialized_edges=edge_domain_node_ids_to_serialized_edges,
         )
 
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
@@ -179,8 +184,6 @@ class LabelBasedGraph(object):
         node_ids_to_serialized_nodes = { serialized_node['nodeid']: serialized_node for serialized_node in serialized_graph['nodes'] }
         edge_domain_node_ids_to_serialized_edges = { serialized_edge['domainnode_id']: serialized_edge for serialized_edge in serialized_graph['edges'] }
 
-        import pdb; pdb.set_trace()
-
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
         for tile in resource.tiles:
@@ -191,7 +194,6 @@ class LabelBasedGraph(object):
                 datatype_factory=datatype_factory,
                 node_ids_to_serialized_nodes=node_ids_to_serialized_nodes,
                 edge_domain_node_ids_to_serialized_edges=edge_domain_node_ids_to_serialized_edges,
-                compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
                 serialized_graph=serialized_graph,
                 as_json=False,
@@ -277,7 +279,9 @@ class LabelBasedGraph(object):
         node_ids_to_tiles_reference,
         nodegroup_cardinality_reference, 
         serialized_graph,
-        datatype_factory
+        datatype_factory,
+        node_ids_to_serialized_nodes,
+        edge_domain_node_ids_to_serialized_edges,
     ):
         def is_valid_semantic_node(node, tile):
             if node.datatype == "semantic":
