@@ -104,6 +104,26 @@ class LabelBasedGraph(object):
         nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
 
         return node_ids_to_tiles_reference, nodegroup_cardinality_reference
+    
+    @classmethod
+    def is_valid_semantic_node(cls, node, tile, node_ids_to_tiles_reference, edge_domain_node_ids_to_range_nodes):
+        if node['datatype'] == "semantic":
+            child_nodes = edge_domain_node_ids_to_range_nodes.get(node['nodeid'], [])
+
+            semantic_child_nodes = [child_node for child_node in child_nodes if child_node['datatype'] == "semantic"]
+            non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node['datatype'] != "semantic"]
+
+            for non_semantic_child_node in non_semantic_child_nodes:
+                if str(non_semantic_child_node['nodeid']) in tile.data or str(non_semantic_child_node['nodeid']) in node_ids_to_tiles_reference:
+                    return True
+
+            has_valid_child_semantic_node = False
+
+            for semantic_child_node in semantic_child_nodes:
+                if cls.is_valid_semantic_node(semantic_child_node, tile, node_ids_to_tiles_reference, edge_domain_node_ids_to_range_nodes):
+                    has_valid_child_semantic_node = True
+
+            return has_valid_child_semantic_node
 
     @classmethod
     def from_tile(
@@ -279,6 +299,7 @@ class LabelBasedGraph(object):
             # so let's handle errors here instead of nullguarding all models
             try:
                 display_value = datatype.to_json(tile=tile, node=serialized_node)
+                print(datatype, display_value)
             except:  # pragma: no cover
                 pass
 
@@ -297,32 +318,14 @@ class LabelBasedGraph(object):
         node_ids_to_serialized_nodes,
         edge_domain_node_ids_to_range_nodes,
     ):
-        def is_valid_semantic_node(node, tile, edge_domain_node_ids_to_range_nodes):
-            if node['datatype'] == "semantic":
-                child_nodes = edge_domain_node_ids_to_range_nodes.get(node['nodeid'], [])
-
-                semantic_child_nodes = [child_node for child_node in child_nodes if child_node['datatype'] == "semantic"]
-                non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node['datatype'] != "semantic"]
-
-                for non_semantic_child_node in non_semantic_child_nodes:
-                    if str(non_semantic_child_node['nodeid']) in tile.data or str(non_semantic_child_node['nodeid']) in node_ids_to_tiles_reference:
-                        return True
-
-                has_valid_child_semantic_node = False
-
-                for semantic_child_node in semantic_child_nodes:
-                    if is_valid_semantic_node(semantic_child_node, tile, edge_domain_node_ids_to_range_nodes):
-                        has_valid_child_semantic_node = True
-
-                return has_valid_child_semantic_node
-
         for associated_tile in node_ids_to_tiles_reference.get(input_node['nodeid'], [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if is_valid_semantic_node(
+                if cls.is_valid_semantic_node(
                     node=input_node, 
                     tile=associated_tile,
+                    node_ids_to_tiles_reference=node_ids_to_tiles_reference,
                     edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes
                 ) or input_node['nodeid'] in associated_tile.data:
                     
