@@ -43,13 +43,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
-            {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
-            <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
-            {% endif %}
-    	{% endcompress %}
-        {% if app_settings.ACCESSIBILITY_MODE %}
-        <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
+        {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
+        <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
         {% endif %}
+        {% if app_settings.ACCESSIBILITY_MODE %}
+        <link type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+        {% endif %}
+    	{% endcompress %}
         <link href="{% webpack_static 'css/package.css' %}" rel="stylesheet">
         <link href="{% webpack_static 'css/project.css' %}" rel="stylesheet">
     {% endblock css%}
