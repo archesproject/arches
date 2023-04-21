@@ -112,8 +112,6 @@ class LabelBasedGraph(object):
         node_ids_to_tiles_reference,
         nodegroup_cardinality_reference=None,
         datatype_factory=None,
-        node_cache=None,
-        compact=False,
         hide_empty_nodes=False,
         serialized_graph=None,
         as_json=True,
@@ -124,13 +122,11 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        if node_cache is None:  # need explicit None comparison
-            node_cache = {}
-
-        node = node_cache.get(tile.nodegroup_id)
-        if not node:
-            node = models.Node.objects.get(pk=tile.nodegroup_id)
-            node_cache[tile.nodegroup_id] = node
+        # node = node_cache.get(tile.nodegroup_id)
+        # if not node:
+        #     import pdb; pdb.set_trace()
+        node = models.Node.objects.get(pk=tile.nodegroup_id)
+        #     node_cache[tile.nodegroup_id] = node
 
         if not serialized_graph:
             user_language = translation.get_language()
@@ -144,7 +140,6 @@ class LabelBasedGraph(object):
             parent_tree=None,
             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
-            node_cache=node_cache,
             serialized_graph=serialized_graph,
             datatype_factory=datatype_factory,
         )
@@ -156,7 +151,6 @@ class LabelBasedGraph(object):
         cls,
         resource,
         datatype_factory=None,
-        node_cache=None,
         compact=False,
         hide_empty_nodes=False,
         as_json=True,
@@ -170,9 +164,6 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        if node_cache is None:  # need explicit None comparison
-            node_cache = {}
-
         if not resource.tiles:
             resource.load_tiles(user, perm)
 
@@ -183,6 +174,12 @@ class LabelBasedGraph(object):
 
         user_language = translation.get_language()
         published_graph = models.PublishedGraph.objects.get(publication=resource.graph.publication, language=user_language)
+        serialized_graph = published_graph.serialized_graph
+
+        node_ids_to_serialized_nodes = { serialized_node['nodeid']: serialized_node for serialized_node in serialized_graph['nodes'] }
+        edge_domain_node_ids_to_serialized_edges = { serialized_edge['domainnode_id']: serialized_edge for serialized_edge in serialized_graph['edges'] }
+
+        import pdb; pdb.set_trace()
 
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
@@ -192,10 +189,11 @@ class LabelBasedGraph(object):
                 node_ids_to_tiles_reference=node_ids_to_tiles_reference,
                 nodegroup_cardinality_reference=nodegroup_cardinality_reference,
                 datatype_factory=datatype_factory,
-                node_cache=node_cache,
+                node_ids_to_serialized_nodes=node_ids_to_serialized_nodes,
+                edge_domain_node_ids_to_serialized_edges=edge_domain_node_ids_to_serialized_edges,
                 compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
-                serialized_graph=published_graph.serialized_graph,
+                serialized_graph=serialized_graph,
                 as_json=False,
             )
 
@@ -234,7 +232,6 @@ class LabelBasedGraph(object):
         """
 
         datatype_factory = DataTypeFactory()
-        node_cache = {}
 
         resource_label_based_graphs = []
 
@@ -242,7 +239,6 @@ class LabelBasedGraph(object):
             resource_label_based_graph = cls.from_resource(
                 resource=resource,
                 datatype_factory=datatype_factory,
-                node_cache=node_cache,
                 compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
                 as_json=as_json,
@@ -280,7 +276,6 @@ class LabelBasedGraph(object):
         parent_tree, 
         node_ids_to_tiles_reference,
         nodegroup_cardinality_reference, 
-        node_cache, 
         serialized_graph,
         datatype_factory
     ):
@@ -322,16 +317,12 @@ class LabelBasedGraph(object):
                         parent_tree.child_nodes.append(label_based_node)
 
                     for child_node in input_node.get_direct_child_nodes():
-                        if not node_cache.get(child_node.pk):
-                            node_cache[child_node.pk] = child_node
-
                         cls._build_graph(
                             input_node=child_node,
                             input_tile=associated_tile,
                             parent_tree=label_based_node,
                             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
                             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
-                            node_cache=node_cache,
                             serialized_graph=serialized_graph,
                             datatype_factory=datatype_factory,
                         )
