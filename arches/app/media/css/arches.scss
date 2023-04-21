@@ -2691,99 +2691,8 @@ label.form-radio.form-normal{
     }
 }
 
-label.form-checkbox.form-normal:before,
-.form-radio.form-normal::before {
-    left: 1px;
-}
-
-label.form-checkbox.form-normal{
-    margin: 4px 0px;
-    display: flex;
-    align-items: center;
-
-    &:before {
-        content: '';
-        margin: 0 5px;
-        display: block;
-        position: unset;
-        width: 16px;
-        height: 16px;
-        background-color: transparent;
-        border: 1px solid #c3cedb;
-        border-radius: 0;
-        left: auto;
-        top: auto;
-    }
-    &:not(.active):hover:after{
-        opacity: 3;
-    }
-    &.form-primary:not(.active):hover:after {
-        border-color: #489eed;
-    }
-
-    &:not(.disabled):hover:after {
-        content: '';
-        position: absolute;
-        height: 6px;
-        width: 11px;
-        left: 8px;
-        top: 50%;
-        margin-top: -5px;
-        -webkit-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-        border-bottom: 2.5px solid #515151;
-        border-left: 2.5px solid #515151;
-    }
-
-    &.active
-    {
-        &:after {
-            content: '';
-            position: absolute;
-            height: 6px;
-            width: 11px;
-            left: 8px;
-            top: 50%;
-            margin-top: -5px;
-            border-bottom: 2.5px solid #515151;
-            border-color: #fff;
-            border-left: 2.5px solid #515151;
-            transform: rotate(-45deg);
-        }
-        &:before {
-            background-color: #5fa2dd;
-            border-color: #5fa2dd;
-        }
-    }
-    span {
-        width: 186px;
-        white-space: normal;
-        padding: 0 5px;
-    }
-
-    &.permission-option i{
-        padding: 0 2px;
-    }
-}
-
-.form-text.form-checkbox,.form-text.form-radio{
-    &:not(.btn){
-        padding: 0px;
-    }
-
-    &>input[type="checkbox"],
-    &>input[type="radio"] {
-        position: unset !important; // TODO: remove !important after nifty.css is purged
-        margin: 5px;
-    }
-}
-
-.columns .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn),
-.columns .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn),
-.columns .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn) {
     width: 225px;
     white-space: nowrap;
@@ -2791,36 +2700,9 @@ label.form-checkbox.form-normal{
     text-overflow: ellipsis;
 }
 
-.option-input {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 100%;
-}
-
-.option-input-config {
-    display: flex;
-    flex-direction: column;
-}
-
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #94A6BC;
     color: #123;
-}
-
-.input-group.date .input-group-addon {
-    background: #fafafa;
-}
-
-.input-group-addon:first-child{
-    border-inline-start: 1px solid #e1e5ea;
-    border-inline-end: none;
-}
-
-.widget-input-label {
-    font-size: 12px;
-    margin-top: 2px;
-    font-weight: 600;
-    color: #666;
 }
 
 .widget-config-container .widget-input-label {
@@ -2836,10 +2718,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .form-contol {
-    height: 36px;
-}
-
-.form-control.input-lg.widget-input {
     height: 36px;
 }
 
@@ -4103,12 +3981,6 @@ ul.nav.nav-tabs.nav-justified {
     font-size: 16px;
     padding-bottom: 5px;
     border-bottom: solid 1px #ddd;
-}
-
-.pad-hor.columns {
-    background: #fff;
-    padding: 8px 5px 6px 10px;
-    /*border: 1px solid #ddd;*/
 }
 
 .form-radio.form-normal::before {
@@ -5379,13 +5251,6 @@ div.dropdown-menu.open {
     padding: 10px;
 }
 
-.ion-asterisk.widget-label-required {
-    padding-left: 3px;
-    font-size: 9px;
-    margin-top: 2px;
-    position: absolute;
-}
-
 #container.cls-container.arches-login {
     background: rgb(236, 238, 241);
 }
@@ -5820,10 +5685,6 @@ textarea:placeholder {
 
 span.editable-card i.fa.fa-align-justify:hover {
     cursor: move;
-}
-
-.widgets {
-    border-bottom-width: 1px;
 }
 
 .report li {
@@ -7484,73 +7345,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     min-width: 200px;
 }
 
-/*  Start card/widget manager Classes
-    used to manage placement and display of elements inside of the Card
-    and Widget Management forms
-*/
-
-.panel-config {
-    flex-direction: row-reverse;
-}
-
-.panel-config .middle-column-container {
-    border-right: transparent;
-    border-left: 1px solid #ddd;
-    background: #f4f4f4;
-    color: #2d3c4b;
-}
-
-.panel-config .toggle-container {
-    padding-bottom: 5px;
-}
-
-.panel-config .form-divider {
-    border-top: 1px solid #ccc;
-}
-
-.widget-config-container {
-    display: flex;
-    flex-direction: column;
-}
-
-.panel-config .widget-config-container {
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-.panel-config .widget-config-container .control-label {
-    padding-top: 5px;
-    // padding-left: 5px;
-}
-
-
-/* panel styling in widget manager for radio groups */
-
-.panel-config .widget-config-container .radio-panel {
-    background: #fff;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 0px;
-    margin-left: -10px;
-    margin-right: -10px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-}
-
-
-/* panel styling in widget manager for checkbox groups */
-
-.panel-config .widget-config-container .checkbox-panel {
-    background: #fff;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 0px;
-    margin-left: -10px;
-    margin-right: -10px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-}
-
 
 /* Color changes if you want to use a dark (#2d3c4b) background panel color
     for the .panel-config .middle-column-container classes
@@ -7614,10 +7408,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.crud-widget-container {
-    padding-bottom: 15px;
 }
 
 .sortable-placeholder {
@@ -8334,12 +8124,6 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     font-size: 19px;
 }
 
-div.row.widget-wrapper {
-    margin: 0;
-    margin-right: 10px;
-    padding: 10px 5px 25px 5px;
-    position: relative;
-}
 
 .map-filter-panel div.row.widget-wrapper {
     padding: 5px 5px 25px 5px;
@@ -8348,7 +8132,7 @@ div.row.widget-wrapper {
 .input-group .form-control {
     position: relative;
     z-index: 0;
-    float: left;
+    float: inherit;
     width: 100%;
     margin-bottom: 0;
 }
@@ -12072,20 +11856,6 @@ a.filter-tools:hover {
     padding-left: 15px;
 }
 
-.number-widget-report {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 5px;
-}
-
-.number-prefix {
-    padding-right: 1px;
-}
-
-.number-suffix {
-    padding-left: 1px;
-}
-
 .report-title-bar {
 }
 
@@ -13558,22 +13328,6 @@ ul.select2-choices:after {
     cursor: pointer;
     padding: 5px;
     font-size: 0.9em;
-}
-
-.widget-inline-tools-collapser {
-    cursor: pointer;
-    font-size: 0.9em;
-    display: flex;
-    z-index: 1;
-    margin-bottom: 5px;
-}
-
-.widget-inline-tools-collapser>label {
-    flex-grow: 1;
-}
-
-.widget-inline-tools-collapser>span {
-    padding-inline-end: 12px;
 }
 
 .style-tools-panel {
