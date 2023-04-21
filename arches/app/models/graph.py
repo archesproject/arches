@@ -499,7 +499,7 @@ class Graph(models.GraphModel):
                         message = _('Fail to save node "{0}".'.format(node.name))
                         raise GraphValidationError(message)
                 if branch_publication_id:
-                    for branch_node in models.Node.objects.filter(publication_id=branch_publication_id, graph=node.graph):
+                    for branch_node in models.Node.objects.filter(sourcebranchpublication_id=branch_publication_id, graph=node.graph):
                         branch_node.sourcebranchpublication_id = None
                         branch_node.save()
 
