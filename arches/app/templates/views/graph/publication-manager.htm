@@ -49,7 +49,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_buttons %}
 
 {% block content %}
-<div style="padding: 0 20px; width: 100%;">
+<div 
+    style="
+        padding: 0 20px 20px 20px; 
+        width: 100%;
+        height: calc(100vh - 105px); 
+        overflow-y: scroll;
+    "
+>
     <fieldset>
         <!-- ko foreach: $data.publishedGraphs() -->
             <div 
@@ -127,39 +134,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </div>
 
-            <div>
-                <!-- ko if: $data['publicationid'] === $parent.graphPublicationId() -->
+            <!-- ko if: $data['publicationid'] === $parent.graphPublicationId() -->
+                <div 
+                    style="
+                        display: flex; 
+                        background-color: #fff; 
+                        padding: 20px; 
+                        padding-left: 110px;
+                        border-left: 1px solid #ddd; 
+                        border-right: 1px solid #ddd; 
+                        border-bottom: 1px solid #ddd;
+                    "
+                >
+                    <div style="width: 120px;">
+                        <strong>{% trans "Published Notes:" %}</strong>
+                    </div>
                     <div 
                         style="
-                            display: flex; 
-                            background-color: #fff; 
-                            padding: 20px; 
-                            padding-left: 110px;
-                            border-left: 1px solid #ddd; 
-                            border-right: 1px solid #ddd; 
-                            border-bottom: 1px solid #ddd;
+                            overflow-y: scroll; 
+                            margin-left: 6px;
+                            max-height: 120px;
+                            width: 90%;
                         "
                     >
-                        <div style="width: 120px;">
-                            <strong>{% trans "Published Notes:" %}</strong>
-                        </div>
                         <div 
-                            style="
-                                overflow-y: scroll; 
-                                margin-left: 6px;
-                                max-height: 120px;
-                                width: 90%;
-                            "
-                        >
-                            <div 
-                                style="white-space: pre-wrap;" 
-                                data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
-                                readonly
-                            ></div>
-                        </div>
+                            style="white-space: pre-wrap;" 
+                            data-bind="text: $data['notes'] || {% quoted_trans 'None' %}" 
+                            readonly
+                        ></div>
                     </div>
-                <!-- /ko -->
-            </div>
+                </div>
+            <!-- /ko -->
         <!-- /ko -->
     </fieldset>
 </div>
