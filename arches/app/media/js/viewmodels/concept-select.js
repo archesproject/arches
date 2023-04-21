@@ -89,14 +89,16 @@ define([
                 url: arches.urls.paged_dropdown,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term, page) {
+                data: function(selectWooParams) {
+                    let term = selectWooParams.term || '';
+                    let page = selectWooParams.page || 1;
                     return {
                         conceptid: ko.unwrap(params.node.config.rdmCollection),
                         query: term,
                         page: page
                     };
                 },
-                results: function(data) {
+                processResults: function(data) {
                     data.results.forEach(function(result) {
                         if (result.collector) {
                             delete result.id;
@@ -108,21 +110,15 @@ define([
                     };
                 }
             },
-            id: function(item) {
-                return item.id;
-            },
-            formatResult: function(item) {
+            templateResult: function(item) {
                 var indentation = '';
                 for (var i = 0; i < item.depth-1; i++) {
                     indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
                 }
                 return indentation + item.text;
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
                 return item.text;
-            },
-            clear: function() {
-                self.value('');
             },
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();

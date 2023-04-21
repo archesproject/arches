@@ -18,14 +18,17 @@ define([
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).selectWoo('destroy');
+                $(el).off("select2:selecting");
+                $(el).off("select2:opening");
+                $(el).off("change");
             });
 
             var placeholder = select2Config.placeholder;
             if (ko.isObservable(placeholder)) {
                 placeholder.subscribe(function(newItems) {
                     select2Config.placeholder = newItems;
-                    $(el).selectWoo("destroy").selectWoo(select2Config);
-                });
+                    $(el).data('renderPlaceholder')();
+                }, this);
                 select2Config.placeholder = select2Config.placeholder();
                 if (select2Config.allowClear) {
                     select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
@@ -41,52 +44,45 @@ define([
                 select2Config.disabled = select2Config.disabled();
             }
 
-            //select2Config.value = value();
             $(el).selectWoo(select2Config);
 
-            // if (value) {
-            //     $(el).selectWoo("val", value());
-            //     value.subscribe(function(newVal) {
-            //         select2Config.value = newVal;
-            //         $(el).selectWoo("val", newVal);
-            //     }, this);
-            //     $(el).on("change", function(val) {
-            //         if (val.val === "") {
-            //             val.val = null;
-            //         }
-            //         return value(val.val);
-            //     });
-            // }
-
-            // if (ko.unwrap(select2Config.disabled)) {
-            //     $(el).prop("disabled", true);
-            //     disabled.subscribe(function(val){
-            //         if (val === false) {
-            //             $(el).prop("disabled", false);
-            //         }
-            //     });
-            // }
-
-            $(el).on("select2-opening", function() {
+            // this initializes the placeholder for the select element
+            // we shouldn't have to do this but there is some issue with selectwoo
+            $(el).data('renderPlaceholder', function(){
+                var renderedEle = $(el).siblings().first().find('.select2-selection__rendered');
+                renderedEle.find('.select2-selection__placeholder').remove();
+                if (renderedEle[0].innerText === ""){
+                    var placeholderHtml = document.createElement("span");
+                    placeholderHtml.classList.add('select2-selection__placeholder');
+                    var placeholderText = document.createTextNode(select2Config.placeholder);
+                    placeholderHtml.appendChild(placeholderText);
+                    renderedEle.append(placeholderHtml);
+                }
+            });
+            $(el).data('renderPlaceholder')();
+            
+            if (value) {
+                // initialize the dropdown with the value
+                //$(el).val(value());
+                
+                // update the dropdown if something else changes the value
+                value.subscribe(function(newVal) {
+                    select2Config.value = newVal;
+                    $(el).val(newVal).trigger('change.select2');
+                }, this);
+            }
+            
+            $(el).on("select2:opening", function() {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');
                 }
             });
-
+            
             if (typeof select2Config.onSelect === 'function') {
                 $(el).on("select2:selecting", function(e) {
                     select2Config.onSelect(e.params.args.data);
                 });
-                // $(el).on("select2:select", function(e) {
-                //     select2Config.onSelect(e.choice);
-                // });
             }
-            if (typeof select2Config.onClear === 'function') {
-                $(el).on("select2-clearing", function(e) {
-                    select2Config.onClear(e.choice);
-                });
-            }
-
         }
     };
 

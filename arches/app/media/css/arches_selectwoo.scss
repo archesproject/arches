@@ -9,9 +9,19 @@
     border-radius: 0px;
 }
 
-.select2-dropdown{
+.select2-dropdown {
     border-radius: 0px;
 }
+
+.select2-selection__clear {
+    margin: 0 8px;
+    font-size: 1.5em;
+
+    &:hover {
+        color: #2986b8
+    }
+}
+
 
 // .resource-instance-wrapper .select2-container {
 //     max-width: 600px !important;
