@@ -1,4 +1,7 @@
 module.exports = {
+    outout: {
+        globalObject: 'this'
+    },
     ARCHES_CORE_NODE_MODULES_ALIASES: JSON.stringify({
         "plugins/knockout-select2": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'knockout-select2.js')",
         "nifty": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'nifty')",
@@ -56,7 +59,7 @@ module.exports = {
         "jqtree": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/jqtree/tree.jquery`)",
         "dom-4": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/dom4/build/dom4`)",
         "numeral": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/numeral/numeral`)",
-        "togeojson": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/@tmcw/togeojson/dist/togeojson.umd`)",
+        "togeojson": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/@tmcw/togeojson/dist/togeojson.es`)",
         "cytoscape": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/cytoscape/dist/cytoscape.min`)",
         "cytoscape-cola": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/cytoscape-cola/cytoscape-cola`)",
         "webcola": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/webcola/WebCola/cola.min`)"

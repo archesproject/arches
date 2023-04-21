@@ -79,9 +79,11 @@ class GraphSettingsView(GraphBaseView):
         node_models = models.Node.objects.filter(graph__pk__in=[resource_graph.pk for resource_graph in resource_graphs])
 
         for res in resource_graphs:
-            node_model = node_models.get(graph=res, istopnode=True)
-            if node_model:
+            try:
+                node_model = node_models.get(graph=res, istopnode=True)
                 resource_data.append({"id": node_model.nodeid, "graph": res, "is_relatable": (node_model in relatable_resources)})
+            except models.Node.DoesNotExist:
+                pass
 
         return JSONResponse(
             {
@@ -415,7 +417,7 @@ class GraphDataView(View):
                                     sortorder = sortorder + 1
                             ret = data
 
-            return JSONResponse(ret)
+            return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
         except PublishedModelError as e:
@@ -459,8 +461,6 @@ class GraphDataView(View):
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
                     graph.delete_instances()
-                    graph.publication = None
-                    graph.save(validate=False)
                 graph.delete()
                 return JSONResponse({"success": True})
             except GraphValidationError as e:
