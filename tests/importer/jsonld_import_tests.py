@@ -1,6 +1,7 @@
 import os
 import datetime
 
+from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory, Client
 from django.urls import reverse
@@ -8,6 +9,7 @@ from django.db import connection
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
+from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
@@ -118,6 +120,14 @@ class JsonLDImportTests(ArchesTestCase):
         with open(os.path.join("tests/fixtures/jsonld_base/models/required_ambiguous_nodes.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
+
+        for graph_id in [
+            "bf734b4e-f6b5-11e9-8f09-a4d18cec433a",
+            "f13f8a92-3e76-11ec-9a49-faffc210b420",
+            "37b50648-78ef-11ec-9508-faffc210b420",
+        ]:
+            graph = Graph.objects.get(pk=graph_id)
+            graph.publish(user=User.objects.get(pk=1))
 
     def setUp(self):
         pass
