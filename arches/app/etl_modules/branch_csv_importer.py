@@ -221,7 +221,7 @@ class BranchCsvImporter(BaseImportModule):
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
 
-    def validate(self):
+    def validate(self, loadid):
         success = True
         with connection.cursor() as cursor:
             error_message = _("Legacy id(s) already exist. Legacy ids must be unique")
@@ -230,7 +230,7 @@ class BranchCsvImporter(BaseImportModule):
             AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""",
                 (error_message, self.loadid, self.loadid),
             )
-        row = self.get_validation_result()
+        row = self.get_validation_result(loadid)
         return {"success": success, "data": row}
 
     def read(self, request):
@@ -324,7 +324,7 @@ class BranchCsvImporter(BaseImportModule):
                 """,
                 [loadid],
             )
-            result["validation"] = self.validate()
+            result["validation"] = self.validate(loadid)
             if len(result["validation"]["data"]) == 0:
                 self.save_to_tiles(loadid, multiprocessing=False)
             else:
