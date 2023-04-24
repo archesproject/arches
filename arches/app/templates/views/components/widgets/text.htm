@@ -6,10 +6,12 @@
 <div class="row widget-wrapper">
     <div class="form-group" style="position: relative;">
         <div style="max-width: 600px; position: relative">
-            <div class="widget-inline-tools-collapser" data-bind=" click: function() {
-                showi18nOptions(!showi18nOptions());
-            }">
-                <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+            <div class="widget-inline-tools-collapser" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+                showi18nOptions(!showi18nOptions()); },
+                attr: { 'aria-pressed': showi18nOptions(), 'aria-label': $root.translations.languages }" 
+                tabindex="0" role="button"
+            >
+                <span class="control-label widget-input-label" for="" data-bind="text:label"></span>
                 <span>
                     <i class="fa" data-bind="{
                         css: {
@@ -26,8 +28,18 @@
                         <label class="widget-input-label" for="lang_dd">
                             <span data-bind="text: $root.translations.language"></span>
                         </label>
-                        <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
-                        </select>
+                        <select 
+                            id="lang_dd" 
+                            style="flex:1" 
+                            name="language" 
+                            data-bind="
+                                options: languages, 
+                                optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
+                                value: currentLanguage, 
+                                chosen: {width:'100%'},
+                                attr: { 'aria-labeledby': 'lang_dd' }
+                            "
+                        ></select>
                         <label class="widget-input-label" for="lang_dir">
                             <span data-bind="text: $root.translations.direction"></span>
                         </label>
@@ -44,6 +56,7 @@
                                     { text: $root.translations.leftToRight, value: 'ltr' },
                                     { text: $root.translations.rightToLeft, value: 'rtl' },
                                 ],
+                                attr: { 'aria-labeledby': 'lang_dir' }
                             "
                         ></select>
                     </div>
@@ -91,9 +104,11 @@
 </div>
 <div class="form-group" style="position: relative;">
     <div style="max-width: 600px; position: relative">
-    <div class="widget-inline-tools-collapser" data-bind=" click: function() {
-        showi18nOptions(!showi18nOptions());
-    }">
+    <div class="widget-inline-tools-collapser" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+        showi18nOptions(!showi18nOptions()); },
+        attr: { 'aria-pressed': showi18nOptions(), 'aria-label': $root.translations.languages }" 
+        tabindex="0" role="button"
+    >
         <label class="control-label widget-input-label" for="input-default-value" data-bind="text: $root.translations.defaultValue"></label>
         <span>
             <i class="fa" data-bind="{
@@ -111,8 +126,18 @@
                 <label class="widget-input-label" for="lang_dd">
                     <span data-bind="text: $root.translations.language"></span>
                 </label>
-                <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentDefaultLanguage, chosen: {width:'100%'}">
-                </select>
+                <select 
+                    id="lang_dd" 
+                    style="flex:1" 
+                    name="language" 
+                    data-bind="
+                        options: languages, 
+                        optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
+                        value: currentDefaultLanguage, 
+                        chosen: {width:'100%'},
+                        attr: { 'aria-labeledby': 'lang_dd' }
+                    "
+                ></select>
                 <label class="widget-input-label" for="lang_dir">
                     <span data-bind="text: $root.translations.direction"></span>
                 </label>
@@ -129,6 +154,7 @@
                             { text: $root.translations.leftToRight, value: 'ltr' },
                             { text: $root.translations.rightToLeft, value: 'rtl' },
                         ],
+                        attr: { 'aria-labeledby': 'lang_dir' }
                     "
                 ></select>
             </div>
