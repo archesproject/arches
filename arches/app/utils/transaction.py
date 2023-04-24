@@ -1,7 +1,7 @@
 import logging
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.models.models import EditLog
+from arches.app.models.models import IIIFManifest, EditLog
 from django.db import transaction, DatabaseError
 
 # Get an instance of a logger
@@ -27,6 +27,20 @@ def reverse_edit_log_entries(transaction_id):
                         obj.data = edit_log.oldvalue
                         obj.save()
                         number_of_db_changes += 1
+    except DatabaseError:
+        logger.error("Error connecting to database")
+
+    return number_of_db_changes
+
+
+def delete_manifests(transaction_id):
+    number_of_db_changes = 0
+    try:
+        with transaction.atomic():
+            transaction_changes = IIIFManifest.objects.filter(transactionid=transaction_id)
+            for obj in transaction_changes:
+                obj.delete()
+                number_of_db_changes += 1
     except DatabaseError:
         logger.error("Error connecting to database")
 

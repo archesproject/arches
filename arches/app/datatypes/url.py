@@ -150,17 +150,15 @@ class URLDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         # Match the label in the same manner as a String datatype
-
         try:
             if value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
                 if "~" in value["op"]:
                     match_query = Match(
                         field="tiles.data.%s.url" % (str(node.pk)),
                         query=value["val"],
-                        type=match_type,
+                        type="phrase_prefix",
                     )
-                if "=" in value["op"]:
+                if "eq" in value["op"]:
                     match_query = Term(field="tiles.data.%s.url.keyword" % (str(node.pk)), term=value["val"])
                 if "!" in value["op"]:
                     query.must_not(match_query)

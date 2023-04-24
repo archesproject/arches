@@ -16,15 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import uuid
-import importlib
 import datetime
 import logging
 from time import time
 from uuid import UUID
+from types import SimpleNamespace
 from django.db import transaction
 from django.db.models import Q
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
@@ -39,7 +38,6 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
-from arches.app.utils.i18n import get_localized_value
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from guardian.shortcuts import assign_perm, remove_perm
@@ -51,7 +49,6 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_users_for_object,
     get_restricted_users,
     get_restricted_instances,
 )
@@ -73,6 +70,14 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
         self.descriptor_function = None
+        try:
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
+        except AttributeError:
+            self.serialized_graph = None
 
     def get_descriptor_language(self, context):
         """
@@ -184,6 +189,13 @@ class Resource(models.ResourceInstance):
 
         """
         # TODO: 7783 cbyrd throw error if graph is unpublished
+        if not self.serialized_graph:
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
+
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
@@ -215,9 +227,13 @@ class Resource(models.ResourceInstance):
 
         """
         root_ontology_class = None
-        graph_nodes = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True)
-        if len(graph_nodes) > 0:
-            root_ontology_class = graph_nodes[0].ontologyclass
+        try:
+            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] is True), None))
+        except:
+            graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
+
+        if graph_node:
+            root_ontology_class = graph_node.ontologyclass
 
         return root_ontology_class
 
@@ -298,7 +314,6 @@ class Resource(models.ResourceInstance):
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
-
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
@@ -307,8 +322,12 @@ class Resource(models.ResourceInstance):
                     context = {}
                 context["language"] = lang[0]
                 self.calculate_descriptors(context=context)
+
             datatype_factory = DataTypeFactory()
-            node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+
+            node_datatypes = {
+                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
+            }
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
@@ -316,15 +335,16 @@ class Resource(models.ResourceInstance):
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
 
-            celery_worker_running = task_management.check_if_celery_available()
+            if len(settings.ELASTICSEARCH_CUSTOM_INDEXES) > 0:
+                celery_worker_running = task_management.check_if_celery_available()
 
-            for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                if celery_worker_running and index.get("should_update_asynchronously"):
-                    index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
-                else:
-                    es_index = import_class_from_string(index["module"])(index["name"])
-                    doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
-                    es_index.index_document(document=doc, id=doc_id)
+                for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                    if celery_worker_running and index.get("should_update_asynchronously"):
+                        index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
+                    else:
+                        es_index = import_class_from_string(index["module"])(index["name"])
+                        doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                        es_index.index_document(document=doc, id=doc_id)
 
             super(Resource, self).save()
 
