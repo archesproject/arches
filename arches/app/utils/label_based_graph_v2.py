@@ -312,7 +312,7 @@ class LabelBasedGraph(object):
             datatype = datatype_factory.get_instance(serialized_node["datatype"])
 
             node_copy = copy.deepcopy(serialized_node)
-            
+
             # `get_display_value` varies between datatypes,
             # so let's handle errors here instead of nullguarding all models
             try:

@@ -175,15 +175,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_smoke(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
@@ -202,15 +195,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
 
         mock_Node.objects.get.return_value = self.string_node
@@ -243,17 +229,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_with_multiple_values(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
-                
+
         mock_Node.objects.get.return_value = self.string_node
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
@@ -297,15 +276,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_semantic_node_with_child(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
 
         mock_Node.objects.get.return_value = self.grouping_node
@@ -346,15 +318,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_grouped_in_separate_card(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
 
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
@@ -398,15 +363,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
 
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
@@ -452,15 +410,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
     def test_handles_empty_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
 
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
@@ -493,17 +444,10 @@ class LabelBasedGraph_FromResourceTests(TestCase):
     @mock.patch("arches.app.utils.label_based_graph.models.CardModel")
     def test_handle_hidden_nodes(self, mock_CardModel, mock_Node, mock_NodeGroup, mock_PublishedGraph):
         mock_PublishedGraph.objects.get.return_value.serialized_graph = {
-            'nodes': JSONDeserializer().deserialize(JSONSerializer().serialize(
-                [ 
-                    self.string_node,
-                    self.grouping_node
-                ]
-            )), 
-            'edges': [
-                { 'domainnode_id': str(self.grouping_node.pk), 'rangenode_id': str(self.string_node.pk) }
-            ]
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
         }
-                
+
         filter_mock = mock.MagicMock()
 
         def filter_side_effect(nodegroup_id=None):
