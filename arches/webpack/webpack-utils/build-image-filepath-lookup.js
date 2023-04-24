@@ -22,7 +22,7 @@ const _buildImageFilePathLookup = function(publicPath, path, outerAcc, imageDire
 
             return { 
                 ...acc, 
-                [Path.join(publicPath, 'img', filename)]: Path.resolve(__dirname, Path.join(outerPath, subPath))
+                [Path.join(publicPath, 'img', filename).replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
             };
         }
     }, outerAcc);
