@@ -14,18 +14,13 @@ import json
 import uuid
 import datetime
 import logging
-import pyotp
-
-from datetime import timedelta
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
-from django.core.files.storage import FileSystemStorage
-from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
@@ -578,6 +573,9 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
+    sourcebranchpublication = models.ForeignKey(
+        GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
+    )
 
     def get_child_nodes_and_edges(self):
         """
@@ -883,8 +881,9 @@ class ResourceXResource(models.Model):
             if type(data) != list:
                 data = [data]
             for relatedresourceItem in data:
-                if relatedresourceItem["resourceId"] != str(deletedResourceId):
-                    newTileData.append(relatedresourceItem)
+                if relatedresourceItem:
+                    if relatedresourceItem["resourceId"] != str(deletedResourceId):
+                        newTileData.append(relatedresourceItem)
             self.tileid.data[str(self.nodeid_id)] = newTileData
             self.tileid.save()
 
@@ -1523,11 +1522,21 @@ class Plugin(models.Model):
         db_table = "plugins"
 
 
+class IIIFManifestValidationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Image Service Validation Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self)
+
 class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
+    transactionid = models.UUIDField(default=uuid.uuid4)
 
     def __str__(self):
         return self.label
@@ -1535,6 +1544,25 @@ class IIIFManifest(models.Model):
     class Meta:
         managed = True
         db_table = "iiif_manifests"
+
+    def delete(self, *args, **kwargs):
+        all_canvases = {annotation.canvas for annotation in VwAnnotation.objects.all()}
+        canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
+        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        canvases_in_use = []
+        for canvas_id in canvas_ids:
+            if canvas_id in all_canvases:
+                canvases_in_use.append(canvas_id)
+        if len(canvases_in_use) > 0:
+            canvas_labels_in_use = [
+                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+            ]
+            message = _("This manifest cannot be deleted because the following canvases have resource annotations: {}").format(
+                ", ".join(canvas_labels_in_use)
+            )
+            raise IIIFManifestValidationError(message)
+
+        super(IIIFManifest, self).delete()
 
 
 class GroupMapSettings(models.Model):
