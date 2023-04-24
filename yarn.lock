@@ -2782,10 +2782,9 @@ anymatch@~3.1.2:
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.0.0.tgz#52520b8ae5b569215b354efc0caa3fe1e45a8adc"
   integrity sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==
 
-arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.3.x:
-  version "7.3.0"
-  uid "6dda75346f4da6293692160c55ffe41579b3a481"
-  resolved "https://codeload.github.com/archesproject/arches-dev-dependencies/tar.gz/6dda75346f4da6293692160c55ffe41579b3a481"
+arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.4.x:
+  version "7.4.0"
+  resolved "https://codeload.github.com/archesproject/arches-dev-dependencies/tar.gz/c59a552427973ad68a43e9b05688bf18e95a4f14"
   dependencies:
     "@babel/core" "^7.16.7"
     "@babel/eslint-parser" "^7.18.2"
@@ -2816,7 +2815,7 @@ arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.3.x:
     stylelint-config-standard "^24.0.0"
     stylelint-webpack-plugin "^3.1.1"
     text-loader "^0.0.1"
-    webpack "^5.66.0"
+    webpack "^5.77.0"
     webpack-cli "^4.9.1"
     webpack-dev-server "^4.7.3"
     webpack-merge "^5.8.0"
@@ -8678,10 +8677,10 @@ webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack@^5.66.0:
-  version "5.75.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.75.0.tgz#1e440468647b2505860e94c9ff3e44d5b582c152"
-  integrity sha512-piaIaoVJlqMsPtX/+3KTTO6jfvrSYgauFVdt8cr9LTHKmcq/AMd4mhzsiP7ZF/PGRNPGA8336jldh9l2Kt2ogQ==
+webpack@^5.77.0:
+  version "5.77.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.77.0.tgz#dea3ad16d7ea6b84aa55fa42f4eac9f30e7eb9b4"
+  integrity sha512-sbGNjBr5Ya5ss91yzjeJTLKyfiwo5C628AFjEa6WSXcZa4E+F57om3Cc8xLb1Jh0b243AWuSYRf3dn7HVeFQ9Q==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^0.0.51"
