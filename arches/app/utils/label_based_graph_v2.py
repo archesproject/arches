@@ -3,6 +3,7 @@ import copy
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from django.utils import translation
+from types import SimpleNamespace
 
 
 RESOURCE_ID_KEY = "@resource_id"
@@ -298,15 +299,11 @@ class LabelBasedGraph(object):
             datatype = datatype_factory.get_instance(serialized_node['datatype'])
 
             node_copy = copy.deepcopy(serialized_node)
-            del node_copy['is_collector']  # need to remove to make Node instantiation happy
-            del node_copy['parentproperty']  # need to remove to make Node instantiation happy
             
-            node = models.Node(**node_copy)
-
             # `get_display_value` varies between datatypes,
             # so let's handle errors here instead of nullguarding all models
             try:
-                display_value = datatype.to_json(tile=tile, node=node)
+                display_value = datatype.to_json(tile=tile, node=SimpleNamespace(**node_copy))
             except:  # pragma: no cover
                 pass
 
