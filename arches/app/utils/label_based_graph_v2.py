@@ -107,17 +107,20 @@ class LabelBasedGraph(object):
         nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
 
         return node_ids_to_tiles_reference, nodegroup_cardinality_reference
-    
+
     @classmethod
     def is_valid_semantic_node(cls, node, tile, node_ids_to_tiles_reference, edge_domain_node_ids_to_range_nodes):
-        if node['datatype'] == "semantic":
-            child_nodes = edge_domain_node_ids_to_range_nodes.get(node['nodeid'], [])
+        if node["datatype"] == "semantic":
+            child_nodes = edge_domain_node_ids_to_range_nodes.get(node["nodeid"], [])
 
-            semantic_child_nodes = [child_node for child_node in child_nodes if child_node['datatype'] == "semantic"]
-            non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node['datatype'] != "semantic"]
+            semantic_child_nodes = [child_node for child_node in child_nodes if child_node["datatype"] == "semantic"]
+            non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node["datatype"] != "semantic"]
 
             for non_semantic_child_node in non_semantic_child_nodes:
-                if str(non_semantic_child_node['nodeid']) in tile.data or str(non_semantic_child_node['nodeid']) in node_ids_to_tiles_reference:
+                if (
+                    str(non_semantic_child_node["nodeid"]) in tile.data
+                    or str(non_semantic_child_node["nodeid"]) in node_ids_to_tiles_reference
+                ):
                     return True
 
             has_valid_child_semantic_node = False
@@ -152,20 +155,26 @@ class LabelBasedGraph(object):
             graph_x_published_graph = models.GraphXPublishedGraph.objects.get(graph_id=node.graph_id)
 
             user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(publication_id=graph_x_published_graph.publicationid, language=user_language)
+            published_graph = models.PublishedGraph.objects.get(
+                publication_id=graph_x_published_graph.publicationid, language=user_language
+            )
 
             serialized_graph = published_graph.serialized_graph
 
         if not node_ids_to_serialized_nodes or not edge_domain_node_ids_to_range_nodes:
-            node_ids_to_serialized_nodes = { serialized_node['nodeid']: serialized_node for serialized_node in serialized_graph['nodes'] }
+            node_ids_to_serialized_nodes = {serialized_node["nodeid"]: serialized_node for serialized_node in serialized_graph["nodes"]}
 
             edge_domain_node_ids_to_range_nodes = {}
-            for serialized_edge in serialized_graph['edges']:
-                if edge_domain_node_ids_to_range_nodes.get(serialized_edge['domainnode_id']) is None:
-                    edge_domain_node_ids_to_range_nodes[serialized_edge['domainnode_id']] = []
+            for serialized_edge in serialized_graph["edges"]:
+                if edge_domain_node_ids_to_range_nodes.get(serialized_edge["domainnode_id"]) is None:
+                    edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]] = []
 
-                range_node = [ serialized_node for serialized_node in serialized_graph['nodes'] if serialized_node['nodeid'] == serialized_edge['rangenode_id'] ][0]
-                edge_domain_node_ids_to_range_nodes[serialized_edge['domainnode_id']].append(range_node)
+                range_node = [
+                    serialized_node
+                    for serialized_node in serialized_graph["nodes"]
+                    if serialized_node["nodeid"] == serialized_edge["rangenode_id"]
+                ][0]
+                edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]].append(range_node)
 
         graph = cls._build_graph(
             input_node=node_ids_to_serialized_nodes[str(tile.nodegroup_id)],
@@ -211,15 +220,19 @@ class LabelBasedGraph(object):
         published_graph = models.PublishedGraph.objects.get(publication=resource.graph.publication, language=user_language)
         serialized_graph = published_graph.serialized_graph
 
-        node_ids_to_serialized_nodes = { serialized_node['nodeid']: serialized_node for serialized_node in serialized_graph['nodes'] }
+        node_ids_to_serialized_nodes = {serialized_node["nodeid"]: serialized_node for serialized_node in serialized_graph["nodes"]}
 
         edge_domain_node_ids_to_range_nodes = {}
-        for serialized_edge in serialized_graph['edges']:
-            if edge_domain_node_ids_to_range_nodes.get(serialized_edge['domainnode_id']) is None:
-                edge_domain_node_ids_to_range_nodes[serialized_edge['domainnode_id']] = []
+        for serialized_edge in serialized_graph["edges"]:
+            if edge_domain_node_ids_to_range_nodes.get(serialized_edge["domainnode_id"]) is None:
+                edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]] = []
 
-            range_node = [ serialized_node for serialized_node in serialized_graph['nodes'] if serialized_node['nodeid'] == serialized_edge['rangenode_id'] ][0]
-            edge_domain_node_ids_to_range_nodes[serialized_edge['domainnode_id']].append(range_node)
+            range_node = [
+                serialized_node
+                for serialized_node in serialized_graph["nodes"]
+                if serialized_node["nodeid"] == serialized_edge["rangenode_id"]
+            ][0]
+            edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]].append(range_node)
 
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
@@ -293,10 +306,10 @@ class LabelBasedGraph(object):
         display_value = None
 
         # if the serialized_node is unable to collect data, let's explicitly say so
-        if datatype_factory.datatypes[serialized_node['datatype']].defaultwidget is None:
+        if datatype_factory.datatypes[serialized_node["datatype"]].defaultwidget is None:
             display_value = NON_DATA_COLLECTING_NODE
         elif tile.data:
-            datatype = datatype_factory.get_instance(serialized_node['datatype'])
+            datatype = datatype_factory.get_instance(serialized_node["datatype"])
 
             node_copy = copy.deepcopy(serialized_node)
             
@@ -311,37 +324,36 @@ class LabelBasedGraph(object):
 
     @classmethod
     def _build_graph(
-        cls, 
-        input_node, 
-        input_tile, 
-        parent_tree, 
+        cls,
+        input_node,
+        input_tile,
+        parent_tree,
         node_ids_to_tiles_reference,
-        nodegroup_cardinality_reference, 
+        nodegroup_cardinality_reference,
         serialized_graph,
         datatype_factory,
         node_ids_to_serialized_nodes,
         edge_domain_node_ids_to_range_nodes,
     ):
-        for associated_tile in node_ids_to_tiles_reference.get(input_node['nodeid'], [input_tile]):
+        for associated_tile in node_ids_to_tiles_reference.get(input_node["nodeid"], [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if cls.is_valid_semantic_node(
-                    node=input_node, 
-                    tile=associated_tile,
-                    node_ids_to_tiles_reference=node_ids_to_tiles_reference,
-                    edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes
-                ) or input_node['nodeid'] in associated_tile.data:
-                    
+                if (
+                    cls.is_valid_semantic_node(
+                        node=input_node,
+                        tile=associated_tile,
+                        node_ids_to_tiles_reference=node_ids_to_tiles_reference,
+                        edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes,
+                    )
+                    or input_node["nodeid"] in associated_tile.data
+                ):
+
                     label_based_node = LabelBasedNode(
-                        name=input_node['name'],
-                        node_id=input_node['nodeid'],
+                        name=input_node["name"],
+                        node_id=input_node["nodeid"],
                         tile_id=str(associated_tile.pk),
-                        value=cls._get_display_value(
-                            tile=associated_tile, 
-                            serialized_node=input_node, 
-                            datatype_factory=datatype_factory
-                        ),
+                        value=cls._get_display_value(tile=associated_tile, serialized_node=input_node, datatype_factory=datatype_factory),
                         cardinality=nodegroup_cardinality_reference.get(str(associated_tile.nodegroup_id)),
                     )
 
@@ -351,7 +363,7 @@ class LabelBasedGraph(object):
                     else:
                         parent_tree.child_nodes.append(label_based_node)
 
-                    for child_node in edge_domain_node_ids_to_range_nodes.get(input_node['nodeid'], []):
+                    for child_node in edge_domain_node_ids_to_range_nodes.get(input_node["nodeid"], []):
                         cls._build_graph(
                             input_node=child_node,
                             input_tile=associated_tile,
