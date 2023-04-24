@@ -90,6 +90,7 @@ class ETLManagerView(View):
 
     def clean_load_event(self, loadid):
         with connection.cursor() as cursor:
+            cursor.execute("""DELETE FROM load_errors WHERE loadid = %s""", [loadid])
             cursor.execute("""DELETE FROM load_staging WHERE loadid = %s""", [loadid])
             cursor.execute("""DELETE FROM load_event WHERE loadid = %s""", [loadid])
         return {"success": True, "data": ""}

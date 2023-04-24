@@ -7,6 +7,7 @@
 # Akash Uttamchandani, 2022
 # Sahibzada Saadoon Hammad <saadoon1122@gmail.com>, 2022
 # Iqtedar Alam, 2022
+# Alexei Peters <apeters@fargeo.com>, 2022
 # Munawar Hussain, 2022
 # Junaid Abdul Jabbar <junaid.abdul.jabbar@gmail.com>, 2022
 # 
