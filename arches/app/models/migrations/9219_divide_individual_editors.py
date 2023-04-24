@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9395_iiifmanifest_transaction"),
+        ("models", "9055_add_branch_publication_to_node"),
     ]
 
     divide_bulk_data_editor = """
