@@ -269,7 +269,6 @@ class StringDataType(BaseDataType):
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
                 exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
                 if exact_terms:
                     if "~" in value["op"]:
@@ -278,11 +277,11 @@ class StringDataType(BaseDataType):
                             query=f"*{exact_terms.group('search_string')}*",
                             case_insensitive=False,
                         )
-                    else:
+                    else:  # "eq" in value["op"]
                         match_query = Match(
                             field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
                             query=exact_terms.group("search_string"),
-                            type=match_type,
+                            type="phrase",
                         )
                 elif "?" in value["val"] or "*" in value["val"]:
                     match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
@@ -291,9 +290,9 @@ class StringDataType(BaseDataType):
                         match_query = Bool()
                         for word in value["val"].split(" "):
                             match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
-                    else:
+                    else:  # "eq" in value["op"]
                         match_query = Match(
-                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type=match_type
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase"
                         )
 
                 if "!" in value["op"]:
@@ -1637,7 +1636,12 @@ class FileListDataType(BaseDataType):
                 file_model.path = file_data
                 file_model.tile = tile
                 if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
+                    original_storage = file_model.path.storage
+                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
+                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
+                        file_model.path.storage = FileSystemStorage()
                     file_model.save()
+                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
@@ -2261,6 +2265,12 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append(error_message)
 
         return errors
+
+    def pre_tile_save(self, tile, nodeid):
+        relationships = tile.data[nodeid]
+        if relationships:
+            for relationship in relationships:
+                relationship["resourceXresourceId"] = str(uuid.uuid4())
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False
