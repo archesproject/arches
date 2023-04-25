@@ -115,4 +115,19 @@ class MapBaseManagerView(BaseManagerView):
         context["resource_map_layers"] = resource_layers
         context["resource_map_sources"] = resource_sources
 
+        all_map_layers = models.MapLayer.objects.all()
+        all_map_sources = models.MapSource.objects.all()
+
+        map_layers = []
+
+        if self.request.user.is_superuser is True:
+            map_layers = all_map_layers
+        else:
+            for m in all_map_layers:
+                if (m.addtomap is True and m.isoverlay is False) or (not self.request.user.has_perm("no_access_to_maplayer", m)):
+                    map_layers.append(m)
+
+        context["map_layers"] = map_layers
+        context["map_sources"] = all_map_sources
+
         return context

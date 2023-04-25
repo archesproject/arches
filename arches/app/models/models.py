@@ -1259,6 +1259,8 @@ class MapLayer(models.Model):
         managed = True
         ordering = ("sortorder", "name")
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (("no_access_to_maplayer", "No access to map layer"),)
 
 
 class GraphXMapping(models.Model):
