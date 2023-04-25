@@ -2816,13 +2816,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-inline-end: none;
 }
 
-.widget-input-label {
-    font-size: 12px;
-    margin-top: 2px;
-    font-weight: 600;
-    color: #666;
-}
-
 .widget-config-container .widget-input-label {
     font-weight: inherit;
 }
@@ -2836,10 +2829,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
 }
 
 .form-contol {
-    height: 36px;
-}
-
-.form-control.input-lg.widget-input {
     height: 36px;
 }
 
@@ -5685,10 +5674,6 @@ span.editable-card i.fa.fa-align-justify:hover {
     cursor: move;
 }
 
-.widgets {
-    border-bottom-width: 1px;
-}
-
 .report li {
     margin-left: -10px;
     padding-left: 5px;
@@ -7457,10 +7442,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     text-overflow: ellipsis;
 }
 
-.crud-widget-container {
-    padding-bottom: 15px;
-}
-
 .sortable-placeholder {
     border: dotted 2px #d4d4d4;
 }
@@ -8175,12 +8156,6 @@ div.hide-file-list>div>div>div>div>form>div>div:nth-child(3) {
     font-size: 19px;
 }
 
-div.row.widget-wrapper {
-    margin: 0;
-    margin-right: 10px;
-    padding: 10px 5px 25px 5px;
-    position: relative;
-}
 
 .map-filter-panel div.row.widget-wrapper {
     padding: 5px 5px 25px 5px;
@@ -8189,7 +8164,7 @@ div.row.widget-wrapper {
 .input-group .form-control {
     position: relative;
     z-index: 0;
-    float: left;
+    float: inherit;
     width: 100%;
     margin-bottom: 0;
 }
@@ -11920,20 +11895,6 @@ a.filter-tools:hover {
 #custom-download-panel {
     padding-top: 20px;
     padding-left: 15px;
-}
-
-.number-widget-report {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 5px;
-}
-
-.number-prefix {
-    padding-right: 1px;
-}
-
-.number-suffix {
-    padding-left: 1px;
 }
 
 .report-title-bar {
