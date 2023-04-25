@@ -17,7 +17,11 @@ define([
                 const response = await fetch(arches.urls.api_search_component_data + componentName);
                 if (response.ok) {
                     const data = await response.json();
-                    self.resourceModels(data.resources);
+                    data.resources.forEach(function(res) {
+                        if (res.isactive === true) {
+                            self.resourceModels.push(res);
+                        }
+                    });
                 } else {
                     // eslint-disable-next-line no-console
                     console.log('Failed to fetch resource instance list');
