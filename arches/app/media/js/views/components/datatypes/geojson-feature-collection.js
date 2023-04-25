@@ -137,16 +137,53 @@ define([
 
                 var updateMapStyle = function() {
                     _.each(overlays, function(layer) {
+                        console.log("am i here")
                         switch (layer.id) {
                         case "resources-fill-" + params.nodeid:
                             layer.paint["fill-color"] = self.config.fillColor();
                             break;
                         case "resources-line-halo-" + params.nodeid:
+                            // // if (!(/^\d+$/.test(self.config.haloWeight())) && !(self.config.haloWeight() === "") ) {
+                            //     if (!(/^\d+$/.test(self.config.haloWeight())) &&
+                            //         !(self.config.haloWeight() === "") &&
+                            //         !(self.config.haloWeight())) {
+
+                            //     console.log("\nBEFORE INP");
+                            //     console.log(self.config.haloWeight(), "whats in the box");
+                            //     console.log(typeof(layer.paint["line-width"]),layer.paint["line-width"], "   Line width");
+                            //     console.log(typeof(self.config.haloWeight()),self.config.haloWeight(), "   Halo weight"); 
+                            
+
+                            //     layer.paint["line-width"] = parseInt(self.config.haloWeight());
+                            //     self.config.haloWeight(layer.paint["line-width"]);
+                            //     layer.paint["line-color"] = self.config.lineHaloColor();
+
+                            //     console.log("\nAFTER");
+                            //     console.log(self.config.haloWeight(), "whats in the box");
+                            //     console.log(typeof(layer.paint["line-width"]),layer.paint["line-width"], "   Line width");
+                            //     console.log(typeof(self.config.haloWeight()),self.config.haloWeight(), "   Halo weight"); 
+                            //     break;
+                            // } else {
+                            //     console.log(self.config.haloWeight())
+                            //     layer.paint["line-width"] = 4;
+                            //     self.config.haloWeight(layer.paint["line-width"]);
+                            //     layer.paint["line-color"] = self.config.lineHaloColor();
+                            //     break;
+                            // };
+                            console.log(self.config.haloWeight())
                             layer.paint["line-width"] = parseInt(self.config.haloWeight());
-                            if (!(self.config.haloWeight() > 0)) { layer.paint["line-width"] = 1; }
+                            console.log(typeof(layer.paint["line-width"]),layer.paint["line-width"], "Line width");
+                            console.log(typeof(self.config.haloWeight()),self.config.haloWeight(), "halo weight");
+                            if (!(/^\d+\.\d+$|^\d+$/.test(self.config.haloWeight()))) {layer.paint["line-width"] = 4;}
+                            if (self.config.haloWeight() === "") {layer.paint["line-width"] = 4;}
+                            //if (!(self.config.haloWeight() > 0)) { layer.paint["line-width"] = 10; }
                             self.config.haloWeight(layer.paint["line-width"]);
+                            console.log(self.config.haloWeight(layer.paint["line-width"]));
                             layer.paint["line-color"] = self.config.lineHaloColor();
+                            console.log("REACHED END")
                             break;
+
+
                         case "resources-line-" + params.nodeid:
                             layer.paint["line-width"] = parseInt(self.config.weight());
                             if (!(self.config.weight() > 0)) { layer.paint["line-width"] = 1; }
@@ -185,7 +222,7 @@ define([
 
                 this.node.json.subscribe(updateMapStyle);
                 this.selectedBasemapName.subscribe(updateMapStyle);
-
+                console.log("test")
                 this.config.advancedStyling.subscribe(function(value) {
                     if (value && !self.config.advancedStyle()) {
                         self.config.advancedStyle(JSON.stringify(overlays, null, '\t'));
