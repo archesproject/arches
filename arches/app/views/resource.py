@@ -358,7 +358,10 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             context["nav"]["help"] = {"title": _("Using the Resource Editor"), "template": "resource-editor-help"}
 
-        return render(request, view_template, context)
+        if graph_has_unpublished_changes or resource_instance and not resource_instance.graph_publication_id == graph.publication_id:
+            return redirect("resource_report", resourceid=resourceid)
+        else:
+            return render(request, view_template, context)
 
     def delete(self, request, resourceid=None):
         delete_error = _("Unable to Delete Resource")

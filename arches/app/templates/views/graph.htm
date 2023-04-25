@@ -132,12 +132,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                <a 
                                    href="#" 
                                    data-bind="
-                                       click:function () { $parent.navigate($parent.arches.urls.publication_manager(graphid)) }, 
-                                       attr: { href: $parent.arches.urls.publication_manager(graphid)}
+                                       click:function () { $parent.navigate($parent.arches.urls.model_history(graphid)) }, 
+                                       attr: { href: $parent.arches.urls.model_history(graphid)}
                                    "
                                >
                                    <i class="fa fa-calendar"></i> 
-                                   <span>{% trans "Manage Published Versions" %}</span>
+                                   <span>{% trans "View Model History" %}</span>
                                </a>
                            </li>
                             <!-- ko if: $parent.showResources() -->

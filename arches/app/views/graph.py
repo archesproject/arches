@@ -540,7 +540,7 @@ class DatatypeTemplateView(TemplateView):
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
-class PublicationManagerView(GraphBaseView):
+class ModelHistoryView(GraphBaseView):
     def get(self, request, graphid):
         self.graph = Graph.objects.get(graphid=graphid)
 
@@ -564,7 +564,7 @@ class PublicationManagerView(GraphBaseView):
                 }
 
         context = self.get_context_data(
-            main_script="views/graph/publication-manager",
+            main_script="views/graph/model-history",
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
             user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
@@ -572,7 +572,7 @@ class PublicationManagerView(GraphBaseView):
         context["nav"]["title"] = self.graph.name
         context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
 
-        return render(request, "views/graph/publication-manager.htm", context)
+        return render(request, "views/graph/model-history.htm", context)
 
     def post(self, request, graphid):
         publication_id = JSONDeserializer().deserialize(request.body)
