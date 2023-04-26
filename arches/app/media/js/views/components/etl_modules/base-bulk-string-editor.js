@@ -17,7 +17,7 @@ define([
 
         this.operationLabel = {
             "trim": "Trim",
-            "replace": "Replace",
+            "replace": "Replace (Case Sensitive)",
             "replace_i": "Replace (Case Insensitive)",
             "capitalize": "Capitalize",
             "capitalize_trim": "Capitalize (Also, remove leading/trailing spaces)",
