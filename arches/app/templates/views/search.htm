@@ -6,8 +6,8 @@
 {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
 
 {% block main_content %}
-    <article class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;">
-        <section class="flex search-results-panel">
+    <article class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;" aria-label="Search page contents">
+        <section class="flex search-results-panel" aria-label="Search results">
             <div class="search-attribute-widget">
                 <div class="search-dropdown" data-bind="component: {
                     name: 'term-filter',
@@ -63,7 +63,7 @@
             </div>
         </section>
 
-        <section class="flex" style="flex-direction: column">
+        <section class="flex" style="flex-direction: column" aria-label="Map and filters">
             <!-- Title Block -->
             <div class="search-toolbar">
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
