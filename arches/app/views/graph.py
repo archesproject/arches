@@ -584,11 +584,13 @@ class ModelHistoryView(GraphBaseView):
         with transaction.atomic():
             graph = Graph.objects.get(pk=graphid)
 
-            models.NodeGroup.objects.filter(pk__in=[ nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True) ]).delete()
-            models.Node.objects.filter(pk__in=[ node.pk for node in graph.nodes.values() ]).delete()
-            models.Edge.objects.filter(pk__in=[ edge.pk for edge in graph.edges.values() ]).delete()
-            models.CardModel.objects.filter(pk__in=[ card.pk for card in graph.cards.values() ]).delete()
-            models.CardXNodeXWidget.objects.filter(pk__in=[ card_x_node_x_widget.pk for card_x_node_x_widget in graph.widgets.values() ]).delete()
+            models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True)]).delete()
+            models.Node.objects.filter(pk__in=[node.pk for node in graph.nodes.values()]).delete()
+            models.Edge.objects.filter(pk__in=[edge.pk for edge in graph.edges.values()]).delete()
+            models.CardModel.objects.filter(pk__in=[card.pk for card in graph.cards.values()]).delete()
+            models.CardXNodeXWidget.objects.filter(
+                pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in graph.widgets.values()]
+            ).delete()
 
             for serialized_nodegroup in serialized_graph["nodegroups"]:
                 for key, value in serialized_nodegroup.items():
@@ -607,8 +609,8 @@ class ModelHistoryView(GraphBaseView):
                     except:
                         pass
 
-                del serialized_node['is_collector']
-                del serialized_node['parentproperty']
+                del serialized_node["is_collector"]
+                del serialized_node["parentproperty"]
 
                 node = models.Node(**serialized_node)
                 node.save()
@@ -630,8 +632,8 @@ class ModelHistoryView(GraphBaseView):
                     except:
                         pass
 
-                del serialized_card['constraints']
-                del serialized_card['is_editable']
+                del serialized_card["constraints"]
+                del serialized_card["is_editable"]
 
                 card = Card(**serialized_card)
                 card.save()
