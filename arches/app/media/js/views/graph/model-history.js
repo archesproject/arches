@@ -36,6 +36,8 @@ require([
                         window.location.assign(arches.urls.graph_designer(viewModel.graphid()));
                     },
                     error: function(_response) {
+                        viewModel.loading(false);
+
                         viewModel.alert(new AlertViewModel(
                             'ep-alert-red',
                             arches.translations.graphPublicationUpdateFailure['title'],

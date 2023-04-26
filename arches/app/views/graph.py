@@ -581,82 +581,85 @@ class ModelHistoryView(GraphBaseView):
         publication = models.PublishedGraph.objects.get(publication_id=publication_id, language=user_language)
         serialized_graph = publication.serialized_graph
 
-        with transaction.atomic():
-            graph = Graph.objects.get(pk=graphid)
+        try:
+            with transaction.atomic():
+                graph = Graph.objects.get(pk=graphid)
 
-            models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True)]).delete()
-            models.Node.objects.filter(pk__in=[node.pk for node in graph.nodes.values()]).delete()
-            models.Edge.objects.filter(pk__in=[edge.pk for edge in graph.edges.values()]).delete()
-            models.CardModel.objects.filter(pk__in=[card.pk for card in graph.cards.values()]).delete()
-            models.CardXNodeXWidget.objects.filter(
-                pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in graph.widgets.values()]
-            ).delete()
+                models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True)]).delete()
+                models.Node.objects.filter(pk__in=[node.pk for node in graph.nodes.values()]).delete()
+                models.Edge.objects.filter(pk__in=[edge.pk for edge in graph.edges.values()]).delete()
+                models.CardModel.objects.filter(pk__in=[card.pk for card in graph.cards.values()]).delete()
+                models.CardXNodeXWidget.objects.filter(
+                    pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in graph.widgets.values()]
+                ).delete()
 
-            for serialized_nodegroup in serialized_graph["nodegroups"]:
-                for key, value in serialized_nodegroup.items():
-                    try:
-                        serialized_nodegroup[key] = uuid.UUID(value)
-                    except:
-                        pass
+                for serialized_nodegroup in serialized_graph["nodegroups"]:
+                    for key, value in serialized_nodegroup.items():
+                        try:
+                            serialized_nodegroup[key] = uuid.UUID(value)
+                        except:
+                            pass
 
-                nodegroup = models.NodeGroup(**serialized_nodegroup)
-                nodegroup.save()
+                    nodegroup = models.NodeGroup(**serialized_nodegroup)
+                    nodegroup.save()
 
-            for serialized_node in serialized_graph["nodes"]:
-                for key, value in serialized_node.items():
-                    try:
-                        serialized_node[key] = uuid.UUID(value)
-                    except:
-                        pass
+                for serialized_node in serialized_graph["nodes"]:
+                    for key, value in serialized_node.items():
+                        try:
+                            serialized_node[key] = uuid.UUID(value)
+                        except:
+                            pass
 
-                del serialized_node["is_collector"]
-                del serialized_node["parentproperty"]
+                    del serialized_node["is_collector"]
+                    del serialized_node["parentproperty"]
 
-                node = models.Node(**serialized_node)
-                node.save()
+                    node = models.Node(**serialized_node)
+                    node.save()
 
-            for serialized_edge in serialized_graph["edges"]:
-                for key, value in serialized_edge.items():
-                    try:
-                        serialized_edge[key] = uuid.UUID(value)
-                    except:
-                        pass
+                for serialized_edge in serialized_graph["edges"]:
+                    for key, value in serialized_edge.items():
+                        try:
+                            serialized_edge[key] = uuid.UUID(value)
+                        except:
+                            pass
 
-                edge = models.Edge(**serialized_edge)
-                edge.save()
+                    edge = models.Edge(**serialized_edge)
+                    edge.save()
 
-            for serialized_card in serialized_graph["cards"]:
-                for key, value in serialized_card.items():
-                    try:
-                        serialized_card[key] = uuid.UUID(value)
-                    except:
-                        pass
+                for serialized_card in serialized_graph["cards"]:
+                    for key, value in serialized_card.items():
+                        try:
+                            serialized_card[key] = uuid.UUID(value)
+                        except:
+                            pass
 
-                del serialized_card["constraints"]
-                del serialized_card["is_editable"]
+                    del serialized_card["constraints"]
+                    del serialized_card["is_editable"]
 
-                card = Card(**serialized_card)
-                card.save()
+                    card = Card(**serialized_card)
+                    card.save()
 
-            widget_dict = {}
-            for serialized_widget in serialized_graph["widgets"]:
-                for key, value in serialized_widget.items():
-                    try:
-                        serialized_widget[key] = uuid.UUID(value)
-                    except:
-                        pass
+                widget_dict = {}
+                for serialized_widget in serialized_graph["widgets"]:
+                    for key, value in serialized_widget.items():
+                        try:
+                            serialized_widget[key] = uuid.UUID(value)
+                        except:
+                            pass
 
-                updated_widget = models.CardXNodeXWidget(**serialized_widget)
-                updated_widget.save()
+                    updated_widget = models.CardXNodeXWidget(**serialized_widget)
+                    updated_widget.save()
 
-                widget_dict[updated_widget.pk] = updated_widget
+                    widget_dict[updated_widget.pk] = updated_widget
 
-            updated_graph = Graph(serialized_graph)
-            updated_graph.widgets = widget_dict
+                updated_graph = Graph(serialized_graph)
+                updated_graph.widgets = widget_dict
 
-            updated_graph.save()
-            updated_graph.create_editable_future_graph()
-
+                updated_graph.save()
+                updated_graph.create_editable_future_graph()
+        except:
+            return JSONErrorResponse(JSONSerializer().serialize({"success": False}))
+        
         return JSONResponse(JSONSerializer().serialize({"success": True}))
 
     def delete(self, request, graphid):
