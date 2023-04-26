@@ -78,7 +78,6 @@ define([
             const ready = !!self.selectedGraph() &&
                 !!self.selectedNode() &&
                 ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
-            console.log(ready);
             return ready;
         });
 
