@@ -863,13 +863,8 @@ class Graph(models.GraphModel):
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
 
-            try:
-                widget.node_id = node_map[widget.node_id]
-                widget.card_id = card_map[widget.card_id]
-            except:
-                import pdb
-
-                pdb.set_trace()
+            widget.node_id = node_map[widget.node_id]
+            widget.card_id = card_map[widget.card_id]
 
         copy_of_self.populate_null_nodegroups()
 
