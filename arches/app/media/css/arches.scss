@@ -2691,115 +2691,13 @@ label.form-radio.form-normal{
     }
 }
 
-label.form-checkbox.form-normal:before,
-.form-radio.form-normal::before {
-    left: 1px;
-}
-
-label.form-checkbox.form-normal{
-    margin: 4px 0px;
-    display: flex;
-    align-items: center;
-
-    &:before {
-        content: '';
-        margin: 0 5px;
-        display: block;
-        position: unset;
-        width: 16px;
-        height: 16px;
-        background-color: transparent;
-        border: 1px solid #c3cedb;
-        border-radius: 0;
-        left: auto;
-        top: auto;
-    }
-    &:not(.active):hover:after{
-        opacity: 3;
-    }
-    &.form-primary:not(.active):hover:after {
-        border-color: #489eed;
-    }
-
-    &:not(.disabled):hover:after {
-        content: '';
-        position: absolute;
-        height: 6px;
-        width: 11px;
-        left: 8px;
-        top: 50%;
-        margin-top: -5px;
-        -webkit-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-        border-bottom: 2.5px solid #515151;
-        border-left: 2.5px solid #515151;
-    }
-
-    &.active
-    {
-        &:after {
-            content: '';
-            position: absolute;
-            height: 6px;
-            width: 11px;
-            left: 8px;
-            top: 50%;
-            margin-top: -5px;
-            border-bottom: 2.5px solid #515151;
-            border-color: #fff;
-            border-left: 2.5px solid #515151;
-            transform: rotate(-45deg);
-        }
-        &:before {
-            background-color: #5fa2dd;
-            border-color: #5fa2dd;
-        }
-    }
-    span {
-        width: 186px;
-        white-space: normal;
-        padding: 0 5px;
-    }
-
-    &.permission-option i{
-        padding: 0 2px;
-    }
-}
-
-.form-text.form-checkbox,.form-text.form-radio{
-    &:not(.btn){
-        padding: 0px;
-    }
-
-    &>input[type="checkbox"],
-    &>input[type="radio"] {
-        position: unset !important; // TODO: remove !important after nifty.css is purged
-        margin: 5px;
-    }
-}
-
-.columns .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn),
-.columns .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn),
-.columns .form-text.form-checkbox:not(.btn),
 .form-text.form-radio:not(.btn) {
     width: 225px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.option-input {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 100%;
-}
-
-.option-input-config {
-    display: flex;
-    flex-direction: column;
 }
 
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
@@ -4094,12 +3992,6 @@ ul.nav.nav-tabs.nav-justified {
     border-bottom: solid 1px #ddd;
 }
 
-.pad-hor.columns {
-    background: #fff;
-    padding: 8px 5px 6px 10px;
-    /*border: 1px solid #ddd;*/
-}
-
 .form-radio.form-normal::before {
     left: 0px;
 }
@@ -5367,15 +5259,6 @@ div.dropdown-menu.open {
     right: 0;
     padding: 10px;
 }
-
-.ion-asterisk.widget-label-required {
-    padding-left: 3px;
-    font-size: 9px;
-    margin-top: 2px;
-    position: absolute;
-}
-
-
 
 .concept_tree {
     padding: 13px;
@@ -7308,73 +7191,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     border-right: solid 1px #ddd;
     border-left: 1px solid #ddd;
     min-width: 200px;
-}
-
-/*  Start card/widget manager Classes
-    used to manage placement and display of elements inside of the Card
-    and Widget Management forms
-*/
-
-.panel-config {
-    flex-direction: row-reverse;
-}
-
-.panel-config .middle-column-container {
-    border-right: transparent;
-    border-left: 1px solid #ddd;
-    background: #f4f4f4;
-    color: #2d3c4b;
-}
-
-.panel-config .toggle-container {
-    padding-bottom: 5px;
-}
-
-.panel-config .form-divider {
-    border-top: 1px solid #ccc;
-}
-
-.widget-config-container {
-    display: flex;
-    flex-direction: column;
-}
-
-.panel-config .widget-config-container {
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-.panel-config .widget-config-container .control-label {
-    padding-top: 5px;
-    // padding-left: 5px;
-}
-
-
-/* panel styling in widget manager for radio groups */
-
-.panel-config .widget-config-container .radio-panel {
-    background: #fff;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 0px;
-    margin-left: -10px;
-    margin-right: -10px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-}
-
-
-/* panel styling in widget manager for checkbox groups */
-
-.panel-config .widget-config-container .checkbox-panel {
-    background: #fff;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 0px;
-    margin-left: -10px;
-    margin-right: -10px;
-    border: 1px solid #ddd;
-    border-radius: 2px;
 }
 
 
