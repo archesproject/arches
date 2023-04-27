@@ -616,7 +616,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
             )
 
         graph_lookup = {
@@ -847,23 +847,3 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
-
-
-class PublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Published Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)
-
-
-class UnpublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Unpublished Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)
