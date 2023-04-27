@@ -140,6 +140,7 @@
                                     <!-- ko if: event.status == "indexed" -->
                                     <button class="btn btn-success" style="width:150px;">
                                         <span data-bind="text: $root.translations.completed"></span>
+                                        <i class="fa fa-spin fa-spinner" data-bind="visible: event.loading()"></i>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->

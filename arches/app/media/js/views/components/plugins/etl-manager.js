@@ -68,6 +68,7 @@ define([
                             return response.json();
                         }
                     }).then(function(data){
+                        data.events.map((event)=> { event.loading = ko.observable(false); });
                         self.loadEvents(data.events);
                         self.paginator(data.paginator);
                         const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
@@ -108,6 +109,7 @@ define([
                 this.alert(new AlertViewModel('ep-alert-red', undoAlertTitle, undoAlertMessage, function() {
                     return;
                 }, function() {
+                    event.loading(true);
                     const formData = new FormData();
                     const url = arches.urls.etl_manager;
                     event.status = 'reversing';
@@ -125,6 +127,7 @@ define([
                         return response.json();
                     }).then(function() {
                         self.fetchLoadEvent();
+                        event.loading(false);
                     });
                 }
                 ));
