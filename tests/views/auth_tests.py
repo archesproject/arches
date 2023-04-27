@@ -49,10 +49,6 @@ class AuthTests(ArchesTestCase):
         cls.factory = RequestFactory()
         cls.client = Client()
 
-        if User.objects.filter(username="test").exists():
-            previous_user = User.objects.get(username="test")
-            previous_user.delete()
-
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
 
         rdm_admin_group = Group.objects.get(name="RDM Administrator")
