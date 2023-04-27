@@ -32,6 +32,7 @@ from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.index_database import index_resources_by_type
 from tests.base_test import ArchesTestCase
 
@@ -43,6 +44,8 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
+        
         models.ResourceInstance.objects.all().delete()
 
         cls.client = Client()
@@ -126,7 +129,7 @@ class ResourceTests(ArchesTestCase):
         cls.test_resource.tiles.append(tile)
 
         cls.test_resource.save()
-        cls.test_resource.publish()
+        # cls.test_resource.publish()
 
         # add delay to allow for indexes to be updated
         time.sleep(1)
