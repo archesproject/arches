@@ -189,14 +189,11 @@ class Resource(models.ResourceInstance):
 
         """
         if not self.serialized_graph:
-            try:
-                self.serialized_graph = (
-                    models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                    .first()
-                    .serialized_graph
-                )
-            except AttributeError:
-                self.serialized_graph = None
+            self.serialized_graph = (
+                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                .first()
+                .serialized_graph
+            )
 
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
@@ -619,7 +616,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(is_active=False)
+                .exclude(publication=None)
             )
 
         graph_lookup = {
@@ -850,3 +847,23 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
+
+
+class PublishedModelError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Published Model Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
+
+
+class UnpublishedModelError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Unpublished Model Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
