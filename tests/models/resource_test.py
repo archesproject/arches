@@ -126,6 +126,7 @@ class ResourceTests(ArchesTestCase):
         cls.test_resource.tiles.append(tile)
 
         cls.test_resource.save()
+        cls.test_resource.publish()
 
         # add delay to allow for indexes to be updated
         time.sleep(1)
