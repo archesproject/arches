@@ -67,6 +67,9 @@ class ResourceTests(ArchesTestCase):
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
         cls.user.groups.add(Group.objects.get(name="Guest"))
 
+        graph = Graph.objects.get(pk=cls.search_model_graphid)
+        graph.publish(user=cls.user)
+
         nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
         assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
 
@@ -139,6 +142,7 @@ class ResourceTests(ArchesTestCase):
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(source_identifier=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
+        cls.user.delete()
 
     def test_get_node_value_string(self):
         """
