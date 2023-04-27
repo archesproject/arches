@@ -1180,9 +1180,7 @@ class BulkResourceReport(APIBase):
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
             for graph in graphs_from_database:
-                serialized_graph = JSONSerializer().serializeToPython(
-                    graph, sort_keys=False, exclude=["functions"] + exclusions
-                )
+                serialized_graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["functions"] + exclusions)
                 cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
