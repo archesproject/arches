@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.test.client import Client
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -45,7 +46,7 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         LanguageSynchronizer.synchronize_settings_with_db()
-        
+
         models.ResourceInstance.objects.all().delete()
 
         cls.client = Client()
@@ -65,6 +66,9 @@ class ResourceTests(ArchesTestCase):
 
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
         cls.user.groups.add(Group.objects.get(name="Guest"))
+
+        graph = Graph.objects.get(pk=cls.search_model_graphid)
+        graph.publish(user=cls.user)
 
         nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
         assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
@@ -129,14 +133,12 @@ class ResourceTests(ArchesTestCase):
         cls.test_resource.tiles.append(tile)
 
         cls.test_resource.save()
-        # cls.test_resource.publish()
 
         # add delay to allow for indexes to be updated
         time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
-        cls.user.delete()
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(source_identifier=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
