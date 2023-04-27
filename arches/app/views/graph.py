@@ -585,7 +585,9 @@ class ModelHistoryView(GraphBaseView):
             with transaction.atomic():
                 graph = Graph.objects.get(pk=graphid)
 
-                models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True)]).delete()
+                models.NodeGroup.objects.filter(
+                    pk__in=[nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True)]
+                ).delete()
                 models.Node.objects.filter(pk__in=[node.pk for node in graph.nodes.values()]).delete()
                 models.Edge.objects.filter(pk__in=[edge.pk for edge in graph.edges.values()]).delete()
                 models.CardModel.objects.filter(pk__in=[card.pk for card in graph.cards.values()]).delete()
@@ -659,7 +661,7 @@ class ModelHistoryView(GraphBaseView):
                 updated_graph.create_editable_future_graph()
         except:
             return JSONErrorResponse(JSONSerializer().serialize({"success": False}))
-        
+
         return JSONResponse(JSONSerializer().serialize({"success": True}))
 
     def delete(self, request, graphid):
