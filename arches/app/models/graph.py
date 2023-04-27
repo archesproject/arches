@@ -1428,11 +1428,7 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("relatable_resource_model_ids", None)
 
-            ret["cards"] = (
-                self.get_cards(use_raw_i18n_json=use_raw_i18n_json)
-                if "cards" not in exclude
-                else ret.pop("cards", None)
-            )
+            ret["cards"] = self.get_cards(use_raw_i18n_json=use_raw_i18n_json) if "cards" not in exclude else ret.pop("cards", None)
 
             if "widgets" not in exclude:
                 ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
