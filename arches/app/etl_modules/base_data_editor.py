@@ -125,66 +125,65 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
+    def get_first_five_values(self, graph_id, node_id, resourceids, language_code):
+        node_id_query = " AND nodeid = %(node_id)s" if node_id else ""
+        graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
+        resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        if language_code is None:
+            language_code = 'en'
+
+        request_parmas_dict = {
+            "node_id": node_id,
+            "language_code": language_code,
+            "graph_id": graph_id,
+            "resourceid": resourceids
+        }
+
+        sql_query = (
+            """
+            SELECT t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' FROM tiles t, nodes n
+            WHERE t.nodegroupid = n.nodegroupid
+        """
+            + node_id_query
+            + graph_id_query
+            + resourceids_query
+            + " LIMIT 5;"
+        )
+
+        tile_count_query = (
+            """
+            SELECT count(t.tileid) FROM tiles t, nodes n
+            WHERE t.nodegroupid = n.nodegroupid
+        """
+            + node_id_query
+            + graph_id_query
+            + resourceids_query
+        )
+
+        resource_count_query = (
+            """
+            SELECT count(n.resourceinstanceid) FROM resource_instances n
+            WHERE 0 = 0
+        """
+            + graph_id_query
+            + resourceids_query
+        )
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_query, request_parmas_dict)
+            row = [value[0] for value in cursor.fetchall()]
+
+            cursor.execute(tile_count_query, request_parmas_dict)
+            count = cursor.fetchall()
+            (number_of_tiles,) = count[0]
+
+            cursor.execute(resource_count_query, request_parmas_dict)
+            count = cursor.fetchall()
+            (number_of_resources,) = count[0]
+
+        return row, number_of_tiles, number_of_resources
+
     def preview(self, request):
-        def get_first_five_values(graph_id, node_id, resourceids, language_code):
-            node_id_query = ""
-            graph_id_query = ""
-            resourceids_query = ""
-            if node_id:
-                node_id_query = " AND nodeid = '{}'".format(node_id)
-            if graph_id:
-                graph_id_query = " AND graphid = '{}'".format(graph_id)
-            if resourceids:
-                resourceids_query = " AND resourceinstanceid IN {}".format(resourceids)
-            if language_code is None:
-                language_code = "en"
-
-            sql_query = (
-                """
-                SELECT t.tiledata -> '{}' -> '{}' ->> 'value' FROM tiles t, nodes n
-                WHERE t.nodegroupid = n.nodegroupid
-            """.format(
-                    node_id, language_code
-                )
-                + node_id_query
-                + graph_id_query
-                + resourceids_query
-                + " LIMIT 5;"
-            )
-
-            tile_count_query = (
-                """
-                SELECT count(t.tileid) FROM tiles t, nodes n
-                WHERE t.nodegroupid = n.nodegroupid
-            """
-                + node_id_query
-                + graph_id_query
-                + resourceids_query
-            )
-
-            resource_count_query = (
-                """
-                SELECT count(n.resourceinstanceid) FROM resource_instances n
-                WHERE 0 = 0
-            """
-                + graph_id_query
-                + resourceids_query
-            )
-
-            with connection.cursor() as cursor:
-                cursor.execute(sql_query)
-                row = [value[0] for value in cursor.fetchall()]
-
-                cursor.execute(tile_count_query)
-                count = cursor.fetchall()
-                (number_of_tiles,) = count[0]
-
-                cursor.execute(resource_count_query)
-                count = cursor.fetchall()
-                (number_of_resources,) = count[0]
-
-            return row, number_of_tiles, number_of_resources
-
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
         operation = request.POST.get("operation", None)
@@ -209,7 +208,7 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values, number_of_tiles, number_of_resources = get_first_five_values(graph_id, node_id, resourceids, language_code)
+        first_five_values, number_of_tiles, number_of_resources = self.get_first_five_values(graph_id, node_id, resourceids, language_code)
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -269,6 +268,9 @@ class BulkStringEditor(BaseBulkEditor):
             "old_text": old_text,
             "new_text": new_text,
         }
+
+        first_five_values, number_of_tiles, number_of_resources = self.get_first_five_values(graph_id, node_id, resourceids, language_code)
+
         load_details = {
             "graph": graph_id,
             "node": node_name,
@@ -276,6 +278,8 @@ class BulkStringEditor(BaseBulkEditor):
             "details": operation_details,
             "search_url": search_url,
             "language_code": language_code,
+            "number_of_resources": number_of_resources,
+            "number_of_tiles": number_of_tiles 
         }
 
         with connection.cursor() as cursor:
