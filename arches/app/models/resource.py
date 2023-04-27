@@ -188,13 +188,15 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         if not self.serialized_graph:
-            self.serialized_graph = (
-                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                .first()
-                .serialized_graph
-            )
+            try:
+                self.serialized_graph = (
+                    models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                    .first()
+                    .serialized_graph
+                )
+            except AttributeError:
+                self.serialized_graph = None
 
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
