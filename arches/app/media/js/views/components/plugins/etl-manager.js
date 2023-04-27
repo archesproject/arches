@@ -124,7 +124,7 @@ define([
                     }).then(function(response) {
                         return response.json();
                     }).then(function() {
-                        //pass
+                        self.fetchLoadEvent();
                     });
                 }
                 ));
