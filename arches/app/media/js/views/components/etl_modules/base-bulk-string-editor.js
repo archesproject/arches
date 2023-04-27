@@ -124,6 +124,7 @@ define([
                         { ...node,
                             label: `${JSON.parse(node.card_name)[arches.activeLanguage]} - ${JSON.parse(node.widget_label)[arches.activeLanguage]}` 
                         }));
+                    self.selectedNode(null);
                     self.nodes(nodes);
                     self.loading(false);
                 });
