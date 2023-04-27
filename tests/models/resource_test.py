@@ -67,6 +67,9 @@ class ResourceTests(ArchesTestCase):
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
         cls.user.groups.add(Group.objects.get(name="Guest"))
 
+        graph = Graph.objects.get(pk=cls.search_model_graphid)
+        graph.publish(user=cls.user)
+
         nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
         assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
 
