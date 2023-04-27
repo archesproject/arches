@@ -4,8 +4,7 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" data-bind="text:label">
-        </label>
+        <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
@@ -16,7 +15,8 @@
                     disable: disabled,
                     select2Query: {
                         select2Config: select2Config
-                    }
+                    },
+                    attr: {'aria-label': label}
                 ">
         </div>
     </div>
@@ -32,7 +32,7 @@
         <input 
             class="form-control input-md widget-input"
             data-bind="
-                attr: {placeholder: $root.translations.placeholder},
+                attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
                 value: placeholder, 
                 valueUpdate: 'keyup'
             "
@@ -50,7 +50,8 @@
                     value: defaultValue,
                     select2Query: {
                         select2Config: select2Config
-                    }
+                    },
+                    attr: {'aria-label': $root.translations.defaultValue}
                 ">
         </div>
     </div>
