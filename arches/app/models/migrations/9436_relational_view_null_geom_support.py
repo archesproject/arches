@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9395_iiifmanifest_transaction"),
+        ("models", "9053_add_future_graphs"),
     ]
 
     operations = [
