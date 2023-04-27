@@ -149,6 +149,14 @@
                 <td><span class="etl-loading-metadata-value" data-bind="text: load_details.search_url"></span></td>      
             </tr>
             <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
+                <td>
+                    <span class="etl-loading-metadata-value"
+                        data-bind="text: load_details.number_of_resources"
+                    ></span>
+                </td>      
+            </tr>
+            <tr>
                 <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation"></span></td>
                 <td>
                     <span class="etl-loading-metadata-value" data-bind="text: operationLabel[load_details.operation]"></span>
