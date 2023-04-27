@@ -50,7 +50,7 @@ class AuthTests(ArchesTestCase):
         cls.client = Client()
 
         if User.objects.filter(username="test").exists():
-            previous_user = User.objects.get(username='test')
+            previous_user = User.objects.get(username="test")
             previous_user.delete()
 
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
