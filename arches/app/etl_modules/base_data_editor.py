@@ -130,14 +130,9 @@ class BulkStringEditor(BaseBulkEditor):
         graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
         resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         if language_code is None:
-            language_code = 'en'
+            language_code = "en"
 
-        request_parmas_dict = {
-            "node_id": node_id,
-            "language_code": language_code,
-            "graph_id": graph_id,
-            "resourceid": resourceids
-        }
+        request_parmas_dict = {"node_id": node_id, "language_code": language_code, "graph_id": graph_id, "resourceid": resourceids}
 
         sql_query = (
             """
@@ -279,7 +274,7 @@ class BulkStringEditor(BaseBulkEditor):
             "search_url": search_url,
             "language_code": language_code,
             "number_of_resources": number_of_resources,
-            "number_of_tiles": number_of_tiles 
+            "number_of_tiles": number_of_tiles,
         }
 
         with connection.cursor() as cursor:
