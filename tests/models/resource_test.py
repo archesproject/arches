@@ -45,7 +45,7 @@ class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         LanguageSynchronizer.synchronize_settings_with_db()
-        
+
         models.ResourceInstance.objects.all().delete()
 
         cls.client = Client()
