@@ -299,6 +299,7 @@ class Graph(models.GraphModel):
             node.exportable = nodeobj.get("exportable", False)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
+            node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)
             if node.hascustomalias or nodeobj.get("alias", False) is not False:
                 node.alias = nodeobj.get("alias", "")
             else:
@@ -483,9 +484,11 @@ class Graph(models.GraphModel):
 
             if nodeid is not None:
                 node = self.nodes[nodeid]
+                branch_publication_id = node.sourcebranchpublication_id
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
+                    node.sourcebranchpublication_id = None
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
@@ -495,6 +498,10 @@ class Graph(models.GraphModel):
                         logger.error(err)
                         message = _('Fail to save node "{0}".'.format(node.name))
                         raise GraphValidationError(message)
+                if branch_publication_id:
+                    for branch_node in models.Node.objects.filter(sourcebranchpublication_id=branch_publication_id, graph=node.graph):
+                        branch_node.sourcebranchpublication_id = None
+                        branch_node.save()
 
             else:
                 for node in self.nodes.values():
@@ -645,6 +652,7 @@ class Graph(models.GraphModel):
 
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
             branch_copy = branch_graph.copy()["copy"]
+            branch_publication_id = branch_graph.publication_id  # == branch_copy.publication_id
             branch_copy.root.istopnode = False
 
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
@@ -653,6 +661,7 @@ class Graph(models.GraphModel):
             aliases = [n.alias for n in self.nodes.values()]
 
             for node in branch_copy.nodes.values():
+                node.sourcebranchpublication_id = branch_publication_id
                 if node.alias and node.alias in aliases:
                     node.alias = self.make_name_unique(node.alias, aliases, "_n")
                 self.add_node(node)
