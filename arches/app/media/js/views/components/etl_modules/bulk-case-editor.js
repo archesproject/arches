@@ -5,9 +5,9 @@ define([
 ], function(ko, BaseEditorViewModel, baseStringEditorTemplate) {
     const viewModel = function(params) {
         BaseEditorViewModel.apply(this, [params]);
-        this.operation('lower');
+        this.operation('case');
     };
-    ko.components.register('bulk-lowercase-editor', {
+    ko.components.register('bulk-case-editor', {
         viewModel: viewModel,
         template: baseStringEditorTemplate,
     });

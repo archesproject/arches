@@ -8,14 +8,27 @@
     <h3>
         <span data-bind="text:
             operation() == 'trim' ? $root.translations.bulkStringEditorTrim
-            : operation() == 'capitalize' ? $root.translations.bulkStringEditorCapitalize
-            : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
-            : operation() == 'upper' ? $root.translations.bulkStringEditorUppercase
-            : operation() == 'lower' ? $root.translations.bulkStringEditorLowercase
+            : operation() == 'case' ? $root.translations.bulkStringEditorChangeCase
             : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
             : ''
         "></span>
     </h3>
+    <div>
+        <!-- ko if: operation() == 'case'-->
+        <h4>
+            <span data-bind="text: $root.translations.SelectEditOperation"></span>
+        </h4>
+        <select data-bind="
+            value: selectedCaseOperation,
+            options: caseOperations,
+            optionsText: 'label',
+            optionsValue: 'name',
+            optionsCaption: $root.translations.select + '...',
+            valueAllowUnset: true,
+            chosen: {width: '500px'}"
+        ></select>
+        <!-- /ko -->
+    </div>
     <div class="etl-module-component">
         <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
             <input type="checkbox" data-bind="checked: trim">
@@ -104,7 +117,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody data-bind="value: console.log(previewValue())">
+            <tbody>
                 <!-- ko foreach: { data: previewValue(), as: "row" } -->
                 <!-- ko if: row[0] -->
                 <tr>
