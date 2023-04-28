@@ -444,6 +444,7 @@ class GraphModel(models.Model):
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
     is_active = models.BooleanField(default=False)
+    is_immutable = models.BooleanField(default=False)
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)

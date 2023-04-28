@@ -227,7 +227,9 @@ define([
         },
 
         beforeMove: function(e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
+            console.log(e)
+            e.cancelDrop = true;
+            // e.cancelDrop = (e.sourceParent!==e.targetParent);
         },
         reorderNodes: function(e) {
             loading(true);
