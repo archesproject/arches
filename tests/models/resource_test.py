@@ -27,11 +27,13 @@ from django.urls import reverse
 from django.test.client import Client
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.index_database import index_resources_by_type
 from tests.base_test import ArchesTestCase
 
@@ -43,6 +45,8 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
+
         models.ResourceInstance.objects.all().delete()
 
         cls.client = Client()
@@ -62,6 +66,9 @@ class ResourceTests(ArchesTestCase):
 
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
         cls.user.groups.add(Group.objects.get(name="Guest"))
+
+        graph = Graph.objects.get(pk=cls.search_model_graphid)
+        graph.publish(user=cls.user)
 
         nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
         assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
@@ -132,9 +139,9 @@ class ResourceTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.user.delete()
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
+        cls.user.delete()
 
     def test_get_node_value_string(self):
         """

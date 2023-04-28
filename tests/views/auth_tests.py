@@ -48,6 +48,7 @@ class AuthTests(ArchesTestCase):
     def setUpClass(cls):
         cls.factory = RequestFactory()
         cls.client = Client()
+
         cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
 
         rdm_admin_group = Group.objects.get(name="RDM Administrator")
