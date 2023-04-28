@@ -652,12 +652,12 @@ class Graph(models.GraphModel):
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
-            aliases = [ node.alias for node in self.nodes.values() ]
-            branch_aliases = [ node.alias for node in branch_copy.nodes.values() ]
+            aliases = [node.alias for node in self.nodes.values()]
+            branch_aliases = [node.alias for node in branch_copy.nodes.values()]
 
             for node in branch_copy.nodes.values():
                 node.sourcebranchpublication_id = branch_publication_id
-                
+
                 if node.alias and node.alias in aliases:
                     node.alias = self.make_name_unique(node.alias, aliases + branch_aliases, "_n")
 
