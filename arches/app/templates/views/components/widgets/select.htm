@@ -5,8 +5,7 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" data-bind="text:label">
-        </label>
+        <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
@@ -22,7 +21,7 @@
                         placeholder: placeholder,
                         allowClear: true
                     }
-                }">
+                }, attr: {'aria-label': label} ">
         </div>
     </div>
 </div>
@@ -37,7 +36,7 @@
         <input 
             class="form-control input-md widget-input"
             data-bind="
-                attr: {placeholder: $root.translations.placeholder},
+                attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
                 value: placeholder, 
                 valueUpdate: 'keyup'"
             >
@@ -59,7 +58,7 @@
                             placeholder: $root.translations.selectDefaultValue,
                             allowClear: true
                         }
-                    }">
+                    }, attr: {'aria-label': $root.translations.selectDefaultValue}">
             </div>
         </div>
     </div>
