@@ -11,7 +11,7 @@ define([
                 if (keyCode === 13) {   // Check if keypress is <enter>.
                     $(element).click();
                 }
-                return true;    // Allow default action.
+                return false;    // Allow default action.
             });
         }
     };
@@ -25,7 +25,7 @@ define([
                 if (keyCode === 32) {   // Check if keypress is <space>.
                     $(element).click();
                 }
-                return true;    // Allow default action.
+                return false;    // Allow default action.
             });
         }
     };

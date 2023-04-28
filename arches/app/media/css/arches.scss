@@ -5178,145 +5178,6 @@ div.dropdown-menu.open {
     padding: 10px;
 }
 
-#container.cls-container.arches-login {
-    background: rgb(236, 238, 241);
-}
-
-.arches-login>.cls-header {
-    background: rgb(236, 238, 241);
-}
-
-.arches-login div .cls-brand:after {
-    background: rgb(236, 238, 241);
-}
-
-.cls-content.arches-signin {
-    padding-top: 20px;
-}
-
-.login-panel-header.arches-signin {
-    font-size: 28px;
-}
-
-.arches-signin-subtext {
-    padding: 0px 5px 10px 5px;
-    color: #888;
-}
-
-.arches-signin .login-panel {
-    border: 1px solid #ddd;
-}
-
-.arches-signin .panel-footer {
-    color: #888;
-    padding: 15px 0px;
-}
-
-.arches-signin .panel-footer a {
-    color: steelblue;
-    font-weight: 600;
-}
-
-.arches-signin-btn {
-    padding-top: 0px;
-    padding-bottom: 10px;
-}
-
-.account-management {
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border-top: 1px solid #ddd;
-}
-
-.cls-container .account-management a {
-    color: steelblue;
-}
-
-.account-link {
-    padding: 5px 0px;
-    display: block;
-}
-
-.account-link:first-child {
-    padding-top: 25px;
-}
-
-#login-form {
-    padding: 10px 5px;
-}
-
-.login-panel {
-    opacity: .9;
-}
-
-.login-panel-header {
-    font-size: 2.4em;
-    margin-top: 0;
-    padding-bottom: 5px;
-    font-weight: 300;
-}
-
-.change-password-form.popover {
-    display: block;
-    margin-top: 65px;
-    font-size: 14px;
-    width: 250px;
-    border: 1px solid rgba(0, 0, 0, .2);
-}
-
-.change-password-form .panel {
-    margin-bottom: 0px;
-}
-
-.profile-summary-page .password-success {
-    color: green;
-    position: absolute;
-    top: 50px;
-}
-
-.profile-toolbar {
-    top: 50px;
-    width: 100%;
-    height: 50px;
-    background: #f8f8f8;
-    border-bottom: 1px solid #ddd;
-}
-
-.change-password-form .error-message {
-    font-size: 11px;
-    color: #880000;
-    padding: 2px;
-}
-
-.change-password-form .error-message-container {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-}
-
-.change-password-form .panel-body {
-    padding: 20px 15px;
-}
-
-.change-password-form .panel-heading {
-    text-align: left;
-    position: relative;
-    padding: 10px 15px;
-    height: 40px;
-    background-color: #f5f6f7;
-    color: #5c7174;
-    line-height: 1.1;
-    border-bottom: solid 0.5px #babebf;
-    font-weight: 300;
-}
-
-.change-password-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-}
-
 .concept_tree {
     padding: 13px;
 }
@@ -6012,28 +5873,6 @@ th.notif-type {
 .btn-profile-password.btn:not(.disabled):not(:disabled):active,
 .btn:not(.disabled):not(:disabled).active {
     box-shadow: none;
-}
-
-.password-rules {
-    margin-top: -5px;
-    font-size: 12px;
-    color: #555;
-}
-
-.password-rule {
-    color: #888;
-    font-size: 13px;
-    padding-left: 5px;
-    padding-bottom: 3px;
-}
-
-.password-rule span {
-    padding-left: 3px;
-    font-size: 12px;
-}
-
-.password-rule i {
-    font-size: 11px;
 }
 
 .device-summary {
@@ -7322,7 +7161,7 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     -webkit-flex: 1;
     flex: 1;
     background: #ebeef0;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
