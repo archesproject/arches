@@ -112,7 +112,7 @@ class GraphSettingsView(GraphBaseView):
                 "slug",
                 "config",
                 "template_id",
-                "is_immutable",
+                "is_copy_immutable",
             ]:
                 setattr(graph, key, value)
 
