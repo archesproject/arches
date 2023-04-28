@@ -77,7 +77,7 @@
                             </button>
                         </div>
                         <div class='rr-table-column icon-column' aria-label="{% trans '' %}">
-                            <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false,
+                            <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId)); $('#resource-report-panel').focus()}, clickBubble: false,
                                     attr: {'aria-label': $root.translations.expandResourceReport + ' ' + $data.resourceName()}
                             ">
                                 <i class="fa fa-info-circle"></i>
@@ -198,7 +198,7 @@
 </div>
 
 
-<div class="create-resource-instance-card-component rr-table-pop"
+<div class="create-resource-instance-card-component rr-table-pop" id="resource-report-panel"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">
         <span data-bind="text: $root.translations.relatedResourceSummary"></span>
