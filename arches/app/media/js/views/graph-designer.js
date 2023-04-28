@@ -443,9 +443,7 @@ define([
                 }
             });
 
-            viewModel.graphSettingsViewModel.foo = function() {
-                console.log(viewModel.graphSettingsViewModel)
-            }
+            console.log(viewModel.graphSettingsViewModel)
 
             viewModel.report = new ReportModel(_.extend(data, {
                 graphModel: viewModel.graphModel,
