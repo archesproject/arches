@@ -443,8 +443,6 @@ define([
                 }
             });
 
-            console.log(viewModel.graphSettingsViewModel)
-
             viewModel.report = new ReportModel(_.extend(data, {
                 graphModel: viewModel.graphModel,
                 cards: viewModel.cardTree.topCards,

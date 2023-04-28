@@ -220,7 +220,9 @@ class GraphDesignerView(GraphBaseView):
             datatypes=datatypes,
             ontology_namespaces=self.get_ontology_namespaces(),
             branches=JSONSerializer().serialize(
-                branch_graphs, exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"]
+                branch_graphs, 
+                exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"],
+                force_recalculation=True,
             ),
             branch_list={"title": _("Branch Library"), "search_placeholder": _("Find a graph branch")},
             widgets=widgets,
