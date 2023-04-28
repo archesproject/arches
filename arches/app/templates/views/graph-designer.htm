@@ -52,7 +52,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         >
             <div style="display: flex;">
                 <h4>
-                    {% trans "Resource:" %}
+                    <span 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Resource Model:'%} : {% quoted_trans 'Branch:'%}"
+                    ></span>
                 </h4>
                 <h4
                     style="padding-left: 8px;"
@@ -61,7 +63,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
 
             <div style="padding: 0 50px;">
-                <h5>{% trans "This will save the graph in its current state and make the Resource accessible to permissioned users." %}</h5>
+                <h5
+                    data-bind="
+                        text: $data.graph.isresource() 
+                            ? {% quoted_trans 'This will save the Resource Model in its current state. It will also create a historical record of the Resource Model.'%} 
+                            : {% quoted_trans 'This will save the Branch in its current state. It will also create a historical record of the Branch.'%}
+                    "
+                ></h5>
                 
                 <!-- ko if: $data.publicationResourceInstanceCount() -->
                 <h5 style="color: red;">
@@ -140,10 +148,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     }"
                 ></div>
                 <!-- ko if: $data.isGraphActive() -->
-                    <span style="font-size: 14px;">{% trans "Active Resource Model" %}</span>
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Active Resource Model'%} : {% quoted_trans 'Active Branch'%}"
+                    ></span>
                 <!-- /ko -->
                 <!-- ko ifnot: $data.isGraphActive() -->
-                    <span style="font-size: 14px;">{% trans "Inactive Resource Model" %}</span>
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Inactive Resource Model'%} : {% quoted_trans 'Inactive Branch'%}"
+                    ></span>
                 <!-- /ko -->
             </div>
         </h4>
@@ -185,10 +199,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
             <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
-                <span>{% trans "Publish Graph" %}</span>
+                <span 
+                    style="font-size: 14px;" 
+                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Publish Resource Model'%} : {% quoted_trans 'Publish Branch'%}"
+                ></span>
             </button>
             <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertGraphAlert">
-                <span>{% trans "Revert Graph" %}</span>
+                <span 
+                    style="font-size: 14px;" 
+                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Revert Resource Model'%} : {% quoted_trans 'Revert Branch'%}"
+                ></span>
             </button>
             <!-- /ko -->
 
