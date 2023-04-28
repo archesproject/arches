@@ -5,12 +5,12 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <span class="control-labx mesel widget-input-label" for="" data-bind="text:label"></span>
+        <span class="control-labx mesel widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <div class="pad-hor">
+            <div>
                 <div class="input-group date">
                     <input type="text" data-bind="value: value, placeholder: placeholder, disable: disabled, attr: {'aria-label': label}, 
                         datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"
@@ -41,7 +41,6 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
         id="datetimepickermin" 
         class="form-control input-md widget-input" 
         data-bind="
@@ -56,7 +55,6 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
         id="datetimepickermax" 
         class="form-control input-md widget-input" 
         data-bind="
@@ -71,8 +69,6 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <select 
-        type="" 
-        id="" 
         data-bind="
             attr: {placeholder: $root.translations.viewMode, 'aria-label': $root.translations.viewMode},
             options:viewModeOptions, 
@@ -89,9 +85,9 @@
 </div>
 <div>
     <div class="form-group col-xs-12 pad-no crud-widget-container">
-        <div class="pad-hor">
+        <div>
             <div class="input-group date">
-                <input type="text" data-bind="value: defaultValue, placeholder: placeholder, attr: {'aria-label': placeholder},
+                <input type="text" data-bind="value: defaultValue, placeholder: placeholder, attr: {'aria-label': $root.translations.defaultValue},
                     datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-md" style="height: 32px;"
                     ><span class="input-group-addon date-icon"><i class="fa fa-calendar fa-lg date-icon"></i></span>
             </div>
@@ -99,11 +95,11 @@
     </div>
     <div class="toggle-container">
         <span id="default-date-switcher" class="switch switch-small" data-bind="css: {'on': getdefault}, onEnterkeyClick, onSpaceClick, click: setdefault, 
-            attr: {'aria-checked': getdefault, 'aria-labeledby': 'default-date-switcher-label'}" tabindex="0" role="switch"><small></small></span>
+            attr: {'aria-checked': getdefault, 'aria-labeledby': 'default-date-switcher-label', 'aria-describedby': 'default-date-switcher-context'}" tabindex="0" role="switch"><small></small></span>
             <div style="display:flex; flex-direction:row;">
                 <label id="default-date-switcher-label" class="arches-toggle-sm" data-bind="text: $root.translations.useDateOfDataEntry"></label>
             </div>
-        <span class="arches-toggle-subtitle" data-bind="text: $root.translations.useDateOfDataEntryForDefaultValue"></span>
+        <span class="arches-toggle-subtitle" id="default-date-switcher-context" data-bind="text: $root.translations.useDateOfDataEntryForDefaultValue"></span>
     </div>
 </div>
 {% endblock config_form %}
