@@ -13,6 +13,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="graphmodel",
+            name="is_copy_immutable",
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name="node",
             name="is_immutable",
             field=models.BooleanField(default=False),
         ),
