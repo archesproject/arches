@@ -147,6 +147,9 @@ define([
                     // this.loading(false); // TODO: @cbyrd 8842 disable page refresh on branch append
                     _.delay(_.bind(function(){
                         if(status === 'success'){
+                            document.dispatchEvent(
+                                new Event('appendBranch')
+                            );
                             window.location.reload();  // TODO: @cbyrd 8842 disable page refresh on branch append
                             this.closeForm();
                         }
