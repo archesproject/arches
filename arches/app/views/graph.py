@@ -219,7 +219,7 @@ class GraphDesignerView(GraphBaseView):
             datatypes=datatypes,
             ontology_namespaces=self.get_ontology_namespaces(),
             branches=JSONSerializer().serialize(
-                branch_graphs, 
+                branch_graphs,
                 exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"],
                 force_recalculation=True,
             ),
