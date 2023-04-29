@@ -492,7 +492,6 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:

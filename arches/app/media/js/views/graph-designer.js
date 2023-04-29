@@ -650,6 +650,7 @@ define([
                 });
             }
 
+            document.addEventListener('appendBranch', updateGraphUnpublishedChanges);
             document.addEventListener('addChildNode', updateGraphUnpublishedChanges);
             document.addEventListener('deleteNode', updateGraphUnpublishedChanges);
             document.addEventListener('reorderNodes', updateGraphUnpublishedChanges);
