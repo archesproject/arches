@@ -802,7 +802,7 @@ class Graph(models.GraphModel):
         if root is not None:
             root["nodegroup_id"] = root["nodeid"]
             root["istopnode"] = True
-            root['is_immutable'] = bool(self.is_copy_immutable)
+            root["is_immutable"] = bool(self.is_copy_immutable)
             updated_values = copy_of_self.update_node(root)
             root_node = updated_values["node"]
             root_card = updated_values["card"]
@@ -840,7 +840,7 @@ class Graph(models.GraphModel):
             if node.datatype == "geojson-feature-collection":
                 node.config["advancedStyle"] = ""
                 node.config["advancedStyling"] = False
-                
+
         copy_of_self.pk = uuid.uuid1()
         node_map = {}
         card_map = {}
