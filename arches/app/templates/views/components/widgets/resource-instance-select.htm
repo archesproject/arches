@@ -189,8 +189,8 @@
 <!-- /ko -->
 
 
-<div class="create-resource-instance-card-component rr-table-pop"
-    data-bind="with: newResourceInstance, style: {transform: !!newResourceInstance() ? 'translate(0,0)' : 'translate(100%,0)'}">
+<div class="create-resource-instance-card-component rr-table-pop" id="resource-creator-panel"
+    data-bind="with: newResourceInstance, style: {transform: !!newResourceInstance() ? 'translate(0,0)' : 'translate(100%,0)'}, attr: {tabindex: 0}">
     <!-- ko component: {
         name: 'related-instance-creator',
         params: {...$data, graphName: $parent.graphLookup[graphid].name}

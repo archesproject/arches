@@ -363,6 +363,8 @@ define([
                                     self.resourceToAdd("");
                                 }, 250);
                             };
+                            let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
+                            resourceCreatorPanel.addEventListener("transitionend", () => resourceCreatorPanel.focus()); // focus on the resource creator panel for keyboard readers
                             params.complete.subscribe(function() {
                                 if (params.resourceid()) {
                                     if (self.renderContext === 'search'){
