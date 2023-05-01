@@ -155,11 +155,11 @@
             <!-- /ko -->
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
-                <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt">
-                    <option value="5" data-bind="text: $root.translations.showFirstFiveFiles"></option>
-                    <option value="10" data-bind="text: $root.translations.showFirstTenFiles"></option>
-                    <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles"></option>
-                    <option value="100" data-bind="text: $root.translations.showAllFiles"></option>
+                <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt" aria-label="{% trans 'Number of Files Shown' %}">
+                    <option value="5" data-bind="text: $root.translations.showFirstFiveFiles" aria-label="{% trans 'Show first 5 files' %}"></option>
+                    <option value="10" data-bind="text: $root.translations.showFirstTenFiles" aria-label="{% trans 'Show first 10 files' %}"></option>
+                    <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles" aria-label="{% trans 'Show first 25 files' %}"></option>
+                    <option value="100" data-bind="text: $root.translations.showAllFiles" aria-label="{% trans 'Show all files' %}"></option>
                 </select>
             </div>
         </div>
