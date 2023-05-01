@@ -26,7 +26,6 @@
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input 
-        type="" 
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.date, 'aria-label': $root.translations.date},
@@ -43,9 +42,7 @@
     <span data-bind="text: $root.translations.dateFormat"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select 
-        type="" 
-        id="" 
+    <select
         data-bind="
             attr: {placeholder: $root.translations.dateFormat, 'aria-label': $root.translations.dateFormat},
             options:dateFormatOptions, 
