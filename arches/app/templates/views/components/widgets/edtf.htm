@@ -10,10 +10,10 @@
     <div class="form-group">
         <div class="widget-inline-tools-collapser" style="max-width: 600px;" 
             data-bind="onEnterkeyClick, onSpaceClick, 
-            click: function() { showEDTFFormats(!showEDTFFormats()); },
-            attr: { 'aria-pressed': showEDTFFormats(), 'aria-label': $root.translations.edtfFormats }" 
+                click: function() { showEDTFFormats(!showEDTFFormats()); },
+                attr: { 'aria-pressed': showEDTFFormats(), 'aria-label': $root.translations.edtfFormats }" 
             tabindex="0" role="button"
-        > <span data-bind="console.log(showEDTFFormats())"></span>
+        >
             <span class="control-label widget-input-label" data-bind="text:label"></span><span>
                 <i class="fa" data-bind="{
                     css: {
@@ -25,7 +25,7 @@
             </span>
           </div>
           <div class="form-horizontal" data-bind="if: showEDTFFormats">
-              <div class="edtf-style-tools-panel">
+              <article class="edtf-style-tools-panel" aria-label="{% trans 'EDTF Formats and Examples' %}">
                   <div class="widget-help-panel">
                     <h2>
                         <span data-bind="text: $root.translations.edtfFormatsExpanded"></span>
@@ -107,7 +107,7 @@
                     </dl>
 
                   </div>
-              </div>
+              </article>
           </div>
         <div class="col-xs-12">
             <input type="text" data-bind="
@@ -132,11 +132,9 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
-        id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.placeholder},
+            attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
             textInput: placeholder
         "
     >
@@ -147,11 +145,9 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
-        id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.defaultValue},
+            attr: {placeholder: $root.translations.defaultValue, 'aria-label': $root.translations.defaultValue},
             textInput: defaultValue
         "
     >
