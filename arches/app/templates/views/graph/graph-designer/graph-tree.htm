@@ -49,14 +49,10 @@
             <i class="jstree-leading-icon fa fa-download" role="presentation" data-toggle="tooltip" data-placement="top" data-container="body" data-original-title="{% trans 'Node is exportable in search' %}"></i>
             <!-- /ko -->
             <span class="" data-bind="{text: graphTree.getDisplayName(node)}"></span>
-            <!-- ko if: graphTree.showIds -->
-            <span style="font-weight:bold;" data-bind="text: ': ' + graphTree.getNodeIdentifier(node)"></span>
-            <!-- /ko -->
-            <span class="spacer"></span>
-            <!-- ko if: node.isImmutable -->
+            <!-- ko if: graph.attributes.isresource && node.isImmutable -->
             <i 
-                style="background-color: transparent;"
-                class="jstree-node-action-icon fa fa-lock" 
+                style="background-color: transparent; padding-left: 5px;"
+                class="fa fa-lock" 
                 role="presentation" 
                 data-toggle="tooltip" 
                 data-placement="auto" 
@@ -64,7 +60,12 @@
                 data-original-title="{% trans "Branch is Locked" %}"
             ></i>
             <!-- /ko -->
-            <!-- ko ifnot: node.isImmutable -->
+
+            <!-- ko if: graphTree.showIds -->
+            <span style="font-weight:bold;" data-bind="text: ': ' + graphTree.getNodeIdentifier(node)"></span>
+            <!-- /ko -->
+            <span class="spacer"></span>
+            <!-- ko ifnot: graph.attributes.isresource && node.isImmutable -->
                 <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
                 <i 
                     class="jstree-node-action-icon fa fa-plus-circle" 
