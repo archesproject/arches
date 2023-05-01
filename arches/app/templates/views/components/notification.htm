@@ -23,10 +23,21 @@
         <!-- ko if: link -->
         <div class='entry'>
             <button data-bind="click: getExportFile" class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>
-                <span data-bind="text: $root.translations.downloadFile"></span>
+                <span data-bind="text: $root.translations.downloadZipFile"></span>
             </button>
             <div style="padding-left: 10px;" data-bind="text: info"></div>
         </div>
+        <!-- /ko -->
+        <!-- ko if: files -->
+        <!-- ko foreach: { data: files, as: 'file' } -->
+        <div class='entry'>
+            <a data-bind="attr: { href: '/files/' + file.fileid }" target="_blank" style="color: steelblue">
+                <button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>
+                    <span data-bind="text: file.name"></span>
+                </button>
+            </a>
+        </div>
+        <!-- /ko -->
         <!-- /ko -->
     </div>
 
