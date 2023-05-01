@@ -6,12 +6,11 @@
 <div class="row widget-wrapper">
     <div class="form-group" style="position: relative;">
         <div style="max-width: 600px; position: relative">
-            <div class="widget-inline-tools-collapser" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
-                showi18nOptions(!showi18nOptions()); },
-                attr: { 'aria-pressed': showi18nOptions(), 'aria-label': $root.translations.languages }" 
-                tabindex="0" role="button"
-            >
-                <span class="control-label widget-input-label" for="" data-bind="text:label"></span>
+            <div class="widget-inline-tools-collapser" tabindex="0" role="button"
+                data-bind="onEnterkeyClick, onSpaceClick, click: function() { showi18nOptions(!showi18nOptions()); },
+                    attr: {'aria-pressed': showi18nOptions(), 'aria-label': label() + ' ' + $root.translations.languageSettings}
+            ">
+                <span class="control-label widget-input-label" data-bind="text:label"></span>
                 <span>
                     <i class="fa" data-bind="{
                         css: {
@@ -104,12 +103,11 @@
 </div>
 <div class="form-group" style="position: relative;">
     <div style="max-width: 600px; position: relative">
-    <div class="widget-inline-tools-collapser" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
-        showi18nOptions(!showi18nOptions()); },
-        attr: { 'aria-pressed': showi18nOptions(), 'aria-label': $root.translations.languages }" 
-        tabindex="0" role="button"
-    >
-        <label class="control-label widget-input-label" for="input-default-value" data-bind="text: $root.translations.defaultValue"></label>
+    <div class="widget-inline-tools-collapser" tabindex="0" role="button"
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() { showi18nOptions(!showi18nOptions()); },
+            attr: {'aria-pressed': showi18nOptions(), 'aria-label': $root.translations.defaultValue + ' ' + $root.translations.languageSettings}
+    ">
+        <span class="control-label widget-input-label" data-bind="text: $root.translations.defaultValue"></span>
         <span>
             <i class="fa" data-bind="{
                 css: {
