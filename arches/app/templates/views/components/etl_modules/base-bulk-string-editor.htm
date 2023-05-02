@@ -5,7 +5,7 @@
 <!-- ko ifnot: loading() -->
 <div class="etl-module-component-container">
 <div class="etl-module-body">
-    <h3>
+    <h2>
         <span data-bind="text:
             operation() == 'trim' ? $root.translations.bulkStringEditorTrim
             : operation() == 'capitalize' ? $root.translations.bulkStringEditorCapitalize
@@ -15,25 +15,24 @@
             : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
             : ''
         "></span>
-    </h3>
-    <div class="etl-module-component">
-        <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
-            <input type="checkbox" data-bind="checked: trim">
-            <span data-bind="text: $root.translations.removeLeadingTrailingSpaces"></span>
-        </div>
-        <div>
-            <h4>
+    </h2>
+    <p class="pad-btm">
+        Summary of bulk editing tool goes here
+    </p>
+    <section class="etl-module-component">
+        <div class="etl-module-component-block">
+            <h3>
                 <span data-bind="text: $root.translations.useSearchUrl"></span>
-            </h4>
+            </h3>
             <textarea 
                 style="min-height: 100px; width: 80%;"
                 class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
             ></textarea>
         </div>
-        <div>
-            <h4>
+        <div class="etl-module-component-block">
+            <h3>
                 <span data-bind="text: $root.translations.selectAResourceModel"></span>
-            </h4>
+            </h3>
             <select data-bind="
                 value: selectedGraph,
                 options: graphs,
@@ -42,13 +41,20 @@
                 optionsCaption: $root.translations.select + '...',
                 valueAllowUnset: true,
                 chosen: {width: '500px'}"
-            ></select>    
+            ></select>   
+            <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
+                <label class="form-check">
+                    <input type="checkbox" data-bind="checked: trim">
+                    <label data-bind="text: $root.translations.removeLeadingTrailingSpaces"></label>
+                </label>
+            </div> 
         </div>
+        
         <!-- ko if: nodes() -->
-        <div>
-            <h4>
+        <div class="etl-module-component-block">
+            <h3>
                 <span data-bind="text: $root.translations.selectANode"></span>
-            </h4>
+            </h3>
             <select data-bind="
                 value: selectedNode,
                 options: nodes,
@@ -60,10 +66,10 @@
             ></select>
         </div>
         <!-- /ko -->
-        <div>
-            <h4>
+        <div class="etl-module-component-block">
+            <h3>
                 <span data-bind="text: $root.translations.language"></span>
-            </h4>
+            </h3>
             <select data-bind="
                 options: languages,
                 optionsCaption: $root.translations.select + '...',
@@ -72,27 +78,36 @@
                 chosen: {width: '500px'}"
             ></select>
         </div>
-        <div data-bind="if: operation() === 'replace'">
-            <h4>
-                <span data-bind="text: $root.translations.from"></span>
-            </h4>
-            <input type="text" style="width: 500px;" class="form-control" placeholder="Old Text" data-bind="value: oldText">
-            <input type="checkbox" data-bind="checked: caseInsensitive">
-            <span data-bind="text: $root.translations.caseInsensitive"></span>
-            <h4>
-                <span data-bind="text: $root.translations.to"></span>
-            </h4>
-            <input type="text" style="width: 500px;" class="form-control" placeholder="New Text" data-bind="value: newText">
+        <div class="etl-module-component-block" data-bind="if: operation() === 'replace'">
+            <div class="etl-from-to">
+                <h3>
+                    <span data-bind="text: $root.translations.from"></span>
+                </h3>
+                <input type="text" class="form-control" placeholder="Old Text" data-bind="value: oldText">
+            </div>
+            <i class="fa fa-arrow-right" style="margin: 0px 2px;"></i>
+            <div class="etl-from-to">
+                <h3>
+                    <span data-bind="text: $root.translations.to"></span>
+                </h3>
+                <input type="text" class="form-control" placeholder="New Text" data-bind="value: newText">
+            </div>
+            <div>
+                <label class="form-check">
+                    <input type="checkbox" data-bind="checked: caseInsensitive">
+                    <label data-bind="text: $root.translations.caseInsensitive"></label>
+                </label>
+            </div>
         </div>
-        <button style="margin: 25px 8px;" data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
+        <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
         </button>
-    </div>
+    </section>
     <!-- ko if: showPreview-->
-    <div>
-        <div>
+    <section  class="etl-preview">
+        <h3 style="margin-top: 0px;">
             <span data-bind="text: $root.translations.theFirstFiveOf + ' ' + numberOfTiles() + ' ' + $root.translations.possibleValuesIn + ' ' + numberOfResources() + ' ' + $root.translations.resources"></span>
-        </div>
+        </h3>
         <table class="table table-striped csv-mapping-table">
             <thead>
                 <tr>
@@ -115,7 +130,7 @@
                 <!-- /ko -->
             </tbody>
         </table>
-    </div>
+    </section>
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
