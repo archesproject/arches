@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}">
     <!-- ko if: node -->
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
@@ -11,7 +11,12 @@
         <div class="widget-inline-tools-collapser" style="max-width: 600px;" 
             data-bind="onEnterkeyClick, onSpaceClick, 
                 click: function() { showEDTFFormats(!showEDTFFormats()); },
-                attr: { 'aria-pressed': showEDTFFormats(), 'aria-label': $root.translations.edtfFormats }" 
+                attr: { 
+                    'aria-pressed': showEDTFFormats().toString(), 
+                    'aria-expanded': showEDTFFormats().toString(), 
+                    'aria-label': $root.translations.edtfFormats , 
+                    'aria-controls': uid
+                }" 
             tabindex="0" role="button"
         >
             <span class="control-label widget-input-label" data-bind="text:label"></span><span>
@@ -24,7 +29,7 @@
                 <span data-bind="text: $root.translations.edtfFormats"></span>
             </span>
           </div>
-          <div class="form-horizontal" data-bind="if: showEDTFFormats">
+          <div class="form-horizontal" data-bind="if: showEDTFFormats, attr: {id: uid}" >
               <article class="edtf-style-tools-panel" aria-label="{% trans 'EDTF Formats and Examples' %}">
                   <div class="widget-help-panel">
                     <h2>
