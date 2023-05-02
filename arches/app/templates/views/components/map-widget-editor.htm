@@ -81,20 +81,24 @@
                                         "
                                     ></select>
                                 </div>
-                                    <div class="map-data-drop-area" data-bind="event: {
-                                        dragover: dropZoneOverHandler,
-                                        drop: dropZoneHandler,
-                                        click: dropZoneClickHandler,
-                                        dragenter: dropZoneEnterHandler,
-                                        dragleave: dropZoneLeaveHandler,
-                                        dragend: dropZoneLeaveHandler
-                                    }">
-                                    <span data-bind="text: $root.translations.dragGeoJsonKml"></span>
-                                </div>
-                                <div class="hidden-file-input">
-                                    <input type="file" accept=".json,.geojson,.kml" data-bind="event: {
-                                        change: self.dropZoneFileSelected
-                                    }"/>
+                                <div>
+                                    <div class="map-data-drop-area" tabindex="0" data-bind="event: {
+                                            dragover: dropZoneOverHandler,
+                                            drop: dropZoneHandler,
+                                            click: dropZoneClickHandler,
+                                            dragenter: dropZoneEnterHandler,
+                                            dragleave: dropZoneLeaveHandler,
+                                            dragend: dropZoneLeaveHandler
+                                        }, attr: {'aria-label': $root.translations.dragGeoJsonKml},
+                                        onEnterkeyClick, onSpaceClick
+                                        ">
+                                        <span data-bind="text: $root.translations.dragGeoJsonKml"></span>
+                                    </div>
+                                    <div class="hidden-file-input">
+                                        <input type="file" accept=".json,.geojson,.kml" data-bind="event: {
+                                            change: self.dropZoneFileSelected
+                                        }"/>
+                                    </div>
                                 </div>
                                 <!-- ko if: self.featureLookup[widget.node_id()].dropErrors().length !== 0 -->
                                 <div class="geojson-error-list">
