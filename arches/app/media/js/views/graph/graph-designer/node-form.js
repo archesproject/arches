@@ -27,6 +27,7 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
             this.isExportable = ko.observable(null);
+            this.shouldEnableMultipleValuesSwitch = ko.observable(self.node().nodeid === self.node().nodeGroupId());
 
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
@@ -37,9 +38,28 @@ define([
                 var node = self.node();
                 return self.graphModel.get('isresource') && node && node.istopnode;
             });
+            this.nodegroup = ko.computed(function() {
+                const node = ko.unwrap(self.node);
+                let nodegroup;
+
+                if (node) {
+                    nodegroup = self.graph.nodegroups().find(function(nodegroup) { 
+                        return nodegroup.nodegroupid() === node.nodeGroupId();
+                    });
+                }
+
+                return nodegroup;
+            });
             this.restrictedNodegroups = options.restrictedNodegroups;
             this.appliedFunctions = options.appliedFunctions;
             this.primaryDescriptorFunction = options.primaryDescriptorFunction;
+
+            this.updateCardinality = function() {
+                console.log(self.node(), self.nodegroup())
+                if (self.shouldEnableMultipleValuesSwitch() || self.node().nodeid === self.node().nodeGroupId()) {
+                    self.nodegroup().cardinality(self.nodegroup().cardinality() === '1' ? 'n' : '1');
+                }
+            };
 
             this.isFuncNode = function() {
                 var node = self.node();
@@ -193,6 +213,7 @@ define([
         toggleIsCollector: function() {
             if (this.checkIfImmutable() === false) {
                 this.node().toggleIsCollector();
+                this.shouldEnableMultipleValuesSwitch(!this.shouldEnableMultipleValuesSwitch());
             }
         }
     });

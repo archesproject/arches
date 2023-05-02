@@ -259,6 +259,33 @@
                         </div>
                     </div>
                     <!-- /ko -->
+                    <div class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div class="relative">
+                                <label class="col-xs-12 control-label widget-input-label">
+                                    <span 
+                                        class="switch switch-small arches-switch" 
+                                        data-bind="
+                                            css: {
+                                                'on': $data.nodegroup() && $data.nodegroup().cardinality() === 'n', 
+                                                'disabled': $data.node() && $data.node().nodeid !== $data.node().nodeGroupId()
+                                            }, 
+                                            click: $data.updateCardinality
+                                        "
+                                    ><small></small></span>
+                                </label>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <p class="control-label graph-settings-switch-label">
+                                    <span>{% trans "Allow multiple values." %}</span>
+                                </p>
+                                <span class="graph-settings-switch-subtitle">
+                                    {% trans "Let users enter multiple values for this data entry card" %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <!-- /ko -->
