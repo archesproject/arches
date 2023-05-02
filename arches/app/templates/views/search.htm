@@ -102,13 +102,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div class="search-type-btn-popup-panel">
                     <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
-                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        <!-- ko if: filter.type === 'popup' && filter.enabled -->                        
+                        <!-- ko if: filter.componentname !== "search-export" || filter.componentname === "search-export" && "{{app_settings.ALLOW_RESULTS_EXPORT}}" !== "False" -->
                         {% if user_can_read %}
                         <button class="saved-search-container search-type-btn-popup relative" style="" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); }">
                             <i data-bind="css: filter.icon"></i>
                             <!-- <p data-bind="text: filter.name"></p> -->
                         </button>
                         {% endif %}
+                        <!-- /ko -->
                         <!-- /ko -->
                     </div>
                 </div>
