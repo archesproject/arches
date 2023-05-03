@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9055_add_branch_publication_to_node"),
+        ("models", "9477_fix_for_spatial_view_dbf_function_table_alias_error"),
     ]
 
     sql_string = """
