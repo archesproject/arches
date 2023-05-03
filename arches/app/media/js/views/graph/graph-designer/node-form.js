@@ -27,7 +27,6 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
             this.isExportable = ko.observable(null);
-            this.shouldEnableMultipleValuesSwitch = ko.observable(self.node().nodeid === self.node().nodeGroupId());
 
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
@@ -55,8 +54,7 @@ define([
             this.primaryDescriptorFunction = options.primaryDescriptorFunction;
 
             this.updateCardinality = function() {
-                console.log(self.node(), self.nodegroup())
-                if (self.shouldEnableMultipleValuesSwitch() || self.node().nodeid === self.node().nodeGroupId()) {
+                if (self.node().nodeid === self.node().nodeGroupId()) {
                     self.nodegroup().cardinality(self.nodegroup().cardinality() === '1' ? 'n' : '1');
                 }
             };
@@ -213,7 +211,6 @@ define([
         toggleIsCollector: function() {
             if (this.checkIfImmutable() === false) {
                 this.node().toggleIsCollector();
-                this.shouldEnableMultipleValuesSwitch(!this.shouldEnableMultipleValuesSwitch());
             }
         }
     });
