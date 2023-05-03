@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9436_relational_view_null_geom_support"),
+        ("models", "9055_add_branch_publication_to_node"),
     ]
 
     sql_string = """
