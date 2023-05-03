@@ -7,6 +7,7 @@ define([
     'bindings/datepicker',
     'bindings/moment-date',
     'bindings/chosen',
+    'bindings/key-events-click',
 ], function(ko, _, WidgetViewModel, moment, datePickerWidgetTemplate) {
     /**
      * registers a datepicker-widget component for use in forms
