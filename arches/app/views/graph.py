@@ -130,8 +130,8 @@ class GraphSettingsView(GraphBaseView):
             node.config = data["graph"]["root"]["config"]
 
         nodegroup_ids_to_serialized_nodegroups = {}
-        for serialized_nodegroup in data['graph']['nodegroups']:
-            nodegroup_ids_to_serialized_nodegroups[serialized_nodegroup['nodegroupid']] = serialized_nodegroup
+        for serialized_nodegroup in data["graph"]["nodegroups"]:
+            nodegroup_ids_to_serialized_nodegroups[serialized_nodegroup["nodegroupid"]] = serialized_nodegroup
 
         try:
             with transaction.atomic():
@@ -139,7 +139,7 @@ class GraphSettingsView(GraphBaseView):
                 node.save()
 
                 for nodegroup in models.NodeGroup.objects.filter(nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()):
-                    nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[str(nodegroup.nodegroupid)]['cardinality']
+                    nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[str(nodegroup.nodegroupid)]["cardinality"]
                     nodegroup.save()
 
             return JSONResponse(
