@@ -54,7 +54,7 @@ define([
             this.primaryDescriptorFunction = options.primaryDescriptorFunction;
 
             this.updateCardinality = function() {
-                if (self.node().nodeid === self.node().nodeGroupId()) {
+                if (self.nodegroup() && self.node().nodeid === self.node().nodeGroupId()) {
                     self.nodegroup().cardinality(self.nodegroup().cardinality() === '1' ? 'n' : '1');
                 }
             };

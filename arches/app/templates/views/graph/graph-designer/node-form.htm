@@ -268,7 +268,7 @@
                                         data-bind="
                                             css: {
                                                 'on': $data.nodegroup() && $data.nodegroup().cardinality() === 'n', 
-                                                'disabled': $data.node() && $data.node().nodeid !== $data.node().nodeGroupId()
+                                                'disabled': !$data.nodegroup() || $data.node() && $data.node().nodeid !== $data.node().nodeGroupId()
                                             }, 
                                             click: $data.updateCardinality
                                         "
