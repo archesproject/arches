@@ -27,7 +27,6 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
             this.isExportable = ko.observable(null);
-
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
             this.hasOntology = ko.computed(function(){
@@ -52,6 +51,15 @@ define([
             this.restrictedNodegroups = options.restrictedNodegroups;
             this.appliedFunctions = options.appliedFunctions;
             this.primaryDescriptorFunction = options.primaryDescriptorFunction;
+
+            options.updatedCardinalityData.subscribe(function(updatedCardinalityData) {
+                const data = updatedCardinalityData[0];
+                const graphSettingsViewModel = updatedCardinalityData[1];
+
+                self.loading(true);
+                self.graph['nodegroups'](ko.mapping.fromJS(data['nodegroups'])());
+                graphSettingsViewModel.save();
+            });
 
             this.updateCardinality = function() {
                 if (self.nodegroup() && self.node().nodeid === self.node().nodeGroupId()) {
