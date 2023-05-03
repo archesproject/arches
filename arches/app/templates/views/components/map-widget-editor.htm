@@ -2,11 +2,13 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('editor');
-}, css: {
-    'active': activeTab() === 'editor'
-}">
+<div class="workbench-card-sidebar-tab" tabindex="0" role="button" data-bind="click: function() {
+        toggleTab('editor');
+    }, css: {
+        'active': activeTab() === 'editor'
+    }, attr: {'aria-label': $root.translations.edit, 'aria-expanded': (activeTab() === 'editor') },
+    onEnterkeyClick, onSpaceClick
+">
     <i class="fa fa-pencil"></i>
     <span data-bind="text: $root.translations.edit"></span>
 </div>
@@ -17,7 +19,9 @@
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <!--ko if: activeTab() === 'editor' -->
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel, text: label"></h4>
+        <h4 class="workbench-card-sidepanel-header" tabindex="0" role="button" 
+            data-bind="click: hideSidePanel, text: label, attr: {'aria-label': $root.translations.hideEditor}
+        "></h4>
     </div>
     <div class="workbench-card-sidepanel-border"></div>
 
@@ -77,12 +81,14 @@
                                                 'width': '100%',
                                                 'disable_search_threshold': 10,
                                                 'allow_single_deselect': true
-                                            }
+                                            },
+                                            attr: {'aria-label': $root.translations.addANewFeature}
                                         "
                                     ></select>
                                 </div>
                                 <div>
-                                    <div class="map-data-drop-area" tabindex="0" data-bind="event: {
+                                    <div class="map-data-drop-area" tabindex="0" role="button" 
+                                        data-bind="event: {
                                             dragover: dropZoneOverHandler,
                                             drop: dropZoneHandler,
                                             click: dropZoneClickHandler,
