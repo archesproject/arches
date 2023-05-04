@@ -13186,69 +13186,11 @@ ul.select2-choices:after {
     border-radius: 2px;
 }
 
-.edtf-style-tools-panel, .i18n-style-tools-panel {
-    background: #fbfbfb;
-    border: 1px solid #ddd;
-    margin-bottom: 5px;
-    border-radius: 2px;
-    height: 200px;
-}
-
-.edtf-style-tools-panel{
-    overflow-y: scroll;
-    height: 200px;
-    width: 600px;
-    padding: 10px 15px 5px 5px;
-}
-
 .i18n-style-tools-panel {
     padding: 10px;
     height: 140px;
     position: relative;
     width: 100%;
-}
-
-.edtf-style-tools-panel::-webkit-scrollbar, .i18n-style-tools-panel::-webkit-scrollbar  {
-    -webkit-appearance: none;
-    width: 9px;
-    border-left: 1px solid #ddd;
-}
-
-.edtf-style-tools-panel::-webkit-scrollbar-thumb, .i18n-style-tools-panel::-webkit-scrollbar-thumb  {
-    border-radius: 1px;
-    background-color: rgba(0, 0, 0, .1);
-    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-}
-
-.workbench-card-sidepanel .edtf-style-tools-panel, .workbench-card-sidepanel .i18n-style-tools-panel {
-    width: 340px;
-}
-
-.widget-help-panel {
-    padding: 5px 10px;
-}
-
-.widget-help-panel h2 {
-    font-size: 1.0em;
-    margin-top: 0px;
-    margin-bottom: 5px;
-}
-
-.widget-help-panel a {
-    color: steelblue;
-    font-weight: 500;
-    text-decoration: underline;
-}
-
-.widget-help-panel h3 {
-    font-size: 1.0em;
-    margin-top: 0px;
-    color: #777;
-}
-
-.widget-help-panel .text-thin {
-    color: #666;
-    font-weight: 400;
 }
 
 .style-tools-color-visualizer {
