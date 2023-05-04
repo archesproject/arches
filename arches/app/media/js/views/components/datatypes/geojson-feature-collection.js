@@ -178,6 +178,18 @@ define([
                             layer.paint["circle-radius"] = radius_value;
                         case "resources-cluster-point-" + params.nodeid:
                             layer.paint["circle-color"] = self.config.pointColor();
+                            cluster_distance_value = self.config.clusterDistance();
+                            if(cluster_distance_value === ""){cluster_distance_value = 20} 
+                            else (cluster_distance_value = Number(cluster_distance_value));    
+                            cluster_max_zoom_value = self.config.clusterMaxZoom();
+                            if(cluster_max_zoom_value === ""){cluster_max_zoom_value = 5} 
+                            else (cluster_max_zoom_value = Number(cluster_max_zoom_value));    
+                            cluster_min_points_value = self.config.clusterMinPoints();
+                            if(cluster_min_points_value === ""){cluster_min_points_value = 3} 
+                            else (cluster_min_points_value = Number(cluster_min_points_value));    
+                            simplification_value = self.config.simplification();
+                            if(simplification_value === ""){simplification_value = 0.3} 
+                            else (simplification_value = Number(simplification_value));     
                             break;
                         default:
 
@@ -199,12 +211,16 @@ define([
 
                 this.saveNode = function() {
                     // do saving of config values at end to avoid double save button issue
-                    self.config.haloWeight(halo_weight_value)
-                    self.config.weight(weight_value)
-                    self.config.outlineWeight(outline_weight_value)
-                    self.config.haloRadius(halo_radius_value)
-                    self.config.radius(radius_value)
-
+                    self.config.haloWeight(halo_weight_value);
+                    self.config.weight(weight_value);
+                    self.config.outlineWeight(outline_weight_value);
+                    self.config.haloRadius(halo_radius_value);
+                    self.config.radius(radius_value);
+                    self.config.clusterDistance(cluster_distance_value);
+                    self.config.clusterMaxZoom(cluster_max_zoom_value);
+                    self.config.clusterMinPoints(cluster_min_points_value);
+                    self.config.simplification(simplification_value);
+                    
                     self.loading(true);
                     self.node.save(function() {
                         self.loading(false);
