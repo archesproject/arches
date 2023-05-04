@@ -24,23 +24,23 @@ class Migration(migrations.Migration):
                                 if in_nodeid is null or in_nodeid is null then
                                     return '<invalid_nodeid>';
                                 end if;
-                                
+
                                 if in_tiledata is null then
                                     return '';
                                 end if;
 
-                                select n.datatype, n.config 
-                                into in_node_type, in_node_config 
+                                select n.datatype, n.config
+                                into in_node_type, in_node_config
                                 from nodes n where nodeid = in_nodeid::uuid;
-                                    
+
                                 if in_node_type = 'semantic' then
                                     return '<semantic>';
                                 end if;
-                                
+
                                 if in_node_type is null then
                                     return '';
                                 end if;
-                                
+
                                 case in_node_type
                                     when 'concept' then
                                         display_value := __arches_get_concept_label((in_tiledata ->> in_nodeid::text)::uuid);
@@ -49,7 +49,9 @@ class Migration(migrations.Migration):
                                     when 'edtf' then
                                         display_value := (in_tiledata ->> in_nodeid::text);
                                     when 'file-list' then
-                                        select string_agg(f.url,' | ') from (select (jsonb_array_elements(in_tiledata -> in_nodeid::text) -> 'name')::text as url) f into display_value;
+                                        select string_agg(f.url,' | ')
+                                          from (select (jsonb_array_elements(in_tiledata -> in_nodeid::text) -> 'name')::text as url) f
+                                          into display_value;
                                     when 'domain-value' then
                                         display_value := __arches_get_domain_label((in_tiledata ->> in_nodeid::text)::uuid, in_nodeid);
                                     when 'domain-value-list' then
@@ -72,12 +74,12 @@ class Migration(migrations.Migration):
                                         -- 'annotation'
                                         -- 'any other custom datatype - will need a pattern to handle this'
                                         display_value := (in_tiledata ->> in_nodeid::text)::text;
-                                    
+
                                     end case;
-                                        
+
                                 return display_value;
                             end;
-                            
+
             $BODY$;
 
             SELECT public.__arches_refresh_spatial_views();

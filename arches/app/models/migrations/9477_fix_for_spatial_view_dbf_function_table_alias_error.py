@@ -30,26 +30,26 @@ class Migration(migrations.Migration):
                     att_comments    text := '';
                 begin
                     att_table_name := format('%s.sp_attr_%s', schema_name, spatial_view_name_slug);
-                    
+
                     att_comments = att_comments || format(
                                     'comment on column %s.%s is ''%s'';',
                                     att_table_name,
                                     'resourceinstanceid',
                                     'Globally unique Arches resource ID'
                                     );
-                    
+
                     declare
                         tmp_nodegroupid_slug  text;
                         node_name_slug        text;
                         n                     record;
                     begin
-                        for n in 
+                        for n in
                                 with attribute_nodes as (
                                     select * from jsonb_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
                                 )
-                                select 
-                                    n1.name, 
-                                    n1.nodeid, 
+                                select
+                                    n1.name,
+                                    n1.nodeid,
                                     n1.nodegroupid,
                                     att_nodes.description
                                 from nodes n1
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                         loop
                             tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
                             node_name_slug := __arches_slugify(n.name);
-                            node_create = node_create || 
+                            node_create = node_create ||
                                 format('
                                     ,__arches_agg_get_node_display_value(distinct "tile_%s".tiledata, ''%s'') as %s
                                     ',
@@ -65,10 +65,10 @@ class Migration(migrations.Migration):
                                         n.nodeid::text,
                                         node_name_slug
                                     );
-                            
+
                             if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
-                                tile_create = tile_create || 
-                                    format(' 
+                                tile_create = tile_create ||
+                                    format('
                                     left outer join tiles "tile_%s" on r.resourceinstanceid = "tile_%s".resourceinstanceid
                                         and "tile_%s".nodegroupid = ''%s''
                                     ',
@@ -89,14 +89,14 @@ class Migration(migrations.Migration):
 
                         end loop;
                     end;
-                    
+
                     att_view_tbl := format(
                         '
-                        create table %s 
+                        create table %s
                         tablespace pg_default
                         as
                         (
-                            select 
+                            select
                                 r.resourceinstanceid::text as resourceinstanceid
                                 %s
                             from resource_instances r
@@ -107,11 +107,11 @@ class Migration(migrations.Migration):
                                 r.resourceinstanceid::text
                         )
                         with data;
-                        
+
                         %s
 
                         create index on %s (resourceinstanceid);
-                        
+
                         ',
                         att_table_name,
                         node_create, 
