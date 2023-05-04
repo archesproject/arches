@@ -40,12 +40,12 @@
             {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 class="workbench-card-sidepanel-header" tabindex="0" role="button"
+                    <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
                         data-bind="click: hideSidePanel, onEnterkeyClick, onSpaceClick,
                         attr: {'aria-label': $root.translations.hideBasemaps}
                     ">
                         <span data-bind="text: $root.translations.basemaps" ></span>
-                    </h4>
+                    </p>
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>
 
@@ -68,12 +68,12 @@
 
             <!--ko if: activeTab() === 'overlays' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 class="workbench-card-sidepanel-header" tabindex="0" role="button"
+                    <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
                         data-bind="click: hideSidePanel, onEnterkeyClick, onSpaceClick,
                             attr: {'aria-label': $root.translations.hideOverlays}
                     ">
                         <span data-bind="text: $root.translations.overlays" ></span>
-                    </h4>
+                    </p>
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>
                 <div class="workbench-card-sidepanel-body">
@@ -109,12 +109,12 @@
 
             <!--ko if: activeTab() === 'legend' -->
                 <div class="workbench-card-sidepanel-header-container">
-                    <h4 class="workbench-card-sidepanel-header" tabindex="0" role="button"
+                    <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
                         data-bind="click: hideSidePanel, onEnterkeyClick, onSpaceClick,
                         attr: {'aria-label': $root.translations.hideLegend}
                     ">
                         <span data-bind="text: $root.translations.legend" ></span>
-                    </h4>
+                    </p>
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>
                 <div class="workbench-card-sidepanel-body">
