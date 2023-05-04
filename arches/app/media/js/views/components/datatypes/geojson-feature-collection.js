@@ -136,7 +136,6 @@ define([
                 };
 
                 var updateMapStyle = function() {
-                    console.log("update map style has been run")
                     _.each(overlays, function(layer) {
                         switch (layer.id) {
                         case "resources-fill-" + params.nodeid:
