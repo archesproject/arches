@@ -779,45 +779,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             except ValueError:
                 layer_def = "[]"
         else:
-            # default_values = {"radius":2,
-            #                   "haloRadius":4,
-            #                   "weight":2,
-            #                   "haloWeight":4,
-            #                   "outlineWeight":2}
-            # try:
-            #     for inp, val in default_values.items():
-            #         # check if input is string
-            #         if isinstance(node.config[inp], str):
-            #             print(inp, node.config[inp])
-            #             print(type(node.config[inp]))
-
-            #             node.config[inp] = int(val)
-            #             print(inp, node.config[inp])
-            #             print(type(node.config[inp]))
-
-            #             node.config[inp].save()
-                    
-
-            # except (AttributeError, KeyError):
-            #     pass
-            # for inp, val in default_values.items():
-            #     #try:
-            #     print(node.config[inp])
-            #     if node.config[inp].isnumeric() == False:
-            #         node.config[inp] = val
-            #     if node.config[inp] is None:
-            #         node.config[inp] = val
-            #     if node.config[inp] == "":
-            #         node.config[inp] = val
-            #     else:
-            #         print(node.config[inp])
-            #     node.config.save()
-
-                #except (AttributeError, KeyError):
-                #    print(inp)
-                #    pass
-
-
             layer_def = """[
                 {
                     "id": "resources-fill-%(nodeid)s",
