@@ -114,19 +114,19 @@ class Migration(migrations.Migration):
 
                         ',
                         att_table_name,
-                        node_create, 
-                        geometry_node_id, 
+                        node_create,
+                        geometry_node_id,
                         tile_create,
                         att_comments,
                         att_table_name);
-                    
+
                     execute att_view_tbl;
-                    
+
                     return att_table_name;
                 end;
-                            
+
             $BODY$;
-                
+
             -- FUNCTION: public.__arches_trg_fnc_update_spatial_attributes()
 
             -- DROP FUNCTION IF EXISTS public.__arches_trg_fnc_update_spatial_attributes();
@@ -141,7 +141,7 @@ class Migration(migrations.Migration):
                     trigger_tile  record;
                     spv           record;
                 begin
-                    if tg_op = 'DELETE' then 
+                    if tg_op = 'DELETE' then
                         trigger_tile := old;
                     else
                         trigger_tile := new;
@@ -159,15 +159,15 @@ class Migration(migrations.Migration):
                             with attribute_nodes as (
                                 select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
                             )
-                            select count(*) into found_attr_key_count 
+                            select count(*) into found_attr_key_count
                             from (select jsonb_object_keys(trigger_tile.tiledata) as node_id) keys
                             where keys.node_id::text in (select nodeid::text from attribute_nodes)
                                 or keys.node_id::text = spv.geometrynodeid::text;
 
                             if found_attr_key_count < 1 then
-                                continue; 
+                                continue;
                             end if;
-                            
+
                             declare
                                 att_table_name        text := spv.schema || '.sp_attr_' || spv.slug;
                                 tmp_nodegroupid_slug  text;
@@ -184,28 +184,28 @@ class Migration(migrations.Migration):
                                     );
                                 execute delete_existing;
 
-                                for n in 
+                                for n in
                                         with attribute_nodes1 as (
                                             select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
                                         )
-                                        select 
-                                            n1.name, 
-                                            n1.nodeid, 
+                                        select
+                                            n1.name,
+                                            n1.nodeid,
                                             n1.nodegroupid,
                                             att_nodes.description
                                         from nodes n1
                                             join (select * from attribute_nodes1) att_nodes ON n1.nodeid = att_nodes.nodeid
                                 loop
                                     tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
-                                    node_create = node_create || 
+                                    node_create = node_create ||
                                         format(' ,__arches_agg_get_node_display_value(distinct "tile_%s".tiledata, %L::uuid) as %s '
                                             ,tmp_nodegroupid_slug
                                             ,n.nodeid::text
                                             ,__arches_slugify(n.name)
                                         );
-                                    
+
                                     if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
-                                        tile_create = tile_create || 
+                                        tile_create = tile_create ||
                                             format(' left outer join tiles "tile_%s" on r.resourceinstanceid = "tile_%s".resourceinstanceid
                                                 and "tile_%s".nodegroupid = ''%s''::uuid ',
                                             tmp_nodegroupid_slug,
@@ -219,7 +219,7 @@ class Migration(migrations.Migration):
                                 insert_attr := format(
                                     '
                                     insert into %s
-                                        select 
+                                        select
                                             r.resourceinstanceid
                                             %s
                                         from resource_instances r
@@ -231,8 +231,8 @@ class Migration(migrations.Migration):
                                         having r.resourceinstanceid = %L::uuid
                                     ',
                                     att_table_name,
-                                    node_create, 
-                                    spv.geometrynodeid::text, 
+                                    node_create,
+                                    spv.geometrynodeid::text,
                                     tile_create,
                                     trigger_tile.resourceinstanceid::text);
 
@@ -244,7 +244,7 @@ class Migration(migrations.Migration):
 
                     return trigger_tile;
                 end;
-                            
+
             $BODY$;
         """
 
