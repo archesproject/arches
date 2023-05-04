@@ -55,13 +55,13 @@
                                 <div class="row" style="display: flex">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
+                                            <p class="text-main account-content-heading">{{ user.username }}</p>
                                             <p class="profile-label-shim">{% trans 'User name' %}</p>
                                         </div>
                                     </div>
 
                                     <div class="col-sm-5">
-                                        <h4 class="text-main">********</h4>
+                                        <p class="text-main account-content-heading">********</p>
                                         <button class="btn btn-default btn-active-success btn-profile-password add-popover" 
                                             data-bind="click: toggleChangePasswordForm, attr: {'aria-expanded': showChangePasswordForm().toString(), 'aria-controls': 'change-password-form-container'}
                                         ">{% trans 'Change password' %}</button>
@@ -85,9 +85,9 @@
                                     <div class="col-sm-5">
                                         <div class="relative">
                                             {% if user.email %}
-                                                <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                                <p class="text-main account-content-heading">{{ user.email }}</p>
                                             {% else %}
-                                                <h4 class="text-main" style="font-weight: 500;">{% trans 'None' %}</h4>
+                                                <p class="text-main account-content-heading">{% trans 'None' %}</p>
                                             {% endif %}
                                             <p class="profile-label-shim">{% trans 'Contact email' %}</p>
                                         </div>
@@ -98,9 +98,9 @@
                                     <div class="col-sm-5">
                                         <div class="relative">
                                             {% if user.userprofile.phone %}
-                                                <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                                <p class="text-main account-content-heading">{{ user.userprofile.phone }}</p>
                                             {% else %}
-                                                <h4 class="text-main" style="font-weight: 500;">{% trans 'None' %}</h4>
+                                                <p class="text-main account-content-heading">{% trans 'None' %}</p>
                                             {% endif %}
                                             <p class="profile-label-shim">{% trans 'Phone' %}</p>
                                         </div>
@@ -111,10 +111,10 @@
                                     <div class="col-sm-5">
                                         <div class="relative">
                                             <!-- ko if: hasUserEnabledTwoFactorAuthentication() -->
-                                            <h4 class="text-main" style="font-weight: 500; color: green;">ENABLED</h4>
+                                            <p class="text-main account-content-heading" style="color: green;">ENABLED</p>
                                             <!-- /ko -->
                                             <!-- ko ifnot: hasUserEnabledTwoFactorAuthentication() -->
-                                            <h4 class="text-main" style="font-weight: 500; color: red;">DISABLED</h4>
+                                            <p class="text-main account-content-heading" style="color: red;">DISABLED</p>
                                             <!-- /ko -->
                                             <p class="profile-label-shim">{% trans 'Two-Factor Authentication' %}</p>
                                         </div>
