@@ -144,12 +144,6 @@
                                             </p>
                                         </div>
 
-                                        <div class="col-sm-2">
-                                            <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}">{% trans 'Save' %}</button>
-                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <!-- Account First Name -->
@@ -266,6 +260,17 @@
                                             </div>
                                         </div>
                                     <!-- /ko -->
+
+                                    <!-- Save & Cancel -->
+                                    <hr style="border-color: #eee;">
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <div>
+                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}">{% trans 'Save' %}</button>
+                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </form>
                                 <!-- /ko -->
                             </div>
