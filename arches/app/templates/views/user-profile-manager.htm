@@ -235,14 +235,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <div class="row">
                                             <div class="col-sm-5">
                                                 <div class="form-group">
-                                                    <label class="control-label account-label">{% trans 'Two-Factor Authentication' %}</label>
+                                                    <span id="2fa-enabled" class="control-label account-label">{% trans 'Two-Factor Authentication' %}</span>
                                                     <input 
                                                         disabled
                                                         type="text" 
                                                         class="form-control input-lg account-input" 
                                                         name="two-factor-authentication-status" 
-                                                        data-bind="value: hasUserEnabledTwoFactorAuthentication() ? 'ENABLED' : 'DISABLED'"
-                                                    >
+                                                        data-bind="value: hasUserEnabledTwoFactorAuthentication() ? 'ENABLED' : 'DISABLED',
+                                                            attr: {'aria-labeledby': '2fa-enabled', 'aria-label': $root.translations.twoFactorAuthentication}
+                                                    ">
                                                 </div>
                                             </div>
                                             <div class="col-sm-5">
