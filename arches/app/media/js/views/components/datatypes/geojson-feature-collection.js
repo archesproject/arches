@@ -143,7 +143,7 @@ define([
                             break;
                         case "resources-line-halo-" + params.nodeid:
                             halo_weight_value = self.config.haloWeight();
-                            //if empty string or combination of int+str convert to default
+                            //if empty string or combination of int+str convert to default values 
                             if(halo_weight_value === ""){halo_weight_value = 4} 
                             else (halo_weight_value = Number(halo_weight_value));
                             layer.paint["line-width"] = halo_weight_value
@@ -203,11 +203,12 @@ define([
 
                 this.node.json.subscribe(updateMapStyle);
                 this.selectedBasemapName.subscribe(updateMapStyle);
+
                 this.config.advancedStyling.subscribe(function(value) {
                     if (value && !self.config.advancedStyle()) {
                         self.config.advancedStyle(JSON.stringify(overlays, null, '\t'));
                     }
-                });                   
+                });
 
                 this.saveNode = function() {
                     // do saving of config values at end to avoid double save button issue
