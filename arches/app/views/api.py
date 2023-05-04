@@ -1083,7 +1083,8 @@ class ResourceReport(APIBase):
         perm = "read_nodegroup"
 
         resource = Resource.objects.get(pk=resourceid)
-        graph = Graph.objects.get(graphid=resource.graph_id)
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=translation.get_language())
+        graph = Graph(published_graph.serialized_graph)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         if not template.preload_resource_data:
@@ -1133,10 +1134,16 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
+            permitted_serialized_cards = []
             permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
+            for serialized_card in published_graph.serialized_graph['cards']:
+                del serialized_card['constraints']
+                del serialized_card['is_editable']
+                card = CardProxyModel(**serialized_card)
+                
                 if request.user.has_perm(perm, card.nodegroup):
                     card.filter_by_perm(request.user, perm)
+                    permitted_serialized_cards.append(serialized_card)
                     permitted_cards.append(card)
 
             cardwidgets = [
@@ -1145,7 +1152,7 @@ class ResourceReport(APIBase):
                 for widget in widgets
             ]
 
-            resp["cards"] = permitted_cards
+            resp["cards"] = permitted_serialized_cards
             resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)

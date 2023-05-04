@@ -217,7 +217,7 @@ class LabelBasedGraph(object):
         ) = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
 
         user_language = translation.get_language()
-        published_graph = models.PublishedGraph.objects.get(publication=resource.graph.publication, language=user_language)
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=user_language)
         serialized_graph = published_graph.serialized_graph
 
         node_ids_to_serialized_nodes = {serialized_node["nodeid"]: serialized_node for serialized_node in serialized_graph["nodes"]}
