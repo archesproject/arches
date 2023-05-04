@@ -136,77 +136,47 @@ define([
                 };
 
                 var updateMapStyle = function() {
+                    console.log("update map style has been run")
                     _.each(overlays, function(layer) {
-                        console.log("am i here")
                         switch (layer.id) {
                         case "resources-fill-" + params.nodeid:
                             layer.paint["fill-color"] = self.config.fillColor();
                             break;
                         case "resources-line-halo-" + params.nodeid:
-                            // // if (!(/^\d+$/.test(self.config.haloWeight())) && !(self.config.haloWeight() === "") ) {
-                            //     if (!(/^\d+$/.test(self.config.haloWeight())) &&
-                            //         !(self.config.haloWeight() === "") &&
-                            //         !(self.config.haloWeight())) {
-
-                            //     console.log("\nBEFORE INP");
-                            //     console.log(self.config.haloWeight(), "whats in the box");
-                            //     console.log(typeof(layer.paint["line-width"]),layer.paint["line-width"], "   Line width");
-                            //     console.log(typeof(self.config.haloWeight()),self.config.haloWeight(), "   Halo weight"); 
-                            
-
-                            //     layer.paint["line-width"] = parseInt(self.config.haloWeight());
-                            //     self.config.haloWeight(layer.paint["line-width"]);
-                            //     layer.paint["line-color"] = self.config.lineHaloColor();
-
-                            //     console.log("\nAFTER");
-                            //     console.log(self.config.haloWeight(), "whats in the box");
-                            //     console.log(typeof(layer.paint["line-width"]),layer.paint["line-width"], "   Line width");
-                            //     console.log(typeof(self.config.haloWeight()),self.config.haloWeight(), "   Halo weight"); 
-                            //     break;
-                            // } else {
-                            //     console.log(self.config.haloWeight())
-                            //     layer.paint["line-width"] = 4;
-                            //     self.config.haloWeight(layer.paint["line-width"]);
-                            //     layer.paint["line-color"] = self.config.lineHaloColor();
-                            //     break;
-                            // };
-                            console.log(self.config.haloWeight())
-                            layer.paint["line-width"] = parseInt(self.config.haloWeight());
-                            console.log(typeof(layer.paint["line-width"]),layer.paint["line-width"], "Line width");
-                            console.log(typeof(self.config.haloWeight()),self.config.haloWeight(), "halo weight");
-                            if (!(/^\d+\.\d+$|^\d+$/.test(self.config.haloWeight()))) {layer.paint["line-width"] = 4;}
-                            if (self.config.haloWeight() === "") {layer.paint["line-width"] = 4;}
-                            //if (!(self.config.haloWeight() > 0)) { layer.paint["line-width"] = 10; }
-                            self.config.haloWeight(layer.paint["line-width"]);
-                            console.log(self.config.haloWeight(layer.paint["line-width"]));
+                            halo_weight_value = self.config.haloWeight();
+                            //if empty string or combination of int+str convert to default
+                            if(halo_weight_value === ""){halo_weight_value = 4} 
+                            else (halo_weight_value = Number(halo_weight_value));
+                            layer.paint["line-width"] = halo_weight_value
                             layer.paint["line-color"] = self.config.lineHaloColor();
-                            console.log("REACHED END")
                             break;
-
-
                         case "resources-line-" + params.nodeid:
-                            layer.paint["line-width"] = parseInt(self.config.weight());
-                            if (!(self.config.weight() > 0)) { layer.paint["line-width"] = 1; }
-                            self.config.weight(layer.paint["line-width"]);
+                            weight_value = self.config.weight();
+                            if(weight_value === ""){weight_value = 2} 
+                            else (weight_value = Number(weight_value));
+                            layer.paint["line-width"] = weight_value;
                             layer.paint["line-color"] = self.config.lineColor();
                             break;
                         case "resources-poly-outline-" + params.nodeid:
-                            layer.paint["line-width"] = parseInt(self.config.outlineWeight());
-                            if (!(self.config.outlineWeight() > 0)) { layer.paint["line-width"] = 1; }
-                            self.config.outlineWeight(layer.paint["line-width"]);
+                            outline_weight_value = self.config.outlineWeight();
+                            if(outline_weight_value === ""){outline_weight_value = 2} 
+                            else (outline_weight_value = Number(outline_weight_value));
+                            layer.paint["line-width"] = outline_weight_value;
                             layer.paint["line-color"] = self.config.outlineColor();
                             break;
                         case "resources-point-halo-" + params.nodeid:
-                            layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
-                            if (!(self.config.haloRadius() > 0)) { layer.paint["circle-radius"] = 1; }
-                            self.config.haloRadius(layer.paint["circle-radius"]);
+                            halo_radius_value = self.config.haloRadius();
+                            if(halo_radius_value === ""){halo_radius_value = 4} 
+                            else (halo_radius_value = Number(halo_radius_value));    
+                            layer.paint["circle-radius"] = halo_radius_value                        
                         case "resources-cluster-point-halo-" + params.nodeid:
                             layer.paint["circle-color"] = self.config.pointHaloColor();
                             break;
                         case "resources-point-" + params.nodeid:
-                            layer.paint["circle-radius"] = parseInt(self.config.radius());
-                            if (!(self.config.radius() > 0)) { layer.paint["circle-radius"] = 1; }
-                            self.config.radius(layer.paint["circle-radius"]);
+                            radius_value = self.config.radius();
+                            if(radius_value === ""){radius_value = 2} 
+                            else (radius_value = Number(radius_value));   
+                            layer.paint["circle-radius"] = radius_value;
                         case "resources-cluster-point-" + params.nodeid:
                             layer.paint["circle-color"] = self.config.pointColor();
                             break;
@@ -222,14 +192,20 @@ define([
 
                 this.node.json.subscribe(updateMapStyle);
                 this.selectedBasemapName.subscribe(updateMapStyle);
-                console.log("test")
                 this.config.advancedStyling.subscribe(function(value) {
                     if (value && !self.config.advancedStyle()) {
                         self.config.advancedStyle(JSON.stringify(overlays, null, '\t'));
                     }
-                });
+                });                   
 
                 this.saveNode = function() {
+                    // do saving of config values at end to avoid double save button issue
+                    self.config.haloWeight(halo_weight_value)
+                    self.config.weight(weight_value)
+                    self.config.outlineWeight(outline_weight_value)
+                    self.config.haloRadius(halo_radius_value)
+                    self.config.radius(radius_value)
+
                     self.loading(true);
                     self.node.save(function() {
                         self.loading(false);
