@@ -1,20 +1,3 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
 {% extends "base-manager.htm" %} 
 {% load static %} 
 {% load template_tags %}
@@ -40,7 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
                 -->
 
-                <div class="">
+                <div>
                     <div class="profile-full-name">
                         {{user.first_name}} {{user.last_name}}
                     </div>
@@ -54,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <div class="profile-sections">
 
                 <!-- My Account Info -->
-                <section id="" class="profile-list">
+                <section class="profile-list">
                     <div class="account-wrapper">
                         <div class="row relative">
 
@@ -66,7 +49,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </div>
 
                             <div class="row-content col-sm-9" style="flex: 1; ">
-                                <!-- ko if: showEditUserForm() === false -->
+
+                                <!-- Account Report -->
+                                <!-- ko if: showEditUserForm() === false --> 
                                 <div class="row" style="display: flex">
                                     <div class="col-sm-5">
                                         <div class="relative">
@@ -77,10 +62,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <div class="col-sm-5">
                                         <h4 class="text-main">********</h4>
-                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
-                                        {% trans 'Change password' %}</button>
+                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" 
+                                            data-bind="click: toggleChangePasswordForm, attr: {'aria-expanded': showChangePasswordForm().toString(), 'aria-controls': 'change-password-form-container'}
+                                        ">{% trans 'Change password' %}</button>
                                         <div class="password-success" data-bind="text:changePasswordSuccess"></div>
-                                        <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                        <div class="change-password-form bottom fade in popover" id="change-password-form-container" data-bind='visible: showChangePasswordForm()'>
                                             <div class="arrow" style="left: 50%;"></div>
                                             {% include 'change_password.htm' %}
                                         </div>
@@ -88,7 +74,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                     <div class="col-sm-2">
                                         <div>
-                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
+                                            <button class="btn btn-primary btn-active-purple btn-profile" aria-label="{% trans 'Edit account information' %}" 
+                                                data-bind="click: toggleEditUserForm, attr: {'aria-expanded': showEditUserForm().toString(), 'aria-controls': 'edit-user-form-container'}
+                                            ">{% trans 'Edit' %}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -96,7 +84,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                            {% if user.email %}
+                                                <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                            {% else %}
+                                                <h4 class="text-main" style="font-weight: 500;">{% trans 'None' %}</h4>
+                                            {% endif %}
                                             <p class="profile-label-shim">{% trans 'Contact email' %}</p>
                                         </div>
                                     </div>
@@ -131,21 +123,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 </div>
                                 <!-- /ko -->
 
+                                <!-- Edit Account Form -->
                                 <!-- ko if: showEditUserForm() === true -->
-                                <form method="post">
+                                <form method="post" id="edit-user-form-container">
                                     {% csrf_token %}
                                     <div class="row">
 
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Arches user name' %}</label>
-                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                                <span id="edit-username" class="control-label account-label">{% trans 'Arches user name' %}</span>
+                                                <input disabled type="text" class="form-control input-lg account-input" aria-labelledby="edit-username" aria-label="{% trans 'Arches user name' %}"
+                                                    placeholder="Username" name="username" value="{{ user.username }}
+                                                ">
                                             </div>
                                         </div>
 
-                                        <!-- Password -->
                                         <div class="col-sm-5">
-                                            <p class="account-tips">
+                                            <p class="account-tips" id="edit-username-tip">
                                                 {% trans 'This is the unique email or name that you use to log on to Arches.' %}
                                             </p>
                                         </div>
@@ -158,12 +152,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </div>
                                     </div>
 
+                                    <!-- Account First Name -->
                                     <hr style="border-color: #eee;">
                                     <div class="row">
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                                <label class="control-label account-label" for="edit-first-name">{% trans 'First name' %}</label>
+                                                <input type="text" class="form-control input-lg account-input" id="edit-first-name" aria-describedby="edit-name-phone-tip"
+                                                    placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}
+                                                ">
                                                 {% if form.first_name.errors %}
                                                 {% for error in form.first_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -172,7 +169,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
-                                            <p class="account-tips">
+                                            <p class="account-tips" id="edit-name-phone-tip">
                                                 {% trans 'Arches uses your name and phone number to make it easier for other users to find and work with you.' %}
                                             </p>
                                         </div>
@@ -183,8 +180,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                                <label class="control-label account-label" for="edit-last-name">{% trans 'Last name' %}</label>
+                                                <input type="text" class="form-control input-lg account-input" id="edit-last-name" aria-describedby="edit-name-phone-tip"
+                                                    placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}
+                                                ">
                                                 {% if form.last_name.errors %}
                                                 {% for error in form.last_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -199,8 +198,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
+                                                <label class="control-label account-label" for="edit-phone">{% trans 'Phone Number (optional)' %}</label>
+                                                <input type="text" class="form-control input-lg account-input" id="edit-phone" aria-describedby="edit-name-phone-tip"
+                                                    placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}
+                                                ">
                                             </div>
                                         </div>
                                     </div>
@@ -212,8 +213,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Names -->
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
+                                                <label class="control-label account-label" for="edit-email">{% trans 'Contact Email' %}</label>
+                                                <input type="email" class="form-control input-lg account-input" id="edit-email" aria-describedby="edit-email-tip"
+                                                    placeholder="jsmith@company.com" name="email" value="{{ user.email }}
+                                                ">
                                                 {% if form.email.errors %}
                                                 {% for error in form.email.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -222,7 +225,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
-                                            <p class="account-tips">
+                                            <p class="account-tips" id="edit-email-tip">
                                                 {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
                                             </p>
                                         </div>
@@ -252,8 +255,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                         class="btn btn-link" 
                                                         type='button' 
                                                         style="color: #579ddb; padding-top: 24px;"
-                                                        data-bind="click: function() { alertTwoFactorAuthenticationChange('{{ user.email }}'); }"
-                                                    >
+                                                        data-bind="click: function() { 
+                                                            alertTwoFactorAuthenticationChange('{{ user.email }}'); 
+                                                            document.querySelector('#card-alert-panel > .ep-form-alert-buttons > button').focus(); 
+                                                        }
+                                                    ">
                                                         {% trans 'Click here to update Two-Factor Authentication settings via email' %}
                                                     </button>
                                                 </p>
@@ -362,14 +368,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <tr>
                                             <td data-bind="text:name"></td>
                                             <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
+                                                <span class="control-label widget-input-label-notif">
+                                                    <span class="switch switch-small arches-switch" tabindex="0" role="switch" 
+                                                        data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}, onEnterkeyClick, onSpaceClick,
+                                                            attr: {'aria-checked': emailnotify().toString(), 'aria-label': '{% trans 'Email Notifications for '%}' + name() }
+                                                    "><small></small></span>{% trans 'Enable' %}
+                                                </span>
                                             </td>
                                             <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
+                                                <span class="control-label widget-input-label-notif">
+                                                    <span class="switch switch-small arches-switch" tabindex="0" role="switch" 
+                                                        data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}, onEnterkeyClick, onSpaceClick,
+                                                            attr: {'aria-checked': webnotify().toString(), 'aria-label': '{% trans 'Web Notifications for '%}' + name() }
+                                                    "><small></small></span>{% trans 'Enable' %}
+                                                </span>
                                             </td>
                                         </tr>
                                         <!-- <tr>
@@ -402,8 +414,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </div>
 
-<!-- SCROLL TOP BUTTON -->
-<button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}
