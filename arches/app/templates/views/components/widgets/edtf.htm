@@ -31,18 +31,18 @@
           <div class="form-horizontal" data-bind="if: showEDTFFormats, attr: {id: uid}" >
               <article class="edtf-style-tools-panel" aria-label="{% trans 'EDTF Formats and Examples' %}">
                   <div class="widget-help-panel">
-                    <h2>
+                    <p class="widget-help-panel-h2">
                         <span data-bind="text: $root.translations.edtfFormatsExpanded"></span>
-                    </h2>
-                    <h3>
+                    </p>
+                    <p class="widget-help-panel-h3">
                         <span data-bind="text: $root.translations.edtfFormatDescription"></span>
                         <a target="_blank" data-bind="attr: { href: 'https://www.loc.gov/standards/datetime'}, click: function() { return true;}, clickBubble: false" tabindex="-1">
                             <span data-bind="text: $root.translations.edtfDateSpecification"></span>
                         </a>
-                    </h3>
-                    <h3>
+                    </p>
+                    <p class="widget-help-panel-h3">
                         <span data-bind="text: $root.translations.someCommonEncodings"></span>
-                    </h3>
+                    </p>
 
                     <dl>
                         <dt>
