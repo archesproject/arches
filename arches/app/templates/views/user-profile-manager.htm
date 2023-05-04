@@ -132,9 +132,10 @@
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <span id="edit-username" class="control-label account-label">{% trans 'Arches user name' %}</span>
-                                                <input disabled type="text" class="form-control input-lg account-input" aria-labelledby="edit-username" aria-label="{% trans 'Arches user name' %}"
-                                                    placeholder="Username" name="username" value="{{ user.username }}
-                                                ">
+                                                <input disabled type="text" class="form-control input-lg account-input" 
+                                                    aria-labelledby="edit-username" aria-label="{% trans 'Arches user name' %}" aria-describedby="edit-username-tip"
+                                                    placeholder="Username" name="username" value="{{ user.username }}"
+                                                >
                                             </div>
                                         </div>
 
@@ -153,8 +154,8 @@
                                             <div class="form-group">
                                                 <label class="control-label account-label" for="edit-first-name">{% trans 'First name' %}</label>
                                                 <input type="text" class="form-control input-lg account-input" id="edit-first-name" aria-describedby="edit-name-phone-tip"
-                                                    placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}
-                                                ">
+                                                    placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}"
+                                                >
                                                 {% if form.first_name.errors %}
                                                 {% for error in form.first_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -176,8 +177,8 @@
                                             <div class="form-group">
                                                 <label class="control-label account-label" for="edit-last-name">{% trans 'Last name' %}</label>
                                                 <input type="text" class="form-control input-lg account-input" id="edit-last-name" aria-describedby="edit-name-phone-tip"
-                                                    placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}
-                                                ">
+                                                    placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}"
+                                                >
                                                 {% if form.last_name.errors %}
                                                 {% for error in form.last_name.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
@@ -194,8 +195,8 @@
                                             <div class="form-group">
                                                 <label class="control-label account-label" for="edit-phone">{% trans 'Phone Number (optional)' %}</label>
                                                 <input type="text" class="form-control input-lg account-input" id="edit-phone" aria-describedby="edit-name-phone-tip"
-                                                    placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}
-                                                ">
+                                                    placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}"
+                                                >
                                             </div>
                                         </div>
                                     </div>
@@ -209,8 +210,8 @@
                                             <div class="form-group">
                                                 <label class="control-label account-label" for="edit-email">{% trans 'Contact Email' %}</label>
                                                 <input type="email" class="form-control input-lg account-input" id="edit-email" aria-describedby="edit-email-tip"
-                                                    placeholder="jsmith@company.com" name="email" value="{{ user.email }}
-                                                ">
+                                                    placeholder="jsmith@company.com" name="email" value="{{ user.email }}"
+                                                >
                                                 {% if form.email.errors %}
                                                 {% for error in form.email.errors %}
                                                     <div style="color:darkred">{{ error|escape }}</div>
