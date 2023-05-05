@@ -1091,22 +1091,28 @@ class ResourceReport(APIBase):
         # if a user is viewing a report for a resource that does not have the same publication as the current graph publication
         # ( and therefore is out-of-date ) only allow them to access report details if they have Graph Editor permissions or higher.
         if (
-            graph_has_different_publication 
-            and not request.user.groups.filter(name__in=['Graph Editor', 'RDM Administrator', 'Application Administrator', 'System Administrator']).exists()
+            graph_has_different_publication
+            and not request.user.groups.filter(
+                name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+            ).exists()
         ):
-            return JSONResponse({
-                "displayname": resource.displayname(),
-                "resourceid": resourceid,
-                "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-                "template": template,
-                "graph": graph,
-            })
+            return JSONResponse(
+                {
+                    "displayname": resource.displayname(),
+                    "resourceid": resourceid,
+                    "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+                    "template": template,
+                    "graph": graph,
+                }
+            )
 
         if not template.preload_resource_data:
-            return JSONResponse({
-                "template": template, 
-                "report_json": resource.to_json(compact=compact, version=version), 
-            })
+            return JSONResponse(
+                {
+                    "template": template,
+                    "report_json": resource.to_json(compact=compact, version=version),
+                }
+            )
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1154,11 +1160,11 @@ class ResourceReport(APIBase):
         if "cards" not in exclude:
             permitted_serialized_cards = []
             permitted_cards = []
-            for serialized_card in published_graph.serialized_graph['cards']:
-                del serialized_card['constraints']
-                del serialized_card['is_editable']
+            for serialized_card in published_graph.serialized_graph["cards"]:
+                del serialized_card["constraints"]
+                del serialized_card["is_editable"]
                 card = CardProxyModel(**serialized_card)
-                
+
                 if request.user.has_perm(perm, card.nodegroup):
                     permitted_serialized_cards.append(serialized_card)
                     permitted_cards.append(card)
