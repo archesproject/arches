@@ -171,18 +171,23 @@
     </div>
 
     <div class="relative">
-        <label class="col-xs-12 control-label widget-input-label">
+        <span class="col-xs-12 control-label widget-input-label">
             <span data-bind="text: $root.translations.searchStringText"></span>
             
             <i 
                 class="fa fa-eye" 
-                style="cursor: pointer;" 
+                style="cursor: pointer;"
+                tabindex="0"
+                role=""
                 data-bind="
-                    attr: {title: $root.translations.viewSearchString},
-                    click: openSearch
+                    attr: {title: $root.translations.viewSearchString,
+                        'aria-label': $root.translations.viewSearchString
+                    },
+                    click: openSearch,
+                    onEnterkeyClick, onSpaceClick
                 "
             ></i>
-        </label>
+        </span>
     </div>
     
     <div class="col-xs-12" style="padding-bottom: 10px;">
@@ -190,7 +195,9 @@
             type="text" 
             class="form-control"
             data-bind="
-                attr: {placeholder: $root.translations.enterSearchStringHere + '...'},
+                attr: {placeholder: $root.translations.enterSearchStringHere + '...',
+                    'aria-label': $root.translations.searchStringText
+                },
                 textInput: config.searchString
             "
         >
