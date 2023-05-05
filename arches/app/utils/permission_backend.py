@@ -24,6 +24,11 @@ from arches.app.search.mappings import RESOURCES_INDEX
 
 class PermissionBackend(ObjectPermissionBackend):
     def has_perm(self, user_obj, perm, obj=None):
+        """
+        Arguments:
+        perm -- the permssion string eg: "read_nodegroup"
+        obj -- the model instance to check (e.g. Node, Nodegroup)
+        """
         # check if user_obj and object are supported (pulled directly from guardian)
         support, user_obj = check_support(user_obj, obj)
         if not support:
@@ -41,7 +46,7 @@ class PermissionBackend(ObjectPermissionBackend):
             else:
                 return perm in explicitly_defined_perms
         else:
-            default_perms = []
+            # default_perms = []
             for group in user_obj.groups.all():
                 for permission in group.permissions.all():
                     if perm in permission.codename:
