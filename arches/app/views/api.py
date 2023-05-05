@@ -1212,6 +1212,7 @@ class ResourceReport(APIBase):
         if uncompacted_value == "true":
             compact = False
         perm = "read_nodegroup"
+        readable_nodegroups = list(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, ["models.read_nodegroup"], any_perm=True))
 
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
@@ -1255,20 +1256,12 @@ class ResourceReport(APIBase):
             resp["related_resources"] = related_resources_summary
 
         if "tiles" not in exclude:
-            permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, tile.nodegroup):
-                    tile.filter_by_perm(request.user, perm)
-                    permitted_tiles.append(tile)
+            permitted_tiles = TileProxyModel.objects.filter(resourceinstance=resource, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
 
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(request.user, perm)
-                    permitted_cards.append(card)
+            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
 
             cardwidgets = [
                 widget
