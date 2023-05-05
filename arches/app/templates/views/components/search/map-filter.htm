@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
+<div class="workbench-card-sidebar-tab" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
     toggleTab('filter');
 }, css: {
     'active': activeTab() === 'filter'
@@ -18,7 +18,7 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'filter' -->
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <h4 tabindex="0" class="workbench-card-sidepanel-header" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel">
             <span data-bind="text: $root.translations.mapSearch"></span>
         </h4>
     </div>
