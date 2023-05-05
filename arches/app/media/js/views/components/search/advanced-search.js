@@ -7,6 +7,7 @@ define([
     'views/components/search/base-filter',
     'templates/views/components/search/advanced-search.htm',
     'bindings/let',
+    'bindings/key-events-click',
 ], function($, _, ko, koMapping, arches, BaseFilter, advancedSearchTemplate) {
     var componentName = 'advanced-search';
     const viewModel = BaseFilter.extend({

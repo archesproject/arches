@@ -82,18 +82,18 @@
                         type="text" 
                         class="form-control"
                         data-bind="
-                            attr:{placeholder: $root.translations.find + '...'},
+                            attr:{placeholder: $root.translations.find + '...', 'aria-label': $root.translations.find + '...'},
                             value: facetFilterText, 
                             valueUpdate: 'keyup'
                         "
                     >
                     <!-- Clear Filter -->
-                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
+                    <span tabindex="0" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
                 <!-- ko if: cards().length > 0  -->
-                <div tabindex="0" class="search-facet-item disabled" data-bind="click: function () { collapsed(!collapsed()) }">
+                <div tabindex="0" class="search-facet-item disabled" data-bind="onEnterkeyClick, onSpaceClick, click: function () { collapsed(!collapsed()) }">
                     <h4 class="search-facet-item-heading">
                         <strong data-bind="text: name"></strong>
                         <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
