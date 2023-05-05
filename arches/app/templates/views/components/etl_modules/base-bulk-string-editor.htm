@@ -89,13 +89,13 @@
             <h4>
                 <span data-bind="text: $root.translations.from"></span>
             </h4>
-            <input type="text" style="width: 500px;" class="form-control" placeholder="Old Text" data-bind="value: oldText">
+            <input type="text" style="width: 500px;" class="form-control" placeholder="Old Text" data-bind="textInput: oldText">
             <input type="checkbox" data-bind="checked: caseInsensitive">
             <span data-bind="text: $root.translations.caseInsensitive"></span>
             <h4>
                 <span data-bind="text: $root.translations.to"></span>
             </h4>
-            <input type="text" style="width: 500px;" class="form-control" placeholder="New Text" data-bind="value: newText">
+            <input type="text" style="width: 500px;" class="form-control" placeholder="New Text" data-bind="textInput: newText">
         </div>
         <button style="margin: 25px 8px;" data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
