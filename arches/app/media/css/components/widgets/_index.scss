@@ -2,6 +2,7 @@
 @import "checkbox";
 @import "datepicker";
 @import "file";
+@import "edtf";
 @import "radio";
 @import "switch";
 
@@ -137,4 +138,45 @@ div.row.widget-wrapper {
 
 .widget-inline-tools-collapser>span {
     padding-inline-end: 12px;
+}
+
+.widget-help-panel {
+    padding: 5px 10px;
+}
+
+.widget-help-panel h2 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel-h2 {
+    font-size: 1.0em;
+    font-weight: 600;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel a {
+    color: steelblue;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.widget-help-panel h3 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel-h3 {
+    font-size: 1.0em;
+    font-weight: 400;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel .text-thin {
+    color: #666;
+    font-weight: 400;
 }
