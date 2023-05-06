@@ -9,7 +9,7 @@ define([
         initialize: async function(options) {
             options.name = 'Resource Type Filter';
 
-             
+
             this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
             this.resourceModels = ko.observableArray();
@@ -19,13 +19,15 @@ define([
             const response = await fetch(arches.urls.api_search_component_data + componentName);
             if (response.ok) {
                 const data = await response.json();
-                self.resourceModels(data.resources);
+                data.resources.forEach(function(res) {
+                    if (res.isactive === true) {
+                        self.resourceModels.push(res);
+                    }
+                });
             } else {
                 // eslint-disable-next-line no-console
                 console.log('Failed to fetch resource instance list');
             }
-
-            this.filter = ko.observableArray();
 
             var filterUpdated = ko.computed(function() {
                 return JSON.stringify(ko.toJS(this.filter()));
