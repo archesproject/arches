@@ -332,10 +332,12 @@ class BulkStringEditor(BaseBulkEditor):
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, old_text, new_text)
             else:
                 self.log_event(cursor, "failed")
-                return {"success": False, "data": data_staged["message"]}
+                return {"success": False, "data": { "title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
             data_updated = self.save_to_tiles(loadid)
             return {"success": True, "data": "done"}
         else:
-            return {"success": False, "data": data_updated["message"]}
+            with connection.cursor() as cursor:
+                self.log_event(cursor, "failed")
+            return {"success": False, "data": { "title":_("Error"), "message": data_updated["message"]}}
