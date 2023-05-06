@@ -130,11 +130,19 @@ class BulkStringEditor(BaseBulkEditor):
         graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
         resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         like_operator = "ilike" if case_insensitive else "like"
-        text_query = " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
+        text_query = (
+            " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
+        )
         if language_code is None:
             language_code = "en"
 
-        request_parmas_dict = {"node_id": node_id, "language_code": language_code, "graph_id": graph_id, "resourceid": resourceids, "old_text": '%'+old_text+'%'}
+        request_parmas_dict = {
+            "node_id": node_id,
+            "language_code": language_code,
+            "graph_id": graph_id,
+            "resourceid": resourceids,
+            "old_text": "%" + old_text + "%",
+        }
 
         sql_query = (
             """
@@ -220,7 +228,9 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(graph_id, node_id, resourceids, language_code, old_text, case_insensitive)
+        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
+            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+        )
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -281,7 +291,9 @@ class BulkStringEditor(BaseBulkEditor):
             "new_text": new_text,
         }
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(graph_id, node_id, resourceids, language_code, old_text, case_insensitive)
+        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
+            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+        )
 
         load_details = {
             "graph": graph_id,
