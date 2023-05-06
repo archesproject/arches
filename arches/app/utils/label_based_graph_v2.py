@@ -1,5 +1,10 @@
+import copy
+
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
+from django.utils import translation
+from types import SimpleNamespace
+
 
 RESOURCE_ID_KEY = "@resource_id"
 NODE_ID_KEY = "@node_id"
@@ -104,15 +109,39 @@ class LabelBasedGraph(object):
         return node_ids_to_tiles_reference, nodegroup_cardinality_reference
 
     @classmethod
+    def is_valid_semantic_node(cls, node, tile, node_ids_to_tiles_reference, edge_domain_node_ids_to_range_nodes):
+        if node["datatype"] == "semantic":
+            child_nodes = edge_domain_node_ids_to_range_nodes.get(node["nodeid"], [])
+
+            semantic_child_nodes = [child_node for child_node in child_nodes if child_node["datatype"] == "semantic"]
+            non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node["datatype"] != "semantic"]
+
+            for non_semantic_child_node in non_semantic_child_nodes:
+                if (
+                    str(non_semantic_child_node["nodeid"]) in tile.data
+                    or str(non_semantic_child_node["nodeid"]) in node_ids_to_tiles_reference
+                ):
+                    return True
+
+            has_valid_child_semantic_node = False
+
+            for semantic_child_node in semantic_child_nodes:
+                if cls.is_valid_semantic_node(semantic_child_node, tile, node_ids_to_tiles_reference, edge_domain_node_ids_to_range_nodes):
+                    has_valid_child_semantic_node = True
+
+            return has_valid_child_semantic_node
+
+    @classmethod
     def from_tile(
         cls,
         tile,
         node_ids_to_tiles_reference,
         nodegroup_cardinality_reference=None,
         datatype_factory=None,
-        node_cache=None,
-        compact=False,
+        node_ids_to_serialized_nodes=None,
+        edge_domain_node_ids_to_range_nodes=None,
         hide_empty_nodes=False,
+        serialized_graph=None,
         as_json=True,
     ):
         """
@@ -121,24 +150,42 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        if node_cache is None:  # need explicit None comparison
-            node_cache = {}
+        if not serialized_graph:
+            node = models.Node.objects.get(pk=tile.nodegroup_id)
+            graph_x_published_graph = models.GraphXPublishedGraph.objects.get(graph_id=node.graph_id)
 
-        nodegroup_id = tile.nodegroup_id
+            user_language = translation.get_language()
+            published_graph = models.PublishedGraph.objects.get(
+                publication_id=graph_x_published_graph.publicationid, language=user_language
+            )
 
-        node = node_cache.get(nodegroup_id)
-        if not node:
-            node = models.Node.objects.get(pk=nodegroup_id)
-            node_cache[nodegroup_id] = node
+            serialized_graph = published_graph.serialized_graph
+
+        if not node_ids_to_serialized_nodes or not edge_domain_node_ids_to_range_nodes:
+            node_ids_to_serialized_nodes = {serialized_node["nodeid"]: serialized_node for serialized_node in serialized_graph["nodes"]}
+
+            edge_domain_node_ids_to_range_nodes = {}
+            for serialized_edge in serialized_graph["edges"]:
+                if edge_domain_node_ids_to_range_nodes.get(serialized_edge["domainnode_id"]) is None:
+                    edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]] = []
+
+                range_node = [
+                    serialized_node
+                    for serialized_node in serialized_graph["nodes"]
+                    if serialized_node["nodeid"] == serialized_edge["rangenode_id"]
+                ][0]
+                edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]].append(range_node)
 
         graph = cls._build_graph(
-            input_node=node,
+            input_node=node_ids_to_serialized_nodes[str(tile.nodegroup_id)],
             input_tile=tile,
             parent_tree=None,
             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
-            node_cache=node_cache,
+            serialized_graph=serialized_graph,
             datatype_factory=datatype_factory,
+            node_ids_to_serialized_nodes=node_ids_to_serialized_nodes,
+            edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes,
         )
 
         return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
@@ -148,7 +195,6 @@ class LabelBasedGraph(object):
         cls,
         resource,
         datatype_factory=None,
-        node_cache=None,
         compact=False,
         hide_empty_nodes=False,
         as_json=True,
@@ -162,9 +208,6 @@ class LabelBasedGraph(object):
         if not datatype_factory:
             datatype_factory = DataTypeFactory()
 
-        if node_cache is None:  # need explicit None comparison
-            node_cache = {}
-
         if not resource.tiles:
             resource.load_tiles(user, perm)
 
@@ -172,6 +215,24 @@ class LabelBasedGraph(object):
             node_ids_to_tiles_reference,
             nodegroup_cardinality_reference,
         ) = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
+
+        user_language = translation.get_language()
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph.publication, language=user_language)
+        serialized_graph = published_graph.serialized_graph
+
+        node_ids_to_serialized_nodes = {serialized_node["nodeid"]: serialized_node for serialized_node in serialized_graph["nodes"]}
+
+        edge_domain_node_ids_to_range_nodes = {}
+        for serialized_edge in serialized_graph["edges"]:
+            if edge_domain_node_ids_to_range_nodes.get(serialized_edge["domainnode_id"]) is None:
+                edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]] = []
+
+            range_node = [
+                serialized_node
+                for serialized_node in serialized_graph["nodes"]
+                if serialized_node["nodeid"] == serialized_edge["rangenode_id"]
+            ][0]
+            edge_domain_node_ids_to_range_nodes[serialized_edge["domainnode_id"]].append(range_node)
 
         root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
 
@@ -181,9 +242,10 @@ class LabelBasedGraph(object):
                 node_ids_to_tiles_reference=node_ids_to_tiles_reference,
                 nodegroup_cardinality_reference=nodegroup_cardinality_reference,
                 datatype_factory=datatype_factory,
-                node_cache=node_cache,
-                compact=compact,
+                node_ids_to_serialized_nodes=node_ids_to_serialized_nodes,
+                edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes,
                 hide_empty_nodes=hide_empty_nodes,
+                serialized_graph=serialized_graph,
                 as_json=False,
             )
 
@@ -222,7 +284,6 @@ class LabelBasedGraph(object):
         """
 
         datatype_factory = DataTypeFactory()
-        node_cache = {}
 
         resource_label_based_graphs = []
 
@@ -230,7 +291,6 @@ class LabelBasedGraph(object):
             resource_label_based_graph = cls.from_resource(
                 resource=resource,
                 datatype_factory=datatype_factory,
-                node_cache=node_cache,
                 compact=compact,
                 hide_empty_nodes=hide_empty_nodes,
                 as_json=as_json,
@@ -242,19 +302,21 @@ class LabelBasedGraph(object):
         return resource_label_based_graphs
 
     @classmethod
-    def _get_display_value(cls, tile, node, datatype_factory):
+    def _get_display_value(cls, tile, serialized_node, datatype_factory):
         display_value = None
 
-        # if the node is unable to collect data, let's explicitly say so
-        if datatype_factory.datatypes[node.datatype].defaultwidget is None:
+        # if the serialized_node is unable to collect data, let's explicitly say so
+        if datatype_factory.datatypes[serialized_node["datatype"]].defaultwidget is None:
             display_value = NON_DATA_COLLECTING_NODE
         elif tile.data:
-            datatype = datatype_factory.get_instance(node.datatype)
+            datatype = datatype_factory.get_instance(serialized_node["datatype"])
+
+            node_copy = copy.deepcopy(serialized_node)
 
             # `get_display_value` varies between datatypes,
             # so let's handle errors here instead of nullguarding all models
             try:
-                display_value = datatype.to_json(tile=tile, node=node)
+                display_value = datatype.to_json(tile=tile, node=SimpleNamespace(**node_copy))
             except:  # pragma: no cover
                 pass
 
@@ -262,36 +324,36 @@ class LabelBasedGraph(object):
 
     @classmethod
     def _build_graph(
-        cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
+        cls,
+        input_node,
+        input_tile,
+        parent_tree,
+        node_ids_to_tiles_reference,
+        nodegroup_cardinality_reference,
+        serialized_graph,
+        datatype_factory,
+        node_ids_to_serialized_nodes,
+        edge_domain_node_ids_to_range_nodes,
     ):
-        def is_valid_semantic_node(node, tile):
-            if node.datatype == "semantic":
-                child_nodes = node.get_direct_child_nodes()
-                semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype == "semantic"]
-                non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype != "semantic"]
-
-                for non_semantic_child_node in non_semantic_child_nodes:
-                    if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
-                        return True
-
-                has_valid_child_semantic_node = False
-
-                for semantic_child_node in semantic_child_nodes:
-                    if is_valid_semantic_node(semantic_child_node, tile):
-                        has_valid_child_semantic_node = True
-
-                return has_valid_child_semantic_node
-
-        for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
+        for associated_tile in node_ids_to_tiles_reference.get(input_node["nodeid"], [input_tile]):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.data:
+                if (
+                    cls.is_valid_semantic_node(
+                        node=input_node,
+                        tile=associated_tile,
+                        node_ids_to_tiles_reference=node_ids_to_tiles_reference,
+                        edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes,
+                    )
+                    or input_node["nodeid"] in associated_tile.data
+                ):
+
                     label_based_node = LabelBasedNode(
-                        name=input_node.name,
-                        node_id=str(input_node.pk),
+                        name=input_node["name"],
+                        node_id=input_node["nodeid"],
                         tile_id=str(associated_tile.pk),
-                        value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
+                        value=cls._get_display_value(tile=associated_tile, serialized_node=input_node, datatype_factory=datatype_factory),
                         cardinality=nodegroup_cardinality_reference.get(str(associated_tile.nodegroup_id)),
                     )
 
@@ -301,18 +363,17 @@ class LabelBasedGraph(object):
                     else:
                         parent_tree.child_nodes.append(label_based_node)
 
-                    for child_node in input_node.get_direct_child_nodes():
-                        if not node_cache.get(child_node.pk):
-                            node_cache[child_node.pk] = child_node
-
+                    for child_node in edge_domain_node_ids_to_range_nodes.get(input_node["nodeid"], []):
                         cls._build_graph(
                             input_node=child_node,
                             input_tile=associated_tile,
                             parent_tree=label_based_node,
                             node_ids_to_tiles_reference=node_ids_to_tiles_reference,
                             nodegroup_cardinality_reference=nodegroup_cardinality_reference,
-                            node_cache=node_cache,
+                            serialized_graph=serialized_graph,
                             datatype_factory=datatype_factory,
+                            node_ids_to_serialized_nodes=node_ids_to_serialized_nodes,
+                            edge_domain_node_ids_to_range_nodes=edge_domain_node_ids_to_range_nodes,
                         )
 
         return parent_tree
