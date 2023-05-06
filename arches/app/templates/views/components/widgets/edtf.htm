@@ -3,17 +3,21 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}">
     <!-- ko if: node -->
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
     <div class="form-group">
         <div class="widget-inline-tools-collapser" style="max-width: 600px;" 
             data-bind="onEnterkeyClick, onSpaceClick, 
-            click: function() { showEDTFFormats(!showEDTFFormats()); },
-            attr: { 'aria-pressed': showEDTFFormats(), 'aria-label': $root.translations.edtfFormats }" 
+                click: function() { showEDTFFormats(!showEDTFFormats()); },
+                attr: {
+                    'aria-expanded': showEDTFFormats().toString(), 
+                    'aria-label': $root.translations.edtfFormats , 
+                    'aria-controls': uid
+                }" 
             tabindex="0" role="button"
-        > <span data-bind="console.log(showEDTFFormats())"></span>
+        >
             <span class="control-label widget-input-label" data-bind="text:label"></span><span>
                 <i class="fa" data-bind="{
                     css: {
@@ -24,21 +28,21 @@
                 <span data-bind="text: $root.translations.edtfFormats"></span>
             </span>
           </div>
-          <div class="form-horizontal" data-bind="if: showEDTFFormats">
-              <div class="edtf-style-tools-panel">
+          <div class="form-horizontal" data-bind="if: showEDTFFormats, attr: {id: uid}" >
+              <article class="edtf-style-tools-panel" aria-label="{% trans 'EDTF Formats and Examples' %}">
                   <div class="widget-help-panel">
-                    <h2>
+                    <p class="widget-help-panel-h2">
                         <span data-bind="text: $root.translations.edtfFormatsExpanded"></span>
-                    </h2>
-                    <h3>
+                    </p>
+                    <p class="widget-help-panel-h3">
                         <span data-bind="text: $root.translations.edtfFormatDescription"></span>
                         <a target="_blank" data-bind="attr: { href: 'https://www.loc.gov/standards/datetime'}, click: function() { return true;}, clickBubble: false" tabindex="-1">
                             <span data-bind="text: $root.translations.edtfDateSpecification"></span>
                         </a>
-                    </h3>
-                    <h3>
+                    </p>
+                    <p class="widget-help-panel-h3">
                         <span data-bind="text: $root.translations.someCommonEncodings"></span>
-                    </h3>
+                    </p>
 
                     <dl>
                         <dt>
@@ -107,7 +111,7 @@
                     </dl>
 
                   </div>
-              </div>
+              </article>
           </div>
         <div class="col-xs-12">
             <input type="text" data-bind="
@@ -132,11 +136,9 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
-        id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.placeholder},
+            attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
             textInput: placeholder
         "
     >
@@ -147,11 +149,9 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
-        id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.defaultValue},
+            attr: {placeholder: $root.translations.defaultValue, 'aria-label': $root.translations.defaultValue},
             textInput: defaultValue
         "
     >
