@@ -4,7 +4,8 @@ define([
     'knockout', 
     'arches', 
     'viewmodels/concept-select', 
-    'templates/views/components/datatypes/concept.htm', 
+    'templates/views/components/datatypes/concept.htm',
+    'bindings/key-events-click', 
 ], function($, _, ko, arches, ConceptSelectViewModel, conceptDatatypeTemplate) {
     var name = 'concept-datatype-config';
     const viewModel = function(params) {

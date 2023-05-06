@@ -1,13 +1,15 @@
+@import "css/themes/default";
+
 #container.cls-container.arches-login {
-    background: rgb(236, 238, 241);
+    background: $auth-background;
 }
 
 .arches-login>.cls-header {
-    background: rgb(236, 238, 241);
+    background: $auth-background;
 }
 
 .arches-login div .cls-brand:after {
-    background: rgb(236, 238, 241);
+    background: $auth-background;
 }
 
 .cls-content.arches-signin {
@@ -84,7 +86,7 @@ legend.arches-signin-subtext {
 }
 
 .arches-signin .panel-footer a {
-    color: steelblue;
+    color: $link-color;
     font-weight: 600;
 }
 
@@ -100,7 +102,7 @@ legend.arches-signin-subtext {
 }
 
 .cls-container .account-management a {
-    color: steelblue;
+    color: $link-color;
 }
 
 .account-link {
