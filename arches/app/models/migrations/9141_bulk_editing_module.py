@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
     """
 
     add_stage_data_for_bulk_edit_function = """
-        CREATE OR REPLACE FUNCTION __arches_stage_data_for_bulk_edit(
+        CREATE OR REPLACE FUNCTION __arches_stage_string_data_for_bulk_edit(
             load_id uuid,
             graph_id uuid,
             node_id uuid,
@@ -77,11 +77,11 @@ class Migration(migrations.Migration):
         $$;
     """
     remove_stage_data_for_bulk_edit_function = """
-        DROP FUNCTION IF EXISTS __arches_stage_data_for_bulk_edit(uuid,uuid,uuid,uuid,uuid[]);
+        DROP FUNCTION IF EXISTS __arches_stage_string_data_for_bulk_edit(uuid,uuid,uuid,uuid,uuid[]);
     """
 
     add_edit_staged_data_function = """
-        CREATE OR REPLACE FUNCTION __arches_edit_staged_data(
+        CREATE OR REPLACE FUNCTION __arches_edit_staged_string_data(
             load_id uuid,
             graph_id uuid,
             node_id uuid,
@@ -177,7 +177,7 @@ class Migration(migrations.Migration):
         $$;
     """
     remove_edit_staged_data_function = """
-        DROP FUNCTION IF EXISTS __arches_edit_staged_data(uuid,uuid,uuid,text,text,text,text);
+        DROP FUNCTION IF EXISTS __arches_edit_staged_string_data(uuid,uuid,uuid,text,text,text,text);
     """
 
     add_save_tile_for_edit_function = """
