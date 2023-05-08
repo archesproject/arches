@@ -20,9 +20,9 @@ define([
             if (response.ok) {
                 const data = await response.json();
                 data.resources.forEach(function(res) {
-                    if (res.isactive === true) {
-                        self.resourceModels.push(res);
-                    }
+                    //if (res.isactive === true) { // TODO: Uncomment once active flag is re-added to graph model
+                    self.resourceModels.push(res);
+                    //}
                 });
             } else {
                 // eslint-disable-next-line no-console
