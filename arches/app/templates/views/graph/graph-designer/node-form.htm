@@ -21,9 +21,10 @@
 
         <!-- Settings Forms -->
         <div style="padding: 20px;" class="settings-panel-body set-variable-pixel-height">
+        <div data-bind="text: console.log(node())"></div>
         <!-- ko if: node() -->
             <div style="position: relative; height: 770px;">
-                <!-- ko if: graph.isresource() && node().isImmutable -->
+                <!-- ko if: graph.isresource() && node().is_immutable -->
                 <div 
                     style="
                         position: absolute; 
@@ -143,7 +144,7 @@
             </div>
 
             <div style="position: relative; height: 190px;">
-                <!-- ko if: graph.isresource() && node().isImmutable -->
+                <!-- ko if: graph.isresource() && node().is_immutable -->
                 <div 
                     style="
                         position: absolute; 
@@ -188,7 +189,7 @@
             </div>
 
             <div style="position: relative; height: 360px;">
-                <!-- ko if: graph.isresource() && node().isImmutable -->
+                <!-- ko if: graph.isresource() && node().is_immutable -->
                 <div 
                     style="
                         position: absolute; 

@@ -229,7 +229,7 @@ define([
         beforeMove: function(e) {
             if (
                 e.sourceParent!==e.targetParent
-                || e.item.isImmutable && !e.item.isCollector() 
+                || e.item.is_immutable && !e.item.isCollector() 
             ) {
                 e.cancelDrop = true;
             }

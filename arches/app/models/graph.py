@@ -483,12 +483,11 @@ class Graph(models.GraphModel):
             datatype_factory = DataTypeFactory()
 
             if nodeid is not None:
-                node = self.nodes[nodeid]
+                import pdb; pdb.set_trace()
                 branch_publication_id = node.sourcebranchpublication_id
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
-                    node.sourcebranchpublication_id = None
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
@@ -500,7 +499,6 @@ class Graph(models.GraphModel):
                         raise GraphValidationError(message)
                 if branch_publication_id:
                     for branch_node in models.Node.objects.filter(sourcebranchpublication_id=branch_publication_id, graph=node.graph):
-                        branch_node.sourcebranchpublication_id = None
                         branch_node.save()
 
             else:
