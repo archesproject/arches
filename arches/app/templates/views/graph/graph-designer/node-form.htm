@@ -25,8 +25,6 @@
             class="settings-panel-body set-variable-pixel-height"
         >
         <!-- ko if: node() -->
-            <div data-bind="text: console.log($data, node())"></div>
-
             <div style="position: relative; height: 770px;">
                 <!-- ko if: node().isImmutable -->
                 <div 
@@ -206,28 +204,7 @@
                 <!-- /ko -->
                 <div class="graph-designer-header" style="margin-top: 20px;">{% trans 'Node Settings' %}</div>
                 <div class="graph-settings-panel-body fade in">
-                    <form>
-                        <!-- ko if: node().datatypeIsSearchable() -->
-                        <div class="row widget-container graph-settings-switch">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
-                                    </label>
-                                </div>
-    
-                                <div class="col-xs-12">
-                                    <p class="control-label graph-settings-switch-label">
-                                    {% trans "Expose to Advanced Search" %}
-                                    </p>
-                                    <span class="graph-settings-switch-subtitle">
-                                        {% trans "Activate to use this node in Advanced Search." %}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /ko -->
-    
+                    <form>    
                         <div class="row widget-container graph-settings-switch">
                             <div class="form-group">
                                 <div class="relative">
@@ -247,30 +224,6 @@
                                 </div>
                             </div>
                         </div>
-    
-                        <!-- ko if: node() && node().datatypeDataBearing() -->
-                        <div class="row widget-container graph-settings-switch">
-                            <div class="form-group">
-                                <div class="relative">
-                                    <label class="col-xs-12 control-label widget-input-label">
-                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
-                                    </label>
-                                </div>
-    
-                                <div class="col-xs-12">
-                                    <p class="control-label graph-settings-switch-label">
-                                    {% trans "Export via Search Results" %}
-                                    </p>
-                                    <span class="graph-settings-switch-subtitle">
-                                        {% trans "Provide a field name for shapefiles. " %} <strong>{% trans "Limited to 10 characters to meet shapefile requirements." %}</strong>
-                                    </span>
-                                    <div class="exportable-field-name">
-                                        <input class="form-control input-md widget-input" placeholder="{% trans 'shapefile fieldname' %}" type="text" maxlength="10" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--/ko-->
     
                         <!-- ko if: node() && !isResourceTopNode() && displayMakeCard() === true -->
                         <div class="row widget-container graph-settings-switch">
@@ -324,6 +277,60 @@
                                 </div>
                             </div>
                         </div>
+                    </form>
+                </div>
+            </div>
+
+            <div>
+                <!-- ko if: node() && ( node().datatypeDataBearing() || node().datatypeIsSearchable() ) -->
+                <div class="graph-designer-header" style="margin-top: 20px;">{% trans 'Search Settings' %}</div>
+                <!-- /ko -->
+                <div class="graph-settings-panel-body fade in">
+                    <form>
+                        <!-- ko if: node().datatypeIsSearchable() -->
+                        <div class="row widget-container graph-settings-switch">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().issearchable()}, click: function () { node().issearchable(!node().issearchable()); }"><small></small></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <p class="control-label graph-settings-switch-label">
+                                    {% trans "Expose to Advanced Search" %}
+                                    </p>
+                                    <span class="graph-settings-switch-subtitle">
+                                        {% trans "Activate to use this node in Advanced Search." %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: node() && node().datatypeDataBearing() -->
+                        <div class="row widget-container graph-settings-switch">
+                            <div class="form-group">
+                                <div class="relative">
+                                    <label class="col-xs-12 control-label widget-input-label">
+                                        <span class="switch switch-small arches-switch" data-bind="css: {'on': node().exportable()}, click: function(){node().exportable(!node().exportable())}"><small></small></span>
+                                    </label>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <p class="control-label graph-settings-switch-label">
+                                    {% trans "Export via Search Results" %}
+                                    </p>
+                                    <span class="graph-settings-switch-subtitle">
+                                        {% trans "Provide a field name for shapefiles. " %} <strong>{% trans "Limited to 10 characters to meet shapefile requirements." %}</strong>
+                                    </span>
+                                    <div class="exportable-field-name">
+                                        <input class="form-control input-md widget-input" placeholder="{% trans 'shapefile fieldname' %}" type="text" maxlength="10" data-bind="textInput: node().fieldname, disable: !node().exportable(), css: {'disabled': !node().exportable()}"></input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--/ko-->
                     </form>
                 </div>
             </div>
