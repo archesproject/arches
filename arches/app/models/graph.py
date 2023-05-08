@@ -483,7 +483,9 @@ class Graph(models.GraphModel):
             datatype_factory = DataTypeFactory()
 
             if nodeid is not None:
-                import pdb; pdb.set_trace()
+                import pdb
+
+                pdb.set_trace()
                 branch_publication_id = node.sourcebranchpublication_id
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
