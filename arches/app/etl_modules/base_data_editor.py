@@ -84,7 +84,7 @@ class BaseBulkEditor(BaseImportModule):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_stage_data_for_bulk_edit(%s, %s, %s, %s, %s)""",
+                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s)""",
                 (self.loadid, graph_id, node_id, self.moduleid, (resourceids)),
             )
             result["success"] = True
@@ -116,7 +116,7 @@ class BulkStringEditor(BaseBulkEditor):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s, %s)""",
+                """SELECT * FROM __arches_edit_staged_string_data(%s, %s, %s, %s, %s, %s, %s)""",
                 (self.loadid, graph_id, node_id, language_code, operation, old_text, new_text),
             )
             result["success"] = True
