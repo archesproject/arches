@@ -52,7 +52,7 @@
                     <span data-bind="text: $root.translations.uploadedFiles"></span>
                 </h4>
                 <div class="file-upload-options">
-                    <div class="file-upload-options-grow">
+                    <div class="file-upload-options-grow list-filter">
                     <!--ko if: filesJSON().length > 1-->
                     
                         <input 
@@ -64,15 +64,17 @@
                             class="file-upload-filter"
                         >
                         <!-- Clear Search -->
-                        <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        <span tabindex="0" aria-label="{% trans "Clear filter" %}" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         <!-- /ko -->
 
-                        <!-- ko if: filter() -->
-                        <span data-bind="text: filteredList().length +' '+ $root.translations.outOf +' '+ filesJSON().length +' '+ $root.translations.filesMatchFilter"></span>
-                        <!-- /ko -->
-                        <!-- ko if: (!filter() || filter() == "") -->
-                        <span data-bind="text: filesJSON().length +' '+ $root.translations.filesUploaded"></span>
-                        <!-- /ko -->
+                        <div style="margin-top: 7px;">
+                            <!-- ko if: filter() -->
+                            <span style="margin:0 35px;" data-bind="text: filteredList().length +' '+ $root.translations.outOf +' '+ filesJSON().length +' '+ $root.translations.filesMatchFilter"></span>
+                            <!-- /ko -->
+                            <!-- ko if: (!filter() || filter() == "") -->
+                            <span style="margin:0 5px;" data-bind="text: filesJSON().length +' '+ $root.translations.filesUploaded"></span>
+                            <!-- /ko -->
+                        </div>
                     </div>
                     <div >
                         <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
