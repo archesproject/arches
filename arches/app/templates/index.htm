@@ -63,7 +63,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!--=== Header ===-->
     <header>
-        <nav class="v5-splash-navbar navbar" role="navigation">
+        <div class="v5-splash-navbar navbar">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
@@ -83,7 +83,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
 
-                <div id="myNavbar" class="navbar-collapse collapse" aria-label="{% trans 'Arches Application Navigation' %}">
+                <nav id="myNavbar" class="navbar-collapse collapse" aria-label="{% trans 'Arches Application Navigation' %}">
                     <ul class="nav navbar-nav navbar-right">
                         <li>
                             <a href="#info-block-1">{% trans "Arches Features" %}</a>
@@ -122,9 +122,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         {% endif %}
                     </ul>
-                </div>
+                </nav>
             </div>
-        </nav>
+        </div>
     </header>
     <!--=== End Header ===-->
 
