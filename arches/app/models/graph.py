@@ -35,6 +35,7 @@ from django.utils.translation import ugettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation
+from guardian.models import GroupObjectPermission, UserObjectPermission
 
 
 logger = logging.getLogger(__name__)
@@ -1356,6 +1357,64 @@ class Graph(models.GraphModel):
                 nodegroups.add(card.nodegroup)
             return list(nodegroups)
 
+    def get_user_permissions(self, force_recalculation=False):
+        """
+        get the user permissions associated with this graph
+
+        returns {
+            nodegroup.pk: [<UserObjectPermission>, ...],
+            ...
+        },
+        """
+        if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
+            user_permissions = self.serialized_graph["user_permissions"]
+            return {
+                nodegroup_id: [UserObjectPermission(**serialized_user_permission) for serialized_user_permission in serialized_user_permissions ]
+                for nodegroup_id, serialized_user_permissions in user_permissions.items()
+            }
+        else:
+            user_permissions = {}
+
+            nodegroup_ids = [nodegroup.pk for nodegroup in self.get_nodegroups()]
+            user_object_permissions = UserObjectPermission.objects.filter(object_pk__in=nodegroup_ids)
+
+            for user_object_permission in user_object_permissions:
+                if not user_permissions.get(uuid.UUID(user_object_permission.object_pk)):
+                    user_permissions[uuid.UUID(user_object_permission.object_pk)] = []
+
+                user_permissions[uuid.UUID(user_object_permission.object_pk)].append(user_object_permission)
+
+            return user_permissions
+
+    def get_group_permissions(self, force_recalculation=False):
+        """
+        get the user permissions associated with this graph
+
+        returns {
+            nodegroup.pk: [<UserObjectPermission>, ...],
+            ...
+        },
+        """
+        if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
+            group_permissions = self.serialized_graph["group_permissions"]
+            return {
+                nodegroup_id: [GroupObjectPermission(**serialized_group_permission) for serialized_group_permission in serialized_group_permissions ]
+                for nodegroup_id, serialized_group_permissions in group_permissions.items()
+            }
+        else:
+            group_permissions = {}
+
+            nodegroup_ids = [nodegroup.pk for nodegroup in self.get_nodegroups()]
+            user_object_permissions = GroupObjectPermission.objects.filter(object_pk__in=nodegroup_ids)
+
+            for user_object_permission in user_object_permissions:
+                if not group_permissions.get(uuid.UUID(user_object_permission.object_pk)):
+                    group_permissions[uuid.UUID(user_object_permission.object_pk)] = []
+
+                group_permissions[uuid.UUID(user_object_permission.object_pk)].append(user_object_permission)
+
+            return group_permissions
+
     def get_or_create_nodegroup(self, nodegroupid, nodegroups_list=[]):
         """
         get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
@@ -1499,6 +1558,16 @@ class Graph(models.GraphModel):
                 ret["nodegroups"] = sorted(nodegroups, key=lambda k: k.pk)
             else:
                 ret.pop("nodegroups", None)
+
+            if "user_permissions" not in exclude:
+                ret["user_permissions"] = self.get_user_permissions(force_recalculation=force_recalculation)
+            else:
+                ret.pop("user_permissions", None)
+
+            if "group_permissions" not in exclude:
+                ret["group_permissions"] = self.get_group_permissions(force_recalculation=force_recalculation)
+            else:
+                ret.pop("group_permissions", None)
 
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
@@ -2095,6 +2164,8 @@ class Graph(models.GraphModel):
         and creates a PublishedGraph entry for every active language
         """
         self.publication = None
+
+        import pdb; pdb.set_trace()
 
         with transaction.atomic():
             if not self.source_identifier:
