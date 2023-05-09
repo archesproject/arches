@@ -82,10 +82,11 @@
                         type="text" 
                         class="form-control"
                         data-bind="
-                            attr:{placeholder: $root.translations.find + '...', 'aria-label': $root.translations.find + '...'},
+                            attr:{placeholder: $root.translations.find + '...'},
                             value: facetFilterText, 
                             valueUpdate: 'keyup'
                         "
+                        aria-label="{% trans 'Search facets' %}"
                     >
                     <!-- Clear Filter -->
                     <span tabindex="0" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }" aria-label="{% trans 'Clear facet filter' %}"><i class="fa fa-times-circle"></i></span>
