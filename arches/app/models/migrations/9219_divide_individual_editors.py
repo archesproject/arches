@@ -92,8 +92,106 @@ class Migration(migrations.Migration):
         );
     """
 
-    update_edit_function = """
-        CREATE OR REPLACE FUNCTION __arches_edit_staged_data(
+    update_staging_function = """
+        DROP FUNCTION IF EXISTS __arches_stage_data_for_bulk_edit(uuid,uuid,uuid,uuid,uuid[]);
+        CREATE OR REPLACE FUNCTION __arches_stage_string_data_for_bulk_edit(
+            load_id uuid,
+            graph_id uuid,
+            node_id uuid,
+            module_id uuid,
+            resourceinstance_ids uuid[],
+            text_replacing text,
+            language_code text,
+            case_insensitive boolean
+        )
+        RETURNS VOID
+        LANGUAGE 'plpgsql'
+        AS $$
+            DECLARE
+                tile_id uuid;
+                tile_data jsonb;
+                nodegroup_id uuid;
+                parenttile_id uuid;
+                resourceinstance_id uuid;
+                text_replacing_like text;
+            BEGIN
+                IF text_replacing IS NOT NULL THEN
+                    text_replacing_like = FORMAT('%%%s%%', text_replacing);
+                END IF;
+                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, passes_validation)
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', true
+                    FROM tiles t, nodes n
+                    WHERE t.nodegroupid = n.nodegroupid
+                    AND CASE
+                        WHEN graph_id IS NULL THEN true
+                        ELSE n.graphid = graph_id
+                        END
+                    AND CASE
+                        WHEN node_id IS NULL THEN n.datatype = 'string'
+                        ELSE n.nodeid = node_id
+                        END
+                    AND CASE
+                        WHEN resourceinstance_ids IS NULL THEN true
+                        ELSE t.resourceinstanceid = ANY(resourceinstance_ids)
+                        END
+                    AND CASE
+                        WHEN text_replacing IS NULL
+                            THEN true
+                        WHEN language_code IS NOT NULL AND case_insensitive
+                            THEN t.tiledata -> nodeid -> language_code -> 'value' ilike text_replacing_like
+                        WHEN language_code IS NOT NULL AND NOT case_insensitive
+                            THEN t.tiledata -> nodeid -> language_code -> 'value' like text_replacing_like
+                        WHEN language_code IS NULL AND case_insensitive
+                            THEN t.tiledata::text ilike text_replacing_like
+                        WHEN language_code IS NULL AND NOT case_insensitive
+                            THEN t.tiledata::text like text_replacing_like
+                        END;
+            END;
+        $$;
+    """
+
+    revert_staging_function = """
+        DROP FUNCTION IF EXISTS __arches_stage_string_data_for_bulk_edit(uuid,uuid,uuid,uuid,uuid[]);
+        CREATE OR REPLACE FUNCTION __arches_stage_data_for_bulk_edit(
+            load_id uuid,
+            graph_id uuid,
+            node_id uuid,
+            module_id uuid,
+            resourceinstance_ids uuid[]
+        )
+        RETURNS VOID
+        LANGUAGE 'plpgsql'
+        AS $$
+            DECLARE
+                tile_id uuid;
+                tile_data jsonb;
+                nodegroup_id uuid;
+                parenttile_id uuid;
+                resourceinstance_id uuid;
+            BEGIN
+                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, passes_validation)
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', true
+                    FROM tiles t, nodes n
+                    WHERE t.nodegroupid = n.nodegroupid
+                    AND CASE
+                        WHEN graph_id IS NULL THEN true
+                        ELSE n.graphid = graph_id
+                        END
+                    AND CASE
+                        WHEN node_id IS NULL THEN n.datatype = 'string'
+                        ELSE n.nodeid = node_id
+                        END
+                    AND CASE
+                        WHEN resourceinstance_ids IS NULL THEN true
+                        ELSE t.resourceinstanceid = ANY(resourceinstance_ids)
+                        END;
+            END;
+        $$;
+    """
+
+    update_editing_function = """
+        DROP FUNCTION IF EXISTS __arches_edit_staged_data(uuid,uuid,uuid,text,text,text,text);
+        CREATE OR REPLACE FUNCTION __arches_edit_staged_string_data(
             load_id uuid,
             graph_id uuid,
             node_id uuid,
@@ -196,7 +294,8 @@ class Migration(migrations.Migration):
             END;
         $$;
     """
-    revert_edit_function = """
+    revert_editing_function = """
+        DROP FUNCTION IF EXISTS __arches_edit_staged_string_data(uuid,uuid,uuid,text,text,text,text);
         CREATE OR REPLACE FUNCTION __arches_edit_staged_data(
             load_id uuid,
             graph_id uuid,
@@ -299,7 +398,11 @@ class Migration(migrations.Migration):
             combine_bulk_data_editor,
         ),
         migrations.RunSQL(
-            update_edit_function,
-            revert_edit_function,
+            update_staging_function,
+            revert_staging_function,
+        ),
+        migrations.RunSQL(
+            update_editing_function,
+            revert_editing_function,
         ),
     ]

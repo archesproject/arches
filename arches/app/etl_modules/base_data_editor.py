@@ -80,12 +80,12 @@ class BaseBulkEditor(BaseImportModule):
 
         return result
 
-    def stage_data(self, cursor, graph_id, node_id, resourceids):
+    def stage_data(self, cursor, graph_id, node_id, resourceids, text_replacing, language_code, case_insensitive):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids)),
+                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), text_replacing, language_code, case_insensitive),
             )
             result["success"] = True
         except Exception as e:
@@ -353,9 +353,12 @@ class BulkStringEditor(BaseBulkEditor):
     def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
+        case_insensitive = False
+        if operation == 'replace_i':
+            case_insensitive = True
 
         with connection.cursor() as cursor:
-            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids)
+            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids, old_text, language_code, case_insensitive)
 
             if data_staged["success"]:
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, old_text, new_text)
