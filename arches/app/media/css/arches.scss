@@ -11885,7 +11885,8 @@ ul.select2-choices:after {
     background: #fafafa;
 }
 
-.card-component-panel h3 {
+.card-component-panel h3,
+.card-component-panel-h3 {
     color: #2f527a;
     font-size: 1.2em;
     font-weight: 400;
@@ -11904,7 +11905,8 @@ ul.select2-choices:after {
     height: 90%;
 }
 
-.card-component-panel h4 {
+.card-component-panel h4,
+.card-component-panel-h4 {
     color: #2f527a;
     font-size: 15px;
     font-weight: 550;

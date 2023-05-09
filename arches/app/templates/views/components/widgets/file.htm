@@ -13,12 +13,12 @@
             <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
                 <div class="bord-top pad-ver file-select">
                     <div style="padding: 5px">
-                        <h2>
+                        <div class="file-select-h2 h2">
                             <span data-bind="text: $root.translations.uploadDocuments"></span>
-                        </h2>
-                        <h3>
+                        </div>
+                        <div class="card-component-panel-h3 h3">
                             <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
-                        </h3>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                         <i class="fa fa-file"></i>
@@ -48,9 +48,9 @@
             <div data-bind="visible: filesJSON().length > 0">
                 <!-- note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                     elements with its class name must exist at time of init -->
-                <h4>
+                <div class="card-component-panel-h4 h4">
                     <span data-bind="text: $root.translations.uploadedFiles"></span>
-                </h4>
+                </div>
                 <div class="file-upload-options">
                     <div class="file-upload-options-grow list-filter">
                     <!--ko if: filesJSON().length > 1-->
@@ -158,10 +158,10 @@
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
                 <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt" aria-label="{% trans 'Number of Files Shown' %}">
-                    <option value="5" data-bind="text: $root.translations.showFirstFiveFiles" aria-label="{% trans 'Show first 5 files' %}"></option>
-                    <option value="10" data-bind="text: $root.translations.showFirstTenFiles" aria-label="{% trans 'Show first 10 files' %}"></option>
-                    <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles" aria-label="{% trans 'Show first 25 files' %}"></option>
-                    <option value="100" data-bind="text: $root.translations.showAllFiles" aria-label="{% trans 'Show all files' %}"></option>
+                    <option value="5" data-bind="text: $root.translations.showFirstFiveFiles"></option>
+                    <option value="10" data-bind="text: $root.translations.showFirstTenFiles"></option>
+                    <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles"></option>
+                    <option value="100" data-bind="text: $root.translations.showAllFiles"></option>
                 </select>
             </div>
         </div>
