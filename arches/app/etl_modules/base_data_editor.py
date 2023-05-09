@@ -130,6 +130,7 @@ class BulkStringEditor(BaseBulkEditor):
         graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
         resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         like_operator = "ilike" if case_insensitive == "true" else "like"
+        old_text_like = "%" + old_text + "%" if old_text else ''
         text_query = (
             " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
         )
@@ -141,7 +142,7 @@ class BulkStringEditor(BaseBulkEditor):
             "language_code": language_code,
             "graph_id": graph_id,
             "resourceid": resourceids,
-            "old_text": "%" + old_text + "%",
+            "old_text": old_text_like,
         }
 
         sql_query = (
