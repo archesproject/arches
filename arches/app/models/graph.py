@@ -2166,8 +2166,6 @@ class Graph(models.GraphModel):
         """
         self.publication = None
 
-        import pdb; pdb.set_trace()
-
         with transaction.atomic():
             if not self.source_identifier:
                 self.update_from_editable_future_graph()
