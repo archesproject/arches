@@ -132,10 +132,18 @@ class GraphSettingsView(GraphBaseView):
         if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
 
+        nodegroup_ids_to_serialized_nodegroups = {}
+        for serialized_nodegroup in data["graph"]["nodegroups"]:
+            nodegroup_ids_to_serialized_nodegroups[serialized_nodegroup["nodegroupid"]] = serialized_nodegroup
+
         try:
             with transaction.atomic():
                 graph.save()
                 node.save()
+
+                for nodegroup in models.NodeGroup.objects.filter(nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()):
+                    nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[str(nodegroup.nodegroupid)]["cardinality"]
+                    nodegroup.save()
 
             return JSONResponse(
                 {"success": True, "graph": graph, "relatable_resource_ids": [res.nodeid for res in node.get_relatable_resources()]}

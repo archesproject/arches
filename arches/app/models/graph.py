@@ -2019,7 +2019,7 @@ class Graph(models.GraphModel):
             node.save()
         # END save related models
 
-        self.save()
+        self.save(validate=False)
 
         # BEGIN delete superflous models
         # Compares UUIDs between models related to the source graph and models related to
