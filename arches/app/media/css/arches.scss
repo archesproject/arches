@@ -5097,6 +5097,7 @@ div.dropdown-menu.open {
 
 .edit-menu-item {
     height: 60px;
+    padding-right: 20px;
     border-left: 3px solid #ebeef0;
     border-bottom: 1px solid #ddd;
     background: #fff;
@@ -5163,6 +5164,30 @@ div.dropdown-menu.open {
 .find-widget {
     width: 450px;
     z-index: 10;
+}
+
+.publication {
+    cursor: pointer;
+    justify-content: left;
+    min-height: 60px; 
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 0 8px; 
+}
+
+.publication:hover {
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.active-publication {
+    justify-content: left;
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 
 .graph-list-header {

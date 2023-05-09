@@ -874,6 +874,7 @@ class Graph(models.GraphModel):
 
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
+
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
 
@@ -2021,7 +2022,7 @@ class Graph(models.GraphModel):
             node.save()
         # END save related models
 
-        self.save()
+        self.save(validate=False)
 
         # BEGIN delete superflous models
         # Compares UUIDs between models related to the source graph and models related to
