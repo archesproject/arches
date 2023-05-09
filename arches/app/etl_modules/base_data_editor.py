@@ -130,7 +130,7 @@ class BulkStringEditor(BaseBulkEditor):
         graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
         resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         like_operator = "ilike" if case_insensitive == "true" else "like"
-        old_text_like = "%" + old_text + "%" if old_text else ''
+        old_text_like = "%" + old_text + "%" if old_text else ""
         text_query = (
             " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
         )
