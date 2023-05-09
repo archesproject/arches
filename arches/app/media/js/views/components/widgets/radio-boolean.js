@@ -28,24 +28,14 @@ define([
          
         WidgetViewModel.apply(this, [params]);
         var self = this;
-        this.ariaCheckedTrueValue = ko.observable();
-        this.ariaCheckedFalseValue = ko.observable();
         this.setValue = function(val) {
             if (ko.unwrap(self.disabled) === false) {
                 if (val === self.value()) {
                     self.value(null);
                 } else {
                     self.value(val);
-                    if (val === true) {
-                        self.ariaCheckedTrueValue(true);
-                        self.ariaCheckedFalseValue(false);
-                    } else if (val === false) {
-                        self.ariaCheckedTrueValue(false);
-                        self.ariaCheckedFalseValue(true);
-                    }
                 }
             }
-            console.log(self.value());
         };
 
         this.displayValue = ko.computed(function() {
@@ -62,13 +52,6 @@ define([
                 self.defaultValue(null);
             } else {
                 self.defaultValue(val);
-                if (val === true) {
-                    self.ariaCheckedTrueValue(true);
-                    self.ariaCheckedFalseValue(false);
-                } else if (val === false) {
-                    self.ariaCheckedTrueValue(false);
-                    self.ariaCheckedFalseValue(true);
-                }
             }
         };
 
