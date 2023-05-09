@@ -138,9 +138,9 @@ class Migration(migrations.Migration):
                         WHEN text_replacing IS NULL
                             THEN true
                         WHEN language_code IS NOT NULL AND case_insensitive
-                            THEN t.tiledata -> nodeid -> language_code -> 'value' ilike text_replacing_like
+                            THEN t.tiledata -> nodeid::text -> language_code ->> 'value' ilike text_replacing_like
                         WHEN language_code IS NOT NULL AND NOT case_insensitive
-                            THEN t.tiledata -> nodeid -> language_code -> 'value' like text_replacing_like
+                            THEN t.tiledata -> nodeid::text -> language_code ->> 'value' like text_replacing_like
                         WHEN language_code IS NULL AND case_insensitive
                             THEN t.tiledata::text ilike text_replacing_like
                         WHEN language_code IS NULL AND NOT case_insensitive
