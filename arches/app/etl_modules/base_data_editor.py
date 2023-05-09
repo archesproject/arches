@@ -354,7 +354,7 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
         case_insensitive = False
-        if operation == 'replace_i':
+        if operation == "replace_i":
             case_insensitive = True
 
         with connection.cursor() as cursor:
