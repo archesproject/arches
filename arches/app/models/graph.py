@@ -300,6 +300,7 @@ class Graph(models.GraphModel):
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
             node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)
+            node.is_immutable = nodeobj.get("is_immutable", False)
             if node.hascustomalias or nodeobj.get("alias", False) is not False:
                 node.alias = nodeobj.get("alias", "")
             else:
@@ -483,7 +484,7 @@ class Graph(models.GraphModel):
             datatype_factory = DataTypeFactory()
 
             if nodeid is not None:
-                import pdb; pdb.set_trace()
+                node = self.nodes[nodeid]
                 branch_publication_id = node.sourcebranchpublication_id
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
