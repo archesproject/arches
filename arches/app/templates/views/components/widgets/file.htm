@@ -13,12 +13,12 @@
             <div class="file-select-window" data-bind="visible: filesJSON().length === 0">
                 <div class="bord-top pad-ver file-select">
                     <div style="padding: 5px">
-                        <h2>
+                        <div class="file-select-h2 h2">
                             <span data-bind="text: $root.translations.uploadDocuments"></span>
-                        </h2>
-                        <h3>
+                        </div>
+                        <div class="card-component-panel-h3 h3">
                             <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
-                        </h3>
+                        </div>
                     </div>
                     <button type="button" class="btn btn-lg btn-file-select fileinput-button dz-clickable" data-bind="css: uniqueidClass, disable: disabled">
                         <i class="fa fa-file"></i>
@@ -48,11 +48,11 @@
             <div data-bind="visible: filesJSON().length > 0">
                 <!-- note that data-bind=visible must be in place (instead of ko if:) as DZ instantiates only once;
                     elements with its class name must exist at time of init -->
-                <h4>
+                <div class="card-component-panel-h4 h4">
                     <span data-bind="text: $root.translations.uploadedFiles"></span>
-                </h4>
+                </div>
                 <div class="file-upload-options">
-                    <div class="file-upload-options-grow">
+                    <div class="file-upload-options-grow list-filter">
                     <!--ko if: filesJSON().length > 1-->
                     
                         <input 
@@ -64,15 +64,17 @@
                             class="file-upload-filter"
                         >
                         <!-- Clear Search -->
-                        <span class="file-upload-clear-filter" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
+                        <span tabindex="0" aria-label="{% trans "Clear filter" %}" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         <!-- /ko -->
 
-                        <!-- ko if: filter() -->
-                        <span data-bind="text: filteredList().length +' '+ $root.translations.outOf +' '+ filesJSON().length +' '+ $root.translations.filesMatchFilter"></span>
-                        <!-- /ko -->
-                        <!-- ko if: (!filter() || filter() == "") -->
-                        <span data-bind="text: filesJSON().length +' '+ $root.translations.filesUploaded"></span>
-                        <!-- /ko -->
+                        <div style="margin-top: 7px;">
+                            <!-- ko if: filter() -->
+                            <span style="margin:0 35px;" data-bind="text: filteredList().length +' '+ $root.translations.outOf +' '+ filesJSON().length +' '+ $root.translations.filesMatchFilter"></span>
+                            <!-- /ko -->
+                            <!-- ko if: (!filter() || filter() == "") -->
+                            <span style="margin:0 5px;" data-bind="text: filesJSON().length +' '+ $root.translations.filesUploaded"></span>
+                            <!-- /ko -->
+                        </div>
                     </div>
                     <div >
                         <button type="button" class="btn btn-file-upload-reset dropzone fileinput-button dz-clickable" data-bind="css: uniqueidClass">
@@ -155,7 +157,7 @@
             <!-- /ko -->
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
-                <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt">
+                <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt" aria-label="{% trans 'Number of Files Shown' %}">
                     <option value="5" data-bind="text: $root.translations.showFirstFiveFiles"></option>
                     <option value="10" data-bind="text: $root.translations.showFirstTenFiles"></option>
                     <option value="25" data-bind="text: $root.translations.showFirstTwentyFiveFiles"></option>
@@ -175,11 +177,9 @@
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
-        type="" 
-        id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.exampleFileTypes, 'aria-labeledby': 'accepted-file-types-label'},
+            attr: {placeholder: $root.translations.exampleFileTypes, 'aria-label': $root.translations.acceptedFileTypes},
             value: acceptedFiles, 
             valueUpdate: 'keyup'
         "
@@ -192,10 +192,9 @@
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         type="number" 
-        id="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.maxFileSize, 'aria-labeledby': 'max-file-size-label'},
+            attr: {placeholder: $root.translations.maxFileSize, 'aria-label': $root.translations.maxFileSize},
             value: maxFilesize
         "
     >
