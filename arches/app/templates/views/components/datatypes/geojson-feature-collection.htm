@@ -13,11 +13,11 @@
         
         <!-- Save/discard edits buttons (for convenience) -->
         <!-- ko if: node.dirty() -->
-        <div class="resource-service-buttons-heading">
-            <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check pull-right mar-top" data-bind="click: function () { saveNode() }">
+        <div class="resource-service-buttons-heading" style="display: inline-flex">
+            <button class="btn btn-primary btn-labeled btn-active-dark fa fa-check mar-top" data-bind="click: function () { saveNode() }">
                 <span data-bind="text: $root.translations.saveEdits"></span> 
             </button>
-            <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo pull-right mar-top" data-bind="click: function () { node.reset() }">
+            <button class="btn btn-mint btn-labeled btn-active-dark fa fa-undo mar-top" data-bind="click: function () { node.reset() }">
                 <span data-bind="text: $root.translations.discardEdits"></span> 
             </button>
         </div>
@@ -25,20 +25,19 @@
 
         <div class="map-service-manage-buttons">
             <div class="form-group">
-                <label class="control-label text-semibold">
-                    <span data-bind="text: $root.translations.activated + ':'"></span> 
-                </label>
-                <span class="switch switch-small" data-bind="css: {
+                <span class="control-label text-semibold" data-bind="text: $root.translations.activated + ':'"></span>
+                <span class="switch switch-small" tabindex="0" role="switch" data-bind="css: {
                         'on': config.layerActivated()
-                    }, click: function () {
+                    }, onEnterkeyClick, onSpaceClick, click: function () {
                         config.layerActivated(!config.layerActivated());
-                    }">
+                    }, 
+                    attr: {'aria-label': $root.translations.activated, 'aria-checked': config.layerActivated()}">
                     <small></small>
                 </span>
             </div>
         </div>
         <div class="btn-group map-server-basemap-button">
-            <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+            <button class="dropdown-toggle btn" data-toggle="dropdown" aria-label="{% trans 'Basemaps' %}" aria-expanded="false"><i class="fa fa-globe"></i></button>
             <ul class="dropdown-menu dropdown-menu-right">
                 <!-- ko foreach: basemaps -->
                 <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
@@ -76,27 +75,27 @@
             <div class="tab-base map-service-tabs">
 
                 <!-- Resource Styling Tabs -->
-                <ul class="nav nav-tabs map-service-nav-tabs">
+                <ul class="nav nav-tabs map-service-nav-tabs" role="tablist">
                     <li class="active">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false">
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="true" role="tab">
                             <i class="ion-ios-settings-strong"></i>
                             <span data-bind="text: $root.translations.settings"></span> 
                         </a>
                     </li>
-                    <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false">
+                    <li>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false" role="tab">
                             <i class="ion-image"></i>
                             <span data-bind="text: $root.translations.serviceStyling"></span> 
                         </a>
                     </li>
-                    <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false">
+                    <li>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#clustering-panel" aria-expanded="false" role="tab">
                             <i class="ion-ios-pie"></i>
                             <span data-bind="text: $root.translations.clustering"></span> 
                         </a>
                     </li>
-                    <li class="">
-                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="true">
+                    <li>
+                        <a class="config-title-tab mar-no" data-toggle="tab" href="#permissions-panel" aria-expanded="false" role="tab">
                             <i class="ion-ios-color-wand"></i>
                             <span data-bind="text: $root.translations.permissions"></span> 
                         </a>
@@ -110,23 +109,20 @@
                             <div class="form-horizontal">
                                 <div class="panel-body">
                                     <div class="form-group map-service-manage-layer-name">
-                                        <label class="col-sm-3 map-service-manage-control-label">
-                                            <span data-bind="text: $root.translations.layerName + ':'"></span> 
-                                        </label>
+                                        <span class="col-sm-3 map-service-manage-control-label" data-bind="text: $root.translations.layerName + ':'"></span> 
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name }">
+                                            <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: config.layerName, attr: { placeholder: layer.name, 'aria-label': $root.translations.layerName }">
                                         </div>
                                     </div>
                                     <div class="form-group map-service-manage-layer-name">
-                                        <label class="col-sm-3 map-service-manage-control-label">
-                                            <span data-bind="text: $root.translations.addSearchMapDefault"></span> 
-                                        </label>
+                                        <span class="col-sm-3 map-service-manage-control-label" data-bind="text: $root.translations.addSearchMapDefault"></span> 
                                         <div class="col-sm-9">
-                                            <span class="switch switch-small" data-bind="css: {
+                                            <span class="switch switch-small" tabindex="0" role="switch" data-bind="css: {
                                                     'on': config.addToMap()
-                                                }, click: function () {
+                                                }, onEnterkeyClick, onSpaceClick, click: function () {
                                                     config.addToMap(!config.addToMap());
-                                                }">
+                                                },
+                                                attr: {'aria-label': $root.translations.addSearchMapDefault, 'aria-checked': config.addToMap()}">
                                                 <small></small>
                                             </span>
                                         </div>
@@ -164,11 +160,12 @@
                                 <label class="control-label text-semibold">
                                     <span data-bind="text: $root.translations.advanced + ':'"></span> 
                                 </label>
-                                <span class="switch switch-small" data-bind="css: {
+                                <span class="switch switch-small" tabindex="0" role="switch" data-bind="css: {
                                         'on': config.advancedStyling()
-                                    }, click: function () {
+                                    }, onEnterkeyClick, onSpaceClick, click: function () {
                                         config.advancedStyling(!config.advancedStyling());
-                                    }">
+                                    },
+                                    attr: {'aria-label': $root.translations.advanced, 'aria-checked': config.advancedStyling()}">
                                     <small></small>
                                 </span>
                             </div>
@@ -185,7 +182,7 @@
 
                             <div class="col-xs-12 simple-style-panel" data-bind="if: !config.advancedStyling()">
                                 <div id="style-panel" class="tab-pane fade active in">
-                                    <div class="panel-body" style="padding-top: 0px; padding-bottom: 5px;">
+                                    <div class="panel-body" style="padding-top: 0.5em; padding-bottom: 1em;">
                                         <!-- ko if: count === 0 -->
                                         <div class="map-server-instructions">
                                             <i class="fa fa-warning"></i>
@@ -200,41 +197,41 @@
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.color"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.color"></span>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.color + ' '}, colorPicker: {color: config.pointColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" 
+                                                                        data-bind="attr: {placeholder: $root.translations.color + ' ', 'aria-label': $root.translations.color}, 
+                                                                            colorPicker: {color: config.pointColor, format:'rgba'}
+                                                                        ">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.haloColor"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.haloColor"></span>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.haloColor + ' '}, colorPicker: {color: config.pointHaloColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" 
+                                                                        data-bind="attr: {placeholder: $root.translations.haloColor + ' ', 'aria-label': $root.translations.haloColor}, 
+                                                                            colorPicker: {color: config.pointHaloColor, format:'rgba'}
+                                                                        ">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.pointHaloColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.radius"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.radius"></span>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.radius">
+                                                                <input type="number" class="form-control" 
+                                                                    data-bind="valueUpdate: 'keyup', value: config.radius, attr: {'aria-label': $root.translations.radius}">
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.haloRadius"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.haloRadius"></span>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloRadius">
+                                                                <input type="number" class="form-control" 
+                                                                    data-bind="valueUpdate: 'keyup', value: config.haloRadius, attr: {'aria-label': $root.translations.haloRadius}">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -248,41 +245,43 @@
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.color"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.color"></span>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.color + ' '}, colorPicker: {color: config.lineColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" 
+                                                                        data-bind="attr: {placeholder: $root.translations.color + ' ', 'aria-label': $root.translations.color}, 
+                                                                            colorPicker: {color: config.lineColor, format:'rgba'}
+                                                                        ">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.haloColor"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.haloColor"></span>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.haloColor + ' '}, colorPicker: {color: config.lineHaloColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" 
+                                                                        data-bind="attr: {placeholder: $root.translations.haloColor + ' ', 'aria-label': $root.translations.haloColor},
+                                                                            colorPicker: {color: config.lineHaloColor, format:'rgba'}
+                                                                        ">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.lineHaloColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.weight"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.weight"></span>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.weight">
+                                                                <input type="number" class="form-control" 
+                                                                    data-bind="valueUpdate: 'keyup', value: config.weight, attr: {'aria-label': $root.translations.weight}
+                                                                ">
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.haloWeight"></span> 
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.haloWeight"></span>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.haloWeight">
+                                                                <input type="number" class="form-control" 
+                                                                    data-bind="valueUpdate: 'keyup', value: config.haloWeight, attr: {'aria-label': $root.translations.haloWeight}
+                                                                ">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -297,33 +296,34 @@
                                                 <div class="form-horizontal">
                                                     <div class="panel-body map-style-panel-body">
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.fillColor + ':'"></span>
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.fillColor + ':'"></span>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.fillColor + ' '}, colorPicker: {color: config.fillColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" 
+                                                                        data-bind="attr: {placeholder: $root.translations.fillColor + ' ', 'aria-label': $root.translations.fillColor}, 
+                                                                            colorPicker: {color: config.fillColor, format:'rgba'}
+                                                                        ">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.fillColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.outlineColor + ':'"></span>
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.outlineColor + ':'"></span>
                                                             <div class="col-sm-9">
                                                                 <div class="colorpicker-component input-group">
-                                                                    <input class="form-control input-lg widget-input" data-bind="attr: {placeholder: $root.translations.outlineColor + ' '}, colorPicker: {color: config.outlineColor, format:'rgba'}">
+                                                                    <input class="form-control input-lg widget-input" 
+                                                                        data-bind="attr: {placeholder: $root.translations.outlineColor + ' ', 'aria-label': $root.translations.outlineColor}, 
+                                                                            colorPicker: {color: config.outlineColor, format:'rgba'}
+                                                                        ">
                                                                     <span class="input-group-addon"><i class="ion-stop resource-color-swatch" data-bind="style: {color: config.outlineColor}"></i></span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="form-group map-style-panel-body-form-group">
-                                                            <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                                                <span data-bind="text: $root.translations.outlineWeight + ':'"></span>
-                                                            </label>
+                                                            <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.outlineWeight + ':'"></span>
                                                             <div class="col-sm-9">
-                                                                <input type="number" placeholder="" class="form-control" data-bind="valueUpdate: 'keyup', value: config.outlineWeight">
+                                                                <input type="number" class="form-control" 
+                                                                    data-bind="valueUpdate: 'keyup', value: config.outlineWeight, attr: {'aria-label': $root.translations.outlineWeight}">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -343,35 +343,31 @@
                             <div class="form-horizontal">
                                 <div class="panel-body">
                                     <div class="form-group clustering-pane-form-group">
-                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                            <span data-bind="text: $root.translations.clusterDistance + ':'"></span>
-                                        </label>
+                                        <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.clusterDistance + ':'"></span>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterDistance">
+                                            <input type="number" class="form-control" 
+                                                data-bind="valueUpdate: 'keyup', value: config.clusterDistance, attr: {'aria-label': $root.translations.clusterDistance}">
                                         </div>
                                     </div>
                                     <div class="form-group clustering-pane-form-group">
-                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                            <span data-bind="text: $root.translations.clusterMaxZoom + ':'"></span>
-                                        </label>
+                                        <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.clusterMaxZoom + ':'"></span>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom">
+                                            <input type="number" class="form-control" 
+                                                data-bind="valueUpdate: 'keyup', value: config.clusterMaxZoom, attr: {'aria-label': $root.translations.clusterMaxZoom}">
                                         </div>
                                     </div>
                                     <div class="form-group clustering-pane-form-group">
-                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                            <span data-bind="text: $root.translations.clusterMinPoints + ':'"></span>
-                                        </label>
+                                        <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.clusterMinPoints + ':'"></span>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints">
+                                            <input type="number" class="form-control" 
+                                                data-bind="valueUpdate: 'keyup', value: config.clusterMinPoints, attr: {'aria-label': $root.translations.clusterMinPoints}">
                                         </div>
                                     </div>
                                     <div class="form-group clustering-pane-form-group">
-                                        <label class="col-sm-3 control-label map-style-panel-body-control-label">
-                                            <span data-bind="text: $root.translations.vectorSimplification + ':'"></span>
-                                        </label>
+                                        <span class="col-sm-3 control-label map-style-panel-body-control-label" data-bind="text: $root.translations.vectorSimplification + ':'"></span>
                                         <div class="col-sm-9">
-                                            <input type="number" class="form-control" data-bind="valueUpdate: 'keyup', value: config.simplification">
+                                            <input type="number" class="form-control" 
+                                                data-bind="valueUpdate: 'keyup', value: config.simplification, attr: {'aria-label': $root.translations.vectorSimplification}">
                                         </div>
                                     </div>
                                     <div class="map-server-instructions">
