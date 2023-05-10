@@ -440,6 +440,12 @@ def user_is_resource_reviewer(user):
 
     return user.groups.filter(name="Resource Reviewer").exists()
 
+def user_is_resource_exporter(user):
+    """
+    Single test for whether a user is in the Resource Exporter group
+    """
+
+    return user.groups.filter(name="Resource Exporter").exists()
 
 def user_created_transaction(user, transactionid):
     if user.is_authenticated:
