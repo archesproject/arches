@@ -80,6 +80,32 @@ class Graph(models.GraphModel):
 
         if args:
             if isinstance(args[0], dict):
+                if 'user_permissions' in args[0] and args[0]['user_permissions']:
+                    # first, delete all existing user permissions for graph
+                    user_permissions = self.get_user_permissions(force_recalculation=True)  # may not need force_recacluation
+                    for user_permission_list in user_permissions.values():
+                        for user_permission in user_permission_list:
+                            user_permission.delete()
+
+                    # then, create permissions from serialized permissions
+                    for serialized_user_permission_list in args[0]['user_permissions'].values():
+                        for serialized_user_permission in serialized_user_permission_list:
+                            user_permission = UserObjectPermission(**serialized_user_permission)
+                            user_permission.save()
+
+                if 'group_permissions' in args[0] and args[0]['group_permissions']:
+                    # first, delete all existing group permissions for graph
+                    group_permissions = self.get_group_permissions(force_recalculation=True)  # may not need force_recacluation
+                    for group_permission_list in group_permissions.values():
+                        for group_permission in group_permission_list:
+                            group_permission.delete()
+
+                    # then, create permissions from serialized permissions
+                    for serialized_group_permission_list in args[0]['group_permissions'].values():
+                        for serialized_group_permission in serialized_group_permission_list:
+                            group_permission = GroupObjectPermission(**serialized_group_permission)
+                            group_permission.save()
+
                 for key, value in args[0].items():
                     if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable", "publication"):
                         setattr(self, key, value)
