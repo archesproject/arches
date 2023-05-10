@@ -80,7 +80,7 @@ class Graph(models.GraphModel):
 
         if args:
             if isinstance(args[0], dict):
-                if 'user_permissions' in args[0] and args[0]['user_permissions']:
+                if 'user_permissions' in args[0]:
                     # first, delete all existing user permissions for graph
                     user_permissions = self.get_user_permissions(force_recalculation=True)  # may not need force_recacluation
                     for user_permission_list in user_permissions.values():
@@ -93,7 +93,7 @@ class Graph(models.GraphModel):
                             user_permission = UserObjectPermission(**serialized_user_permission)
                             user_permission.save()
 
-                if 'group_permissions' in args[0] and args[0]['group_permissions']:
+                if 'group_permissions' in args[0]:
                     # first, delete all existing group permissions for graph
                     group_permissions = self.get_group_permissions(force_recalculation=True)  # may not need force_recacluation
                     for group_permission_list in group_permissions.values():
@@ -1402,7 +1402,7 @@ class Graph(models.GraphModel):
         else:
             user_permissions = {}
 
-            nodegroup_ids = [nodegroup.pk for nodegroup in self.get_nodegroups()]
+            nodegroup_ids = [str(nodegroup.pk) for nodegroup in self.get_nodegroups()]
             user_object_permissions = UserObjectPermission.objects.filter(object_pk__in=nodegroup_ids)
 
             for user_object_permission in user_object_permissions:
@@ -1431,7 +1431,7 @@ class Graph(models.GraphModel):
         else:
             group_permissions = {}
 
-            nodegroup_ids = [nodegroup.pk for nodegroup in self.get_nodegroups()]
+            nodegroup_ids = [str(nodegroup.pk) for nodegroup in self.get_nodegroups()]
             user_object_permissions = GroupObjectPermission.objects.filter(object_pk__in=nodegroup_ids)
 
             for user_object_permission in user_object_permissions:
