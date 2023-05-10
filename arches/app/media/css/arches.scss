@@ -10992,12 +10992,14 @@ table.table.dataTable {
     font-size: 15px;
 }
 
-.search-export .instruction h2 {
+.search-export .instruction h2,
+.search-export-instruction-h2 {
     font-size: 15px;
     margin-top: 5px;
 }
 
-.search-export .instruction h4 {
+.search-export .instruction h4,
+.search-export-instruction-h4 {
     font-size: 13px;
     padding-left: 15px;
     color: #888;
