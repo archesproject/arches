@@ -53,8 +53,8 @@ label.form-radio.form-normal{
 .form-text.form-radio:not(.btn),
 .form-text.form-radio:not(.btn),
 .form-text.form-radio:not(.btn) {
-    width: 225px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding-inline-end: 40px;
 }
