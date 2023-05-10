@@ -36,7 +36,6 @@ define([
                     self.value(val);
                 }
             }
-            console.log(self.value());
         };
 
         this.displayValue = ko.computed(function() {
