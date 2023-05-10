@@ -9,7 +9,7 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <div class="pad-hor columns option-input" data-bind="foreach: flatOptions" role="radiogroup">
+            <div class="pad-hor columns option-input" data-bind="foreach: flatOptions, attr:{'aria-label': label}" role="radiogroup">
                 <label class="form-radio form-normal form-text" role="radio"
                     data-bind="css: {
                         'active': $parent.isOptionSelected($data),
@@ -43,7 +43,7 @@
         <span data-bind="text: $root.translations.defaultValue"></span>
     </div>
     <div class="col-xs-12">
-        <div class="pad-hor columns radio-panel option-input-config" data-bind="foreach: flatOptions" role="radiogroup">
+        <div class="pad-hor columns radio-panel option-input-config" data-bind="foreach: flatOptions, attr:{'aria-label': $root.translations.defaultValue}" role="radiogroup">
             <label class="form-radio form-normal form-text" role="radio"
                 data-bind="css: {
                     'active': $parent.isOptionSelected($data)
