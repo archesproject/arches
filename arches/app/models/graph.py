@@ -1801,10 +1801,10 @@ class Graph(models.GraphModel):
 
             editable_future_graph = graph_copy["copy"]
             editable_future_graph.source_identifier_id = self.graphid
+            editable_future_graph.has_unpublished_changes = False
             editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
 
             editable_future_graph.save()
-            editable_future_graph.publish()
 
             return editable_future_graph
 
