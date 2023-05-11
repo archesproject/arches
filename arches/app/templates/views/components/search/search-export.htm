@@ -195,23 +195,25 @@
         <!-- /ko -->
     </div>
 
+    <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')) -->
     <div 
         id="export-warning"
         data-bind="
-            visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')),
             text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records. The html option is only allowed with a selection of up to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} resources.'),
         "
     ></div>
+    <!-- /ko -->
+
     <div class="search-export download">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
-            aria-expanded="false"
-            aria-controls="export-warning"
             data-bind="
                 css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },
                 click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }},
                 attr: {
                     'aria-disabled': (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True'),
+                    'aria-describedby': 'export-warning',
+                    'aria-busy': downloadPending(),
                 },
             "
         > 
@@ -219,6 +221,6 @@
             <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
         </button>
     </div>
-    <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
+    <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600, attr: {'aria-live': 'polite'}">
     </div>
 </div>
