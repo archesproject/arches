@@ -499,6 +499,45 @@ class CsvReader(Reader):
                 if header.upper() in mapping_filefieldname_to_nodeid_dict
             }
 
+        graphid = mapping["resource_model_id"]
+        blanktilecache = {}
+        save_count = 0
+        legacyid = business_data[0]["LegacyID"] if "LegacyID" in business_data[0] else None
+        # try:
+        #     resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], legacyid, overwrite)
+        # except KeyError:
+        #     print("*" * 80)
+        #     print(
+        #         "ERROR: No column 'ResourceID' found in business data file. \
+        #         Please add a 'ResourceID' column with a unique resource identifier."
+        #     )
+        #     print("*" * 80)
+        #     if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
+        #         sys.exit()
+        # populated_cardinality_1_nodegroups = {}
+        # populated_cardinality_1_nodegroups[resourceinstanceid] = []
+        previous_row_resourceid = None
+        group_no_to_tileids = {}
+        populated_tiles = []
+        target_resource_model = None
+        single_cardinality_nodegroups = [
+            str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list("nodegroupid", flat=True).filter(cardinality="1")
+        ]
+        node_datatypes = {
+            str(nodeid): datatype
+            for nodeid, datatype in Node.objects.values_list("nodeid", "datatype").filter(
+                ~Q(datatype="semantic"), graph__isresource=True
+            )
+        }
+        all_nodes = Node.objects.filter(graph_id=graphid)
+        node_dict = {str(node.pk): node for node in all_nodes}
+        datatype_factory = DataTypeFactory()
+        concepts_to_create = {}
+        new_concepts = {}
+        required_nodes = {}
+        for node in Node.objects.filter(~Q(datatype="semantic"), isrequired=True, graph_id=graphid).values_list("nodeid", "name"):
+            required_nodes[str(node[0])] = node[1]
+
         print("Starting import of business data")
         self.start = time()
 
@@ -566,47 +605,634 @@ class CsvReader(Reader):
 
             return resourceinstanceid
 
+        def create_reference_data(new_concepts, create_collections):
+            errors = []
+            candidates = Concept().get(id="00000000-0000-0000-0000-000000000006")
+            for arches_nodeid, concepts in new_concepts.items():
+                collectionid = str(uuid.uuid4())
+                topconceptid = str(uuid.uuid4())
+                node = self.lookup_node(arches_nodeid)
+
+                # if node.datatype is concept or concept-list create concepts and collections
+                if node.datatype in ["concept", "concept-list"]:
+                    # create collection if create_collections = create, otherwise append to collection already assigned to node
+                    if create_collections == True:
+                        collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
+                        # check to see that there is not already a collection for this node
+                        if node.config["rdmCollection"] is not None:
+                            errors.append(
+                                {
+                                    "type": "WARNING",
+                                    "message": f"A collection already exists for the {node.name} node. \
+                                    Use the add option to add concepts to this collection.",
+                                }
+                            )
+                            if len(errors) > 0:
+                                self.errors += errors
+                            collection = None
+                        else:
+                            # if there is no collection assigned to this node, create one and assign it to the node
+                            try:
+                                # check to see that a collection with this legacyid does not already exist
+                                collection = Concept().get(legacyoid=collection_legacyoid)
+                                errors.append(
+                                    {
+                                        "type": "WARNING",
+                                        "message": "A collection with the legacyid {0} already exists.".format(
+                                            node.name + "_" + str(node.graph_id) + "_import"
+                                        ),
+                                    }
+                                )
+                                if len(errors) > 0:
+                                    self.errors += errors
+                            except:
+                                collection = Concept(
+                                    {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection"}
+                                )
+                                collection.addvalue(
+                                    {
+                                        "id": str(uuid.uuid4()),
+                                        "value": node.name + "_import",
+                                        "language": settings.LANGUAGE_CODE,
+                                        "type": "prefLabel",
+                                    }
+                                )
+                                node.config["rdmCollection"] = collectionid
+                                node.save()
+                                collection.save()
+                    else:
+                        # if create collection = add check that there is a collection associated with node,
+                        # if no collection associated with node create a collection and associated with the node
+                        try:
+                            collection = Concept().get(id=node.config["rdmCollection"])
+                        except:
+                            collection = Concept(
+                                {
+                                    "id": collectionid,
+                                    "legacyoid": node.name + "_" + str(node.graph_id) + "_import",
+                                    "nodetype": "Collection",
+                                }
+                            )
+                            collection.addvalue(
+                                {
+                                    "id": str(uuid.uuid4()),
+                                    "value": node.name + "_import",
+                                    "language": settings.LANGUAGE_CODE,
+                                    "type": "prefLabel",
+                                }
+                            )
+                            node.config["rdmCollection"] = collectionid
+                            node.save()
+                            collection.save()
+
+                    if collection is not None:
+                        topconcept_legacyoid = node.name + "_" + str(node.graph_id)
+                        # Check if top concept already exists, if not create it and add to candidates scheme
+                        try:
+                            topconcept = Concept().get(legacyoid=topconcept_legacyoid)
+                        except:
+                            topconcept = Concept({"id": topconceptid, "legacyoid": topconcept_legacyoid, "nodetype": "Concept"})
+                            topconcept.addvalue(
+                                {
+                                    "id": str(uuid.uuid4()),
+                                    "value": node.name + "_import",
+                                    "language": settings.LANGUAGE_CODE,
+                                    "type": "prefLabel",
+                                }
+                            )
+                            topconcept.save()
+                        candidates.add_relation(topconcept, "narrower")
+
+                        # create child concepts and relate to top concept and collection accordingly
+                        for conceptid, value in concepts.items():
+                            concept_legacyoid = value + "_" + node.name + "_" + str(node.graph_id)
+                            # check if concept already exists, if not create and add to topconcept and collection
+                            try:
+                                conceptid = [
+                                    concept for concept in topconcept.get_child_concepts(topconcept.id) if concept[1] == value
+                                ][0][0]
+                                concept = Concept().get(id=conceptid)
+                            except:
+                                concept = Concept({"id": conceptid, "legacyoid": concept_legacyoid, "nodetype": "Concept"})
+                                concept.addvalue(
+                                    {
+                                        "id": str(uuid.uuid4()),
+                                        "value": value,
+                                        "language": settings.LANGUAGE_CODE,
+                                        "type": "prefLabel",
+                                    }
+                                )
+                                concept.save()
+                            collection.add_relation(concept, "member")
+                            topconcept.add_relation(concept, "narrower")
+
+                # if node.datatype is domain or domain-list create options array in node.config
+                elif node.datatype in ["domain-value", "domain-value-list"]:
+                    for domainid, value in new_concepts[arches_nodeid].items():
+                        # check if value already exists in domain
+                        if value not in [t["text"] for t in node.config["options"]]:
+                            domainvalue = {"text": value, "selected": False, "id": domainid}
+                            node.config["options"].append(domainvalue)
+                            node.save()
+        
+        def column_names_to_targetids(row, mapping, row_number):
+            errors = []
+            if "ADDITIONAL" in row or "MISSING" in row:
+                errors.append(
+                    {
+                        "type": "WARNING",
+                        "message": "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
+                            row["ResourceID"], str(int(row_number.split("on line ")[1]))
+                        ),
+                    }
+                )
+                if len(errors) > 0:
+                    self.errors += errors
+            return [
+                {col_header_to_nodeid_dict[key.upper()]: value}
+                for key, value in row.items()
+                if value != "" and key and key.upper() != "RESOURCEID" and key.upper() in col_header_to_nodeid_dict
+            ]
+        
+        def transform_value(datatype, value, source, nodeid, tileid=None):
+            """
+            Transforms values from probably string/wkt representation to specified datatype in arches.
+            This code could probably move to somehwere where it can be accessed by other importers.
+            """
+            request = ""
+            if datatype != "":
+                errors = []
+                datatype_instance = self.datatype_factory.get_instance(datatype)
+                if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
+                    if len(str(value)) == 37:
+                        value = str(value)
+                        value = value[0:36]
+                        logger.warn(f"Extra character removed {row_number} from index 36 of UUID {value}")
+                    try:
+                        uuid.UUID(value)
+                    except:
+                        if datatype in ["domain-value", "domain-value-list"]:
+                            collection_id = nodeid
+                        else:
+                            collection_id = self.lookup_node(nodeid).config["rdmCollection"]
+                        if collection_id is not None:
+                            value = concept_lookup.lookup_labelid_from_label(value, collection_id)
+                try:
+                    value = datatype_instance.transform_value_for_tile(value, tileid=tileid)
+                    errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
+                except Exception as e:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": "datatype: {0} value: {1} {2} - {3}".format(
+                                datatype_instance.datatype_model.classname,
+                                value,
+                                source,
+                                str(e) + " or is not a prefLabel in the given collection.",
+                            ),
+                        }
+                    )
+                if len(errors) > 0:
+                    error_types = [error["type"] for error in errors]
+                    if "ERROR" in error_types:
+                        value = None
+                    self.errors += errors
+            else:
+                print(_("No datatype detected for {0}".format(value)))
+
+            return {"value": value, "request": request}
+        
+        
+        def get_preexisting_tile(target_tile, populated_tiles, resourceid, parenttileid=None, tileid=None):
+            # finds a pre-existing tile for a particular nodegroup on a resource_instance
+            # assumes tiles are flat/un-nested, otherwise recurses through child tiles
+            if tileid:
+                preexisting_tile_for_nodegroup = list(filter(lambda t: str(t.tileid) == str(tileid), populated_tiles))
+            elif parenttileid:
+                preexisting_tile_for_nodegroup = list(
+                    filter(
+                        lambda t: str(t.resourceinstance_id) == str(resourceid)
+                        and str(t.nodegroup_id) == str(target_tile.nodegroup_id)
+                        and str(t.parenttile.tileid) == str(parenttileid),
+                        populated_tiles,
+                    )
+                )
+            else:
+                preexisting_tile_for_nodegroup = list(
+                    filter(
+                        lambda t: str(t.resourceinstance_id) == str(resourceid)
+                        and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
+                        populated_tiles,
+                    )
+                )
+            if len(preexisting_tile_for_nodegroup) > 0:
+                return preexisting_tile_for_nodegroup[0]
+            for t in populated_tiles:
+                get_preexisting_tile(target_tile, t.tiles, resourceid, parenttileid, tileid)
+
+        def get_preexisting_parenttileid(tileid, populated_tiles):
+            preexisting_parenttile = list(
+                filter(
+                    lambda t: str(t.tileid) == str(tileid),
+                    populated_tiles,
+                )
+            )
+            if len(preexisting_parenttile) > 0:
+                return str(preexisting_parenttile[0].tileid)
+            for t in populated_tiles:
+                get_preexisting_parenttileid(tileid, t.tiles)
+
+        def check_required_nodes(tile, parent_tile, required_nodes):
+            # Check that each required node in a tile is populated.
+            if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
+                return
+            errors = []
+            if len(required_nodes) > 0:
+                if bool(tile.data):
+                    for target_k, target_v in tile.data.items():
+                        if target_k in list(required_nodes.keys()) and target_v is None:
+                            if parent_tile in populated_tiles:
+                                populated_tiles.pop(populated_tiles.index(parent_tile))
+                            errors.append(
+                                {
+                                    "type": "WARNING",
+                                    "message": "The {0} node ({1}) is required and must be populated. \
+                                    This data was not imported.".format(
+                                        required_nodes[target_k],
+                                        target_k,
+                                    ),
+                                }
+                            )
+                elif bool(tile.tiles):
+                    for tile in tile.tiles:
+                        check_required_nodes(tile, parent_tile, required_nodes)
+            if len(errors) > 0:
+                self.errors += errors
+        
+        def cache(blank_tile):
+            if blank_tile.data != {}:
+                for key in list(blank_tile.data.keys()):
+                    if key not in blanktilecache:
+                        blanktilecache[str(key)] = blank_tile
+            else:
+                for tile in blank_tile.tiles:
+                    for key in list(tile.data.keys()):
+                        if key not in blanktilecache:
+                            blanktilecache[str(key)] = blank_tile
+
+
+        def get_blank_tile(source_data, child_only=False):
+            if len(source_data) > 0:
+                if source_data[0] != {}:
+                    key = str(list(source_data[0].keys())[0])
+                    source_node = node_dict[key]
+                    if child_only:
+                        blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
+                        blank_tile.tiles = []
+                        blank_tile.tileid = None
+                    elif key not in blanktilecache:
+                        blank_tile = Tile.get_blank_tile(key)
+                        cache(blank_tile)
+                    else:
+                        blank_tile = blanktilecache[key]
+                        blank_tile.tileid = uuid.uuid4()
+                else:
+                    blank_tile = None
+            else:
+                blank_tile = None
+            # return deepcopy(blank_tile)
+            return pickle.loads(pickle.dumps(blank_tile, -1))
+        
+
+        def populate_tile(
+            source_data,
+            tile_to_populate,
+            row,
+            row_number,
+            resourceinstanceid,
+            populated_tiles,
+            group_no,
+            group_valid,
+            group_no_to_tileids,
+            non_unique_col_headers,
+            populated_cardinality_1_nodegroups,
+            node_datatypes,
+            appending_to_parent=False,
+            prefix="",
+        ):
+            """
+            source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
+            All nodes in source_data belong to the same resource.
+            A dictionary of nodeids would not allow for multiple values for the same nodeid.
+            Grouping is enforced by having all grouped attributes in the same row.
+            """
+            need_new_tile = False
+            if group_valid:
+                if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
+                    group_no = row["GROUP_NO"] + "-" + str(prefix)
+                elif str(tile_to_populate.nodegroup_id) in eval_nodegroups:
+                    group_no = row["GROUP_NO"]
+            # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
+            if tile_to_populate.tileid is None:
+                tile_to_populate.tileid = uuid.uuid4()
+            if "TileID" in row and row["TileID"] is not None:
+                tile_to_populate.tileid = row["TileID"]
+            tile_to_populate.resourceinstance_id = resourceinstanceid
+            # if first time seeing this nodegroup for this group
+            if (
+                group_valid
+                and group_no
+                and group_no in group_no_to_tileids
+                and str(tile_to_populate.nodegroup_id) not in group_no_to_tileids[group_no]
+            ):
+                group_no_to_tileids[group_no][str(tile_to_populate.nodegroup_id)] = {}
+                group_no_to_tileids[group_no][str(tile_to_populate.nodegroup_id)]["tileid"] = str(tile_to_populate.tileid)
+                try:
+                    group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = str(
+                        target_tile.parenttile.tileid
+                    )
+                except:
+                    group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = None
+
+            # Check the cardinality of the tile and check if it has been populated.
+            # If cardinality is one and the tile is populated the tile should not be populated again.
+            if str(tile_to_populate.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
+                target_tile_cardinality = "1"
+            else:
+                target_tile_cardinality = "n"
+
+            def populate_child_tiles(source_data):
+                prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
+                tileid = row["TileID"] if "TileID" in row else uuid.uuid4()
+                prototype_tile_copy.tileid = tileid
+                prototype_tile_copy.parenttile = tile_to_populate
+                parenttileid = row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
+                if parenttileid is not None:
+                    prototype_tile_copy.parenttile.tileid = parenttileid
+                prototype_tile_copy.resourceinstance_id = resourceinstanceid
+                # if (
+                #     row["GROUP_NO"]
+                #     and row["GROUP_NO"] != ""
+                #     and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
+                #     and str(prototype_tile_copy.nodegroup_id)
+                #     not in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
+                # ):
+                #     group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][
+                #         str(prototype_tile_copy.nodegroup_id)
+                #     ] = str(prototype_tile_copy.tileid)
+                if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
+                    prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
+                    for target_key in list(prototype_tile_copy.data.keys()):
+                        if non_unique_col_headers:
+                            for source_column in source_data:
+                                for source_key in list(source_column.keys()):
+                                    if source_key == target_key:
+                                        if prototype_tile_copy.data[source_key] is None:
+                                            value = transform_value(
+                                                node_datatypes[source_key],
+                                                source_column[source_key],
+                                                row_number,
+                                                source_key,
+                                                tileid=prototype_tile_copy.tileid
+                                            )
+                                            prototype_tile_copy.data[source_key] = value["value"]
+                                            # print(prototype_tile_copy.data[source_key]
+                                            # print('&'*80
+                                            # target_tile.request = value['request']
+                                            del source_column[source_key]
+                                        else:
+                                            populate_child_tiles(source_data)
+                        else:
+                            s_tile_value = source_dict.get(target_key, None)
+                            if s_tile_value is not None and prototype_tile_copy.data[target_key] is None:
+                                try:
+                                    value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=prototype_tile_copy.tileid)
+                                    prototype_tile_copy.data[target_key] = value["value"]
+                                    found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                    if len(found) > 0:
+                                        found = found[0]
+                                        i = source_data.index(found)
+                                        del source_dict[target_key]
+                                        del source_data[i]
+                                except KeyError:  # semantic datatype
+                                    pass
+                            elif (
+                                s_tile_value
+                                and prototype_tile_copy.data[target_key]
+                                and isinstance(prototype_tile_copy.data[target_key], list)
+                            ):  # weve found a pre-existing value for this node on tile
+                                try:
+                                    value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=prototype_tile_copy.tileid)
+                                    value = value["value"]
+                                    if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
+                                        value, list
+                                    ):
+                                        value = value[0]
+
+                                    prototype_tile_copy.data[target_key].append(value)
+                                    found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                    if len(found) > 0:
+                                        found = found[0]
+                                        i = source_data.index(found)
+                                        del source_dict[target_key]
+                                        del source_data[i]
+                                except KeyError:  # semantic datatype
+                                    pass
+
+                            elif s_tile_value is None:
+                                found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                if len(found) > 0:
+                                    found = found[0]
+                                    i = source_data.index(found)
+                                    del source_dict[target_key]
+                                    del source_data[i]
+                            elif prototype_tile_copy.data[target_key] is not None:
+                                populate_child_tiles(source_data)
+
+                if prototype_tile_copy.data != {}:
+                    if (
+                        group_valid
+                        and group_no
+                        and group_no in group_no_to_tileids
+                        and str(prototype_tile_copy.nodegroup_id) not in group_no_to_tileids[group_no]
+                    ):
+                        group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)] = {}
+                        group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["tileid"] = str(
+                            prototype_tile_copy.tileid
+                        )
+                        try:
+                            group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = str(
+                                prototype_tile_copy.parenttile.tileid
+                            )
+                        except:
+                            group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = None
+                    if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
+                        if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
+                            if bulk:
+                                prototype_tile_copy.tiles = []
+                                populated_tiles.append(prototype_tile_copy)
+                            else:
+                                populated_child_tiles.append(prototype_tile_copy)
+
+                if prototype_tile_copy is not None:
+                    if child_tile_cardinality == "1" and "NodeGroupID" not in row:
+                        populated_child_nodegroups.append(str(prototype_tile_copy.nodegroup_id))
+
+                source_data[:] = [item for item in source_data if item != {}]
+
+            if (
+                str(tile_to_populate.nodegroup_id) not in populated_cardinality_1_nodegroups[resourceinstanceid]
+                or appending_to_parent
+            ):
+                tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
+                # Check if we are populating a parent tile by inspecting the tile_to_populate.data array.
+                source_data_has_target_tile_nodes = (
+                    len({list(obj.keys())[0] for obj in source_data} & set(tile_to_populate.data.keys())) > 0
+                )
+                source_dict = {k: v for s in source_data for k, v in s.items()}
+
+                if source_data_has_target_tile_nodes:
+                    # Iterate through the tile nodes and begin populating by iterating through source_data array.
+                    # The idea is to populate as much of the tile_to_populate as possible,
+                    # before moving on to the next tile_to_populate.
+                    for target_key in list(tile_to_populate.data.keys()):
+                        if non_unique_col_headers:
+                            for source_tile in source_data:
+                                for source_key in list(source_tile.keys()):
+                                    # Check for source and target key match.
+                                    if source_key == target_key:
+                                        if tile_to_populate.data[source_key] is None:
+                                            # If match populate tile_to_populate node with transformed value.
+                                            value = transform_value(
+                                                node_datatypes[source_key], source_tile[source_key], row_number, source_key, tileid=tile_to_populate.tileid
+                                            )
+                                            tile_to_populate.data[source_key] = value["value"]
+                                            # tile_to_populate.request = value['request']
+                                            # Delete key from source_tile so
+                                            # we do not populate another tile based on the same data.
+                                            del source_tile[source_key]
+                        else:
+                            s_tile_value = source_dict.get(target_key, None)
+                            if s_tile_value is not None and tile_to_populate.data[target_key] is None:
+                                # If match populate tile_to_populate node with transformed value.
+                                try:
+                                    value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=tile_to_populate.tileid)
+
+                                    tile_to_populate.data[target_key] = value["value"]
+                                    found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                    if len(found) > 0:
+                                        found = found[0]
+                                        i = source_data.index(found)
+                                        del source_dict[target_key]
+                                        del source_data[i]
+                                except KeyError:  # semantic datatype
+                                    pass
+                            elif (
+                                s_tile_value
+                                and tile_to_populate.data[target_key]
+                                and isinstance(tile_to_populate.data[target_key], list)
+                            ):  # weve found a pre-existing value for this node on tile
+                                try:
+                                    value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=tile_to_populate.tileid)
+                                    value = value["value"]
+                                    if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
+                                        value, list
+                                    ):
+                                        value = value[0]
+
+                                    tile_to_populate.data[target_key].append(value)
+                                    found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                    if len(found) > 0:
+                                        found = found[0]
+                                        i = source_data.index(found)
+                                        del source_dict[target_key]
+                                        del source_data[i]
+                                except KeyError:  # semantic datatype
+                                    pass
+                            elif s_tile_value is None:
+                                found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
+                                if len(found) > 0:
+                                    found = found[0]
+                                    i = source_data.index(found)
+                                    del source_dict[target_key]
+                                    del source_data[i]
+                    # Cleanup source_data array to remove source_tiles that are now '{}' from the code above.
+                    source_data[:] = [item for item in source_data if item != {}]
+
+                # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
+                elif tile_to_populate.tiles is not None:
+                    populated_child_tiles = []
+                    populated_child_nodegroups = []
+                    for childtile in tile_to_populate.tiles:
+                        if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
+                            child_tile_cardinality = "1"
+                        else:
+                            child_tile_cardinality = "n"
+
+                        populate_child_tiles(source_data)
+
+                    if not bulk:
+                        tile_to_populate.tiles = populated_child_tiles
+
+                # bulk alone being true here is because a parent tile without children would fail (not tile.is_blank())
+                if bulk or (not tile_to_populate.is_blank() and not appending_to_parent):
+                    if bulk:
+                        tile_to_populate.tiles = []
+                    dupe = False
+                    for i, t in enumerate(populated_tiles):
+                        if str(t.tileid) == str(tile_to_populate.tileid):
+                            # if t.data == tile_to_populate.data: # we mutated a pre-existing tile, don't re-add
+                            dupe = True
+                            break
+
+                    if not dupe:
+                        populated_tiles.append(tile_to_populate)
+
+                if len(source_data) > 0 and component_type_nodeid not in source_data[0]:
+                    need_new_tile = True
+                elif len(source_data) > 0 and component_type_nodeid in source_data[0]:
+                    if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
+                        source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
+
+                if target_tile_cardinality == "1" and "NodeGroupID" not in row:
+                    populated_cardinality_1_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
+
+                if need_new_tile:
+                    new_tile = get_blank_tile(source_data)
+                    if new_tile is not None:
+                        populate_tile(
+                            source_data,
+                            new_tile,
+                            row,
+                            row_number,
+                            resourceinstanceid,
+                            populated_tiles,
+                            group_no,
+                            group_valid,
+                            group_no_to_tileids,
+                            non_unique_col_headers,
+                            populated_cardinality_1_nodegroups,
+                            node_datatypes,
+                            appending_to_parent=False,
+                            prefix=prefix,
+                        )
+        
+        try:
+            resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], legacyid, overwrite)
+        except KeyError:
+            print("*" * 80)
+            print(
+                "ERROR: No column 'ResourceID' found in business data file. \
+                Please add a 'ResourceID' column with a unique resource identifier."
+            )
+            print("*" * 80)
+            if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
+                sys.exit()
+        populated_cardinality_1_nodegroups = {}
+        populated_cardinality_1_nodegroups[resourceinstanceid] = []
+        display_nodes = get_display_nodes(graphid)
         try:
             with transaction.atomic():
-                save_count = 0
-                legacyid = business_data[0]["LegacyID"] if "LegacyID" in business_data[0] else None
-                try:
-                    resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], legacyid, overwrite)
-                except KeyError:
-                    print("*" * 80)
-                    print(
-                        "ERROR: No column 'ResourceID' found in business data file. \
-                        Please add a 'ResourceID' column with a unique resource identifier."
-                    )
-                    print("*" * 80)
-                    if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
-                        sys.exit()
-                graphid = mapping["resource_model_id"]
-                blanktilecache = {}
-                populated_cardinality_1_nodegroups = {}
-                populated_cardinality_1_nodegroups[resourceinstanceid] = []
-                previous_row_resourceid = None
-                group_no_to_tileids = {}
-                populated_tiles = []
-                target_resource_model = None
-                single_cardinality_nodegroups = [
-                    str(nodegroupid) for nodegroupid in NodeGroup.objects.values_list("nodegroupid", flat=True).filter(cardinality="1")
-                ]
-                node_datatypes = {
-                    str(nodeid): datatype
-                    for nodeid, datatype in Node.objects.values_list("nodeid", "datatype").filter(
-                        ~Q(datatype="semantic"), graph__isresource=True
-                    )
-                }
-                display_nodes = get_display_nodes(graphid)
-                all_nodes = Node.objects.filter(graph_id=graphid)
-                node_dict = {str(node.pk): node for node in all_nodes}
-                datatype_factory = DataTypeFactory()
-                concepts_to_create = {}
-                new_concepts = {}
-                required_nodes = {}
-                for node in Node.objects.filter(~Q(datatype="semantic"), isrequired=True, graph_id=graphid).values_list("nodeid", "name"):
-                    required_nodes[str(node[0])] = node[1]
 
                 # This code can probably be moved into it's own module.
                 resourceids = set()
@@ -655,619 +1281,11 @@ class CsvReader(Reader):
                     if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                         sys.exit()
 
-                def create_reference_data(new_concepts, create_collections):
-                    errors = []
-                    candidates = Concept().get(id="00000000-0000-0000-0000-000000000006")
-                    for arches_nodeid, concepts in new_concepts.items():
-                        collectionid = str(uuid.uuid4())
-                        topconceptid = str(uuid.uuid4())
-                        node = self.lookup_node(arches_nodeid)
-
-                        # if node.datatype is concept or concept-list create concepts and collections
-                        if node.datatype in ["concept", "concept-list"]:
-                            # create collection if create_collections = create, otherwise append to collection already assigned to node
-                            if create_collections == True:
-                                collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
-                                # check to see that there is not already a collection for this node
-                                if node.config["rdmCollection"] is not None:
-                                    errors.append(
-                                        {
-                                            "type": "WARNING",
-                                            "message": f"A collection already exists for the {node.name} node. \
-                                            Use the add option to add concepts to this collection.",
-                                        }
-                                    )
-                                    if len(errors) > 0:
-                                        self.errors += errors
-                                    collection = None
-                                else:
-                                    # if there is no collection assigned to this node, create one and assign it to the node
-                                    try:
-                                        # check to see that a collection with this legacyid does not already exist
-                                        collection = Concept().get(legacyoid=collection_legacyoid)
-                                        errors.append(
-                                            {
-                                                "type": "WARNING",
-                                                "message": "A collection with the legacyid {0} already exists.".format(
-                                                    node.name + "_" + str(node.graph_id) + "_import"
-                                                ),
-                                            }
-                                        )
-                                        if len(errors) > 0:
-                                            self.errors += errors
-                                    except:
-                                        collection = Concept(
-                                            {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection"}
-                                        )
-                                        collection.addvalue(
-                                            {
-                                                "id": str(uuid.uuid4()),
-                                                "value": node.name + "_import",
-                                                "language": settings.LANGUAGE_CODE,
-                                                "type": "prefLabel",
-                                            }
-                                        )
-                                        node.config["rdmCollection"] = collectionid
-                                        node.save()
-                                        collection.save()
-                            else:
-                                # if create collection = add check that there is a collection associated with node,
-                                # if no collection associated with node create a collection and associated with the node
-                                try:
-                                    collection = Concept().get(id=node.config["rdmCollection"])
-                                except:
-                                    collection = Concept(
-                                        {
-                                            "id": collectionid,
-                                            "legacyoid": node.name + "_" + str(node.graph_id) + "_import",
-                                            "nodetype": "Collection",
-                                        }
-                                    )
-                                    collection.addvalue(
-                                        {
-                                            "id": str(uuid.uuid4()),
-                                            "value": node.name + "_import",
-                                            "language": settings.LANGUAGE_CODE,
-                                            "type": "prefLabel",
-                                        }
-                                    )
-                                    node.config["rdmCollection"] = collectionid
-                                    node.save()
-                                    collection.save()
-
-                            if collection is not None:
-                                topconcept_legacyoid = node.name + "_" + str(node.graph_id)
-                                # Check if top concept already exists, if not create it and add to candidates scheme
-                                try:
-                                    topconcept = Concept().get(legacyoid=topconcept_legacyoid)
-                                except:
-                                    topconcept = Concept({"id": topconceptid, "legacyoid": topconcept_legacyoid, "nodetype": "Concept"})
-                                    topconcept.addvalue(
-                                        {
-                                            "id": str(uuid.uuid4()),
-                                            "value": node.name + "_import",
-                                            "language": settings.LANGUAGE_CODE,
-                                            "type": "prefLabel",
-                                        }
-                                    )
-                                    topconcept.save()
-                                candidates.add_relation(topconcept, "narrower")
-
-                                # create child concepts and relate to top concept and collection accordingly
-                                for conceptid, value in concepts.items():
-                                    concept_legacyoid = value + "_" + node.name + "_" + str(node.graph_id)
-                                    # check if concept already exists, if not create and add to topconcept and collection
-                                    try:
-                                        conceptid = [
-                                            concept for concept in topconcept.get_child_concepts(topconcept.id) if concept[1] == value
-                                        ][0][0]
-                                        concept = Concept().get(id=conceptid)
-                                    except:
-                                        concept = Concept({"id": conceptid, "legacyoid": concept_legacyoid, "nodetype": "Concept"})
-                                        concept.addvalue(
-                                            {
-                                                "id": str(uuid.uuid4()),
-                                                "value": value,
-                                                "language": settings.LANGUAGE_CODE,
-                                                "type": "prefLabel",
-                                            }
-                                        )
-                                        concept.save()
-                                    collection.add_relation(concept, "member")
-                                    topconcept.add_relation(concept, "narrower")
-
-                        # if node.datatype is domain or domain-list create options array in node.config
-                        elif node.datatype in ["domain-value", "domain-value-list"]:
-                            for domainid, value in new_concepts[arches_nodeid].items():
-                                # check if value already exists in domain
-                                if value not in [t["text"] for t in node.config["options"]]:
-                                    domainvalue = {"text": value, "selected": False, "id": domainid}
-                                    node.config["options"].append(domainvalue)
-                                    node.save()
-
                 if create_concepts == True:
                     create_reference_data(concepts_to_create, create_collections)
                 # if concepts are created on import concept_lookup must be instatiated afterward
                 concept_lookup = ConceptLookup()
 
-                def cache(blank_tile):
-                    if blank_tile.data != {}:
-                        for key in list(blank_tile.data.keys()):
-                            if key not in blanktilecache:
-                                blanktilecache[str(key)] = blank_tile
-                    else:
-                        for tile in blank_tile.tiles:
-                            for key in list(tile.data.keys()):
-                                if key not in blanktilecache:
-                                    blanktilecache[str(key)] = blank_tile
-
-                def column_names_to_targetids(row, mapping, row_number):
-                    errors = []
-                    if "ADDITIONAL" in row or "MISSING" in row:
-                        errors.append(
-                            {
-                                "type": "WARNING",
-                                "message": "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
-                                    row["ResourceID"], str(int(row_number.split("on line ")[1]))
-                                ),
-                            }
-                        )
-                        if len(errors) > 0:
-                            self.errors += errors
-                    return [
-                        {col_header_to_nodeid_dict[key.upper()]: value}
-                        for key, value in row.items()
-                        if value != "" and key and key.upper() != "RESOURCEID" and key.upper() in col_header_to_nodeid_dict
-                    ]
-
-                def transform_value(datatype, value, source, nodeid, tileid=None):
-                    """
-                    Transforms values from probably string/wkt representation to specified datatype in arches.
-                    This code could probably move to somehwere where it can be accessed by other importers.
-                    """
-                    request = ""
-                    if datatype != "":
-                        errors = []
-                        datatype_instance = self.datatype_factory.get_instance(datatype)
-                        if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
-                            if len(str(value)) == 37:
-                                value = str(value)
-                                value = value[0:36]
-                                logger.warn(f"Extra character removed {row_number} from index 36 of UUID {value}")
-                            try:
-                                uuid.UUID(value)
-                            except:
-                                if datatype in ["domain-value", "domain-value-list"]:
-                                    collection_id = nodeid
-                                else:
-                                    collection_id = self.lookup_node(nodeid).config["rdmCollection"]
-                                if collection_id is not None:
-                                    value = concept_lookup.lookup_labelid_from_label(value, collection_id)
-                        try:
-                            value = datatype_instance.transform_value_for_tile(value, tileid=tileid)
-                            errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
-                        except Exception as e:
-                            errors.append(
-                                {
-                                    "type": "ERROR",
-                                    "message": "datatype: {0} value: {1} {2} - {3}".format(
-                                        datatype_instance.datatype_model.classname,
-                                        value,
-                                        source,
-                                        str(e) + " or is not a prefLabel in the given collection.",
-                                    ),
-                                }
-                            )
-                        if len(errors) > 0:
-                            error_types = [error["type"] for error in errors]
-                            if "ERROR" in error_types:
-                                value = None
-                            self.errors += errors
-                    else:
-                        print(_("No datatype detected for {0}".format(value)))
-
-                    return {"value": value, "request": request}
-
-                def get_blank_tile(source_data, child_only=False):
-                    if len(source_data) > 0:
-                        if source_data[0] != {}:
-                            key = str(list(source_data[0].keys())[0])
-                            source_node = node_dict[key]
-                            if child_only:
-                                blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
-                                blank_tile.tiles = []
-                                blank_tile.tileid = None
-                            elif key not in blanktilecache:
-                                blank_tile = Tile.get_blank_tile(key)
-                                cache(blank_tile)
-                            else:
-                                blank_tile = blanktilecache[key]
-                                blank_tile.tileid = uuid.uuid4()
-                        else:
-                            blank_tile = None
-                    else:
-                        blank_tile = None
-                    # return deepcopy(blank_tile)
-                    return pickle.loads(pickle.dumps(blank_tile, -1))
-
-                def get_preexisting_tile(target_tile, populated_tiles, resourceid, parenttileid=None, tileid=None):
-                    # finds a pre-existing tile for a particular nodegroup on a resource_instance
-                    # assumes tiles are flat/un-nested, otherwise recurses through child tiles
-                    if tileid:
-                        preexisting_tile_for_nodegroup = list(filter(lambda t: str(t.tileid) == str(tileid), populated_tiles))
-                    elif parenttileid:
-                        preexisting_tile_for_nodegroup = list(
-                            filter(
-                                lambda t: str(t.resourceinstance_id) == str(resourceid)
-                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id)
-                                and str(t.parenttile.tileid) == str(parenttileid),
-                                populated_tiles,
-                            )
-                        )
-                    else:
-                        preexisting_tile_for_nodegroup = list(
-                            filter(
-                                lambda t: str(t.resourceinstance_id) == str(resourceid)
-                                and str(t.nodegroup_id) == str(target_tile.nodegroup_id),
-                                populated_tiles,
-                            )
-                        )
-                    if len(preexisting_tile_for_nodegroup) > 0:
-                        return preexisting_tile_for_nodegroup[0]
-                    for t in populated_tiles:
-                        get_preexisting_tile(target_tile, t.tiles, resourceid, parenttileid, tileid)
-
-                def get_preexisting_parenttileid(tileid, populated_tiles):
-                    preexisting_parenttile = list(
-                        filter(
-                            lambda t: str(t.tileid) == str(tileid),
-                            populated_tiles,
-                        )
-                    )
-                    if len(preexisting_parenttile) > 0:
-                        return str(preexisting_parenttile[0].tileid)
-                    for t in populated_tiles:
-                        get_preexisting_parenttileid(tileid, t.tiles)
-
-                def check_required_nodes(tile, parent_tile, required_nodes):
-                    # Check that each required node in a tile is populated.
-                    if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
-                        return
-                    errors = []
-                    if len(required_nodes) > 0:
-                        if bool(tile.data):
-                            for target_k, target_v in tile.data.items():
-                                if target_k in list(required_nodes.keys()) and target_v is None:
-                                    if parent_tile in populated_tiles:
-                                        populated_tiles.pop(populated_tiles.index(parent_tile))
-                                    errors.append(
-                                        {
-                                            "type": "WARNING",
-                                            "message": "The {0} node ({1}) is required and must be populated. \
-                                            This data was not imported.".format(
-                                                required_nodes[target_k],
-                                                target_k,
-                                            ),
-                                        }
-                                    )
-                        elif bool(tile.tiles):
-                            for tile in tile.tiles:
-                                check_required_nodes(tile, parent_tile, required_nodes)
-                    if len(errors) > 0:
-                        self.errors += errors
-
-                def populate_tile(
-                    source_data,
-                    tile_to_populate,
-                    row,
-                    row_number,
-                    resourceinstanceid,
-                    populated_tiles,
-                    group_no,
-                    group_valid,
-                    group_no_to_tileids,
-                    non_unique_col_headers,
-                    populated_cardinality_1_nodegroups,
-                    node_datatypes,
-                    appending_to_parent=False,
-                    prefix="",
-                ):
-                    """
-                    source_data = [{nodeid:value},{nodeid:value},{nodeid:value} . . .]
-                    All nodes in source_data belong to the same resource.
-                    A dictionary of nodeids would not allow for multiple values for the same nodeid.
-                    Grouping is enforced by having all grouped attributes in the same row.
-                    """
-                    need_new_tile = False
-                    if group_valid:
-                        if str(tile_to_populate.nodegroup_id) == component_nodegroupid:
-                            group_no = row["GROUP_NO"] + "-" + str(prefix)
-                        elif str(tile_to_populate.nodegroup_id) in eval_nodegroups:
-                            group_no = row["GROUP_NO"]
-                    # Set target tileid to None because this will be a new tile, a new tileid will be created on save.
-                    if tile_to_populate.tileid is None:
-                        tile_to_populate.tileid = uuid.uuid4()
-                    if "TileID" in row and row["TileID"] is not None:
-                        tile_to_populate.tileid = row["TileID"]
-                    tile_to_populate.resourceinstance_id = resourceinstanceid
-                    # if first time seeing this nodegroup for this group
-                    if (
-                        group_valid
-                        and group_no
-                        and group_no in group_no_to_tileids
-                        and str(tile_to_populate.nodegroup_id) not in group_no_to_tileids[group_no]
-                    ):
-                        group_no_to_tileids[group_no][str(tile_to_populate.nodegroup_id)] = {}
-                        group_no_to_tileids[group_no][str(tile_to_populate.nodegroup_id)]["tileid"] = str(tile_to_populate.tileid)
-                        try:
-                            group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = str(
-                                target_tile.parenttile.tileid
-                            )
-                        except:
-                            group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["parenttileid"] = None
-
-                    # Check the cardinality of the tile and check if it has been populated.
-                    # If cardinality is one and the tile is populated the tile should not be populated again.
-                    if str(tile_to_populate.nodegroup_id) in single_cardinality_nodegroups and "TileiD" not in row:
-                        target_tile_cardinality = "1"
-                    else:
-                        target_tile_cardinality = "n"
-
-                    def populate_child_tiles(source_data):
-                        prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
-                        tileid = row["TileID"] if "TileID" in row else uuid.uuid4()
-                        prototype_tile_copy.tileid = tileid
-                        prototype_tile_copy.parenttile = tile_to_populate
-                        parenttileid = row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
-                        if parenttileid is not None:
-                            prototype_tile_copy.parenttile.tileid = parenttileid
-                        prototype_tile_copy.resourceinstance_id = resourceinstanceid
-                        # if (
-                        #     row["GROUP_NO"]
-                        #     and row["GROUP_NO"] != ""
-                        #     and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                        #     and str(prototype_tile_copy.nodegroup_id)
-                        #     not in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
-                        # ):
-                        #     group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][
-                        #         str(prototype_tile_copy.nodegroup_id)
-                        #     ] = str(prototype_tile_copy.tileid)
-                        if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                            prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
-                            for target_key in list(prototype_tile_copy.data.keys()):
-                                if non_unique_col_headers:
-                                    for source_column in source_data:
-                                        for source_key in list(source_column.keys()):
-                                            if source_key == target_key:
-                                                if prototype_tile_copy.data[source_key] is None:
-                                                    value = transform_value(
-                                                        node_datatypes[source_key],
-                                                        source_column[source_key],
-                                                        row_number,
-                                                        source_key,
-                                                        tileid=prototype_tile_copy.tileid
-                                                    )
-                                                    prototype_tile_copy.data[source_key] = value["value"]
-                                                    # print(prototype_tile_copy.data[source_key]
-                                                    # print('&'*80
-                                                    # target_tile.request = value['request']
-                                                    del source_column[source_key]
-                                                else:
-                                                    populate_child_tiles(source_data)
-                                else:
-                                    s_tile_value = source_dict.get(target_key, None)
-                                    if s_tile_value is not None and prototype_tile_copy.data[target_key] is None:
-                                        try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=prototype_tile_copy.tileid)
-                                            prototype_tile_copy.data[target_key] = value["value"]
-                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                            if len(found) > 0:
-                                                found = found[0]
-                                                i = source_data.index(found)
-                                                del source_dict[target_key]
-                                                del source_data[i]
-                                        except KeyError:  # semantic datatype
-                                            pass
-                                    elif (
-                                        s_tile_value
-                                        and prototype_tile_copy.data[target_key]
-                                        and isinstance(prototype_tile_copy.data[target_key], list)
-                                    ):  # weve found a pre-existing value for this node on tile
-                                        try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=prototype_tile_copy.tileid)
-                                            value = value["value"]
-                                            if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
-                                                value, list
-                                            ):
-                                                value = value[0]
-
-                                            prototype_tile_copy.data[target_key].append(value)
-                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                            if len(found) > 0:
-                                                found = found[0]
-                                                i = source_data.index(found)
-                                                del source_dict[target_key]
-                                                del source_data[i]
-                                        except KeyError:  # semantic datatype
-                                            pass
-
-                                    elif s_tile_value is None:
-                                        found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                        if len(found) > 0:
-                                            found = found[0]
-                                            i = source_data.index(found)
-                                            del source_dict[target_key]
-                                            del source_data[i]
-                                    elif prototype_tile_copy.data[target_key] is not None:
-                                        populate_child_tiles(source_data)
-
-                        if prototype_tile_copy.data != {}:
-                            if (
-                                group_valid
-                                and group_no
-                                and group_no in group_no_to_tileids
-                                and str(prototype_tile_copy.nodegroup_id) not in group_no_to_tileids[group_no]
-                            ):
-                                group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)] = {}
-                                group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["tileid"] = str(
-                                    prototype_tile_copy.tileid
-                                )
-                                try:
-                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = str(
-                                        prototype_tile_copy.parenttile.tileid
-                                    )
-                                except:
-                                    group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = None
-                            if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
-                                if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                                    if bulk:
-                                        prototype_tile_copy.tiles = []
-                                        populated_tiles.append(prototype_tile_copy)
-                                    else:
-                                        populated_child_tiles.append(prototype_tile_copy)
-
-                        if prototype_tile_copy is not None:
-                            if child_tile_cardinality == "1" and "NodeGroupID" not in row:
-                                populated_child_nodegroups.append(str(prototype_tile_copy.nodegroup_id))
-
-                        source_data[:] = [item for item in source_data if item != {}]
-
-                    if (
-                        str(tile_to_populate.nodegroup_id) not in populated_cardinality_1_nodegroups[resourceinstanceid]
-                        or appending_to_parent
-                    ):
-                        tile_to_populate.nodegroup_id = str(tile_to_populate.nodegroup_id)
-                        # Check if we are populating a parent tile by inspecting the tile_to_populate.data array.
-                        source_data_has_target_tile_nodes = (
-                            len({list(obj.keys())[0] for obj in source_data} & set(tile_to_populate.data.keys())) > 0
-                        )
-                        source_dict = {k: v for s in source_data for k, v in s.items()}
-
-                        if source_data_has_target_tile_nodes:
-                            # Iterate through the tile nodes and begin populating by iterating through source_data array.
-                            # The idea is to populate as much of the tile_to_populate as possible,
-                            # before moving on to the next tile_to_populate.
-                            for target_key in list(tile_to_populate.data.keys()):
-                                if non_unique_col_headers:
-                                    for source_tile in source_data:
-                                        for source_key in list(source_tile.keys()):
-                                            # Check for source and target key match.
-                                            if source_key == target_key:
-                                                if tile_to_populate.data[source_key] is None:
-                                                    # If match populate tile_to_populate node with transformed value.
-                                                    value = transform_value(
-                                                        node_datatypes[source_key], source_tile[source_key], row_number, source_key, tileid=tile_to_populate.tileid
-                                                    )
-                                                    tile_to_populate.data[source_key] = value["value"]
-                                                    # tile_to_populate.request = value['request']
-                                                    # Delete key from source_tile so
-                                                    # we do not populate another tile based on the same data.
-                                                    del source_tile[source_key]
-                                else:
-                                    s_tile_value = source_dict.get(target_key, None)
-                                    if s_tile_value is not None and tile_to_populate.data[target_key] is None:
-                                        # If match populate tile_to_populate node with transformed value.
-                                        try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=tile_to_populate.tileid)
-
-                                            tile_to_populate.data[target_key] = value["value"]
-                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                            if len(found) > 0:
-                                                found = found[0]
-                                                i = source_data.index(found)
-                                                del source_dict[target_key]
-                                                del source_data[i]
-                                        except KeyError:  # semantic datatype
-                                            pass
-                                    elif (
-                                        s_tile_value
-                                        and tile_to_populate.data[target_key]
-                                        and isinstance(tile_to_populate.data[target_key], list)
-                                    ):  # weve found a pre-existing value for this node on tile
-                                        try:
-                                            value = transform_value(node_datatypes[target_key], s_tile_value, row_number, target_key, tileid=tile_to_populate.tileid)
-                                            value = value["value"]
-                                            if (isinstance(value, str) is False or isinstance(value, uuid) is False) and isinstance(
-                                                value, list
-                                            ):
-                                                value = value[0]
-
-                                            tile_to_populate.data[target_key].append(value)
-                                            found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                            if len(found) > 0:
-                                                found = found[0]
-                                                i = source_data.index(found)
-                                                del source_dict[target_key]
-                                                del source_data[i]
-                                        except KeyError:  # semantic datatype
-                                            pass
-                                    elif s_tile_value is None:
-                                        found = list(filter(lambda x: x.get(target_key, "not found") != "not found", source_data))
-                                        if len(found) > 0:
-                                            found = found[0]
-                                            i = source_data.index(found)
-                                            del source_dict[target_key]
-                                            del source_data[i]
-                            # Cleanup source_data array to remove source_tiles that are now '{}' from the code above.
-                            source_data[:] = [item for item in source_data if item != {}]
-
-                        # Check if we are populating a child tile(s) by inspecting the target_tiles.tiles array.
-                        elif tile_to_populate.tiles is not None:
-                            populated_child_tiles = []
-                            populated_child_nodegroups = []
-                            for childtile in tile_to_populate.tiles:
-                                if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
-                                    child_tile_cardinality = "1"
-                                else:
-                                    child_tile_cardinality = "n"
-
-                                populate_child_tiles(source_data)
-
-                            if not bulk:
-                                tile_to_populate.tiles = populated_child_tiles
-
-                        # bulk alone being true here is because a parent tile without children would fail (not tile.is_blank())
-                        if bulk or (not tile_to_populate.is_blank() and not appending_to_parent):
-                            if bulk:
-                                tile_to_populate.tiles = []
-                            dupe = False
-                            for i, t in enumerate(populated_tiles):
-                                if str(t.tileid) == str(tile_to_populate.tileid):
-                                    # if t.data == tile_to_populate.data: # we mutated a pre-existing tile, don't re-add
-                                    dupe = True
-                                    break
-
-                            if not dupe:
-                                populated_tiles.append(tile_to_populate)
-
-                        if len(source_data) > 0 and component_type_nodeid not in source_data[0]:
-                            need_new_tile = True
-                        elif len(source_data) > 0 and component_type_nodeid in source_data[0]:
-                            if len(source_data) == 1 and component_type_nodeid in source_data[0] and len(list(source_data[0].keys())) == 1:
-                                source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
-
-                        if target_tile_cardinality == "1" and "NodeGroupID" not in row:
-                            populated_cardinality_1_nodegroups[resourceinstanceid].append(str(tile_to_populate.nodegroup_id))
-
-                        if need_new_tile:
-                            new_tile = get_blank_tile(source_data)
-                            if new_tile is not None:
-                                populate_tile(
-                                    source_data,
-                                    new_tile,
-                                    row,
-                                    row_number,
-                                    resourceinstanceid,
-                                    populated_tiles,
-                                    group_no,
-                                    group_valid,
-                                    group_no_to_tileids,
-                                    non_unique_col_headers,
-                                    populated_cardinality_1_nodegroups,
-                                    node_datatypes,
-                                    appending_to_parent=False,
-                                    prefix=prefix,
-                                )
 
                 resources = []
                 missing_display_values = {}
