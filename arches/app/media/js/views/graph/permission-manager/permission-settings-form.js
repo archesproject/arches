@@ -116,6 +116,10 @@ define([
                 success: function(res) {
                     self.trigger('save');
                     self.clearUserPermissionCache();
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('permissionsSave')
+                    );
                 }
             });
         },
@@ -134,6 +138,10 @@ define([
                 success: function(res) {
                     self.clearUserPermissionCache();
                     self.trigger('revert');
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('permissionsSave')
+                    );
                 }
             });
         },

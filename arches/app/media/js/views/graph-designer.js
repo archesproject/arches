@@ -660,6 +660,7 @@ define([
             document.addEventListener('reorderCards', updateGraphUnpublishedChanges);
             document.addEventListener('cardSave', updateGraphUnpublishedChanges);
             document.addEventListener('nodeSave', updateGraphUnpublishedChanges);
+            document.addEventListener('permissionsSave', updateGraphUnpublishedChanges);
             document.addEventListener('graphSettingsSave', updateGraphUnpublishedChanges);
             
             BaseManagerView.prototype.initialize.apply(this, arguments);
