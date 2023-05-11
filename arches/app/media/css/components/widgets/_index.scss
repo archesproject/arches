@@ -5,7 +5,7 @@
 @import "edtf";
 @import "radio";
 @import "switch";
-
+@import "text";
 
 .widgets {
     border-bottom-width: 1px;
@@ -180,4 +180,13 @@ div.row.widget-wrapper {
 .widget-help-panel .text-thin {
     color: #666;
     font-weight: 400;
+}
+
+// base styling for expandable panels for language selection and edtf info
+.edtf-style-tools-panel, .i18n-style-tools-panel {
+    background: #fbfbfb;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    border-radius: 2px;
+    max-height: 200px;
 }
