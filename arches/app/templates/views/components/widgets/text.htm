@@ -3,13 +3,19 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}">
     <div class="form-group" style="position: relative;">
         <div style="max-width: 600px; position: relative">
             <div class="widget-inline-tools-collapser" tabindex="0" role="button"
-                data-bind="onEnterkeyClick, onSpaceClick, click: function() { showi18nOptions(!showi18nOptions()); },
-                    attr: {'aria-pressed': showi18nOptions(), 'aria-label': label() + ' ' + $root.translations.languageSettings}
-            ">
+                data-bind="onEnterkeyClick, onSpaceClick, 
+                    click: function() { showi18nOptions(!showi18nOptions()); },
+                    attr: {
+                        'aria-expanded': showi18nOptions().toString(), 
+                        'aria-label': label() + ' ' + $root.translations.languageSettings,
+                        'aria-controls': uid
+                    },
+                "
+            >
                 <span class="control-label widget-input-label" data-bind="text:label"></span>
                 <span>
                     <i class="fa" data-bind="{
@@ -21,7 +27,7 @@
                     <span data-bind="text: $root.translations.languages"></span>
                 </span>
             </div>
-            <div data-bind="if: showi18nOptions">
+            <div data-bind="if: showi18nOptions, attr: {id: uid}">
                 <div class="i18n-style-tools-panel">
                     <div style="display: flex; flex-direction: column; max-width:600px">
                         <span class="control-label widget-input-label" data-bind="text: $root.translations.language"></span>
@@ -96,12 +102,18 @@
         "
     >
 </div>
-<div class="form-group" style="position: relative;">
+<div class="form-group" style="position: relative;" data-bind="let: {uid: Math.random().toString()}">
     <div style="max-width: 600px; position: relative">
     <div class="widget-inline-tools-collapser" tabindex="0" role="button"
-        data-bind="onEnterkeyClick, onSpaceClick, click: function() { showi18nOptions(!showi18nOptions()); },
-            attr: {'aria-pressed': showi18nOptions(), 'aria-label': $root.translations.defaultValue + ' ' + $root.translations.languageSettings}
-    ">
+        data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function() { showi18nOptions(!showi18nOptions()); },
+            attr: {
+                'aria-expanded': showi18nOptions().toString(), 
+                'aria-label': $root.translations.defaultValue + ' ' + $root.translations.languageSettings,
+                'aria-controls': uid,
+            },
+        "
+    >
         <span class="control-label widget-input-label" data-bind="text: $root.translations.defaultValue"></span>
         <span>
             <i class="fa" data-bind="{
@@ -113,14 +125,13 @@
             <span data-bind="text: $root.translations.languages"></span>
         </span>
     </div>
-    <div class="form-horizontal" data-bind="if: showi18nOptions">
+    <div class="form-horizontal" data-bind="if: showi18nOptions, attr: {id: uid}">
         <div class="i18n-style-tools-panel">
             <div style="display: flex; flex-direction: column; max-width:600px">
-                <label class="widget-input-label" for="lang_dd">
+                <label class="widget-input-label">
                     <span data-bind="text: $root.translations.language"></span>
                 </label>
                 <select 
-                    id="lang_dd" 
                     style="flex:1" 
                     name="language" 
                     data-bind="
@@ -128,14 +139,13 @@
                         optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
                         value: currentDefaultLanguage, 
                         chosen: {width:'100%'},
-                        attr: {'aria-labeledby': 'lang_dd'}
+                        attr: {'aria-label': $root.translations.language}
                     "
                 ></select>
-                <label class="widget-input-label" for="lang_dir">
+                <label class="widget-input-label">
                     <span data-bind="text: $root.translations.direction"></span>
                 </label>
                 <select
-                    id="lang_dir"
                     style="flex:1"
                     name="language"
                     data-bind="
@@ -147,7 +157,7 @@
                             { text: $root.translations.leftToRight, value: 'ltr' },
                             { text: $root.translations.rightToLeft, value: 'rtl' },
                         ],
-                        attr: {'aria-labeledby': 'lang_dir'}
+                        attr: {'aria-label': $root.translations.direction}
                     "
                 ></select>
             </div>
