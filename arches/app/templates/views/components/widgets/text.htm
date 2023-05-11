@@ -128,9 +128,7 @@
     <div class="form-horizontal" data-bind="if: showi18nOptions, attr: {id: uid}">
         <div class="i18n-style-tools-panel">
             <div style="display: flex; flex-direction: column; max-width:600px">
-                <label class="widget-input-label">
-                    <span data-bind="text: $root.translations.language"></span>
-                </label>
+                <span class="widget-input-label" data-bind="text: $root.translations.language"></span>
                 <select 
                     style="flex:1" 
                     name="language" 
@@ -142,9 +140,7 @@
                         attr: {'aria-label': $root.translations.language}
                     "
                 ></select>
-                <label class="widget-input-label">
-                    <span data-bind="text: $root.translations.direction"></span>
-                </label>
+                <span class="widget-input-label" data-bind="text: $root.translations.direction"></span>
                 <select
                     style="flex:1"
                     name="language"
