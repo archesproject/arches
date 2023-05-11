@@ -199,10 +199,7 @@
         id="export-warning"
         data-bind="
             visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')),
-            text: ('{% blocktrans with immediateExportLimit=app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD  htmlExportLimit=app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT %} 
-                    Arches is currently running without Celery. Exports will be limited to {{ immediateExportLimit }} records. 
-                    The html option is only allowed with a selection of up to {{ htmlExportLimit }} resources.
-                {% endblocktrans %}'),
+            text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records. The html option is only allowed with a selection of up to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} resources.'),
         "
     ></div>
     <div class="search-export download">
