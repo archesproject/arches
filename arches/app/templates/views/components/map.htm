@@ -30,7 +30,7 @@
         {% endblock tabs %}
     </div>
     <!--ko if: activeTab() -->
-        <div class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
+        <div id="side-panel" class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
             {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
                 <div class="workbench-card-sidepanel-header-container">
