@@ -798,7 +798,7 @@ class ResourceReportView(MapBaseManagerView):
             geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
-        
+
         context = self.get_context_data(
             main_script="views/resource/report",
             resourceid=resourceid,
@@ -811,8 +811,10 @@ class ResourceReportView(MapBaseManagerView):
             geocoding_providers=geocoding_providers,
             graph_has_different_publication=graph_has_different_publication,
             graph_has_different_publication_and_user_has_insufficient_permissions=bool(
-                graph_has_different_publication 
-                and not request.user.groups.filter(name__in=['Graph Editor', 'RDM Administrator', 'Application Administrator', 'System Administrator']).exists()
+                graph_has_different_publication
+                and not request.user.groups.filter(
+                    name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+                ).exists()
             ),
         )
 
