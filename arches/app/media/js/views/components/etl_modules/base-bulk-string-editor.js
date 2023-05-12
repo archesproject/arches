@@ -55,7 +55,13 @@ define([
         this.trim = ko.observable();
         this.numberOfResources = ko.observable();
         this.numberOfTiles = ko.observable();
+        this.selectedCaseOperation = ko.observable();
 
+        this.caseOperations = [
+            {name: 'capitalize', label: 'Capitalize'},
+            {name: 'upper', label: 'Upper Case'},
+            {name: 'lower', label: 'Lower Case'}
+        ];
         this.getGraphs = function(){
             self.loading(true);
             self.submit('get_graphs').then(function(response){
@@ -82,7 +88,11 @@ define([
         });
 
         this.addAllFormData = () => {
-            self.formData.append('operation', self.operation());
+            if (self.operation() == 'case'){
+                self.formData.append('operation', self.selectedCaseOperation());
+            } else {
+                self.formData.append('operation', self.operation());
+            }
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.selectedNode()) { self.formData.append('node_id', self.selectedNode()); }
             if (self.selectedNodeName()) { self.formData.append('node_name', self.selectedNodeName()); }

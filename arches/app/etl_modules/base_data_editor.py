@@ -80,12 +80,12 @@ class BaseBulkEditor(BaseImportModule):
 
         return result
 
-    def stage_data(self, cursor, graph_id, node_id, resourceids):
+    def stage_data(self, cursor, graph_id, node_id, resourceids, text_replacing, language_code, case_insensitive):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_stage_data_for_bulk_edit(%s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids)),
+                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), text_replacing, language_code, case_insensitive),
             )
             result["success"] = True
         except Exception as e:
@@ -116,7 +116,7 @@ class BulkStringEditor(BaseBulkEditor):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_edit_staged_data(%s, %s, %s, %s, %s, %s, %s)""",
+                """SELECT * FROM __arches_edit_staged_string_data(%s, %s, %s, %s, %s, %s, %s)""",
                 (self.loadid, graph_id, node_id, language_code, operation, old_text, new_text),
             )
             result["success"] = True
@@ -125,14 +125,25 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_first_five_values(self, graph_id, node_id, resourceids, language_code):
+    def get_preview_data(self, graph_id, node_id, resourceids, language_code, old_text, case_insensitive):
         node_id_query = " AND nodeid = %(node_id)s" if node_id else ""
         graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
         resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        like_operator = "ilike" if case_insensitive == "true" else "like"
+        old_text_like = "%" + old_text + "%" if old_text else ""
+        text_query = (
+            " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
+        )
         if language_code is None:
             language_code = "en"
 
-        request_parmas_dict = {"node_id": node_id, "language_code": language_code, "graph_id": graph_id, "resourceid": resourceids}
+        request_parmas_dict = {
+            "node_id": node_id,
+            "language_code": language_code,
+            "graph_id": graph_id,
+            "resourceid": resourceids,
+            "old_text": old_text_like,
+        }
 
         sql_query = (
             """
@@ -142,6 +153,7 @@ class BulkStringEditor(BaseBulkEditor):
             + node_id_query
             + graph_id_query
             + resourceids_query
+            + text_query
             + " LIMIT 5;"
         )
 
@@ -153,6 +165,19 @@ class BulkStringEditor(BaseBulkEditor):
             + node_id_query
             + graph_id_query
             + resourceids_query
+            + text_query
+        )
+
+        tile_sub_query = (
+            """
+            AND resourceinstanceid IN (SELECT DISTINCT t.resourceinstanceid FROM tiles t, nodes n
+            WHERE t.nodegroupid = n.nodegroupid
+        """
+            + node_id_query
+            + graph_id_query
+            + resourceids_query
+            + text_query
+            + ")"
         )
 
         resource_count_query = (
@@ -162,6 +187,7 @@ class BulkStringEditor(BaseBulkEditor):
         """
             + graph_id_query
             + resourceids_query
+            + tile_sub_query
         )
 
         with connection.cursor() as cursor:
@@ -203,7 +229,9 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_first_five_values(graph_id, node_id, resourceids, language_code)
+        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
+            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+        )
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -264,7 +292,9 @@ class BulkStringEditor(BaseBulkEditor):
             "new_text": new_text,
         }
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_first_five_values(graph_id, node_id, resourceids, language_code)
+        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
+            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+        )
 
         load_details = {
             "graph": graph_id,
@@ -324,18 +354,23 @@ class BulkStringEditor(BaseBulkEditor):
     def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
+        case_insensitive = False
+        if operation == "replace_i":
+            case_insensitive = True
 
         with connection.cursor() as cursor:
-            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids)
+            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids, old_text, language_code, case_insensitive)
 
             if data_staged["success"]:
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, old_text, new_text)
             else:
                 self.log_event(cursor, "failed")
-                return {"success": False, "data": data_staged["message"]}
+                return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
             data_updated = self.save_to_tiles(loadid)
             return {"success": True, "data": "done"}
         else:
-            return {"success": False, "data": data_updated["message"]}
+            with connection.cursor() as cursor:
+                self.log_event(cursor, "failed")
+            return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}
