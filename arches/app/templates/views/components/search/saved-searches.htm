@@ -4,7 +4,7 @@
 
 <div class="search-container saved-search-container relative" style="overflow-y: scroll;">
 
-    <div data-bind="visible: items().length === 0">
+    <!-- ko if: items().length === 0 -->
         <div id="rr-splash" class="rr-splash">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
@@ -18,20 +18,28 @@
 
             <!-- Splash Instructions -->
             <div class="rr-splash-description">
-                <span data-bind="text: $root.translations.noSavedSearches"></span>
+                <span data-bind="text: $root.translations.noSavedSearches, attr: {'aria-live': 'polite'}"></span>
             </div>
         </div>
-    </div>
+    <!-- /ko -->
 
-    <div id="" class="saved-search-grid">
-        <div class="" data-bind="smartresize: {childclass: '.ss-grid-item'}, foreach: items">
+    <div class="saved-search-grid">
+        <div data-bind="smartresize: {childclass: '.ss-grid-item'}, foreach: items">
             <!-- Saved Search Query -->
             <div class="ss-grid-item relative">
                     <div class="search-caption-activeWrap">
                         <div class="search-caption-alignCenter">
                             <div class="search-caption-body">
                                 <div class="search-query">
-                                    <a class="search-query-link-captions" data-bind="click: function(){window.location.href = searchUrl; }"><i class="rounded-x fa fa-search"></i> <span data-bind="text: title"></span></a>
+                                    <a class="search-query-link-captions" tabindex="0"
+                                        data-bind="
+                                            click: function(){window.location.href = searchUrl; },
+                                            onEnterkeyClick,
+                                            attr: {
+                                                'aria-label': title, 
+                                                'aria-description': subtitle
+                                            }
+                                        "><i class="rounded-x fa fa-search"></i> <span data-bind="text: title"></span></a>
                                     <div class="search-query-desc">
                                         <span data-bind="html: subtitle"></span>
                                     </div>
