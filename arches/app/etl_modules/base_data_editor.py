@@ -141,7 +141,7 @@ class BulkStringEditor(BaseBulkEditor):
             "node_id": node_id,
             "language_code": language_code,
             "graph_id": graph_id,
-            "resourceid": resourceids,
+            "resourceids": resourceids,
             "old_text": old_text_like,
         }
 
@@ -222,8 +222,7 @@ class BulkStringEditor(BaseBulkEditor):
             resourceids = self.get_resourceids_from_search_url(search_url)
         if resourceids:
             resourceids = tuple(resourceids)
-            if len(resourceids) == 1:
-                resourceids = "('{}')".format(resourceids[0])
+
         if case_insensitive == "true" and operation == "replace":
             operation = "replace_i"
         if also_trim == "true":
@@ -279,7 +278,7 @@ class BulkStringEditor(BaseBulkEditor):
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
         if resourceids:
-            resourceids = [uuid.UUID(id) for id in resourceids]
+            resourceids = tuple(resourceids)
 
         if case_insensitive == "true" and operation == "replace":
             operation = "replace_i"
