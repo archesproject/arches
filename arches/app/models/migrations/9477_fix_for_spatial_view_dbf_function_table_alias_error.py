@@ -8,10 +8,10 @@ class Migration(migrations.Migration):
 
     sql_string = """
             CREATE OR REPLACE FUNCTION public.__arches_create_spatial_view_attribute_table(
-                spatial_view_name_slug text,
-                geometry_node_id uuid,
-                attribute_node_list jsonb,
-                schema_name text DEFAULT 'public'::text)
+                spatial_view_name_slug  text,
+                geometry_node_id        uuid,
+                attribute_node_list     jsonb,
+                schema_name             text DEFAULT 'public'::text)
                 RETURNS text
                 LANGUAGE 'plpgsql'
                 COST 100
@@ -241,14 +241,14 @@ class Migration(migrations.Migration):
 
     reverse_sql_string = """
             create or replace function __arches_create_spatial_view_attribute_table(
-                    spatial_view_name_slug text,
-                    geometry_node_id uuid,
-                    attribute_node_list jsonb,
-                    schema_name text default 'public'
+                    spatial_view_name_slug  text,
+                    geometry_node_id        uuid,
+                    attribute_node_list     jsonb,
+                    schema_name             text default 'public'
                 ) returns text
-                language plpgsql 
+                language plpgsql
                 strict
-                as 
+                as
                 $$
                 declare
                     att_table_name  text;
@@ -271,13 +271,13 @@ class Migration(migrations.Migration):
                         node_name_slug	      text;
                         n                     record;
                     begin
-                        for n in 
+                        for n in
                                 with attribute_nodes as (
                                     select * from jsonb_to_recordset(attribute_node_list) as x(nodeid uuid, description text)
                                 )
-                                select 
-                                    n1.name, 
-                                    n1.nodeid, 
+                                select
+                                    n1.name,
+                                    n1.nodeid,
                                     n1.nodegroupid,
                                     att_nodes.description
                                 from nodes n1
@@ -285,7 +285,7 @@ class Migration(migrations.Migration):
                         loop
                             tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
                             node_name_slug := __arches_slugify(n.name);
-                            node_create = node_create || 
+                            node_create = node_create ||
                                 format('
                                     ,__arches_agg_get_node_display_value(distinct tile_%s.tiledata, ''%s'') as %s
                                     ',
@@ -295,8 +295,8 @@ class Migration(migrations.Migration):
                                     );
 
                             if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
-                                tile_create = tile_create || 
-                                    format(' 
+                                tile_create = tile_create ||
+                                    format('
                                     left outer join tiles tile_%s on r.resourceinstanceid = tile_%s.resourceinstanceid
                                         and tile_%s.nodegroupid = ''%s''
                                     ',
@@ -320,7 +320,7 @@ class Migration(migrations.Migration):
 
                     att_view_tbl := format(
                         '
-                        create table %s 
+                        create table %s
                         tablespace pg_default
                         as
                         (
@@ -335,19 +335,19 @@ class Migration(migrations.Migration):
                                 r.resourceinstanceid::text
                         )
                         with data;
-                        
+
                         %s
 
                         create index on %s (resourceinstanceid);
-                        
+
                         ',
                         att_table_name,
-                        node_create, 
-                        geometry_node_id, 
+                        node_create,
+                        geometry_node_id,
                         tile_create,
                         att_comments,
                         att_table_name);
-                    
+
                     execute att_view_tbl;
                     
                     return att_table_name;
@@ -355,14 +355,14 @@ class Migration(migrations.Migration):
                 $$;
 
             create or replace function __arches_trg_fnc_update_spatial_attributes()
-                returns trigger 
+                returns trigger
                 language plpgsql
                 as $func$
                 declare
                     trigger_tile  record;
                     spv           record;
                 begin
-                    if tg_op = 'DELETE' then 
+                    if tg_op = 'DELETE' then
                         trigger_tile := old;
                     else
                         trigger_tile := new;
@@ -380,13 +380,13 @@ class Migration(migrations.Migration):
                             with attribute_nodes as (
                                 select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
                             )
-                            select count(*) into found_attr_key_count 
+                            select count(*) into found_attr_key_count
                             from (select jsonb_object_keys(trigger_tile.tiledata) as node_id) keys
                             where keys.node_id::text in (select nodeid::text from attribute_nodes)
                                 or keys.node_id::text = spv.geometrynodeid::text;
 
                             if found_attr_key_count < 1 then
-                                continue; 
+                                continue;
                             end if;
 
                             declare
@@ -409,16 +409,16 @@ class Migration(migrations.Migration):
                                         with attribute_nodes1 as (
                                             select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
                                         )
-                                        select 
-                                            n1.name, 
-                                            n1.nodeid, 
+                                        select
+                                            n1.name,
+                                            n1.nodeid,
                                             n1.nodegroupid,
                                             att_nodes.description
                                         from nodes n1
                                             join (select * from attribute_nodes1) att_nodes ON n1.nodeid = att_nodes.nodeid
                                 loop
                                     tmp_nodegroupid_slug := __arches_slugify(n.nodegroupid::text);
-                                    node_create = node_create || 
+                                    node_create = node_create ||
                                         format(' ,__arches_agg_get_node_display_value(distinct tile_%s.tiledata, %L::uuid) as %s '
                                             ,tmp_nodegroupid_slug
                                             ,n.nodeid::text
@@ -426,7 +426,7 @@ class Migration(migrations.Migration):
                                         );
 
                                     if tile_create not like (format('%%tile_%s%%',tmp_nodegroupid_slug)) then
-                                        tile_create = tile_create || 
+                                        tile_create = tile_create ||
                                             format(' left outer join tiles tile_%s on r.resourceinstanceid = tile_%s.resourceinstanceid
                                                 and tile_%s.nodegroupid = ''%s''::uuid ',
                                             tmp_nodegroupid_slug,
@@ -452,8 +452,8 @@ class Migration(migrations.Migration):
                                         having r.resourceinstanceid = %L::uuid
                                     ',
                                     att_table_name,
-                                    node_create, 
-                                    spv.geometrynodeid::text, 
+                                    node_create,
+                                    spv.geometrynodeid::text,
                                     tile_create,
                                     trigger_tile.resourceinstanceid::text);
 

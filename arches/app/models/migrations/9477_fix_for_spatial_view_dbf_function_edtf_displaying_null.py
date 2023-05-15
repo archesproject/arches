@@ -77,7 +77,12 @@ class Migration(migrations.Migration):
         """
 
     reverse_sql_string = """
-            create or replace function __arches_get_node_display_value(in_tiledata jsonb, in_nodeid uuid) returns text language plpgsql as $$
+            create or replace function __arches_get_node_display_value(
+                in_tiledata jsonb,
+                in_nodeid uuid)
+                returns text
+                language plpgsql
+            as $$
                 declare
                     display_value   text := '';
                     in_node_type    text;
@@ -91,14 +96,14 @@ class Migration(migrations.Migration):
                         return '';
                     end if;
 
-                    select n.datatype, n.config 
-                    into in_node_type, in_node_config 
+                    select n.datatype, n.config
+                    into in_node_type, in_node_config
                     from nodes n where nodeid = in_nodeid::uuid;
-                        
+
                     if in_node_type = 'semantic' then
                         return '<semantic>';
                     end if;
-                    
+
                     if in_node_type is null then
                         return '';
                     end if;
@@ -133,8 +138,8 @@ class Migration(migrations.Migration):
 
                     return display_value;
                 end;
-                $$;
-                SELECT public.__arches_refresh_spatial_views();
+            $$;
+            SELECT public.__arches_refresh_spatial_views();
         """
 
     operations = [
