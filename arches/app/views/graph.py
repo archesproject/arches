@@ -193,6 +193,9 @@ class GraphDesignerView(GraphBaseView):
         except Graph.DoesNotExist:
             raise Exception(_("Graph does not have a source identifier."))
 
+        # self.graph = Graph.objects.get(graphid=graphid)
+
+
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
         source_graph = Graph.objects.get(pk=graphid)
 

@@ -30,8 +30,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block graph_title %}
 <div class="ep-tools-title">
     <h1 class="page-header text-overflow ep-graph-title">
-        <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
-        <span data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"></span>
+        <span>
+            <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
+            <span data-bind="text: graph.name()"></span>
+            <span 
+                class="graph-type" 
+                data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"
+            ></span>
+        </span>
+        <span>
+            <button
+                style="
+                    border: 1px solid #ddd; 
+                    border-radius: 4px;
+                    padding: 8px;
+                    font-size: 16px;
+                "
+            >
+                <i 
+                    class="text-center" 
+                    data-bind="css: ($data.graph.source_identifier_id() ? 'fa fa-unlock' : 'fa fa-lock')" 
+                ></i>
+                <span data-bind="text: $data.graph.source_identifier_id() ? &quot;{% trans "Unlocked" %}&quot; : &quot;{% trans "Locked" %}&quot;"></span>
+            </button>
+        </span>
     </h1>
 </div>
 {% endblock graph_title %}
