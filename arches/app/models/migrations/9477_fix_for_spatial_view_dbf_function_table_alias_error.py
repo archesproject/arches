@@ -324,7 +324,7 @@ class Migration(migrations.Migration):
                         tablespace pg_default
                         as
                         (
-                            select 
+                            select
                                 r.resourceinstanceid::text as resourceinstanceid
                                 %s
                             from resource_instances r
@@ -349,7 +349,7 @@ class Migration(migrations.Migration):
                         att_table_name);
 
                     execute att_view_tbl;
-                    
+
                     return att_table_name;
                 end;
                 $$;
@@ -405,7 +405,7 @@ class Migration(migrations.Migration):
                                     );
                                 execute delete_existing;
 
-                                for n in 
+                                for n in
                                         with attribute_nodes1 as (
                                             select * from jsonb_to_recordset(spv.attributenodes) as x(nodeid uuid, description text)
                                         )
@@ -440,7 +440,8 @@ class Migration(migrations.Migration):
                                 insert_attr := format(
                                     '
                                     insert into %s
-                                        select 
+
+                                        select
                                             r.resourceinstanceid
                                             %s
                                         from resource_instances r
