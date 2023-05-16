@@ -743,12 +743,12 @@ class DateDataType(BaseDataType):
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
-            og_value = data[str(node.pk)]
+            og_value = data[str(node.nodeid)]
             valid_date_format, valid = self.get_valid_date_format(og_value)
             new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
             value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
         except TypeError:
-            value = data[str(node.pk)]
+            value = data[str(node.nodeid)]
         return value
 
 
@@ -775,9 +775,9 @@ class EDTFDataType(BaseDataType):
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
-            value = data[str(node.pk)]["value"]
+            value = data[str(node.nodeid)]["value"]
         except TypeError:
-            value = data[str(node.pk)]
+            value = data[str(node.nodeid)]
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1593,7 +1593,7 @@ class FileListDataType(BaseDataType):
 
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
-        files = data[str(node.pk)]
+        files = data[str(node.nodeid)]
         file_urls = ""
         if files is not None:
             file_urls = " | ".join([file["url"] for file in files])
@@ -1603,7 +1603,7 @@ class FileListDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return self.compile_json(tile, node, file_details=data[str(node.pk)])
+            return self.compile_json(tile, node, file_details=data[str(node.nodeid)])
 
     def post_tile_save(self, tile, nodeid, request):
         if request is not None:
@@ -1737,6 +1737,7 @@ class FileListDataType(BaseDataType):
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
                 try:
+                    print(file['file_id'])
                     if file["file_id"]:
                         if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
@@ -2479,7 +2480,7 @@ class NodeValueDataType(BaseDataType):
         try:
             value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
             data = self.get_tile_data(tile)
-            tileid = data[str(node.pk)]
+            tileid = data[str(node.nodeid)]
             if tileid:
                 value_tile = models.TileModel.objects.get(tileid=tileid)
                 datatype = datatype_factory.get_instance(value_node.datatype)
