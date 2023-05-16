@@ -105,6 +105,14 @@ define([
                                 iconEl.addClass("fa-chevron-right");
                             }
                             var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                            let contentExpanded = contentEl.css('display');
+                            if (contentExpanded) {
+                                if (contentExpanded === 'none') {
+                                    $(this).attr('aria-expanded', 'true');
+                                } else if (contentExpanded === 'block') {
+                                    $(this).attr('aria-expanded', 'false');
+                                };
+                            };
                             contentEl.slideToggle();
                         });
                         $('.reloadable-img').click(function(){
