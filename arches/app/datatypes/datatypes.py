@@ -1737,7 +1737,7 @@ class FileListDataType(BaseDataType):
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
                 try:
-                    print(file['file_id'])
+                    print(file["file_id"])
                     if file["file_id"]:
                         if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
