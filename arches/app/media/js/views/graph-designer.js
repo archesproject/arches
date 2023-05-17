@@ -643,14 +643,18 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
+            console.log('!!!!', data)
             function updateGraphUnpublishedChanges() {
-                viewModel.graphHasUnpublishedChanges(true);
-
-                $.ajax({
-                    type: 'POST',
-                    url: arches.urls.graph_has_unpublished_changes_api(data.graphid),
-                    data: {'has_unpublished_changes': true}
-                });
+                if (data.graph.source_identifier_id) {
+                    $.ajax({
+                        type: 'POST',
+                        url: arches.urls.graph_has_unpublished_changes_api(data.graph.source_identifier_id),
+                        data: {'has_unpublished_changes': true},
+                        success: function(response) {
+                            console.log(response);
+                        }
+                    });
+                }
             }
 
             document.addEventListener('appendBranch', updateGraphUnpublishedChanges);

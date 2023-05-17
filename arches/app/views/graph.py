@@ -188,12 +188,12 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        try:
-            self.graph = Graph.objects.get(source_identifier_id=graphid)
-        except Graph.DoesNotExist:
-            raise Exception(_("Graph does not have a source identifier."))
+        # try:
+        #     self.graph = Graph.objects.get(source_identifier_id=graphid)
+        # except Graph.DoesNotExist:
+        #     raise Exception(_("Graph does not have a source identifier."))
 
-        # self.graph = Graph.objects.get(graphid=graphid)
+        self.graph = Graph.objects.get(graphid=graphid)
 
 
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))

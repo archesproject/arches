@@ -29,7 +29,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_title %}
 <div class="ep-tools-title">
-    <h1 class="page-header text-overflow ep-graph-title">
+    <h1 
+        style="display: flex; justify-content: space-between;"
+        class="page-header text-overflow ep-graph-title"
+    >
         <span>
             <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
             <span data-bind="text: graph.name()"></span>
