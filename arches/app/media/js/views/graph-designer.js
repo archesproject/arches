@@ -651,7 +651,7 @@ define([
                         url: arches.urls.graph_has_unpublished_changes_api(data.graph.source_identifier_id),
                         data: {'has_unpublished_changes': true},
                         success: function(response) {
-                            console.log(response);
+                            viewModel.graphHasUnpublishedChanges(response['has_unpublished_changes']);
                         }
                     });
                 }

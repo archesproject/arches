@@ -387,14 +387,13 @@ class GraphHasUnpublishedChanges(APIBase):
 
     def post(self, request, graph_id=None):
         has_unpublished_changes = bool(request.POST.get("has_unpublished_changes"))
-        graph = Graph.objects.get(pk=graph_id)
-        source_graph = graph.source_identifier
+        graph = Graph.objects.get(source_identifier=graph_id)
 
-        if source_graph.has_unpublished_changes != has_unpublished_changes:
-            source_graph.has_unpublished_changes = has_unpublished_changes
-            source_graph.save()
+        if graph.has_unpublished_changes != has_unpublished_changes:
+            graph.has_unpublished_changes = has_unpublished_changes
+            graph.save()
 
-        return JSONResponse({'has_unpublished_changes': source_graph.has_unpublished_changes})        
+        return JSONResponse({'has_unpublished_changes': graph.has_unpublished_changes})        
 
 
 class GraphIsActive(APIBase):
