@@ -6,6 +6,7 @@ django.setup()
 
 import pyprind
 import sys
+from types import SimpleNamespace
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
@@ -28,6 +29,25 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def get_serialized_graph(graph):
+    """
+    Finds and returns the ontology class of the instance's root node
+
+    """
+    if not graph:
+        return None
+
+    serialized_graph = None
+    try:
+        serialized_graph = (
+            models.PublishedGraph.objects.filter(publication=graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+            .first()
+            .serialized_graph
+        )
+    except AttributeError:
+        pass
+
+    return serialized_graph
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
     """
@@ -152,15 +172,18 @@ def index_resources_using_multiprocessing(
 
 
 def index_resources_using_singleprocessing(
-    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None
+    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None, graph=None
 ):
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+    serialized_graph = get_serialized_graph(graph) if graph else None
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
             for resource in resources:
+                if serialized_graph and (str(resource.graph.graphid) == serialized_graph["graphid"]):
+                    resource.set_serialized_graph(serialized_graph)
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 document, terms = resource.get_documents_to_index(
@@ -203,8 +226,8 @@ def index_resources_by_type(
     for resource_type in resource_types:
         start = datetime.now()
 
-        graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
-        logger.info("Indexing resource type '{0}'".format(graph_name))
+        graph = models.GraphModel.objects.get(graphid=str(resource_type))
+        logger.info("Indexing resource type '{0}'".format(graph.name))
 
         if clear_index:
             tq = Query(se=se)
@@ -231,7 +254,8 @@ def index_resources_by_type(
             from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
             resources = Resource.objects.filter(graph_id=str(resource_type))
-            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title=graph_name)
+            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet,
+                                                   title=graph.name, graph=graph)
 
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
@@ -240,7 +264,7 @@ def index_resources_by_type(
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
         logger.info(
             "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(
-                status, graph_name, result_summary["database"], result_summary["indexed"], (datetime.now() - start).seconds
+                status, graph.name, result_summary["database"], result_summary["indexed"], (datetime.now() - start).seconds
             )
         )
     return status
