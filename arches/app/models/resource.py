@@ -234,8 +234,11 @@ class Resource(models.ResourceInstance):
         """
         try:
             if self.serialized_graph:
-                return (self.serialized_graph["topnode"] if "topnode" in self.serialized_graph else
-                        SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None))).ontologyclass
+                return (
+                    self.serialized_graph["topnode"]
+                    if "topnode" in self.serialized_graph
+                    else SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None))
+                ).ontologyclass
         except:
             pass
 
