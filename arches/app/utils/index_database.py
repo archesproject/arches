@@ -29,6 +29,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def get_serialized_graph(graph):
     """
     Finds and returns the ontology class of the instance's root node
@@ -254,8 +255,7 @@ def index_resources_by_type(
             from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
             resources = Resource.objects.filter(graph_id=str(resource_type))
-            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet,
-                                                   title=graph.name, graph=graph)
+            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title=graph.name, graph=graph)
 
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
