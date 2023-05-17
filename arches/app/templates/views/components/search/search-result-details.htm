@@ -9,13 +9,13 @@
 
     <!-- ko ifnot: loading() -->
         <!--ko if: report() -->
-        <div class='resource-report' data-bind='component: {
-            name: "resource-report-abstract",
+        <div class="resource-report" data-bind="component: {
+            name: 'resource-report-abstract',
             params: {
                 report: report(),
                 summary: true
             }
-        }'></div>
+        }, attr: {'aria-label': report().report_json.displayname + ' ' + $root.translations.resourceDetails}"></div>
         <!--/ko-->
         <!--ko ifnot: report() -->
         <div class="search-result-details-splash">
@@ -32,7 +32,7 @@
 
                 <!-- Splash Instructions -->
                 <div class="rr-splash-description">
-                    <span data-bind="text: $root.translations.resourceDetailsText"></span>
+                    <span data-bind="text: $root.translations.resourceDetailsText, attr: {'aria-label': $root.translations.noDetailsShown}" aria-live="polite"></span>
                 </div>
             </div>
         </div>
