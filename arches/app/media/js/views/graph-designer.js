@@ -645,16 +645,14 @@ define([
 
             console.log('!!!!', data)
             function updateGraphUnpublishedChanges() {
-                if (data.graph.source_identifier_id) {
-                    $.ajax({
-                        type: 'POST',
-                        url: arches.urls.graph_has_unpublished_changes_api(data.graph.source_identifier_id),
-                        data: {'has_unpublished_changes': true},
-                        success: function(response) {
-                            viewModel.graphHasUnpublishedChanges(response['has_unpublished_changes']);
-                        }
-                    });
-                }
+                $.ajax({
+                    type: 'POST',
+                    url: arches.urls.graph_has_unpublished_changes_api(data.graph.source_identifier_id || data.graphid),
+                    data: {'has_unpublished_changes': true},
+                    success: function(response) {
+                        viewModel.graphHasUnpublishedChanges(response['has_unpublished_changes']);
+                    }
+                });
             }
 
             document.addEventListener('appendBranch', updateGraphUnpublishedChanges);

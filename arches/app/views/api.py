@@ -387,7 +387,7 @@ class GraphHasUnpublishedChanges(APIBase):
 
     def post(self, request, graph_id=None):
         has_unpublished_changes = bool(request.POST.get("has_unpublished_changes"))
-        graph = Graph.objects.get(source_identifier=graph_id)
+        graph = Graph.objects.get(pk=graph_id)
 
         if graph.has_unpublished_changes != has_unpublished_changes:
             graph.has_unpublished_changes = has_unpublished_changes
