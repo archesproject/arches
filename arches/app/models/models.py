@@ -496,8 +496,9 @@ class GraphXPublishedGraph(models.Model):
     publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.DO_NOTHING)
     published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
+    most_recent_edit = models.ForeignKey('PublishedGraphEdit', db_column="edit_id", on_delete=models.DO_NOTHING, null=True, blank=True)
 
     class Meta:
         managed = True
@@ -775,6 +776,18 @@ class PublishedGraph(models.Model):
     class Meta:
         managed = True
         db_table = "published_graphs"
+
+
+class PublishedGraphEdit(models.Model):
+    edit_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    edit_time = models.DateTimeField(default=datetime.datetime.now, null=False)
+    publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
+    notes = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        managed = True
+        db_table = "published_graph_edits"
 
 
 class Relation(models.Model):
