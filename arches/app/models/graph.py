@@ -2089,6 +2089,13 @@ class Graph(models.GraphModel):
 
         self.create_editable_future_graph()
 
+    def update_publications(self):
+        """
+        Changes information in in GraphPublication models without creating
+        a new entry in graphs_x_published_graphs table
+        """
+        pass
+
     def publish(self, user=None, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
