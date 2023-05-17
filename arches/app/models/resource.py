@@ -198,7 +198,7 @@ class Resource(models.ResourceInstance):
 
         """
         # TODO: 7783 cbyrd throw error if graph is unpublished
-        # TODO: 9540 - this initializes serialized graph (for use in superclass?). Setup for the above TODO
+        # This initializes serialized graph (for use in superclass?). Setup for the above. NOt sure
         if not self.get_serialized_graph():
             pass
 
