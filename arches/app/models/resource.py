@@ -239,7 +239,7 @@ class Resource(models.ResourceInstance):
         except:
             pass
 
-        graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
+        graph_node = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True).first()
         return graph_node.ontologyclass if graph_node.ontologyclass else None
 
     def load_tiles(self, user=None, perm=None):
