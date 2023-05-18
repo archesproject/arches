@@ -526,7 +526,11 @@ class GraphPublicationView(View):
 
         elif self.action == "revert_foo":
             try:
-                graph.revert_foo()
+                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=translation.get_language())
+                serialized_graph = published_graph.serialized_graph
+
+                graph.restore_state_from_serialized_graph(serialized_graph)
+                
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))
