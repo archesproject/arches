@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 def get_serialized_graph(graph):
     """
-    Finds and returns the ontology class of the instance's root node
+    Returns the serialized version of the graph from the database
 
     """
     if not graph:

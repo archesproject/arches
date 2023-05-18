@@ -232,15 +232,14 @@ class Resource(models.ResourceInstance):
         Finds and returns the ontology class of the instance's root node
 
         """
-        try:
-            if self.serialized_graph:
-                return (
-                    self.serialized_graph["topnode"]
-                    if "topnode" in self.serialized_graph
-                    else SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None))
-                ).ontologyclass
-        except:
-            pass
+        if self.serialized_graph:
+            try:
+                if "topnode" in self.serialized_graph:
+                    return self.serialized_graph["topnode"]["ontologyclass"]
+                else:
+                    return SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)).ontologyclass
+            except AttributeError:
+                pass #graph has no ontology
 
         graph_node = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True).first()
         return graph_node.ontologyclass if graph_node.ontologyclass else None
