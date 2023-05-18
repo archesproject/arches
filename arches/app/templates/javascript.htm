@@ -112,6 +112,30 @@
             "title": "{% trans "Delete Branch/Resource Model?" %}",
             "text": "{% trans "Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
         }'
+        confirm-graph-publication-delete='{
+            "title": "{% trans "Delete Published Graph?" %}",
+            "text": "{% trans "Deleting this publication will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-delete-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully deleted." %}"
+        }'
+        graph-publication-delete-failure='{
+            "title": "{% jsescaped_trans "Delete Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-publication-update='{
+            "title": "{% trans "Update Graph to selected version?" %}",
+            "text": "{% trans "Updating this Graph to the selected published version will change the Graph throughout the application.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-update-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully updated." %}"
+        }'
+        graph-publication-update-failure='{
+            "title": "{% jsescaped_trans "Restore Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
         confirm-graph-revert='{
             "title": "{% trans "Revert Branch/Resource Model?" %}",
             "text": "{% trans "This will revert the current branch/resource model to the latest published version.  Are you sure you would like to proceed?" %}"
@@ -141,11 +165,11 @@
         }'
         resource-graph-has-unpublished-changes='{
             "title": "{% jsescaped_trans "Graph Has Unpublished Changes" %}",
-            "text": "{% jsescaped_trans "This Resource Instance is based on a graph that has unpublished changes. If you want this Resource Instance to include the latest changes, please navigate to the Graph Designer and publish the related Graph." %}"
+            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
         }'
         resource-graph-has-different-publication='{
-            "title": "{% jsescaped_trans "Graph Has Different Publication" %}",
-            "text": "{% jsescaped_trans "This Resource Instance is based on a graph that has a different publication than the current one. If you want this Resource Instance to include the latest changes, please migrate this instance to the current graph publication." %}"
+            "title": "{% jsescaped_trans "Graph Has Different Published Version" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
         }'
         resource-graph-change-active-status-error='{
             "title": "{% jsescaped_trans "Could not update Resource Model active state" %}",
@@ -807,6 +831,7 @@
         from_sparql_endpoint="{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
         search_sparql_endpoint="{% url 'search_sparql_endpoint' %}"
         confirm_delete="{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        graph_designer='(graphid)=>{return "{% url "graph_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         search_home="{% url 'search_home' %}"
         search_terms="{% url 'search_terms' %}"
         search_results="{% url 'search_results' %}"
@@ -844,6 +869,8 @@
         delete_provisional_tile="{% url 'delete_provisional_tile' %}"
         tile_history="{% url 'tile_history' %}"
         download_files="{% url 'download_files' %}"
+        delete_published_graph='"{% url "delete_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        update_published_graph='"{% url "update_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         remove_functions='"{% url "remove_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         time_wheel_config="{% url 'time_wheel_config' %}"
@@ -868,6 +895,7 @@
         delete_instances='(graphid)=>{return "{% url "delete_instances" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         export_mapping_file='(graphid)=>{return "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         add_resource='(graphid)=>{return "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        model_history='(graphid)=>{return "{% url "model_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
         transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'

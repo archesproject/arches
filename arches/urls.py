@@ -34,6 +34,7 @@ from arches.app.views.graph import (
     CardView,
     FunctionManagerView,
     PermissionDataView,
+    ModelHistoryView,
     IconDataView,
     NodegroupView,
 )
@@ -188,6 +189,9 @@ urlpatterns = [
     url(r"^graph/(?P<graphid>%s)/publish$" % uuid_regex, GraphPublicationView.as_view(action="publish"), name="publish_graph"),
     url(r"^graph/(?P<graphid>%s)/revert$" % uuid_regex, GraphPublicationView.as_view(action="revert"), name="revert_graph"),
     url(r"^graph/(?P<graphid>%s)/revert_foo$" % uuid_regex, GraphPublicationView.as_view(action="revert_foo"), name="revert_foo"),
+    url(r"^graph/(?P<graphid>%s)/model_history$" % uuid_regex, ModelHistoryView.as_view(), name="model_history"),
+    url(r"^graph/(?P<graphid>%s)/update_published_graph$" % uuid_regex, ModelHistoryView.as_view(), name="update_published_graph"),
+    url(r"^graph/(?P<graphid>%s)/delete_published_graph$" % uuid_regex, ModelHistoryView.as_view(), name="delete_published_graph"),
     url(r"^graph/(?P<graphid>%s)/function_manager$" % uuid_regex, FunctionManagerView.as_view(), name="function_manager"),
     url(r"^graph/(?P<graphid>%s)/apply_functions$" % uuid_regex, FunctionManagerView.as_view(), name="apply_functions"),
     url(r"^graph/(?P<graphid>%s)/remove_functions$" % uuid_regex, FunctionManagerView.as_view(), name="remove_functions"),
