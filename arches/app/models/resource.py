@@ -237,9 +237,11 @@ class Resource(models.ResourceInstance):
                 if "topnode" in self.serialized_graph:
                     return self.serialized_graph["topnode"]["ontologyclass"]
                 else:
-                    return SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)).ontologyclass
+                    return SimpleNamespace(
+                        **next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)
+                    ).ontologyclass
             except AttributeError:
-                pass #graph has no ontology
+                pass  # graph has no ontology
 
         graph_node = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True).first()
         return graph_node.ontologyclass if graph_node.ontologyclass else None
