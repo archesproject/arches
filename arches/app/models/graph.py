@@ -876,7 +876,6 @@ class Graph(models.GraphModel):
 
         for widget in copy_of_self.widgets.values():
             widget.pk = uuid.uuid1()
-
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
 
@@ -2100,6 +2099,8 @@ class Graph(models.GraphModel):
         Reverts a Graph's editable_future_graph to represent the source,
         discarding all changes
         """
+        published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=translation.get_language())
+        serialized_graph = published_graph.serialized_graph
         import pdb; pdb.set_trace()
 
 
