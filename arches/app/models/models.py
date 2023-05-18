@@ -498,7 +498,7 @@ class GraphXPublishedGraph(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.DO_NOTHING)
     published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
-    most_recent_edit = models.ForeignKey('PublishedGraphEdit', db_column="edit_id", on_delete=models.DO_NOTHING, null=True, blank=True)
+    most_recent_edit = models.ForeignKey("PublishedGraphEdit", db_column="edit_id", on_delete=models.DO_NOTHING, null=True, blank=True)
 
     class Meta:
         managed = True

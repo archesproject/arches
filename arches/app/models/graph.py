@@ -126,12 +126,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if (
-                    self.publication 
-                    and not self.source_identifier_id 
-                    and not self.has_unpublished_changes
-                    and not has_deferred_args
-                ):
+                if self.publication and not self.source_identifier_id and not self.has_unpublished_changes and not has_deferred_args:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     node_slugs = []
@@ -2101,15 +2096,18 @@ class Graph(models.GraphModel):
         """
         published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=translation.get_language())
         serialized_graph = published_graph.serialized_graph
-        import pdb; pdb.set_trace()
+        import pdb
 
+        pdb.set_trace()
 
     def update_publications(self):
         """
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
         """
-        import pdb; pdb.set_trace()
+        import pdb
+
+        pdb.set_trace()
         pass
 
     def publish(self, user=None, notes=None):

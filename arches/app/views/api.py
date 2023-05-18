@@ -393,7 +393,7 @@ class GraphHasUnpublishedChanges(APIBase):
             graph.has_unpublished_changes = has_unpublished_changes
             graph.save()
 
-        return JSONResponse({'has_unpublished_changes': graph.has_unpublished_changes})        
+        return JSONResponse({"has_unpublished_changes": graph.has_unpublished_changes})
 
 
 class GraphIsActive(APIBase):
@@ -427,7 +427,9 @@ class GraphIsActive(APIBase):
                     editable_future_graph.is_active = is_active
                     editable_future_graph.save()
 
-            return JSONResponse({"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": editable_future_graph.is_active})
+            return JSONResponse(
+                {"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": editable_future_graph.is_active}
+            )
         except:
             return JSONResponse(status=500)
 
