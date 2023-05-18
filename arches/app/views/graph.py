@@ -530,7 +530,7 @@ class GraphPublicationView(View):
                 serialized_graph = published_graph.serialized_graph
 
                 graph.restore_state_from_serialized_graph(serialized_graph)
-                
+
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))

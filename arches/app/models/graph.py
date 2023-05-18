@@ -2094,15 +2094,11 @@ class Graph(models.GraphModel):
         Reverts a Graph's editable_future_graph to represent the source,
         discarding all changes
         """
-        models.NodeGroup.objects.filter(
-            pk__in=[nodegroup.pk for nodegroup in self.get_nodegroups(force_recalculation=True)]
-        ).delete()
+        models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in self.get_nodegroups(force_recalculation=True)]).delete()
         models.Node.objects.filter(pk__in=[node.pk for node in self.nodes.values()]).delete()
         models.Edge.objects.filter(pk__in=[edge.pk for edge in self.edges.values()]).delete()
         models.CardModel.objects.filter(pk__in=[card.pk for card in self.cards.values()]).delete()
-        models.CardXNodeXWidget.objects.filter(
-            pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in self.widgets.values()]
-        ).delete()
+        models.CardXNodeXWidget.objects.filter(pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in self.widgets.values()]).delete()
 
         for serialized_nodegroup in serialized_graph["nodegroups"]:
             for key, value in serialized_nodegroup.items():
