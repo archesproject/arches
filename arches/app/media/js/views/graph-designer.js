@@ -205,6 +205,31 @@ define([
                 });
             };
 
+            viewModel.showRevertFOO = function() {
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    'foo', 
+                    'bar',
+                    function() {}, 
+                    viewModel.revertFOO,
+                ));
+            };
+
+            viewModel.revertFOO = function() {
+                viewModel.loading(true);
+
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.revert_foo(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        if (status === 'success') { window.location.reload(); }
+                        else {
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+                    }
+                });
+            };
+
             viewModel.deleteGraph = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 

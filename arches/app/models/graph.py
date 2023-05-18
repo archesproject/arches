@@ -2094,6 +2094,14 @@ class Graph(models.GraphModel):
 
         self.create_editable_future_graph()
 
+    def revert_foo(self):
+        """
+        Reverts a Graph's editable_future_graph to represent the source,
+        discarding all changes
+        """
+        import pdb; pdb.set_trace()
+
+
     def update_publications(self):
         """
         Changes information in in GraphPublication models without creating

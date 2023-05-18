@@ -223,18 +223,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- /ko -->
 
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-            <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
-                <span 
-                    style="font-size: 14px;" 
-                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Publish Resource Model'%} : {% quoted_trans 'Publish Branch'%}"
-                ></span>
-            </button>
-            <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertGraphAlert">
-                <span 
-                    style="font-size: 14px;" 
-                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Revert Resource Model'%} : {% quoted_trans 'Revert Branch'%}"
-                ></span>
-            </button>
+                <!-- ko if: $data.graph.source_identifier_id() -->
+                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Publish Resource Model'%} : {% quoted_trans 'Publish Branch'%}"
+                    ></span>
+                </button>
+                <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertGraphAlert">
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Revert Resource Model'%} : {% quoted_trans 'Revert Branch'%}"
+                    ></span>
+                </button>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.graph.source_identifier_id() -->
+                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
+                    <span style="font-size: 14px;">{% trans 'Apply Changes'%}</span>
+                </button>
+                <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertFOO">
+                    <span style="font-size: 14px;">{% trans 'Revert Changes'%}</span>
+                </button>
+                <!-- /ko -->
             <!-- /ko -->
 
             <a class="btn btn-md btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="

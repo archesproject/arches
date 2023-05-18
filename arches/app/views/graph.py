@@ -498,7 +498,9 @@ class GraphPublicationView(View):
 
     def post(self, request, graphid):
         graph = Graph.objects.get(pk=graphid)
-        source_graph = Graph.objects.get(pk=graph.source_identifier_id)
+
+        if graph.source_identifier:
+            source_graph = graph.source_identifier
 
         if self.action == "publish":
             notes = None
@@ -516,6 +518,13 @@ class GraphPublicationView(View):
         elif self.action == "revert":
             try:
                 source_graph.revert()
+                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+            except Exception as e:
+                return JSONErrorResponse(str(e))
+
+        elif self.action == "revert_foo":
+            try:
+                graph.revert_foo()
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))
