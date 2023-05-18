@@ -5,67 +5,100 @@
 {% block workbench_wrapper_classes %}related-resources-graph-workbench{% endblock workbench_wrapper_classes %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('information');
-}, css: {
-    'active': activeTab() === 'information'
-}">
-    <i class="fa fa-info"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.info"
-    ></span>
-</div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('search');
-}, css: {
-    'active': activeTab() === 'search'
-}">
-    <i class="fa fa-search"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.search"
-    ></span>
-</div>
-{% comment %} Uncomment this section to show additional tabs...
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('analyze');
-}, css: {
-    'active': activeTab() === 'analyze'
-}">
-    <i class="fa fa-line-chart"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.analyze"
-    ></span>
-</div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('settings');
-}, css: {
-    'active': activeTab() === 'settings'
-}">
-    <i class="fa fa-cog"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.settings"
-    ></span>
-</div>
-{% endcomment %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('legend');
-}, css: {
-    'active': activeTab() === 'legend'
-}">
-    <i class="fa fa-list"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.legend"
-    ></span>
+<div role="tablist">
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('information');
+        }, css: {
+            'active': activeTab() === 'information'
+        }, attr: {
+            'aria-label': $root.translations.info,
+            'aria-selected': activeTab() === 'information',
+            'aria-controls': 'infoTabId',
+        }"
+    >
+        <i class="fa fa-info"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.info"
+        ></span>
+    </div>
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('search');
+        }, css: {
+            'active': activeTab() === 'search'
+        }, attr: {
+            'aria-label': $root.translations.search,
+            'aria-selected': activeTab() === 'search',
+            'aria-controls': 'searchTabId',
+        }"
+    >
+        <i class="fa fa-search"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.search"
+        ></span>
+    </div>
+    {% comment %} Uncomment this section to show additional tabs...
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('analyze');
+        }, css: {
+            'active': activeTab() === 'analyze'
+        }, attr: {
+            'aria-label': $root.translations.analyze,
+            'aria-selected': activeTab() === 'analyze',
+            'aria-controls': 'analyzeTabId',
+        }"
+    >
+        <i class="fa fa-line-chart"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.analyze"
+        ></span>
+    </div>
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('settings');
+        }, css: {
+            'active': activeTab() === 'settings'
+        }, attr: {
+            'aria-label': $root.translations.settings,
+            'aria-selected': activeTab() === 'settings',
+            'aria-controls': 'settingsTabId',
+        }"
+    >
+        <i class="fa fa-cog"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.settings"
+        ></span>
+    </div>
+    {% endcomment %}
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('legend');
+        }, css: {
+            'active': activeTab() === 'legend'
+        }, attr: {
+            'aria-label': $root.translations.legend,
+            'aria-selected': activeTab() === 'legend',
+            'aria-controls': 'legendTabId',
+        }"
+    >
+        <i class="fa fa-list"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.legend"
+        ></span>
+    </div>
 </div>
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'information' -->
+<div id="infoTabId" role="tabpanel">
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
         <span data-bind="text: $root.translations.resourceInformation"></span>
@@ -193,9 +226,11 @@
     <!--/ko -->
     <!--/ko -->
 </div>
+</div>
 <!--/ko -->
 
 <!--ko if: activeTab() === 'search' -->
+<div id="searchTabId" role="tabpanel">
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
         <span data-bind="text: $root.translations.searchNetwork"></span>
@@ -245,22 +280,24 @@
     </div>
 </div>
 </div>
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
-<div class="workbench-card-sidepanel-header-container">
+<div class="workbench-card-sidepanel-header-container" id="analyzeTabId" role="tabpanel">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
         <span data-bind="text: $root.translations.analyzeNetwork"></span>
     </h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'settings' -->
-<div class="workbench-card-sidepanel-header-container">
+<div class="workbench-card-sidepanel-header-container" id="settingsTabId" role="tabpanel">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
         <span data-bind="text: $root.translations.settings"></span>
     </h4>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
+<div id="legendTabId" role="tabpanel">
 <div class="workbench-card-sidepanel-header-container">
     <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
         <span data-bind="text: $root.translations.legend"></span>
@@ -276,6 +313,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <!--/ko -->
 {% endblock sidepanel %}
