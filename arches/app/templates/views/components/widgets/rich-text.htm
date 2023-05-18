@@ -8,7 +8,12 @@
         <div class="widget-inline-tools-collapser" data-bind=" click: function() {
             showi18nOptions(!showi18nOptions());
         }">
-            <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+            <span">
+                <label class="control-label widget-input-label data-bind="text:label"></label>
+                <!-- ko if: node -->
+                <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+                <!-- /ko -->
+            </span>
             <span>
                 <i class="fa" data-bind="{
                     css: {
@@ -48,9 +53,6 @@
                 </div>
             </div>
         </div>
-        <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-        <!-- /ko -->
         <div class="col-xs-12">
             <textarea 
                 rows="10" 
