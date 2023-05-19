@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block tabs %}
-<div id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+<div tabindex="0" id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
     toggleTab('filter'); toggleAriaExpanded('toggle-map-filter-panel');
 }, css: {
     'active': activeTab() === 'filter'
