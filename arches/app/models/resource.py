@@ -59,6 +59,7 @@ logger = logging.getLogger(__name__)
 
 class Resource(models.ResourceInstance):
     serialized_graph = None
+    node_datatypes = None
 
     class Meta:
         proxy = True
@@ -87,6 +88,24 @@ class Resource(models.ResourceInstance):
 
     def set_serialized_graph(self, serialized_graph):
         self.serialized_graph = serialized_graph
+
+    def get_node_datatypes(self):
+        if not self.node_datatypes:
+            self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        return self.node_datatypes
+
+    def set_node_datatypes(self, node_datatypes):
+        self.node_datatypes = node_datatypes
+
+    def get_root_ontology(self):
+        """
+        Finds and returns the ontology class of the instance's root node
+
+        """
+        if "topnode" in self.serialized_graph:
+            return self.get_serialized_graph()["topnode"]["ontologyclass"]
+        else:
+            return SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)).ontologyclass
 
     def get_descriptor_language(self, context):
         """
@@ -226,25 +245,6 @@ class Resource(models.ResourceInstance):
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index(context)
-
-    def get_root_ontology(self):
-        """
-        Finds and returns the ontology class of the instance's root node
-
-        """
-        if self.serialized_graph:
-            try:
-                if "topnode" in self.serialized_graph:
-                    return self.serialized_graph["topnode"]["ontologyclass"]
-                else:
-                    return SimpleNamespace(
-                        **next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)
-                    ).ontologyclass
-            except AttributeError:
-                pass  # graph has no ontology
-
-        graph_node = models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True).first()
-        return graph_node.ontologyclass if graph_node.ontologyclass else None
 
     def load_tiles(self, user=None, perm=None):
         """
