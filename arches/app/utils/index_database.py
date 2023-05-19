@@ -168,8 +168,10 @@ def index_resources_using_multiprocessing(
         pool.close()
         pool.join()
 
+
 def index_resources_using_singleprocessing(
-    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None):
+    resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None
+):
     datatype_factory = DataTypeFactory()
     node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
