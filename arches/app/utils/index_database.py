@@ -39,7 +39,7 @@ def get_serialized_graph(graph):
     if not graph:
         return None
 
-    if not graph.graphid in serialized_graphs:
+    if graph.graphid not in serialized_graphs:
         serialized_graphs[graph.graphid] = (
             models.PublishedGraph.objects.filter(publication=graph.publication.publicationid, language=settings.LANGUAGE_CODE)
             .first()
