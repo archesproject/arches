@@ -48,6 +48,12 @@ define([
             return "unique_id_" + self.uniqueId;
         });
 
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.validationErrors = params.validationErrors || ko.observable();
+        this.validated = params.validated || ko.observable();
+        this.getErrorReport = params.getErrorReport;
+        this.getNodeError = params.getNodeError;
+
         this.createTableConfig = function(col) {
             return {
                 paging: false,
@@ -110,6 +116,10 @@ define([
             }
         });
 
+        this.selectedGraph.subscribe(graph => {
+            if (!graph) {self.nodes(null);}
+        });
+
         this.csvBody.subscribe(val => {
             self.numberOfRow(val.length);
             self.csvExample(val.slice(0, 5));
@@ -119,7 +129,6 @@ define([
             self.loading(true);
             self.submit('get_graphs').then(function(response){
                 self.graphs(response.result);
-                self.selectedGraph(self.graphs()[0].graphid);
                 self.loading(false);
             });
         };

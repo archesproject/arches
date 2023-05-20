@@ -112,12 +112,12 @@ class ImportSingleCsv(BaseImportModule):
                 data["config"] = row[0][0]
         return {"success": True, "data": data}
 
-    def validate(self):
+    def validate(self, loadid):
         """
         Creates records in the load_staging table (validated before poulating the load_staging table with error message)
         Collects error messages if any and returns table of error messages
         """
-        rows = self.get_validation_result()
+        rows = self.get_validation_result(loadid)
         return {"success": True, "data": rows}
 
     def write(self, request):
@@ -164,8 +164,13 @@ class ImportSingleCsv(BaseImportModule):
 
         self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
-        validation = self.validate()
+        validation = self.validate(loadid)
         if len(validation["data"]) == 0:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    ("validated", loadid),
+                )
             response = self.save_to_tiles(loadid, multiprocessing=False)
             return response
         else:
@@ -236,11 +241,10 @@ class ImportSingleCsv(BaseImportModule):
                             datatype_instance = self.datatype_factory.get_instance(datatype)
                             source_value = row[i]
                             config = current_node.config
-                            if datatype == "file-list":
-                                config["path"] = temp_dir
-                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
-                                errors = datatype_instance.validate(value, nodeid=node, path=temp_dir)
-                            elif datatype == "string":
+                            config["nodeid"] = node
+                            config["path"] = temp_dir
+
+                            if datatype == "string":
                                 try:
                                     code = csv_mapping[i]["language"]["code"]
                                     direction = csv_mapping[i]["language"]["default_direction"]
@@ -252,13 +256,19 @@ class ImportSingleCsv(BaseImportModule):
                                 )
                                 errors = datatype_instance.validate(value, nodeid=node)
                             else:
-                                value = datatype_instance.transform_value_for_tile(source_value, **config) if source_value else None
-                                errors = datatype_instance.validate(value, nodeid=node)
+                                value, errors = self.prepare_data_for_loading(datatype_instance, source_value, config)
+
                             valid = True if len(errors) == 0 else False
                             error_message = ""
                             for error in errors:
                                 error_message = (
                                     "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                                )
+                                cursor.execute(
+                                    """
+                                    INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
+                                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                    ("node", source_value, csv_file_name, error["title"], error["message"], datatype, loadid, node),
                                 )
 
                             if nodegroupid in dict_by_nodegroup:
@@ -337,6 +347,15 @@ class ImportSingleCsv(BaseImportModule):
                         )
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
+                cursor.execute(
+                    """
+                    INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
+                    SELECT 'tile', source_description, error_message, loadid, nodegroupid
+                    FROM load_staging
+                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
+                    """,
+                    [loadid],
+                )
 
         self.delete_from_default_storage(temp_dir)
 
