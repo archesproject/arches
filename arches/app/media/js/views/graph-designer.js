@@ -208,8 +208,8 @@ define([
             viewModel.showRestoreStateFromSerializedGraphAlert = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 
-                    'foo', 
-                    'bar',
+                    arches.translations.confirmGraphRevert.title, 
+                    arches.translations.confirmGraphRevert.text,
                     function() {}, 
                     viewModel.restoreStateFromSerializedGraph,
                 ));
@@ -233,8 +233,8 @@ define([
             viewModel.showUpdatePublishedGraphsAlert = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 
-                    'foo', 
-                    'bar',
+                    arches.translations.confirmGraphPublicationEdit.title, 
+                    arches.translations.confirmGraphPublicationEdit.text, 
                     function() {}, 
                     viewModel.updatePublishedGraphs,
                 ));
