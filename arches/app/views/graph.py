@@ -525,10 +525,8 @@ class GraphPublicationView(View):
                 return JSONErrorResponse(str(e))
 
         elif self.action == "apply_bar":
-            import pdb; pdb.set_trace()
             try:
-         
-
+                source_graph.update_publications()
                 return JSONResponse({"graph": source_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))

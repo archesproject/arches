@@ -2171,10 +2171,15 @@ class Graph(models.GraphModel):
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
         """
-        import pdb
+        self.has_unpublished_changes = False
+        self.save()
 
-        pdb.set_trace()
-        pass
+        serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True))
+
+        for published_graph in models.PublishedGraph.objects.filter(publication_id=self.publication_id):
+            published_graph.serialized_graph = serialized_graph
+            published_graph.save()
+
 
     def publish(self, user=None, notes=None):
         """

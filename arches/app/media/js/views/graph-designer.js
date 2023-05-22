@@ -236,7 +236,7 @@ define([
                     'foo', 
                     'bar',
                     function() {}, 
-                    viewModel.revertBAR,
+                    viewModel.applyBAR,
                 ));
             };
 
