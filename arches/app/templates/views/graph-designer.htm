@@ -238,10 +238,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </button>
                 <!-- /ko -->
                 <!-- ko ifnot: $data.graph.source_identifier_id() -->
-                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: $data.showApplyBAR">
+                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: $data.showUpdatePublishedGraphsAlert">
                     <span style="font-size: 14px;">{% trans 'Apply Changes'%}</span>
                 </button>
-                <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertFOO">
+                <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRestoreStateFromSerializedGraphAlert">
                     <span style="font-size: 14px;">{% trans 'Revert Changes'%}</span>
                 </button>
                 <!-- /ko -->

@@ -205,17 +205,17 @@ define([
                 });
             };
 
-            viewModel.showRevertFOO = function() {
+            viewModel.showRestoreStateFromSerializedGraphAlert = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 
                     'foo', 
                     'bar',
                     function() {}, 
-                    viewModel.revertFOO,
+                    viewModel.restoreStateFromSerializedGraph,
                 ));
             };
 
-            viewModel.revertFOO = function() {
+            viewModel.restoreStateFromSerializedGraph = function() {
                 viewModel.loading(true);
 
                 $.ajax({
@@ -230,17 +230,17 @@ define([
                 });
             };
 
-            viewModel.showApplyBAR = function() {
+            viewModel.showUpdatePublishedGraphsAlert = function() {
                 viewModel.alert(new AlertViewModel(
                     'ep-alert-red', 
                     'foo', 
                     'bar',
                     function() {}, 
-                    viewModel.applyBAR,
+                    viewModel.updatePublishedGraphs,
                 ));
             };
 
-            viewModel.applyBAR = function() {
+            viewModel.updatePublishedGraphs = function() {
                 viewModel.loading(true);
 
                 $.ajax({
