@@ -524,14 +524,14 @@ class GraphPublicationView(View):
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
-        elif self.action == "apply_bar":
+        elif self.action == "update_published_graphs":
             try:
-                source_graph.update_publications()
+                source_graph.update_published_graphs()
                 return JSONResponse({"graph": source_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
-        elif self.action == "revert_foo":
+        elif self.action == "restore_state_from_serialized_graph":
             try:
                 published_graph = models.PublishedGraph.objects.get(publication=source_graph.publication, language=settings.LANGUAGE_CODE)
                 serialized_graph = published_graph.serialized_graph

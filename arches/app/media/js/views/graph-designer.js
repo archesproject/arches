@@ -220,7 +220,7 @@ define([
 
                 $.ajax({
                     type: "POST",
-                    url: arches.urls.revert_foo(viewModel.graph.graphid()),
+                    url: arches.urls.restore_state_from_serialized_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         if (status === 'success') { window.location.reload(); }
                         else {
@@ -245,7 +245,7 @@ define([
 
                 $.ajax({
                     type: "POST",
-                    url: arches.urls.apply_bar(viewModel.graph.graphid()),
+                    url: arches.urls.update_published_graphs(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         if (status === 'success') { window.location.reload(); }
                         else {

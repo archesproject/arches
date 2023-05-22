@@ -2166,7 +2166,7 @@ class Graph(models.GraphModel):
 
         return updated_graph
 
-    def update_publications(self):
+    def update_published_graphs(self):
         """
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
