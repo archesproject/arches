@@ -197,7 +197,6 @@ class GraphDesignerView(GraphBaseView):
 
         self.graph = Graph.objects.get(graphid=graphid)
 
-        # import pdb; pdb.set_trace()
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
         source_graph = Graph.objects.get(pk=graphid)
 

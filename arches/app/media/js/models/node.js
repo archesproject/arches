@@ -324,13 +324,14 @@ define([
                 if (status==='success') {
                     this.alias(request.responseJSON.updated_values?.node.alias);
                     this._node(this.json());
-
-                    // adds event to trigger dirty state in graph-designer
-                    document.dispatchEvent(
-                        new Event('nodeSave')
-                    );
                 }
             };
+
+            // adds event to trigger dirty state in graph-designer
+            // need to execute before save to avoid issues with graph caching
+            document.dispatchEvent(
+                new Event('nodeSave')
+            );
             return this._doRequest({
                 type: method,
                 url: this._getURL(method),
