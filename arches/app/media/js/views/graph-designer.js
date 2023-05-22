@@ -139,6 +139,10 @@ define([
 
             viewModel.shouldShowPublishModal = ko.observable(false);
 
+            viewModel.toggleLockedState = function() {
+                console.log(viewModel, self)
+            };
+
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
 

@@ -190,30 +190,37 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        # try:
-        #     self.graph = Graph.objects.get(source_identifier_id=graphid)
-        # except Graph.DoesNotExist:
-        #     raise Exception(_("Graph does not have a source identifier."))
+        self.source_graph = Graph.objects.get(pk=graphid)
+        self.editable_future_graph = None
 
-        self.graph = Graph.objects.get(graphid=graphid)
+        if self.source_graph.source_identifier:
+            self.editable_future_graph = self.source_graph
+            self.source_graph = self.source_graph.source_identifier
 
-        serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
-        source_graph = Graph.objects.get(pk=graphid)
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+
+        if self.editable_future_graph:
+            serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.editable_future_graph, force_recalculation=True))
+            primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.editable_future_graph).filter(
+                function__functiontype="primarydescriptors"
+            )
+            if self.editable_future_graph.ontology is not None:
+                branch_graphs = branch_graphs.filter(ontology=self.editable_future_graph.ontology)
+        else:
+            serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.source_graph, force_recalculation=True))
+            primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.source_graph).filter(
+                function__functiontype="primarydescriptors"
+            )
+            if self.source_graph.ontology is not None:
+                branch_graphs = branch_graphs.filter(ontology=self.source_graph.ontology)
 
         datatypes = models.DDataType.objects.all()
-        primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
-            function__functiontype="primarydescriptors"
-        )
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
         )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         graph_models = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
         restricted_nodegroups = []
         if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
@@ -264,19 +271,28 @@ class GraphDesignerView(GraphBaseView):
 
         context["graph"] = JSONSerializer().serialize(serialized_graph)
 
+        if self.editable_future_graph:
+            context["nav"]["title"] = self.editable_future_graph.name
+
+            help_title = _("Designing a Resource Model")
+            if not self.editable_future_graph.isresource:
+                help_title = _("Designing a Branch")
+        else:
+            context["nav"]["title"] = self.source_graph.name
+
+            help_title = _("Designing a Resource Model")
+            if not self.source_graph.isresource:
+                help_title = _("Designing a Branch")
+
         context["publication_resource_instance_count"] = models.ResourceInstance.objects.filter(
-            graph_id=source_graph.pk, graph_publication_id=source_graph.publication_id
+            graph_id=self.source_graph.pk, graph_publication_id=self.source_graph.publication_id
         ).count()
 
-        context["source_graph"] = JSONSerializer().serialize(source_graph, force_recalculation=True)
-        context["source_graph_id"] = source_graph.pk
+        context["source_graph"] = JSONSerializer().serialize(self.source_graph, force_recalculation=True)
+        context["source_graph_id"] = self.source_graph.pk
+        context['editable_future_graph_id'] = self.editable_future_graph.pk
 
-        context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True
-
-        help_title = _("Designing a Resource Model")
-        if not self.graph.isresource:
-            help_title = _("Designing a Branch")
 
         context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
 
