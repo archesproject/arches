@@ -77,7 +77,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 
 ## 7.5 - Release date: December 15, 2023 
 - Continued Accessibility improvements
-- Improved package manaagement
+- Improved package management
 - Business data migrations that correspond to graph changes
 - Relationship transversal search
 - Search component redesign
