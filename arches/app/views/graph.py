@@ -499,10 +499,11 @@ class GraphPublicationView(View):
     action = None
 
     def post(self, request, graphid):
-        graph = Graph.objects.get(pk=graphid)
+        source_graph = Graph.objects.get(pk=graphid)
 
-        if graph.source_identifier:
-            source_graph = graph.source_identifier
+        if source_graph.source_identifier:
+            editable_future_graph = source_graph
+            source_graph = source_graph.source_identifier
 
         if self.action == "publish":
             notes = None
@@ -513,25 +514,34 @@ class GraphPublicationView(View):
 
             try:
                 source_graph.publish(notes=notes, user=request.user)
-                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+                return JSONResponse({"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."})
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
         elif self.action == "revert":
             try:
                 source_graph.revert()
-                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+                return JSONResponse({"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+            except Exception as e:
+                return JSONErrorResponse(str(e))
+
+        elif self.action == "apply_bar":
+            import pdb; pdb.set_trace()
+            try:
+         
+
+                return JSONResponse({"graph": source_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
         elif self.action == "revert_foo":
             try:
-                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=translation.get_language())
+                published_graph = models.PublishedGraph.objects.get(publication=source_graph.publication, language=settings.LANGUAGE_CODE)
                 serialized_graph = published_graph.serialized_graph
 
-                graph.restore_state_from_serialized_graph(serialized_graph)
+                source_graph.restore_state_from_serialized_graph(serialized_graph)
 
-                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+                return JSONResponse({"graph": source_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
