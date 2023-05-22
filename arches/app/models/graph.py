@@ -2180,7 +2180,6 @@ class Graph(models.GraphModel):
             published_graph.serialized_graph = serialized_graph
             published_graph.save()
 
-
     def publish(self, user=None, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,

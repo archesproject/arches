@@ -386,7 +386,7 @@ class GraphHasUnpublishedChanges(APIBase):
         return JSONResponse(graph.has_unpublished_changes)
 
     def post(self, request, graph_id=None):
-        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes") == 'true')
+        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes") == "true")
         graph = models.GraphModel.objects.filter(pk=graph_id)  # need filter here for `update` to work
         graph.update(has_unpublished_changes=has_unpublished_changes)
 
