@@ -140,7 +140,16 @@ define([
             viewModel.shouldShowPublishModal = ko.observable(false);
 
             viewModel.toggleLockedState = function() {
-                console.log(viewModel, data)
+                let url = new URL(window.location.href);
+
+                if (url.searchParams.has('should_show_source_graph')) {
+                    url.searchParams.delete('should_show_source_graph');
+                }
+                else {
+                    url.searchParams.append('should_show_source_graph', true)
+                }
+
+                window.location.href = url;
             };
 
             viewModel.publishGraph = function() {

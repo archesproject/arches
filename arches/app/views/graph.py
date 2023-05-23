@@ -190,21 +190,17 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        graph = Graph.objects.get(pk=graphid)
+        self.source_graph = Graph.objects.get(pk=graphid)
+        self.editable_future_graph = None
 
-        if graph.source_identifier_id:
-            self.source_graph = Graph.objects.filter(source_identifier_id=graph.source_identifier_id)
-            self.editable_future_graph = graph
-            self.graph = self.editable_future_graph
-        else:
-            self.source_graph = graph
-            self.editable_future_graph = None
+        editable_future_graph_query = Graph.objects.filter(source_identifier_id=graphid)
+        if len(editable_future_graph_query):
+            self.editable_future_graph = editable_future_graph_query[0]
 
-            editable_future_graph_query = Graph.objects.filter(source_identifier_id=graphid)
-            if len(editable_future_graph_query):
-                self.editable_future_graph = editable_future_graph_query[0]
-
+        if bool(request.GET.get('should_show_source_graph') == 'true'):
             self.graph = self.source_graph
+        else:
+            self.graph = self.editable_future_graph
 
         serialized_graph = JSONDeserializer().deserialize(
             JSONSerializer().serialize(self.graph, force_recalculation=True)
