@@ -202,7 +202,9 @@ class GraphDesignerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
 
         if self.editable_future_graph:
-            serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.editable_future_graph, force_recalculation=True))
+            serialized_graph = JSONDeserializer().deserialize(
+                JSONSerializer().serialize(self.editable_future_graph, force_recalculation=True)
+            )
             primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.editable_future_graph).filter(
                 function__functiontype="primarydescriptors"
             )
@@ -534,14 +536,18 @@ class GraphPublicationView(View):
 
             try:
                 source_graph.publish(notes=notes, user=request.user)
-                return JSONResponse({"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."})
+                return JSONResponse(
+                    {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
+                )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
         elif self.action == "revert":
             try:
                 source_graph.revert()
-                return JSONResponse({"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+                return JSONResponse(
+                    {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully reverted."}
+                )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
