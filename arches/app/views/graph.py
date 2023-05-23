@@ -516,20 +516,15 @@ class GraphPublicationView(View):
             editable_future_graph = None
 
         if self.action == "publish":
-            notes = None
-
-            if request.body:
-                data = JSONDeserializer().deserialize(request.body)
-                notes = data.get("notes")
-
             try:
-                with transaction.atomic:
-                    source_graph.update_from_editable_future_graph()
-                    source_graph.publish(notes=notes, user=request.user)
-                    
-                    return JSONResponse(
-                        {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
-                    )
+                data = JSONDeserializer().deserialize(request.body)
+
+                source_graph.update_from_editable_future_graph()
+                source_graph.publish(notes=data.get("notes"), user=request.user)
+
+                return JSONResponse(
+                    {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
+                )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
