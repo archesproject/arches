@@ -506,12 +506,14 @@ class GraphPublicationView(View):
     action = None
 
     def post(self, request, graphid):
-        source_graph = Graph.objects.get(pk=graphid)
-        editable_future_graph = None
+        graph = Graph.objects.get(pk=graphid)
 
-        if source_graph.source_identifier:
-            editable_future_graph = source_graph
-            source_graph = source_graph.source_identifier
+        if graph.source_identifier:
+            editable_future_graph = graph
+            source_graph = Graph.objects.get(source_identifier_id=graph.source_identifier_id)
+        else:
+            source_graph = graph
+            editable_future_graph = None
 
         if self.action == "publish":
             notes = None
@@ -521,10 +523,9 @@ class GraphPublicationView(View):
                 notes = data.get("notes")
 
             try:
+                import pdb; pdb.set_trace()
                 with transaction.atomic:
-                    if not self.source_identifier:
-                        self.update_from_editable_future_graph()
-
+                    source_graph.update_from_editable_future_graph()
                     source_graph.publish(notes=notes, user=request.user)
                 return JSONResponse(
                     {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
