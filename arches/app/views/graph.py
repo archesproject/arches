@@ -523,13 +523,13 @@ class GraphPublicationView(View):
                 notes = data.get("notes")
 
             try:
-                import pdb; pdb.set_trace()
                 with transaction.atomic:
                     source_graph.update_from_editable_future_graph()
                     source_graph.publish(notes=notes, user=request.user)
-                return JSONResponse(
-                    {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
-                )
+                    
+                    return JSONResponse(
+                        {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
+                    )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
