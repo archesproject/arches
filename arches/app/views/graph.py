@@ -521,6 +521,7 @@ class GraphPublicationView(View):
 
                 source_graph.update_from_editable_future_graph()
                 source_graph.publish(notes=data.get("notes"), user=request.user)
+                editable_future_graph.publish()
 
                 return JSONResponse(
                     {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
