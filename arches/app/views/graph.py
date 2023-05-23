@@ -294,7 +294,7 @@ class GraphDesignerView(GraphBaseView):
 
         context["source_graph"] = JSONSerializer().serialize(self.source_graph, force_recalculation=True)
         context["source_graph_id"] = self.source_graph.pk
-        context['editable_future_graph_id'] = self.editable_future_graph.pk if self.editable_future_graph else None
+        context["editable_future_graph_id"] = self.editable_future_graph.pk if self.editable_future_graph else None
 
         context["nav"]["menu"] = True
 
