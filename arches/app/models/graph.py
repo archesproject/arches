@@ -268,6 +268,7 @@ class Graph(models.GraphModel):
         )
 
         graph = Graph.objects.get(pk=graph_model.graphid)
+        graph.publish()
 
         if not graph.source_identifier_id:
             graph.create_editable_future_graph()
@@ -2173,6 +2174,7 @@ class Graph(models.GraphModel):
         """
         self.has_unpublished_changes = False
         self.save()
+        self.create_editable_future_graph()
 
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True))
 
