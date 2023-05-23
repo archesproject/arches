@@ -509,8 +509,8 @@ class GraphPublicationView(View):
         graph = Graph.objects.get(pk=graphid)
 
         if graph.source_identifier:
-            editable_future_graph = graph
             source_graph = Graph.objects.get(source_identifier_id=graph.source_identifier_id)
+            editable_future_graph = graph
         else:
             source_graph = graph
             editable_future_graph = None
