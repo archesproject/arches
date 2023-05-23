@@ -197,14 +197,12 @@ class GraphDesignerView(GraphBaseView):
         if len(editable_future_graph_query):
             self.editable_future_graph = editable_future_graph_query[0]
 
-        if bool(request.GET.get('should_show_source_graph') == 'true'):
+        if bool(request.GET.get("should_show_source_graph") == "true"):
             self.graph = self.source_graph
         else:
             self.graph = self.editable_future_graph
 
-        serialized_graph = JSONDeserializer().deserialize(
-            JSONSerializer().serialize(self.graph, force_recalculation=True)
-        )
+        serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
             function__functiontype="primarydescriptors"
         )
