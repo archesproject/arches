@@ -190,14 +190,21 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        self.source_graph = Graph.objects.get(pk=graphid)
-        self.editable_future_graph = None
-        self.graph = self.source_graph
+        graph = Graph.objects.get(pk=graphid)
 
-        if self.source_graph.source_identifier:
-            self.editable_future_graph = self.source_graph
-            self.source_graph = self.source_graph.source_identifier
+        if graph.source_identifier_id:
+            self.source_graph = Graph.objects.filter(source_identifier_id=graph.source_identifier_id)
+            self.editable_future_graph = graph
             self.graph = self.editable_future_graph
+        else:
+            self.source_graph = graph
+            self.editable_future_graph = None
+
+            editable_future_graph_query = Graph.objects.filter(source_identifier_id=graphid)
+            if len(self.editable_future_graph_query):
+                self.editable_future_graph = editable_future_graph_query[0]
+
+            self.graph = self.source_graph
 
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
 
