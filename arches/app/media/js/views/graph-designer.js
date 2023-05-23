@@ -697,7 +697,6 @@ define([
                 viewModel.graphTree.expandParentNode(node);
             });
 
-            console.log('!!!!', data)
             function updateGraphUnpublishedChanges() {
                 $.ajax({
                     type: 'POST',
