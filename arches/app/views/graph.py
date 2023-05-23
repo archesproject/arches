@@ -201,7 +201,7 @@ class GraphDesignerView(GraphBaseView):
             self.editable_future_graph = None
 
             editable_future_graph_query = Graph.objects.filter(source_identifier_id=graphid)
-            if len(self.editable_future_graph_query):
+            if len(editable_future_graph_query):
                 self.editable_future_graph = editable_future_graph_query[0]
 
             self.graph = self.source_graph
