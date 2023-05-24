@@ -209,10 +209,9 @@ class StringDataType(BaseDataType):
 
         if value["op"] == "not_null":
             query.must(tiles_w_node_exists)
-            non_blank_string_query = Wildcard(
-                field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
+            non_blank_string_query = Wildcard(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
             query.must(Nested(path="tiles", query=non_blank_string_query))
-        
+
         elif value["op"] == "null":
             # search for tiles that don't exist
             not_exists_query = Bool()
@@ -220,8 +219,7 @@ class StringDataType(BaseDataType):
             query.should(not_exists_query)
 
             # search for tiles that do exist, but have empty strings
-            non_blank_string_query = Term(
-                field=f"tiles.data.{str(node.pk)}.{value['lang']}.value.keyword", query="")
+            non_blank_string_query = Term(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value.keyword", query="")
             query.should(Nested(path="tiles", query=non_blank_string_query))
 
     def append_search_filters(self, value, node, query, request):
