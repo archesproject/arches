@@ -201,16 +201,13 @@ class StringDataType(BaseDataType):
         """
         Appends the search query dsl to search for fields that have not been populated or are empty strings
         """
-        # base_query = Bool()
+
         query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
-        # data_exists = Bool()
         data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value")
         tiles_w_node_exists = Nested(path="tiles", query=data_exists_query)
-        # data_exists.must(tiles_w_node_exists)
 
         if value["op"] == "not_null":
-            # query.must(base_query)
             query.must(tiles_w_node_exists)
             non_blank_string_query = Wildcard(
                 field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
