@@ -343,12 +343,7 @@ class ResourceEditorView(MapBaseManagerView):
             is_system_settings=is_system_settings,
         )
 
-        graph_has_unpublished_changes = False
-        editable_future_graph = Graph.objects.get(source_identifier=graph.pk)
-        if editable_future_graph and editable_future_graph.has_unpublished_changes:
-            graph_has_unpublished_changes = True
-
-        context["graph_has_unpublished_changes"] = graph_has_unpublished_changes
+        context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
@@ -358,7 +353,7 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             context["nav"]["help"] = {"title": _("Using the Resource Editor"), "template": "resource-editor-help"}
 
-        if graph_has_unpublished_changes or resource_instance and not resource_instance.graph_publication_id == graph.publication_id:
+        if graph.has_unpublished_changes or resource_instance and not resource_instance.graph_publication_id == graph.publication_id:
             return redirect("resource_report", resourceid=resourceid)
         else:
             return render(request, view_template, context)

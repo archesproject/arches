@@ -33,13 +33,13 @@ define([
             params.cache = params.cache === undefined ? true : params.cache;
 
             if (params.view) {
-                params.view.alert(new AlertViewmodel(
-                    'ep-alert-red',
-                    arches.translations.resourceGraphHasDifferentPublication.title,
-                    arches.translations.resourceGraphHasDifferentPublication.text,
-                    null,
-                    function() {}
-                ));
+                // params.view.alert(new AlertViewmodel(
+                //     'ep-alert-red',
+                //     arches.translations.resourceGraphHasDifferentPublication.title,
+                //     arches.translations.resourceGraphHasDifferentPublication.text,
+                //     null,
+                //     function() {}
+                // ));
             }
 
             if (params.report) {
