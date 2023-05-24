@@ -2092,7 +2092,7 @@ class Graph(models.GraphModel):
 
     def restore_state_from_serialized_graph(self, serialized_graph):
         """
-        Restores a Graph's state from a serialized graph, and creates a 
+        Restores a Graph's state from a serialized graph, and creates a
         new editable_future_graph
         """
         models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in self.get_nodegroups(force_recalculation=True)]).delete()
