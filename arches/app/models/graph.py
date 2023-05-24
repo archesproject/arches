@@ -2076,9 +2076,10 @@ class Graph(models.GraphModel):
 
             editable_future_graph.delete()
 
-            self.create_editable_future_graph()
+            graph_from_database = Graph.objects.get(pk=self.pk)
+            graph_from_database.create_editable_future_graph()
 
-        return self
+        return graph_from_database
 
     def revert(self):
         """
