@@ -2180,6 +2180,7 @@ class Graph(models.GraphModel):
 
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True))
 
+        # need to add language support here
         for published_graph in models.PublishedGraph.objects.filter(publication_id=self.publication_id):
             published_graph.serialized_graph = serialized_graph
             published_graph.save()
