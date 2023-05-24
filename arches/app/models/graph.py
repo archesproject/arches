@@ -2178,12 +2178,19 @@ class Graph(models.GraphModel):
         self.save()
         self.create_editable_future_graph()
 
-        serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True))
+        published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 
-        # need to add language support here
-        for published_graph in models.PublishedGraph.objects.filter(publication_id=self.publication_id):
-            published_graph.serialized_graph = serialized_graph
-            published_graph.save()
+        for language_tuple in settings.LANGUAGES:
+            translation.activate(language=language_tuple[0])
+
+            published_graph_query = published_graphs.filter(language=language_tuple[0])
+
+            if len(published_graph_query) == 1:
+                published_graph = published_graph_query[0]
+                published_graph.serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True))
+                published_graph.save()
+
+        translation.deactivate()
 
     def publish(self, user=None, notes=None):
         """
