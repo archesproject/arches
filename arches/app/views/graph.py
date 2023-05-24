@@ -523,7 +523,7 @@ class GraphPublicationView(View):
                 source_graph.publish(notes=data.get("notes"), user=request.user)
 
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully updated.")}
                 )
             except Exception as e:
                 return JSONErrorResponse(str(e))
@@ -532,15 +532,15 @@ class GraphPublicationView(View):
             try:
                 source_graph.revert()
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully reverted."}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully reverted.")}
                 )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
         elif self.action == "update_published_graphs":
             try:
-                source_graph.update_published_graphs()
-                return JSONResponse({"graph": source_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+                source_graph.update_published_graphs(user=request.user)
+                return JSONResponse({"graph": source_graph, "title": _("Success!"), "message": _("The published graphs have been successfully updated.")})
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
@@ -551,7 +551,7 @@ class GraphPublicationView(View):
 
                 source_graph.restore_state_from_serialized_graph(serialized_graph)
 
-                return JSONResponse({"graph": source_graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+                return JSONResponse({"graph": source_graph, "title": _("Success!"), "message": _("The graph has been successfully restored.")})
             except Exception as e:
                 return JSONErrorResponse(str(e))
 

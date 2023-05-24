@@ -2169,7 +2169,7 @@ class Graph(models.GraphModel):
 
         return updated_graph
 
-    def update_published_graphs(self):
+    def update_published_graphs(self, user=None, notes=None):
         """
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
@@ -2177,6 +2177,13 @@ class Graph(models.GraphModel):
         self.has_unpublished_changes = False
         self.save()
         self.create_editable_future_graph()
+
+        published_graph_edit = models.PublishedGraphEdit.objects.create(
+            publication=self.publication,
+            user=user,
+            notes=notes
+        )
+        published_graph_edit.save()
 
         published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 
