@@ -202,6 +202,7 @@ class GraphDesignerView(GraphBaseView):
         else:
             self.graph = self.editable_future_graph
 
+        # import pdb; pdb.set_trace()
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
             function__functiontype="primarydescriptors"
@@ -427,7 +428,6 @@ class GraphDataView(View):
                     ret = clone_data["copy"]
                     ret.slug = None
                     ret.save()
-                    ret.publish(user=request.user)
 
                     ret.create_editable_future_graph()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
@@ -521,7 +521,6 @@ class GraphPublicationView(View):
 
                 source_graph.update_from_editable_future_graph()
                 source_graph.publish(notes=data.get("notes"), user=request.user)
-                editable_future_graph.publish()
 
                 return JSONResponse(
                     {"graph": editable_future_graph, "title": "Success!", "message": "The graph has been successfully updated."}

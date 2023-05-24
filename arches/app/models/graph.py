@@ -2076,10 +2076,9 @@ class Graph(models.GraphModel):
 
             editable_future_graph.delete()
 
-            graph_from_database = type(self).objects.get(pk=self.pk)  # returns an updated copy of self
-            graph_from_database.create_editable_future_graph()
+            self.create_editable_future_graph()
 
-        return graph_from_database
+        return self
 
     def revert(self):
         """
@@ -2093,8 +2092,8 @@ class Graph(models.GraphModel):
 
     def restore_state_from_serialized_graph(self, serialized_graph):
         """
-        Reverts a Graph's editable_future_graph to represent the source,
-        discarding all changes
+        Restores a Graph's state from a serialized graph, and creates a 
+        new editable_future_graph
         """
         models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in self.get_nodegroups(force_recalculation=True)]).delete()
         models.Node.objects.filter(pk__in=[node.pk for node in self.nodes.values()]).delete()
@@ -2165,6 +2164,7 @@ class Graph(models.GraphModel):
         updated_graph.widgets = widget_dict
 
         updated_graph.save()
+        updated_graph.create_editable_future_graph()
 
         return updated_graph
 
