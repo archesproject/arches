@@ -146,7 +146,7 @@ define([
                     url.searchParams.delete('should_show_source_graph');
                 }
                 else {
-                    url.searchParams.append('should_show_source_graph', true)
+                    url.searchParams.append('should_show_source_graph', true);
                 }
 
                 window.location.href = url;
@@ -709,7 +709,7 @@ define([
             function updateGraphUnpublishedChanges() {
                 $.ajax({
                     type: 'POST',
-                    url: arches.urls.graph_has_unpublished_changes_api(data.graph.source_identifier_id || data.graphid),
+                    url: arches.urls.graph_has_unpublished_changes_api(data.graph.graphid),
                     data: {'has_unpublished_changes': true},
                     success: function(response) {
                         viewModel.graphHasUnpublishedChanges(response['has_unpublished_changes']);
