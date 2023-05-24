@@ -1801,7 +1801,7 @@ class Graph(models.GraphModel):
             editable_future_graph.has_unpublished_changes = False
             editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
 
-            editable_future_graph.save()
+            editable_future_graph.save(validate=False)
 
             return editable_future_graph
 
