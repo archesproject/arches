@@ -539,7 +539,9 @@ class GraphPublicationView(View):
 
         elif self.action == "update_published_graphs":
             try:
-                source_graph.update_published_graphs(user=request.user)
+                data = JSONDeserializer().deserialize(request.body)
+                source_graph.update_published_graphs(notes=data.get("notes"), user=request.user)
+                
                 return JSONResponse({"graph": source_graph, "title": _("Success!"), "message": _("The published graphs have been successfully updated.")})
             except Exception as e:
                 return JSONErrorResponse(str(e))
