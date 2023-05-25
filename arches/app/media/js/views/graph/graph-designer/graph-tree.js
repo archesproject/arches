@@ -230,6 +230,7 @@ define([
             if (
                 e.sourceParent!==e.targetParent
                 || e.item.is_immutable && !e.item.isCollector() 
+                || !Boolean(e.item.graph.attributes.source_identifier_id)
             ) {
                 e.cancelDrop = true;
             }
