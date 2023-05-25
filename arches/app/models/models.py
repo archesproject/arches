@@ -334,6 +334,19 @@ class File(models.Model):
         db_table = "files"
 
 
+class TempFile(models.Model):
+    fileid = models.UUIDField(primary_key=True)
+    path = models.FileField(upload_to="archestemp")
+
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        if not self.fileid:
+            self.fileid = uuid.uuid4()
+
+    class Meta:
+        managed = True
+        db_table = "files_temporary"
+
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
 @receiver(post_delete, sender=File)
