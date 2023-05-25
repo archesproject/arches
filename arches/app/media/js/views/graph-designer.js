@@ -40,6 +40,7 @@ define([
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.graphPublicationNotes = ko.observable();
+            viewModel.shouldShowUpdatePublishedGraphsButton = ko.observable();
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
@@ -243,14 +244,9 @@ define([
                 });
             };
 
-            viewModel.showUpdatePublishedGraphsAlert = function() {
-                viewModel.alert(new AlertViewModel(
-                    'ep-alert-red', 
-                    arches.translations.confirmGraphPublicationEdit.title, 
-                    arches.translations.confirmGraphPublicationEdit.text, 
-                    function() {}, 
-                    viewModel.updatePublishedGraphs,
-                ));
+            viewModel.showUpdatePublishedGraphsModal = function() {
+                viewModel.shouldShowUpdatePublishedGraphsButton(true);
+                viewModel.shouldShowPublishModal(true);
             };
 
             viewModel.updatePublishedGraphs = function() {
@@ -258,12 +254,39 @@ define([
 
                 $.ajax({
                     type: "POST",
+                    data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
                     url: arches.urls.update_published_graphs(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        if (status === 'success') { window.location.reload(); }
-                        else {
-                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        let alert;
+
+                        if (status === 'success') {
+                            alert = new AlertViewModel(
+                                'ep-alert-blue', 
+                                response.responseJSON.title, 
+                                response.responseJSON.message,
+                                null,
+                                function(){},
+                            );
                         }
+                        else {
+                            alert = new JsonErrorAlertViewModel(
+                                'ep-alert-red', 
+                                response.responseJSON,
+                                null,
+                                function(){},
+                            );
+                        }
+
+                        // must reload window since this editable_future_graph has been deleted
+                        alert.active.subscribe(function() {
+                            window.location.reload();
+                        });
+                        viewModel.alert(alert);
+                        
+                        viewModel.shouldShowUpdatePublishedGraphsButton(false);
+                        viewModel.graphPublicationNotes(null);
+                        viewModel.shouldShowPublishModal(false);
+                        viewModel.loading(false);
                     }
                 });
             };

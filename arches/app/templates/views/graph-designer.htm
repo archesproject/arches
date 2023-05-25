@@ -129,14 +129,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     rows="4" 
                     type="text" 
                     name="publication_notes"
-                    placeholder="{% quoted_trans 'Add publication notes...'  %}"
+                    placeholder="{% quoted_trans 'Add notes...'  %}"
                 ></textarea>
             </div>
                     
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
                 <span style="align-self: flex-end;">
-                    <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">
+                    <button 
+                        style="transition: none;" 
+                        class="btn btn-sm btn-primary btn-labeled fa fa-check" 
+                        data-bind="click: $data.shouldShowUpdatePublishedGraphsButton() ? $data.updatePublishedGraphs : $data.publishGraph"
+                    >
+                        <!-- ko if: $data.shouldShowUpdatePublishedGraphsButton() -->
+                        <span>{% trans "Update Published Graphs" %}</span>
+                        <!-- /ko -->
+                        <!-- ko ifnot: $data.shouldShowUpdatePublishedGraphsButton() -->
                         <span>{% trans "Publish" %}</span>
+                        <!-- /ko -->
                     </button>
                 </span>
             <!-- /ko -->
@@ -239,7 +248,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </button>
                 <!-- /ko -->
                 <!-- ko ifnot: $data.graph.source_identifier_id() -->
-                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: $data.showUpdatePublishedGraphsAlert">
+                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: $data.showUpdatePublishedGraphsModal">
                     <span style="font-size: 14px;">{% trans 'Apply Changes'%}</span>
                 </button>
                 <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRestoreStateFromSerializedGraphAlert">
