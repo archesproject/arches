@@ -6,7 +6,9 @@
     toggleTab('filter'); toggleAriaExpanded('toggle-map-filter-panel');
 }, css: {
     'active': activeTab() === 'filter'
-}" aria-label="Click to open map filter" aria-controls="side-panel" aria-expanded="false">
+}, attr: {
+    'aria-label': $root.translations.openMapFilter
+}" aria-controls="side-panel" aria-expanded="false">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">
         <span data-bind="text: $root.translations.filter"></span>
