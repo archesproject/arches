@@ -227,7 +227,12 @@ define([
         },
 
         beforeMove: function(e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
+            if (
+                e.sourceParent!==e.targetParent
+                || e.item.is_immutable && !e.item.isCollector() 
+            ) {
+                e.cancelDrop = true;
+            }
         },
         reorderNodes: function(e) {
             loading(true);

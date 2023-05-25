@@ -185,6 +185,7 @@ define([
                     config: config,
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
+                    is_immutable: self.is_immutable,
                     fieldname: self.fieldname,
                     exportable: self.exportable,
                     alias: self.alias,
@@ -276,6 +277,7 @@ define([
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
+            self.is_immutable = source.is_immutable;
             self.sourceBranchPublicationId = source.sourcebranchpublication_id;
 
             self.set('id', self.nodeid);

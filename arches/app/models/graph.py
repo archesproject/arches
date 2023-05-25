@@ -301,6 +301,7 @@ class Graph(models.GraphModel):
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
             node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)
+            node.is_immutable = nodeobj.get("is_immutable", False)
             if node.hascustomalias or nodeobj.get("alias", False) is not False:
                 node.alias = nodeobj.get("alias", "")
             else:
@@ -489,7 +490,6 @@ class Graph(models.GraphModel):
                 self.update_es_node_mapping(node, datatype_factory, se)
                 self.create_node_alias(node)
                 try:
-                    node.sourcebranchpublication_id = None
                     node.save()
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
@@ -501,7 +501,6 @@ class Graph(models.GraphModel):
                         raise GraphValidationError(message)
                 if branch_publication_id:
                     for branch_node in models.Node.objects.filter(sourcebranchpublication_id=branch_publication_id, graph=node.graph):
-                        branch_node.sourcebranchpublication_id = None
                         branch_node.save()
 
             else:
@@ -803,6 +802,7 @@ class Graph(models.GraphModel):
         if root is not None:
             root["nodegroup_id"] = root["nodeid"]
             root["istopnode"] = True
+            root["is_immutable"] = bool(root.is_immutable or self.is_copy_immutable)
             updated_values = copy_of_self.update_node(root)
             root_node = updated_values["node"]
             root_card = updated_values["card"]
@@ -834,10 +834,13 @@ class Graph(models.GraphModel):
         # returns a list of node ids sorted by nodes that are collector nodes first and then others last
         node_ids = sorted(copy_of_self.nodes, key=lambda node_id: copy_of_self.nodes[node_id].is_collector, reverse=True)
 
-        for nodeid, node in copy_of_self.nodes.items():
+        for node in copy_of_self.nodes.values():
+            node.is_immutable = bool(node.is_immutable or self.is_copy_immutable)
+
             if node.datatype == "geojson-feature-collection":
                 node.config["advancedStyle"] = ""
                 node.config["advancedStyling"] = False
+
         copy_of_self.pk = uuid.uuid1()
         node_map = {}
         card_map = {}
