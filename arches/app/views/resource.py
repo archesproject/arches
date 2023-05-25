@@ -804,7 +804,7 @@ class ResourceReportView(MapBaseManagerView):
             map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id),
-            graph_has_unpublished_changes=bool(graph.has_unpublished_changes)
+            graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
         )
 
         if graph.iconclass:
