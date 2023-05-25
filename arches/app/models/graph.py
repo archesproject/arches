@@ -2178,11 +2178,7 @@ class Graph(models.GraphModel):
         self.save()
         self.create_editable_future_graph()
 
-        published_graph_edit = models.PublishedGraphEdit.objects.create(
-            publication=self.publication,
-            user=user,
-            notes=notes
-        )
+        published_graph_edit = models.PublishedGraphEdit.objects.create(publication=self.publication, user=user, notes=notes)
         published_graph_edit.save()
 
         published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
@@ -2194,7 +2190,9 @@ class Graph(models.GraphModel):
 
             if len(published_graph_query) == 1:
                 published_graph = published_graph_query[0]
-                published_graph.serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True))
+                published_graph.serialized_graph = JSONDeserializer().deserialize(
+                    JSONSerializer().serialize(self, force_recalculation=True)
+                )
                 published_graph.save()
 
         translation.deactivate()

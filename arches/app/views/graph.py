@@ -541,8 +541,10 @@ class GraphPublicationView(View):
             try:
                 data = JSONDeserializer().deserialize(request.body)
                 source_graph.update_published_graphs(notes=data.get("notes"), user=request.user)
-                
-                return JSONResponse({"graph": source_graph, "title": _("Success!"), "message": _("The published graphs have been successfully updated.")})
+
+                return JSONResponse(
+                    {"graph": source_graph, "title": _("Success!"), "message": _("The published graphs have been successfully updated.")}
+                )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
@@ -553,7 +555,9 @@ class GraphPublicationView(View):
 
                 source_graph.restore_state_from_serialized_graph(serialized_graph)
 
-                return JSONResponse({"graph": source_graph, "title": _("Success!"), "message": _("The graph has been successfully restored.")})
+                return JSONResponse(
+                    {"graph": source_graph, "title": _("Success!"), "message": _("The graph has been successfully restored.")}
+                )
             except Exception as e:
                 return JSONErrorResponse(str(e))
 
