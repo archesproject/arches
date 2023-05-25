@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+import django.contrib.postgres.fields.jsonb
 from django.core.validators import validate_slug
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
@@ -935,7 +936,7 @@ class ResourceInstance(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     name = I18n_TextField(blank=True, null=True)
-    descriptors = JSONField(blank=True, null=True)
+    descriptors = django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
