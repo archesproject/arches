@@ -269,10 +269,6 @@ class Graph(models.GraphModel):
 
         graph = Graph.objects.get(pk=graph_model.graphid)
 
-        if not graph.source_identifier_id:
-            graph.create_editable_future_graph()
-            graph.publish()
-
         return graph
 
     def add_node(self, node, nodegroups=None):
@@ -1099,6 +1095,7 @@ class Graph(models.GraphModel):
                     break
 
             if not found:
+                import pdb; pdb.set_trace()
                 raise GraphValidationError(_("Ontology rules don't allow this graph to be appended"))
         return True
 
