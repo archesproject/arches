@@ -203,7 +203,6 @@ class GraphDesignerView(GraphBaseView):
         else:
             self.graph = self.editable_future_graph
 
-        # import pdb; pdb.set_trace()
         serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
             function__functiontype="primarydescriptors"
