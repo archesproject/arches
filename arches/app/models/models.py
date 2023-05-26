@@ -750,7 +750,7 @@ class OntologyClass(models.Model):
 class PublishedGraph(models.Model):
     language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
     publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+    serialized_graph = models.JSONField(blank=True, null=True, db_column="serialized_graph")
 
     class Meta:
         managed = True
@@ -935,7 +935,7 @@ class ResourceInstance(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     name = I18n_TextField(blank=True, null=True)
-    descriptors = JSONField(blank=True, null=True)
+    descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
@@ -1691,7 +1691,7 @@ class LoadErrors(models.Model):
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
     source = models.TextField(blank=True, null=True)
-    error = models.TextField(blank=True, null=True)
+    value = models.TextField(blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     datatype = models.TextField(blank=True, null=True)
 
