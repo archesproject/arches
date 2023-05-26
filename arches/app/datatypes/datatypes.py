@@ -245,9 +245,9 @@ class StringDataType(BaseDataType):
                     match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
                 else:
                     if "~" in value["op"]:
-                        match_query = Bool()
-                        for word in value["val"].split(" "):
-                            match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase_prefix"
+                        )
                     else:  # "eq" in value["op"]
                         match_query = Match(
                             field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase"
