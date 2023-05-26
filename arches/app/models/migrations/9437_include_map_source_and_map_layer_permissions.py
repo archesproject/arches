@@ -16,5 +16,4 @@ class Migration(migrations.Migration):
                                      ("read_maplayer", "Read"),
                                      ("write_maplayer", "Create/Update"),
                                      ("delete_maplayer", "Delete"))},
-        ),
-    ]
+        ),]
