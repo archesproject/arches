@@ -116,7 +116,6 @@ class MapBaseManagerView(BaseManagerView):
         context["resource_map_layers"] = resource_layers
         context["resource_map_sources"] = resource_sources
 
-        
         all_map_sources = models.MapSource.objects.all()
 
         map_layers = user_can_read_map_layers(self.request.user)

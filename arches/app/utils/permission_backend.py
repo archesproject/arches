@@ -204,7 +204,6 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     return permitted_nodegroups
 
 
-
 def get_map_layers_by_perm(user, perms, any_perm=True):
     """
     returns a list of node groups that a user has the given permission on
@@ -235,7 +234,7 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
         user_permissions = ObjectPermissionChecker(user)
 
         for map_layer in MapLayer.objects.all():
-            if map_layer.addtomap is True and map_layer.isoverlay is False: 
+            if map_layer.addtomap is True and map_layer.isoverlay is False:
                 permitted_map_layers.append(map_layer)
             else:  # if no explicit permissions, object is considered accessible by all with group permissions
                 explicit_map_layer_perms = user_permissions.get_perms(map_layer)
@@ -246,27 +245,28 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
                     else:
                         if set(formatted_perms) == set(explicit_map_layer_perms):
                             permitted_map_layers.append(map_layer)
-                    
 
         return permitted_map_layers
-    
+
 def user_can_read_map_layers(user):
     map_layers_with_read_permission = get_map_layers_by_perm(user,['models.read_maplayer'])
     map_layers_allowed = []
+
     for map_layer in map_layers_with_read_permission:
-        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+        if ('no_access_to_maplayer' not in get_user_perms(user,map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
             map_layers_allowed.append(map_layer)
-    
+
     return map_layers_allowed
 
 
 def user_can_write_map_layers(user):
     map_layers_with_read_permission = get_map_layers_by_perm(user,['models.write_maplayer'])
     map_layers_allowed = []
+
     for map_layer in map_layers_with_read_permission:
         if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
             map_layers_allowed.append(map_layer)
-    
+
     return map_layers_allowed
 
 
