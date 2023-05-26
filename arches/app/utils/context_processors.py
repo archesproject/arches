@@ -23,7 +23,6 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.utils.translation import get_language, get_language_bidi
-from arches.app.views.search import allow_user_to_export_results
 
 
 def livereload(request):
@@ -84,6 +83,5 @@ def app_settings(request=None):
             "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
             "DEBUG": settings.DEBUG,
-            "ALLOW_RESULTS_EXPORT": allow_user_to_export_results(request.user),
         }
     }

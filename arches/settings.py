@@ -536,11 +536,6 @@ UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 
 OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
-# Specify the user groups that are allowed to export results from the application
-# If the list is empty then export will be allowed for ALL users.
-
-ENABLE_EXPORT_FOR_SPECIFIC_GROUPS = []
-
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
