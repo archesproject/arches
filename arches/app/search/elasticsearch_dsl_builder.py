@@ -382,6 +382,10 @@ class Prefix(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
 
+    NOTE: we should be careful when using this method as it does NOT analyse the incomming query
+    string like most other mehtods do.  It's really a term search.  It does not operate like 
+    a "match phrase prefix" search.  See the online docs for an explanation.
+
     """
 
     def __init__(self, **kwargs):
