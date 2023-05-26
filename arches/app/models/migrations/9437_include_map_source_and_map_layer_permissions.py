@@ -12,9 +12,9 @@ class Migration(migrations.Migration):
             name='maplayer',
             options={'default_permissions': (), 
                      'managed': True, 
-                     'permissions': (("no_access_to_maplayer", "No access to map layer"),
-                                     ("read_maplayer", "Read map layer"),
-                                     ("edit_maplayer", "Edit map layer"),
-                                     ("delete_maplayer", "Delete map layer"))},
+                     'permissions': (("no_access_to_maplayer", "No Access"),
+                       ("read_maplayer", "Read"),
+                       ("write_maplayer", "Create/Update"),
+                       ("delete_maplayer", "Delete"))},
         ),
     ]
