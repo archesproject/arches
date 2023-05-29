@@ -334,6 +334,19 @@ class File(models.Model):
         db_table = "files"
 
 
+class TempFile(models.Model):
+    fileid = models.UUIDField(primary_key=True)
+    path = models.FileField(upload_to="archestemp")
+
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        if not self.fileid:
+            self.fileid = uuid.uuid4()
+
+    class Meta:
+        managed = True
+        db_table = "files_temporary"
+
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
 @receiver(post_delete, sender=File)
@@ -573,6 +586,9 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
+    sourcebranchpublication = models.ForeignKey(
+        GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
+    )
 
     def get_child_nodes_and_edges(self):
         """
@@ -1533,7 +1549,7 @@ class IIIFManifest(models.Model):
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
-    transactionid = models.UUIDField(default=uuid.uuid4)
+    transactionid = models.UUIDField(default=uuid.uuid4, null=True)
 
     def __str__(self):
         return self.label
