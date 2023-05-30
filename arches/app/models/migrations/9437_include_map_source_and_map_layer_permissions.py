@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9055_add_branch_publication_to_node'),
+        ('models', '9566_migration_fix'),
     ]
 
     operations = [
