@@ -277,6 +277,7 @@ define([
             });
 
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
+            viewModel.updatedCardinalityData = ko.observable();
 
             viewModel.saveNode = function(node) {
                 if (node) {
@@ -289,6 +290,8 @@ define([
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                         }
+
+                        viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         viewModel.loading(false);
                     });
                 }
@@ -346,7 +349,8 @@ define([
                 node: viewModel.selectedNode,
                 appliedFunctions: viewModel.appliedFunctions,
                 primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
-                restrictedNodegroups: data.restrictedNodegroups
+                restrictedNodegroups: data.restrictedNodegroups,
+                updatedCardinalityData: viewModel.updatedCardinalityData,
             });
 
             viewModel.branchListView = new BranchListView({
