@@ -355,10 +355,8 @@ class QueryString(Dsl):
             "query": self.query,
         }
         query_obj.update(dict(kwargs))
-        
-        self.dsl = {
-            "query_string": query_obj
-        }
+
+        self.dsl = {"query_string": query_obj}
 
 
 class Exists(Dsl):

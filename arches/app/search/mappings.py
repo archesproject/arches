@@ -27,17 +27,8 @@ RESOURCES_INDEX = "resources"
 RESOURCE_RELATIONS_INDEX = "resource_relations"
 
 
-ANALYZER = {
-    "analyzer": {
-        "folding": {
-            "tokenizer": "whitespace",
-            "filter": [
-                "lowercase",
-                "asciifolding"
-            ]
-        }
-    }
-}
+ANALYZER = {"analyzer": {"folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]}}}
+
 
 def prepare_terms_index(create=False):
     """
@@ -46,9 +37,7 @@ def prepare_terms_index(create=False):
     """
 
     index_settings = {
-        "settings": {
-            "analysis": ANALYZER
-        },
+        "settings": {"analysis": ANALYZER},
         "mappings": {
             "properties": {
                 "nodegroupid": {"type": "keyword"},
@@ -80,9 +69,7 @@ def prepare_concepts_index(create=False):
     """
 
     index_settings = {
-        "settings": {
-            "analysis": ANALYZER
-        },
+        "settings": {"analysis": ANALYZER},
         "mappings": {
             "properties": {
                 "top_concept": {"type": "keyword"},
