@@ -446,7 +446,7 @@ class GraphDataView(View):
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.publication:
-                    return JSONErrorResponse(_("Unable to delete node of a published graph"), _("Please unpublish your graph before deleting a node"))
+                    return JSONErrorResponse(_("Unable to delete nodes of a published graph"), _("Please unpublish your graph before deleting a node"))
                 graph.delete_node(node=data.get("nodeid", None))
                 return JSONResponse({})
             except GraphValidationError as e:
