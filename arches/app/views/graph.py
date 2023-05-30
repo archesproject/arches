@@ -497,7 +497,11 @@ class GraphPublicationView(View):
             elif self.action == "unpublish":
                 graph.unpublish()
         except Exception as e:
-            return JSONErrorResponse(e)
+            logger.exception(e)
+            return JSONErrorResponse(
+                _('Unable to process publication'),
+                _('Please contact your administrator if issue persists')
+            )
 
         return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
 
