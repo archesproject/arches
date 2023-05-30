@@ -17,25 +17,19 @@ class Migration(migrations.Migration):
 
         try:
             users = User.objects.using(db_alias)
-            users.groups.add(resource_exporter_group)
+            resource_exporter_group.user_set.add(*users)
             print('added users group')
         except Exception as e:
             print(e)
 
     def remove_permissions(apps, schema_editor, with_create_permissions=True):
-        db_alias = schema_editor.connection.alias
         Group = apps.get_model("auth", "Group")
-        resource_exporter_group = Group.objects.using(db_alias).get(name='Resource Exporter')
-        User = apps.get_model("auth", "User")
 
         try:
-            users = User.objects.using(db_alias)
-            users.groups.remove(resource_exporter_group)
-            print('removed users group')
+            Group.objects.filter(name__in=["Resource Exporter"]).delete()
+            print('removed Resource Exporter group')
         except:
             pass
-
-        resource_exporter_group.delete()
 
     operations = [
         migrations.RunPython(add_permissions, reverse_code=remove_permissions),
