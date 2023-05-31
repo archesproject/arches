@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9566_migration_fix'),
+        ('models', '9219_update_load_event_task'),
     ]
 
     operations = [
