@@ -43,17 +43,13 @@ class MapLayerManagerView(MapBaseManagerView):
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         icons = models.Icon.objects.order_by("name")
         context = self.get_context_data(
             icons=JSONSerializer().serialize(icons),
             datatypes=datatypes,
             widgets=widgets,
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script="views/map-layer-manager",
         )
