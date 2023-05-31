@@ -84,15 +84,15 @@ define([
                     self.viewModel.loading(true);
                     window.location.assign(url);
                 },
-                getHelp: function() {
+                getHelp: function(template) {
                     self.viewModel.helploading(true);
                     var el = $('.ep-help-content');
                     $.ajax({
                         type: "GET",
                         url: arches.urls.help_template,
-                        data: {'template': self.viewModel.helpTemplate()}
+                        data: {'template': template}
                     }).done(function(data) {
-                        el.html(data);
+                        el.append(data);
                         self.viewModel.helploading(false);
                         $('.ep-help-topic-toggle').click(function() {
                             var sectionEl = $(this).closest('div');
@@ -108,9 +108,13 @@ define([
                             contentEl.slideToggle();
                         });
                         $('.reloadable-img').click(function(){
-                            $(this).attr('src', $(this).attr('src'));
+                            $(this).attr('src', $(this).attr('src'));ß
                         });
                     });
+                },
+                closeHelp: function() {
+                    var el = $('.ep-help-content');
+                    el.empty();
                 },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();

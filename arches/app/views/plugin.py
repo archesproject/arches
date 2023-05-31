@@ -79,4 +79,9 @@ class PluginView(MapBaseManagerView):
         context["nav"]["icon"] = plugin.icon
         context["nav"]["title"] = plugin.name
 
+        if plugin.name == "Bulk Data Manager" and plugin.config["showHelp"] == True:
+            context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.config["helpTemplate"]]}
+        elif plugin.config["showHelp"] == True: 
+            context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.config["helpTemplate"]]}
+
         return render(request, "views/plugin.htm", context)
