@@ -245,6 +245,8 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
                     else:
                         if set(formatted_perms) == set(explicit_map_layer_perms):
                             permitted_map_layers.append(map_layer)
+                else:
+                    permitted_map_layers.append(map_layer)
 
         return permitted_map_layers
 
