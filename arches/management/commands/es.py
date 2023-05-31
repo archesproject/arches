@@ -236,8 +236,16 @@ class Command(BaseCommand):
         es_index = get_index(name)
         es_index.delete_index()
 
-    def index_database(self, batch_size, clear_index=True, name=None, quiet=False, use_multiprocessing=False,
-                       max_subprocesses=0, recalculate_descriptors=False):
+    def index_database(
+        self,
+        batch_size,
+        clear_index=True,
+        name=None,
+        quiet=False,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+        recalculate_descriptors=False,
+    ):
         if name is not None:
             index_database_util.index_custom_indexes(
                 index_name=name,
@@ -258,13 +266,7 @@ class Command(BaseCommand):
             )
 
     def reindex_database(
-        self,
-        batch_size,
-        name=None,
-        quiet=False,
-        use_multiprocessing=False,
-        max_subprocesses=0,
-        recalculate_descriptors=False
+        self, batch_size, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0, recalculate_descriptors=False
     ):
         self.delete_indexes(name=name)
         self.setup_indexes(name=name)
@@ -275,7 +277,7 @@ class Command(BaseCommand):
             quiet=quiet,
             use_multiprocessing=use_multiprocessing,
             max_subprocesses=max_subprocesses,
-            recalculate_descriptors=recalculate_descriptors
+            recalculate_descriptors=recalculate_descriptors,
         )
 
     def setup_indexes(self, name=None):

@@ -48,8 +48,14 @@ def get_serialized_graph(graph):
     return serialized_graphs[graph.graphid]
 
 
-def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False,
-             max_subprocesses=0, recalculate_descriptors=False):
+def index_db(
+    clear_index=True,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+    quiet=False,
+    use_multiprocessing=False,
+    max_subprocesses=0,
+    recalculate_descriptors=False,
+):
     """
     Deletes any existing indicies from elasticsearch and then indexes all
     concepts and resources from the database
@@ -70,14 +76,18 @@ def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet
         quiet=quiet,
         use_multiprocessing=use_multiprocessing,
         max_subprocesses=max_subprocesses,
-        recalculate_descriptors=recalculate_descriptors
+        recalculate_descriptors=recalculate_descriptors,
     )
     index_custom_indexes(clear_index=clear_index, batch_size=batch_size, quiet=quiet)
 
 
 def index_resources(
-    clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False,
-    max_subprocesses=0, recalculate_descriptors=False
+    clear_index=True,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+    quiet=False,
+    use_multiprocessing=False,
+    max_subprocesses=0,
+    recalculate_descriptors=False,
 ):
     """
     Indexes all resources from the database
@@ -104,7 +114,7 @@ def index_resources(
         quiet=quiet,
         use_multiprocessing=use_multiprocessing,
         max_subprocesses=max_subprocesses,
-        recalculate_descriptors=recalculate_descriptors
+        recalculate_descriptors=recalculate_descriptors,
     )
 
 
@@ -205,8 +215,13 @@ def index_resources_using_singleprocessing(
 
 
 def index_resources_by_type(
-    resource_types, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False,
-    use_multiprocessing=False, max_subprocesses=0, recalculate_descriptors=False
+    resource_types,
+    clear_index=True,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+    quiet=False,
+    use_multiprocessing=False,
+    max_subprocesses=0,
+    recalculate_descriptors=False,
 ):
     """
     Indexes all resources of a given type(s)
@@ -257,16 +272,20 @@ def index_resources_by_type(
                 str(rid) for rid in Resource.objects.filter(graph_id=str(resource_type)).values_list("resourceinstanceid", flat=True)
             ]
             index_resources_using_multiprocessing(
-                resourceids=resources, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses,
-                recalculate_descriptors=recalculate_descriptors
+                resourceids=resources,
+                batch_size=batch_size,
+                quiet=quiet,
+                max_subprocesses=max_subprocesses,
+                recalculate_descriptors=recalculate_descriptors,
             )
 
         else:
             from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
             resources = Resource.objects.filter(graph_id=str(resource_type))
-            index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet,
-                                                   title=graph_name, recalculate_descriptors=recalculate_descriptors)
+            index_resources_using_singleprocessing(
+                resources=resources, batch_size=batch_size, quiet=quiet, title=graph_name, recalculate_descriptors=recalculate_descriptors
+            )
 
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
@@ -286,8 +305,9 @@ def _index_resource_batch(resourceids, recalculate_descriptors):
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    return index_resources_using_singleprocessing(resources, batch_size, quiet=True, se=_se,
-                                                  recalculate_descriptors=recalculate_descriptors)
+    return index_resources_using_singleprocessing(
+        resources, batch_size, quiet=True, se=_se, recalculate_descriptors=recalculate_descriptors
+    )
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
@@ -415,8 +435,12 @@ def index_concepts(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE)
 
 
 def index_resources_by_transaction(
-    transaction_id, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False,
-    max_subprocesses=0, recalculate_descriptors=False
+    transaction_id,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+    quiet=False,
+    use_multiprocessing=False,
+    max_subprocesses=0,
+    recalculate_descriptors=False,
 ):
     """
     Indexes all the resources with a transaction id
@@ -443,8 +467,11 @@ def index_resources_by_transaction(
 
     if use_multiprocessing:
         index_resources_using_multiprocessing(
-            resourceids=resourceids, batch_size=batch_size, quiet=quiet, max_subprocesses=max_subprocesses,
-            recalculate_descriptors=recalculate_descriptors
+            resourceids=resourceids,
+            batch_size=batch_size,
+            quiet=quiet,
+            max_subprocesses=max_subprocesses,
+            recalculate_descriptors=recalculate_descriptors,
         )
     else:
         index_resources_using_singleprocessing(
@@ -452,7 +479,7 @@ def index_resources_by_transaction(
             batch_size=batch_size,
             quiet=quiet,
             title="transaction {}".format(transaction_id),
-            recalculate_descriptors=recalculate_descriptors
+            recalculate_descriptors=recalculate_descriptors,
         )
 
     logger.info(
