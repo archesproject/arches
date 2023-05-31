@@ -445,6 +445,10 @@ class GraphDataView(View):
             data = JSONDeserializer().deserialize(request.body)
             try:
                 graph = Graph.objects.get(graphid=graphid)
+                if graph.publication:
+                    return JSONErrorResponse(
+                        _("Unable to delete nodes of a published graph"), _("Please unpublish your graph before deleting a node")
+                    )
                 graph.delete_node(node=data.get("nodeid", None))
                 return JSONResponse({})
             except GraphValidationError as e:
@@ -497,7 +501,8 @@ class GraphPublicationView(View):
             elif self.action == "unpublish":
                 graph.unpublish()
         except Exception as e:
-            return JSONErrorResponse(e)
+            logger.exception(e)
+            return JSONErrorResponse(_("Unable to process publication"), _("Please contact your administrator if issue persists"))
 
         return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
 

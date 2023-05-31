@@ -211,14 +211,16 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
-        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
-        user = User.objects.get(id=userid)
-        notify_completion(msg, user)
     except Exception as e:
         logger.error(e)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
-        load_event.status = _("Failed")
+        load_event.status = "failed"
         load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
 
 
 @shared_task
@@ -232,37 +234,41 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
         ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
-        status = _("completed") if load_event.status == "indexed" else _("failed")
-        msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
-        user = User.objects.get(id=userid)
-        notify_completion(msg, user)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
         logger.error(e)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
-        load_event.status = _("failed")
+        load_event.status = "failed"
         load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Single CSV Import: {} [{}]").format(csv_file_name, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
 
 
 @shared_task
-def edit_bulk_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
-    from arches.app.etl_modules import bulk_data_editor
+def edit_bulk_string_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+    from arches.app.etl_modules import base_data_editor
 
     logger = logging.getLogger(__name__)
 
     try:
-        BulkDataEditor = bulk_data_editor.BulkDataEditor(loadid=load_id)
-        BulkDataEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+        BulkStringEditor = base_data_editor.BulkStringEditor(loadid=load_id)
+        BulkStringEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
-        msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
-        user = User.objects.get(id=userid)
-        notify_completion(msg, user)
     except Exception as e:
         logger.error(e)
         load_event = models.LoadEvent.objects.get(loadid=load_id)
-        load_event.status = _("Failed")
+        load_event.status = "failed"
         load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
 
 
 @shared_task
