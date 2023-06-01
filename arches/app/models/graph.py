@@ -1500,7 +1500,7 @@ class Graph(models.GraphModel):
 
             # TODO: Remove this section when PR 9112 / Issue 9053 is merged
             for key in ["cards", "widgets", "nodes"]:
-                if key in ret:
+                if key in ret and ret[key]:
                     ret[key].sort(key=lambda card: card["sortorder"] if card["sortorder"] else 0)
             # TODO: End section to remove
 
