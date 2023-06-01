@@ -88,9 +88,6 @@ class PluginView(MapBaseManagerView):
                 template_paths.sort(key=lambda x: x['helpsortorder'])
                 ordered_template_paths = [x['helptemplate'] for x in template_paths]
                 context["nav"]["help"] = {"title": _("Plugin Help"), "templates": ordered_template_paths}
-
-
-                print(ordered_template_paths)
         elif plugin.helptemplate: 
             context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.helptemplate]}
 
