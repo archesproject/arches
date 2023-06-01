@@ -351,7 +351,7 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             context["nav"]["help"] = {"title": _("Using the Resource Editor"), "template": "resource-editor-help"}
 
-        if graph.has_unpublished_changes or resource_instance and not resource_instance.graph_publication_id == graph.publication_id:
+        if graph.has_unpublished_changes or resource_instance and resource_instance.graph_publication_id != graph.publication_id:
             return redirect("resource_report", resourceid=resourceid)
         else:
             return render(request, view_template, context)

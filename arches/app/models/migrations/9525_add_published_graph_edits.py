@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("models", "9466_immutable_branches"),
+        ("models", "9511_update_tile_nodegroup_reference"),
     ]
 
     operations = [

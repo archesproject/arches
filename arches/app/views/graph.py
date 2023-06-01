@@ -636,6 +636,8 @@ class ModelHistoryView(GraphBaseView):
         serialized_graph = publication.serialized_graph
         graph = Graph.objects.get(pk=graphid)
 
+        import pdb; pdb.set_trace()
+
         try:
             graph.restore_state_from_serialized_graph(serialized_graph=serialized_graph)
         except:

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9055_add_branch_publication_to_node"),
+        ("models", "9525_add_published_graph_edits"),
     ]
 
     operations = [
