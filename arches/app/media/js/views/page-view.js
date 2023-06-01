@@ -95,7 +95,7 @@ define([
                     }).done(function(data) {
                         $(el).html(data);
                         self.viewModel.helploading(false);
-                        $('.ep-help-topic-toggle').click(function() {
+                        $(el).find('.ep-help-topic-toggle').click(function() {
                             var sectionEl = $(this).closest('div');
                             var iconEl = $(this).find('i');
                             if (iconEl.hasClass("fa-chevron-right")) {
@@ -108,7 +108,7 @@ define([
                             var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                             contentEl.slideToggle();
                         });
-                        $('.reloadable-img').click(function(){
+                        $(el).find('.reloadable-img').click(function(){
                             $(this).attr('src', $(this).attr('src'));
                         });
                     });
