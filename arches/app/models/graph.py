@@ -1499,7 +1499,7 @@ class Graph(models.GraphModel):
                 ret.pop("nodes", None)
 
             # TODO: Remove this section when PR 9112 / Issue 9053 is merged
-            for key in ["cards","widgets","nodes"]:
+            for key in ["cards", "widgets", "nodes"]:
                 if key in ret:
                     ret[key].sort(key=lambda card: card["sortorder"] if card["sortorder"] else 0)
 
