@@ -86,13 +86,14 @@ define([
                 },
                 getHelp: function(template) {
                     self.viewModel.helploading(true);
-                    var el = $('.ep-help-content');
+                    var el = document.createElement('div');
+                    $('.ep-help-content').append(el);
                     $.ajax({
                         type: "GET",
                         url: arches.urls.help_template,
                         data: {'template': template}
                     }).done(function(data) {
-                        el.append(data);
+                        $(el).html(data);
                         self.viewModel.helploading(false);
                         $('.ep-help-topic-toggle').click(function() {
                             var sectionEl = $(this).closest('div');
@@ -108,7 +109,7 @@ define([
                             contentEl.slideToggle();
                         });
                         $('.reloadable-img').click(function(){
-                            $(this).attr('src', $(this).attr('src'));ß
+                            $(this).attr('src', $(this).attr('src'));
                         });
                     });
                 },
