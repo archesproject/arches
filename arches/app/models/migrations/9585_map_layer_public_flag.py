@@ -10,6 +10,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="maplayer",
             name="ispublic",
-            field=models.IntegerField(blank=False, null=False, default=True),
+            field=models.BooleanField(blank=False, null=False, default=True),
         ),
     ]
