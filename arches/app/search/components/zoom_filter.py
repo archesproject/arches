@@ -25,19 +25,18 @@ details = {
 
 class ZoomFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
-        print("HELLOOOOOOOOOO")
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
                 feature_geom = spatial_filter["features"][0]["geometry"]
-                feature_properties = {}
-                if "properties" in spatial_filter["features"][0]:
-                    feature_properties = spatial_filter["features"][0]["properties"]
+                # feature_properties = {}
+                # if "properties" in spatial_filter["features"][0]:
+                #     feature_properties = spatial_filter["features"][0]["properties"]
                 buffer = {"width": 0, "unit": "ft"}
-                if "buffer" in feature_properties:
-                    buffer = feature_properties["buffer"]
+                # if "buffer" in feature_properties:
+                #     buffer = feature_properties["buffer"]
                 search_buffer = _buffer(feature_geom, buffer["width"], buffer["unit"])
                 feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
                 geoshape = GeoShape(
