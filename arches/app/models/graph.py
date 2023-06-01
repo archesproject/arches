@@ -154,7 +154,7 @@ class Graph(models.GraphModel):
 
                         for key, value in card_dict.items():
                             # filter out keys from the serialized_graph that would cause an error on instantiation
-                            if key not in ["constraints"]:
+                            if key not in ["constraints", "is_editable"]:
                                 if isinstance(value, str):
                                     try:
                                         value = uuid.UUID(value)
@@ -1470,7 +1470,7 @@ class Graph(models.GraphModel):
             if card.nodegroup.parentnodegroup is None:
                 return card
 
-    def get_cards(self, check_if_editable=True, use_raw_i18n_json=False):
+    def get_cards(self, use_raw_i18n_json=False):
         """
         get the card data (if any) associated with this graph
 
@@ -1553,11 +1553,8 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("relatable_resource_model_ids", None)
 
-            check_if_editable = "is_editable" not in exclude
-            ret["is_editable"] = self.is_editable() if check_if_editable else ret.pop("is_editable", None)
-
             if "cards" not in exclude:
-                cards = self.get_cards(check_if_editable=check_if_editable, use_raw_i18n_json=use_raw_i18n_json)
+                cards = self.get_cards(use_raw_i18n_json=use_raw_i18n_json)
                 ret["cards"] = sorted(cards, key=lambda k: (k["sortorder"] or 0, k["cardid"] or 0))
             else:
                 ret.pop("cards", None)
