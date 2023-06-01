@@ -1653,6 +1653,13 @@ class FileListDataType(BaseDataType):
         mime = MimeTypes()
         tile_data = []
         source_path = kwargs.get("path")
+
+        def save_file(file_obj, file_id):
+            current_file = models.File.objects.get_or_create(fileid=file_id)[0]
+            filename = default_storage.save(os.path.join("uploadedfiles", os.path.basename(file_obj.name)), File(file_obj))
+            current_file.path = os.path.join(filename)
+            current_file.save()
+
         for file_path in [filename.strip() for filename in value.split(",")]:
             tile_file = {}
             try:
@@ -1665,22 +1672,16 @@ class FileListDataType(BaseDataType):
             tile_file["name"] = os.path.basename(file_path)
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            file_path = "uploadedfiles/" + str(tile_file["name"])
             tile_file["file_id"] = str(uuid.uuid4())
-            if source_path:
-                source_file = os.path.join(source_path, tile_file["name"])
-                fs = default_storage
-                try:
-                    with default_storage.open(source_file) as f:
-                        current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
-                        filename = fs.save(os.path.join("uploadedfiles", os.path.basename(f.name)), File(f))
-                        current_file.path = os.path.join(filename)
-                        current_file.save()
-                except FileNotFoundError:
-                    logger.exception(_("File does not exist"))
-
-            else:
-                models.File.objects.get_or_create(fileid=tile_file["file_id"], path=file_path)
+            source_path = kwargs.get('path') if kwargs.get('path') else 'uploadedfiles'
+            source_file = os.path.join(source_path, tile_file["name"])
+   
+            try:
+                with default_storage.open(source_file) as f:
+                    save_file(f, tile_file["file_id"])
+            except FileNotFoundError:
+                with open(os.path.join(settings.MEDIA_ROOT, source_file), 'rb') as f:
+                    save_file(f, tile_file["file_id"])
 
             tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
             tile_file["accepted"] = True
