@@ -58,6 +58,9 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
+    serialized_graph = None
+    node_datatypes = None
+
     class Meta:
         proxy = True
 
@@ -70,14 +73,39 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
         self.descriptor_function = None
-        try:
-            self.serialized_graph = (
-                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                .first()
-                .serialized_graph
-            )
-        except AttributeError:
-            self.serialized_graph = None
+
+    def get_serialized_graph(self):
+        if not self.serialized_graph:
+            try:
+                self.serialized_graph = (
+                    models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                    .first()
+                    .serialized_graph
+                )
+            except AttributeError:
+                self.serialized_graph = None
+        return self.serialized_graph
+
+    def set_serialized_graph(self, serialized_graph):
+        self.serialized_graph = serialized_graph
+
+    def get_node_datatypes(self):
+        if not self.node_datatypes:
+            self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        return self.node_datatypes
+
+    def set_node_datatypes(self, node_datatypes):
+        self.node_datatypes = node_datatypes
+
+    def get_root_ontology(self):
+        """
+        Finds and returns the ontology class of the instance's root node
+
+        """
+        if "topnode" in self.get_serialized_graph():
+            return self.get_serialized_graph()["topnode"]["ontologyclass"]
+        else:
+            return SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)).ontologyclass
 
     def get_descriptor_language(self, context):
         """
@@ -220,22 +248,6 @@ class Resource(models.ResourceInstance):
         if index is True:
             self.index(context)
 
-    def get_root_ontology(self):
-        """
-        Finds and returns the ontology class of the instance's root node
-
-        """
-        root_ontology_class = None
-        try:
-            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] is True), None))
-        except:
-            graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
-
-        if graph_node:
-            root_ontology_class = graph_node.ontologyclass
-
-        return root_ontology_class
-
     def load_tiles(self, user=None, perm=None):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
@@ -325,7 +337,7 @@ class Resource(models.ResourceInstance):
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
-                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
+                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.get_serialized_graph()["nodes"])
             }
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()

@@ -313,7 +313,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Login -->
                 {% if nav.login %}
                 <a
-                    href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ home }}{% endif %}"
+                    href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ request.get_full_path }}{% endif %}"
                     class="ep-tools ep-tools-login"
                 >
                     <div

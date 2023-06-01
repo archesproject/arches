@@ -329,9 +329,7 @@ class ResourceEditorView(MapBaseManagerView):
             nodes=JSONSerializer().serialize(nodes.filter(nodegroup__in=nodegroups)),
             cardwidgets=JSONSerializer().serialize(updated_cardwidgets),
             datatypes_json=JSONSerializer().serialize(models.DDataType.objects.all(), exclude=["iconclass", "modulename", "classname"]),
-            map_layers=models.MapLayer.objects.all(),
             map_markers=models.MapMarker.objects.all(),
-            map_sources=models.MapSource.objects.all(),
             geocoding_providers=models.Geocoder.objects.all(),
             user_is_reviewer=json.dumps(user_is_reviewer),
             user_can_delete_resource=user_can_delete_resource(request.user, resourceid),
@@ -786,9 +784,7 @@ class ResourceReportView(MapBaseManagerView):
         graph = Graph.objects.get(graphid=resource.graph_id)
 
         try:
-            map_layers = models.MapLayer.objects.all()
             map_markers = models.MapMarker.objects.all()
-            map_sources = models.MapSource.objects.all()
             geocoding_providers = models.Geocoder.objects.all()
         except AttributeError:
             raise Http404(_("No active report template is available for this resource."))
@@ -799,9 +795,7 @@ class ResourceReportView(MapBaseManagerView):
             report_templates=models.ReportTemplate.objects.all(),
             card_components=models.CardComponent.objects.all(),
             widgets=models.Widget.objects.all(),
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
