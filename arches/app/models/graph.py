@@ -1502,6 +1502,7 @@ class Graph(models.GraphModel):
             for key in ["cards", "widgets", "nodes"]:
                 if key in ret:
                     ret[key].sort(key=lambda card: card["sortorder"] if card["sortorder"] else 0)
+            # TODO: End section to remove
 
             res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
