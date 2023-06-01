@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9219_update_load_event_task'),
+        ("models", "9219_update_load_event_task"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='etlmodule',
-            name='helpsortorder',
+            model_name="etlmodule",
+            name="helpsortorder",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='etlmodule',
-            name='helptemplate',
+            model_name="etlmodule",
+            name="helptemplate",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='plugin',
-            name='helptemplate',
+            model_name="plugin",
+            name="helptemplate",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.RunSQL(
@@ -71,6 +71,6 @@ class Migration(migrations.Migration):
                 UPDATE etl_modules
                 SET helptemplate = NULL,
                     helpsortorder = NULL
-            """
+            """,
         ),
     ]

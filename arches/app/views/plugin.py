@@ -83,12 +83,12 @@ class PluginView(MapBaseManagerView):
             template_paths = []
             for etl_module in models.ETLModule.objects.all():
                 if etl_module.helptemplate:
-                    template_paths.append({'helpsortorder': etl_module.helpsortorder, 'helptemplate': etl_module.helptemplate})
+                    template_paths.append({"helpsortorder": etl_module.helpsortorder, "helptemplate": etl_module.helptemplate})
             if len(template_paths) > 0:
-                template_paths.sort(key=lambda x: x['helpsortorder'])
-                ordered_template_paths = [x['helptemplate'] for x in template_paths]
+                template_paths.sort(key=lambda x: x["helpsortorder"])
+                ordered_template_paths = [x["helptemplate"] for x in template_paths]
                 context["nav"]["help"] = {"title": _("Plugin Help"), "templates": ordered_template_paths}
-        elif plugin.helptemplate: 
+        elif plugin.helptemplate:
             context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.helptemplate]}
 
         return render(request, "views/plugin.htm", context)
