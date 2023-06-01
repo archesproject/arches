@@ -154,7 +154,7 @@ class Graph(models.GraphModel):
 
                         for key, value in card_dict.items():
                             # filter out keys from the serialized_graph that would cause an error on instantiation
-                            if key not in ["constraints", "is_editable"]:
+                            if key not in ["constraints"]:
                                 if isinstance(value, str):
                                     try:
                                         value = uuid.UUID(value)
@@ -549,25 +549,19 @@ class Graph(models.GraphModel):
                 for nodegroup in self.get_nodegroups():
                     nodegroup.delete()
 
-                for edge in self.edges.values():
-                    edge.delete()
+            for edge in self.edges.values():
+                edge.delete()
 
-                for node in self.nodes.values():
-                    node.delete()
+            for node in self.nodes.values():
+                node.delete()
 
-                for card in self.cards.values():
-                    card.delete()
+            for card in self.cards.values():
+                card.delete()
 
-                for widget in self.widgets.values():
-                    widget.delete()
+            for widget in self.widgets.values():
+                widget.delete()
 
-                super(Graph, self).delete()
-        else:
-            raise GraphValidationError(
-                _("Your resource model: {0}, already has instances saved. You cannot delete a Resource Model with instances.").format(
-                    self.name
-                )
-            )
+            super(Graph, self).delete()
 
     def delete_instances(self, verbose=False):
         """
@@ -712,23 +706,12 @@ class Graph(models.GraphModel):
         append the node to the root of this graph
 
         """
-
         node_names = [node.name for node in self.nodes.values()]
         temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
-
-        if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
-            tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
-            if tile_count > 0:
-                raise GraphValidationError(
-                    _("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.").format(
-                        self.name
-                    ),
-                    1006,
-                )
-
         nodegroup = None
+
         if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
             newid = uuid.uuid1()
             nodegroup = models.NodeGroup.objects.create(pk=newid)
@@ -1049,15 +1032,6 @@ class Graph(models.GraphModel):
             nodegroups = []
 
             tree = self.get_tree(root=node)
-            tile_count = models.TileModel.objects.filter(nodegroup=node.nodegroup).count()
-            if self.is_editable() is False and tile_count > 0:
-                raise GraphValidationError(
-                    _(
-                        "Your resource model: {self.name}, already has instances saved. \
-                            You cannot delete nodes from a Resource Model with instances."
-                    ).format(**locals()),
-                    1006,
-                )
 
             def traverse_tree(tree):
                 nodes.append(tree["node"])
@@ -1504,7 +1478,6 @@ class Graph(models.GraphModel):
 
         cards = []
         for card in self.cards.values():
-            is_editable = True
             if self.isresource:
                 if not card.name:
                     card.name = self.nodes[card.nodegroup_id].name
@@ -1513,8 +1486,6 @@ class Graph(models.GraphModel):
                         card.description = self.nodes[card.nodegroup_id].description
                     except KeyError as e:
                         print("Error: card.description not accessible, nodegroup_id not in self.nodes: ", e)
-                if check_if_editable:
-                    is_editable = card.is_editable()
             else:
                 if card.nodegroup.parentnodegroup_id is None:
                     card.name = self.name
@@ -1525,7 +1496,6 @@ class Graph(models.GraphModel):
                     if str(card.description) in ["null", ""]:
                         card.description = self.nodes[card.nodegroup_id].description
             card_dict = JSONSerializer().serializeToPython(card, use_raw_i18n_json=use_raw_i18n_json)
-            card_dict["is_editable"] = is_editable
             card_constraints = card.constraintmodel_set.all()
             card_dict["constraints"] = JSONSerializer().serializeToPython(card_constraints)
             cards.append(card_dict)
@@ -1650,72 +1620,6 @@ class Graph(models.GraphModel):
 
             return res
 
-    def check_if_resource_is_editable(self):
-        def find_unpermitted_edits(obj_a, obj_b, ignore_list, obj_type):
-            # if node_tile_count > 0:
-            res = None
-            pre_diff = self._compare(obj_a, obj_b, ignore_list)
-            diff = [x for x in pre_diff if len(list(x.keys())) > 0]
-            if len(diff) > 0:
-                if obj_type == "node":
-                    tile_count = models.TileModel.objects.filter(nodegroup_id=db_node.nodegroup_id).count()
-                    res = diff if tile_count > 0 else None  # If your node has no data, you can change any property
-            return res
-
-        if self.isresource is True:
-            if self.is_editable() is False:
-                unpermitted_edits = []
-                db_nodes = models.Node.objects.filter(graph=self)
-                for db_node in db_nodes:
-                    unpermitted_node_edits = find_unpermitted_edits(
-                        db_node,
-                        self.nodes[db_node.nodeid],
-                        [
-                            "name",
-                            "alias",
-                            "hascustomalias",
-                            "issearchable",
-                            "ontologyclass",
-                            "description",
-                            "isrequired",
-                            "fieldname",
-                            "exportable",
-                            "config",
-                        ],
-                        "node",
-                    )
-                    if unpermitted_node_edits is not None:
-                        unpermitted_edits.append(unpermitted_node_edits)
-                db_graph = Graph.objects.get(pk=self.graphid)
-                unpermitted_graph_edits = find_unpermitted_edits(
-                    db_graph,
-                    self,
-                    [
-                        "name",
-                        "ontology_id",
-                        "subtitle",
-                        "iconclass",
-                        "author",
-                        "description",
-                        "color",
-                        "nodes",
-                        "edges",
-                        "cards",
-                        "nodegroup_id",
-                    ],
-                    "graph",
-                )
-                if unpermitted_graph_edits is not None:
-                    unpermitted_edits.append(unpermitted_graph_edits)
-                if len(unpermitted_edits) > 0:
-                    raise GraphValidationError(
-                        _(
-                            "Your resource model: {self.name}, already has instances saved. \
-                                You cannot modify a Resource Model with instances."
-                        ).format(**locals()),
-                        1006,
-                    )
-
     def _validate_node_name(self, node):
         """
         Verifies a node's name is unique to its nodegroup
@@ -1731,10 +1635,6 @@ class Graph(models.GraphModel):
             if len(names_in_nodegroup) > len(unique_names_in_nodegroup):
                 message = _('Duplicate node name: "{0}". All node names in a card must be unique.'.format(node.name))
                 raise GraphValidationError(message)
-            elif node.is_editable() is False:
-                if node.name != models.Node.objects.values_list("name", flat=True).get(pk=node.nodeid):
-                    message = "The name of this node cannot be changed because business data has already been saved to a card that this node is part of."
-                    raise GraphValidationError(_(message))
             else:
                 sibling_node_names = [node.name for node in self.get_sibling_nodes(node)]
                 if node.name in sibling_node_names:
@@ -1766,9 +1666,6 @@ class Graph(models.GraphModel):
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
 
         """
-        # validates that the resource graph is editable despite having saved instances.
-        self.check_if_resource_is_editable()
-
         # validates that the top node of a resource graph is semantic and a collector
         if self.isresource is True:
             if self.root.is_collector is True:

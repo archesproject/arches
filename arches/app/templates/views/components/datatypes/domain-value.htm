@@ -12,11 +12,10 @@
             class="form-control library-search" 
             data-bind="
                 attr: {placeholder: $root.translations.addNewOption + '...'},
-                disable: !isEditable, 
                 value: newOptionLabel, valueUpdate: 'keyup'
             "
         >
-        <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if(isEditable){addNewOption()}}">
+        <a href="#" data-bind="click: addNewOption">
              <i class="fa fa-plus-circle pull-right"></i>
         </a>
         <div data-bind="sortable: {data: options}">
@@ -24,8 +23,8 @@
                 <span class="domain-drag-handle">
                     <i class="fa fa-ellipsis-v option-drag-handle" aria-hidden="true">  </i>
                 </span>
-                <input class="domain-input-item"  type="text" class="form-control library-search" data-bind="disable: !$parent.isEditable, value: text, valueUpdate: 'keyup'">
-                <a href="#" data-bind="disable: !$parent.isEditable, click: function(){if($parent.isEditable){remove()}}">
+                <input class="domain-input-item"  type="text" class="form-control library-search" data-bind="value: text, valueUpdate: 'keyup'">
+                <a href="#" data-bind="click: remove">
                      <i class="fa fa-minus-circle pull-right"></i>
                 </a>
             </div>

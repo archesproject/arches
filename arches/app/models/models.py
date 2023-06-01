@@ -70,12 +70,6 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            return True
-        else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
-
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
         if not self.cardid:
@@ -487,14 +481,6 @@ class GraphModel(models.Model):
             return _("This Model has unpublished changes, and is not available for instance creation.")
         return False
 
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-            return True
-        elif self.isresource:
-            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
-        else:
-            return True
-
     def __str__(self):
         return str(self.name)
 
@@ -644,12 +630,6 @@ class Node(models.Model):
     @property
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
-
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            return True
-        else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     def get_relatable_resources(self):
         relatable_resource_ids = [

@@ -220,15 +220,9 @@ class GraphDesignerView(GraphBaseView):
         card_components = models.CardComponent.objects.all()
         graph_models = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
 
-        restricted_nodegroups = []
-        if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
-            restricted_nodegroups = (
-                models.TileModel.objects.filter(
-                    nodegroup__pk__in=[nodegroup_dict["nodegroupid"] for nodegroup_dict in serialized_graph["nodegroups"]]
-                )
-                .values_list("nodegroup_id", flat=True)
-                .distinct()
-            )
+        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+        if self.graph.ontology is not None:
+            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
         context = self.get_context_data(
             main_script="views/graph-designer",
@@ -254,7 +248,7 @@ class GraphDesignerView(GraphBaseView):
             primary_descriptor_function=primary_descriptor_function,
             geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
-            restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
+            restricted_nodegroups=[],
             ontologies=JSONSerializer().serialize(models.Ontology.objects.filter(parentontology=None), exclude=["version", "path"]),
             ontology_classes=JSONSerializer().serialize(models.OntologyClass.objects.values("source", "ontology_id")),
             graph_models=graph_models,
