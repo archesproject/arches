@@ -1673,14 +1673,14 @@ class FileListDataType(BaseDataType):
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
             tile_file["file_id"] = str(uuid.uuid4())
-            source_path = kwargs.get('path') if kwargs.get('path') else 'uploadedfiles'
+            source_path = kwargs.get("path") if kwargs.get("path") else "uploadedfiles"
             source_file = os.path.join(source_path, tile_file["name"])
-   
+
             try:
                 with default_storage.open(source_file) as f:
                     save_file(f, tile_file["file_id"])
             except FileNotFoundError:
-                with open(os.path.join(settings.MEDIA_ROOT, source_file), 'rb') as f:
+                with open(os.path.join(settings.MEDIA_ROOT, source_file), "rb") as f:
                     save_file(f, tile_file["file_id"])
 
             tile_file["url"] = settings.MEDIA_URL + tile_file["file_id"]
