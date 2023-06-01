@@ -185,6 +185,7 @@ define([
                     config: config,
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
+                    is_immutable: self.is_immutable,
                     fieldname: self.fieldname,
                     exportable: self.exportable,
                     alias: self.alias,
@@ -276,6 +277,7 @@ define([
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
+            self.is_immutable = source.is_immutable;
             self.sourceBranchPublicationId = source.sourcebranchpublication_id;
 
             self.set('id', self.nodeid);
@@ -324,13 +326,14 @@ define([
                 if (status==='success') {
                     this.alias(request.responseJSON.updated_values?.node.alias);
                     this._node(this.json());
-
-                    // adds event to trigger dirty state in graph-designer
-                    document.dispatchEvent(
-                        new Event('nodeSave')
-                    );
                 }
             };
+
+            // adds event to trigger dirty state in graph-designer
+            // need to execute before save to avoid issues with graph caching
+            document.dispatchEvent(
+                new Event('nodeSave')
+            );
             return this._doRequest({
                 type: method,
                 url: this._getURL(method),

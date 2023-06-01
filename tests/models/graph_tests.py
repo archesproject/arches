@@ -701,6 +701,7 @@ class GraphTests(ArchesTestCase):
 
         # test that data is persisited propertly when creating a new graph
         graph = Graph.new(is_resource=False)
+        graph.create_editable_future_graph()
 
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()

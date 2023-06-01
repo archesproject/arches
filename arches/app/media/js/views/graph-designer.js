@@ -40,6 +40,7 @@ define([
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             viewModel.graphPublicationNotes = ko.observable();
+            viewModel.shouldShowUpdatePublishedGraphsButton = ko.observable();
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
@@ -139,6 +140,19 @@ define([
 
             viewModel.shouldShowPublishModal = ko.observable(false);
 
+            viewModel.toggleLockedState = function() {
+                let url = new URL(window.location.href);
+
+                if (url.searchParams.has('should_show_source_graph')) {
+                    url.searchParams.delete('should_show_source_graph');
+                }
+                else {
+                    url.searchParams.append('should_show_source_graph', true);
+                }
+
+                window.location.href = url;
+            };
+
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
 
@@ -201,6 +215,78 @@ define([
                         else {
                             viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                         }
+                    }
+                });
+            };
+
+            viewModel.showRestoreStateFromSerializedGraphAlert = function() {
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmGraphRevert.title, 
+                    arches.translations.confirmGraphRevert.text,
+                    function() {}, 
+                    viewModel.restoreStateFromSerializedGraph,
+                ));
+            };
+
+            viewModel.restoreStateFromSerializedGraph = function() {
+                viewModel.loading(true);
+
+                $.ajax({
+                    type: "POST",
+                    url: arches.urls.restore_state_from_serialized_graph(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        if (status === 'success') { window.location.reload(); }
+                        else {
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                        }
+                    }
+                });
+            };
+
+            viewModel.showUpdatePublishedGraphsModal = function() {
+                viewModel.shouldShowUpdatePublishedGraphsButton(true);
+                viewModel.shouldShowPublishModal(true);
+            };
+
+            viewModel.updatePublishedGraphs = function() {
+                viewModel.loading(true);
+
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
+                    url: arches.urls.update_published_graphs(viewModel.graph.graphid()),
+                    complete: function(response, status) {
+                        let alert;
+
+                        if (status === 'success') {
+                            alert = new AlertViewModel(
+                                'ep-alert-blue', 
+                                response.responseJSON.title, 
+                                response.responseJSON.message,
+                                null,
+                                function(){},
+                            );
+                        }
+                        else {
+                            alert = new JsonErrorAlertViewModel(
+                                'ep-alert-red', 
+                                response.responseJSON,
+                                null,
+                                function(){},
+                            );
+                        }
+
+                        // must reload window since this editable_future_graph has been deleted
+                        alert.active.subscribe(function() {
+                            window.location.reload();
+                        });
+                        viewModel.alert(alert);
+                        
+                        viewModel.shouldShowUpdatePublishedGraphsButton(false);
+                        viewModel.graphPublicationNotes(null);
+                        viewModel.shouldShowPublishModal(false);
+                        viewModel.loading(false);
                     }
                 });
             };
@@ -644,12 +730,13 @@ define([
             });
 
             function updateGraphUnpublishedChanges() {
-                viewModel.graphHasUnpublishedChanges(true);
-
                 $.ajax({
                     type: 'POST',
-                    url: arches.urls.graph_has_unpublished_changes_api(data.graphid),
-                    data: {'has_unpublished_changes': true}
+                    url: arches.urls.graph_has_unpublished_changes_api(data.graph.graphid),
+                    data: {'has_unpublished_changes': true},
+                    success: function(response) {
+                        viewModel.graphHasUnpublishedChanges(response['has_unpublished_changes']);
+                    }
                 });
             }
 

@@ -24,6 +24,7 @@ define([
         this.configType = params.configType;
 
         this.graphHasDifferentPublication = ko.observable(params.graph_has_different_publication === "True" ? true : false);
+        this.graphHasUnpublishedChanges = ko.observable(params.graph_has_unpublished_changes === "True" ? true : false);
 
         this.template = ko.observable();
         this.report = ko.observable();
@@ -33,13 +34,24 @@ define([
             params.cache = params.cache === undefined ? true : params.cache;
 
             if (params.view) {
-                params.view.alert(new AlertViewmodel(
-                    'ep-alert-red',
-                    arches.translations.resourceGraphHasDifferentPublication.title,
-                    arches.translations.resourceGraphHasDifferentPublication.text,
-                    null,
-                    function() {}
-                ));
+                if (self.graphHasDifferentPublication()) {
+                    params.view.alert(new AlertViewmodel(
+                        'ep-alert-red',
+                        arches.translations.resourceGraphHasDifferentPublication.title,
+                        arches.translations.resourceGraphHasDifferentPublication.text,
+                        null,
+                        function() {}
+                    ));
+                }
+                if (self.graphHasUnpublishedChanges()) {
+                    params.view.alert(new AlertViewmodel(
+                        'ep-alert-red',
+                        arches.translations.resourceGraphHasUnpublishedChanges.title,
+                        arches.translations.resourceGraphHasUnpublishedChanges.text,
+                        null,
+                        function() {}
+                    ));
+                }
             }
 
             if (params.report) {

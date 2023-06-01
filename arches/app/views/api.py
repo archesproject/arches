@@ -382,26 +382,25 @@ class Graphs(APIBase):
 
 class GraphHasUnpublishedChanges(APIBase):
     def get(self, request, graph_id=None):
-        graph = Graph.objects.get(pk=graph_id)
+        graph = models.GraphModel.objects.get(pk=graph_id)
         return JSONResponse(graph.has_unpublished_changes)
 
     def post(self, request, graph_id=None):
-        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes"))
-        graph = Graph.objects.get(pk=graph_id)
+        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes") == "true")
+        graph = models.GraphModel.objects.filter(pk=graph_id)  # need filter here for `update` to work
+        graph.update(has_unpublished_changes=has_unpublished_changes)
 
-        if graph.has_unpublished_changes != has_unpublished_changes:
-            graph.has_unpublished_changes = has_unpublished_changes
-            graph.save()
-
-        return JSONResponse(graph.has_unpublished_changes)
+        return JSONResponse({"has_unpublished_changes": has_unpublished_changes})
 
 
 class GraphIsActive(APIBase):
     def get(self, request, graph_id=None):
         graph = Graph.objects.get(pk=graph_id)
-        source_grah = graph.source_identifier
 
-        return JSONResponse(source_grah.is_active)
+        if graph.source_identifier:
+            grah = graph.source_identifier
+
+        return JSONResponse(grah.is_active)
 
     def post(self, request, graph_id=None):
         try:
@@ -409,16 +408,25 @@ class GraphIsActive(APIBase):
 
             with transaction.atomic():
                 graph = Graph.objects.get(pk=graph_id)
-                if graph.is_active != is_active:
-                    graph.is_active = is_active
-                    graph.save()
 
-                source_graph = graph.source_identifier
+                if graph.source_identifier:
+                    source_graph = graph.source_identifier
+                    editable_future_graph = graph
+                else:
+                    source_graph = graph
+                    editable_future_graph = Graph.objects.get(source_identifier_id=graph_id)
+
                 if source_graph.is_active != is_active:
                     source_graph.is_active = is_active
                     source_graph.save()
 
-            return JSONResponse({"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": graph.is_active})
+                if editable_future_graph.is_active != is_active:
+                    editable_future_graph.is_active = is_active
+                    editable_future_graph.save()
+
+            return JSONResponse(
+                {"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": editable_future_graph.is_active}
+            )
         except:
             return JSONResponse(status=500)
 

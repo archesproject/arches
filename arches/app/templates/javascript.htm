@@ -128,6 +128,10 @@
             "title": "{% trans "Update Graph to selected version?" %}",
             "text": "{% trans "Updating this Graph to the selected published version will change the Graph throughout the application.  Are you sure you would like to proceed?" %}"
         }'
+        confirm-graph-publication-edit='{
+            "title": "{% trans "Apply Edits to Published Graphs?" %}",
+            "text": "{% trans "This will update the historical records of the Graph without creating a new publication. Are you sure you would like to proceed?" %}"
+        }'
         graph-publication-update-success='{
             "title": "{% trans "Success!" %}",
             "text": "{% trans "The published graph has been successfully updated." %}"
@@ -165,7 +169,7 @@
         }'
         resource-graph-has-unpublished-changes='{
             "title": "{% jsescaped_trans "Graph Has Unpublished Changes" %}",
-            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
+            "text": "{% jsescaped_trans "This resource instance is based on a Graph that has unpublished changes. Your system administrator will need to update this instance before you can edit it." %}"
         }'
         resource-graph-has-different-publication='{
             "title": "{% jsescaped_trans "Graph Has Different Published Version" %}",
@@ -890,6 +894,8 @@
         export_graph='(graphid)=>{return "{% url "export_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         publish_graph='(graphid)=>{return "{% url "publish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         revert_graph='(graphid)=>{return "{% url "revert_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        restore_state_from_serialized_graph='(graphid)=>{return "{% url "restore_state_from_serialized_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        update_published_graphs='(graphid)=>{return "{% url "update_published_graphs" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         delete_graph='(graphid)=>{return "{% url "delete_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         delete_instances='(graphid)=>{return "{% url "delete_instances" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         export_mapping_file='(graphid)=>{return "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
