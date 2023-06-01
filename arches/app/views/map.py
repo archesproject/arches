@@ -109,6 +109,7 @@ class MapLayerManagerView(MapBaseManagerView):
         map_layer.legend = data["legend"]
         map_layer.searchonly = data["searchonly"]
         map_layer.sortorder = data["sortorder"]
+        map_layer.ispublic = data["ispublic"]
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:

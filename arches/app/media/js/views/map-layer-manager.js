@@ -49,6 +49,7 @@ define([
         layer.centerY = ko.observable(layer.centery);
         layer.zoom = ko.observable(layer.zoom);
         layer.sortOrder = ko.observable(layer.sortorder);
+        layer.isPublic = ko.observable(layer.ispublic);
         layer.toJSON = ko.computed(function() {
             var layers;
             try {
@@ -71,7 +72,8 @@ define([
                 "centerx": layer.centerX(),
                 "centery": layer.centerY(),
                 "zoom": layer.zoom(),
-                "sortorder": layer.sortOrder()
+                "sortorder": layer.sortOrder(),
+                "ispublic": layer.isPublic()
             });
         });
         layer.dirty = ko.computed(function() {
@@ -119,6 +121,7 @@ define([
             layer.centerY(_layer.centery);
             layer.zoom(_layer.zoom);
             layer.sortOrder(_layer.sortorder);
+            layer.isPublic(_layer.ispublic);
             layer.legend(_layer.legend);
             layer.searchonly(_layer.searchonly);
         };
