@@ -813,11 +813,11 @@ class PermissionDataView(View):
                     try:
                         nodegroupid = card["nodegroupid"]
                     except KeyError:
-                        try: 
+                        try:
                             nodegroupid = card["nodegroup"]
                         except KeyError:
-                            nodegroupid = card['model']['nodegroup_id']
-                            
+                            nodegroupid = card["model"]["nodegroup_id"]
+
                     nodegroup = models.NodeGroup.objects.get(pk=nodegroupid)
 
                     # first remove all the current permissions

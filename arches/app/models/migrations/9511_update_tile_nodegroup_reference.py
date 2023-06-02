@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9466_immutable_branches'),
+        ("models", "9466_immutable_branches"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='tilemodel',
-            name='nodegroup',
+            model_name="tilemodel",
+            name="nodegroup",
         ),
         migrations.AddField(
-            model_name='tilemodel',
-            name='nodegroup_id',
-            field=models.UUIDField(db_column='nodegroupid', null=True),
+            model_name="tilemodel",
+            name="nodegroup_id",
+            field=models.UUIDField(db_column="nodegroupid", null=True),
         ),
     ]

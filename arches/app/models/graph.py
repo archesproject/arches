@@ -81,7 +81,17 @@ class Graph(models.GraphModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].items():
-                    if key not in ("root", "nodes", "edges", "cards", "functions", "is_editable", "publication", "user_permissions", "group_permissions"):
+                    if key not in (
+                        "root",
+                        "nodes",
+                        "edges",
+                        "cards",
+                        "functions",
+                        "is_editable",
+                        "publication",
+                        "user_permissions",
+                        "group_permissions",
+                    ):
                         setattr(self, key, value)
 
                 self.update_permissions(args[0])
@@ -1341,14 +1351,14 @@ class Graph(models.GraphModel):
                 except models.NodeGroup.DoesNotExist:
                     pass
             return list(nodegroups)
-        
+
     def update_permissions(self, serialized_graph):
-        if 'user_permissions' or 'group_permissions' in serialized_graph:
+        if "user_permissions" or "group_permissions" in serialized_graph:
             graph_from_database_query = Graph.objects.filter(pk=self.pk)
             if len(graph_from_database_query):
                 graph_from_database = graph_from_database_query[0]
 
-            if 'user_permissions' in serialized_graph:
+            if "user_permissions" in serialized_graph:
                 # first, delete all existing user permissions for graph
                 if graph_from_database:
                     user_permissions = graph_from_database.get_user_permissions(force_recalculation=True)  # may not need force_recacluation
@@ -1357,21 +1367,23 @@ class Graph(models.GraphModel):
                             user_permission.delete()
 
                 # then, create permissions from serialized permissions
-                for serialized_user_permission_list in serialized_graph['user_permissions'].values():
+                for serialized_user_permission_list in serialized_graph["user_permissions"].values():
                     for serialized_user_permission in serialized_user_permission_list:
                         updated_user_permission = UserObjectPermission(**serialized_user_permission)
                         updated_user_permission.save()
 
-            if 'group_permissions' in serialized_graph:
+            if "group_permissions" in serialized_graph:
                 # first, delete all existing group permissions for graph
                 if graph_from_database:
-                    group_permissions = graph_from_database.get_group_permissions(force_recalculation=True)  # may not need force_recacluation
+                    group_permissions = graph_from_database.get_group_permissions(
+                        force_recalculation=True
+                    )  # may not need force_recacluation
                     for group_permission_list in group_permissions.values():
                         for group_permission in group_permission_list:
                             group_permission.delete()
 
                 # then, create permissions from serialized permissions
-                for serialized_group_permission_list in serialized_graph['group_permissions'].values():
+                for serialized_group_permission_list in serialized_graph["group_permissions"].values():
                     for serialized_group_permission in serialized_group_permission_list:
                         updated_group_permission = GroupObjectPermission(**serialized_group_permission)
                         updated_group_permission.save()
@@ -1388,7 +1400,9 @@ class Graph(models.GraphModel):
         if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
             user_permissions = self.serialized_graph["user_permissions"]
             return {
-                nodegroup_id: [UserObjectPermission(**serialized_user_permission) for serialized_user_permission in serialized_user_permissions ]
+                nodegroup_id: [
+                    UserObjectPermission(**serialized_user_permission) for serialized_user_permission in serialized_user_permissions
+                ]
                 for nodegroup_id, serialized_user_permissions in user_permissions.items()
             }
         else:
@@ -1417,7 +1431,9 @@ class Graph(models.GraphModel):
         if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
             group_permissions = self.serialized_graph["group_permissions"]
             return {
-                nodegroup_id: [GroupObjectPermission(**serialized_group_permission) for serialized_group_permission in serialized_group_permissions ]
+                nodegroup_id: [
+                    GroupObjectPermission(**serialized_group_permission) for serialized_group_permission in serialized_group_permissions
+                ]
                 for nodegroup_id, serialized_group_permissions in group_permissions.items()
             }
         else:
@@ -2116,7 +2132,7 @@ class Graph(models.GraphModel):
         models.Edge.objects.filter(pk__in=[edge.pk for edge in self.edges.values()]).delete()
         models.CardModel.objects.filter(pk__in=[card.pk for card in self.cards.values()]).delete()
         models.CardXNodeXWidget.objects.filter(pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in self.widgets.values()]).delete()
-        
+
         for serialized_nodegroup in serialized_graph["nodegroups"]:
             for key, value in serialized_nodegroup.items():
                 try:
@@ -2159,8 +2175,8 @@ class Graph(models.GraphModel):
 
             del serialized_card["constraints"]
 
-            if 'is_editable' in serialized_card:
-                del serialized_card['is_editable']
+            if "is_editable" in serialized_card:
+                del serialized_card["is_editable"]
 
             card = Card(**serialized_card)
             card.save()

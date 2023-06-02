@@ -238,7 +238,9 @@ class ResourceEditorView(MapBaseManagerView):
                 is_system_settings = True
                 displayname = _("System Settings")
 
-            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(nodegroup_id__in=[nodegroup.pk for nodegroup in nodegroups])
+            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(
+                nodegroup_id__in=[nodegroup.pk for nodegroup in nodegroups]
+            )
             provisionaltiles = []
             for tile in tiles:
                 append_tile = True
