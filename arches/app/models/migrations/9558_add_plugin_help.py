@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9219_update_load_event_task"),
+        ("models", "9437_include_map_source_and_map_layer_permissions"),
     ]
 
     operations = [
