@@ -3,6 +3,7 @@ define([
     'viewmodels/concept-widget',
     'templates/views/components/widgets/radio.htm',
     'plugins/knockout-select2',
+    'bindings/key-events-click',
 ], function(ko, ConceptWidgetViewModel, conceptRadioTemplate) {
     /**
      * registers a select-widget component for use in forms
