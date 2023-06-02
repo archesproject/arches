@@ -1145,7 +1145,6 @@ class ResourceReport(APIBase):
             permitted_cards = []
             for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
                 if request.user.has_perm(perm, card.nodegroup):
-                    # card_proxy_model.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
 
             cardwidgets = [

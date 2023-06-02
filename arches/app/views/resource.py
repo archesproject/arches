@@ -781,10 +781,7 @@ class ResourceDescriptors(View):
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.only("graph_id").get(pk=resourceid)
-        published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=translation.get_language())
-
-        # NEED TO FETCH BOTH GRAPHS FOR BOOLS IN CONTEXT
-        graph = Graph(published_graph.serialized_graph)
+        graph = Graph.objects.get(pk=resource.graph_id)
 
         try:
             map_markers = models.MapMarker.objects.all()
