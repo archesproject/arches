@@ -152,13 +152,10 @@ class LabelBasedGraph(object):
 
         if not serialized_graph:
             node = models.Node.objects.get(pk=tile.nodegroup_id)
-            graph_x_published_graph = models.GraphXPublishedGraph.objects.get(graph_id=node.graph_id)
+            graph = models.GraphModel.objects.get(pk=node.graph_id)
 
             user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(
-                publication_id=graph_x_published_graph.publicationid, language=user_language
-            )
-
+            published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
             serialized_graph = published_graph.serialized_graph
 
         if not node_ids_to_serialized_nodes or not edge_domain_node_ids_to_range_nodes:
