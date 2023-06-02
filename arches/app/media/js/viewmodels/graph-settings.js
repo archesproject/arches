@@ -17,7 +17,7 @@ define([
         self.relatable_resources = ko.computed(function() {
             return _.each(self.resource_data(), function(resource) {
                 resource.isRelatable = ko.observable(resource.is_relatable);
-            });
+            }).filter(resource => !resource.graph.source_identifier_id);
         });
 
         self.designerViewModel = params.designerViewModel;
@@ -26,6 +26,7 @@ define([
             self.graph.root.name(val);
             self.rootnode.name(val);
         });
+
         self.graph.root.datatype.subscribe(function(val){
             self.rootnode.datatype(val);
         });
@@ -94,6 +95,10 @@ define([
                 .done(function(response) {
                     self.jsonCache(self.jsonData());
                     self.rootnode._node(JSON.stringify(self.rootnode));
+
+                    if (params.onSave && typeof params.onSave === 'function') {
+                        params.onSave();
+                    }
                 })
                 .fail(function(response) {
                     self.designerViewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));

@@ -112,6 +112,34 @@
             "title": "{% trans "Delete Branch/Resource Model?" %}",
             "text": "{% trans "Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
         }'
+        confirm-graph-publication-delete='{
+            "title": "{% trans "Delete Published Graph?" %}",
+            "text": "{% trans "Deleting this publication will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-delete-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully deleted." %}"
+        }'
+        graph-publication-delete-failure='{
+            "title": "{% jsescaped_trans "Delete Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-publication-update='{
+            "title": "{% trans "Update Graph to selected version?" %}",
+            "text": "{% trans "Updating this Graph to the selected published version will change the Graph throughout the application.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-update-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully updated." %}"
+        }'
+        graph-publication-update-failure='{
+            "title": "{% jsescaped_trans "Restore Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-revert='{
+            "title": "{% trans "Revert Branch/Resource Model?" %}",
+            "text": "{% trans "This will revert the current branch/resource model to the latest published version.  Are you sure you would like to proceed?" %}"
+        }'
         confirm-maplayer-delete='{
             "title": "{% jsescaped_trans "Delete map layer?" %}",
             "text": "{% jsescaped_trans "Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?" %}"
@@ -135,6 +163,18 @@
             "title": "{% jsescaped_trans "Send Two-Factor Authentication email?" %}",
             "text": "{% jsescaped_trans "This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?" %}"
         }'
+        resource-graph-has-unpublished-changes='{
+            "title": "{% jsescaped_trans "Graph Has Unpublished Changes" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
+        }'
+        resource-graph-has-different-publication='{
+            "title": "{% jsescaped_trans "Graph Has Different Published Version" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
+        }'
+        resource-graph-change-active-status-error='{
+            "title": "{% jsescaped_trans "Could not update Resource Model active state" %}",
+            "text": "{% jsescaped_trans "Please contact your System Administrator" %}"
+        }'
         two-factor-authentication-email-success='{
             "title": "{% jsescaped_trans "Success!" %}",
             "text": "{% jsescaped_trans "An email with instructions to change two-factor authentication settings has been sent to your registered email address." %}"
@@ -146,10 +186,12 @@
         resource-copy-success='{
             "title": "{% jsescaped_trans "Resource Successfully Copied."%}"
         }'
-        resource-has-unpublished-graph='{
-            "title": "{% jsescaped_trans "This resource is based on an unpublished graph." %}",
-            "text": "{% jsescaped_trans "To continue, please ensure the graph is published." %}"
+        resource-is-not-active='{
+            "title": "{% jsescaped_trans "This resource has not been marked active." %}",
+            "text": "{% jsescaped_trans "To continue, please ensure the graph is marked active." %}"
         }'
+        active='{% trans "Active" as active %}  "{{ active|escapejs }}"'
+        inactive='{% trans "Inactive" as inactive %}  "{{ inactive|escapejs }}"'
         please-contact-system-administrator='{% trans "Please contact your system administrator for more details." as pleaseContactSystemAdministrator %}  "{{ pleaseContactSystemAdministrator|escapejs }}"'
         hide-null-values='{% trans "Hide Null Values" as hideNullValues %} "{{ hideNullValues|escapejs }}"'
         load-more='{% trans "Load More" as loadMore %} "{{ loadMore|escapejs }}"'
@@ -181,7 +223,7 @@
         meters='{% trans "meters:" as meters %} "{{ meters|escapejs }}"'
         feet='{% trans "feet:" as feet %} "{{ feet|escapejs }}"'
         download='{% trans "Download" as download %} "{{ download|escapejs }}"'
-        download-file='{% trans "Download File" as downloadFile %} "{{ downloadFile|escapejs }}"'
+        download-zip-file='{% trans "Download Zip File" as downloadZipFile %} "{{ downloadZipFile|escapejs }}"'
         triggering-nodegroups='{% trans "Triggering Nodegroups" as triggeringNodegroups %} "{{ triggeringNodegroups|escapejs }}"'
         select-a-nodegroup='{% trans "Select a Nodegroup" as selectANodegroup %} "{{ selectANodegroup|escapejs }}"'
         no-relationships-added='{% trans "No Relationships Added" as noRelationshipsAdded %} "{{ noRelationshipsAdded|escapejs }}"'
@@ -249,7 +291,13 @@
         select-an-option='{% trans "Select an Option" as selectAnOption %} "{{ selectAnOption|escapejs }}"'
         concept-collection='{% trans "Concept Collection" as conceptCollection %} "{{ conceptCollection|escapejs }}"'
         select-a-concept-collection='{% trans "Select a concept collection" as selectAConceptCollection %} "{{ selectAConceptCollection|escapejs }}"'
-        select-a-node='{% trans "Select a Node" as selectANode %} "{{ selectANode|escapejs }}"'
+        search-url='{% trans "Search Url" as SearchUrl %} "{{ SearchUrl|escapejs }}"'
+        use-search-url='{% trans "Use search url" as useSearchUrl %} "{{ useSearchUrl|escapejs }}"'
+        before='{% trans "Before" as before %} "{{ before|escapejs }}"'
+        after='{% trans "After" as after %} "{{ after|escapejs }}"'
+        case-insensitive='{% trans "Case Insensitive" as caseInsensitive %} "{{ caseInsensitive|escapejs }}"'
+        remove-leading-trailing-spaces='{% trans "Also Remove Leading & Trailing Spaces" as removeLeadingTrailingSpaces %} "{{ removeLeadingTrailingSpaces|escapejs }}"'
+        select-a-node='{% trans "Select a node" as selectANode %} "{{ selectANode|escapejs }}"'
         select-a-property='{% trans "Select a Property" as selectAProperty %} "{{ selectAProperty|escapejs }}"'
         no-date-entered='{% trans "No Date Entered" as noDateEntered %} "{{ noDateEntered|escapejs }}"'
         use-date-of-data-entry='{% trans "Use date of data entry" as useDateOfDataEntry %} "{{ useDateOfDataEntry|escapejs }}"'
@@ -674,8 +722,14 @@
         dropzone-file-upload-caption='{% trans "Drag & Drop your file onto this area to upload" as dropzoneFileUploadCaption %} "{{ dropzoneFileUploadCaption|escapejs }}"'
         select-file='{% trans "Select File" as selectFile %} "{{ selectFile|escapejs }}"'
         cancel-file-import='{% trans "Cancel File Import" as cancelFileImport %} "{{ cancelFileImport|escapejs }}"'
+        cancel-editing='{% trans "Cancel Editing" as cancelEditing %} "{{ cancelEditing|escapejs }}"'
+        preview='{% trans "Preview" as preview %} "{{ preview|escapejs }}"'
         etl-file-upload-message='{% trans "Use this workflow to upload a file with data that you want to use to create new data instances of a model." as etlFileUploadMessage %} "{{ etlFileUploadMessage|escapejs }}"'
         etl-single-csv-title='{% trans "Import Format: Single .csv file" as etlSingleCSVTitle %} "{{ etlSingleCSVTitle|escapejs }}"'
+        bulk-data-edit-details='{% trans "Bulk Data Edit Details" as bulkDataEditDetails %} "{{ bulkDataEditDetails|escapejs }}"'
+        resource-model-editied='{% trans "Resource Model Edited" as resourceModelEditied %} "{{ resourceModelEditied|escapejs }}"'
+        field-name-edited='{% trans "Field Name Edited" as fieldNameEdited %} "{{ fieldNameEdited|escapejs }}"'
+        edit-operation='{% trans "Edit Operation" as editOperation %} "{{ editOperation|escapejs }}"'
         file-summary='{% trans "File Summary" as fileSummary %} "{{ fileSummary|escapejs }}"'
         file-name='{% trans "File name" as fileName %} "{{ fileName|escapejs }}"'
         file-size='{% trans "File size" as fileSize %} "{{ fileSize|escapejs }}"'
@@ -688,7 +742,6 @@
         showing-all='{% trans "Showing All" as showingAll %} "{{ showingAll|escapejs }}"'
         rows='{% trans "Rows" as rows %} "{{ rows|escapejs }}"'
         import-data='{% trans "Import data" as importData %} "{{ importData|escapejs }}"'
-        cancel-file-import='{% trans "Cancel File Import" as cancelFileImport %} "{{ cancelFileImport|escapejs }}"'
         import-single-csv='{% trans "Import Single CSV" as importSingleCsv %} "{{ importSingleCsv|escapejs }}"'
         target-resource='{% trans "Target Resource" as targetResource %} "{{ targetResource|escapejs }}"'
         target-fields='{% trans "Target Fields" as targetFields %} "{{ targetFields|escapejs }}"'
@@ -713,8 +766,11 @@
         start='{% trans "Start" as start %} "{{ start|escapejs }}"'
         warning='{% trans "Warning" as warning %} "{{ warning|escapejs }}"'
         etl-reverse-warning-message='{% trans "Are you sure you want to delete this load?" as etlReverseWarningMessage %} "{{ etlReverseWarningMessage|escapejs }}"'
-        undo-import='{% trans "undo import" as undoImport %} "{{ undoImport|escapejs }}"'
+        undo-import='{% trans "undo" as undoImport %} "{{ undoImport|escapejs }}"'
+        stop-etl='{% trans "stop" as stopEtl %} "{{ stopEtl|escapejs }}"'
+        cancelled='{% trans "cancelled" as cancelled %} "{{ cancelled|escapejs }}"'
         remove-from-history='{% trans "remove from history" as removeFromHistory %} "{{ removeFromHistory|escapejs }}"'
+        number-of-resources-updated='{% trans "Number of Resources Updated" as numberOfResourcesUpdated %} "{{ numberOfResourcesUpdated|escapejs }}"'
         indexing='{% trans "indexing" as indexing %} "{{ indexing|escapejs }}"'
         validating='{% trans "validating" as validating %} "{{ validating|escapejs }}"'
         completed='{% trans "completed" as completed %} "{{ completed|escapejs }}"'
@@ -722,6 +778,11 @@
         running='{% trans "running" as running %} "{{ running|escapejs }}"'
         unloading='{% trans "unloading" as unloading %} "{{ unloading|escapejs }}"'
         unloaded='{% trans "unloaded" as unloaded %} "{{ unloaded|escapejs }}"'
+        bulk-string-editor-trim='{% trans "Bulk String Editor - Trim" as bulkStringEditorTrim %} "{{ bulkStringEditorTrim|escapejs }}"'
+        bulk-string-editor-change-case='{% trans "Bulk String Editor - Change Case" as bulkStringEditorChangeCase %} "{{ bulkStringEditorChangeCase|escapejs }}"'
+        bulk-string-editor-replace='{% trans "Bulk String Editor - Replace" as bulkStringEditorReplace %} "{{ bulkStringEditorReplace|escapejs }}"'
+        select-edit-operation='{% trans "Select an Edit Operation" as SelectEditOperation %} "{{ SelectEditOperation|escapejs }}"'
+        preview-count-stats='(limit, possible, resCount) => {return {% trans "Showing first ${limit} of ${possible} values in ${resCount} resources" as previewCountStats %} `{{ previewCountStats|escapejs }}` }'
         show='{% trans "show" as show %} "{{ show|escapejs }}"'
         hide='{% trans "hide" as hide %} "{{ hide|escapejs }}"'
         first-five-shown='{% trans "First 5 errors are shown" as firstFiveShown %} "{{ firstFiveShown|escapejs }}"'
@@ -789,6 +850,7 @@
         from_sparql_endpoint="{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
         search_sparql_endpoint="{% url 'search_sparql_endpoint' %}"
         confirm_delete="{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        graph_designer='(graphid)=>{return "{% url "graph_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         search_home="{% url 'search_home' %}"
         search_terms="{% url 'search_terms' %}"
         search_results="{% url 'search_results' %}"
@@ -826,6 +888,8 @@
         delete_provisional_tile="{% url 'delete_provisional_tile' %}"
         tile_history="{% url 'tile_history' %}"
         download_files="{% url 'download_files' %}"
+        delete_published_graph='"{% url "delete_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        update_published_graph='"{% url "update_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         remove_functions='"{% url "remove_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         time_wheel_config="{% url 'time_wheel_config' %}"
@@ -844,17 +908,20 @@
         clone_graph='(graphid)=>{return "{% url "clone_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         export_graph='(graphid)=>{return "{% url "export_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         publish_graph='(graphid)=>{return "{% url "publish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
-        unpublish_graph='(graphid)=>{return "{% url "unpublish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        revert_graph='(graphid)=>{return "{% url "revert_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         delete_graph='(graphid)=>{return "{% url "delete_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         delete_instances='(graphid)=>{return "{% url "delete_instances" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         export_mapping_file='(graphid)=>{return "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         add_resource='(graphid)=>{return "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        model_history='(graphid)=>{return "{% url "model_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
         transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
         mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
         help_template="{% url 'help_templates' %}"
         graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        graph_has_unpublished_changes_api='(graphid)=>{return "{% url "graph_has_unpublished_changes_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        graph_is_active_api='(graphid)=>{return "{% url "graph_is_active_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         api_card='"{% url "api_card" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         api_tiles='(tileid)=>{
             return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);

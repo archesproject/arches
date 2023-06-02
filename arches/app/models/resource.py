@@ -58,6 +58,9 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
+    serialized_graph = None
+    node_datatypes = None
+
     class Meta:
         proxy = True
 
@@ -70,14 +73,39 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
         self.descriptor_function = None
-        try:
-            self.serialized_graph = (
-                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                .first()
-                .serialized_graph
-            )
-        except AttributeError:
-            self.serialized_graph = None
+
+    def get_serialized_graph(self):
+        if not self.serialized_graph:
+            try:
+                self.serialized_graph = (
+                    models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
+                    .first()
+                    .serialized_graph
+                )
+            except AttributeError:
+                self.serialized_graph = None
+        return self.serialized_graph
+
+    def set_serialized_graph(self, serialized_graph):
+        self.serialized_graph = serialized_graph
+
+    def get_node_datatypes(self):
+        if not self.node_datatypes:
+            self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        return self.node_datatypes
+
+    def set_node_datatypes(self, node_datatypes):
+        self.node_datatypes = node_datatypes
+
+    def get_root_ontology(self):
+        """
+        Finds and returns the ontology class of the instance's root node
+
+        """
+        if "topnode" in self.get_serialized_graph():
+            return self.get_serialized_graph()["topnode"]["ontologyclass"]
+        else:
+            return SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)).ontologyclass
 
     def get_descriptor_language(self, context):
         """
@@ -188,13 +216,9 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        # TODO: 7783 cbyrd throw error if graph is unpublished
-        if not self.serialized_graph:
-            self.serialized_graph = (
-                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                .first()
-                .serialized_graph
-            )
+        # This initializes serialized graph (for use in superclass?). Setup for the above. NOt sure
+        if not self.get_serialized_graph():
+            pass
 
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)
@@ -220,22 +244,6 @@ class Resource(models.ResourceInstance):
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index(context)
-
-    def get_root_ontology(self):
-        """
-        Finds and returns the ontology class of the instance's root node
-
-        """
-        root_ontology_class = None
-        try:
-            graph_node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["istopnode"] is True), None))
-        except:
-            graph_node = next(models.Node.objects.filter(graph_id=self.graph_id).filter(istopnode=True))
-
-        if graph_node:
-            root_ontology_class = graph_node.ontologyclass
-
-        return root_ontology_class
 
     def load_tiles(self, user=None, perm=None):
         """
@@ -326,7 +334,7 @@ class Resource(models.ResourceInstance):
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
-                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.serialized_graph["nodes"])
+                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.get_serialized_graph()["nodes"])
             }
             document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
             document["root_ontology_class"] = self.get_root_ontology()
@@ -493,7 +501,6 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -617,7 +624,7 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
             )
 
         graph_lookup = {
@@ -848,23 +855,3 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
-
-
-class PublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Published Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)
-
-
-class UnpublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Unpublished Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)

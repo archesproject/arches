@@ -28,6 +28,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_editable_resource_types,
     get_resource_types_by_perm,
+    user_can_read_map_layers,
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
@@ -96,7 +97,7 @@ class MapBaseManagerView(BaseManagerView):
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
         geom_nodes = models.Node.objects.filter(
             graph__isresource=True,
-            graph__publication__isnull=False,
+            graph__is_active=True,
             datatype__in=geom_datatypes,
         ).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []
@@ -114,5 +115,12 @@ class MapBaseManagerView(BaseManagerView):
         context["geom_nodes"] = geom_nodes
         context["resource_map_layers"] = resource_layers
         context["resource_map_sources"] = resource_sources
+
+        all_map_sources = models.MapSource.objects.all()
+
+        map_layers = user_can_read_map_layers(self.request.user)
+
+        context["map_layers"] = map_layers
+        context["map_sources"] = all_map_sources
 
         return context

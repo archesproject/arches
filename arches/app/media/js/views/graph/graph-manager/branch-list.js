@@ -44,7 +44,7 @@ define([
 
             this.filtered_items = ko.pureComputed(function() {
                 var filtered_items = _.filter(this.items(), function(item){ 
-                    return !item.filtered(); 
+                    return !item.filtered() && !item.source_identifier_id; 
                 }, this);
                 filtered_items.sort(function(a,b) {
                     return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;});
@@ -147,6 +147,9 @@ define([
                     // this.loading(false); // TODO: @cbyrd 8842 disable page refresh on branch append
                     _.delay(_.bind(function(){
                         if(status === 'success'){
+                            document.dispatchEvent(
+                                new Event('appendBranch')
+                            );
                             window.location.reload();  // TODO: @cbyrd 8842 disable page refresh on branch append
                             this.closeForm();
                         }

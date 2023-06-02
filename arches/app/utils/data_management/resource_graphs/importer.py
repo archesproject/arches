@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-import sys
 import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
@@ -146,6 +145,12 @@ def import_graph(graphs, overwrite_graphs=True):
                 with transaction.atomic():
                     # saves graph publication with serialized graph
                     graph = Graph.objects.get(pk=graph.graphid)  # retrieve graph using the ORM to ensure strings are I18n_Strings
+
+                    try:
+                        Graph.objects.get(source_identifier_id=graph.graphid)
+                    except Graph.DoesNotExist:
+                        graph.create_editable_future_graph()
+
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
                             publicationid=publication_data["publicationid"],

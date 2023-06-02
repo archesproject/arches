@@ -21,9 +21,11 @@ import zipfile
 import json
 import uuid
 import logging
+from dateutil import tz
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
@@ -39,7 +41,6 @@ from arches.app.models.card import Card
 from arches.app.models.concept import Concept
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.system_settings import settings
-from arches.app.models.resource import PublishedModelError, UnpublishedModelError
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
@@ -48,6 +49,7 @@ from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_pe
 from io import BytesIO
 from elasticsearch.exceptions import RequestError
 from django.core.cache import cache
+
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +98,7 @@ class GraphSettingsView(GraphBaseView):
     def post(self, request, graphid):
         graph = Graph.objects.get(graphid=graphid)
         data = JSONDeserializer().deserialize(request.body)
+
         for key, value in data.get("graph").items():
             if key in [
                 "iconclass",
@@ -158,10 +161,11 @@ class GraphManagerView(GraphBaseView):
             context = self.get_context_data(main_script="views/graph", root_nodes=JSONSerializer().serialize(root_nodes))
             context["graph_models"] = models.GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             context["graphs"] = JSONSerializer().serialize(context["graph_models"], exclude=["functions"])
+
             context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
-            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}
+            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "templates": ["arches-designer-help"]}
             return render(request, "views/graph.htm", context)
 
 
@@ -186,8 +190,13 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
-        serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
+        try:
+            self.graph = Graph.objects.get(source_identifier_id=graphid)
+        except Graph.DoesNotExist:
+            raise Exception(_("Graph does not have a source identifier."))
+
+        serialized_graph = JSONDeserializer().deserialize(JSONSerializer().serialize(self.graph, force_recalculation=True))
+        source_graph = Graph.objects.get(pk=graphid)
 
         datatypes = models.DDataType.objects.all()
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
@@ -210,7 +219,9 @@ class GraphDesignerView(GraphBaseView):
             datatypes=datatypes,
             ontology_namespaces=self.get_ontology_namespaces(),
             branches=JSONSerializer().serialize(
-                branch_graphs, exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"]
+                branch_graphs,
+                exclude=["cards", "domain_connections", "functions", "cards", "deploymentfile", "deploymentdate"],
+                force_recalculation=True,
             ),
             branch_list={"title": _("Branch Library"), "search_placeholder": _("Find a graph branch")},
             widgets=widgets,
@@ -239,21 +250,14 @@ class GraphDesignerView(GraphBaseView):
             graph_models, exclude=["functions"]
         )  # returns empty array when called in 'get_context_data'
 
-        # reduces load sent to frontend
-        if serialized_graph.get("functions"):
-            serialized_graph["functions"] = None
-        if serialized_graph.get("cards"):
-            serialized_graph["cards"] = None
-        if serialized_graph.get("deploymentfile"):
-            serialized_graph["deploymentfile"] = None
-        if serialized_graph.get("deploymentdate"):
-            serialized_graph["deploymentdate"] = None
-        if serialized_graph.get("_nodegroups_to_delete"):
-            serialized_graph["_nodegroups_to_delete"] = None
-        if serialized_graph.get("_functions"):
-            serialized_graph["_functions"] = None
-
         context["graph"] = JSONSerializer().serialize(serialized_graph)
+
+        context["publication_resource_instance_count"] = models.ResourceInstance.objects.filter(
+            graph_id=source_graph.pk, graph_publication_id=source_graph.publication_id
+        ).count()
+
+        context["source_graph"] = JSONSerializer().serialize(source_graph, force_recalculation=True)
+        context["source_graph_id"] = source_graph.pk
 
         context["nav"]["title"] = self.graph.name
         context["nav"]["menu"] = True
@@ -262,7 +266,7 @@ class GraphDesignerView(GraphBaseView):
         if not self.graph.isresource:
             help_title = _("Designing a Branch")
 
-        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+        context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
 
         return render(request, "views/graph-designer.htm", context)
 
@@ -346,6 +350,7 @@ class GraphDataView(View):
                     name = _("New Resource Model") if isresource else _("New Branch")
                     author = request.user.first_name + " " + request.user.last_name
                     ret = Graph.new(name=name, is_resource=isresource, author=author)
+                    ret.save()
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
@@ -388,16 +393,23 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == "export_branch":
+                    if graph.source_identifier:
+                        graph = Graph.objects.get(pk=graph.source_identifier_id)
+
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
                     clone_data["copy"].save()
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
 
                 elif self.action == "clone_graph":
+                    if graph.source_identifier:
+                        graph = Graph.objects.get(pk=graph.source_identifier_id)
+
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = None
                     ret.save()
+                    ret.create_editable_future_graph()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
@@ -418,8 +430,6 @@ class GraphDataView(View):
             return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except PublishedModelError as e:
-            return JSONErrorResponse(e.title, e.message)
         except RequestError as e:
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
@@ -435,6 +445,10 @@ class GraphDataView(View):
             data = JSONDeserializer().deserialize(request.body)
             try:
                 graph = Graph.objects.get(graphid=graphid)
+                if graph.publication:
+                    return JSONErrorResponse(
+                        _("Unable to delete nodes of a published graph"), _("Please unpublish your graph before deleting a node")
+                    )
                 graph.delete_node(node=data.get("nodeid", None))
                 return JSONResponse({})
             except GraphValidationError as e:
@@ -452,14 +466,19 @@ class GraphDataView(View):
                 )
             except GraphValidationError as e:
                 return JSONErrorResponse(e.title, e.message)
-            except PublishedModelError as e:
-                return JSONErrorResponse(e.title, e.message)
         elif self.action == "delete_graph":
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
                     graph.delete_instances()
                 graph.delete()
+
+                try:
+                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier_id)
+                    source_graph.delete()
+                except models.GraphModel.DoesNotExist:
+                    pass  # no sourcee graph to delete
+
                 return JSONResponse({"success": True})
             except GraphValidationError as e:
                 return JSONErrorResponse(e.title, e.message)
@@ -472,24 +491,28 @@ class GraphPublicationView(View):
 
     def post(self, request, graphid):
         graph = Graph.objects.get(pk=graphid)
+        source_graph = Graph.objects.get(pk=graph.source_identifier_id)
 
-        try:
+        if self.action == "publish":
             notes = None
+
             if request.body:
                 data = JSONDeserializer().deserialize(request.body)
                 notes = data.get("notes")
 
-            if self.action == "publish":
-                try:
-                    graph.publish(notes=notes, user=request.user)
-                except UnpublishedModelError as e:
-                    return JSONErrorResponse(e.title, e.message)
-            elif self.action == "unpublish":
-                graph.unpublish()
-        except Exception as e:
-            return JSONErrorResponse(e)
+            try:
+                source_graph.publish(notes=notes, user=request.user)
+                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+            except Exception as e:
+                logger.exception(e)
+                return JSONErrorResponse(str(_("Unable to process publication"), _("Please contact your administrator if issue persists")))
 
-        return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
+        elif self.action == "revert":
+            try:
+                source_graph.revert()
+                return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully reverted."})
+            except Exception as e:
+                return JSONErrorResponse(str(e))
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
@@ -522,6 +545,149 @@ class DatatypeTemplateView(TemplateView):
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
+class ModelHistoryView(GraphBaseView):
+    def get(self, request, graphid):
+        self.graph = Graph.objects.get(graphid=graphid)
+
+        graphs_x_published_graphs = sorted(
+            models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True
+        )
+
+        user_ids_to_user_data = {}
+
+        for graph_x_published_graph in graphs_x_published_graphs:
+            # changes datetime to human-readable format with local timezone
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
+                "%Y-%m-%d | %I:%M %p %Z"
+            )
+
+            if not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
+                user_ids_to_user_data[graph_x_published_graph.user.pk] = {
+                    "username": graph_x_published_graph.user.username,
+                    "first_name": graph_x_published_graph.user.first_name,
+                    "last_name": graph_x_published_graph.user.last_name,
+                }
+
+        context = self.get_context_data(
+            main_script="views/graph/model-history",
+            graph_publication_id=self.graph.publication_id,
+            graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
+            user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
+        )
+        context["nav"]["title"] = self.graph.name
+        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
+
+        return render(request, "views/graph/model-history.htm", context)
+
+    def post(self, request, graphid):
+        publication_id = JSONDeserializer().deserialize(request.body)
+
+        user_language = translation.get_language()
+        publication = models.PublishedGraph.objects.get(publication_id=publication_id, language=user_language)
+        serialized_graph = publication.serialized_graph
+
+        try:
+            with transaction.atomic():
+                graph = Graph.objects.get(pk=graphid)
+
+                models.NodeGroup.objects.filter(
+                    pk__in=[nodegroup.pk for nodegroup in graph.get_nodegroups(force_recalculation=True)]
+                ).delete()
+                models.Node.objects.filter(pk__in=[node.pk for node in graph.nodes.values()]).delete()
+                models.Edge.objects.filter(pk__in=[edge.pk for edge in graph.edges.values()]).delete()
+                models.CardModel.objects.filter(pk__in=[card.pk for card in graph.cards.values()]).delete()
+                models.CardXNodeXWidget.objects.filter(
+                    pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in graph.widgets.values()]
+                ).delete()
+
+                for serialized_nodegroup in serialized_graph["nodegroups"]:
+                    for key, value in serialized_nodegroup.items():
+                        try:
+                            serialized_nodegroup[key] = uuid.UUID(value)
+                        except:
+                            pass
+
+                    nodegroup = models.NodeGroup(**serialized_nodegroup)
+                    nodegroup.save()
+
+                for serialized_node in serialized_graph["nodes"]:
+                    for key, value in serialized_node.items():
+                        try:
+                            serialized_node[key] = uuid.UUID(value)
+                        except:
+                            pass
+
+                    del serialized_node["is_collector"]
+                    del serialized_node["parentproperty"]
+
+                    node = models.Node(**serialized_node)
+                    node.save()
+
+                for serialized_edge in serialized_graph["edges"]:
+                    for key, value in serialized_edge.items():
+                        try:
+                            serialized_edge[key] = uuid.UUID(value)
+                        except:
+                            pass
+
+                    edge = models.Edge(**serialized_edge)
+                    edge.save()
+
+                for serialized_card in serialized_graph["cards"]:
+                    for key, value in serialized_card.items():
+                        try:
+                            serialized_card[key] = uuid.UUID(value)
+                        except:
+                            pass
+
+                    del serialized_card["constraints"]
+                    del serialized_card["is_editable"]
+
+                    card = Card(**serialized_card)
+                    card.save()
+
+                widget_dict = {}
+                for serialized_widget in serialized_graph["widgets"]:
+                    for key, value in serialized_widget.items():
+                        try:
+                            serialized_widget[key] = uuid.UUID(value)
+                        except:
+                            pass
+
+                    updated_widget = models.CardXNodeXWidget(**serialized_widget)
+                    updated_widget.save()
+
+                    widget_dict[updated_widget.pk] = updated_widget
+
+                updated_graph = Graph(serialized_graph)
+                updated_graph.widgets = widget_dict
+
+                updated_graph.save()
+                updated_graph.create_editable_future_graph()
+        except:
+            return JSONErrorResponse(JSONSerializer().serialize({"success": False}))
+
+        return JSONResponse(JSONSerializer().serialize({"success": True}))
+
+    def delete(self, request, graphid):
+        publication_id = JSONDeserializer().deserialize(request.body)
+        publication = models.GraphXPublishedGraph.objects.get(pk=publication_id)
+        publication.delete()
+
+        graphs_x_published_graphs = sorted(
+            models.GraphXPublishedGraph.objects.filter(graph_id=graphid), key=lambda x: x.published_time, reverse=True
+        )
+
+        for graph_x_published_graph in graphs_x_published_graphs:
+            # changes datetime to human-readable format with local timezone
+            graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
+                "%Y-%m-%d | %I:%M %p %Z"
+            )
+
+        return JSONResponse(JSONSerializer().serialize(graphs_x_published_graphs))
+
+
+@method_decorator(group_required("Graph Editor"), name="dispatch")
 class FunctionManagerView(GraphBaseView):
     action = ""
 
@@ -541,7 +707,7 @@ class FunctionManagerView(GraphBaseView):
             )
             context["nav"]["title"] = self.graph.name
             context["nav"]["menu"] = True
-            context["nav"]["help"] = {"title": _("Managing Functions"), "template": "function-help"}
+            context["nav"]["help"] = {"title": _("Managing Functions"), "templates": ["function-help"]}
 
             return render(request, "views/graph/function-manager.htm", context)
         else:

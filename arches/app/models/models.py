@@ -17,6 +17,8 @@ import logging
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
@@ -66,6 +68,7 @@ class CardModel(models.Model):
         "CardComponent", db_column="componentid", default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"), on_delete=models.SET_DEFAULT
     )
     config = JSONField(blank=True, null=True, db_column="config")
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
@@ -73,6 +76,11 @@ class CardModel(models.Model):
             self.cardid = uuid.uuid4()
         if isinstance(self.cardid, str):
             self.cardid = uuid.UUID(self.cardid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(CardModel, self).save()
 
     class Meta:
         managed = True
@@ -228,6 +236,7 @@ class Edge(models.Model):
     domainnode = models.ForeignKey("Node", db_column="domainnodeid", related_name="edge_domains", on_delete=models.CASCADE)
     rangenode = models.ForeignKey("Node", db_column="rangenodeid", related_name="edge_ranges", on_delete=models.CASCADE)
     graph = models.ForeignKey("GraphModel", db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
@@ -235,6 +244,11 @@ class Edge(models.Model):
             self.edgeid = uuid.uuid4()
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Edge, self).save()
 
     class Meta:
         managed = True
@@ -327,6 +341,19 @@ class File(models.Model):
         managed = True
         db_table = "files"
 
+
+class TempFile(models.Model):
+    fileid = models.UUIDField(primary_key=True)
+    path = models.FileField(upload_to="archestemp")
+
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        if not self.fileid:
+            self.fileid = uuid.uuid4()
+
+    class Meta:
+        managed = True
+        db_table = "files_temporary"
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
@@ -423,6 +450,7 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
+    is_active = models.BooleanField(default=False)
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
@@ -437,13 +465,17 @@ class GraphModel(models.Model):
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
+    source_identifier = models.ForeignKey(
+        blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
+    )
+    has_unpublished_changes = models.BooleanField(default=False)
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        if not self.publication:
-            return _("This Model is currently unpublished and not available for instance creation.")
+        if not self.is_active:
+            return _("This Model is not active, and is not available for instance creation.")
         return False
 
     def __str__(self):
@@ -559,6 +591,7 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -619,10 +652,23 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, **kwargs)
+
+        if ret["config"] and ret["config"].get("options"):
+            ret["config"]["options"] = sorted(ret["config"]["options"], key=lambda k: k["id"])
+
+        return ret
+
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
         if not self.nodeid:
             self.nodeid = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Node, self).save()
 
     class Meta:
         managed = True
@@ -717,7 +763,7 @@ class OntologyClass(models.Model):
 class PublishedGraph(models.Model):
     language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
     publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+    serialized_graph = models.JSONField(blank=True, null=True, db_column="serialized_graph")
 
     class Meta:
         managed = True
@@ -902,7 +948,7 @@ class ResourceInstance(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     name = I18n_TextField(blank=True, null=True)
-    descriptors = JSONField(blank=True, null=True)
+    descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
@@ -1242,6 +1288,11 @@ class MapLayer(models.Model):
         managed = True
         ordering = ("sortorder", "name")
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (("no_access_to_maplayer", "No Access"),
+                       ("read_maplayer", "Read"),
+                       ("write_maplayer", "Create/Update"),
+                       ("delete_maplayer", "Delete"))
 
 
 class GraphXMapping(models.Model):
@@ -1488,6 +1539,7 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    helptemplate = models.TextField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
@@ -1516,7 +1568,7 @@ class IIIFManifest(models.Model):
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
-    transactionid = models.UUIDField(default=uuid.uuid4)
+    transactionid = models.UUIDField(default=uuid.uuid4, null=True)
 
     def __str__(self):
         return self.label
@@ -1602,6 +1654,8 @@ class ETLModule(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
+    helptemplate = models.TextField(blank=True, null=True)
+    helpsortorder = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -1627,6 +1681,7 @@ class LoadEvent(models.Model):
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
     indexed_time = models.DateTimeField(blank=True, null=True)
+    taskid = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -1658,7 +1713,7 @@ class LoadErrors(models.Model):
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
     source = models.TextField(blank=True, null=True)
-    error = models.TextField(blank=True, null=True)
+    value = models.TextField(blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     datatype = models.TextField(blank=True, null=True)
 

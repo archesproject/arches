@@ -47,6 +47,7 @@ define([
             self.slug = ko.observable(null);
             self.alias = ko.observable(null);
             self.hasCustomAlias = ko.observable(false);
+            self.sourceIdentifierId = ko.observable(null);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -267,6 +268,7 @@ define([
             self.exportable(source.exportable);
             self.alias(source.alias);
             self.hasCustomAlias(source.hascustomalias);
+            self.sourceIdentifierId(source.source_identifier_id);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -322,6 +324,11 @@ define([
                 if (status==='success') {
                     this.alias(request.responseJSON.updated_values?.node.alias);
                     this._node(this.json());
+
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('nodeSave')
+                    );
                 }
             };
             return this._doRequest({

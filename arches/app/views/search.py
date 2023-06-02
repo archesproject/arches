@@ -57,13 +57,11 @@ logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication=None)
+            .exclude(is_active=False)
         )
         geocoding_providers = models.Geocoder.objects.all()
         search_components = models.SearchComponent.objects.all()
@@ -73,9 +71,7 @@ class SearchView(MapBaseManagerView):
         card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
             widgets=widgets,
@@ -107,7 +103,7 @@ class SearchView(MapBaseManagerView):
         context["nav"]["search"] = False
         context["nav"]["help"] = {
             "title": _("Searching the Database"),
-            "template": "search-help",
+            "templates": ["search-help"],
         }
         context["celery_running"] = task_management.check_if_celery_available()
         context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()

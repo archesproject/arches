@@ -37,7 +37,7 @@ class ImportSingleCsv(BaseImportModule):
             GraphModel.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication_id__isnull=True)
+            .exclude(is_active=False)
             .order_by(graph_name_i18n)
         )
         return {"success": True, "data": graphs}
@@ -191,9 +191,14 @@ class ImportSingleCsv(BaseImportModule):
         csv_file_name = request.POST.get("csvFileName")
         id_label = "resourceid"
 
-        tasks.load_single_csv.apply_async(
+        load_task = tasks.load_single_csv.apply_async(
             (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label),
         )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def start(self, request):
         graphid = request.POST.get("graphid")

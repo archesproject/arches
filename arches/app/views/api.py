@@ -380,6 +380,49 @@ class Graphs(APIBase):
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
+class GraphHasUnpublishedChanges(APIBase):
+    def get(self, request, graph_id=None):
+        graph = Graph.objects.get(pk=graph_id)
+        return JSONResponse(graph.has_unpublished_changes)
+
+    def post(self, request, graph_id=None):
+        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes"))
+        graph = Graph.objects.get(pk=graph_id)
+
+        if graph.has_unpublished_changes != has_unpublished_changes:
+            graph.has_unpublished_changes = has_unpublished_changes
+            graph.save()
+
+        return JSONResponse(graph.has_unpublished_changes)
+
+
+class GraphIsActive(APIBase):
+    def get(self, request, graph_id=None):
+        graph = Graph.objects.get(pk=graph_id)
+        source_grah = graph.source_identifier
+
+        return JSONResponse(source_grah.is_active)
+
+    def post(self, request, graph_id=None):
+        try:
+            is_active = bool(request.POST.get("is_active") == "true")
+
+            with transaction.atomic():
+                graph = Graph.objects.get(pk=graph_id)
+                if graph.is_active != is_active:
+                    graph.is_active = is_active
+                    graph.save()
+
+                source_graph = graph.source_identifier
+                if source_graph.is_active != is_active:
+                    source_graph.is_active = is_active
+                    source_graph.save()
+
+            return JSONResponse({"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": graph.is_active})
+        except:
+            return JSONResponse(status=500)
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
 
@@ -1061,7 +1104,7 @@ class ResourceReport(APIBase):
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
-                .exclude(publication=None)
+                .exclude(is_active=False)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             )
 

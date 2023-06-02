@@ -52,7 +52,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         >
             <div style="display: flex;">
                 <h4>
-                    {% trans "Resource:" %}
+                    <span 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Resource Model:'%} : {% quoted_trans 'Branch:'%}"
+                    ></span>
                 </h4>
                 <h4
                     style="padding-left: 8px;"
@@ -60,7 +62,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ></h4>
             </div>
 
-            <h5 style="color: red; padding: 0 50px;">{% trans "Warning! This will save the graph in its current state and make the Resource accessible to permissioned users." %}</h5>
+            <div style="padding: 0 50px;">
+                <h5
+                    data-bind="
+                        text: $data.graph.isresource() 
+                            ? {% quoted_trans 'This will save the Resource Model in its current state. It will also create a historical record of the Resource Model.'%} 
+                            : {% quoted_trans 'This will save the Branch in its current state. It will also create a historical record of the Branch.'%}
+                    "
+                ></h5>
+                
+                <!-- ko if: $data.publicationResourceInstanceCount() -->
+                <h5 style="color: red;">
+                {% blocktrans count publication_resource_instance_count as publication_resource_instance_count %}
+                    Warning! There is {{ publication_resource_instance_count }} Resource Instance that will be affected by this change.
+                    {% plural %}
+                    Warning! There are {{ publication_resource_instance_count }} Resource Instances that will be affected by this change.
+                {% endblocktrans %}
+                </h5>
+                <!-- /ko -->
+            </div>
+
 
             <div
                 style="
@@ -86,14 +107,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ></textarea>
             </div>
                     
-            <!-- ko ifnot: $data.isGraphPublished() -->
-                <!-- ko if: $data.shouldShowGraphPublishButtons() -->
+            <!-- ko if: $data.shouldShowGraphPublishButtons() -->
                 <span style="align-self: flex-end;">
                     <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">
                         <span>{% trans "Publish" %}</span>
                     </button>
                 </span>
-                <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
@@ -102,7 +121,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <!-- Title Block -->
     <div class="ep-form-toolbar">
 
-        <h4 class="ep-form-toolbar-title">
+        <h4 class="ep-form-toolbar-title" style="display: flex;">
             <!-- Menu Item -->
             <div class="graph-selector" data-bind="">
                 <!-- ko if: groupedGraphs -->
@@ -117,35 +136,53 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <!-- /ko -->
                 </script>
             </div>
+
+            <div class="graph-active-switch-container">
+                <div 
+                    style="display: flex; justify-content: center;"
+                    data-bind="component: {
+                        name: 'views/components/simple-switch',
+                        params: {
+                            value: $data.isGraphActive,
+                        }
+                    }"
+                ></div>
+                <!-- ko if: $data.isGraphActive() -->
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Active Resource Model'%} : {% quoted_trans 'Active Branch'%}"
+                    ></span>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.isGraphActive() -->
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Inactive Resource Model'%} : {% quoted_trans 'Inactive Branch'%}"
+                    ></span>
+                <!-- /ko -->
+            </div>
         </h4>
 
         <div class="ep-form-toolbar-tools">
             <span class="graph-settings" data-bind="visible: graphSettingsVisible()" style="display: none;">
                 <!-- ko if: graphSettingsViewModel.dirty() -->
                     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset"><span>{% trans "Discard Edits" %}</span></button>
-                    <!-- ko if: !$data.isGraphPublished() -->
-                        <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save"><span>{% trans "Save Edits" %}</span></button>
-                    <!-- /ko -->
+                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save"><span>{% trans "Save Edits" %}</span></button>
                 <!-- /ko -->
             </span>
 
             <span class="graph-settings" data-bind="visible: selectedNode() && activeTab() === 'graph'" style="display: none;">
                 <!-- ko if: selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false -->
                     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}"><span>{% trans "Discard Edits" %}</span></button>
-                    <!-- ko if: !$data.isGraphPublished() -->
-                        <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode"><span>{% trans "Save Edits" %}</span></button>
-                    <!-- /ko -->
+                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode"><span>{% trans "Save Edits" %}</span></button>
                 <!-- /ko -->
             </span>
 
             <!-- ko if: ko.unwrap(cardTree.selection) && ko.unwrap(cardTree.selection) !=='root' -->
             <span class="graph-settings" data-bind="visible: cardTree.selection() && activeTab() === 'card'" style="display: none;">
                 <!-- ko with: ko.unwrap(cardTree.selection).model ? ko.unwrap(cardTree.selection).model : ko.unwrap(cardTree.selection).card -->
-                <!-- ko if: $data.dirty() -->
-                    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$data.reset(); $parent.cardTree.selection.valueHasMutated();}"><span>{% trans "Discard Card Edits" %}</span></button>
-                    <!-- ko if: !$parent.isGraphPublished() -->
-                        <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){$data.save()}"><span>{% trans "Save Card Edits" %}</span></button>
-                    <!-- /ko -->
+                <!-- ko if: $data.dirty() || $parent.isDirty() -->
+                    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$parent.hasDirtyWidget(false); $data.reset();}"><span>{% trans "Discard Card Edits" %}</span></button>
+                    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: function(){$parent.hasDirtyWidget(false); $parent.saveCardEdits($data);}"><span>{% trans "Save Card Edits" %}</span></button>
                 <!-- /ko -->
                 <!-- /ko -->
             </span>
@@ -153,26 +190,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
             <!-- ko if: ko.unwrap(cardTree.selection) && ko.unwrap(cardTree.selection) ==='root' -->
             <span>
-                <!-- ko if: $data.dirty() -->
-                    <button class="btn btn-md btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$data.reset()}"><span>{% trans "Discard Card Edits" %}</span></button>
-                    <!-- ko if: !$data.isGraphPublished() -->
-                        <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function(){$data.save()}"><span>{% trans "Save Card Edits" %}</span></button>
-                    <!-- /ko -->
+                <!-- ko if: $data.dirty() || $parent.isDirty() -->
+                    <button class="btn btn-md btn-danger btn-labeled fa fa-trash" data-bind="click: function(){$data.hasDirtyWidget(false); $data.reset();}"><span>{% trans "Discard Card Edits" %}</span></button>
+                    <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function(){$parent.hasDirtyWidget(false); $data.save();}"><span>{% trans "Save Card Edits" %}</span></button>
                 <!-- /ko -->
             </span>
             <!-- /ko -->
-            
-            <!-- ko if: $data.isGraphPublished() -->
-            <button class="btn btn-md btn-danger btn-labeled fa fa-exclamation" data-bind="click: $data.displayUnpublishWarning">
-                <span>{% trans "Unpublish Graph" %}</span>
+
+            <!-- ko if: $data.shouldShowGraphPublishButtons() -->
+            <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
+                <span 
+                    style="font-size: 14px;" 
+                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Publish Resource Model'%} : {% quoted_trans 'Publish Branch'%}"
+                ></span>
             </button>
-            <!-- /ko -->
-            <!-- ko ifnot: $data.isGraphPublished() -->
-                <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
-                    <span>{% trans "Publish Graph" %}</span>
-                </button>
-                <!-- /ko -->
+            <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertGraphAlert">
+                <span 
+                    style="font-size: 14px;" 
+                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Revert Resource Model'%} : {% quoted_trans 'Revert Branch'%}"
+                ></span>
+            </button>
             <!-- /ko -->
 
             <a class="btn btn-md btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
@@ -394,6 +431,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "ontologies": {{ontologies}},
         "datatypes": {{datatypes_json}},
         "graph": {{graph}},
+        "source_graph": {{source_graph}},
+        "publication_resource_instance_count": {{publication_resource_instance_count}},
         "ontology_namespaces": "{{ontology_namespaces}}",
         "branches": {{branches}},
         "cards": {{cards}},

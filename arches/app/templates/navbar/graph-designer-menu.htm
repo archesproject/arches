@@ -12,8 +12,11 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: newResource">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "New Model" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Create new Resource Model" %} </span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-sitemap"></i> 
+                                <span>{% trans "New Model" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create new Resource Model" %}</span>
                         </div>
                     </a>
                 </li>
@@ -21,8 +24,11 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: newBranch">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa ion-merge"></i> {% trans "New Branch" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Create new Branch" %} </span>
+                            <div class="menu-item-title">
+                                <i class="fa ion-merge"></i> 
+                                <span>{% trans "New Branch" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create new Branch" %}</span>
                         </div>
                     </a>
                 </li>
@@ -33,8 +39,11 @@
                     </form>
                     <a href="{% url 'graph' '' %}" data-bind="click: importButtonClick">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-upload"></i> {% trans "Import Model" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Import Model by uploading a json file" %} </span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-upload"></i> 
+                                <span>{% trans "Import Model" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Import Model by uploading a json file" %}</span>
                         </div>
                     </a>
                 </li>
@@ -42,8 +51,14 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: cloneGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-clone"></i><span data-bind="text: graph.isresource() ? {% quoted_trans "Clone Model" %} : {% quoted_trans "Clone Branch" %} "></span></div>
-                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? {% quoted_trans "Clone the existing Resource Model" %} : {% quoted_trans "Clone the existing Branch" %} "></span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-clone"></i>
+                                <span data-bind="text: graph.isresource() ? {% quoted_trans "Clone Model" %} : {% quoted_trans "Clone Branch" %}"></span>
+                            </div>
+                            <span 
+                                class="text-muted menu-item-subtitle" 
+                                data-bind="text: graph.isresource() ? {% quoted_trans "Clone the existing Resource Model" %} : {% quoted_trans "Clone the existing Branch" %}"
+                            ></span>
                         </div>
                     </a>
                 </li>
@@ -51,17 +66,38 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: exportGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-download"></i><span data-bind="text: graph.isresource() ? {% quoted_trans "Export Model" %} : {% quoted_trans "Export Branch" %} "></span></div>
-                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? {% quoted_trans "Export the existing Resource Model" %} : {% quoted_trans "Export the existing Branch" %} "></span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-download"></i>
+                                <span data-bind="text: graph.isresource() ? {% quoted_trans "Export Model" %} : {% quoted_trans "Export Branch" %}"></span>
+                            </div>
+                            <span 
+                                class="text-muted menu-item-subtitle" 
+                                data-bind="text: graph.isresource() ? {% quoted_trans "Export the existing Resource Model" %} : {% quoted_trans "Export the existing Branch" %}"
+                            ></span>
+                        </div>
+                    </a>
+                </li>
+                <!-- Menu Item -->
+                <li class="edit-menu-item">
+                    <a href="{% url 'model_history' source_graph_id %}">
+                        <div class="media-body">
+                            <div class="menu-item-title">
+                                <i class="fa fa-calendar"></i>
+                                <span>{% trans "View Model History" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Select the Resource Model version from a list of publications" %}</span>
                         </div>
                     </a>
                 </li>
                 <!-- Menu Item -->
                 <li class="edit-menu-item" data-bind="visible: graph.isresource">
-                    <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                    <a href="{% url 'function_manager' source_graph_id %}" data-bind="click:function () { navigate('{% url 'function_manager' source_graph_id %}'); }">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Configure functions attached to this Resource Model" %} </span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-code"></i> 
+                                <span>{% trans "Functions" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Configure functions attached to this Resource Model" %}</span>
                         </div>
                     </a>
                 </li>
@@ -69,10 +105,11 @@
                 <li class="edit-menu-item" data-bind="visible: graph.isresource">
                     <a data-bind="click: exportMappingFile">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-download"></i> {% trans "Export Mapping File" %}</div>
-                            <span
-                                class="text-muted menu-item-subtitle">{% trans "Use a mapping file with import/export of business data" %}
-                            </span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-download"></i> 
+                                <span>{% trans "Export Mapping File" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Use a mapping file with import/export of business data" %}</span>
                         </div>
                     </a>
                 </li>
@@ -80,7 +117,10 @@
                 <li class="edit-menu-item" data-bind="visible: graph.isresource">
                     <a href="{% url 'graph' '' %}" data-bind="click: deleteInstances">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-trash"></i> {% trans "Delete Associated Instances" %}</div>
+                            <div class="menu-item-title">
+                                <i class="fa fa-trash"></i> 
+                                <span>{% trans "Delete Associated Instances" %}</span>
+                            </div>
                             <span class="text-muted menu-item-subtitle">{% trans "Delete All Associated Instances with this Model" %}</span>
                         </div>
                     </a>
@@ -89,8 +129,14 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: deleteGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-trash"></i><span data-bind="text: graph.isresource() ? {% quoted_trans "Delete Model" %} : {% quoted_trans "Delete Branch" %} "></span></div>
-                            <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? {% quoted_trans "Delete the existing Resource Model" %} : {% quoted_trans "Delete the existing Branch" %} "></span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-trash"></i>
+                                <span data-bind="text: graph.isresource() ? {% quoted_trans "Delete Model" %} : {% quoted_trans "Delete Branch" %}"></span>
+                            </div>
+                            <span 
+                                class="text-muted menu-item-subtitle" 
+                                data-bind="text: graph.isresource() ? {% quoted_trans "Delete the existing Resource Model" %} : {% quoted_trans "Delete the existing Branch" %}"
+                            ></span>
                         </div>
                     </a>
                 </li>
@@ -99,16 +145,16 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
+                            <div class="menu-item-title">
+                                <i class="fa fa-tag"></i> 
+                                <span>{% trans "Return to Arches Designer" %}</span>
+                            </div>
+                            <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %}</span>
                         </div>
                     </a>
                 </li>
             </ul>
         </div>
-        <div class="panel-footer ep-menu-footer hidden">
-
-            {% trans "footer" %}
-        </div>
+        <div class="panel-footer ep-menu-footer hidden">{% trans "footer" %}</div>
     </div>
 </div>

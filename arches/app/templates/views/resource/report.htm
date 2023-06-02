@@ -31,7 +31,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         component: { 
             name: 'resource-report-abstract',
             params: {
-                resourceid: '{{ resourceid }}'
+                resourceid: '{{ resourceid }}',
+                graph_has_different_publication: '{{ graph_has_different_publication }}',
+                view: $data
             }
         }
     "
