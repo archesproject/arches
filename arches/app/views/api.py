@@ -1091,7 +1091,8 @@ class ResourceReport(APIBase):
         perm = "read_nodegroup"
 
         resource = Resource.objects.get(pk=resourceid)
-        graph = Graph.objects.get(graphid=resource.graph_id)
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=translation.get_language())
+        graph = Graph(published_graph.serialized_graph)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         if not template.preload_resource_data:
@@ -1103,7 +1104,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "report_json": resource.to_json(compact=compact, version=version),
+            # "report_json": resource.to_json(compact=compact, version=version),
         }
 
         if "template" not in exclude:
@@ -1133,7 +1134,7 @@ class ResourceReport(APIBase):
 
         if "tiles" not in exclude:
             permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
+            for tile in TileProxyModel.objects.filter(resourceinstance=resource).order_by("sortorder"):
                 if request.user.has_perm(perm, tile.nodegroup):
                     tile.filter_by_perm(request.user, perm)
                     permitted_tiles.append(tile)
@@ -1142,9 +1143,9 @@ class ResourceReport(APIBase):
 
         if "cards" not in exclude:
             permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
+            for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
                 if request.user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(request.user, perm)
+                    # card_proxy_model.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
 
             cardwidgets = [

@@ -538,30 +538,29 @@ class Graph(models.GraphModel):
         return self
 
     def delete(self):
-        if self.is_editable() is True:
-            with transaction.atomic():
-                try:
-                    editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
-                    editable_future_graph.delete()
-                except models.GraphModel.DoesNotExist:
-                    pass  # no editable future graph to delete
+        with transaction.atomic():
+            try:
+                editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
+                editable_future_graph.delete()
+            except models.GraphModel.DoesNotExist:
+                pass  # no editable future graph to delete
 
-                for nodegroup in self.get_nodegroups():
-                    nodegroup.delete()
+            for nodegroup in self.get_nodegroups():
+                nodegroup.delete()
 
-            for edge in self.edges.values():
-                edge.delete()
+        for edge in self.edges.values():
+            edge.delete()
 
-            for node in self.nodes.values():
-                node.delete()
+        for node in self.nodes.values():
+            node.delete()
 
-            for card in self.cards.values():
-                card.delete()
+        for card in self.cards.values():
+            card.delete()
 
-            for widget in self.widgets.values():
-                widget.delete()
+        for widget in self.widgets.values():
+            widget.delete()
 
-            super(Graph, self).delete()
+        super(Graph, self).delete()
 
     def delete_instances(self, verbose=False):
         """
@@ -1033,14 +1032,6 @@ class Graph(models.GraphModel):
 
             tree = self.get_tree(root=node)
             tile_count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id).count()
-            if self.is_editable() is False and tile_count > 0:
-                raise GraphValidationError(
-                    _(
-                        "Your resource model: {self.name}, already has instances saved. \
-                            You cannot delete nodes from a Resource Model with instances."
-                    ).format(**locals()),
-                    1006,
-                )
 
             def traverse_tree(tree):
                 nodes.append(tree["node"])
@@ -1345,7 +1336,10 @@ class Graph(models.GraphModel):
                 if node.is_collector:
                     nodegroups.add(node.nodegroup)
             for card in self.cards.values():
-                nodegroups.add(card.nodegroup)
+                try:
+                    nodegroups.add(card.nodegroup)
+                except models.NodeGroup.DoesNotExist:
+                    pass
             return list(nodegroups)
         
     def update_permissions(self, serialized_graph):
@@ -2122,7 +2116,7 @@ class Graph(models.GraphModel):
         models.Edge.objects.filter(pk__in=[edge.pk for edge in self.edges.values()]).delete()
         models.CardModel.objects.filter(pk__in=[card.pk for card in self.cards.values()]).delete()
         models.CardXNodeXWidget.objects.filter(pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in self.widgets.values()]).delete()
-
+        
         for serialized_nodegroup in serialized_graph["nodegroups"]:
             for key, value in serialized_nodegroup.items():
                 try:
@@ -2164,7 +2158,9 @@ class Graph(models.GraphModel):
                     pass
 
             del serialized_card["constraints"]
-            del serialized_card["is_editable"]
+
+            if 'is_editable' in serialized_card:
+                del serialized_card['is_editable']
 
             card = Card(**serialized_card)
             card.save()
