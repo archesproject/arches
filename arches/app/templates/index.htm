@@ -63,7 +63,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!--=== Header ===-->
     <header>
-        <nav class="v5-splash-navbar navbar" role="navigation">
+        <div class="v5-splash-navbar navbar">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-controls="myNavbar">
@@ -83,7 +83,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
 
-                <div id="myNavbar" class="navbar-collapse collapse">
+                <nav id="myNavbar" class="navbar-collapse collapse" aria-label="{% trans 'Arches Application Navigation' %}">
                     <ul class="nav navbar-nav navbar-right">
                         <li>
                             <a href="#info-block-1">{% trans "Arches Features" %}</a>
@@ -102,7 +102,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         {% else %}
                             <li>
-                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}">
+                                <a class="auth-welcome" href="{% url 'user_profile_manager' %}" aria-label="{% trans 'Visit user profile' %}">
                                     {% trans "Welcome, " %} {{ user.first_name|default:user.username }}
                                 </a>
                             </li>
@@ -122,9 +122,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         {% endif %}
                     </ul>
-                </div>
+                </nav>
             </div>
-        </nav>
+        </div>
     </header>
     <!--=== End Header ===-->
 
@@ -135,30 +135,32 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Vertical Nav -->
                 <div class="vertical-nav-container-background"></div>
 
-                <div id="cd-vertical-nav" class="vertical-nav-container">
+                <nav id="cd-vertical-nav" class="vertical-nav-container" aria-label="{% trans 'Page Navigation' %}">
                     <ul class="vertical-nav-list">
                         <li class="active">
-                            <a class="vertical-nav-list-link" href="#info-block-0" data-number="1" aria-label="Go to the top of the page">
+                            <a class="vertical-nav-list-link" href="#info-block-0" data-number="1" aria-label="{% trans 'Go to the top of the page' %}"
+                                data-bind="click: function() { document.QuerySelector('#info-block-0').focus; }"
+                            >
                                 <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
                             </a>
                         </li>
                         <li>
-                            <a class="vertical-nav-list-link" href="#info-block-1" data-number="2" aria-label="Go to the fast section">
+                            <a class="vertical-nav-list-link" href="#info-block-1" data-number="2" aria-label="{% trans 'Go to the fast section' %}">
                                 <span class="vertical-nav-list-ref">{% trans "Fast" %}</span>
                             </a>
                         </li>
                         <li>
-                            <a class="vertical-nav-list-link" href="#info-block-2" data-number="3" aria-label="Go to the workflows section">
+                            <a class="vertical-nav-list-link" href="#info-block-2" data-number="3" aria-label="{% trans 'Go to the workflows section' %}">
                                 <span class="vertical-nav-list-ref">{% trans "Workflows" %}</span>
                             </a>
                         </li>
                         <li>
-                            <a class="vertical-nav-list-link" href="#info-block-3" data-number="4" aria-label="Go to the search tools section">
+                            <a class="vertical-nav-list-link" href="#info-block-3" data-number="4" aria-label="{% trans 'Go to the search tools section' %}">
                                 <span class="vertical-nav-list-ref">{% trans "Search Tools" %}</span>
                             </a>
                         </li>
                     </ul>
-                </div>
+                </nav>
 
                 <!-- Splash Screen -->
                 <div class="fullscreenbanner-container">
@@ -208,7 +210,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
 
                     <!-- Down button -->
-                    <a href="#info-block-1" class="down-button" aria-label="Go to content"><i class="fa fa-angle-down down-button-icon"></i></a>
+                    <a href="#info-block-1" class="down-button" tabindex="-1"><i class="fa fa-angle-down down-button-icon"></i></a>
                 </div>
             </section>
             <!-- End Intro Section -->
@@ -486,6 +488,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'revolution-slider',
             'one-app',
             'bindings/chosen',
+            'bindings/key-events-click',
             'views/components/language-switcher'
         ], function ($, ko) {
             $(document).ready(function () {

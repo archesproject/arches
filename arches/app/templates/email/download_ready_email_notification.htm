@@ -12,6 +12,20 @@
     <a class="btn" href="{{email_link}}"><button
             class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>
     {% endif %}
+    {% if files %}
+        <!-- ko foreach: { data: files, as: 'file' } -->
+        <div class='entry'>
+            <a data-bind="attr: { href: '/files/' + file.fileid }" target="_blank" style="color: steelblue">
+                <button class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'>
+                    <span data-bind="text: file.name"></span>
+                </button>
+            </a>
+        </div>
+        <!-- /ko -->
+
+    <a class="btn" href="{{email_link}}"><button
+            class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>
+    {% endif %}
     <p>{{closing}}</p>
 </body>
 
