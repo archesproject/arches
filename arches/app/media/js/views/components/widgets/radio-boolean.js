@@ -3,6 +3,7 @@ define([
     'underscore', 
     'viewmodels/widget',
     'templates/views/components/widgets/radio-boolean.htm',
+    'bindings/key-events-click',
 ], function(ko, _, WidgetViewModel, radioBooleanWidgetTemplate) {
     /**
     * knockout components namespace used in arches

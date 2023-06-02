@@ -13,7 +13,8 @@
         {id: 'f', name: falseLabel},
         {id: 'null', name: $root.translations.hasNoValue},
         {id: 'not_null', name: $root.translations.hasAnyValue}
-    ], optionsText: 'name', optionsValue: 'id'"></select>
+    ], optionsText: 'name', optionsValue: 'id', 
+    attr: {'aria-label': $root.translations.selectAnOption, role:'select'}"></select>
 </div>
 {% endblock search %}
 <!-- /ko -->
@@ -23,12 +24,12 @@
     <span data-bind="text: $root.translations.labelTrue"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input class="form-control input-md widget-input" data-bind="textInput: trueLabel">
+    <input class="form-control input-md widget-input" data-bind="textInput: trueLabel, attr: {'aria-label': $root.translations.labelTrue}">
 </div>
 <div class="control-label">
     <span data-bind="text: $root.translations.labelFalse"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input class="form-control input-md widget-input" data-bind="textInput: falseLabel">
+    <input class="form-control input-md widget-input" data-bind="textInput: falseLabel, attr: {'aria-label': $root.translations.labelFalse}">
 </div>
 <!-- /ko -->
