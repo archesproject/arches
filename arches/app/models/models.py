@@ -70,12 +70,6 @@ class CardModel(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            return True
-        else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
-
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
         if not self.cardid:
@@ -348,6 +342,19 @@ class File(models.Model):
         db_table = "files"
 
 
+class TempFile(models.Model):
+    fileid = models.UUIDField(primary_key=True)
+    path = models.FileField(upload_to="archestemp")
+
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        if not self.fileid:
+            self.fileid = uuid.uuid4()
+
+    class Meta:
+        managed = True
+        db_table = "files_temporary"
+
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
 @receiver(post_delete, sender=File)
@@ -473,14 +480,6 @@ class GraphModel(models.Model):
         if self.has_unpublished_changes:
             return _("This Model has unpublished changes, and is not available for instance creation.")
         return False
-
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-            return True
-        elif self.isresource:
-            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
-        else:
-            return True
 
     def __str__(self):
         return str(self.name)
@@ -632,12 +631,6 @@ class Node(models.Model):
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
 
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            return True
-        else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
-
     def get_relatable_resources(self):
         relatable_resource_ids = [
             r2r.resourceclassfrom
@@ -775,7 +768,7 @@ class OntologyClass(models.Model):
 class PublishedGraph(models.Model):
     language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
     publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+    serialized_graph = models.JSONField(blank=True, null=True, db_column="serialized_graph")
 
     class Meta:
         managed = True
@@ -972,7 +965,7 @@ class ResourceInstance(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     name = I18n_TextField(blank=True, null=True)
-    descriptors = JSONField(blank=True, null=True)
+    descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
@@ -1312,6 +1305,11 @@ class MapLayer(models.Model):
         managed = True
         ordering = ("sortorder", "name")
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (("no_access_to_maplayer", "No Access"),
+                       ("read_maplayer", "Read"),
+                       ("write_maplayer", "Create/Update"),
+                       ("delete_maplayer", "Delete"))
 
 
 class GraphXMapping(models.Model):
@@ -1558,6 +1556,7 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    helptemplate = models.TextField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
@@ -1586,7 +1585,7 @@ class IIIFManifest(models.Model):
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
-    transactionid = models.UUIDField(default=uuid.uuid4)
+    transactionid = models.UUIDField(default=uuid.uuid4, null=True)
 
     def __str__(self):
         return self.label
@@ -1672,6 +1671,8 @@ class ETLModule(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
+    helptemplate = models.TextField(blank=True, null=True)
+    helpsortorder = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -1697,6 +1698,7 @@ class LoadEvent(models.Model):
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
     indexed_time = models.DateTimeField(blank=True, null=True)
+    taskid = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -1728,7 +1730,7 @@ class LoadErrors(models.Model):
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
     source = models.TextField(blank=True, null=True)
-    error = models.TextField(blank=True, null=True)
+    value = models.TextField(blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     datatype = models.TextField(blank=True, null=True)
 

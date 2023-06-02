@@ -25,6 +25,9 @@ define([
 
         this.graphHasDifferentPublication = ko.observable(params.graph_has_different_publication === "True" ? true : false);
         this.graphHasUnpublishedChanges = ko.observable(params.graph_has_unpublished_changes === "True" ? true : false);
+        this.graphHasDifferentPublicationAndUserHasInsufficientPermissions = ko.observable(
+            params.graph_has_different_publication_and_user_has_insufficient_permissions === "True" ? true : false
+        );
 
         this.template = ko.observable();
         this.report = ko.observable();
@@ -33,21 +36,21 @@ define([
             var url;
             params.cache = params.cache === undefined ? true : params.cache;
 
-            if (params.view) {
-                if (self.graphHasDifferentPublication()) {
+            if (params.view && self.graphHasDifferentPublication()) {
+                if (self.graphHasDifferentPublicationAndUserHasInsufficientPermissions()) {
                     params.view.alert(new AlertViewmodel(
                         'ep-alert-red',
-                        arches.translations.resourceGraphHasDifferentPublication.title,
-                        arches.translations.resourceGraphHasDifferentPublication.text,
+                        arches.translations.resourceGraphHasDifferentPublicationUserIsNotPermissioned.title,
+                        arches.translations.resourceGraphHasDifferentPublicationUserIsNotPermissioned.text,
                         null,
                         function() {}
                     ));
                 }
-                if (self.graphHasUnpublishedChanges()) {
+                else {
                     params.view.alert(new AlertViewmodel(
                         'ep-alert-red',
-                        arches.translations.resourceGraphHasUnpublishedChanges.title,
-                        arches.translations.resourceGraphHasUnpublishedChanges.text,
+                        arches.translations.resourceGraphHasDifferentPublication.title,
+                        arches.translations.resourceGraphHasDifferentPublication.text,
                         null,
                         function() {}
                     ));

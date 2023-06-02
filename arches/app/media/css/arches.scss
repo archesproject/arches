@@ -13605,12 +13605,12 @@ ul.select2-choices:after {
     margin-bottom: 5px;
 }
 
-.widget-inline-tools-collapser>label {
-    flex-grow: 1;
-}
-
 .widget-inline-tools-collapser>span {
     padding-inline-end: 12px;
+
+    &:first-child {
+        flex-grow: 1;
+    }
 }
 
 .style-tools-panel {
@@ -14691,9 +14691,10 @@ ul.select2-choices:after {
     padding-bottom: 5px;
 }
 
-.etl-module-footer .btn {
+.etl-module-footer .btn, .etl-module-component .btn {
     border-radius: 2px;
     margin-right: 20px;
+    min-width: 100px;
 }
 
 .etl-loading-metadata-key {
