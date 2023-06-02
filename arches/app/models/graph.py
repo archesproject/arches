@@ -658,12 +658,15 @@ class Graph(models.GraphModel):
             newEdge = models.Edge(domainnode=nodeToAppendTo, rangenode=branch_copy.root, ontologyproperty=property, graph=self)
             branch_copy.add_edge(newEdge)
 
-            aliases = [n.alias for n in self.nodes.values()]
+            aliases = [node.alias for node in self.nodes.values()]
+            branch_aliases = [node.alias for node in branch_copy.nodes.values()]
 
             for node in branch_copy.nodes.values():
                 node.sourcebranchpublication_id = branch_publication_id
+
                 if node.alias and node.alias in aliases:
-                    node.alias = self.make_name_unique(node.alias, aliases, "_n")
+                    node.alias = self.make_name_unique(node.alias, aliases + branch_aliases, "_n")
+
                 self.add_node(node)
             for card in branch_copy.get_cards():
                 self.add_card(card)
@@ -1522,11 +1525,19 @@ class Graph(models.GraphModel):
                 nodes = []
                 for key, node in self.nodes.items():
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
+                    if node.istopnode:
+                        ret["topnode"] = nodeobj
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
                     nodes.append(nodeobj)
                 ret["nodes"] = sorted(nodes, key=lambda k: (k["sortorder"], k["nodeid"]))
             else:
                 ret.pop("nodes", None)
+
+            # TODO: Remove this section when PR 9112 / Issue 9053 is merged
+            for key in ["cards", "widgets", "nodes"]:
+                if key in ret and ret[key]:
+                    ret[key].sort(key=lambda item: item["sortorder"] if item["sortorder"] else 0)
+            # TODO: End section to remove
 
             res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
