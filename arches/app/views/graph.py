@@ -161,7 +161,7 @@ class GraphManagerView(GraphBaseView):
             context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
-            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}
+            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "templates": ["arches-designer-help"]}
             return render(request, "views/graph.htm", context)
 
 
@@ -272,7 +272,7 @@ class GraphDesignerView(GraphBaseView):
         if not self.graph.isresource:
             help_title = _("Designing a Branch")
 
-        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+        context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
 
         return render(request, "views/graph-designer.htm", context)
 
@@ -556,7 +556,7 @@ class FunctionManagerView(GraphBaseView):
             )
             context["nav"]["title"] = self.graph.name
             context["nav"]["menu"] = True
-            context["nav"]["help"] = {"title": _("Managing Functions"), "template": "function-help"}
+            context["nav"]["help"] = {"title": _("Managing Functions"), "templates": ["function-help"]}
 
             return render(request, "views/graph/function-manager.htm", context)
         else:
