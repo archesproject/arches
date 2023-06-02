@@ -46,6 +46,8 @@ class NotificationView(View):
                         if userxnotif.notif.context:
                             notif["loaded_resources"] = userxnotif.notif.context.get("loaded_resources", [])
                             notif["link"] = userxnotif.notif.context.get("link")
+                            if userxnotif.notif.context.get("files"):
+                                notif["files"] = userxnotif.notif.context.get("files")
 
                         notif_dict_list.append(notif)
 
