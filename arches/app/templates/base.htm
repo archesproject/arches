@@ -48,6 +48,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
+        <link type="text/x-scss" href="{% webpack_static 'css/core.scss' %}" rel="stylesheet" media="screen">
         {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
         <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
         {% endif %}
