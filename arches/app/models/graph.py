@@ -558,17 +558,17 @@ class Graph(models.GraphModel):
             for nodegroup in self.get_nodegroups():
                 nodegroup.delete()
 
-        for edge in self.edges.values():
-            edge.delete()
+            for edge in self.edges.values():
+                edge.delete()
 
-        for node in self.nodes.values():
-            node.delete()
+            for node in self.nodes.values():
+                node.delete()
 
-        for card in self.cards.values():
-            card.delete()
+            for card in self.cards.values():
+                card.delete()
 
-        for widget in self.widgets.values():
-            widget.delete()
+            for widget in self.widgets.values():
+                widget.delete()
 
         super(Graph, self).delete()
 
