@@ -909,7 +909,7 @@ class CsvReader(Reader):
 
                     row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
 
-                    missing_display_nodes = set(row_keys[0]).intersection_update(display_nodes)
+                    missing_display_nodes = set(row_keys[0]).intersection_update(display_nodes) if len(row_keys) else None
                     if missing_display_nodes is not None:
                         errors = []
                         for mdn in missing_display_nodes:
