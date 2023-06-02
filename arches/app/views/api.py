@@ -354,7 +354,7 @@ class Graphs(APIBase):
         user = request.user
         if graph_id and not self.action:
             graph = Graph.objects.get(graphid=graph_id)
-            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["functions"] + exclusions)
 
             if get_cards:
                 datatypes = models.DDataType.objects.all()
@@ -370,7 +370,7 @@ class Graphs(APIBase):
                     for widget in widgets
                 ]
 
-                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False)
 
                 return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
             else:
@@ -1253,9 +1253,7 @@ class BulkResourceReport(APIBase):
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
             for graph in graphs_from_database:
-                serialized_graph = JSONSerializer().serializeToPython(
-                    graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions
-                )
+                serialized_graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["functions"] + exclusions)
                 cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
@@ -1303,7 +1301,7 @@ class BulkResourceReport(APIBase):
 
             resp[graph_id] = {
                 "graph": graph,
-                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False),
                 "cardwidgets": cardwidgets,
             }
 

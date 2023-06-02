@@ -598,13 +598,6 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-# If True, users can make edits to graphs that are locked
-# (generally because they have resource intances saved against them)
-# Changing this setting to True and making graph modifications may result in
-# disagreement between your Resource Models and Resource Instances potentially
-# causing your application to break.
-OVERRIDE_RESOURCE_MODEL_LOCK = False
-
 # If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 

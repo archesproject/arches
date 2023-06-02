@@ -65,7 +65,6 @@ define([
             };
             updateProperties();
             this.config.nodeid.subscribe(updateProperties);
-            this.isEditable = true;
             if (params.graph) {
                 this.propertyName = ko.computed(function() {
                     var propertyId = self.config.property();
@@ -81,12 +80,6 @@ define([
                     });
                     return relatedNode ? relatedNode.name() : '';
                 });
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable;
-                }
-            } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable');
             }
         } else {
             var filter = params.filterValue();

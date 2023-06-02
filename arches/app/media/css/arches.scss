@@ -5097,6 +5097,7 @@ div.dropdown-menu.open {
 
 .edit-menu-item {
     height: 60px;
+    padding-right: 20px;
     border-left: 3px solid #ebeef0;
     border-bottom: 1px solid #ddd;
     background: #fff;
@@ -5163,6 +5164,30 @@ div.dropdown-menu.open {
 .find-widget {
     width: 450px;
     z-index: 10;
+}
+
+.publication {
+    cursor: pointer;
+    justify-content: left;
+    min-height: 60px; 
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 0 8px; 
+}
+
+.publication:hover {
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.active-publication {
+    justify-content: left;
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 
 .graph-list-header {
@@ -13580,12 +13605,12 @@ ul.select2-choices:after {
     margin-bottom: 5px;
 }
 
-.widget-inline-tools-collapser>label {
-    flex-grow: 1;
-}
-
 .widget-inline-tools-collapser>span {
     padding-inline-end: 12px;
+
+    &:first-child {
+        flex-grow: 1;
+    }
 }
 
 .style-tools-panel {
@@ -14666,9 +14691,10 @@ ul.select2-choices:after {
     padding-bottom: 5px;
 }
 
-.etl-module-footer .btn {
+.etl-module-footer .btn, .etl-module-component .btn {
     border-radius: 2px;
     margin-right: 20px;
+    min-width: 100px;
 }
 
 .etl-loading-metadata-key {

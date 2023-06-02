@@ -64,30 +64,44 @@ Our general release cycle will typically be a functional release (either major i
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change
 
 ## 7.4 - Release date: June 15, 2023
-- Accessibility improvements
-- Bulk Data Manager - Date editor
+- Initial accessibility support for WCAG 2.2 level AA
+- Bulk Data Manager - Default data editing scripts for common string editing functions: case editing, search & replace
 - Bulk Data Manager - Import improvements
   - better i18n support
   - improved error handling and feedback
-  - data update
-- Concept relationship types
-- Improved graph editing
-- Security enhancements
+- Added support for custom resource relationship types
 - Updates to JSONLD loader
+- Improved ETL/indexing performance 
+- Improved API/application performance
+- Enhancements to the relational data model
+- Improved documentation
+- Added map layer permissions
+- Improvements to spatial views
+- Improved term matching (relevance) in search 
+- Project version support
+- Improved null searches (ability to search for absence data)
+- Templating engine v0.1 release
 
 ## 7.5 - Release date: December 15, 2023 
-- Continued Accessibility improvements
-- Improved package manaagement
-- Business data migrations that correspond to graph changes
+- Continued accessibility improvements
+- Improved package management
 - Relationship transversal search
 - Search component redesign
+- Search UI redesign
+- Tabular search results
+- Ability to define search views
+- Support for editing and publishing graphs (removing instance restrictions)
+- Support for viewing and restoring previous graph publications
+- Support for editing/localizing UI labels and permissions for published graphs
+- Business data migrations that correspond to graph changes
+- Security enhancements
+- Support for component authoring in Vue Javascript framework
+
+## 7.6 - Release date: June 15, 2024
+- Activity stream edit logs
 - User specific saved searches
 
-## 8.0 - Release date: June 15, 2024
-- Activity stream edit logs
-- RDM Redesign
-
-## 8.5 - Release date: December 15, 2024
+## 8.0 - Release date: December 15, 2024
 - Migrate Arches UI Framework
-
+- RDM Redesign
 
