@@ -157,6 +157,10 @@
                     <td>{% trans "Place node(s) in a separate card" %}</td>
                     <td><em>{% blocktrans%}only present if this node is not already the top node for a card{% endblocktrans %}</em><br>{% blocktrans %}If true this node will be set in a different card from its parent. This affects data entry, and you are encouraged to test both states of this setting while building you graph. Once data is collected for this node, this setting cannot be changed.{% endblocktrans %}</td>
                 </tr>
+                <tr>
+                    <td>{% trans "Allow Multiple Values" %}</td>
+                    <td>{% blocktrans %}While certain node data types allow the storage of multiple values in a single node, "concept-list" for example, this setting is how you control cardinality at a higher level. When determining whether or not to use this setting, we recommend testing out the resource editor interface directly.{% endblocktrans %}</td>
+                </tr>
             </table>
         </div>
     </div>

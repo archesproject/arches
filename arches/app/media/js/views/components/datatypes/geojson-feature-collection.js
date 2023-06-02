@@ -20,6 +20,15 @@ define([
         this.config = params.config;
         this.graph = params.graph;
         this.layer = params.layer;
+        let haloWeightValue = self.config.haloWeight();
+        let outlineWeightValue = self.config.outlineWeight();
+        let weightValue = self.config.weight();
+        let haloRadiusValue = self.config.haloRadius();
+        let radiusValue = self.config.radius();
+        let clusterDistanceValue = self.config.clusterDistance();
+        let clusterMaxZoomValue = self.config.clusterMaxZoom();
+        let clusterMinPointsValue = self.config.clusterMinPoints();
+        let simplificationValue = self.config.simplification();
         if (this.layer) {
             this.permissions = params.permissions;
             this.iconFilter = ko.observable('');
@@ -148,39 +157,87 @@ define([
                     case "resources-fill-" + params.nodeid:
                         layer.paint["fill-color"] = self.config.fillColor();
                         break;
+
                     case "resources-line-halo-" + params.nodeid:
-                        layer.paint["line-width"] = parseInt(self.config.haloWeight());
-                        if (!(self.config.haloWeight() > 0)) { layer.paint["line-width"] = 1; }
-                        self.config.haloWeight(layer.paint["line-width"]);
-                        layer.paint["line-color"] = self.config.lineHaloColor();
+                        haloWeightValue = self.config.haloWeight();
+                        if (haloWeightValue === "") {
+                            haloWeightValue = 4;
+                        } else {
+                            (haloWeightValue = Number(haloWeightValue));
+                        }
+                        layer.paint["line-width"] = haloWeightValue;
+                        layer.paint["line-color"] = self.config.lineHaloColor();                    
                         break;
+
                     case "resources-line-" + params.nodeid:
-                        layer.paint["line-width"] = parseInt(self.config.weight());
-                        if (!(self.config.weight() > 0)) { layer.paint["line-width"] = 1; }
-                        self.config.weight(layer.paint["line-width"]);
+                        weightValue = self.config.weight();
+                        if (weightValue === "") {
+                            weightValue = 4;
+                        } else {
+                            (weightValue = Number(weightValue));
+                        }
+                        layer.paint["line-width"] = weightValue;
                         layer.paint["line-color"] = self.config.lineColor();
                         break;
+
                     case "resources-poly-outline-" + params.nodeid:
-                        layer.paint["line-width"] = parseInt(self.config.outlineWeight());
-                        if (!(self.config.outlineWeight() > 0)) { layer.paint["line-width"] = 1; }
-                        self.config.outlineWeight(layer.paint["line-width"]);
+                        outlineWeightValue = self.config.outlineWeight();
+                        if (outlineWeightValue === "") {
+                            outlineWeightValue = 2;
+                        } else {
+                            (outlineWeightValue = Number(outlineWeightValue));
+                        }
+                        layer.paint["line-width"] = outlineWeightValue;
                         layer.paint["line-color"] = self.config.outlineColor();
                         break;
+
                     case "resources-point-halo-" + params.nodeid:
-                        layer.paint["circle-radius"] = parseInt(self.config.haloRadius());
-                        if (!(self.config.haloRadius() > 0)) { layer.paint["circle-radius"] = 1; }
-                        self.config.haloRadius(layer.paint["circle-radius"]);
-                        break;
+                        haloRadiusValue = self.config.haloRadius();
+                        if (haloRadiusValue === "") {
+                            haloRadiusValue = 4;
+                        } else {
+                            (haloRadiusValue = Number(haloRadiusValue));
+                        }    
+                        layer.paint["circle-radius"] = haloRadiusValue;
+
                     case "resources-cluster-point-halo-" + params.nodeid:
                         layer.paint["circle-color"] = self.config.pointHaloColor();
                         break;
+
                     case "resources-point-" + params.nodeid:
-                        layer.paint["circle-radius"] = parseInt(self.config.radius());
-                        if (!(self.config.radius() > 0)) { layer.paint["circle-radius"] = 1; }
-                        self.config.radius(layer.paint["circle-radius"]);
-                        break;
+                        radiusValue = self.config.radius();
+                        if (radiusValue === "") {
+                            radiusValue = 2;
+                        } else {
+                            (radiusValue = Number(radiusValue));
+                        }
+                        layer.paint["circle-radius"] = radiusValue;
+
                     case "resources-cluster-point-" + params.nodeid:
-                        layer.paint["circle-color"] = self.config.pointColor();
+                        clusterDistanceValue = self.config.clusterDistance();
+                        if (clusterDistanceValue === "") {
+                            clusterDistanceValue = 20;
+                        } else {
+                            (clusterDistanceValue = Number(clusterDistanceValue));
+                        }
+                        clusterMaxZoomValue = self.config.clusterMaxZoom();
+                        if (clusterMaxZoomValue === "") {
+                            clusterMaxZoomValue = 5;
+                        } else {
+                            (clusterMaxZoomValue = Number(clusterMaxZoomValue));
+                        }
+                        clusterMinPointsValue = self.config.clusterMinPoints();
+                        if (clusterMinPointsValue === "") {
+                            clusterMinPointsValue = 3;
+                        } else {
+                            (clusterMinPointsValue = Number(clusterMinPointsValue));
+                        }
+                        simplificationValue = self.config.simplification();
+                        if (simplificationValue === "") {
+                            simplificationValue = 0.3;
+                        } else {
+                            (simplificationValue = Number(simplificationValue));
+                        }
                         break;
                     default:
 
@@ -202,6 +259,16 @@ define([
             });
 
             this.saveNode = function() {
+                // do saving of config values at end to avoid double save button issue
+                self.config.haloWeight(haloWeightValue);
+                self.config.weight(weightValue);
+                self.config.outlineWeight(outlineWeightValue);
+                self.config.haloRadius(haloRadiusValue);
+                self.config.radius(radiusValue);
+                self.config.clusterDistance(clusterDistanceValue);
+                self.config.clusterMaxZoom(clusterMaxZoomValue);
+                self.config.clusterMinPoints(clusterMinPointsValue);
+                self.config.simplification(simplificationValue);
                 self.loading(true);
                 self.node.save(function() {
                     self.loading(false);
