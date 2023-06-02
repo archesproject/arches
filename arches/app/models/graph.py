@@ -1498,6 +1498,12 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("nodes", None)
 
+            # TODO: Remove this section when PR 9112 / Issue 9053 is merged
+            for key in ["cards", "widgets", "nodes"]:
+                if key in ret and ret[key]:
+                    ret[key].sort(key=lambda item: item["sortorder"] if item["sortorder"] else 0)
+            # TODO: End section to remove
+
             res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
             return res
