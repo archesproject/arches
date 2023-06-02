@@ -16,10 +16,6 @@ except ImportError:
 
 APP_NAME = '{{ project_name }}'
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-STATICFILES_DIRS =  (
-    os.path.join(APP_ROOT, 'media', 'build'),
-    os.path.join(APP_ROOT, 'media'),
-) + STATICFILES_DIRS
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -31,9 +27,6 @@ DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
 FUNCTION_LOCATIONS.append('{{ project_name }}.functions')
 ETL_MODULE_LOCATIONS.append('{{ project_name }}.etl_modules')
 SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
-TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
-TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
-TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 LOCALE_PATHS.append(os.path.join(APP_ROOT, 'locale'))
 
@@ -114,6 +107,8 @@ INSTALLED_APPS = (
     "{{ project_name }}",
 )
 
+INSTALLED_PACKAGES = ()
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -130,6 +125,19 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
     # "silk.middleware.SilkyMiddleware",
 ]
+
+STATICFILES_DIRS =  build_staticfiles_dirs(
+    root_dir=ROOT_DIR,
+    app_root=APP_ROOT,
+    installed_packages=INSTALLED_PACKAGES,
+)
+
+TEMPLATES = build_templates_config(
+    root_dir=ROOT_DIR,
+    debug=DEBUG,
+    app_root=APP_ROOT,
+    installed_packages=INSTALLED_PACKAGES,
+)
 
 ALLOWED_HOSTS = []
 
@@ -338,14 +346,12 @@ except ImportError as e:
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    print(
-        json.dumps({
-            'ARCHES_NAMESPACE_FOR_DATA_EXPORT': ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-            'STATIC_URL': STATIC_URL,
-            'ROOT_DIR': ROOT_DIR,
-            'APP_ROOT': APP_ROOT,
-            'WEBPACK_DEVELOPMENT_SERVER_PORT': WEBPACK_DEVELOPMENT_SERVER_PORT,
-        })
+    transmit_webpack_django_config(
+        root_dir=ROOT_DIR,
+        app_root=APP_ROOT,
+        installed_packages=INSTALLED_PACKAGES,
+        public_server_address=PUBLIC_SERVER_ADDRESS,
+        static_url=STATIC_URL,
+        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
     )
-    sys.stdout.flush()
 

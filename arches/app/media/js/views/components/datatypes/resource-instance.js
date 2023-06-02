@@ -26,18 +26,9 @@ define([
         if (!this.search) {
             this.makeFriendly = ontologyUtils.makeFriendly;
             this.getSelect2ConfigForOntologyProperties = ontologyUtils.getSelect2ConfigForOntologyProperties;
-            this.isEditable = params.isEditable;
             this.graphIsSemantic = !!params.graph.get('ontology_id');
             this.rootOntologyClass = params.graph.get('root').ontologyclass();
             this.graphName = params.graph.get('root').name();
-            if (params.graph) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable;
-                }
-            } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable');
-            }
             
             this.node = params;
             this.config = params.config;

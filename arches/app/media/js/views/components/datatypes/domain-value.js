@@ -27,17 +27,6 @@ define([
             });
 
         } else {
-            this.isEditable = true;
-
-            if (params.graph) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable;
-                }
-            } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable');
-            }
-
             this.options = params.config.options;
             params.config.options().map(option => { 
                 option.text = ko.observable(ko.unwrap(option.text));

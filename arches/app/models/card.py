@@ -129,7 +129,7 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].items():
-                    if key not in ("cards", "widgets", "nodes", "is_editable", "nodegroup", "constraints"):
+                    if key not in ("cards", "widgets", "nodes", "nodegroup", "constraints"):
                         setattr(self, key, value)
 
                 if "cards" in args[0]:
@@ -254,7 +254,6 @@ class Card(models.CardModel):
         ret["nodes"] = list(self.nodegroup.node_set.all()) if "nodes" not in exclude else ret.pop("nodes", None)
         ret["visible"] = self.visible if "visible" not in exclude else ret.pop("visible", None)
         ret["active"] = self.active if "active" not in exclude else ret.pop("active", None)
-        ret["is_editable"] = self.is_editable() if "is_editable" not in exclude else ret.pop("is_editable", None)
         ret["ontologyproperty"] = self.ontologyproperty if "ontologyproperty" not in exclude else ret.pop("ontologyproperty", None)
         ret["disabled"] = self.disabled if "disabled" not in exclude else ret.pop("disabled", None)
         ret["constraints"] = self.constraints if "constraints" not in exclude else ret.pop("constraints", None)
