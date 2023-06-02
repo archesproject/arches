@@ -4,6 +4,7 @@ define([
     'arches',
     'viewmodels/widget',
     'templates/views/components/widgets/edtf.htm',
+    'bindings/key-events-click',
 ], function(ko, _, arches, WidgetViewModel, edtfTemplate) {
     /**
     * registers a edtf-widget component for use in forms
