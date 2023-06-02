@@ -1561,6 +1561,7 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    helptemplate = models.TextField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
@@ -1675,6 +1676,8 @@ class ETLModule(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
+    helptemplate = models.TextField(blank=True, null=True)
+    helpsortorder = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name

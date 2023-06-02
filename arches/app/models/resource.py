@@ -216,12 +216,9 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        if not self.serialized_graph:
-            self.serialized_graph = (
-                models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                .first()
-                .serialized_graph
-            )
+        # This initializes serialized graph (for use in superclass?). Setup for the above. NOt sure
+        if not self.get_serialized_graph():
+            pass
 
         request = kwargs.pop("request", None)
         user = kwargs.pop("user", None)

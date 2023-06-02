@@ -166,7 +166,7 @@ class GraphManagerView(GraphBaseView):
             context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
-            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}
+            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "templates": ["arches-designer-help"]}
             return render(request, "views/graph.htm", context)
 
 
@@ -677,7 +677,7 @@ class FunctionManagerView(GraphBaseView):
             )
             context["nav"]["title"] = self.graph.name
             context["nav"]["menu"] = True
-            context["nav"]["help"] = {"title": _("Managing Functions"), "template": "function-help"}
+            context["nav"]["help"] = {"title": _("Managing Functions"), "templates": ["function-help"]}
 
             return render(request, "views/graph/function-manager.htm", context)
         else:

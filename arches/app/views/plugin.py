@@ -75,4 +75,14 @@ class PluginView(MapBaseManagerView):
         context["nav"]["icon"] = plugin.icon
         context["nav"]["title"] = plugin.name
 
+        if plugin.componentname == "etl-manager":
+            template_paths = []
+            for etl_module in models.ETLModule.objects.order_by("helpsortorder"):
+                if etl_module.helptemplate:
+                    template_paths.append(etl_module.helptemplate)
+            if len(template_paths) > 0:
+                context["nav"]["help"] = {"title": _("Plugin Help"), "templates": template_paths}
+        elif plugin.helptemplate:
+            context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.helptemplate]}
+
         return render(request, "views/plugin.htm", context)

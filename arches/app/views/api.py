@@ -1094,9 +1094,33 @@ class ResourceReport(APIBase):
         published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=translation.get_language())
         graph = Graph(published_graph.serialized_graph)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
+        graph_has_different_publication = bool(resource.graph.publication_id != published_graph.publication_id)
+
+        # if a user is viewing a report for a resource that does not have the same publication as the current graph publication
+        # ( and therefore is out-of-date ) only allow them to access report details if they have Graph Editor permissions or higher.
+        if (
+            graph_has_different_publication
+            and not request.user.groups.filter(
+                name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+            ).exists()
+        ):
+            return JSONResponse(
+                {
+                    "displayname": resource.displayname(),
+                    "resourceid": resourceid,
+                    "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+                    "template": template,
+                    "graph": graph,
+                }
+            )
 
         if not template.preload_resource_data:
-            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version)})
+            return JSONResponse(
+                {
+                    "template": template,
+                    "report_json": resource.to_json(compact=compact, version=version),
+                }
+            )
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1142,6 +1166,7 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
+            permitted_serialized_cards = []
             permitted_cards = []
             for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
                 if request.user.has_perm(perm, card.nodegroup):
@@ -1153,7 +1178,7 @@ class ResourceReport(APIBase):
                 for widget in widgets
             ]
 
-            resp["cards"] = permitted_cards
+            resp["cards"] = permitted_serialized_cards
             resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)

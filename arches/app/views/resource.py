@@ -89,7 +89,7 @@ class ResourceListView(BaseManagerView):
         context["nav"]["icon"] = "fa fa-bookmark"
         context["nav"]["title"] = _("Resource Manager")
         context["nav"]["login"] = True
-        context["nav"]["help"] = {"title": _("Creating Resources"), "template": "resource-editor-landing-help"}
+        context["nav"]["help"] = {"title": _("Creating Resources"), "templates": ["resource-editor-landing-help"]}
 
         return render(request, "views/resource.htm", context)
 
@@ -347,9 +347,9 @@ class ResourceEditorView(MapBaseManagerView):
         context["nav"]["menu"] = nav_menu
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
-            context["nav"]["help"] = {"title": _("Managing System Settings"), "template": "system-settings-help"}
+            context["nav"]["help"] = {"title": _("Managing System Settings"), "templates": ["system-settings-help"]}
         else:
-            context["nav"]["help"] = {"title": _("Using the Resource Editor"), "template": "resource-editor-help"}
+            context["nav"]["help"] = {"title": _("Using the Resource Editor"), "templates": ["resource-editor-help"]}
 
         if graph.has_unpublished_changes or resource_instance and resource_instance.graph_publication_id != graph.publication_id:
             return redirect("resource_report", resourceid=resourceid)
@@ -781,7 +781,8 @@ class ResourceDescriptors(View):
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.only("graph_id").get(pk=resourceid)
-        graph = Graph.objects.get(pk=resource.graph_id)
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        graph_has_different_publication = bool(resource.graph_publication_id != graph.publication_id)
 
         try:
             map_markers = models.MapMarker.objects.all()
@@ -797,7 +798,13 @@ class ResourceReportView(MapBaseManagerView):
             widgets=models.Widget.objects.all(),
             map_markers=map_markers,
             geocoding_providers=geocoding_providers,
-            graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id),
+            graph_has_different_publication=graph_has_different_publication,
+            graph_has_different_publication_and_user_has_insufficient_permissions=bool(
+                graph_has_different_publication
+                and not request.user.groups.filter(
+                    name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+                ).exists()
+            ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
         )
 
