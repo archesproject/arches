@@ -217,23 +217,11 @@ dl.inline-flex dd {
     color: #888;
 }
 
-.switch.switch-small.switch-widget {
-    width: 35px;
-}
-
 .iiif-image-tool-slider .switch.switch-small.switch-widget {
     width: 25px;
 }
 
-.switch.switch-widget.on>small {
-    left: 22px;
-}
-
 .iiif-image-tool-slider .switch.switch-widget.on>small {
-    left: 12px;
-}
-
-.switch.switch-widget.null>small {
     left: 12px;
 }
 
@@ -2639,67 +2627,6 @@ div.final-cons-step-separator>h4 {
     flex-wrap: wrap;
 }
 
-.columns label {
-    .form-radio {
-        display: flex;
-        align-items: center;
-    }
-}
-
-label.form-radio.form-normal{
-    cursor: pointer;
-    margin: 2px 0px;
-
-    &::before{
-        top: 22px;
-        content: '';
-        position: relative;
-        width: 16px;
-        height: 16px;
-        border: 1px solid #c3cedb;
-        left: auto;
-        bottom: auto;
-        display: block;
-        border-radius: 50%;
-        background-color: transparent;
-        padding-bottom:4px;
-        &:hover{
-            padding-bottom: 0;
-        }
-    }
-
-    &:not(.disabled):not(.active):hover::after {
-        opacity: .3;
-    }
-    &::after{
-        content: '';
-        position: relative;
-        display: block;
-        width: 8px;
-        height: 8px;
-    }
-
-    &.active::after, &:not(.disabled):hover::after{
-        bottom: 13px;
-        position: relative;
-        border: none;
-        display: block;
-        left: auto;
-        border-radius: 50%;
-        background-color: #515151;
-        margin: 0 4px;
-    }
-}
-
-.form-text.form-radio:not(.btn),
-.form-text.form-radio:not(.btn),
-.form-text.form-radio:not(.btn) {
-    width: 225px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 span.icon-wrap.icon-circle.bg-gray-dark:hover {
     background: #94A6BC;
     color: #123;
@@ -2967,59 +2894,6 @@ a.select2-search-choice-close {
 
 .btn-group .btn+.btn {
     margin-left: 0px;
-}
-
-.switch {
-    background-color: #fff;
-    border: 1px solid #dfdfdf;
-    border-radius: 20px;
-    cursor: pointer;
-    display: inline-block;
-    height: 30px;
-    position: relative;
-    vertical-align: middle;
-    width: 50px;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    box-sizing: content-box;
-    background-clip: content-box;
-    transition-duration: .1s;
-}
-
-.switch>small {
-    transition-duration: .1s;
-    left: 0;
-}
-
-.switch.on {
-    background-color: #64bd63;
-    border-color: #64bd63;
-}
-
-.switch.null {
-    background-color: #ddd;
-    border-color: #ddd;
-}
-
-.switch.on>small {
-    left: 13px;
-}
-
-.switch.disabled {
-    background-color: #f1f1f1;
-    border-color: #ddd;
-}
-
-.switch.disabled.on {
-    background-color: #87c586;
-    border-color: #87c586;
-}
-
-.switch.disabled>small {
-    background-color: #f1f1f1;
 }
 
 .library {
@@ -4238,29 +4112,6 @@ div.dropdown-menu.open {
     border-bottom: 1px solid #eee;
     border-top: 1px solid #eee;
     color: #5f5f5f;
-}
-
-.switchery>small,
-.switch>small {
-    background: #fff;
-    border-radius: 100%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    height: 30px;
-    position: absolute;
-    top: 0;
-    width: 30px;
-}
-
-.switch-small {
-    border-radius: 13px;
-    height: 13px;
-    width: 25px;
-    margin: 0 4px;
-}
-
-.switch-small>small {
-    height: 13px;
-    width: 13px;
 }
 
 .node .node-collected,
@@ -10753,68 +10604,6 @@ table.table.dataTable {
     }
 }
 
-
-.map-service-container {
-    .config-title {
-        margin: 0;
-        flex: 1;
-    }
-    & > div {
-        align-items: center;
-        margin-bottom: 10px;
-        display: flex;
-        flex-wrap: wrap;
-    }
-}
-
-.map-service-manage-buttons {
-    margin: 0 10px;
-    display: flex;
-
-    .form-group {
-        align-items: center;
-        display: flex;
-        margin-bottom: 0;
-        .control-label {
-            margin: 0 5px;
-        }
-    }
-}
-
-.map-service-manage-layer-name {
-    display: flex;
-    align-items: center;
-}
-
-.map-service-manage-icon-selector {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.map-service-preview {
-    background: #f4f4f4;
-    border: 1px solid #ddd;
-    height: 250px;
-}
-
-.map-service-tab-content {
-    min-height: 250px;
-}
-
-.advanced-map-style-switch {
-    margin-top: -35px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-.service-url {
-    font-size: 12px;
-    color: #999;
-}
-
 .config-title {
     font-weight: normal;
     padding: 0 20px 0 0px;
@@ -10836,70 +10625,6 @@ table.table.dataTable {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-.advanced-style-panel {
-    margin-right: 0px;
-    margin-left: 0px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-}
-
-.map-style-panel-body {
-    padding-bottom: 5px;
-}
-
-.simple-style-panel {
-    margin-top: -15px;
-}
-
-.map-service-nav-tabs {
-    background: #f6f6f6;
-    display: flex;
-    padding: 0;
-}
-
-.service-widget-container {
-    padding: 0px 15px 10px 15px;
-    margin-top: -10px;
-}
-
-.dropdown-shim {
-    margin-top: 10px;
-}
-
-.style-title {
-    font-weight: 600;
-    color: #666;
-}
-
-.col-divider {
-    border-right: 1px solid #eee;
-}
-
-.map-server-instructions {
-    padding: 20px 10px 20px 10px;
-    color: #808080;
-}
-
-.map-server-basemap-button {
-    background: rgba(255, 255, 255, 0.88);
-}
-
-.map-service-tabs {
-    border: 1px solid #ddd;
-    background: #f9f9f9;
-    margin-bottom: 0px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.hover-feature-loading {
-    padding: 25px;
-    font-size: 16px;
-}
-
 
 /**********
 *  Axes
@@ -13081,13 +12806,6 @@ ul.select2-choices:after {
     padding: 15px 15px 5px 5px;
     margin-bottom: 5px;
     border-radius: 2px;
-}
-
-.i18n-style-tools-panel {
-    padding: 10px;
-    height: 140px;
-    position: relative;
-    width: 100%;
 }
 
 .style-tools-color-visualizer {
