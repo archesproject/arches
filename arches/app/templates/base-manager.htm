@@ -378,7 +378,7 @@
 
                         {% if nav.help %}
                         <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
-                            data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
+                            data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
                                 <i class="ion-help"></i>
                             </div>
@@ -396,12 +396,6 @@
                             </a>
                         {% endif %}
 
-                {% if nav.help %}
-                <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
-                    data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }">
-                    <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
-                        <i class="ion-help"></i>
-                    </div>
 
                 </div>
 
