@@ -28,6 +28,7 @@ class ZoomFilter(BaseSearchFilter):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
+        spatial_filter = spatial_filter["featureCollection"]
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
                 feature_geom = spatial_filter["features"][0]["geometry"]
