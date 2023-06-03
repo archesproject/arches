@@ -68,6 +68,7 @@ define([
                             return response.json();
                         }
                     }).then(function(data){
+                        data.events.map((event)=> { event.loading = ko.observable(false); });
                         self.loadEvents(data.events);
                         self.paginator(data.paginator);
                         const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
@@ -108,6 +109,7 @@ define([
                 this.alert(new AlertViewModel('ep-alert-red', undoAlertTitle, undoAlertMessage, function() {
                     return;
                 }, function() {
+                    event.loading(true);
                     const formData = new FormData();
                     const url = arches.urls.etl_manager;
                     event.status = 'reversing';
@@ -124,7 +126,8 @@ define([
                     }).then(function(response) {
                         return response.json();
                     }).then(function() {
-                        //pass
+                        self.fetchLoadEvent();
+                        event.loading(false);
                     });
                 }
                 ));
@@ -140,6 +143,17 @@ define([
 
             this.fetchStagedData = function(loadid){
                 const url = arches.urls.etl_manager + "?action=stagedData&loadid="+loadid;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data);
+                });
+            };
+
+            this.stopEtl = function(loadid) {
+                const url = arches.urls.etl_manager + "?action=stop&loadid="+loadid;
                 window.fetch(url).then(function(response){
                     if(response.ok){
                         return response.json();

@@ -110,24 +110,19 @@
                             </div>
                             <div class="etl-job-task-bar">
                                 <div class="task">
-                                    <!-- ko if: event.status == "completed" -->
+                                    <!-- ko if: event.status == "completed" || event.status == "indexed" -->
                                     <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
                                         <span data-bind="text: $root.translations.undoImport"></span>
                                     </a>
                                     <!-- /ko -->
-                                    <!-- ko if: event.status == "indexed" -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, $root.translations.warning, $root.translations.etlReverseWarningMessage)}">
-                                        <span data-bind="text: $root.translations.undoImport"></span>
-                                    </a>
-                                    <!-- /ko -->
-                                    <!-- ko if: event.status == "unloaded" -->
+                                    <!-- ko if: event.status == "unloaded" || event.status == "failed" || event.status == "cancelled" -->
                                     <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">
                                         <span data-bind="text: $root.translations.removeFromHistory"></span>
                                     </a>
                                     <!-- /ko -->
-                                    <!-- ko if: event.status == "failed" -->
-                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">
-                                        <span data-bind="text: $root.translations.removeFromHistory"></span>
+                                    <!-- ko if: event.status == "running" -->
+                                    <a data-bind="click: function() { $parent.stopEtl(event.loadid)}">
+                                        <span data-bind="text: $root.translations.stopEtl"></span>
                                     </a>
                                     <!-- /ko -->
                                 </div>
@@ -145,6 +140,7 @@
                                     <!-- ko if: event.status == "indexed" -->
                                     <button class="btn btn-success" style="width:150px;">
                                         <span data-bind="text: $root.translations.completed"></span>
+                                        <i class="fa fa-spin fa-spinner" data-bind="visible: event.loading()"></i>
                                     </button>
                                     <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->
@@ -165,6 +161,11 @@
                                     <!-- ko if: event.status == "unloaded" -->
                                     <button class="btn btn-success" style="width:150px;">
                                         <span data-bind="text: $root.translations.unloaded"></span>
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "cancelled" -->
+                                    <button class="btn btn-success" style="width:150px;">
+                                        <span data-bind="text: $root.translations.cancelled"></span>
                                     </button>
                                     <!-- /ko -->
                                 </div>
@@ -221,8 +222,12 @@
                                     text:
                                         selectedLoadEvent().status == 'indexed' ? $root.translations.completed
                                         : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
-                                        : selectedLoadEvent().status == 'failed' ? $root.translations.failed 
-                                        : $root.translations.running
+                                        : selectedLoadEvent().status == 'validated' ? $root.translations.running
+                                        : selectedLoadEvent().status == 'running' ? $root.translations.validating
+                                        : selectedLoadEvent().status == 'reversing' ? $root.translations.unloading
+                                        : selectedLoadEvent().status == 'unloaded' ? $root.translations.unloaded
+                                        : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
+                                        : $root.translations.failed
                                 "></span>  
                             </div>
                             <div>
