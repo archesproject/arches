@@ -16,7 +16,7 @@ from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
-from arches.app.models.models import ResourceInstance
+from arches.app.models.models import ResourceInstance, MapLayer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 
@@ -202,6 +202,75 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
             permitted_nodegroups.add(nodegroup)
 
     return permitted_nodegroups
+
+
+def get_map_layers_by_perm(user, perms, any_perm=True):
+    """
+    returns a list of node groups that a user has the given permission on
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_map_layer" or list of strings
+    any_perm -- True to check ANY perm in "perms" or False to check ALL perms
+
+    """
+
+    if not isinstance(perms, list):
+            perms = [perms]
+
+    formatted_perms = []
+    # in some cases, `perms` can have a `model.` prefix
+    for perm in perms:
+        if len(perm.split(".")) > 1:
+            formatted_perms.append(perm.split(".")[1])
+        else:
+            formatted_perms.append(perm)
+
+    if user.is_superuser is True:
+        return MapLayer.objects.all()
+    else:
+        permitted_map_layers = list()
+
+        user_permissions = ObjectPermissionChecker(user)
+
+        for map_layer in MapLayer.objects.all():
+            if map_layer.addtomap is True and map_layer.isoverlay is False:
+                permitted_map_layers.append(map_layer)
+            else:  # if no explicit permissions, object is considered accessible by all with group permissions
+                explicit_map_layer_perms = user_permissions.get_perms(map_layer)
+                if len(explicit_map_layer_perms):
+                    if any_perm:
+                        if len(set(formatted_perms) & set(explicit_map_layer_perms)):
+                            permitted_map_layers.append(map_layer)
+                    else:
+                        if set(formatted_perms) == set(explicit_map_layer_perms):
+                            permitted_map_layers.append(map_layer)
+                else:
+                    permitted_map_layers.append(map_layer)
+
+        return permitted_map_layers
+
+def user_can_read_map_layers(user):
+
+    map_layers_with_read_permission = get_map_layers_by_perm(user, ['models.read_maplayer'])
+    map_layers_allowed = []
+
+    for map_layer in map_layers_with_read_permission:
+        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+            map_layers_allowed.append(map_layer)
+
+    return map_layers_allowed
+
+
+def user_can_write_map_layers(user):
+    map_layers_with_write_permission = get_map_layers_by_perm(user, ['models.write_maplayer'])
+    map_layers_allowed = []
+
+    for map_layer in map_layers_with_write_permission:
+        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+            map_layers_allowed.append(map_layer)
+
+    return map_layers_allowed
 
 
 def get_editable_resource_types(user):

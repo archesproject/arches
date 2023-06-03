@@ -27,6 +27,9 @@ RESOURCES_INDEX = "resources"
 RESOURCE_RELATIONS_INDEX = "resource_relations"
 
 
+ANALYZER = {"analyzer": {"folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]}}}
+
+
 def prepare_terms_index(create=False):
     """
     Creates the settings and mappings in Elasticsearch to support term search
@@ -34,7 +37,7 @@ def prepare_terms_index(create=False):
     """
 
     index_settings = {
-        "settings": {"analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}}},
+        "settings": {"analysis": ANALYZER},
         "mappings": {
             "properties": {
                 "nodegroupid": {"type": "keyword"},
@@ -44,7 +47,7 @@ def prepare_terms_index(create=False):
                 "language": {"type": "text"},
                 "provisional": {"type": "boolean"},
                 "value": {
-                    "analyzer": "standard",
+                    "analyzer": "whitespace",
                     "type": "text",
                     "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
                 },
@@ -66,7 +69,7 @@ def prepare_concepts_index(create=False):
     """
 
     index_settings = {
-        "settings": {"analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}}},
+        "settings": {"analysis": ANALYZER},
         "mappings": {
             "properties": {
                 "top_concept": {"type": "keyword"},
@@ -77,7 +80,7 @@ def prepare_concepts_index(create=False):
                 "provisional": {"type": "boolean"},
                 "type": {"type": "keyword"},
                 "value": {
-                    "analyzer": "standard",
+                    "analyzer": "whitespace",
                     "type": "text",
                     "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
                 },
@@ -110,7 +113,7 @@ def prepare_search_index(create=False):
 
     index_settings = {
         "settings": {
-            "analysis": {"analyzer": {"folding": {"tokenizer": "standard", "filter": ["lowercase", "asciifolding"]}}},
+            "analysis": ANALYZER,
             "index.mapping.total_fields.limit": 50000,
             "index.mapping.nested_objects.limit": 50000,
         },
