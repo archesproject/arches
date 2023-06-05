@@ -28,6 +28,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_editable_resource_types,
     get_resource_types_by_perm,
+    user_can_read_map_layers,
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
@@ -114,5 +115,12 @@ class MapBaseManagerView(BaseManagerView):
         context["geom_nodes"] = geom_nodes
         context["resource_map_layers"] = resource_layers
         context["resource_map_sources"] = resource_sources
+
+        all_map_sources = models.MapSource.objects.all()
+
+        map_layers = user_can_read_map_layers(self.request.user)
+
+        context["map_layers"] = map_layers
+        context["map_sources"] = all_map_sources
 
         return context
