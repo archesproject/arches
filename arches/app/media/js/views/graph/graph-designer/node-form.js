@@ -40,7 +40,7 @@ define([
                 const node = ko.unwrap(self.node);
                 let nodegroup;
 
-                if (node) {
+                if (node && self.graph.nodegroups()) {
                     nodegroup = self.graph.nodegroups().find(function(nodegroup) { 
                         return nodegroup.nodegroupid() === node.nodeGroupId();
                     });

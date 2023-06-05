@@ -965,6 +965,11 @@ class Graph(models.GraphModel):
         """
         node["nodeid"] = uuid.UUID(str(node.get("nodeid")))
         old_node = self.nodes.pop(node["nodeid"])
+
+        for sibling_node in self.get_sibling_nodes(old_node):
+            if sibling_node.name == node['name']:
+                raise ValueError(_("Nodes that exist on the same level cannot have the same name."))
+
         new_node = self.add_node(node)
         new_card = None
 
