@@ -67,6 +67,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="sidenav-menu">
                     {% block navbar %}
                     <ul class="list-group">
+        
+                        <!-- Home. -->
+                        <li>
+                            <a href="/" data-bind="click:function () { navigate('/') }">
+                                <i class="ti-home"></i>
+                                <span class="menu-title">
+                                    <strong>{% trans "Home" %}</strong>
+                                </span>
+                            </a>
+                        </li>
 
                         <!-- Tools -->
                         <li class="list-header">{% trans "Tools" %}</li>
