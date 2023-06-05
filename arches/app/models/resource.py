@@ -29,6 +29,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
@@ -58,9 +59,6 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
-    serialized_graph = None
-    node_datatypes = None
-
     class Meta:
         proxy = True
 
@@ -73,15 +71,15 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
         self.descriptor_function = None
+        self.serialized_graph = None
+        self.node_datatypes = None
 
     def get_serialized_graph(self):
         if not self.serialized_graph:
             try:
-                self.serialized_graph = (
-                    models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                    .first()
-                    .serialized_graph
-                )
+                graph = Graph.objects.get(pk=self.graph.pk)
+                published_graph = graph.get_published_graph()
+                self.serialized_graph = published_graph.serialized_graph
             except AttributeError:
                 self.serialized_graph = None
         return self.serialized_graph

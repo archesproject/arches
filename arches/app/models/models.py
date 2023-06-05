@@ -940,7 +940,10 @@ class ResourceInstance(models.Model):
     createdtime = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.graph_publication = self.graph.publication
+        try:
+            self.graph_publication = self.graph.publication
+        except ResourceInstance.graph.RelatedObjectDoesNotExist:
+            pass
         super(ResourceInstance, self).save()
 
     def __init__(self, *args, **kwargs):

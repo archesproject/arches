@@ -8,8 +8,11 @@ from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
+from arches.app.models.graph import Graph
 from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+
 
 ArchesPOFile = namedtuple("ArchesPOFile", ["language", "file"])
 
@@ -285,22 +288,17 @@ class LanguageSynchronizer:
                 )
 
             for lang in settings.LANGUAGES:
-                for graph in GraphModel.objects.all():
+                for graph in Graph.objects.all():
                     if graph.publication:
-                        existing_language = PublishedGraph.objects.filter(
-                            publication__publicationid=graph.publication.publicationid
-                        ).first()
-                        found_language = PublishedGraph.objects.filter(
-                            publication__publicationid=graph.publication.publicationid, language=lang[0]
-                        ).first()
+                        found_language_published_graph = graph.get_published_graph(language=lang[0])
 
                         # no need to add the language if it already exists
-                        if found_language:
+                        if found_language_published_graph:
                             continue
 
                         publication_language = Language.objects.filter(code=lang[0]).first()
                         PublishedGraph.objects.create(
                             language=publication_language,
-                            serialized_graph=existing_language.serialized_graph,
-                            publication=existing_language.publication,
+                            serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(graph, force_recalculation=True)),
+                            publication=graph.publication,
                         )

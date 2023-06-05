@@ -192,11 +192,11 @@ class ResourceEditorView(MapBaseManagerView):
 
         if resourceid is None:
             resource_instance = None
-            graph = models.GraphModel.objects.get(pk=graphid)
+            graph = models.Graph.objects.get(pk=graphid)
             resourceid = ""
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
-            graph = resource_instance.graph
+            graph = models.Graph.objects.get(pk=resource_instance.graph_id)
             instance_creator = get_instance_creator(resource_instance, request.user)
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
@@ -268,12 +268,11 @@ class ResourceEditorView(MapBaseManagerView):
 
         serialized_graph = None
         if graph.publication:
-            user_language = translation.get_language()
             try:
-                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+                published_graph = graph.get_published_graph()
             except models.PublishedGraph.DoesNotExist:
                 LanguageSynchronizer.synchronize_settings_with_db()
-                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+                published_graph = graph.get_published_graph()
 
             serialized_graph = published_graph.serialized_graph
 

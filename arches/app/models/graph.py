@@ -1437,8 +1437,7 @@ class Graph(models.GraphModel):
 
         if self.publication and not force_recalculation:
             try:
-                user_language = translation.get_language()
-                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
+                published_graph = self.get_published_graph()
                 serialized_graph = published_graph.serialized_graph
                 for key in exclude:
                     if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
@@ -1754,6 +1753,18 @@ class Graph(models.GraphModel):
             graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
+
+    def get_published_graph(self, language=None):
+        if not language:
+            language = translation.get_language()
+        
+        try:
+            graph = models.PublishedGraph.objects.get(publication=self.publication, language=language)
+        except models.PublishedGraph.DoesNotExist:
+            graph = None
+
+        return graph
+
 
     def publish(self, user, notes=None):
         """
