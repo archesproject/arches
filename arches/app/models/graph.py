@@ -1437,8 +1437,7 @@ class Graph(models.GraphModel):
 
         if self.publication and not force_recalculation:
             try:
-                user_language = translation.get_language()
-                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
+                published_graph = self.get_published_graph()
                 serialized_graph = published_graph.serialized_graph
                 for key in exclude:
                     if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
