@@ -269,8 +269,6 @@ class ArchesPOLoader:
 
 class LanguageSynchronizer:
     def synchronize_settings_with_db():
-        from arches.app.models.graph import Graph
-
         if settings.LANGUAGES:
             for lang in settings.LANGUAGES:
                 found_language = Language.objects.filter(code=lang[0]).first()
@@ -289,7 +287,7 @@ class LanguageSynchronizer:
                 )
 
             for lang in settings.LANGUAGES:
-                for graph in Graph.objects.all():
+                for graph in GraphModel.objects.all():
                     if graph.publication:
                         found_language_published_graph = graph.get_published_graph(language=lang[0])
 

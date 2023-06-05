@@ -10,7 +10,6 @@ from types import SimpleNamespace
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.models.models import Value
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -41,7 +40,6 @@ def get_serialized_graph(graph):
         return None
 
     if graph.graphid not in serialized_graphs:
-        graph = Graph.objects.get(pk=graph.graphid)
         published_graph = graph.get_published_graph()
         serialized_graphs[graph.graphid] = published_graph.serialized_graph
     return serialized_graphs[graph.graphid]

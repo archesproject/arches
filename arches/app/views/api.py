@@ -768,7 +768,7 @@ class Card(APIBase):
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
         except Resource.DoesNotExist:
-            graph = Graph.objects.get(pk=resourceid)
+            graph = models.GraphModel.objects.get(pk=resourceid)
             resourceid = None
             resource_instance = None
             pass

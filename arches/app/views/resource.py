@@ -192,11 +192,11 @@ class ResourceEditorView(MapBaseManagerView):
 
         if resourceid is None:
             resource_instance = None
-            graph = Graph.objects.get(pk=graphid)
+            graph = models.GraphModel.objects.get(pk=graphid)
             resourceid = ""
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
-            graph = Graph.objects.get(pk=resource_instance.graph_id)
+            graph = models.GraphModel.objects.get(pk=resource_instance.graph_id)
             instance_creator = get_instance_creator(resource_instance, request.user)
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]

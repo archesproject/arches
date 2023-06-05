@@ -1754,18 +1754,6 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def get_published_graph(self, language=None):
-        if not language:
-            language = translation.get_language()
-        
-        try:
-            graph = models.PublishedGraph.objects.get(publication=self.publication, language=language)
-        except models.PublishedGraph.DoesNotExist:
-            graph = None
-
-        return graph
-
-
     def publish(self, user, notes=None):
         """
         Adds a row to the GraphXPublishedGraph table

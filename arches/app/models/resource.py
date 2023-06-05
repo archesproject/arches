@@ -74,12 +74,9 @@ class Resource(models.ResourceInstance):
         self.node_datatypes = None
 
     def get_serialized_graph(self):
-        from arches.app.models.graph import Graph
-
         if not self.serialized_graph:
             try:
-                graph = Graph.objects.get(pk=self.graph.pk)
-                published_graph = graph.get_published_graph()
+                published_graph = self.graph.get_published_graph()
                 self.serialized_graph = published_graph.serialized_graph
             except AttributeError:
                 self.serialized_graph = None

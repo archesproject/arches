@@ -32,7 +32,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.resource import EditLog
 from arches.app.models.system_settings import settings
@@ -108,8 +107,7 @@ class Tile(models.TileModel):
                         tile.parenttile = self
                         self.tiles.append(tile)
         try:
-            graph = Graph.objects.get(pk=self.resourceinstance.graph.pk)
-            published_graph = graph.get_published_graph()
+            published_graph = self.resourceinstance.graph.get_published_graph()
             self.serialized_graph = published_graph.serialized_graph
         except:
             self.serialized_graph = None
@@ -394,8 +392,7 @@ class Tile(models.TileModel):
         oldprovisionalvalue = None
 
         if not self.serialized_graph:
-            graph = Graph.objects.get(pk=self.resourceinstance.graph.pk)
-            published_graph = graph.get_published_graph()
+            published_graph = self.resourceinstance.graph.get_published_graph()
             self.serialized_graph = published_graph.serialized_graph
         try:
             if user is None and request is not None:
