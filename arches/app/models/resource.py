@@ -29,7 +29,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
 from arches.app.models.concept import get_preflabel_from_valueid
@@ -75,6 +74,8 @@ class Resource(models.ResourceInstance):
         self.node_datatypes = None
 
     def get_serialized_graph(self):
+        from arches.app.models.graph import Graph
+
         if not self.serialized_graph:
             try:
                 graph = Graph.objects.get(pk=self.graph.pk)

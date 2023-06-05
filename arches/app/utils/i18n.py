@@ -8,7 +8,6 @@ from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
-from arches.app.models.graph import Graph
 from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -270,6 +269,8 @@ class ArchesPOLoader:
 
 class LanguageSynchronizer:
     def synchronize_settings_with_db():
+        from arches.app.models.graph import Graph
+
         if settings.LANGUAGES:
             for lang in settings.LANGUAGES:
                 found_language = Language.objects.filter(code=lang[0]).first()
