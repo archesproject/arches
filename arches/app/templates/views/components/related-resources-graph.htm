@@ -325,10 +325,10 @@
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
-<div id="legendTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.legend, 'aria-description': $root.translations.resourceLegendDescription}">
+<div id="legendTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.legend}">
 <div class="workbench-card-sidepanel-header-container">
-    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
-        data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, attr: {'aria-label': $root.translations.closeLegend}">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, 
+            attr: {'aria-label': $root.translations.closeLegend, 'aria-description': $root.translations.resourceLegendDescription}">
         <span data-bind="text: $root.translations.legend"></span>
     </div>
 </div>
