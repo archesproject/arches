@@ -64,27 +64,30 @@
                     <div class="rr-table-row-initial">
                         <div class='rr-table-column icon-column'>
                             <button data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false,
-                                    attr: {'aria-label': $root.translations.editRelatedResource + ' ' + $data.resourceName()}
+                                    attr: {'aria-label': $root.translations.editRelatedResource($data.resourceName())}
                             ">
                                 <i class="fa fa-pencil"></i>
                             </button>
                         </div>
                         <div class='rr-table-column icon-column' aria-label="{% trans '' %}">
                             <button data-bind="click: $parent.deleteRelationship, clickBubble: false,
-                                    attr: {'aria-label': $root.translations.delete + ' ' + $root.translations.relationshipTo + ' ' + $data.resourceName()}
+                                    attr: {'aria-label': $root.translations.deleteRelationshipResource($data.resourceName())}
                             ">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
                         <div class='rr-table-column icon-column' aria-label="{% trans '' %}">
                             <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId)); $('#resource-report-panel').focus()}, clickBubble: false,
-                                    attr: {'aria-label': $root.translations.expandResourceReport + ' ' + $data.resourceName()}
+                                    attr: {'aria-label': $root.translations.expandResourceReport($data.resourceName())}
                             ">
                                 <i class="fa fa-info-circle"></i>
                             </button>
                         </div>
                         <!-- ko if: self.node.config.graphs()[0].useOntologyRelationship -->
-                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
+                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" tabindex="0" role="button" 
+                            data-bind="onEnterkeyClick, onSpaceClick, click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
+                                attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
+                            ">
                             <div class="rr-table-instance-label" style="padding-left: 10px;">
                                 <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
                             </div>
@@ -98,16 +101,17 @@
                         </div>
                         <!-- /ko -->
                     </div>
-                    <div class="rr-table-row-panel"
+                    <!-- Ontology Properties Accordion -->
+                    <div class="rr-table-row-panel" 
                         data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
 
-                        <div class="row">
+                        <div class="row" data-bind="let: {resourceToRRLabel: Math.random().toString(), rrToResourceLabel: Math.random().toString()}">
                             <!-- Relationship from instance to rr -->
                             <div class="row" style="margin-bottom: 10px;">
-                                <label class="col-xs-12" style="font-weight: bold; text-align: left;">
+                                <div class="col-xs-12" style="font-weight: bold; text-align: left; margin-bottom:5px;" data-bind="attr: {id: resourceToRRLabel}">
                                     <span data-bind="text: $root.translations.resourcesRelationshipTo"></span>
                                     <span data-bind="text: $data.resourceName"></span>
-                                </label>
+                                </div>
 
                                 <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                     <!-- Instance name -->
@@ -127,7 +131,8 @@
                                                         $data.ontologyClass(), 
                                                         $root.translations.selectAnOntologyProperty
                                                     )
-                                                }
+                                                },
+                                                attr: {'aria-labeledby': resourceToRRLabel},
                                             "
                                         >
                                     </span>
@@ -139,10 +144,10 @@
 
                             <!-- Relationship from rr to instance -->
                             <div class="row">
-                                <label class="col-xs-12" style="font-weight: bold;">
+                                <div class="col-xs-12" style="font-weight: bold; margin-bottom:5px;" data-bind="attr: {id: rrToResourceLabel }">
                                     <span data-bind="text: $data.resourceName"></span>
                                     <span data-bind="text: $root.translations.relationshipToResource"></span>
-                                </label>
+                                </div>
 
                                 <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                     <!-- rr name -->
@@ -162,7 +167,8 @@
                                                         self.rootOntologyClass, 
                                                         $root.translations.selectAnOntologyProperty
                                                     )
-                                                }
+                                                },
+                                                attr: {'aria-labeledby': rrToResourceLabel},
                                             "
                                         >
                                     </span>
@@ -292,43 +298,45 @@
                     <div class='rr-table-row'>
                         <div class="rr-table-row-initial">
                             <div class='rr-table-column icon-column'>
-                                <button data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false,
-                                        attr: {'aria-label': $root.translations.editRelatedResource + ' ' + $data.resourceName()}
+                                <button data-bind="onEnterkeyClick, onSpaceClick, click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false,
+                                        attr: {'aria-label': $root.translations.editRelatedResource($data.resourceName())}
                                 ">
                                     <i class="fa fa-pencil"></i>
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
-                                <button data-bind="click: $parent.deleteRelationship, clickBubble: false,
-                                        attr: {'aria-label': $root.translations.delete + ' ' + $root.translations.relationshipTo + ' ' + $data.resourceName()}
+                                <button data-bind="onEnterkeyClick, onSpaceClick, click: $parent.deleteRelationship, clickBubble: false,
+                                        attr: {'aria-label': $root.translations.deleteRelationshipResource($data.resourceName())}
                                 ">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
-                                <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false,
-                                        attr: {'aria-label': $root.translations.expandResourceReport + ' ' + $data.resourceName()}    
+                                <button data-bind="onEnterkeyClick, onSpaceClick, click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false,
+                                        attr: {'aria-label': $root.translations.expandResourceReport($data.resourceName())}    
                                 ">
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </div>
-                            <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;"
-                                data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false">
+                            <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" tabindex="0" role="button"
+                                data-bind="onEnterkeyClick, onSpaceClick, click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
+                                    attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
+                                ">
                                 <div class="rr-table-instance-label" style="padding-left: 10px;"
                                     data-bind="text: $data.resourceName()">
                                 </div>
                             </div>
                         </div>
+                        <!-- Ontology Properties Accordion -->
                         <div class="rr-table-row-panel"
                             data-bind="visible: self.selectedResourceRelationship() === $data, if: self.selectedResourceRelationship() === $data, css: { 'rr-table-border': self.selectedResourceRelationship() === $data} ">
-    
-                            <div class="row">
+                            <div class="row" data-bind="let: {resourceToRRLabel: Math.random().toString(), rrToResourceLabel: Math.random().toString()} ">
                                 <!-- Relationship from instance to rr -->
                                 <div class="row" style="margin-bottom: 10px;">
-                                    <label class="col-xs-12" style="font-weight: bold; text-align: left;">
+                                    <div class="col-xs-12" style="font-weight: bold; text-align: left; margin-bottom:5px;"  data-bind="attr: {id: resourceToRRLabel}">
                                         <span data-bind="text: $root.translations.resourcesRelationshipTo"></span>
                                         <span data-bind="text: $data.resourceName"></span>
-                                    </label>
+                                    </div>
     
                                     <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                         <!-- Instance name -->
@@ -348,7 +356,8 @@
                                                             $data.ontologyClass(), 
                                                             $root.translations.selectAnOntologyProperty
                                                         )
-                                                    }
+                                                    },
+                                                    attr: {'aria-labeledby': resourceToRRLabel},
                                                 "
                                             >
                                         </span>
@@ -361,10 +370,10 @@
     
                                 <!-- Relationship from rr to instance -->
                                 <div class="row">
-                                    <label class="col-xs-12" style="font-weight: bold;">
+                                    <div class="col-xs-12" style="font-weight: bold; margin-bottom:5px;" data-bind="attr: {id: rrToResourceLabel }">
                                         <span data-bind="text: $data.resourceName"></span>
                                         <span data-bind="text: $root.translations.relationshipToResource"></span>
-                                    </label>
+                                    </div>
     
                                     <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
                                         <!-- rr name -->
@@ -384,7 +393,8 @@
                                                             self.rootOntologyClass, 
                                                             $root.translations.selectAnOntologyProperty
                                                         )
-                                                    }
+                                                    },
+                                                    attr: {'aria-labeledby': rrToResourceLabel},
                                                 "
                                             >
                                         </span>
