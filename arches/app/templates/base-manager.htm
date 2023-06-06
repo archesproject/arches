@@ -70,7 +70,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         
                         <!-- Home. -->
                         <li>
-                            <a href="/" data-bind="click:function () { navigate('/') }">
+                            <a href="{% url 'home' %}" data-bind="click:function () { navigate('{% url 'home' %}') }">
                                 <i class="ti-home"></i>
                                 <span class="menu-title">
                                     <strong>{% trans "Home" %}</strong>
