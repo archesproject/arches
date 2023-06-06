@@ -48,7 +48,7 @@ define([
         layer.centerX = ko.observable(layer.centerx);
         layer.centerY = ko.observable(layer.centery);
         layer.zoom = ko.observable(layer.zoom);
-        layer.sortOrder = ko.observable(layer.sortorder);
+        layer.overlaySortOrder = ko.observable(layer.overlaysortorder);
         layer.toJSON = ko.computed(function() {
             var layers;
             try {
@@ -71,7 +71,7 @@ define([
                 "centerx": layer.centerX(),
                 "centery": layer.centerY(),
                 "zoom": layer.zoom(),
-                "sortorder": layer.sortOrder()
+                "overlaysortorder": layer.overlaySortOrder()
             });
         });
         layer.dirty = ko.computed(function() {
@@ -118,7 +118,7 @@ define([
             layer.centerX(_layer.centerx);
             layer.centerY(_layer.centery);
             layer.zoom(_layer.zoom);
-            layer.sortOrder(_layer.sortorder);
+            layer.overlaySortOrder(_layer.overlaysortorder);
             layer.legend(_layer.legend);
             layer.searchonly(_layer.searchonly);
         };

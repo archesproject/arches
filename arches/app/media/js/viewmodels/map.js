@@ -134,7 +134,7 @@ define([
 
         var mapLayers = params.mapLayers || arches.mapLayers;
 
-        //mapLayers = mapLayers.sort((a, b) => a.overlaysortorder - b.overlaysortorder)
+        mapLayers = mapLayers.sort((a, b) => a.overlaysortorder - b.overlaysortorder)
         console.log(mapLayers)
 
         mapLayers.forEach(function(layer) {
@@ -468,21 +468,11 @@ define([
             var new_order = []
             for (let i = 0; i < map_order().length; i++) {
                 const element = map_order()[i];
-                if (element.is_resource_layer == true) {
-                    console.log(element);
-                    console.log(i)
-                    new_order.push({
-                        "maplayerid": element.maplayerid,
-                        "overlaysortorder": i,
-                        "is_resource_layer": element.is_resource_layer,
-                    })
-                } else {
-                    new_order.push({
-                        "maplayerid": element.maplayerid,
-                        "sortorder": i,
-                        "is_resource_layer": element.is_resource_layer,
-                    })
-                }
+                new_order.push({
+                    "maplayerid": element.maplayerid,
+                    "overlaysortorder": i,
+                    "is_resource_layer": element.is_resource_layer,
+                })
             }
             
             $.ajax({

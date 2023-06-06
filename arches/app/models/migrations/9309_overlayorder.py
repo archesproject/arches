@@ -15,6 +15,11 @@ class Migration(migrations.Migration):
             name='overlaysortorder',
             field=models.IntegerField(default=0),
         ),
+        migrations.RenameField(
+            model_name='MapLayer',
+            old_name='sortorder',
+            new_name='overlaysortorder',
+        ),
     ]
 
 
