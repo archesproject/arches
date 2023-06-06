@@ -216,7 +216,7 @@ def get_resource_model_label(result):
         return ""
 
 
-@method_decorator(group_required("Resource Exporter"), name="dispatch")
+@group_required("Resource Exporter")
 def export_results(request):
 
     total = int(request.GET.get("total", 0))

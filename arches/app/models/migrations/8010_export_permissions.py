@@ -6,7 +6,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('models', '9055_add_branch_publication_to_node'),
+        ('models', '9558_add_plugin_help'),
     ]
 
     def add_permissions(apps, schema_editor, with_create_permissions=True):
