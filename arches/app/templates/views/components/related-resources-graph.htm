@@ -257,10 +257,10 @@
 <!--/ko -->
 
 <!--ko if: activeTab() === 'search' -->
-<div id="searchTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.searchNetwork, 'aria-description': $root.translations.resourceInformationDescription}">
+<div id="searchTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.searchNetwork}">
 <div class="workbench-card-sidepanel-header-container">
-    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" 
-        data-bind="click: hideSidePanel, attr: {'aria-label': $root.translations.closeSearchNetwork}">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, 
+        attr: {'aria-label': $root.translations.closeSearchNetwork, 'aria-description': $root.translations.resourceSearchDescription}">
         <span data-bind="text: $root.translations.searchNetwork"></span>
     </div>
 <div class="related-reasources-search-container">
@@ -268,15 +268,16 @@
         type="text" 
         class="form-control" 
         data-bind="
-            attr: {placeholder: $root.translations.filter + '...'},
+            attr: {placeholder: $root.translations.filter + '...', 'aria-label': $root.translations.filterNetwork},
             value: nodeSearchFilter, 
             valueUpdate: 'afterkeydown'
         "
     >
-    <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
+    <span class="clear-node-search" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, 
+        click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
 </div>
-<div class="related-reasources-search-list" data-bind="foreach: searchNodes">
-    <div class="edge-node-information" data-bind="event: {
+<div class="related-reasources-search-list" role="list" data-bind="foreach: searchNodes">
+    <div role="listitem" class="edge-node-information" data-bind="event: {
             mouseover: function() {
                 $parent.hoverElementId($data.id)
             },
@@ -286,17 +287,17 @@
         }, css: {'element-hover': $parent.hoverElementId() === $data.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: graph.fillColor}"></div>
         <div class="edge-node-title">
-            <div class="edge-node-display-name" data-bind="text: displayname, click: function() {
+            <div class="edge-node-display-name" tabindex="0" role="button" data-bind="text: displayname, onEnterkeyClick, onSpaceClick, click: function() {
                 $parent.informationElement($data);
-            }"></div>
+            }, attr: {'aria-label': $root.translations.expandRelatedResource(displayname) }"></div>
             <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
             <div class="relationships-list-count shim">
                 <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
                 <span data-bind="text: $root.translations.relationshipsShown"></span>
                 <!--ko if: shownRelationsCount() !== totalRelations -->
-                <a href="javascript:void(0);" data-bind="click: function() {
+                <a href="javascript:void(0);" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
                     $parent.expandNode($data);
-                }">
+                }, attr: {'aria-label': $root.translations.loadMore }">
                     <span data-bind="text: $root.translations.loadMore"></span>
                 </a>
                 <!--/ko -->
@@ -308,26 +309,26 @@
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
-<div class="workbench-card-sidepanel-header-container" id="analyzeTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.analyzeNetwork, 'aria-description': $root.translations.resourceInformationDescription}">
+<div class="workbench-card-sidepanel-header-container" id="analyzeTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.analyzeNetwork}">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
-        data-bind="click: hideSidePanel, attr: {'aria-label': $root.translations.closeAnalyzeNetwork}">
+        data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, attr: {'aria-label': $root.translations.closeAnalyzeNetwork}">
         <span data-bind="text: $root.translations.analyzeNetwork"></span>
     </div>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'settings' -->
-<div class="workbench-card-sidepanel-header-container" id="settingsTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.settings, 'aria-description': $root.translations.resourceInformationDescription}">
+<div class="workbench-card-sidepanel-header-container" id="settingsTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.settings}">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
-        data-bind="click: hideSidePanel, attr: {'aria-label': $root.translations.closeSettings}">
+        data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, attr: {'aria-label': $root.translations.closeSettings}">
         <span data-bind="text: $root.translations.settings"></span>
     </div>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
-<div id="legendTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.legend, 'aria-description': $root.translations.resourceInformationDescription}">
+<div id="legendTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.legend, 'aria-description': $root.translations.resourceLegendDescription}">
 <div class="workbench-card-sidepanel-header-container">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
-        data-bind="click: hideSidePanel, attr: {'aria-label': $root.translations.closeLegend}">
+        data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, attr: {'aria-label': $root.translations.closeLegend}">
         <span data-bind="text: $root.translations.legend"></span>
     </div>
 </div>
