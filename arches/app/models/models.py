@@ -589,7 +589,7 @@ class Node(models.Model):
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
-    overlaysortorder = models.IntegerField(blank=True, null=True, default=0)
+    overlaysortorder = models.IntegerField(default=0)
 
     def get_child_nodes_and_edges(self):
         """

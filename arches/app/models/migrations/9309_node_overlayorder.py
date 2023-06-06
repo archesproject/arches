@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='node',
             name='overlaysortorder',
-            field=models.IntegerField(blank=True, default=0, null=True),
+            field=models.IntegerField(default=0),
         ),
     ]
 

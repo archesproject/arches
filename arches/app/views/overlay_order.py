@@ -18,8 +18,10 @@ class OverlayOrder(BaseManagerView):
         data = JSONDeserializer().deserialize(json)
         maps = MapLayer.objects.all()
         for map in data['map_order']:
+            print(map)
             try:
                 temp = maps.get(maplayerid = map['maplayerid'])
+                print(temp)
             except MapLayer.DoesNotExist:
                 #Just to suppress any errors in the front end if stuff fails
                 try:
@@ -31,7 +33,7 @@ class OverlayOrder(BaseManagerView):
                     temp.save()
                     print(vars(temp))
             else:
-                temp.overlaysortorder = map['overlaysortorder']
+                temp.sortorder = map['sortorder']
                 temp.save()
 
 

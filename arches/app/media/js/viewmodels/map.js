@@ -134,7 +134,8 @@ define([
 
         var mapLayers = params.mapLayers || arches.mapLayers;
 
-        mapLayers = mapLayers.sort((a, b) => a.layersortorder - b.layersortorder)
+        //mapLayers = mapLayers.sort((a, b) => a.overlaysortorder - b.overlaysortorder)
+        console.log(mapLayers)
 
         mapLayers.forEach(function(layer) {
             if (!layer.isoverlay) {
@@ -465,14 +466,23 @@ define([
         ko.bindingHandlers.sortable.afterMove = function(e) {
             const map_order = ko.observableArray(e.sourceParent())
             var new_order = []
-           
             for (let i = 0; i < map_order().length; i++) {
                 const element = map_order()[i];
-                new_order.push({
-                    "maplayerid": element.maplayerid,
-                    "overlaysortorder": i,
-                    "is_resource_layer": element.is_resource_layer,
-                })
+                if (element.is_resource_layer == true) {
+                    console.log(element);
+                    console.log(i)
+                    new_order.push({
+                        "maplayerid": element.maplayerid,
+                        "overlaysortorder": i,
+                        "is_resource_layer": element.is_resource_layer,
+                    })
+                } else {
+                    new_order.push({
+                        "maplayerid": element.maplayerid,
+                        "sortorder": i,
+                        "is_resource_layer": element.is_resource_layer,
+                    })
+                }
             }
             
             $.ajax({
