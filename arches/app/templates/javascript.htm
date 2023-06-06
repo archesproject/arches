@@ -958,7 +958,8 @@
             "legend": "{{ resource_map_layer.legend | escapejs  }}",
             "activated": true,
             "addtomap": {{ resource_map_layer.addtomap|lower }},
-            "is_resource_layer": true
+            "is_resource_layer": true,
+            "overlaysortorder: {{ resource_map_layer.overlaysortorder }}"
         },{% endfor %}]'
         map-markers='[{% for map_marker in map_markers %}{
             "name": "{{ map_marker.name }}",
