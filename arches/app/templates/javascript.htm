@@ -520,7 +520,9 @@
         url-placeholder='{% trans "URL Placeholder" as urlPlaceholder %} "{{ urlPlaceholder|escapejs }}"'
         url-label-placeholder='{% trans "URL Label Placeholder" as urlLabelPlaceholder %} "{{ urlLabelPlaceholder|escapejs }}"'
         default-relationship-to='{% trans "Default relationship to" as defaultRelationshipTo %} "{{ defaultRelationshipTo|escapejs }}"'
+        default-relationship-to-resource='(resource) => {return {% trans "Default relationship to ${resource}" as defaultRelationshipToResource %} `{{ defaultRelationshipToResource|escapejs }}` }'
         default-inverse-relationship-to='{% trans "Default inverse relationship to" as defaultInverseRelationshipTo %} "{{ defaultInverseRelationshipTo|escapejs }}"'
+        default-inverse-relationship-to-resource='(resource) => {return {% trans "Default inverse relationship to ${resource}" as defaultInverseRelationshipToResource %} `{{ defaultInverseRelationshipToResource|escapejs }}` }'
         relationship-concept='{% trans "Relationship Concept" as relationshipConcept %} "{{ relationshipConcept|escapejs }}"'
         inverse-relationship-concept='{% trans "Inverse Relationship Concept" as inverseRelationshipConcept %} "{{ inverseRelationshipConcept|escapejs }}"'
         use-ontology='{% trans "Define Relationship using Ontology Property" as useOntology %} "{{ useOntology|escapejs }}"'
@@ -792,6 +794,7 @@
         delete-relationship-resource='(resource) => {return {% trans "Delete relationship to ${resource}" as deleteRelationshipResource %} `{{ deleteRelationshipResource|escapejs }}` }'
         expand-resource-report='(resource) => {return {% trans "Expand resource report for ${resource}" as expandResourceReport %} `{{ expandResourceReport|escapejs }}` }'
         expand-relatioship-ontology-options='(resource, relatedResource) => {return {% trans "Expand relationship ontology options between ${resource} and ${relatedResource}" as expandRelatioshipOntologyOptions %} `{{ expandRelatioshipOntologyOptions|escapejs }}` }'
+        remove-related-resource-model='(resourceModel) => {return {% trans "Remove resource model ${resourceModel} from the related resource options" as removeRelatedResourceModel %} `{{ removeRelatedResourceModel|escapejs }}` }'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
