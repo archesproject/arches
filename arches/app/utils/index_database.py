@@ -40,11 +40,8 @@ def get_serialized_graph(graph):
         return None
 
     if graph.graphid not in serialized_graphs:
-        serialized_graphs[graph.graphid] = (
-            models.PublishedGraph.objects.filter(publication=graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-            .first()
-            .serialized_graph
-        )
+        published_graph = graph.get_published_graph()
+        serialized_graphs[graph.graphid] = published_graph.serialized_graph
     return serialized_graphs[graph.graphid]
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
@@ -183,6 +180,7 @@ def index_resources_using_singleprocessing(
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
+                resource.calculate_descriptors()
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
