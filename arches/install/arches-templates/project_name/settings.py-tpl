@@ -7,6 +7,7 @@ import os
 import sys
 import arches
 import inspect
+import semantic_version
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -15,11 +16,10 @@ except ImportError:
     pass
 
 APP_NAME = '{{ project_name }}'
-APP_VERSION = (0, 0, 0, "alpha", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
-APP_VERSION_LABEL = arches.setup.get_version(APP_VERSION)
+APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-MIN_ARCHES_VERSION = ({{arches_major_version}}, {{arches_minor_version}})
-MAX_ARCHES_VERSION = ({{arches_major_version}}, {{arches_minor_version}})
+MIN_ARCHES_VERSION = arches.__version__
+MAX_ARCHES_VERSION = arches.__version__
 
 STATICFILES_DIRS =  (
     os.path.join(APP_ROOT, 'media', 'build'),
