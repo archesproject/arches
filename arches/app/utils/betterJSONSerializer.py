@@ -43,15 +43,28 @@ class UnableToSerializeMethodTypesError(Exception):
 
 
 class JSONSerializer(object):
-    def serializeToPython(self, obj, **options):
-        self.options = options.copy()
+    """
+    You can pass this class as a JSON Encoder to the json.dumps "cls" property
+    eg: json.dumps(obj, cls=JSONSerializer)
+    """
 
-        self.stream = options.pop("stream", StringIO())
-        self.selected_fields = options.pop("fields", None)
-        self.exclude = options.pop("exclude", None)
-        self.use_natural_keys = options.pop("use_natural_keys", False)
-        self.geom_format = options.pop("geom_format", "wkt")
-        self.force_recalculation = options.pop("force_recalculation", False)
+    def __init__(self, **options):
+        self._options = options
+
+    def encode(self, obj):
+        return self.serializeToPython(obj, **self._options)
+
+    def serializeToPython(self, obj, **options):
+        # allow users to override any kwargs passed into the __init__ method
+        self.options = self._options.copy()
+        self.options.update(options)
+
+        self.stream = self.options.get("stream", StringIO())
+        self.selected_fields = self.options.get("fields", None)
+        self.exclude = self.options.get("exclude", None)
+        self.use_natural_keys = self.options.get("use_natural_keys", False)
+        self.geom_format = self.options.get("geom_format", "wkt")
+        self.force_recalculation = self.options.get("force_recalculation", False)
 
         return self.handle_object(obj, **self.options)
 

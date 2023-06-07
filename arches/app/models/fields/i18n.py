@@ -166,7 +166,9 @@ class I18n_TextField(JSONField):
     description = _("A I18n_TextField object")
 
     def __init__(self, *args, **kwargs):
+        from arches.app.utils.betterJSONSerializer import JSONSerializer
         self.use_nulls = kwargs.get("null", False)
+        kwargs["encoder"] = JSONSerializer
         kwargs["default"] = I18n_String(use_nulls=self.use_nulls)
         super().__init__(*args, **kwargs)
 
@@ -357,6 +359,8 @@ class I18n_JSONField(JSONField):
     description = _("A I18n_JSONField object")
 
     def __init__(self, *args, **kwargs):
+        from arches.app.utils.betterJSONSerializer import JSONSerializer
+        kwargs["encoder"] = JSONSerializer
         super().__init__(*args, **kwargs)
 
     def from_db_value(self, value, expression, connection):
