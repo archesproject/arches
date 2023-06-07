@@ -111,8 +111,8 @@ define([
                                     $(this).attr('aria-expanded', 'true');
                                 } else if (contentExpanded === 'block') {
                                     $(this).attr('aria-expanded', 'false');
-                                };
-                            };
+                                }
+                            }
                             contentEl.slideToggle();
                         });
                         $('.reloadable-img').click(function(){
