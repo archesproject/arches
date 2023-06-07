@@ -19,7 +19,7 @@ define(['utils/set-csrf-token'], function() {
                 && attribute.name !== 'class'
             ) {
                 try {
-                    var functionFromString = Function("return" + attribute.value);
+                    let functionFromString = Function("return" + attribute.value);
                     let result = functionFromString();
 
                     if (!result) {
@@ -45,7 +45,18 @@ define(['utils/set-csrf-token'], function() {
                 && attribute.name !== 'style'
                 && attribute.name !== 'class'
             ) {
-                parsedArchesTranslations[convertToCamelCase(attribute.name)] = JSON.parse(attribute.value);
+                try {
+                    let functionFromString = Function("return" + attribute.value);
+                    let result = functionFromString();
+
+                    if (!result) {
+                        result = "";
+                    }
+
+                    parsedArchesTranslations[convertToCamelCase(attribute.name)] = result;
+                } catch (error) {
+                    parsedArchesTranslations[convertToCamelCase(attribute.name)] = JSON.parse(attribute.value);
+                }
             }
         }
     }
