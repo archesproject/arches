@@ -58,9 +58,6 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
-    serialized_graph = None
-    node_datatypes = None
-
     class Meta:
         proxy = True
 
@@ -73,15 +70,14 @@ class Resource(models.ResourceInstance):
         # end from models.ResourceInstance
         self.tiles = []
         self.descriptor_function = None
+        self.serialized_graph = None
+        self.node_datatypes = None
 
     def get_serialized_graph(self):
         if not self.serialized_graph:
             try:
-                self.serialized_graph = (
-                    models.PublishedGraph.objects.filter(publication=self.graph.publication.publicationid, language=settings.LANGUAGE_CODE)
-                    .first()
-                    .serialized_graph
-                )
+                published_graph = self.graph.get_published_graph()
+                self.serialized_graph = published_graph.serialized_graph
             except AttributeError:
                 self.serialized_graph = None
         return self.serialized_graph
