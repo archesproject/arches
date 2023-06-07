@@ -28,6 +28,7 @@ from django.core.validators import RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -478,6 +479,25 @@ class GraphModel(models.Model):
         if not self.is_active:
             return _("This Model is not active, and is not available for instance creation.")
         return False
+
+    def is_editable(self):
+        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
+            return True
+        elif self.isresource:
+            return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
+        else:
+            return True
+
+    def get_published_graph(self, language=None):
+        if not language:
+            language = translation.get_language()
+        
+        try:
+            graph = PublishedGraph.objects.get(publication=self.publication, language=language)
+        except PublishedGraph.DoesNotExist:
+            graph = None
+
+        return graph
 
     def __str__(self):
         return str(self.name)
@@ -955,7 +975,10 @@ class ResourceInstance(models.Model):
     createdtime = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.graph_publication = self.graph.publication
+        try:
+            self.graph_publication = self.graph.publication
+        except ResourceInstance.graph.RelatedObjectDoesNotExist:
+            pass
         super(ResourceInstance, self).save()
 
     def __init__(self, *args, **kwargs):

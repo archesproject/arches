@@ -19,14 +19,14 @@ class Migration(migrations.Migration):
         VALUES
             (
                 '80fc7aab-cbd8-4dc0-b55b-5facac4cd157',
-                'Bulk Data Editor - Trim',
+                'Remove Whitespace',
                 'Remove Leading and Trailing Spaces',
                 'edit',
                 'views/components/etl_modules/bulk-trim-editor',
                 'bulk-trim-editor',
                 'base_data_editor.py',
                 'BulkStringEditor',
-                '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
+                '{"bgColor": "#2ecc71", "circleColor": "#51D88C", "show": true}',
                 'fa fa-edit',
                 'bulk-trim-editor'
             ),
@@ -45,14 +45,14 @@ class Migration(migrations.Migration):
             ),
             (
                 '9079b83c-e22b-4fdc-a22e-74487ee7b7f3',
-                'Bulk Data Editor - Replace',
-                'Replace All the Matching Words with a New Word',
+                'Replace Text',
+                'Replace Matching Words with a New Word',
                 'edit',
                 'views/components/etl_modules/bulk-replace-editor',
                 'bulk-replace-editor',
                 'base_data_editor.py',
                 'BulkStringEditor',
-                '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
+                '{"bgColor": "#27ae60", "circleColor": "#51D88C", "show": true}',
                 'fa fa-edit',
                 'bulk-replace-editor'
             );
