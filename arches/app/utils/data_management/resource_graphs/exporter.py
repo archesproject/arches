@@ -7,6 +7,7 @@ import csv
 import zipfile
 from io import StringIO
 from io import BytesIO
+from django.utils.translation import get_language
 
 from arches.app.models.graph import Graph
 from arches.app.models.concept import Concept
@@ -178,6 +179,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
     nodes = []
     values = {}
     export_json = OrderedDict()
+    language = get_language()
     if graphid != False:
         if graphid is None or graphid == "all" or graphid == [""]:
             node_query = (
@@ -279,7 +281,7 @@ def create_mapping_configuration_file(graphid, include_concepts=True, data_dir=N
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
-        with open(os.path.join(data_dir, file_name + ".zip"), "wb") as archive:
+        with open(os.path.join(data_dir, file_name[language] + ".zip"), "wb") as archive:
             archive.write(zip_stream)
     else:
         return files_for_export
