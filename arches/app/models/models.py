@@ -601,6 +601,7 @@ class Node(models.Model):
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
+    overlaysortorder = models.IntegerField(default=0)
 
     def get_child_nodes_and_edges(self):
         """
@@ -1271,7 +1272,7 @@ class MapLayer(models.Model):
     zoom = models.FloatField(blank=True, null=True)
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
-    sortorder = models.IntegerField(default=0)
+    overlaysortorder = models.IntegerField(default=0)
 
     @property
     def layer_json(self):
@@ -1288,7 +1289,7 @@ class MapLayer(models.Model):
 
     class Meta:
         managed = True
-        ordering = ("sortorder", "name")
+        ordering = ("overlaysortorder", "name")
         db_table = "map_layers"
         default_permissions = ()
         permissions = (("no_access_to_maplayer", "No Access"),

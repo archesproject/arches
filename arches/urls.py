@@ -74,6 +74,7 @@ from arches.app.views.auth import (
     TwoFactorAuthenticationResetView,
     ExternalOauth,
 )
+from arches.app.views.overlay_order import OverlayOrder
 from arches.app.models.system_settings import settings
 from django.views.decorators.cache import cache_page
 from django.urls import path
@@ -301,6 +302,7 @@ urlpatterns = [
     url(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     url(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     url(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
+    url(r"^overlay_order", OverlayOrder.as_view(), name ="overlay_order"),
 ]
 
 if settings.DEBUG:
