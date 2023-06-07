@@ -284,12 +284,7 @@ define([
                     viewModel.loading(true);
                     node.save(function(data) {
                         if (data.responseJSON.success === false || data.status === 500) {
-                            const alert = new JsonErrorAlertViewModel('ep-alert-red', data.responseJSON);
-                            viewModel.alert(alert);
-
-                            alert.active.subscribe(function() {
-                                window.location.reload();  // need to reload here to handle ValueError when renaming nodes
-                            });
+                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', data.responseJSON));
                         }
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
