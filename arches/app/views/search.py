@@ -28,6 +28,7 @@ from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.utils.translation import get_language, ugettext as _
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
@@ -42,7 +43,8 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
-from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
+from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer, user_is_resource_exporter
+from arches.app.utils.decorators import group_required
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
@@ -57,25 +59,24 @@ logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
             .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
-        search_components = models.SearchComponent.objects.all()
+        if user_is_resource_exporter(request.user):
+            search_components = models.SearchComponent.objects.all()
+        else:
+            search_components = models.SearchComponent.objects.all().exclude(componentname='search-export')
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
         card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
             widgets=widgets,
@@ -107,7 +108,7 @@ class SearchView(MapBaseManagerView):
         context["nav"]["search"] = False
         context["nav"]["help"] = {
             "title": _("Searching the Database"),
-            "template": "search-help",
+            "templates": ["search-help"],
         }
         context["celery_running"] = task_management.check_if_celery_available()
         context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
@@ -211,6 +212,7 @@ def get_resource_model_label(result):
         return ""
 
 
+@group_required("Resource Exporter")
 def export_results(request):
 
     total = int(request.GET.get("total", 0))
