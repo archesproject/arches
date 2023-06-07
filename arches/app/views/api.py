@@ -869,8 +869,7 @@ class Card(APIBase):
 
         serialized_graph = None
         if graph.publication:
-            user_language = translation.get_language()
-            published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+            published_graph = graph.get_published_graph()
             serialized_graph = published_graph.serialized_graph
 
         if serialized_graph:
