@@ -430,8 +430,6 @@ class GraphDataView(View):
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
         except PublishedModelError as e:
             return JSONErrorResponse(e.title, e.message)
-        except ValueError as e:
-            return JSONErrorResponse(_("Value Error"), str(e))
         except RequestError as e:
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
