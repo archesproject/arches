@@ -1437,8 +1437,7 @@ class Graph(models.GraphModel):
 
         if self.publication and not force_recalculation:
             try:
-                user_language = translation.get_language()
-                published_graph = models.PublishedGraph.objects.get(publication=self.publication, language=user_language)
+                published_graph = self.get_published_graph()
                 serialized_graph = published_graph.serialized_graph
                 for key in exclude:
                     if serialized_graph.get(key) is not None:  # explicit None comparison so falsey values will still return
@@ -1491,8 +1490,6 @@ class Graph(models.GraphModel):
                 ret["nodes"] = []
                 for key, node in self.nodes.items():
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
-                    if node.istopnode:
-                        ret["topnode"] = nodeobj
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
                     ret["nodes"].append(nodeobj)
             else:
