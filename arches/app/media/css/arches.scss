@@ -13813,9 +13813,10 @@ ul.select2-choices:after {
     padding-bottom: 5px;
 }
 
-.etl-module-footer .btn {
+.etl-module-footer .btn, .etl-module-component .btn {
     border-radius: 2px;
     margin-right: 20px;
+    min-width: 100px;
 }
 
 .etl-loading-metadata-key {
