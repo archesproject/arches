@@ -93,7 +93,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="PublishedGraph",
             fields=[
-                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("serialized_graph", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="serialized_graph", null=True)),
             ],
             options={

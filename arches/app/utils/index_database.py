@@ -6,6 +6,7 @@ django.setup()
 
 import pyprind
 import sys
+from types import SimpleNamespace
 from django.db import connection, connections
 from django.db.models import Q
 from arches.app.models import models
@@ -27,7 +28,21 @@ import math
 import logging
 
 logger = logging.getLogger(__name__)
+serialized_graphs = {}
 
+
+def get_serialized_graph(graph):
+    """
+    Returns the serialized version of the graph from the database
+
+    """
+    if not graph:
+        return None
+
+    if graph.graphid not in serialized_graphs:
+        published_graph = graph.get_published_graph()
+        serialized_graphs[graph.graphid] = published_graph.serialized_graph
+    return serialized_graphs[graph.graphid]
 
 def index_db(clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, use_multiprocessing=False, max_subprocesses=0):
     """
@@ -161,8 +176,11 @@ def index_resources_using_singleprocessing(
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
             for resource in resources:
+                resource.set_node_datatypes(node_datatypes)
+                resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
+                resource.calculate_descriptors()
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )

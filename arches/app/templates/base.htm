@@ -38,11 +38,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="shortcut icon" href="{% webpack_static 'img/favicon.png' %}" />
+    <link rel="shortcut icon" href="{% webpack_static 'favicons/favicon.ico' %}" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="{% webpack_static 'favicons/apple-touch-icon.png' %}" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{% webpack_static 'favicons/apple-touch-icon-76x76.png' %}" />
+    <link rel="apple-touch-icon" sizes="120x120" href="{% webpack_static 'favicons/apple-touch-icon-120x120.png' %}" />
+    <link rel="apple-touch-icon" sizes="152x152" href="{% webpack_static 'favicons/apple-touch-icon-152x152.png' %}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
     {% block css %}
         {% compress css %}
         <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
+        <link type="text/x-scss" href="{% webpack_static 'css/core.scss' %}" rel="stylesheet" media="screen">
         {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
         <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
         {% endif %}
