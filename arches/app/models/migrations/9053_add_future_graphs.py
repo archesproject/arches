@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9395_iiifmanifest_transaction"),
+        ("models", "9604_fix_inefficient_trigger"),
     ]
 
     operations = [
