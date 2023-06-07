@@ -112,7 +112,7 @@
                 <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, attr: {id: filter.componentname + '-tabpanel'}">
+                        <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, attr: {id: filter.componentname + '-tabpanel'}">
                             <div style="height: calc(100vh - 100px)" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
@@ -123,7 +123,7 @@
 
                     <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, attr: {id: filter.componentname + '-popup-tabpanel'}">
+                        <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, attr: {id: filter.componentname + '-popup-tabpanel'}">
                             <div data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
