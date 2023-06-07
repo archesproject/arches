@@ -21,7 +21,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.compatibility import is_arches_compatible, CompatibilityError
+from arches.app.utils.compatibility import is_compatible_with_arches, CompatibilityError
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -36,7 +36,7 @@ from arches.app.utils.permission_backend import get_createable_resource_types, u
 
 class BaseManagerView(TemplateView):
 
-    if is_arches_compatible() is False:
+    if is_compatible_with_arches() is False:
         message = _("This project is incompatible with Arches {0}.").format(__version__)
         raise CompatibilityError(message)
 

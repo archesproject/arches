@@ -1,35 +1,53 @@
+import arches
 import logging
-from arches import VERSION
+import semantic_version
 from arches.app.models.system_settings import settings
 from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
-
-def is_arches_compatible(min_arches=settings.MIN_ARCHES_VERSION, max_arches=settings.MAX_ARCHES_VERSION, target="project"):
+def is_compatible_with_arches(min_arches=settings.MIN_ARCHES_VERSION, max_arches=settings.MAX_ARCHES_VERSION, target="project"):
     """
     Check if the current version of arches falls between a min and max version.
 
     Keyword arguments
-    min_arches -- A tuple with at least a major version of arches, but may also include a min and patch release e.g. (7,4,0)
-    max_arches -- A tuple with at least a major version of arches, but may also include a min and patch release e.g. (7,5,0)
+    min_arches -- A semvar string representing the minimum supported arches version
+    max_arches -- A semver string representing the maximum supported arches version
     target -- A description of what is being checked for compatibility
 
     """
+    
+    try:
+        arches_version = semantic_version.Version(arches.__version__)
+    except ValueError:
+        arches_version = semantic_version.Version.coerce(arches.__version__)
 
-    if min_arches is None or max_arches is None:
-        logger.error(
-            _("Either a minimum or maximum compatible Arches version is not specified. Unable to check {0} compatibility".format(target))
-        )
-        return
+    min_is_valid = True
+    max_is_valid = True
 
-    if len(min_arches) <= 3 and len(max_arches) <= 3:
-        min_is_valid = min_arches <= VERSION[: len(min_arches)]
-        max_is_valid = max_arches >= VERSION[: len(max_arches)]
-        return min_is_valid and max_is_valid
-    else:
-        raise ValueError(_("No more than 3 digits allowed in MIN_ARCHES_VERSION or MAX_ARCHES_VERSION"))
+    versions = {
+        'minimum': min_arches,
+        'maximum': max_arches
+    }
 
+    for key, value in versions.items():
+        if value:
+            try:
+                sem_version = semantic_version.Version(value)
+            except ValueError:
+                sem_version = semantic_version.Version.coerce(value)
+            except Exception as e:
+                logger.error(e)
+                return False
+            if key == "minimum":
+                min_is_valid = sem_version <= arches_version
+            if key == "maximum":
+                max_is_valid = sem_version >= arches_version
+        else:
+            logger.warning(
+                _("A {0} Arches version is not specified. Unable to check {0} version {1} compatibility".format(key, target))
+            )
+    return min_is_valid and max_is_valid
 
 class CompatibilityError(Exception):
     def __init__(self, message, code=None):

@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from arches.app.utils.compatibility import is_arches_compatible
+from arches.app.utils.compatibility import is_compatible_with_arches
 from tests.base_test import ArchesTestCase
 from arches import VERSION
 
@@ -27,34 +27,20 @@ from arches import VERSION
 
 class CompatibilityTests(ArchesTestCase):
     def test_compatibility(self):
-        self.assertTrue(is_arches_compatible())
+        self.assertTrue(is_compatible_with_arches())
 
-    def test_min_patch_version_too_high(self):
-        min_version = (VERSION[0], VERSION[1], VERSION[2] + 1)
-        max_version = (VERSION[0], VERSION[1], VERSION[2] + 2)
-        self.assertFalse(is_arches_compatible(min_version, max_version))
+    def test_min_version_too_high(self):
+        min_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] + 1}"
+        max_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] + 2}"
+        self.assertFalse(is_compatible_with_arches(min_version, max_version))
 
-    def test_max_patch_version_too_low(self):
-        min_version = (VERSION[0], VERSION[1], VERSION[2] - 1)
-        max_version = (VERSION[0], VERSION[1], VERSION[2] - 2)
-        self.assertFalse(is_arches_compatible(min_version, max_version))
+    def test_max_version_too_low(self):
+        min_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] - 1}"
+        max_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] - 2}"
+        self.assertFalse(is_compatible_with_arches(min_version, max_version))
 
-    def test_min_feature_version_too_high(self):
-        min_version = (VERSION[0], VERSION[1] + 1)
-        max_version = (VERSION[0], VERSION[1] + 2)
-        self.assertFalse(is_arches_compatible(min_version, max_version))
 
-    def test_max_feature_version_too_low(self):
-        min_version = (VERSION[0], VERSION[1] - 1)
-        max_version = (VERSION[0], VERSION[1] - 2)
-        self.assertFalse(is_arches_compatible(min_version, max_version))
-
-    def test_major_version_too_high(self):
-        min_version = (VERSION[0] + 1,)
-        max_version = (VERSION[0] + 2,)
-        self.assertFalse(is_arches_compatible(min_version, max_version))
-
-    def test_major_version_too_low(self):
-        min_version = (VERSION[0] - 1,)
-        max_version = (VERSION[0] - 2,)
-        self.assertFalse(is_arches_compatible(min_version, max_version))
+    def test_invalid_version(self):
+        min_version = f"{VERSION[0]}"
+        max_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] - 2}"
+        self.assertFalse(is_compatible_with_arches(min_version, max_version))
