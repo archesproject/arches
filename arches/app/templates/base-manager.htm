@@ -67,6 +67,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="sidenav-menu">
                     {% block navbar %}
                     <ul class="list-group">
+        
+                        <!-- Home. -->
+                        <li>
+                            <a href="{% url 'home' %}" data-bind="click:function () { navigate('{% url 'home' %}') }">
+                                <i class="ti-home"></i>
+                                <span class="menu-title">
+                                    <strong>{% trans "Home" %}</strong>
+                                </span>
+                            </a>
+                        </li>
 
                         <!-- Tools -->
                         <li class="list-header">{% trans "Tools" %}</li>
@@ -396,7 +406,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 {% if nav.help %}
                 <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
-                    data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
+                    data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }">
                     <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
                         <i class="ion-help"></i>
                     </div>
@@ -467,7 +477,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span>{% trans nav.help.title %}</span>
                     </div>
                     <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none"
-                        data-bind="click: function(){helpOpen(false)}">
+                        data-bind="click: function(){closeHelp(); helpOpen(false)}">
                         <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close Help" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>

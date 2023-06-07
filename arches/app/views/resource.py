@@ -89,7 +89,7 @@ class ResourceListView(BaseManagerView):
         context["nav"]["icon"] = "fa fa-bookmark"
         context["nav"]["title"] = _("Resource Manager")
         context["nav"]["login"] = True
-        context["nav"]["help"] = {"title": _("Creating Resources"), "template": "resource-editor-landing-help"}
+        context["nav"]["help"] = {"title": _("Creating Resources"), "templates": ["resource-editor-landing-help"]}
 
         return render(request, "views/resource.htm", context)
 
@@ -268,12 +268,11 @@ class ResourceEditorView(MapBaseManagerView):
 
         serialized_graph = None
         if graph.publication:
-            user_language = translation.get_language()
             try:
-                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+                published_graph = graph.get_published_graph()
             except models.PublishedGraph.DoesNotExist:
                 LanguageSynchronizer.synchronize_settings_with_db()
-                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+                published_graph = graph.get_published_graph()
 
             serialized_graph = published_graph.serialized_graph
 
@@ -345,9 +344,9 @@ class ResourceEditorView(MapBaseManagerView):
         context["nav"]["menu"] = nav_menu
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
-            context["nav"]["help"] = {"title": _("Managing System Settings"), "template": "system-settings-help"}
+            context["nav"]["help"] = {"title": _("Managing System Settings"), "templates": ["system-settings-help"]}
         else:
-            context["nav"]["help"] = {"title": _("Using the Resource Editor"), "template": "resource-editor-help"}
+            context["nav"]["help"] = {"title": _("Using the Resource Editor"), "templates": ["resource-editor-help"]}
 
         return render(request, view_template, context)
 
