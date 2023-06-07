@@ -1,11 +1,12 @@
 define([
     'knockout',
     'underscore',
+    'jquery',
     'arches',
     'viewmodels/widget',
     'utils/ontology',
     'views/components/resource-report-abstract',
-], function(ko, _, arches, WidgetViewModel, ontologyUtils) {
+], function(ko, _, $, arches, WidgetViewModel, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
 
@@ -184,6 +185,10 @@ define([
             this.newResourceInstance(null);
         };
         
+        this.openReport = function(resourceId) {
+            this.reportResourceId(resourceId);
+            $('#resource-report-panel button').focus();    
+        };
         
         this.setValue = function(valueObject) {
             if (self.multiple) {
@@ -364,7 +369,7 @@ define([
                                 }, 250);
                             };
                             let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
-                            resourceCreatorPanel.addEventListener("transitionend", () => resourceCreatorPanel.focus()); // focus on the resource creator panel for keyboard readers
+                            resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
                             params.complete.subscribe(function() {
                                 if (params.resourceid()) {
                                     if (self.renderContext === 'search'){

@@ -69,15 +69,15 @@
                                 <i class="fa fa-pencil"></i>
                             </button>
                         </div>
-                        <div class='rr-table-column icon-column' aria-label="{% trans '' %}">
+                        <div class='rr-table-column icon-column'>
                             <button data-bind="click: $parent.deleteRelationship, clickBubble: false,
                                     attr: {'aria-label': $root.translations.deleteRelationshipResource($data.resourceName())}
                             ">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
-                        <div class='rr-table-column icon-column' aria-label="{% trans '' %}">
-                            <button data-bind="click:function(){self.reportResourceId(ko.unwrap($data.resourceId)); $('#resource-report-panel').focus()}, clickBubble: false,
+                        <div class='rr-table-column icon-column'>
+                            <button data-bind="click:function(){self.openReport(ko.unwrap($data.resourceId)) }, clickBubble: false,
                                     attr: {'aria-label': $root.translations.expandResourceReport($data.resourceName())}
                             ">
                                 <i class="fa fa-info-circle"></i>
@@ -194,18 +194,18 @@
 <!-- /ko -->
 <!-- /ko -->
 
-
 <div class="create-resource-instance-card-component rr-table-pop" id="resource-creator-panel"
-    data-bind="with: newResourceInstance, style: {transform: !!newResourceInstance() ? 'translate(0,0)' : 'translate(100%,0)'}, attr: {tabindex: 0}">
+    data-bind="with: newResourceInstance, style: {transform: !!newResourceInstance() ? 'translate(0,0)' : 'translate(100%,0)'}">
     <!-- ko component: {
         name: 'related-instance-creator',
         params: {...$data, graphName: $parent.graphLookup[graphid].name}
     } --><!--/ko -->
 </div>
 
-
 <div class="create-resource-instance-card-component rr-table-pop" id="resource-report-panel"
     data-bind="style: {transform: !!reportResourceId() ? 'translate(0,0)' : 'translate(100%,0)'}">
+
+    <!-- ko if: reportResourceId -->
     <div class="create-instance-header" style="display: flex; justify-content: space-between;">
         <span data-bind="text: $root.translations.relatedResourceSummary"></span>
 
@@ -222,6 +222,7 @@
             summary: true,
         }
     }"></div>
+    <!-- /ko -->
 </div>
 
 {% endblock form %}
