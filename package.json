@@ -55,7 +55,7 @@
         "knockout-mapping": "~2.6.0",
         "knockstrap": "1.3.2",
         "latlon-geohash": "1.1.0",
-        "leaflet": "1.6.0",
+        "leaflet": "1.7.1",
         "leaflet-draw": "^1.0.4",
         "leaflet-iiif": "^3.0.0",
         "leaflet.fullscreen": "^1.6.0",
