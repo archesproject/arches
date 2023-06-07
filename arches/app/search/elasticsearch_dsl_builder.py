@@ -337,6 +337,28 @@ class SimpleQueryString(Dsl):
         }
 
 
+class QueryString(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+
+        if not isinstance(self.field, list):
+            self.field = [self.field]
+
+        query_obj = {
+            "fields": self.field,
+            "query": self.query,
+        }
+        query_obj.update(dict(kwargs))
+
+        self.dsl = {"query_string": query_obj}
+
+
 class Exists(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html
