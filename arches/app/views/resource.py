@@ -270,12 +270,11 @@ class ResourceEditorView(MapBaseManagerView):
 
         serialized_graph = None
         if graph.publication:
-            user_language = translation.get_language()
             try:
-                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+                published_graph = graph.get_published_graph()
             except models.PublishedGraph.DoesNotExist:
                 LanguageSynchronizer.synchronize_settings_with_db()
-                published_graph = models.PublishedGraph.objects.get(publication=graph.publication, language=user_language)
+                published_graph = graph.get_published_graph()
 
             serialized_graph = published_graph.serialized_graph
 
