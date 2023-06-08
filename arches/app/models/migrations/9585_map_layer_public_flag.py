@@ -3,7 +3,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "9437_include_map_source_and_map_layer_permissions"),
+        ("models", "9604_fix_inefficient_trigger"),
     ]
 
     operations = [
