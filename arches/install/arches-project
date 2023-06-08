@@ -15,7 +15,6 @@ from django.utils.crypto import get_random_string
 from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
 from django.core.management.base import BaseCommand, CommandError
-from arches import __version__
 from arches.setup import get_complete_version
 from arches.management.commands import utils
 
@@ -56,12 +55,11 @@ class ArchesCommand(TemplateCommand):
         complete_version = get_complete_version()
         options["arches_version"] = "master"
         if complete_version[3] == 'final':
-            options["arches_version"] = f"stable/{__version__}"
+            options["arches_version"] = f"stable/{arches.__version__}"
         elif complete_version[3] == 'beta':
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
-
+        options["arches_semantic_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
         super(ArchesCommand, self).handle('project', project_name, target, **options)
-
 
 def command_create_app(args):
     cmd = ArchesCommand()

@@ -3,7 +3,7 @@
 
 <!-- ko ifnot: $data.search -->
 <!--ko let: {self: $data} -->
-<div class="node-widget-label concept-label" style="width:540px;">
+<div class="node-widget-label concept-label" style="width:40vw;">
 
     <div class="control-label">
         <span data-bind="text: $root.translations.resourceModel"></span>
@@ -17,7 +17,8 @@
             chosen: {
                 width: '100%',
                 disabled: isEditable === false
-            }
+            },
+            attr: {'aria-label': $root.translations.selectAResourceModel},
         "></select>
     </div>
     <div class="rr-table">
@@ -25,12 +26,21 @@
             <div class='rr-table-row'>
                 <div class="rr-table-row-initial" data-bind="style:{color: $parent.isEditable === true || '#aaa'}">
                     <div class='rr-table-column icon-column'>
-                        <button data-bind="click: function(){if ($parent.isEditable !== false) {$data.removeRelationship($data)}}, clickBubble: false, attr:{'disabled': $parent.isEditable === false}, style:{color: $parent.isEditable === true || '#aaa'}">
+                        <button 
+                            data-bind="
+                                click: function(){if ($parent.isEditable !== false) {$data.removeRelationship($data)}}, 
+                                clickBubble: false, 
+                                attr: {'disabled': $parent.isEditable === false, 'aria-label': $root.translations.remove + ' ' + $data.name}, 
+                                style: {color: $parent.isEditable === true || '#aaa'}">
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
-                    <div class="rr-table-column" style="flex-grow: 1; padding-left: 10px;"
-                       data-bind="click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; }, clickBubble: false" style="cursor: pointer;">
+                    <div class="rr-table-column" tabindex="0" role="button" style="flex-grow: 1; padding-left: 10px;"
+                        data-bind="
+                            click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; },
+                            clickBubble: false,
+                            onEnterkeyClick, onSpaceClick," 
+                        style="cursor: pointer;">
                         <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
                     </div>
                 </div>
@@ -70,7 +80,8 @@
                                                     $root.translations.selectAnOntologyProperty, 
                                                     true
                                                 )
-                                            }
+                                            }, 
+                                            attr: {'aria-label': $root.translations.defaultRelationshipTo + ' ' + $data.name}
                                         "
                                     >
                                 </span>
@@ -88,7 +99,7 @@
                             </label>
 
                             <div class="row" style="padding: 0px 12px; margin-bottom: 10px;">
-                                <span class="col-xs-12" style=""
+                                <span class="col-xs-12"
                                     data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
                                 </span>
 
@@ -102,7 +113,8 @@
                                                 $root.translations.selectAnOntologyProperty, 
                                                 true
                                             )
-                                        }
+                                        },
+                                        attr: {'aria-label': $root.translations.defaultInverseRelationshipTo + ' ' + $data.name}
                                     ">
                                 </span>
 
@@ -129,8 +141,10 @@
                                     params: {
                                         node: {'config': {'rdmCollection': $data.relationshipCollection() }},
                                         value: $data.relationshipConcept,
-                                    }
-                                }"></div>
+                                    }, 
+                                },
+                                attr: {'aria-label': $root.translations.relationshipConcept}
+                                "></div>
                             </div>
                         </div>
 
@@ -145,7 +159,9 @@
                                         node: {'config': {'rdmCollection': relationshipCollection()}},
                                         value: $data.inverseRelationshipConcept,
                                     }
-                                }"></div>
+                                },
+                                attr: {'aria-label': $root.translations.inverseRelationshipConcept}
+                                "></div>
                             </div>
                         </div>
                     </div> 
@@ -155,26 +171,33 @@
     </div>
 
     <div class="relative">
-        <label class="col-xs-12 control-label widget-input-label">
+        <span class="col-xs-12 control-label widget-input-label">
             <span data-bind="text: $root.translations.searchStringText"></span>
             
             <i 
                 class="fa fa-eye" 
-                style="cursor: pointer;" 
+                style="cursor: pointer;"
+                tabindex="0"
+                role=""
                 data-bind="
-                    attr: {title: $root.translations.viewSearchString},
-                    click: openSearch
+                    attr: {title: $root.translations.viewSearchString,
+                        'aria-label': $root.translations.viewSearchString
+                    },
+                    click: openSearch,
+                    onEnterkeyClick, onSpaceClick
                 "
             ></i>
-        </label>
+        </span>
     </div>
     
     <div class="col-xs-12" style="padding-bottom: 10px;">
         <input 
             type="text" 
-            class="form-control" style=""
+            class="form-control"
             data-bind="
-                attr: {placeholder: $root.translations.enterSearchStringHere + '...'},
+                attr: {placeholder: $root.translations.enterSearchStringHere + '...',
+                    'aria-label': $root.translations.searchStringText
+                },
                 textInput: config.searchString
             "
         >
@@ -199,6 +222,7 @@
                 { text: $root.translations.hasNoValue, value: 'null' },
                 { text: $root.translations.hasAnyValue, value: 'not_null' },
             ],
+            attr: {'aria-label': $root.translations.searchCriteria}
         "
     ></select>
 </div>

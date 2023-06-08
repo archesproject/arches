@@ -1,0 +1,87 @@
+.switch.switch-small.switch-widget {
+    width: 35px;
+}
+
+.switch.switch-widget.on>small {
+    left: 22px;
+}
+
+.switch.switch-widget.null>small {
+    left: 12px;
+}
+
+.switch {
+    background-color: #fff;
+    border: 1px solid #dfdfdf;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-block;
+    height: 30px;
+    position: relative;
+    vertical-align: middle;
+    width: 50px;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    box-sizing: content-box;
+    background-clip: content-box;
+    transition-duration: .1s;
+}
+
+.switch>small {
+    transition-duration: .1s;
+    left: 0;
+}
+
+.switch.on {
+    background-color: #64bd63;
+    border-color: #64bd63;
+}
+
+.switch.null {
+    background-color: #ddd;
+    border-color: #ddd;
+}
+
+.switch.on>small {
+    left: 13px;
+}
+
+.switch.disabled {
+    background-color: #f1f1f1;
+    border-color: #ddd;
+}
+
+.switch.disabled.on {
+    background-color: #87c586;
+    border-color: #87c586;
+}
+
+.switch.disabled>small {
+    background-color: #f1f1f1;
+}
+
+.switchery>small,
+.switch>small {
+    background: #fff;
+    border-radius: 100%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    height: 30px;
+    position: absolute;
+    top: 0;
+    width: 30px;
+}
+
+.switch-small {
+    border-radius: 13px;
+    height: 13px;
+    width: 25px;
+    margin: 0 4px;
+}
+
+.switch-small>small {
+    height: 13px;
+    width: 13px;
+}

@@ -43,17 +43,13 @@ class MapLayerManagerView(MapBaseManagerView):
         datatype_factory = DataTypeFactory()
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         icons = models.Icon.objects.order_by("name")
         context = self.get_context_data(
             icons=JSONSerializer().serialize(icons),
             datatypes=datatypes,
             widgets=widgets,
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             datatypes_json=JSONSerializer().serialize(datatypes),
             main_script="views/map-layer-manager",
         )
@@ -95,7 +91,7 @@ class MapLayerManagerView(MapBaseManagerView):
 
         context["nav"]["title"] = _("Map Layer Manager")
         context["nav"]["icon"] = "fa-server"
-        context["nav"]["help"] = {"title": _("Map Layer Manager"), "template": "map-manager-help"}
+        context["nav"]["help"] = {"title": _("Map Layer Manager"), "templates": ["map-manager-help"]}
 
         return render(request, "views/map-layer-manager.htm", context)
 
@@ -113,6 +109,7 @@ class MapLayerManagerView(MapBaseManagerView):
         map_layer.legend = data["legend"]
         map_layer.searchonly = data["searchonly"]
         map_layer.sortorder = data["sortorder"]
+        map_layer.ispublic = data["ispublic"]
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:

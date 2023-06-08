@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
             """
             DELETE FROM relations WHERE relationtype = 'inverseOf';
             DELETE FROM d_relation_types WHERE relationtype = 'inverseOf';
-            """
-            ),
+            """,
+        ),
     ]

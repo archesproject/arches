@@ -26,6 +26,7 @@ from django.core.validators import RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -472,6 +473,17 @@ class GraphModel(models.Model):
             return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
         else:
             return True
+
+    def get_published_graph(self, language=None):
+        if not language:
+            language = translation.get_language()
+        
+        try:
+            graph = PublishedGraph.objects.get(publication=self.publication, language=language)
+        except PublishedGraph.DoesNotExist:
+            graph = None
+
+        return graph
 
     def __str__(self):
         return str(self.name)
@@ -940,7 +952,10 @@ class ResourceInstance(models.Model):
     createdtime = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.graph_publication = self.graph.publication
+        try:
+            self.graph_publication = self.graph.publication
+        except ResourceInstance.graph.RelatedObjectDoesNotExist:
+            pass
         super(ResourceInstance, self).save()
 
     def __init__(self, *args, **kwargs):
@@ -1257,6 +1272,7 @@ class MapLayer(models.Model):
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
     sortorder = models.IntegerField(default=0)
+    ispublic = models.BooleanField(default=False)
 
     @property
     def layer_json(self):
@@ -1275,6 +1291,11 @@ class MapLayer(models.Model):
         managed = True
         ordering = ("sortorder", "name")
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (("no_access_to_maplayer", "No Access"),
+                       ("read_maplayer", "Read"),
+                       ("write_maplayer", "Create/Update"),
+                       ("delete_maplayer", "Delete"))
 
 
 class GraphXMapping(models.Model):
@@ -1521,6 +1542,7 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    helptemplate = models.TextField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
@@ -1635,6 +1657,8 @@ class ETLModule(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
+    helptemplate = models.TextField(blank=True, null=True)
+    helpsortorder = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -1660,6 +1684,7 @@ class LoadEvent(models.Model):
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
     indexed_time = models.DateTimeField(blank=True, null=True)
+    taskid = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
