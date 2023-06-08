@@ -21,11 +21,8 @@
 }
 
 .arches-signin-subtext {
-    padding: 0px 5px 10px 5px;
+    padding: 0px 5px 20px 5px;
     color: #888;
-}
-
-legend.arches-signin-subtext {
     font-size: 1em;
     font-weight: normal;
     border: none;
@@ -51,13 +48,14 @@ legend.arches-signin-subtext {
 
 .floating-label-input:focus ~ .floating-label, 
 .floating-label-input:valid ~ .floating-label {
-    top: -2.5em;
-    font-size: 0.8em;   
+    top: -1.7em;
+    padding: 0px;
 }
 
 .floating-label-input.change-password:focus ~ .floating-label, 
 .floating-label-input.change-password:valid ~ .floating-label {
-    top: -0.85em; 
+    top: -0.55em; 
+    padding: 0px;
 }
 
 .floating-label {
