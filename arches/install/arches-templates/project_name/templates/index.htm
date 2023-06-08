@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load compress %}
 {% load webpack_static from webpack_loader %}
 
 <!DOCTYPE html>
@@ -43,18 +44,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="apple-touch-icon" sizes="152x152" href="{% webpack_static 'favicons/apple-touch-icon-152x152.png' %}" />
     <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
-    <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
-
-    <link href="{% webpack_static 'css/unify.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-    <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
-    {% if app_settings.ACCESSIBILITY_MODE %}
-    <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
-    {% endif %}
+    {% block css %}
+        <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
+        {% if app_settings.ACCESSIBILITY_MODE %}
+            {% compress css %}
+                <link type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+            {% endcompress %}
+        {% endif %}
+    {% endblock css%}
 </head>
 
 <body>
+    <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
+    {% include 'javascript.htm' %}
 
     <!--=== Header ===-->
     <header>
@@ -158,25 +163,44 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Splash Screen -->
                 <div class="fullscreenbanner-container">
                     <div class="fullscreenbanner">
-                        <ul>
+                        <ul style="padding: 0px;" >
                             <!-- SLIDE 1 -->
                             <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
                                 <!-- MAIN IMAGE -->
-                                <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="slidebg1" data-bgfit="cover" data-bgposition="center center" data-bgrepeat="no-repeat">
-                                <!-- LAYERS -->
-                                <!-- NEW LAYER -->
-                                <div class="tp-caption sft start text-bold v5-splash-caption" delay="4500" data-hoffset="0" data-y="400" data-speed="800" data-start="100" data-easing="Back.easeInOut" data-endspeed="300" data-x="0">
-                                    <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                                    <p>{% trans "A web and mobile platform for" %}</p>
-                                    <p style="padding-bottom: 15px;">{% trans "managing your most important resource information" %}</p>
-                                </div>
+                                <div>
+                                    <img 
+                                        src="{% webpack_static 'img/landing/landing-primary.jpg' %}" 
+                                        alt="slidebg1" 
+                                        data-bgfit="cover" 
+                                        data-bgposition="center center" 
+                                        data-bgrepeat="no-repeat"
+                                    >
 
-                                <!-- Gradient -->
-                                <div class="image-gradient"></div>
-
-                                <!-- Attribution -->
-                                <div class="image-attribution">
-                                    <span>{% trans "Glarus thrust, Tectonic Area Sardona, Switzerland | Jonas Wagner https://www.flickr.com/photos/80225884@N06/ | Attribution 2.0 Generic (CC BY 2.0)" %}</span>
+                                    <!-- LAYERS -->
+                                    <!-- NEW LAYER -->
+                                    <div 
+                                        class="tp-caption sft start text-bold v5-splash-caption" 
+                                        delay="4500" 
+                                        data-hoffset="0"
+                                        data-y="400" 
+                                        data-speed="800" 
+                                        data-start="100" 
+                                        data-easing="Back.easeInOut" 
+                                        data-endspeed="300" 
+                                        data-x="0"
+                                    >
+                                        <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                                        <p>{% trans "A web and mobile platform for" %}</p>
+                                        <p style="padding-bottom: 15px;">{% trans "managing your most important resource information" %}</p>
+                                    </div>
+    
+                                    <!-- Gradient -->
+                                    <div class="image-gradient"></div>
+    
+                                    <!-- Attribution -->
+                                    <div class="image-attribution">
+                                        <span>{% trans "Image courtesy of Luis Alfonso Orellana" %}</span>
+                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -410,30 +434,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     </footer>
     <!-- End Footer -->
 
-<script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
-
 <script>
 
     require.config({
-        baseUrl: '{{ STATIC_URL }}js',
+        baseUrl: "{% webpack_static 'build/js' %}",
         paths: {
-            'templates': '{% url "templates" ""%}'.replace(/\/$/, ""),
-            'text': '{{ STATIC_URL }}node_modules/requirejs-text/text',
-            'jquery-lib': '{{ STATIC_URL }}node_modules/jquery/dist/jquery.min',
-            'jquery': '{{ STATIC_URL }}node_modules/jquery-migrate/dist/jquery-migrate.min',
-            'jquery-ui': '{{ STATIC_URL }}node_modules/jqueryui/jquery-ui.min',
-            'underscore': '{{ STATIC_URL }}node_modules/underscore/underscore-min',
-            'chosen': '{{ STATIC_URL }}node_modules/chosen-js/chosen.jquery.min',
-            'knockout': '{{ STATIC_URL }}node_modules/knockout/build/output/knockout-latest',
-            'bootstrap': '{{ STATIC_URL }}node_modules/bootstrap/dist/js/bootstrap.min',
-            'themepunch-tools': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min',
-            'themepunch-revolution': '{{ STATIC_URL }}plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution',
-            'revolution-slider': '{{ STATIC_URL }}plugins/revolution-slider',
-            'one-app': '{{ STATIC_URL }}plugins/one.app',
+            'text': "{% webpack_static 'node_modules/requirejs-text/text' %}",
+            'jquery': "{% webpack_static 'node_modules/jquery/dist/jquery.min' %}",
+            'jquery-ui': "{% webpack_static 'node_modules/jqueryui/jquery-ui.min' %}",
+            'jquery-validate': "{% webpack_static 'node_modules/jquery-validation/dist/jquery.validate.min' %}",
+            'underscore': "{% webpack_static 'node_modules/underscore/underscore-min' %}",
+            'chosen': "{% webpack_static 'node_modules/chosen-js/chosen.jquery.min' %}",
+            'knockout': "{% webpack_static 'node_modules/knockout/build/output/knockout-latest' %}",
+            'bootstrap': "{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min' %}",
+            'themepunch-tools': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min' %}",
+            'themepunch-revolution': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution' %}",
+            'revolution-slider': "{% webpack_static 'plugins/revolution-slider' %}",
+            'one-app': "{% webpack_static 'plugins/one.app' %}",
         },
         shim: {
             'jquery': {
-                deps: ['jquery-lib'],
                 exports: '$'
             },
             'bootstrap': {
@@ -457,7 +477,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         }
     });
     require(
-        ['jquery',
+        [
+            'jquery',
             'knockout',
             'bootstrap',
             'themepunch-tools',
