@@ -201,6 +201,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                             </div>
 
                                                             <div class="form-group map-service-manage-layer-name">
+                                                                <label class="col-sm-3 map-service-manage-control-label">{% trans "Visible by default:" %}</label>
+                                                                <div class="col-sm-9">
+                                                                    <span class="switch switch-small" data-bind="css: {
+                                                                                'on': selection().isPublic()
+                                                                            }, click: function () {
+                                                                                selection().isPublic(!selection().isPublic());
+                                                                            }">
+                                                                            <small></small>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group map-service-manage-layer-name">
                                                                 <label class="col-sm-3 map-service-manage-control-label" data-bind="text: selection().isoverlay ? {% quoted_trans "Add to map by default:" %} : {% quoted_trans "Default basemap:" %}"></label>
                                                                 <div class="col-sm-9">
                                                                     <span class="switch switch-small" data-bind="css: {

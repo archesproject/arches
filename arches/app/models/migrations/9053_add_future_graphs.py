@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9604_fix_inefficient_trigger"),
+        ("models", "9585_map_layer_public_flag"),
     ]
 
     operations = [
