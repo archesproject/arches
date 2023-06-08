@@ -72,7 +72,7 @@ legend.arches-signin-subtext {
 }
 
 .floating-label.change-password {
-    top: 2em;
+    top: 1.3em;
     color: #888;
 }
 
@@ -179,12 +179,14 @@ legend.arches-signin-subtext {
     text-align: start;
     position: relative;
     padding: 10px 15px;
+    margin: 0px;
     height: 40px;
     background-color: #f5f6f7;
     color: #5c7174;
     line-height: 1.1;
     border-bottom: solid 0.5px #babebf;
     font-weight: 300;
+    font-size: 14px;
 }
 
 .change-password-buttons {
