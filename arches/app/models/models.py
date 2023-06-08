@@ -1315,6 +1315,7 @@ class MapLayer(models.Model):
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
     sortorder = models.IntegerField(default=0)
+    ispublic = models.BooleanField(default=False)
 
     @property
     def layer_json(self):
