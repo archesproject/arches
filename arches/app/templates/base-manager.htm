@@ -45,6 +45,16 @@
                 <div class="sidenav-menu">
                     {% block navbar %}
                     <ul class="list-group">
+        
+                        <!-- Home. -->
+                        <li>
+                            <a href="{% url 'home' %}" data-bind="click:function () { navigate('{% url 'home' %}') }">
+                                <i class="ti-home"></i>
+                                <span class="menu-title">
+                                    <strong>{% trans "Home" %}</strong>
+                                </span>
+                            </a>
+                        </li>
 
                         <!-- Tools -->
                         <li class="list-header">{% trans "Tools" %}</li>
