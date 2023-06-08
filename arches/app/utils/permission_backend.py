@@ -245,7 +245,7 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
                     else:
                         if set(formatted_perms) == set(explicit_map_layer_perms):
                             permitted_map_layers.append(map_layer)
-                else:
+                elif map_layer.ispublic:
                     permitted_map_layers.append(map_layer)
 
         return permitted_map_layers
@@ -513,6 +513,14 @@ def user_is_resource_reviewer(user):
     """
 
     return user.groups.filter(name="Resource Reviewer").exists()
+
+
+def user_is_resource_exporter(user):
+    """
+    Single test for whether a user is in the Resource Exporter group
+    """
+
+    return user.groups.filter(name="Resource Exporter").exists()
 
 
 def user_created_transaction(user, transactionid):
