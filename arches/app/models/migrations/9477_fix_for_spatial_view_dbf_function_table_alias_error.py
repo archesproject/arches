@@ -3,7 +3,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "9558_add_plugin_help"),
+        ("models", "9585_map_layer_public_flag"),
     ]
 
     sql_string = """
