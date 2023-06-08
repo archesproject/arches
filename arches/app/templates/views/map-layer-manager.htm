@@ -1,20 +1,3 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
 {% extends "base-manager.htm" %}
 {% load static %}
 {% load template_tags %}
@@ -85,22 +68,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div class="category-header">
                     <!-- Resource/Graph Toggle -->
                     <div style="display: block;">
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
-                        <a id="" class="category-title" href="" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
+                        <a class="category-title" data-bind="css: { 'active': selectedList() && selectedList() === geomNodes  }, click: function() { selectedList(geomNodes); }">{% trans "Resource Layers" %}</a>
+                        <a class="category-title" data-bind="css: { 'active': selectedList() && selectedList() === basemaps  }, click: function() { selectedList(basemaps); }">{% trans "Basemaps" %}</a>
+                        <a class="category-title" data-bind="css: { 'active': selectedList() && selectedList() === overlays  }, click: function() { selectedList(overlays); }">{% trans "Overlays" %}</a>
                     </div>
                 </div>
                 <div class="ep-card-crud-container">
                     <div class="panel">
                         <!-- ko if: !selection() -->
                         <div class="panel-heading">
-                            <h3 class="panel-title"><span>{% trans 'No overlays available' %}</span></h3>
+                            <div class="panel-title h3"><span>{% trans 'No overlays available' %}</span></div>
                         </div>
                         <!-- /ko -->
 
                         <!-- ko if: selection()  && selection().nodeid -->
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></h3>
+                            <div class="panel-title h3"><i data-bind="css: selection().config.layerIcon() || selection().layer.icon"></i> <span data-bind="text: selection().config.layerName() || selection().layer.name"></span></div>
                         </div>
 
                         <div class="panel-body map-preview-panel">
@@ -113,7 +96,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                         <!-- ko if: selection()  && !selection().nodeid -->
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></h3>
+                            <div class="panel-title h3"><i data-bind="css: selection().icon"></i> <span data-bind="text: selection().name"></span></div>
 
                             <!-- Service management buttons (for convenience) -->
                             <div class="service-buttons-heading">
@@ -129,22 +112,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="panel-body map-preview-panel">
                             <div class="map-service-container">
                                 <div>
-                                    <h3 class="config-title"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}</h3>
+                                    <div class="config-title h3"><i class="fa fa-binoculars"></i> {% trans "Layer Preview" %}</div>
 
                                     <div class="map-service-manage-buttons">
                                         <div class="form-group">
-                                            <label class="control-label">{% trans "Activated:" %}</label>
-                                            <span class="switch switch-small" data-bind="css: {
+                                            <span class="control-label">{% trans "Activated:" %}</span>
+                                            <span class="switch switch-small" tabindex="0" role="switch" data-bind="css: {
                                                     'on': selection().activated()
-                                                }, click: function () {
+                                                }, onEnterkeyClick, onSpaceClick, click: function () {
                                                     selection().activated(!selection().activated());
-                                                }">
+                                                },
+                                                attr: {'aria-label': $root.translations.activated, 'aria-checked': selection().activated()}">
                                                 <small></small>
                                             </span>
                                         </div>
                                     </div>
                                     <div class="btn-group map-server-basemap-button" data-bind="if: selection().isoverlay">
-                                        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-globe"></i></button>
+                                        <button class="dropdown-toggle btn" data-toggle="dropdown" aria-label="{% trans 'Overlays' %}" aria-expanded="false"><i class="fa fa-globe"></i></button>
                                         <ul class="dropdown-menu dropdown-menu-right">
                                             <!-- ko foreach: basemaps -->
                                             <li><a href="#" data-bind="text: name, click: function () { select(); }"></a></li>
@@ -178,12 +162,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     <div class="tab-base map-service-tabs">
 
                                         <!-- Resource Styling Tabs -->
-                                        <ul class="nav nav-tabs map-service-nav-tabs">
+                                        <ul class="nav nav-tabs map-service-nav-tabs" role="tablist">
                                             <li class="active">
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false"><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#settings-panel" aria-expanded="false" aria-expanded="true" role="tab"
+                                                ><i class="ion-ios-settings-strong"></i> {% trans "Settings" %}</a>
                                             </li>
                                             <li>
-                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false"><i class="ion-image"></i> {% trans "Service Styling" %}</a>
+                                                <a class="config-title-tab mar-no" data-toggle="tab" href="#styling-panel" aria-expanded="false" aria-expanded="false" role="tab"
+                                                ><i class="ion-image"></i> {% trans "Service Styling" %}</a>
                                             </li>
                                         </ul>
 
@@ -194,61 +180,63 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="form-horizontal">
                                                         <div class="panel-body">
                                                             <div class="form-group map-service-manage-layer-name">
-                                                                <label class="col-sm-3 control-label map-service-manage-control-label">{% trans "Layer Name:" %}</label>
+                                                                <span class="col-sm-3 control-label map-service-manage-control-label">{% trans "Layer Name:" %}</span>
                                                                 <div class="col-sm-9">
-                                                                    <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name">
+                                                                    <input type="text" class="form-control" data-bind="valueUpdate: 'keyup', value: selection().name, 
+                                                                        attr: {'aria-label': $root.translations.layerName}
+                                                                    ">
                                                                 </div>
                                                             </div>
-
-                                                            <div class="form-group map-service-manage-layer-name">
-                                                                <label class="col-sm-3 map-service-manage-control-label">{% trans "Visible by default:" %}</label>
+                                                            <div class="form-group map-service-manage-layer-name" data-bind="let: {uid: Math.random().toString()}">
+                                                                <span class="col-sm-3 map-service-manage-control-label"
+                                                                    data-bind="attr: {id: uid}">{% trans "Visible by default:" %}</span>
                                                                 <div class="col-sm-9">
                                                                     <span class="switch switch-small" data-bind="css: {
                                                                                 'on': selection().isPublic()
                                                                             }, click: function () {
                                                                                 selection().isPublic(!selection().isPublic());
-                                                                            }">
+                                                                            }, attr: {'aria-labeledby': uid, 'aria-checked': selection().isPublic()}">
                                                                             <small></small>
                                                                     </span>
                                                                 </div>
                                                             </div>
-                                                            <div class="form-group map-service-manage-layer-name">
-                                                                <label class="col-sm-3 map-service-manage-control-label" data-bind="text: selection().isoverlay ? {% quoted_trans "Add to map by default:" %} : {% quoted_trans "Default basemap:" %}"></label>
+                                                            <div class="form-group map-service-manage-layer-name" data-bind="let: {uid: Math.random().toString()}">
+                                                                <span class="col-sm-3 map-service-manage-control-label"
+                                                                    data-bind="text: selection().isoverlay ? {% quoted_trans 'Add to map by default:' %} : {% quoted_trans 'Default basemap:' %},
+                                                                    attr: {id: uid}
+                                                                "></span>
                                                                 <div class="col-sm-9">
-                                                                    <span class="switch switch-small" data-bind="css: {
+                                                                    <span class="switch switch-small" tabindex="0" role="switch" data-bind="css: {
                                                                                 'on': selection().addtomap()
-                                                                            }, click: function () {
+                                                                            }, onEnterkeyClick, onSpaceClick, click: function () {
                                                                                 selection().addtomap(!selection().addtomap());
-                                                                            }">
+                                                                            }, attr: {'aria-labeledby': uid, 'aria-checked': selection().addtomap()}">
                                                                             <small></small>
                                                                     </span>
                                                                 </div>
                                                             </div>
 
                                                             <!-- ko if: selection().isoverlay-->
-                                                            <div class="form-group map-service-manage-layer-name">
-                                                                <label class="col-sm-3 control-label map-service-manage-control-label">{% trans "Only show on search map:" %}</label>
+                                                            <div class="form-group map-service-manage-layer-name" data-bind="let: {uid: Math.random().toString()}">
+                                                                <label class="col-sm-3 control-label map-service-manage-control-label" 
+                                                                    data-bind="attr: {id: uid}">{% trans "Only show on search map:" %}</label>
                                                                 <div class="col-sm-9">
-                                                                    <span class="switch switch-small" data-bind="css: {
+                                                                    <span class="switch switch-small" tabindex="0" role="switch" data-bind="css: {
                                                                             'on': selection().searchonly()
-                                                                        }, click: function () {
+                                                                        }, onEnterkeyClick, onSpaceClick, click: function () {
                                                                             selection().searchonly(!selection().searchonly());
-                                                                        }">
+                                                                        }, attr: {'aria-labeledby': uid, 'aria-checked': selection().searchonly()}">
                                                                         <small></small>
                                                                     </span>
                                                                 </div>
                                                             </div>
                                                             <!-- /ko -->
-                                                            <div class="form-group">
-                                                                <label class="col-sm-3 control-label map-service-manage-layer-name">{% trans "Sort Order:" %}</label>
-                                                                <div class="col-sm-1">
-                                                                    <div data-bind="component: {
-                                                                    name: 'number-widget',
-                                                                    params: {
-                                                                        value: selection().sortOrder
-                                                                    }
-                                                                }">
-                                                                    </div>
+                                                            <div class="form-group map-service-manage-layer-name" data-bind="let: {uid: Math.random().toString()}">
+                                                                <label class="col-sm-3 control-label map-service-manage-control-label" 
+                                                                    data-bind="attr: {id: uid}">{% trans "Sort Order:" %}</label>
+                                                                <div class="col-sm-3">
+                                                                    <input type="number" data-bind="value: selection().sortOrder, attr: {'aria-labeledby': uid}" 
+                                                                        class="form-control input-lg widget-input">
                                                                 </div>
                                                             </div>
                                                             <div class="form-group">
@@ -258,7 +246,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                                         selectedIconObservable: selection().icon,
                                                                         iconFilter: iconFilter,
                                                                         iconList: icons,
-                                                                        label: {% quoted_trans "Layer icon:" %}
+                                                                        label: $root.translations.layerIcon
                                                                     }
                                                                 }">
                                                                 </div>
