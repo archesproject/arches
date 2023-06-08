@@ -1353,7 +1353,7 @@ class Graph(models.GraphModel):
             return list(nodegroups)
 
     def update_permissions(self, serialized_graph):
-        if "user_permissions" or "group_permissions" in serialized_graph:
+        if "user_permissions" in serialized_graph or "group_permissions" in serialized_graph:
             graph_from_database_query = Graph.objects.filter(pk=self.pk)
             if len(graph_from_database_query):
                 graph_from_database = graph_from_database_query[0]
