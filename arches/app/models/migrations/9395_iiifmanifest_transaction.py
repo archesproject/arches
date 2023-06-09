@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="iiifmanifest",
             name="transactionid",
-            field=models.UUIDField(default=uuid.uuid4),
+            field=models.UUIDField(default=uuid.uuid4, null=True),
         ),
     ]
