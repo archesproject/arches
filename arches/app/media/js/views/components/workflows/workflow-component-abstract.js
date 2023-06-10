@@ -306,13 +306,13 @@ define([
                         );
                     }
                     else {
-                        resolve({});
+                        resolve(null);
                     }
                 });
 
                 resourceInstanceDataPromise.then( function(data) {
                     if (self.cardinality() === '1') {
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
                             self.complete(true);
                         }
@@ -320,7 +320,7 @@ define([
                     }
                     else if (self.cardinality() === 'n') {
                         MultipleTileBasedComponent.apply(self);
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.complete(true);
                         }
                         
