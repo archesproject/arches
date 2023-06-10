@@ -306,7 +306,7 @@ define([
                         );
                     }
                     else {
-                        resolve(null);
+                        resolve({});
                     }
                 });
 
