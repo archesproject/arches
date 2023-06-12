@@ -25,7 +25,7 @@ define(['arches'], function(arches) {
         },
 
         /**
-         * lookupResourceInstanceDataByQuery - gets mlutiple resource instance data from Elastic Search
+         * lookupResourceInstanceDataByQuery - gets resource instance(s) from Elasticsearch using custom query
          *
          * @param  {query} a premade ES query
          * @return {array}
