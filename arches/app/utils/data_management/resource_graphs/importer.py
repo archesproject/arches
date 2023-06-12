@@ -152,7 +152,7 @@ def import_graph(graphs, overwrite_graphs=True):
                             defaults={
                                 "notes": publication_data.get("notes"),
                                 "graph_id": publication_data.get("graph_id"),
-                                "user_id": publication_data.get("user_id"),
+                                "user_id": None,
                                 "published_time": publication_data.get("published_time"),
                             },
                         )
