@@ -25,6 +25,28 @@ define(['arches'], function(arches) {
         },
 
         /**
+         * lookupResourceInstanceDataByQuery - gets mlutiple resource instance data from Elastic Search
+         *
+         * @param  {query} a premade ES query
+         * @return {array}
+         */
+        lookupResourceInstanceDataByQuery: function(query) {
+            searchParams = new URLSearchParams({
+                'advanced-search': JSON.stringify([query]),
+                tiles: true
+            });
+            return window.fetch(`${arches.urls.search_results}?${searchParams}`)
+                .then(function(response) {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function(json) {
+                    return json["results"]["hits"]["hits"];
+                });
+            },
+
+        /**
          * getNodeValues - gets resource instance data from Elastic Search
          *
          * @param  {queryClause} - object to specify which node to collect data from
