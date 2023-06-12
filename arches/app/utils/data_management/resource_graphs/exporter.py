@@ -164,6 +164,7 @@ def get_graphs_for_export(graphids=None):
 
         if publication_id:
             publication = JSONDeserializer().deserialize(JSONSerializer().serialize(GraphXPublishedGraph.objects.get(pk=publication_id)))
+            del publication['user_id']
 
         resource_graph["publication"] = publication
         del resource_graph["publication_id"]
