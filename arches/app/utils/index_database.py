@@ -199,7 +199,6 @@ def index_resources_using_singleprocessing(
                     resource.calculate_descriptors()
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
-                resource.calculate_descriptors()
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
