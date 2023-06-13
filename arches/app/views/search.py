@@ -28,6 +28,7 @@ from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.utils.translation import get_language, ugettext as _
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
@@ -42,7 +43,8 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
-from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
+from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer, user_is_resource_exporter
+from arches.app.utils.decorators import group_required
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
@@ -64,7 +66,10 @@ class SearchView(MapBaseManagerView):
             .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
-        search_components = models.SearchComponent.objects.all()
+        if user_is_resource_exporter(request.user):
+            search_components = models.SearchComponent.objects.all()
+        else:
+            search_components = models.SearchComponent.objects.all().exclude(componentname='search-export')
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -207,6 +212,7 @@ def get_resource_model_label(result):
         return ""
 
 
+@group_required("Resource Exporter")
 def export_results(request):
 
     total = int(request.GET.get("total", 0))
