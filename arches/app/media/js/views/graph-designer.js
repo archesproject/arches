@@ -293,9 +293,9 @@ define([
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         }
 
-                        viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         viewModel.loading(false);
                     });
                 }
