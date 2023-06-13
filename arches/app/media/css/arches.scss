@@ -1126,7 +1126,7 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-select-plugin {
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
 }
 
 #workflow-container {
@@ -13582,7 +13582,7 @@ ul.select2-choices:after {
 }
 
 .etl-manager-filter-container {
-    margin: 50px 50px 0px 50px;
+    margin: 25px 50px 0px 50px;
 }
 
 .etl-manager-filter-button {
@@ -13638,11 +13638,48 @@ ul.select2-choices:after {
 }
 
 .etl-module-body {
-    padding: 15px 25px;
+    padding: 15px 45px;
     width: 100%;
     flex: 1 1 0px;
     overflow: auto;
 }
+
+.etl-module-body h2 {
+    font-size: 17px;
+    color: #565656;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.etl-module-body p {
+    font-size: 14px;
+    color: #999;
+    font-weight: 400;
+}
+
+.etl-module-body section h3 {
+    font-size: 15px;
+    color: #565656;
+    font-weight: 300;
+    margin: 10px 0px 5px 0px;
+}
+
+.etl-module-body section .etl-module-component-block {
+    padding-bottom: 15px;
+}
+
+.etl-module-component-block .form-check {
+    padding: 5px 0px 0px 5px;
+}
+
+.etl-module-component-block label {
+    margin-bottom: 0px;
+}
+
+.etl-module-body p.pad-btm {
+    padding-bottom: 5px;
+}
+
 
 .etl-module-status {
     border-right: 1px solid rgba(0,0,0,0.14);
@@ -13744,7 +13781,7 @@ ul.select2-choices:after {
 }
 
 .etl-module-component {
-    margin-top: 30px;
+    padding-top: 0px;
     padding-bottom: 5px;
 }
 
@@ -13764,6 +13801,26 @@ ul.select2-choices:after {
     font-size: 15px;
     padding-right: 3px;
     color: rgb(4, 4, 45);
+}
+
+.etl-preview {
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+.etl-preview h3 {
+    padding-top: 0px;
+    padding-bottom: 5px;
+    color: #454545;
+}
+
+section .etl-preview table {
+    padding-top: 5px;
+}
+
+.etl-from-to {
+    display: inline-block;
+    width: 240px;
 }
 
 .csv-mapping-table-container {
