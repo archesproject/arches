@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.3.0 release notes](https://github.com/archesproject/arches/blob/dev/7.3.x/releases/7.3.0.md)
+[Version 7.4.0 release notes](https://github.com/archesproject/arches/blob/dev/7.4.x/releases/7.4.0.md)
 
 #### Quick Install
 
@@ -49,11 +49,59 @@ If you run into problems, please review our the full [installation documentation
 
 #### Release Cycle
 
-Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) followed in 6-12 weeks by a bug release (patch). See [semver.org](https://semver.org/) for version numbering.
+Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) every 6 months. Each functional release will typically be followed by one or more patch releases. See [semver.org](https://semver.org/) for version numbering.
 
--   Functional releases will usually introduce new functionality to the application but could also include styling updates, enhancements to the UX, bug fixes, and general improvements.
--   Bug releases are really only concerned with fixing any bugs related to the previous release or any other issues not yet addressed
+-   Functional releases will usually introduce new functionality to the application, but could also include styling updates, enhancements to the UX, bug fixes, and performance improvements.
+-   Patch releases are really only concerned with fixing any bugs related to the previous release or any other issues not yet addressed
 
-##### Support for previous releases
+#### Support for previous releases
 
-Functional releases will be supported until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+- Stable releases will be supported with patch releases for at least 18 months. Typically the stable release will be the second or third minor release of a major release. 
+- Functional releases (with the exception of stable releases) will be supported only until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+
+#### Feature roadmap
+
+The following a general plan for the Arches project. Be aware this plan is tentative and subject to change
+
+## 7.4 - Release date: June 15, 2023
+- Initial accessibility support for WCAG 2.2 level AA
+- Bulk Data Manager - Default data editing scripts for common string editing functions: case editing, search & replace
+- Bulk Data Manager - Import improvements
+  - better i18n support
+  - improved error handling and feedback
+- Added support for custom resource relationship types
+- Updates to JSONLD loader
+- Improved ETL/indexing performance 
+- Improved API/application performance
+- Enhancements to the relational data model
+- Improved documentation
+- Added map layer permissions
+- Improvements to spatial views
+- Improved term matching (relevance) in search 
+- Project version support
+- Improved null searches (ability to search for absence data)
+- Templating engine v0.1 release
+
+## 7.5 - Release date: December 15, 2023 
+- Continued accessibility improvements
+- Improved package management
+- Relationship transversal search
+- Search component redesign
+- Search UI redesign
+- Tabular search results
+- Ability to define search views
+- Support for editing and publishing graphs (removing instance restrictions)
+- Support for viewing and restoring previous graph publications
+- Support for editing/localizing UI labels and permissions for published graphs
+- Business data migrations that correspond to graph changes
+- Security enhancements
+- Support for component authoring in Vue Javascript framework
+
+## 7.6 - Release date: June 15, 2024
+- Activity stream edit logs
+- User specific saved searches
+
+## 8.0 - Release date: December 15, 2024
+- Migrate Arches UI Framework
+- RDM Redesign
+

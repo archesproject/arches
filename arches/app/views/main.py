@@ -36,6 +36,7 @@ def index(request):
             "app_title": settings.APP_TITLE,
             "copyright_text": settings.COPYRIGHT_TEXT,
             "copyright_year": settings.COPYRIGHT_YEAR,
+            "app_version": settings.APP_VERSION,
             "version": __version__,
             "show_language_swtich": settings.SHOW_LANGUAGE_SWITCH,
         },

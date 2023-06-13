@@ -1,0 +1,222 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+<div class="etl-module-component-container">
+<div class="etl-module-body">
+    <h2>
+        <span data-bind="text:
+            operation() == 'trim' ? $root.translations.bulkStringEditorTrim
+            : operation() == 'case' ? $root.translations.bulkStringEditorChangeCase
+            : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
+            : ''
+        "></span>
+    </h2>
+    <!-- ko if: operation() == 'trim'-->
+    <p class="pad-btm">
+        {% blocktrans %}Removes all leading and trailing whitespace from the selected data{% endblocktrans %}
+    </p>
+    <!-- /ko -->
+    <!-- ko if: operation() == 'case'-->
+    <p class="pad-btm">
+        {% blocktrans %}Changes the case of all words in the selected data to upper case or lower case, or capitalizes those words{% endblocktrans %}
+    </p>
+    <!-- /ko -->
+    <!-- ko if: operation() == 'replace'-->
+    <p class="pad-btm">
+        {% blocktrans %}Find and replace words or phrases within a larger text{% endblocktrans %}
+    </p>
+    <!-- /ko -->
+    <section class="etl-module-component">
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+            </h3>
+            <textarea id="search-url-input"
+                style="min-height: 100px; width: 80%;"
+                class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
+            ></textarea>
+        </div>
+
+        <!-- ko if: operation() == 'case'-->
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="case-operation-select" data-bind="text: $root.translations.selectEditOperation"></label>
+            </h3>
+            <select id="case-operation-select" data-bind="
+                value: selectedCaseOperation,
+                options: caseOperations,
+                optionsText: 'label',
+                optionsValue: 'name',
+                optionsCaption: $root.translations.select + '...',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+            <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
+                <span class="form-check">
+                    <input id="trim-checkbox" type="checkbox" data-bind="checked: trim">
+                    <label for="trim-checkbox" data-bind="text: $root.translations.removeLeadingTrailingSpaces"></label>
+                </span>
+            </div> 
+        </div>
+        <!-- /ko -->
+
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
+            </h3>
+            <select id="resource-model-select" data-bind="
+                value: selectedGraph,
+                options: graphs,
+                optionsText: 'name',
+                optionsValue: 'graphid',
+                optionsCaption: $root.translations.select + '...',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
+        
+        <!-- ko if: nodes() -->
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="node-select" data-bind="text: $root.translations.selectANode"></label>
+            </h3>
+            <select id="node-select" data-bind="
+                value: selectedNode,
+                options: nodes,
+                optionsText: 'label',
+                optionsCaption: $root.translations.select + '...',
+                optionsValue: 'nodeid',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
+        <!-- /ko -->
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="language-select" data-bind="text: $root.translations.language"></label>
+            </h3>
+            <select id="language-select" data-bind="
+                options: languages,
+                optionsCaption: $root.translations.select + '...',
+                optionsText: function(item){return item.name + ' (' + item.code + ')'},
+                value: selectedLanguage,
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
+        <div class="etl-module-component-block" data-bind="if: operation() === 'replace'">
+            <div class="etl-from-to">
+                <h3>
+                    <label for="old-text-input" data-bind="text: $root.translations.from"></label>
+                </h3>
+                <input id="old-text-input" type="text" class="form-control" placeholder="Old Text" data-bind="textInput: oldText">
+            </div>
+            <i class="fa fa-arrow-right" style="margin: 0px 2px;"></i>
+            <div class="etl-from-to">
+                <h3>
+                    <label for="new-text-input" data-bind="text: $root.translations.to"></label>
+                </h3>
+                <input id="new-text-input" type="text" class="form-control" placeholder="New Text" data-bind="textInput: newText">
+            </div>
+            <div>
+                <span class="form-check">
+                    <input id="case-insensitive-input" type="checkbox" data-bind="checked: caseInsensitive">
+                    <label for="case-insensitive-input" data-bind="text: $root.translations.caseInsensitive"></label>
+                </span>
+            </div>
+        </div>
+        <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
+            <span data-bind="text: $root.translations.preview"></span>
+        </button>
+    </section>
+    <!-- ko if: showPreview-->
+    <section  class="etl-preview">
+        <h3 style="margin-top: 0px;">
+            <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
+        </h3>
+        <table class="table table-striped csv-mapping-table">
+            <thead>
+                <tr>
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
+                        <span data-bind="text: $root.translations.before"></span>
+                    </th>
+                    <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
+                        <span data-bind="text: $root.translations.after"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="value: console.log(previewValue())">
+                <!-- ko foreach: { data: previewValue(), as: "row" } -->
+                <!-- ko if: row[0] -->
+                <tr>
+                    <td style="vertical-align: text-top;" data-bind="html: row[0]"></td>
+                    <td style="vertical-align: text-top;" data-bind="html: row[1]"></td>
+                </tr>
+                <!-- /ko -->
+                <!-- /ko -->
+            </tbody>
+        </table>
+    </section>
+    <!-- /ko -->
+</div>
+<div class="tabbed-workflow-footer, etl-module-footer">
+    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !ready()}" class="btn btn-success">
+        <span data-bind="text: $root.translations.start"></span>
+    </button>
+</div>
+</div>
+<!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div>
+    <h4>
+        <span data-bind="text: $root.translations.bulkDataEditDetails"></span>
+    </h4>
+    <!-- ko if: load_details -->
+    <!-- ko ifnot: loading() -->
+    <table class="table table-striped" style="border:1px solid #ddd;">
+        <tbody>
+            <tr>
+                <td style="min-width: 200px;"><span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEditied"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameEdited"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: load_details.node"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.searchUrl"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: load_details.search_url"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
+                <td>
+                    <span class="etl-loading-metadata-value"
+                        data-bind="text: load_details.number_of_resources"
+                    ></span>
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation"></span></td>
+                <td>
+                    <span class="etl-loading-metadata-value" data-bind="text: operationLabel[load_details.operation]"></span>
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.details"></span></td>
+                <td>
+                    <!-- ko if: ['replace', 'replace_i'].includes(load_details.operation) -->
+                    <span class="etl-loading-metadata-value" data-bind="text: load_details.details.old_text"></span>
+                    <i class="fa fa-long-arrow-right"></i>
+                    <span class="etl-loading-metadata-value" data-bind="text: load_details.details.new_text"></span>
+                    <!-- /ko -->
+                </td>      
+            </tr>
+        </tbody>
+    </table>
+    <!-- /ko -->
+    <!-- /ko -->
+</div>
+{% endblock etl_status %}

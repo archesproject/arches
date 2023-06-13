@@ -1,13 +1,15 @@
+@import "css/themes/default";
+
 #container.cls-container.arches-login {
-    background: rgb(236, 238, 241);
+    background: $auth-background;
 }
 
 .arches-login>.cls-header {
-    background: rgb(236, 238, 241);
+    background: $auth-background;
 }
 
 .arches-login div .cls-brand:after {
-    background: rgb(236, 238, 241);
+    background: $auth-background;
 }
 
 .cls-content.arches-signin {
@@ -19,11 +21,8 @@
 }
 
 .arches-signin-subtext {
-    padding: 0px 5px 10px 5px;
+    padding: 0px 5px 20px 5px;
     color: #888;
-}
-
-legend.arches-signin-subtext {
     font-size: 1em;
     font-weight: normal;
     border: none;
@@ -49,13 +48,14 @@ legend.arches-signin-subtext {
 
 .floating-label-input:focus ~ .floating-label, 
 .floating-label-input:valid ~ .floating-label {
-    top: -2.5em;
-    font-size: 0.8em;   
+    top: -1.7em;
+    padding: 0px;
 }
 
 .floating-label-input.change-password:focus ~ .floating-label, 
 .floating-label-input.change-password:valid ~ .floating-label {
-    top: -0.85em; 
+    top: -0.55em; 
+    padding: 0px;
 }
 
 .floating-label {
@@ -70,7 +70,7 @@ legend.arches-signin-subtext {
 }
 
 .floating-label.change-password {
-    top: 2em;
+    top: 1.3em;
     color: #888;
 }
 
@@ -84,7 +84,7 @@ legend.arches-signin-subtext {
 }
 
 .arches-signin .panel-footer a {
-    color: steelblue;
+    color: $link-color;
     font-weight: 600;
 }
 
@@ -100,7 +100,7 @@ legend.arches-signin-subtext {
 }
 
 .cls-container .account-management a {
-    color: steelblue;
+    color: $link-color;
 }
 
 .account-link {
@@ -177,12 +177,14 @@ legend.arches-signin-subtext {
     text-align: start;
     position: relative;
     padding: 10px 15px;
+    margin: 0px;
     height: 40px;
     background-color: #f5f6f7;
     color: #5c7174;
     line-height: 1.1;
     border-bottom: solid 0.5px #babebf;
     font-weight: 300;
+    font-size: 14px;
 }
 
 .change-password-buttons {
