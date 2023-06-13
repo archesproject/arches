@@ -13,7 +13,8 @@ define([
     'geojson-extent',
     'uuid',
     'geojsonhint',
-], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
+    'utils/aria',
+], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint, ariaUtils) {
     var componentName = 'map-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -603,15 +604,7 @@ define([
             }
         },
         
-        toggleAriaExpanded: function(id) {
-            var x = document.getElementById(id).getAttribute("aria-expanded"); 
-            if (x == "true") {
-                x = "false";
-            } else {
-                x = "true";
-            }
-            document.getElementById(id).setAttribute("aria-expanded", x);
-        }
+        toggleAriaExpanded: ariaUtils.toggleAriaExpanded
     });
 
     return ko.components.register(componentName, {
