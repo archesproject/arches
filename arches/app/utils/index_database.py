@@ -86,6 +86,7 @@ def index_resources(
     resource_types = (
         models.GraphModel.objects.filter(isresource=True)
         .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        .exclude(publication=None)
         .values_list("graphid", flat=True)
     )
     index_resources_by_type(
