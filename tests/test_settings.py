@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from arches.settings import *
+import arches
 import os
 import inspect
 
@@ -30,6 +31,9 @@ ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, "..", "arches"))
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
+
+MIN_ARCHES_VERSION = arches.__version__
+MAX_ARCHES_VERSION = arches.__version__
 
 # LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
 # data migration tests, which could add over a minute to the test process. It's
@@ -112,9 +116,9 @@ LANGUAGES = [
 ]
 
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
     try:
-        from settings_docker import *
+        from .settings_docker import *
     except ImportError:
         pass
