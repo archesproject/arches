@@ -1319,6 +1319,7 @@ class Command(BaseCommand):
                         "legend",
                         "searchonly",
                         "sortorder",
+                        "ispublic",
                     ]
                     arches_metadata = data["arches-metadata"] if "arches-metadata" in data else {}
                     if "icon" not in arches_metadata:
