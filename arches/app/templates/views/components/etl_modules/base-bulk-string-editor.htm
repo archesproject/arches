@@ -5,49 +5,68 @@
 <!-- ko ifnot: loading() -->
 <div class="etl-module-component-container">
 <div class="etl-module-body">
-    <h3>
+    <h2>
         <span data-bind="text:
             operation() == 'trim' ? $root.translations.bulkStringEditorTrim
             : operation() == 'case' ? $root.translations.bulkStringEditorChangeCase
             : operation() == 'replace' ? $root.translations.bulkStringEditorReplace
             : ''
         "></span>
-    </h3>
-    <div>
-        <!-- ko if: operation() == 'case'-->
-        <h4>
-            <span data-bind="text: $root.translations.SelectEditOperation"></span>
-        </h4>
-        <select data-bind="
-            value: selectedCaseOperation,
-            options: caseOperations,
-            optionsText: 'label',
-            optionsValue: 'name',
-            optionsCaption: $root.translations.select + '...',
-            valueAllowUnset: true,
-            chosen: {width: '500px'}"
-        ></select>
-        <!-- /ko -->
-    </div>
-    <div class="etl-module-component">
-        <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
-            <input type="checkbox" data-bind="checked: trim">
-            <span data-bind="text: $root.translations.removeLeadingTrailingSpaces"></span>
-        </div>
-        <div>
-            <h4>
-                <span data-bind="text: $root.translations.useSearchUrl"></span>
-            </h4>
-            <textarea 
+    </h2>
+    <!-- ko if: operation() == 'trim'-->
+    <p class="pad-btm">
+        {% blocktrans %}Removes all leading and trailing whitespace from the selected data{% endblocktrans %}
+    </p>
+    <!-- /ko -->
+    <!-- ko if: operation() == 'case'-->
+    <p class="pad-btm">
+        {% blocktrans %}Changes the case of all words in the selected data to upper case or lower case, or capitalizes those words{% endblocktrans %}
+    </p>
+    <!-- /ko -->
+    <!-- ko if: operation() == 'replace'-->
+    <p class="pad-btm">
+        {% blocktrans %}Find and replace words or phrases within a larger text{% endblocktrans %}
+    </p>
+    <!-- /ko -->
+    <section class="etl-module-component">
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+            </h3>
+            <textarea id="search-url-input"
                 style="min-height: 100px; width: 80%;"
                 class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
             ></textarea>
         </div>
-        <div>
-            <h4>
-                <span data-bind="text: $root.translations.selectAResourceModel"></span>
-            </h4>
-            <select data-bind="
+
+        <!-- ko if: operation() == 'case'-->
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="case-operation-select" data-bind="text: $root.translations.selectEditOperation"></label>
+            </h3>
+            <select id="case-operation-select" data-bind="
+                value: selectedCaseOperation,
+                options: caseOperations,
+                optionsText: 'label',
+                optionsValue: 'name',
+                optionsCaption: $root.translations.select + '...',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+            <div data-bind="ifnot: ['trim', 'replace'].includes(operation())">
+                <span class="form-check">
+                    <input id="trim-checkbox" type="checkbox" data-bind="checked: trim">
+                    <label for="trim-checkbox" data-bind="text: $root.translations.removeLeadingTrailingSpaces"></label>
+                </span>
+            </div> 
+        </div>
+        <!-- /ko -->
+
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
+            </h3>
+            <select id="resource-model-select" data-bind="
                 value: selectedGraph,
                 options: graphs,
                 optionsText: 'name',
@@ -55,14 +74,15 @@
                 optionsCaption: $root.translations.select + '...',
                 valueAllowUnset: true,
                 chosen: {width: '500px'}"
-            ></select>    
+            ></select>
         </div>
+        
         <!-- ko if: nodes() -->
-        <div>
-            <h4>
-                <span data-bind="text: $root.translations.selectANode"></span>
-            </h4>
-            <select data-bind="
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="node-select" data-bind="text: $root.translations.selectANode"></label>
+            </h3>
+            <select id="node-select" data-bind="
                 value: selectedNode,
                 options: nodes,
                 optionsText: 'label',
@@ -73,11 +93,11 @@
             ></select>
         </div>
         <!-- /ko -->
-        <div>
-            <h4>
-                <span data-bind="text: $root.translations.language"></span>
-            </h4>
-            <select data-bind="
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="language-select" data-bind="text: $root.translations.language"></label>
+            </h3>
+            <select id="language-select" data-bind="
                 options: languages,
                 optionsCaption: $root.translations.select + '...',
                 optionsText: function(item){return item.name + ' (' + item.code + ')'},
@@ -85,27 +105,36 @@
                 chosen: {width: '500px'}"
             ></select>
         </div>
-        <div data-bind="if: operation() === 'replace'">
-            <h4>
-                <span data-bind="text: $root.translations.from"></span>
-            </h4>
-            <input type="text" style="width: 500px;" class="form-control" placeholder="Old Text" data-bind="textInput: oldText">
-            <input type="checkbox" data-bind="checked: caseInsensitive">
-            <span data-bind="text: $root.translations.caseInsensitive"></span>
-            <h4>
-                <span data-bind="text: $root.translations.to"></span>
-            </h4>
-            <input type="text" style="width: 500px;" class="form-control" placeholder="New Text" data-bind="textInput: newText">
+        <div class="etl-module-component-block" data-bind="if: operation() === 'replace'">
+            <div class="etl-from-to">
+                <h3>
+                    <label for="old-text-input" data-bind="text: $root.translations.from"></label>
+                </h3>
+                <input id="old-text-input" type="text" class="form-control" placeholder="Old Text" data-bind="textInput: oldText">
+            </div>
+            <i class="fa fa-arrow-right" style="margin: 0px 2px;"></i>
+            <div class="etl-from-to">
+                <h3>
+                    <label for="new-text-input" data-bind="text: $root.translations.to"></label>
+                </h3>
+                <input id="new-text-input" type="text" class="form-control" placeholder="New Text" data-bind="textInput: newText">
+            </div>
+            <div>
+                <span class="form-check">
+                    <input id="case-insensitive-input" type="checkbox" data-bind="checked: caseInsensitive">
+                    <label for="case-insensitive-input" data-bind="text: $root.translations.caseInsensitive"></label>
+                </span>
+            </div>
         </div>
-        <button style="margin: 25px 8px;" data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
+        <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
         </button>
-    </div>
+    </section>
     <!-- ko if: showPreview-->
-    <div>
-        <div>
+    <section  class="etl-preview">
+        <h3 style="margin-top: 0px;">
             <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
-        </div>
+        </h3>
         <table class="table table-striped csv-mapping-table">
             <thead>
                 <tr>
@@ -117,7 +146,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody data-bind="value: console.log(previewValue())">
                 <!-- ko foreach: { data: previewValue(), as: "row" } -->
                 <!-- ko if: row[0] -->
                 <tr>
@@ -128,7 +157,7 @@
                 <!-- /ko -->
             </tbody>
         </table>
-    </div>
+    </section>
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
