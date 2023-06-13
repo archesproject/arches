@@ -251,7 +251,7 @@
         concept-collection='{% trans "Concept Collection" as conceptCollection %} "{{ conceptCollection|escapejs }}"'
         select-a-concept-collection='{% trans "Select a concept collection" as selectAConceptCollection %} "{{ selectAConceptCollection|escapejs }}"'
         search-url='{% trans "Search Url" as SearchUrl %} "{{ SearchUrl|escapejs }}"'
-        use-search-url='{% trans "Use search url" as useSearchUrl %} "{{ useSearchUrl|escapejs }}"'
+        use-search-url='{% trans "Use search url (otional)" as useSearchUrl %} "{{ useSearchUrl|escapejs }}"'
         before='{% trans "Before" as before %} "{{ before|escapejs }}"'
         after='{% trans "After" as after %} "{{ after|escapejs }}"'
         case-insensitive='{% trans "Case Insensitive" as caseInsensitive %} "{{ caseInsensitive|escapejs }}"'
@@ -741,9 +741,9 @@
         running='{% trans "running" as running %} "{{ running|escapejs }}"'
         unloading='{% trans "unloading" as unloading %} "{{ unloading|escapejs }}"'
         unloaded='{% trans "unloaded" as unloaded %} "{{ unloaded|escapejs }}"'
-        bulk-string-editor-trim='{% trans "Bulk String Editor - Trim" as bulkStringEditorTrim %} "{{ bulkStringEditorTrim|escapejs }}"'
+        bulk-string-editor-trim='{% trans "Trim Whitespace" as bulkStringEditorTrim %} "{{ bulkStringEditorTrim|escapejs }}"'
         bulk-string-editor-change-case='{% trans "Bulk String Editor - Change Case" as bulkStringEditorChangeCase %} "{{ bulkStringEditorChangeCase|escapejs }}"'
-        bulk-string-editor-replace='{% trans "Bulk String Editor - Replace" as bulkStringEditorReplace %} "{{ bulkStringEditorReplace|escapejs }}"'
+        bulk-string-editor-replace='{% trans "Replace Text" as bulkStringEditorReplace %} "{{ bulkStringEditorReplace|escapejs }}"'
         select-edit-operation='{% trans "Select an Edit Operation" as SelectEditOperation %} "{{ SelectEditOperation|escapejs }}"'
         preview-count-stats='(limit, possible, resCount) => {return {% trans "Showing first ${limit} of ${possible} values in ${resCount} resources" as previewCountStats %} `{{ previewCountStats|escapejs }}` }'
         show='{% trans "show" as show %} "{{ show|escapejs }}"'
@@ -954,7 +954,8 @@
             "centerx": {{ map_layer.centerx|default_if_none:"null"|unlocalize }},
             "centery": {{ map_layer.centery|default_if_none:"null"|unlocalize }},
             "zoom": {{ map_layer.zoom|default_if_none:"null"|unlocalize }},
-            "sortorder": {{ map_layer.sortorder }}
+            "sortorder": {{ map_layer.sortorder }},
+            "ispublic": {{ map_layer.ispublic|lower }}
         },{% endfor %}{% for resource_map_layer in resource_map_layers %}{
             "maplayerid": "{{ resource_map_layer.nodeid }}",
             "name": "{{ resource_map_layer.name }}",
