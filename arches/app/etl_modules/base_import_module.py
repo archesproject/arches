@@ -123,7 +123,9 @@ class BaseImportModule(object):
         except:
             value = source_value
         try:
-            errors = datatype_instance.validate(value, **config)
+            errors =[]
+            if value is not None:
+                errors = datatype_instance.validate(value, **config)
         except:
             message = "Unexpected Error Occurred"
             title = "Invalid {} Format".format(datatype_instance.datatype_name)
