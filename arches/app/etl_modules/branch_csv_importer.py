@@ -148,7 +148,7 @@ class BranchCsvImporter(BaseImportModule):
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-                raise ValueError("All the row should to have the valid id")
+                raise ValueError(_("All rows must have a valid resource id"))
             if str(resourceid).strip() in ("--", "resource_id"):
                 nodegroup_alias = cell_values[1][0:-4].strip().split(" ")[0].strip()
                 data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
@@ -209,7 +209,7 @@ class BranchCsvImporter(BaseImportModule):
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-                raise ValueError("A graphid is not available in the metadata worksheet")
+                raise ValueError(_("A graphid is not available in the metadata worksheet"))
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
             for worksheet in workbook.worksheets:
