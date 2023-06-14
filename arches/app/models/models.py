@@ -477,7 +477,7 @@ class GraphModel(models.Model):
     def get_published_graph(self, language=None):
         if not language:
             language = translation.get_language()
-        
+
         try:
             graph = PublishedGraph.objects.get(publication=self.publication, language=language)
         except PublishedGraph.DoesNotExist:
@@ -1272,7 +1272,7 @@ class MapLayer(models.Model):
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
     sortorder = models.IntegerField(default=0)
-    ispublic = models.BooleanField(default=False)
+    ispublic = models.BooleanField(default=True)
 
     @property
     def layer_json(self):
