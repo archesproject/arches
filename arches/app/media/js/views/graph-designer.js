@@ -50,7 +50,7 @@ define([
                 else if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     shouldShowGraphPublishButtons = false;
                 }
-                else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                else if (viewModel.isNodeDirty()) {
                     shouldShowGraphPublishButtons = false;
                 }
                 else if (ko.unwrap(viewModel.cardTree.selection)) {
@@ -67,6 +67,10 @@ define([
                 return shouldShowGraphPublishButtons;
             });
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+
+            viewModel.isNodeDirty = ko.pureComputed(function() {
+                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
+            });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -289,9 +293,9 @@ define([
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         }
 
-                        viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         viewModel.loading(false);
                     });
                 }
