@@ -6314,7 +6314,7 @@ th.notif-type {
     font-weight: 700;
 }
 
-.ep-help-topic-toggle>h4 {
+.ep-help-topic-toggle>.h4 {
     display: inline-block;
 }
 
@@ -9943,35 +9943,25 @@ ul.pagination {
     z-index: 1;
 }
 
-.time-search-container {
-    padding: 20px;
-    background: #fff;
+.arches-select2 .select2-choices .select2-search-field {
+    height: 34px;
 }
 
-.time-search-container .calendar {
-    display: block;
-    width: inherit;
-    padding-left: 5px;
-    max-width: 152px;
+.select2-container-multi .select2-choices {
+    min-height: 36px !important;
+    z-index: 10;
 }
 
-.time-search-container #calendar {
-    display: flex;
-    flex-wrap: wrap;
+.select2-container-multi .select2-choices .select2-search-field input {
+    margin: 3px 10px;
 }
 
-.time-search-container #calendar .calendar .search-label {
-    margin-top: 10px;
+.arches-select2 .select2-choices .select2-search-field input {
+    margin-top: 3px;
 }
 
-.hide-datepicker-time-option .bootstrap-datetimepicker-widget table td span {
-    display: none;
-}
-
-.calendar.picker {
-    max-width: 175px;
-    min-width: 175px;
-    position: relative;
+.select2-container.select2-container-multi.select2-container-disabled.select2-container-disabled .select2-search-choice {
+    color: #999;
 }
 
 .dropdown-crud {
@@ -9992,38 +9982,6 @@ ul.pagination {
     width: 400px;
 }
 
-.calendar {
-    display: table-cell;
-    width: 180px;
-    padding-left: 5px;
-}
-
-.calendar div .form-control[disabled] {
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    color: #777;
-}
-
-.datepicker-inline {
-    background: #fff;
-    border-width: 0px;
-}
-
-.search-label {
-    font-weight: 400;
-    font-size: 15px;
-    margin-bottom: 3px;
-}
-
-#calendar .chosen-container-single .chosen-single {
-    height: 35px;
-    padding-top: 8px;
-}
-
-#calendar .chosen-container-single .chosen-single div b:before {
-    vertical-align: -70%;
-}
-
 .rr-display-toggle {
     width: 100px;
 }
@@ -10040,8 +9998,6 @@ ul.pagination {
     font-size: 19px;
     font-weight: 500;
 }
-
-.related-resources-relationship {}
 
 .related-resources-relationship .dropdown-menu {
     left: auto;
