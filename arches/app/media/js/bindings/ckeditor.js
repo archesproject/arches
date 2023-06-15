@@ -19,6 +19,7 @@ define([
         var value = ko.utils.unwrapObservable(valueAccessor());
         const language = allBindings.get('language') || ko.observable(arches.activeLanguage);
         const direction = allBindings.get('direction') || ko.observable(arches.activeLanguageDir);
+        const title = allBindings.get('title') || ko.observable('Rich Text Editor');
         var $element = $(element);
         var options = {bodyId: 'ckeditor'};
         const languageList = [];
@@ -31,6 +32,7 @@ define([
         CKEDITOR.config.language = language();
         CKEDITOR.config.contentsLangDirection = direction();
         CKEDITOR.config.autoParagraph = false;
+        CKEDITOR.config.title = title();
         CKEDITOR.config.toolbar = [
             { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
             { name: 'editing', groups: [ /* 'find' , 'selection',*/ 'spellchecker' ], items: [ /* 'Find', 'Replace', '-', 'SelectAll', '-',*/ 'Scayt' ] },
