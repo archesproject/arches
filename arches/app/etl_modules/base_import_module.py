@@ -73,7 +73,7 @@ class BaseImportModule(object):
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                     ("completed", datetime.now(), loadid),
                 )
-                index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False)
+                index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                     ("indexed", datetime.now(), True, True, loadid),
@@ -123,7 +123,9 @@ class BaseImportModule(object):
         except:
             value = source_value
         try:
-            errors = datatype_instance.validate(value, **config)
+            errors =[]
+            if value is not None:
+                errors = datatype_instance.validate(value, **config)
         except:
             message = "Unexpected Error Occurred"
             title = "Invalid {} Format".format(datatype_instance.datatype_name)
