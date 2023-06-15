@@ -11,7 +11,7 @@
                     click: function() { showi18nOptions(!showi18nOptions()); },
                     attr: {
                         'aria-expanded': showi18nOptions().toString(), 
-                        'aria-label': label() + ' ' + $root.translations.languageSettings,
+                        'aria-label': $root.translations.languageSettingsLabel(label()),
                         'aria-controls': uid
                     },
                 "
@@ -106,7 +106,7 @@
             click: function() { showi18nOptions(!showi18nOptions()); },
             attr: {
                 'aria-expanded': showi18nOptions().toString(), 
-                'aria-label': $root.translations.defaultValue + ' ' + $root.translations.languageSettings,
+                'aria-label': $root.translations.languageSettingsLabel($root.translations.defaultValue),
                 'aria-controls': uid,
             },
         "
