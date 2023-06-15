@@ -71,10 +71,17 @@
         <section class="flex" style="flex-direction: column" aria-label="{% trans 'Map and filters' %}">
             <!-- Title Block -->
             <div class="search-toolbar">
-                <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
                     <!-- ko if: filter.type === 'filter' && filter.enabled -->
                     {% if user_can_read %}
-                    <button class="search-type-btn relative" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)}">
+                    <button class="search-type-btn relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
+                        css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, 
+                        click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)},
+                        attr: {
+                            'aria-selected': ($parent.sharedStateObject.selectedTab() === filter.componentname).toString(), 
+                            'aria-controls': filter.componentname + '-tabpanel'
+                        }                  
+                    ">
                         <i data-bind="css: filter.icon"></i>
                         <span data-bind="text: filter.name"></span>
                     </button>
@@ -83,10 +90,18 @@
                 </div>
 
                 <div class="search-type-btn-popup-panel">
-                    <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
                         {% if user_can_read %}
-                        <button class="saved-search-container search-type-btn-popup relative" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); }">
+                        <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
+                            css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, 
+                            click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); },
+                            attr: {
+                                'aria-selected': ($parent.sharedStateObject.selectedPopup() === filter.componentname).toString(),
+                                'aria-label': filter.name,
+                                'aria-controls': filter.componentname + '-popup-tabpanel'
+                            }
+                        ">
                             <i data-bind="css: filter.icon"></i>
                             <!-- <p data-bind="text: filter.name"></p> -->
                         </button>
@@ -101,7 +116,7 @@
                 <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}">
+                        <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, attr: {id: filter.componentname + '-tabpanel'}">
                             <div style="height: calc(100vh - 100px)" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
@@ -112,7 +127,7 @@
 
                     <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        <div class="tab-pane" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}">
+                        <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, attr: {id: filter.componentname + '-popup-tabpanel'}">
                             <div data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
