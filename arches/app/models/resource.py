@@ -187,10 +187,10 @@ class Resource(models.ResourceInstance):
         tiles = sorted(tiles, key=lambda t: t.parenttile is not None, reverse=True)
 
         # need to save the models first before getting the documents for index
+        fetchTiles = True
 
         if overwrite == "append":
             TileModel.objects.bulk_create(tiles)
-            fetchTiles = True
 
             # save edits for new tiles on existing resources
             Tile.bulk_save_edits(
@@ -226,8 +226,8 @@ class Resource(models.ResourceInstance):
 
             Resource.objects.bulk_create(resources_to_create)
             TileModel.objects.bulk_create(tiles)
-            new_resource_tiles = [t for t in tiles if uuid.UUID(t.resourceinstance_id) not in existing_resources_ids]
-            existing_resource_tiles = [t for t in tiles if uuid.UUID(t.resourceinstance_id) in existing_resources_ids]
+            new_resource_tiles = [t for t in tiles if t.resourceinstance_id not in existing_resources_ids]
+            existing_resource_tiles = [t for t in tiles if t.resourceinstance_id in existing_resources_ids]
             tiles.clear()
 
             # save edits for new tiles on new resources
