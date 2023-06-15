@@ -41,12 +41,10 @@
                             <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
                             <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
                             <!--/ko-->
-                            <span style="width:125px">
-                                <div data-bind="component: {
-                                    name: 'sort-results',
-                                    params: sharedStateObject
-                                }"></div>
-                            </span>
+                            <div data-bind="component: {
+                                name: 'sort-results',
+                                params: sharedStateObject
+                            }"></div>
                         </div>
                     </div>
                 </div>
