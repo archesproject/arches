@@ -2,6 +2,7 @@ define([
     'knockout',
     'viewmodels/domain-widget',
     'templates/views/components/widgets/radio.htm',
+    'bindings/key-events-click',
 ], function(ko, DomainWidgetViewModel, radioTemplate) {
     /**
      * registers a select-widget component for use in forms
