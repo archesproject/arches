@@ -18,6 +18,7 @@ import logging
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.db.models import JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
@@ -1749,3 +1750,15 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+
+class DataMigration(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")
+    name = models.TextField()
+    operation = models.TextField()
+    resource_instance_ids = ArrayField(models.UUIDField(blank=True))
+    applied = models.DateTimeField(auto_now_add=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = "data_migrations"
