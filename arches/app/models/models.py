@@ -18,6 +18,9 @@ from django.db.models import Case, F, JSONField, Max, Q, Value, When
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import CombinedExpression
 from django.db.models.functions import Concat, Lower
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import JSONField
+from django.db.models import Q, Max
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -2819,6 +2822,20 @@ class UserPreference(models.Model):
                 name="unique_preference_name_user",
             )
         ]
+
+
+class DataMigration(models.Model):
+    id = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+    )
+    name = models.TextField()
+    operation = models.TextField()
+    resource_instance_ids = ArrayField(models.UUIDField(blank=True))
+    applied = models.DateTimeField(auto_now_add=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = "data_migrations"
 
 
 # Import proxy models to ensure they are always discovered.
