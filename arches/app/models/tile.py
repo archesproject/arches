@@ -566,7 +566,7 @@ class Tile(models.TileModel):
 
     def is_blank(self):
         if self.data != {}:
-            if len([item for item in list(self.data.values()) if item is not None]) > 0:
+            if any(self.data.values()):
                 return False
 
         child_tiles_are_blank = True
