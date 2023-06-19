@@ -309,9 +309,9 @@
                 </div>
 
                 <!-- Top Right Nav  -->
-                <div role="navigation" class="col-xs-12 col-sm-4">
+                <div class="col-xs-12 col-sm-4">
 
-                    <ul role="list" class="top-right-nav">
+                    <ul class="top-right-nav" role="navigation" aria-label="{% trans 'User and User Actions Navigation' %}">
                         
                         <!-- Login -->
                         {% if nav.login %}
@@ -347,7 +347,10 @@
                         <!-- Notifications -->
                         {% if nav.notifs %}
                         <li>
-                            <button class="ep-tools ep-notifs-toggle ep-tools-right" data-bind="click: function() {getNotifications();}" aria-label="{% trans 'Show recent notifications' %}">
+                            <button class="ep-tools ep-notifs-toggle ep-tools-right" 
+                                data-bind="click: function() {getNotifications();}" aria-label="{% trans 'Show recent notifications' %}"
+                                aria-controls="ep-notifs-panel" aria-expanded="false" data-toggle="collapse" data-target="#ep-notifs-panel"
+                            >
                                 <div data-placement="bottom" data-toggle="tooltip"
                                     data-original-title="{% trans 'Notifications' %}">
                                     <div>
@@ -377,7 +380,9 @@
                         {% if user_is_reviewer == False and user_can_edit %}
                         <li>
                             <button class="ep-edits-toggle ep-tools ep-tools-right"
-                                data-bind="click:function () { getProvisionalHistory(); }" aria-label="{% trans 'Show my recent edits' %}">
+                                data-bind="click:function () { getProvisionalHistory(); }" aria-label="{% trans 'Show my recent edits' %}"
+                                aria-controls="ep-edits-panel" aria-expanded="false" data-toggle="collapse" data-target="#ep-edits-panel"
+                            >
                                 <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "My Recent Edits" %}">
                                     <i class="ion-clock"></i>
                                 </div>
@@ -408,8 +413,10 @@
 
                         {% if nav.help %}
                         <li>
-                            <button class="ep-help-toggle ep-tools ep-tools-right" aria-label="{% trans 'Show help' %}"
-                                data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }">
+                            <button class="ep-help-toggle ep-tools ep-tools-right"
+                                data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }"
+                                aria-label="{% trans 'Show help' %}" aria-controls="ep-help-panel" aria-expanded="false" data-toggle="collapse" data-target="#ep-help-panel"
+                            >
                                 <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
                                     <i class="ion-help"></i>
                                 </div>
