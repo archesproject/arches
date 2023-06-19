@@ -15,18 +15,18 @@ class UpdatePublicationId(Operation):
     reversible = True
 
     @staticmethod
-    def get_current_migration():
+    def get_current_migration_name(app_label):
         connection = connections[DEFAULT_DB_ALIAS]
         connection.prepare_database()
         executor = MigrationExecutor(connection)
         targets = executor.loader.graph.leaf_nodes()
-        migration_list = executor.migration_plan(targets)
-        
-        current_migration = None
-        if len(migration_list):
-            current_migration = migration_list[0][0]
 
-        return current_migration
+        migration = None
+        for target in targets:
+            if target[0] == app_label:
+                migration = target[1]
+
+        return migration
 
     def __init__(self, current_publication_id, updated_publication_id):
         self.current_publication_id = current_publication_id
@@ -41,11 +41,12 @@ class UpdatePublicationId(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # The Operation should use schema_editor to apply any changes it
         # wants to make to the database.
-        current_migration = self.get_current_migration()
+        current_migration_name = self.get_current_migration_name(app_label=app_label)
         operation_name = self.__class__.__name__
 
         data_migration = models.DataMigration.objects.create(
-            name=current_migration.name,
+            name=current_migration_name,
+            app=app_label,
             operation = operation_name,
             resource_instance_ids=[ 
                 resource_instance_id 
@@ -61,10 +62,14 @@ class UpdatePublicationId(Operation):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # If reversible is True, this is called when the operation is reversed.
-        most_recent_migration = MigrationRecorder.Migration.objects.latest('id')
+        current_migration_name = self.get_current_migration_name(app_label=app_label)
         operation_name = self.__class__.__name__
 
-        data_migration = models.DataMigration.objects.filter(name=most_recent_migration.name, operation=operation_name).last()
+        data_migration = models.DataMigration.objects.filter(
+            name=current_migration_name, 
+            app=app_label,
+            operation=operation_name
+        ).last()
 
         schema_editor.execute(
             """
