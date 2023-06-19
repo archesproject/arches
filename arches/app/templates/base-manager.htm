@@ -281,12 +281,20 @@
 
                     <!-- Tools Menu -->
                     {% if nav.menu %}
-                        <a id="menu-control" href="" class="ep-tools ep-tool-title"
-                            data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
-                            <div class="flex">{% trans "Manage" %}
-                                <i class="ion-more" style="padding: 0px 5px;"></i>
-                            </div>
-                        </a>
+                        <nav aria-label="{% trans 'Graph and Resource Management' %}">
+                            <button id="menu-control" class="ep-tools ep-tool-title"
+                                data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false,
+                                    attr: {
+                                        'aria-expanded': menuActive().toString(),
+                                        'aria-controls': '#menu-panel'
+                                    }
+                                "
+                            >
+                                <div class="flex">{% trans "Manage" %}
+                                    <i class="ion-more" style="padding: 0px 5px;"></i>
+                                </div>
+                            </button>
+                        </nav>
                         {% if main_script == 'views/resource/editor' %}
                             {% include 'navbar/resource-manage-menu.htm' %}
                         {% elif main_script == 'views/graph/function-manager' %}
@@ -309,9 +317,9 @@
                 </div>
 
                 <!-- Top Right Nav  -->
-                <div class="col-xs-12 col-sm-4">
+                <nav class="col-xs-12 col-sm-4" aria-label="{% trans 'User and User Actions Navigation' %}">
 
-                    <ul class="top-right-nav" role="navigation" aria-label="{% trans 'User and User Actions Navigation' %}">
+                    <ul class="top-right-nav" aria-label="{% trans 'User and User Actions Navigation' %}">
                         
                         <!-- Login -->
                         {% if nav.login %}
@@ -441,7 +449,7 @@
 
                     </ul>
 
-                </div>
+                </nav>
 
             <!-- Notifications Panel -->
             <div id="ep-notifs-panel" class="ep-notifs" style="display:none;">
