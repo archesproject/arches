@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
             name='DataMigration',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('app', models.TextField()),
                 ('name', models.TextField()),
                 ('operation', models.TextField()),
                 ('resource_instance_ids', django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(blank=True), size=None)),

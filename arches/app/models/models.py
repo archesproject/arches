@@ -1754,6 +1754,7 @@ class SpatialView(models.Model):
 
 class DataMigration(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")
+    app = models.TextField()
     name = models.TextField()
     operation = models.TextField()
     resource_instance_ids = ArrayField(models.UUIDField(blank=True))
