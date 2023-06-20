@@ -47,6 +47,7 @@ class Command(BaseCommand):
                 "groups": [
                     "Graph Editor",
                     "Resource Editor",
+                    "Resource Exporter",
                     "Resource Reviewer",
                     "Application Administrator",
                     "Crowdsource Editor",
