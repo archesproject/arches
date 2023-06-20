@@ -1,37 +1,37 @@
 {% load static %}
 {% load i18n %}
 <div id="menu-panel" class="ep-menu" style="display: none;" data-bind="visible:menuActive()">
-    <div class="panel ep-menu-panel relative" style="">
+    <div class="panel ep-menu-panel relative">
 
         <!-- Menu List -->
-        <div class="panel-body">
-           <ul class="list-group ep-menu-list">
-                <!-- Menu Item -->
-                <li class="resource-selector" data-bind="click: function() { menuActive(true); }, clickBubble: false">
+        <nav class="panel-body">
+           <ul class="list-group ep-menu-list" role="menu">
+                <!-- Select Graph -->
+                <li class="resource-selector" role="menuitem" data-bind="click: function() { menuActive(true); }, clickBubble: false">
                     <select data-placeholder="{% trans "Select a graph..." %}" class="design" style="width:100px;" data-bind="value: graphid, options: allGraphs, optionsText: 'name', optionsValue: 'graphid', chosen: {'width': '100%'}"></select>
                 </li>
 
-                <!-- Menu Item -->
-                <li id="graph-manager" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}">
-                    <a href="{% url 'graph_designer' graphid %}" data-bind="click:function () { navigate('{% url 'graph_designer' graphid %}') }">
+                <!-- Manage Graph -->
+                <li id="graph-manager" role="menuitem" class="edit-menu-item {% if main_script == "views/graph/graph-manager" %} selected{% endif %}" aria-describedby="graph-manager-desc">
+                    <a href="{% url 'graph_designer' graphid %}" data-bind="click:function () { navigate('{% url 'graph_designer' graphid %}') }" aria-labelledby="graph-manager-label">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-sitemap"></i> {% trans "Graphs/Semantics" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Define graph" %}</span>
+                            <div class="menu-item-title"><i class="fa fa-sitemap"></i><span id="graph-manager-label"> {% trans "Graphs/Semantics" %}</span></div>
+                            <span id="graph-manager-desc" class="text-muted menu-item-subtitle">{% trans "Define graph" %}</span>
                         </div>
                     </a>
                 </li>
 
-                <!-- Menu Item -->
-                <li class="edit-menu-item">
-                    <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">
+                <!-- Designer Index -->
+                <li class="edit-menu-item" role="menuitem" aria-describedby="return-designer-index-desc">
+                    <a href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }" aria-labelledby="return-designer-index-label">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-tag"></i> {% trans "Return to Arches Designer" %}</div>
-                            <span class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
+                            <div class="menu-item-title"><i class="fa fa-tag"></i><span id="return-designer-index-label"> {% trans "Return to Arches Designer" %}</span></div>
+                            <span id="return-designer-index-desc" class="text-muted menu-item-subtitle">{% trans "Create Arches Resource Models and Branches" %} </span>
                         </div>
                     </a>
                 </li>
             </ul>
-        </div>
+        </nav>
         <div class="panel-footer ep-menu-footer hidden">
 
             {% trans "footer" %}
