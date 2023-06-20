@@ -42,6 +42,7 @@ define([
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
         this.renderContext = params.renderContext;
+        this.relationship = ko.observable();
         /* 
             shoehorn logic to piggyback off of search context functionality. 
             Should be refactored when we get the chance for better component clarity.
@@ -244,7 +245,7 @@ define([
                                         names.push(resourceInstance["_source"].displayname);
                                         self.displayValue(names.join(', '));
                                         val.resourceName(resourceInstance["_source"].displayname);
-                                        val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question');
+                                        val?.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question');
                                         val.ontologyClass(resourceInstance["_source"].root_ontology_class);
                                     }
                                 });
@@ -279,6 +280,7 @@ define([
                 inverseOntologyProperty = graph.config.inverseOntologyProperty;
 
                 if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
+                    self.relationship(self.node.config.graphs()?.[0]?.useOntologyRelationship);
                     var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
                         return nodeConfigGraph.graphid === graph.graphid;
                     });
