@@ -1416,10 +1416,7 @@ class CsvReader(Reader):
                         # if sort_str and "DETAILS" in sort_str:  # TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
                         #     continue
 
-                        if (
-                            (str(target_tile.nodegroup_id) in eval_nodegroups or str(target_tile.nodegroup_id) == component_nodegroupid)
-                            and group_valid
-                        ):
+                        if group_valid:
 
                             if str(target_tile.nodegroup_id) in eval_nodegroups:
                                 if group_no not in group_no_to_tileids:
