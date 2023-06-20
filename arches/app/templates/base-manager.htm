@@ -6,10 +6,10 @@
 {% block body %}
 
     <!-- ko if: alert() -->
-    <div data-bind="visible: alert().active" style="display: none;" class="relative">
-        <div id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
+    <div data-bind="visible: alert().active" style="display: none;" class="relative" aria-live="assertive">
+        <dialog id="card-alert-panel" data-bind="css: 'ep-form-alert ' + (alert() ? alert().type() : '')">
             <div style="display: flex;">
-                <h4 style="flex: 1" class="ep-form-alert-title" data-bind="text: alert().title"></h4>
+                <div style="flex: 1" class="h4 ep-form-alert-title" data-bind="text: alert().title"></div>
                 <div class="ep-form-alert-default-dismiss">
                     <i class="fa fa-times-circle" data-bind="click: alert().close"></i>
                 </div>
@@ -18,13 +18,15 @@
 
             <div class="ep-form-alert-buttons">
                 <!-- ko if: alert().cancel -->
-                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel"><span>{% trans "Cancel" %}</span></button>
+                <button class="btn btn-sm btn-danger btn-labeled fa fa-times" data-bind="click: alert().cancel, hasFocus: (alert().cancel).toString()"
+                ><span>{% trans "Cancel" %}</span></button>
                 <!-- /ko -->
                 <!-- ko if: alert().ok -->
-                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok"><span>{% trans "OK" %}</span></button>
+                <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: alert().ok, hasFocus: (!alert().cancel && alert().ok).toString()"
+                ><span>{% trans "OK" %}</span></button>
                 <!-- /ko -->
             </div>
-        </div>
+        </dialog>
     </div>
     <!-- /ko -->
 
