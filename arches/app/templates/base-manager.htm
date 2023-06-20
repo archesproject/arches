@@ -281,7 +281,7 @@
 
                     <!-- Tools Menu -->
                     {% if nav.menu %}
-                        <nav aria-label="{% trans 'Graph and Resource Management' %}">
+                        <nav id="manage-top-left-nav" aria-label="{% trans 'Graph and Resource Management' %}">
                             <button id="menu-control" class="ep-tools ep-tool-title"
                                 data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false,
                                     attr: {
@@ -317,7 +317,7 @@
                 </div>
 
                 <!-- Top Right Nav  -->
-                <nav class="col-xs-12 col-sm-4" aria-label="{% trans 'User and User Actions Navigation' %}">
+                <nav class="col-xs-12 col-sm-4" id="user-actions-top-right-nav"> 
 
                     <ul class="top-right-nav" aria-label="{% trans 'User and User Actions Navigation' %}">
                         
