@@ -1156,8 +1156,8 @@ class CsvReader(Reader):
                 elif tile_to_populate.tiles is not None:
                     populated_child_tiles = []
                     populated_child_nodegroups = []
-                    for childtile in tile_to_populate.tiles:
-                        if str(childtile.nodegroup_id) in single_cardinality_nodegroups:
+                    for child_tile in tile_to_populate.tiles:
+                        if str(child_tile.nodegroup_id) in single_cardinality_nodegroups:
                             child_tile_cardinality = "1"
                         else:
                             child_tile_cardinality = "n"
