@@ -1001,16 +1001,7 @@ class CsvReader(Reader):
                 if parenttileid is not None:
                     prototype_tile_copy.parenttile.tileid = parenttileid
                 prototype_tile_copy.resourceinstance_id = resourceinstanceid
-                # if (
-                #     row["GROUP_NO"]
-                #     and row["GROUP_NO"] != ""
-                #     and row["GROUP_NO"] in group_no_to_tileids[row["ResourceID"]]
-                #     and str(prototype_tile_copy.nodegroup_id)
-                #     not in group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]]
-                # ):
-                #     group_no_to_tileids[row["ResourceID"]][row["GROUP_NO"]][
-                #         str(prototype_tile_copy.nodegroup_id)
-                #     ] = str(prototype_tile_copy.tileid)
+                
                 if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                     prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                     for target_key in list(prototype_tile_copy.data.keys()):
@@ -1409,8 +1400,6 @@ class CsvReader(Reader):
                         target_tile = get_blank_tile(source_data)  # Heres our parent tile, i.e. a semantic Evaluation or a Semantic
                         target_tile.tileid = uuid.uuid4()
 
-                        # group_no = False
-                        # group_valid = row["GROUP_NO"] and row["GROUP_NO"] != ""
                         if group_valid and not isinstance(row["GROUP_NO"], str):
                             row["GROUP_NO"] = str(row["GROUP_NO"])
 
@@ -1426,13 +1415,6 @@ class CsvReader(Reader):
                         #   }
                         # }
 
-                        # all the tiles should be flat except for the first appearance of a NG on a resource???
-
-                        # if there's an object in source_data that is node integiry, elgibility, or one of the component concept-list nodes, then aggregate on tile
-                        # TODO: figure out how to aggregate values without changing tiles (maybe don't append to populated_tiles later?)
-                        # append what we need to to the source data
-                        # if row['COMP_SORTORDER']
-                        # nodegroup_type = 'other'
                         preexisting_tile_for_resource_group_nodegroup = False
                         preexisting_eval_parenttile = False
                         sort_str = False
@@ -1442,9 +1424,6 @@ class CsvReader(Reader):
 
                         if "COMP_SORTORDER" in row and row["COMP_SORTORDER"] and row["COMP_SORTORDER"] != "":
                             sort_str = row["COMP_SORTORDER"]
-
-                        # if sort_str and "DETAILS" in sort_str:  # TODO NOT ADVISABLE TO JUST SKIP, TESTING PURPOSES ONLY
-                        #     continue
 
                         if group_valid:
 
@@ -1529,8 +1508,6 @@ class CsvReader(Reader):
                             target_tile.tileid = row["TileID"]
                         if "NodeGroupID" in row and row["NodeGroupID"] is not None:
                             target_tile.nodegroupid = row["NodeGroupID"]
-
-                        # mock_request_object = HttpRequest()
 
                         # identify whether a tile for this nodegroup on this resource already exists
                         if not preexisting_tile_for_nodegroup and not preexisting_eval_parenttile:
