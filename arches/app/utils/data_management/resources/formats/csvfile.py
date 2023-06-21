@@ -954,11 +954,11 @@ class CsvReader(Reader):
             else:
                 target_tile_cardinality = "n"
 
-            def populate_child_tiles(source_data):
+            def populate_child_tiles(source_data, childtile, parenttile):
                 prototype_tile_copy = pickle.loads(pickle.dumps(childtile, -1))
                 tileid = row["TileID"] if "TileID" in row else uuid.uuid4()
                 prototype_tile_copy.tileid = tileid
-                prototype_tile_copy.parenttile = tile_to_populate
+                prototype_tile_copy.parenttile = parenttile
                 parenttileid = row["ParentTileID"] if "ParentTileID" in row and row["ParentTileID"] is not None else None
                 if parenttileid is not None:
                     prototype_tile_copy.parenttile.tileid = parenttileid
@@ -994,7 +994,7 @@ class CsvReader(Reader):
                                             # target_tile.request = value['request']
                                             del source_column[source_key]
                                         else:
-                                            populate_child_tiles(source_data)
+                                            populate_child_tiles(source_data, childtile, parenttile)
                         else:
                             s_tile_value = source_dict.get(target_key, None)
                             if s_tile_value is not None and prototype_tile_copy.data[target_key] is None:
@@ -1040,7 +1040,7 @@ class CsvReader(Reader):
                                     del source_dict[target_key]
                                     del source_data[i]
                             elif prototype_tile_copy.data[target_key] is not None:
-                                populate_child_tiles(source_data)
+                                populate_child_tiles(source_data, childtile, parenttile)
 
                 if prototype_tile_copy.data != {}:
                     if (
@@ -1161,8 +1161,8 @@ class CsvReader(Reader):
                             child_tile_cardinality = "1"
                         else:
                             child_tile_cardinality = "n"
-
-                        populate_child_tiles(source_data)
+                        
+                        populate_child_tiles(source_data, child_tile, tile_to_populate)
 
                     if not bulk:
                         tile_to_populate.tiles = populated_child_tiles
