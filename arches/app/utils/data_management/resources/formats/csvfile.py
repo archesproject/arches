@@ -806,18 +806,12 @@ class CsvReader(Reader):
         def get_preexisting_tile(target_tile, populated_tiles, resourceid, parenttileid=None, tileid=None):
             # finds a pre-existing tile for a particular nodegroup on a resource_instance
             # assumes tiles are flat/un-nested, otherwise recurses through child tiles
+            preexisting_tile_for_nodegroup = []
             if tileid:
                 preexisting_tile_for_nodegroup = list(filter(lambda t: str(t.tileid) == str(tileid), populated_tiles))
-            elif parenttileid:
-                preexisting_tile_for_nodegroup = list(
-                    filter(
-                        lambda t: str(t.resourceinstance_id) == str(resourceid)
-                        and str(t.nodegroup_id) == str(target_tile.nodegroup_id)
-                        and str(t.parenttile.tileid) == str(parenttileid),
-                        populated_tiles,
-                    )
-                )
-            else:
+            if not len(preexisting_tile_for_nodegroup) and parenttileid:
+                preexisting_tile_for_nodegroup = list(filter(lambda t: t.parenttile and str(t.parenttile.tileid) == str(parenttileid), populated_tiles))
+            if not len(preexisting_tile_for_nodegroup):
                 preexisting_tile_for_nodegroup = list(
                     filter(
                         lambda t: str(t.resourceinstance_id) == str(resourceid)
@@ -825,7 +819,7 @@ class CsvReader(Reader):
                         populated_tiles,
                     )
                 )
-            if len(preexisting_tile_for_nodegroup) > 0:
+            if len(preexisting_tile_for_nodegroup):
                 return preexisting_tile_for_nodegroup[0]
             for t in populated_tiles:
                 get_preexisting_tile(target_tile, t.tiles, resourceid, parenttileid, tileid)
