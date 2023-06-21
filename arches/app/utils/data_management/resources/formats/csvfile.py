@@ -386,7 +386,7 @@ class CsvReader(Reader):
         legacyid,
         resources,
         target_resource_model,
-        bulk,
+        BULK,
         save_count,
         row_number,
         prevent_indexing,
@@ -407,7 +407,7 @@ class CsvReader(Reader):
             populated_tiles.clear()
 
             # if bulk saving then append the resources to a list otherwise just save the resource
-            if bulk:
+            if BULK:
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources, flat=True, overwrite=overwrite, transaction_id=transaction_id)
@@ -470,6 +470,7 @@ class CsvReader(Reader):
         mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
         headers = [k.upper() for k in business_data[0].keys() if k and k.upper() != "RESOURCEID"]
         NON_UNIQUE_COL_HEADERS = False
+        BULK = bulk
         unique_nodeids = set(list(mapping_filefieldname_to_nodeid_dict.values()))
         hist_res_eval_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd"  # parent tiledata IS semantic, parenttile=null
         component_nodegroupid = "a271c312-1037-11ec-b65f-31043b30bbcd"  # tiledata is not semantic, parenttile=null
@@ -1098,7 +1099,7 @@ class CsvReader(Reader):
                             group_no_to_tileids[group_no][str(prototype_tile_copy.nodegroup_id)]["parenttileid"] = None
                     if len([item for item in list(prototype_tile_copy.data.values()) if item is not None]) > 0:
                         if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
-                            if bulk:
+                            if BULK:
                                 prototype_tile_copy.tiles = []
                                 populated_tiles.append(prototype_tile_copy)
                             else:
@@ -1201,12 +1202,12 @@ class CsvReader(Reader):
                         
                         populate_child_tiles(source_data, child_tile, tile_to_populate)
 
-                    if not bulk:
+                    if not BULK:
                         tile_to_populate.tiles = populated_child_tiles
 
                 # bulk alone being true here is because a parent tile without children would fail (not tile.is_blank())
-                if bulk or (not tile_to_populate.is_blank() and not appending_to_parent):
-                    if bulk:
+                if BULK or (not tile_to_populate.is_blank() and not appending_to_parent):
+                    if BULK:
                         tile_to_populate.tiles = []
                     dupe = False
                     for i, t in enumerate(populated_tiles):
@@ -1344,7 +1345,7 @@ class CsvReader(Reader):
                             legacyid,
                             resources,
                             target_resource_model,
-                            bulk,
+                            BULK,
                             save_count,
                             row_number,
                             prevent_indexing,
@@ -1555,7 +1556,7 @@ class CsvReader(Reader):
                                 appending_to_parent=True,
                                 prefix=prefix,
                             )
-                            if not bulk:
+                            if not BULK:
                                 preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
@@ -1595,7 +1596,7 @@ class CsvReader(Reader):
                                         prefix=prefix,
                                     )
 
-                                if not bulk and preexisting_tile_for_nodegroup:
+                                if not BULK and preexisting_tile_for_nodegroup:
                                     preexisting_tile_for_nodegroup.tiles.append(target_tile)
 
                         # populates a tile from parent-level nodegroup because
@@ -1669,7 +1670,7 @@ class CsvReader(Reader):
                                         node_datatypes,
                                         prefix=prefix,
                                     )
-                                if not bulk and preexisting_tile_for_nodegroup:
+                                if not BULK and preexisting_tile_for_nodegroup:
                                     preexisting_tile_for_nodegroup.tiles.append(target_tile)
                             # Check that required nodes are populated. If not remove tile from populated_tiles array.
                             check_required_nodes(target_tile, target_tile, required_nodes)
@@ -1699,7 +1700,7 @@ class CsvReader(Reader):
                         legacyid,
                         resources,
                         target_resource_model,
-                        bulk,
+                        BULK,
                         save_count,
                         row_number,
                         prevent_indexing,
@@ -1707,7 +1708,7 @@ class CsvReader(Reader):
                         transaction_id=transaction_id,
                     )
 
-                if bulk:
+                if BULK:
                     Resource.bulk_save(resources=resources, flat=True, overwrite=overwrite, transaction_id=transaction_id)
                     del resources[:]  # clear out the array
                     print("Time to create resource and tile objects: %s" % datetime.timedelta(seconds=time() - self.start))
