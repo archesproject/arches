@@ -896,6 +896,43 @@ class CsvReader(Reader):
                 blank_tile = None
             # return deepcopy(blank_tile)
             return pickle.loads(pickle.dumps(blank_tile, -1))
+
+ 
+        def check_for_preexisting_parent_child_pair(given_tile, group_no, group_no_to_tileids, source_data, populated_tiles, resourceinstanceid):
+            # given_tile = get_blank_tile(source_data)
+            preexisting_parent = None
+            preexisting_child = None
+            # if group_no not in group_no_to_tileids:
+            #     group_no_to_tileids[group_no] = {}
+            # checks for whether a parent tile exists since get_blank_tile starts out getting parent
+            preexisting_parent_created_for_resource_group_nodegroup = (
+                group_no in group_no_to_tileids and str(given_tile.nodegroup_id) in group_no_to_tileids[group_no]
+            )
+            if preexisting_parent_created_for_resource_group_nodegroup:
+                preexisting_parent = get_preexisting_tile(
+                    given_tile,
+                    populated_tiles,
+                    resourceinstanceid,
+                    tileid=group_no_to_tileids[group_no][str(given_tile.nodegroup_id)]["tileid"],
+                )
+                # we know theres a parenttile for this group already
+            if preexisting_parent:  # lets see if theres a child for our source_data's nodegroup
+                proto_child_tile = get_blank_tile(source_data, child_only=True)
+
+                # {group_no: {nodegroupid: {tileid: tileid, parenttileid: parenttileid } } }
+                preexisting_child_created_for_resource_group_nodegroup = (
+                    str(proto_child_tile.nodegroup_id) in group_no_to_tileids[group_no]
+                )
+                if preexisting_child_created_for_resource_group_nodegroup and BULK:
+                    preexisting_child = get_preexisting_tile(
+                        proto_child_tile,
+                        populated_tiles,
+                        resourceinstanceid,
+                        parenttileid=str(group_no_to_tileids[group_no][str(proto_child_tile.nodegroup_id)]["parenttileid"]),
+                        tileid=str(group_no_to_tileids[group_no][str(proto_child_tile.nodegroup_id)]["tileid"])
+                    )
+
+            return preexisting_parent, preexisting_child
         
 
         def populate_tile(
