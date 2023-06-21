@@ -469,7 +469,7 @@ class CsvReader(Reader):
         celery_worker_running = task_management.check_if_celery_available()
         mapping_filefieldname_to_nodeid_dict = {n["file_field_name"].upper(): n["arches_nodeid"] for n in mapping["nodes"]}
         headers = [k.upper() for k in business_data[0].keys() if k and k.upper() != "RESOURCEID"]
-        non_unique_col_headers = False
+        NON_UNIQUE_COL_HEADERS = False
         unique_nodeids = set(list(mapping_filefieldname_to_nodeid_dict.values()))
         hist_res_eval_nodegroupid = "a271c31e-1037-11ec-b65f-31043b30bbcd"  # parent tiledata IS semantic, parenttile=null
         component_nodegroupid = "a271c312-1037-11ec-b65f-31043b30bbcd"  # tiledata is not semantic, parenttile=null
@@ -480,8 +480,8 @@ class CsvReader(Reader):
         plan_dist_eval_nodegroupid = "2ae3b6ad-3752-11ec-b65f-31043b30bbcd"
         eval_nodegroups = [hist_res_eval_nodegroupid, hist_dist_eval_nodegroupid, plan_dist_eval_nodegroupid]
         if len(unique_nodeids) != len(list(mapping_filefieldname_to_nodeid_dict.keys())):
-            non_unique_col_headers = True
-        non_unique_col_headers = False
+            NON_UNIQUE_COL_HEADERS = True
+        NON_UNIQUE_COL_HEADERS = False
         try:
             col_header_to_nodeid_dict = {header: mapping_filefieldname_to_nodeid_dict[header.upper()] for header in headers}
         except KeyError as e:
@@ -908,7 +908,6 @@ class CsvReader(Reader):
             group_no,
             group_valid,
             group_no_to_tileids,
-            non_unique_col_headers,
             populated_cardinality_1_nodegroups,
             node_datatypes,
             appending_to_parent=False,
@@ -977,7 +976,7 @@ class CsvReader(Reader):
                 if str(prototype_tile_copy.nodegroup_id) not in populated_child_nodegroups:
                     prototype_tile_copy.nodegroup_id = str(prototype_tile_copy.nodegroup_id)
                     for target_key in list(prototype_tile_copy.data.keys()):
-                        if non_unique_col_headers:
+                        if NON_UNIQUE_COL_HEADERS:
                             for source_column in source_data:
                                 for source_key in list(source_column.keys()):
                                     if source_key == target_key:
@@ -1090,7 +1089,7 @@ class CsvReader(Reader):
                     # The idea is to populate as much of the tile_to_populate as possible,
                     # before moving on to the next tile_to_populate.
                     for target_key in list(tile_to_populate.data.keys()):
-                        if non_unique_col_headers:
+                        if NON_UNIQUE_COL_HEADERS:
                             for source_tile in source_data:
                                 for source_key in list(source_tile.keys()):
                                     # Check for source and target key match.
@@ -1204,7 +1203,6 @@ class CsvReader(Reader):
                             group_no,
                             group_valid,
                             group_no_to_tileids,
-                            non_unique_col_headers,
                             populated_cardinality_1_nodegroups,
                             node_datatypes,
                             appending_to_parent=False,
@@ -1513,7 +1511,6 @@ class CsvReader(Reader):
                                 group_no,
                                 group_valid,
                                 group_no_to_tileids,
-                                non_unique_col_headers,
                                 populated_cardinality_1_nodegroups,
                                 node_datatypes,
                                 appending_to_parent=True,
@@ -1537,7 +1534,6 @@ class CsvReader(Reader):
                                         group_no,
                                         group_valid,
                                         group_no_to_tileids,
-                                        non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         appending_to_parent=True,
@@ -1555,7 +1551,6 @@ class CsvReader(Reader):
                                         group_no,
                                         group_valid,
                                         group_no_to_tileids,
-                                        non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         prefix=prefix,
@@ -1577,7 +1572,6 @@ class CsvReader(Reader):
                                 group_no,
                                 group_valid,
                                 group_no_to_tileids,
-                                non_unique_col_headers,
                                 populated_cardinality_1_nodegroups,
                                 node_datatypes,
                                 prefix=prefix,
@@ -1600,7 +1594,6 @@ class CsvReader(Reader):
                                         group_no,
                                         group_valid,
                                         group_no_to_tileids,
-                                        non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         appending_to_parent=True,
@@ -1617,7 +1610,6 @@ class CsvReader(Reader):
                                         group_no,
                                         group_valid,
                                         group_no_to_tileids,
-                                        non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         prefix=prefix,
@@ -1634,7 +1626,6 @@ class CsvReader(Reader):
                                         group_no,
                                         group_valid,
                                         group_no_to_tileids,
-                                        non_unique_col_headers,
                                         populated_cardinality_1_nodegroups,
                                         node_datatypes,
                                         prefix=prefix,
