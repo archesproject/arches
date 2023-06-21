@@ -1229,7 +1229,7 @@ class CsvReader(Reader):
 
                 if need_new_tile:
                     new_tile = get_blank_tile(source_data)
-                    if new_tile is not None:
+                    if new_tile is not None and not str(new_tile.nodegroup_id) in eval_nodegroups:
                         populate_tile(
                             source_data,
                             new_tile,
