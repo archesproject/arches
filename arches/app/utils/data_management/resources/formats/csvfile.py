@@ -1470,19 +1470,21 @@ class CsvReader(Reader):
                                     preexisting_childtile_created_for_resource_group_nodegroup = (
                                         str(prototype_child_tile.nodegroup_id) in group_no_to_tileids[group_no]
                                     )
-                                    if preexisting_childtile_created_for_resource_group_nodegroup:
-                                        test_tile = get_preexisting_tile(
-                                            target_tile,
+                                    if preexisting_childtile_created_for_resource_group_nodegroup and BULK:
+                                        preexisting_childtile = get_preexisting_tile(
+                                            prototype_child_tile,
                                             populated_tiles,
                                             resourceinstanceid,
-                                            tileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["tileid"]),
+                                            parenttileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["parenttileid"]),
+                                            tileid=str(group_no_to_tileids[group_no][str(prototype_child_tile.nodegroup_id)]["tileid"])
                                         )
-                                        if test_tile:
-                                            target_tile = test_tile
+                                        if preexisting_childtile:
+                                            target_tile = preexisting_childtile
                                     else:
                                         target_tile = prototype_child_tile
                                         target_tile.tileid = uuid.uuid4()
                                         target_tile.parenttile = preexisting_eval_parenttile
+                                        target_tile.parenttile_id = str(preexisting_eval_parenttile.tileid)
                                         group_no_to_tileids[group_no][str(target_tile.nodegroup_id)] = {}
                                         group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"] = str(target_tile.tileid)
                                         try:
