@@ -25,7 +25,7 @@
                         click: function () { format('tilecsv') },
                         onSpaceClick, 
                         attr: {
-                            'aria-checked': format() === 'tilecsv', 
+                            'aria-checked': format() === 'tilecsv',
                             'aria-describedby': 'format-instruction-text'
                         },
                     ">
@@ -149,6 +149,7 @@
                     "
             ></div>
         </div>
+
         <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>
             <div class="instruction">
@@ -195,11 +196,12 @@
         <!-- /ko -->
     </div>
 
+    <!-- Celery Warning -->
     <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')) -->
     <div 
         id="export-warning"
         data-bind="
-            text: ('Arches is currently running without Celery. Exports will be limited to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} records. The html option is only allowed with a selection of up to {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} resources.'),
+            text: $root.translations.celeryNotRunningWarning( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}, {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ),
         "
     ></div>
     <!-- /ko -->
