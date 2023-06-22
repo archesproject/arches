@@ -341,7 +341,7 @@ class TempFile(models.Model):
     path = models.FileField(upload_to="archestemp")
 
     def __init__(self, *args, **kwargs):
-        super(File, self).__init__(*args, **kwargs)
+        super(TempFile, self).__init__(*args, **kwargs)
         if not self.fileid:
             self.fileid = uuid.uuid4()
 

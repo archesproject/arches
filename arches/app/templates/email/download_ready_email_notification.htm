@@ -23,8 +23,10 @@
         </div>
         <!-- /ko -->
 
+    {% if link != "" %}
     <a class="btn" href="{{email_link}}"><button
-            class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>
+            class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>    
+    {% endif %}
     {% endif %}
     <p>{{closing}}</p>
 </body>
