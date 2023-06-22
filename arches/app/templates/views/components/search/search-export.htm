@@ -150,6 +150,7 @@
             ></div>
         </div>
 
+        <!-- Options if Celery is running -->
         <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>
             <div class="instruction">
@@ -206,6 +207,7 @@
     ></div>
     <!-- /ko -->
 
+    <!-- Download -->
     <div class="search-export download">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
