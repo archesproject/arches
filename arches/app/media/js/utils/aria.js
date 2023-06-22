@@ -1,4 +1,4 @@
-define([], function(){
+define(['jquery'], function($){
 
     var ariaUtils = {
         toggleAriaExpanded: function(id) {
@@ -20,24 +20,24 @@ define([], function(){
             *   Implement this function within the toggleElement's click event handler, passing event.currentTarget as toggleElement
             */
             let attachListener = function(evt) {
-                    evt = evt || window.event;
-                    var isEscape = false;
-                    
-                    // Check for escape key press
-                    if ('key' in evt) {
-                        isEscape = (evt.key === 'Escape' || evt.key === 'Esc');
-                    } else {
-                        isEscape = (evt.keyCode === 27);
-                    }
-    
-                    // Handle escape key press
-                    if (isEscape) {
-                        $(toggleElement).click();
-                        $(toggleElement).focus();
-                        $(listenerScope).off('keydown', attachListener);
-                    }
+                evt = evt || window.event;
+                var isEscape = false;
+                
+                // Check for escape key press
+                if ('key' in evt) {
+                    isEscape = (evt.key === 'Escape' || evt.key === 'Esc');
+                } else {
+                    isEscape = (evt.keyCode === 27);
+                }
+
+                // Handle escape key press
+                if (isEscape) {
+                    $(toggleElement).click();
+                    $(toggleElement).focus();
+                }
             };
-            $(listenerScope).on('keydown', attachListener);
+            $(listenerScope).one('keydown', attachListener);
+            $(listenerScope).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
         }
     };
 
