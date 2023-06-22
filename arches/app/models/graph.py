@@ -541,6 +541,22 @@ class Graph(models.GraphModel):
                 if functionxgraph.function_id in [str(id) for id in models.Function.objects.values_list("functionid", flat=True)]:
                     functionxgraph.save()
 
+            # edge case for instantiating a serialized_graph that has a publication
+            if not len(models.GraphXPublishedGraph.objects.filter(publicationid=self.publication_id)):
+                self.publication.save()
+
+                for language_tuple in settings.LANGUAGES:
+                    language = models.Language.objects.get(code=language_tuple[0])
+
+                    translation.activate(language=language_tuple[0])
+
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication=self.publication,
+                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                        language=language,
+                    )
+                    published_graph.save()
+
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
             self._nodegroups_to_delete = []
