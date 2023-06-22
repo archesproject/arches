@@ -97,7 +97,7 @@ define([
                 }),
                 'selectedCards': this.selectedCards().map(function(card) {
                     return {
-                        nodegroupid: card.nodegroupid
+                        nodegroupid: card.nodegroupid || ko.unwrap(card.model.nodegroup_id)
                     };
                 }),
                 'selectedPermissions': _.filter(this.nodegroupPermissions(), function(perm) {
@@ -116,6 +116,10 @@ define([
                 success: function(res) {
                     self.trigger('save');
                     self.clearUserPermissionCache();
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('permissionsSave')
+                    );
                 }
             });
         },
@@ -134,6 +138,10 @@ define([
                 success: function(res) {
                     self.clearUserPermissionCache();
                     self.trigger('revert');
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('permissionsSave')
+                    );
                 }
             });
         },

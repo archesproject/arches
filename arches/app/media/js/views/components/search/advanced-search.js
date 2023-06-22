@@ -70,7 +70,8 @@ define([
                 _.each(graphs, function(graph) {
                     if (
                         graph.isresource 
-                        && graph.publication_id
+                        && graph.is_active
+                        && graph.source_identifier_id === null 
                     ) {
                         var graphCards = _.filter(response.cards, function(card) {
                             return card.graph_id === graph.graphid && card.nodes.length > 0;

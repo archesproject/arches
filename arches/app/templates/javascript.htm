@@ -112,6 +112,38 @@
             "title": "{% trans "Delete Branch/Resource Model?" %}",
             "text": "{% trans "Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
         }'
+        confirm-graph-publication-delete='{
+            "title": "{% trans "Delete Published Graph?" %}",
+            "text": "{% trans "Deleting this publication will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-delete-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully deleted." %}"
+        }'
+        graph-publication-delete-failure='{
+            "title": "{% jsescaped_trans "Delete Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-publication-update='{
+            "title": "{% trans "Update Graph to selected version?" %}",
+            "text": "{% trans "Updating this Graph to the selected published version will change the Graph throughout the application.  Are you sure you would like to proceed?" %}"
+        }'
+        confirm-graph-publication-edit='{
+            "title": "{% trans "Apply Edits to Published Graphs?" %}",
+            "text": "{% trans "This will update the historical records of the Graph without creating a new publication. Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-update-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully updated." %}"
+        }'
+        graph-publication-update-failure='{
+            "title": "{% jsescaped_trans "Restore Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-revert='{
+            "title": "{% trans "Revert Branch/Resource Model?" %}",
+            "text": "{% trans "This will revert the current branch/resource model to the latest published version.  Are you sure you would like to proceed?" %}"
+        }'
         confirm-maplayer-delete='{
             "title": "{% jsescaped_trans "Delete map layer?" %}",
             "text": "{% jsescaped_trans "Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?" %}"
@@ -135,6 +167,22 @@
             "title": "{% jsescaped_trans "Send Two-Factor Authentication email?" %}",
             "text": "{% jsescaped_trans "This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?" %}"
         }'
+        resource-graph-has-unpublished-changes='{
+            "title": "{% jsescaped_trans "Graph Has Unpublished Changes" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on a Graph that has unpublished changes. Your system administrator will need to update this instance before you can edit it." %}"
+        }'
+        resource-graph-has-different-publication='{
+            "title": "{% jsescaped_trans "Graph Has Different Published Version" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
+        }'
+        resource-graph-has-different-publication-user-is-not-permissioned='{
+            "title": "{% jsescaped_trans "Graph Has Different Publication" %}",
+            "text": "{% jsescaped_trans "This Resource Instance is based on a graph that has a different publication than the current one. If you want to view the Resource please contact your System Administrator." %}"
+        }'
+        resource-graph-change-active-status-error='{
+            "title": "{% jsescaped_trans "Could not update Resource Model active state" %}",
+            "text": "{% jsescaped_trans "Please contact your System Administrator" %}"
+        }'
         two-factor-authentication-email-success='{
             "title": "{% jsescaped_trans "Success!" %}",
             "text": "{% jsescaped_trans "An email with instructions to change two-factor authentication settings has been sent to your registered email address." %}"
@@ -146,10 +194,12 @@
         resource-copy-success='{
             "title": "{% jsescaped_trans "Resource Successfully Copied."%}"
         }'
-        resource-has-unpublished-graph='{
-            "title": "{% jsescaped_trans "This resource is based on an unpublished graph." %}",
-            "text": "{% jsescaped_trans "To continue, please ensure the graph is published." %}"
+        resource-is-not-active='{
+            "title": "{% jsescaped_trans "This resource has not been marked active." %}",
+            "text": "{% jsescaped_trans "To continue, please ensure the graph is marked active." %}"
         }'
+        active='{% trans "Active" as active %}  "{{ active|escapejs }}"'
+        inactive='{% trans "Inactive" as inactive %}  "{{ inactive|escapejs }}"'
         please-contact-system-administrator='{% trans "Please contact your system administrator for more details." as pleaseContactSystemAdministrator %}  "{{ pleaseContactSystemAdministrator|escapejs }}"'
         hide-null-values='{% trans "Hide Null Values" as hideNullValues %} "{{ hideNullValues|escapejs }}"'
         load-more='{% trans "Load More" as loadMore %} "{{ loadMore|escapejs }}"'
@@ -815,6 +865,7 @@
         from_sparql_endpoint="{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
         search_sparql_endpoint="{% url 'search_sparql_endpoint' %}"
         confirm_delete="{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+        graph_designer='(graphid)=>{return "{% url "graph_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         search_home="{% url 'search_home' %}"
         search_terms="{% url 'search_terms' %}"
         search_results="{% url 'search_results' %}"
@@ -852,6 +903,8 @@
         delete_provisional_tile="{% url 'delete_provisional_tile' %}"
         tile_history="{% url 'tile_history' %}"
         download_files="{% url 'download_files' %}"
+        delete_published_graph='"{% url "delete_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        update_published_graph='"{% url "update_published_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         remove_functions='"{% url "remove_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         time_wheel_config="{% url 'time_wheel_config' %}"
@@ -870,17 +923,22 @@
         clone_graph='(graphid)=>{return "{% url "clone_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         export_graph='(graphid)=>{return "{% url "export_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         publish_graph='(graphid)=>{return "{% url "publish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
-        unpublish_graph='(graphid)=>{return "{% url "unpublish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        revert_graph='(graphid)=>{return "{% url "revert_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        restore_state_from_serialized_graph='(graphid)=>{return "{% url "restore_state_from_serialized_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        update_published_graphs='(graphid)=>{return "{% url "update_published_graphs" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         delete_graph='(graphid)=>{return "{% url "delete_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         delete_instances='(graphid)=>{return "{% url "delete_instances" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         export_mapping_file='(graphid)=>{return "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         add_resource='(graphid)=>{return "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        model_history='(graphid)=>{return "{% url "model_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
         transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
         mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
         help_template="{% url 'help_templates' %}"
         graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+        graph_has_unpublished_changes_api='(graphid)=>{return "{% url "graph_has_unpublished_changes_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+        graph_is_active_api='(graphid)=>{return "{% url "graph_is_active_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         api_card='"{% url "api_card" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         api_tiles='(tileid)=>{
             return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);

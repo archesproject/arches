@@ -36,6 +36,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
         cls.loadOntology()
 
     def setUp(self):
@@ -159,6 +160,8 @@ class GraphManagerViewTests(ArchesTestCase):
             Edge.objects.create(**edges_dict).save()
 
         graph = Graph.new()
+        graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
+        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
         graph.author = "Arches"
@@ -168,8 +171,6 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
         graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
-        graph.save()
-
         graph.root.name = "ROOT NODE"
         graph.root.description = "Test Root Node"
         graph.root.datatype = "semantic"
@@ -182,17 +183,18 @@ class GraphManagerViewTests(ArchesTestCase):
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID
         )
         graph.save()
+        graph.create_editable_future_graph()
 
         self.ROOT_ID = graph.root.nodeid
         self.GRAPH_ID = str(graph.pk)
         self.NODE_COUNT = 5
 
         self.client = Client()
-        LanguageSynchronizer.synchronize_settings_with_db()
 
     def tearDown(self):
         try:
-            self.deleteGraph(self.GRAPH_ID)
+            graph = Graph.objects.get(source_identifier_id=self.GRAPH_ID)
+            graph.delete()
         except:
             pass
 

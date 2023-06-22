@@ -41,7 +41,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource, PublishedModelError
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -238,7 +238,9 @@ class ResourceEditorView(MapBaseManagerView):
                 is_system_settings = True
                 displayname = _("System Settings")
 
-            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups)
+            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(
+                nodegroup_id__in=[nodegroup.pk for nodegroup in nodegroups]
+            )
             provisionaltiles = []
             for tile in tiles:
                 append_tile = True
@@ -313,7 +315,7 @@ class ResourceEditorView(MapBaseManagerView):
             resource_graphs=(
                 models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
             ),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
@@ -340,6 +342,8 @@ class ResourceEditorView(MapBaseManagerView):
             is_system_settings=is_system_settings,
         )
 
+        context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
+
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
 
@@ -348,7 +352,10 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             context["nav"]["help"] = {"title": _("Using the Resource Editor"), "templates": ["resource-editor-help"]}
 
-        return render(request, view_template, context)
+        if graph.has_unpublished_changes or resource_instance and resource_instance.graph_publication_id != graph.publication_id:
+            return redirect("resource_report", resourceid=resourceid)
+        else:
+            return render(request, view_template, context)
 
     def delete(self, request, resourceid=None):
         delete_error = _("Unable to Delete Resource")
@@ -360,9 +367,6 @@ class ResourceEditorView(MapBaseManagerView):
                 ret = Resource.objects.get(pk=resourceid)
                 try:
                     deleted = ret.delete(user=request.user)
-                except PublishedModelError as e:
-                    message = _("Unable to delete. Please verify the model is not currently published.")
-                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 except PermissionDenied:
                     return JSONErrorResponse(delete_error, delete_msg)
                 if deleted is True:
@@ -779,6 +783,7 @@ class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.only("graph_id").get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
+        graph_has_different_publication = bool(resource.graph_publication_id != graph.publication_id)
 
         try:
             map_markers = models.MapMarker.objects.all()
@@ -794,6 +799,14 @@ class ResourceReportView(MapBaseManagerView):
             widgets=models.Widget.objects.all(),
             map_markers=map_markers,
             geocoding_providers=geocoding_providers,
+            graph_has_different_publication=graph_has_different_publication,
+            graph_has_different_publication_and_user_has_insufficient_permissions=bool(
+                graph_has_different_publication
+                and not request.user.groups.filter(
+                    name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+                ).exists()
+            ),
+            graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
         )
 
         if graph.iconclass:
@@ -812,7 +825,7 @@ class RelatedResourcesView(BaseManagerView):
         models.GraphModel.objects.all()
         .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .exclude(isresource=False)
-        .exclude(publication=None)
+        .exclude(is_active=False)
     )
 
     def paginate_related_resources(self, related_resources, page, request):
@@ -956,11 +969,7 @@ class RelatedResourcesView(BaseManagerView):
                     datestarted=datefrom,
                     dateended=dateto,
                 )
-                try:
-                    rr.save()
-                except PublishedModelError as e:
-                    message = _("Unable to save. Please verify the model is not currently published.")
-                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                rr.save()
             else:
                 print("relationship not permitted")
 
@@ -970,11 +979,7 @@ class RelatedResourcesView(BaseManagerView):
             rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
-            try:
-                rr.save()
-            except PublishedModelError as e:
-                message = _("Unable to save. Please verify the model is not currently published.")
-                return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+            rr.save()
 
         start = request.GET.get("start", 0)
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])

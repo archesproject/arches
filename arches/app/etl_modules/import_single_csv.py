@@ -37,7 +37,7 @@ class ImportSingleCsv(BaseImportModule):
             GraphModel.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication_id__isnull=True)
+            .exclude(is_active=False)
             .order_by(graph_name_i18n)
         )
         return {"success": True, "data": graphs}

@@ -17,6 +17,8 @@ import logging
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.forms.models import model_to_dict
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import JSONField
@@ -68,12 +70,7 @@ class CardModel(models.Model):
         "CardComponent", db_column="componentid", default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"), on_delete=models.SET_DEFAULT
     )
     config = JSONField(blank=True, null=True, db_column="config")
-
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            return True
-        else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
@@ -81,6 +78,11 @@ class CardModel(models.Model):
             self.cardid = uuid.uuid4()
         if isinstance(self.cardid, str):
             self.cardid = uuid.UUID(self.cardid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(CardModel, self).save()
 
     class Meta:
         managed = True
@@ -236,6 +238,7 @@ class Edge(models.Model):
     domainnode = models.ForeignKey("Node", db_column="domainnodeid", related_name="edge_domains", on_delete=models.CASCADE)
     rangenode = models.ForeignKey("Node", db_column="rangenodeid", related_name="edge_ranges", on_delete=models.CASCADE)
     graph = models.ForeignKey("GraphModel", db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
@@ -243,6 +246,11 @@ class Edge(models.Model):
             self.edgeid = uuid.uuid4()
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Edge, self).save()
 
     class Meta:
         managed = True
@@ -444,6 +452,8 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
+    is_active = models.BooleanField(default=False)
+    is_copy_immutable = models.BooleanField(default=False)
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
@@ -458,13 +468,19 @@ class GraphModel(models.Model):
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
+    source_identifier = models.ForeignKey(
+        blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
+    )
+    has_unpublished_changes = models.BooleanField(default=False)
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        if not self.publication:
-            return _("This Model is currently unpublished and not available for instance creation.")
+        if not self.is_active:
+            return _("This Model is not active, and is not available for instance creation.")
+        if self.has_unpublished_changes:
+            return _("This Model has unpublished changes, and is not available for instance creation.")
         return False
 
     def is_editable(self):
@@ -503,8 +519,9 @@ class GraphXPublishedGraph(models.Model):
     publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.DO_NOTHING)
     published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
+    most_recent_edit = models.ForeignKey("PublishedGraphEdit", db_column="edit_id", on_delete=models.DO_NOTHING, null=True, blank=True)
 
     class Meta:
         managed = True
@@ -594,11 +611,13 @@ class Node(models.Model):
     config = I18n_JSONField(blank=True, null=True, db_column="config")
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
+    is_immutable = models.BooleanField(default=False)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -633,12 +652,6 @@ class Node(models.Model):
     def is_collector(self):
         return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
 
-    def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
-            return True
-        else:
-            return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
-
     def get_relatable_resources(self):
         relatable_resource_ids = [
             r2r.resourceclassfrom
@@ -665,10 +678,23 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, **kwargs)
+
+        if ret["config"] and ret["config"].get("options"):
+            ret["config"]["options"] = sorted(ret["config"]["options"], key=lambda k: k["id"])
+
+        return ret
+
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
         if not self.nodeid:
             self.nodeid = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Node, self).save()
 
     class Meta:
         managed = True
@@ -768,6 +794,18 @@ class PublishedGraph(models.Model):
     class Meta:
         managed = True
         db_table = "published_graphs"
+
+
+class PublishedGraphEdit(models.Model):
+    edit_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    edit_time = models.DateTimeField(default=datetime.datetime.now, null=False)
+    publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
+    notes = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+
+    class Meta:
+        managed = True
+        db_table = "published_graph_edits"
 
 
 class Relation(models.Model):
@@ -1088,7 +1126,7 @@ class TileModel(models.Model):  # Tile
     resourceinstance = models.ForeignKey(ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE)
     parenttile = models.ForeignKey("self", db_column="parenttileid", blank=True, null=True, on_delete=models.CASCADE)
     data = JSONField(blank=True, null=True, db_column="tiledata")
-    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
+    nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
 
@@ -1100,6 +1138,11 @@ class TileModel(models.Model):  # Tile
         super(TileModel, self).__init__(*args, **kwargs)
         if not self.tileid:
             self.tileid = uuid.uuid4()
+
+    @property
+    def nodegroup(self):
+        nodegroup_query = NodeGroup.objects.filter(pk=self.nodegroup_id)
+        return nodegroup_query.first()
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):

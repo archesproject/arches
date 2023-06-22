@@ -3924,6 +3924,17 @@ ul.nav.nav-tabs.nav-justified {
     min-width: 468px;
 }
 
+.graph-active-switch-container {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+.graph-active-switch-container .toggle-container {
+    padding: 0 !important;
+    height: 20px;
+    width: 40px;
+}
+
 .function-node-alert {
     display: inline-block;
     background: #A2EAE2;
@@ -4126,7 +4137,7 @@ div.dropdown-menu.open {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 999;
+    z-index: 9999;
     transition: all 0.3s;
     cursor: pointer;
 }
@@ -4137,6 +4148,7 @@ div.dropdown-menu.open {
     margin: 15% auto;
     max-width: 600px;
     padding: 18px;
+    z-index: 9999;
     border: 1px solid #ddd;
     border-radius: 5px;
     width: 70%;
@@ -4558,7 +4570,7 @@ div.dropdown-menu.open {
 }
 
 .resource-grid-main-container.active {
-    background: #f6f6f6;
+    background: #f8f8f8;
 }
 
 .resource-grid-icon {
@@ -4600,9 +4612,10 @@ div.dropdown-menu.open {
 
 .resource-grid-item .resource-grid-tools-container {
     flex-direction: column;
-    margin: 15px;
+    padding: 15px;
     display: flex;
-    width: 76px;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .report-image-grid .resource-grid-item:last-of-type .resource-grid-tools-container .btn-group .manage-menu {
@@ -4807,6 +4820,7 @@ div.dropdown-menu.open {
 
 .edit-menu-item {
     height: 60px;
+    padding-right: 20px;
     border-left: 3px solid #ebeef0;
     border-bottom: 1px solid #ddd;
     background: #fff;
@@ -4873,6 +4887,30 @@ div.dropdown-menu.open {
 .find-widget {
     width: 450px;
     z-index: 10;
+}
+
+.publication {
+    cursor: pointer;
+    justify-content: left;
+    min-height: 60px; 
+    display: grid;
+    grid-auto-flow: column;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 0 8px; 
+}
+
+.publication:hover {
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.active-publication {
+    justify-content: left;
+    background-color: #fff;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 
 .graph-list-header {
@@ -7109,18 +7147,12 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     margin-bottom: 0px;
 }
 
-.resource-status {
-    font-size: 13px;
-    font-weight: 600;
-    color: #123;
-    margin-top: 3px;
-}
-
 .resource-status-label {
+    display: flex;
     font-size: 11px;
     float: right;
     color: #555;
-    margin-top: 3px;
+    margin-top: 5px;
 }
 
 .list-filter {

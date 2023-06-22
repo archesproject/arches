@@ -9,7 +9,6 @@
     <div data-bind="if: conceptCollections().length > 0">
         <select 
             data-bind="
-                disable: isEditable === false, 
                 placeholder: $root.translations.selectAConceptCollection, 
                 value: topConcept, 
                 options: conceptCollections, 

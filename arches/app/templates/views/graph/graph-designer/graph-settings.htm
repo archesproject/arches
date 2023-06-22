@@ -102,14 +102,37 @@
                             <div class="col-xs-12 crm-selector">
                                 <div data-bind='component: {
                                     name: graphSettingsViewModel.rootnode.datatypeConfigComponent,
-                                    params: graphSettingsViewModel.extendNode(graphSettingsViewModel.rootnode, {isEditable: true})}' style="width: 500px;">
+                                    params: graphSettingsViewModel.extendNode(graphSettingsViewModel.rootnode)
+                                }' style="width: 500px;">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- /ko -->
 
-                    <div class="row widget-container graph-settings-switch">
+                    <div style="padding: 0px 10px;" class="row widget-container graph-settings-switch">
+                        <div class="form-group">
+                            <div 
+                                style="position: relative; top: 18px; height: 44px; margin-top: -10px;"
+                                data-bind="component: { 
+                                    name: 'views/components/simple-switch', 
+                                    params: {
+                                        value: graphSettingsViewModel.graph.is_copy_immutable, 
+                                    }
+                                }"
+                            ></div>
+                            <div style='padding-left: 5px;' class="col-xs-12">
+                                <div class="control-label graph-settings-switch-label">
+                                    <span>{% trans "Make Immutable" %}</span>
+                                </div>
+                                <span class="graph-settings-switch-subtitle">
+                                    {% trans "When this branch is added to a graph, it cannot be changed or modified within the graph." %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style='margin-bottom: 10px;' class="row widget-container graph-settings-switch">
                         <div class="form-group">
                             <div class="relative">
                                 <label class="col-xs-12 control-label widget-input-label">
