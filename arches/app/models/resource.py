@@ -186,6 +186,8 @@ class Resource(models.ResourceInstance):
 
         tiles = sorted(tiles, key=lambda t: t.parenttile is not None, reverse=True)
 
+        resourceids = [str(resource.resourceinstanceid) for resource in resources]
+
         # need to save the models first before getting the documents for index
         fetchTiles = True
 
@@ -215,9 +217,25 @@ class Resource(models.ResourceInstance):
                 new_resource_created=True
             )
             tiles.clear()
+        elif overwrite == "append_replace":
+            # Resource.objects.bulk_create(resources)
+            nodegroups_to_delete_from = list({str(t.nodegroup_id) for t in tiles})
+            TileModel.objects.filter(resourceinstance_id__in=resourceids, nodegroup_id__in=nodegroups_to_delete_from).delete()
+            TileModel.objects.bulk_create(tiles)
+            fetchTiles = True
+            
+            # save edits for new tiles on new resources
+            Tile.bulk_save_edits(
+                tiles=tiles,
+                note=f"Bulk created - {overwrite}",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+                new_resource_created=False
+            )
+            tiles.clear()
         else: # unknown overwrite -- assume mixed
             existing_resources_ids = set(
-                list(Resource.objects.filter(resourceinstanceid__in=[resource.resourceinstanceid for resource in resources]).values_list(
+                list(Resource.objects.filter(resourceinstanceid__in=resourceids).values_list(
                     "resourceinstanceid", flat=True
                 ))
             )
