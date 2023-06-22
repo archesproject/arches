@@ -1,0 +1,8 @@
+@import "colors";
+
+$link-color: $steel-blue;
+$auth-background: $athens-gray;
+
+
+// this allows a project to override the colors defined above
+@import "css/themes/project";

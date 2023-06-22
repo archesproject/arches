@@ -1,4 +1,8 @@
-define(['knockout', 'templates/views/components/icon-selector.htm'], function(ko, iconSelectorTemplate) {
+define([
+    'knockout', 
+    'templates/views/components/icon-selector.htm',
+    'bindings/key-events-click'
+], function(ko, iconSelectorTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"

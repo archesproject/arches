@@ -1,0 +1,96 @@
+label.form-checkbox.form-normal:before,
+.form-radio.form-normal::before {
+    left: 1px;
+}
+
+label.form-checkbox.form-normal{
+    margin: 4px 0px;
+    display: flex;
+    align-items: center;
+
+    &:before {
+        content: '';
+        margin: 0 5px;
+        display: block;
+        position: unset;
+        width: 16px;
+        height: 16px;
+        background-color: transparent;
+        border: 1px solid #c3cedb;
+        border-radius: 0;
+        left: auto;
+        top: auto;
+    }
+    &:not(.active):hover:after{
+        opacity: 3;
+    }
+    &.form-primary:not(.active):hover:after {
+        border-color: #489eed;
+    }
+
+    &:not(.disabled):hover:after {
+        content: '';
+        position: absolute;
+        height: 6px;
+        width: 11px;
+        left: 8px;
+        top: 50%;
+        margin-top: -5px;
+        -webkit-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+        border-bottom: 2.5px solid #515151;
+        border-left: 2.5px solid #515151;
+    }
+
+    &.active
+    {
+        &:after {
+            content: '';
+            position: absolute;
+            height: 6px;
+            width: 11px;
+            left: 8px;
+            top: 50%;
+            margin-top: -5px;
+            border-bottom: 2.5px solid #515151;
+            border-color: #fff;
+            border-left: 2.5px solid #515151;
+            transform: rotate(-45deg);
+        }
+        &:before {
+            background-color: #5fa2dd;
+            border-color: #5fa2dd;
+        }
+    }
+    span {
+        width: 186px;
+        white-space: normal;
+        padding: 0 5px;
+    }
+
+    &.permission-option i{
+        padding: 0 2px;
+    }
+}
+
+.form-text.form-checkbox,.form-text.form-radio{
+    &:not(.btn){
+        padding: 0px;
+    }
+
+    &>input[type="checkbox"],
+    &>input[type="radio"] {
+        position: unset !important; // TODO: remove !important after nifty.css is purged
+        margin: 5px;
+    }
+}
+
+.columns .form-text.form-checkbox:not(.btn),
+.columns .form-text.form-checkbox:not(.btn),
+.columns .form-text.form-checkbox:not(.btn) {
+    width: 225px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

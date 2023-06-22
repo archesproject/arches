@@ -3,7 +3,12 @@
 
 {% block form %}
 <div class="toggle-container">
-    <span class="switch switch-small" data-bind="css: {'on': getvalue}, click: setvalue"><small></small></span>
+    <span class="switch switch-small" tabindex="0" role="switch"
+        data-bind="
+            css: {'on': getvalue}, 
+            onEnterkeyClick, onSpaceClick, 
+            click: setvalue, attr: {'aria-checked': getvalue, 'aria-label': config().label}
+        "><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
                 <div style="margin-top: -17px;">
@@ -27,7 +32,12 @@
   <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="toggle-container">
-    <span class="switch switch-small" data-bind="css: {'on': getvalue}, click: setvalue"><small></small></span>
+    <span class="switch switch-small" tabindex="0" role="switch"
+        data-bind="
+            css: {'on': getvalue}, 
+            onEnterkeyClick, onSpaceClick,
+            click: setvalue, attr: {'aria-checked': getvalue, 'aria-label': config().label}
+        "><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
             </div>
