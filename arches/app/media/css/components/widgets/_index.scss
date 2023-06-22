@@ -1,0 +1,192 @@
+@import "number";
+@import "checkbox";
+@import "datepicker";
+@import "file";
+@import "edtf";
+@import "radio";
+@import "switch";
+@import "text";
+
+.widgets {
+    border-bottom-width: 1px;
+}
+
+div.row.widget-wrapper {
+    margin: 0;
+    margin-right: 10px;
+    padding: 10px 5px 25px 5px;
+    position: relative;
+}
+
+.widget-input-label {
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 600;
+    color: #666;
+    display: inline-block;
+}
+
+.crud-widget-container {
+    padding-bottom: 15px;
+}
+
+.form-control.input-lg.widget-input {
+    height: 36px;
+}
+
+.option-input {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+.option-input-config {
+    display: flex;
+    flex-direction: column;
+}
+
+.pad-hor.columns {
+    background: #fff;
+    padding: 8px 5px 6px 10px;
+    /*border: 1px solid #ddd;*/
+}
+
+.ion-asterisk.widget-label-required {
+    padding-left: 3px;
+    font-size: 9px;
+    margin-top: 2px;
+    position: absolute;
+}
+
+/*  Start card/widget manager Classes
+    used to manage placement and display of elements inside of the Card
+    and Widget Management forms
+*/
+
+.panel-config {
+    flex-direction: row-reverse;
+}
+
+.panel-config .middle-column-container {
+    border-right: transparent;
+    border-left: 1px solid #ddd;
+    background: #f4f4f4;
+    color: #2d3c4b;
+}
+
+.panel-config .toggle-container {
+    padding-bottom: 5px;
+}
+
+.panel-config .form-divider {
+    border-top: 1px solid #ccc;
+}
+
+.widget-config-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-config .widget-config-container {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.panel-config .widget-config-container .control-label {
+    padding-top: 5px;
+    // padding-left: 5px;
+}
+
+
+/* panel styling in widget manager for radio groups */
+
+.panel-config .widget-config-container .radio-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+
+/* panel styling in widget manager for checkbox groups */
+
+.panel-config .widget-config-container .checkbox-panel {
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+}
+
+.widget-inline-tools-collapser {
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    z-index: 1;
+    margin-bottom: 5px;
+}
+
+.widget-inline-tools-collapser>.widget-input-label {
+    flex-grow: 1;
+}
+
+.widget-inline-tools-collapser>span {
+    padding-inline-end: 12px;
+}
+
+.widget-help-panel {
+    padding: 5px 10px;
+}
+
+.widget-help-panel h2 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel-h2 {
+    font-size: 1.0em;
+    font-weight: 600;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel a {
+    color: steelblue;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.widget-help-panel h3 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel-h3 {
+    font-size: 1.0em;
+    font-weight: 400;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel .text-thin {
+    color: #666;
+    font-weight: 400;
+}
+
+// base styling for expandable panels for language selection and edtf info
+.edtf-style-tools-panel, .i18n-style-tools-panel {
+    background: #fbfbfb;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    border-radius: 2px;
+    max-height: 200px;
+}
