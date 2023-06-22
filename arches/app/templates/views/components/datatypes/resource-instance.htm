@@ -30,7 +30,7 @@
                             data-bind="
                                 click: function(){if ($parent.isEditable !== false) {$data.removeRelationship($data)}}, 
                                 clickBubble: false, 
-                                attr: {'disabled': $parent.isEditable === false, 'aria-label': $root.translations.remove + ' ' + $data.name}, 
+                                attr: {'disabled': $parent.isEditable === false, 'aria-label': $root.translations.removeRelatedResourceModel($data.name)}, 
                                 style: {color: $parent.isEditable === true || '#aaa'}">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -81,7 +81,7 @@
                                                     true
                                                 )
                                             }, 
-                                            attr: {'aria-label': $root.translations.defaultRelationshipTo + ' ' + $data.name}
+                                            attr: {'aria-label': $root.translations.defaultRelationshipToResource($data.name)}
                                         "
                                     >
                                 </span>
@@ -114,7 +114,7 @@
                                                 true
                                             )
                                         },
-                                        attr: {'aria-label': $root.translations.defaultInverseRelationshipTo + ' ' + $data.name}
+                                        attr: {'aria-label': $root.translations.defaultInverseRelationshipToResource($data.name)}
                                     ">
                                 </span>
 
@@ -178,7 +178,6 @@
                 class="fa fa-eye" 
                 style="cursor: pointer;"
                 tabindex="0"
-                role=""
                 data-bind="
                     attr: {title: $root.translations.viewSearchString,
                         'aria-label': $root.translations.viewSearchString

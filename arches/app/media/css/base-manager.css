@@ -21,6 +21,36 @@
     width: 100vw;
 }
 
+#skip-link-holder a, #skip-link-holder a:link, #skip-link-holder a:visited {
+  color: #000;
+  background-color: #fae619;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 10px;
+  text-align: center;
+  outline: none !important;
+  max-height: 38px;
+  display: block;
+  width: 100%;
+  position: fixed;
+  top: -38px;
+  left: 0;
+  z-index: 10001;
+}
+
+#skip-target-holder {
+  position: absolute;
+  top: -38px;
+  left: 0;
+}
+
+#skip-link-holder a:focus, #skip-link-holder a:active {
+  text-decoration: underline !important;
+  left: 0;
+  top: 0;
+  z-index: 10000000;
+}
+
 @media print {
     .base-manager-grid {
         display: block;
