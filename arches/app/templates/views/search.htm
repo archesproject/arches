@@ -17,33 +17,36 @@
                 <!-- Inline Filters (for QA and Resource Type) -->
                 <div class="search-inline-filters">
                     <div class="resource-filter" data-bind="component: {
-                            name: 'resource-type-filter',
-                            params: sharedStateObject
-                    }"></div>
-
-                    <!--ko if: sharedStateObject.userIsReviewer-->
-                    <div class="qa-filter" data-bind="component: {
-                        name: 'provisional-filter',
+                        name: 'resource-type-filter',
                         params: sharedStateObject
                     }"></div>
+                    <!--ko if: sharedStateObject.userIsReviewer-->
+                        <div class="qa-filter" data-bind="component: {
+                            name: 'provisional-filter',
+                            params: sharedStateObject
+                        }"></div>
                     <!--/ko-->
                 </div>
             </div>
             <div class="search-tools-container">
-                <!-- Result Count and ordering Block -->
-                <div class="search-count-container">
-                    <h3 class="search-title" data-bind="text: {% quoted_trans 'Results: ' %} + total()"></h3>
-                </div>
-                <div class="search-controls-container">
-                    <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
-                    <!--/ko-->
-                    <span style="width:125px">
-                        <div data-bind="component: {
-                            name: 'sort-results',
-                            params: sharedStateObject
-                        }"></div>
-                    </span>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <!-- Result Count and ordering Block -->
+                        <div class="search-count-container">
+                            <p class="search-title" data-bind="text: {% quoted_trans 'Results: ' %} + total()"></p>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="search-controls-container">
+                            <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
+                            <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
+                            <!--/ko-->
+                            <div data-bind="component: {
+                                name: 'sort-results',
+                                params: sharedStateObject
+                            }"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -1,11 +1,11 @@
 {% load i18n %}
 <div class="resource-selector-button pull-right">
     <div class="btn-group btn-group-xs">
-        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
+        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false" aria-controls="provisional-filter-contents">
             <span data-bind="text: $root.translations.qaType"></span>
             <i class="dropdown-caret fa fa-caret-down"></i>
         </button>
-        <ul class="dropdown-menu dropdown-menu-right">
+        <ul id="provisional-filter-contents" class="dropdown-menu dropdown-menu-right">
             <li><a href="#" data-bind="onEnterkeyClick, click: selectProvisional.bind($data, null)">
                 <span data-bind="text: $root.translations.allEdits"></span>
             </a></li>

@@ -2,11 +2,11 @@
 
 <div class="resource-selector-button pull-right">
     <div class="btn-group btn-group-xs">
-        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
+        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false" aria-controls="resource-type-filter-contents">
             <span data-bind="text: $root.translations.resourceType"></span>
             <i class="dropdown-caret fa fa-caret-down"></i>
         </button>
-        <ul class="dropdown-menu dropdown-menu-right">
+        <ul id="resource-type-filter-contents" class="dropdown-menu dropdown-menu-right">
             <li><a href="#" data-bind="onEnterkeyClick, click: selectModelType.bind($data, null)">
                 <span data-bind="text: $root.translations.allResources"></span>
             </a></li>
