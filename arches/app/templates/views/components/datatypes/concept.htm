@@ -15,7 +15,8 @@
                 options: conceptCollections, 
                 optionsText: 'label', 
                 optionsValue: 'id', 
-                chosen: {width: '100%', allow_single_deselect: true}
+                chosen: {width: '100%', allow_single_deselect: true},
+                attr: {'aria-label': $root.translations.conceptCollection}
             "
         ></select>
     </div>
@@ -37,6 +38,7 @@
                 { text: $root.translations.hasNoValue, value: 'null' },
                 { text: $root.translations.hasAnyValue, value: 'not_null' },
             ],
+            attr: {'aria-label': $root.translations.searchCriteria},
         "
     ></select>
 </div>
@@ -49,6 +51,6 @@
                 select2Config: select2Config
             }
         ">
-    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}"><i class="fa fa-times-circle fa-lg"></i></span>
+    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}, onEnterkeyClick, onSpaceClick" tabindex="0"><i class="fa fa-times-circle fa-lg"></i></span>
 </div>
 <!-- /ko -->

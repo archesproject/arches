@@ -349,7 +349,7 @@ class GraphDataView(View):
             if self.action == "import_graph":
                 graph_file = request.FILES.get("importedGraph").read()
                 graphs = JSONDeserializer().deserialize(graph_file)["graph"]
-                ret = GraphImporter.import_graph(graphs)
+                ret = GraphImporter.import_graph(graphs, user=request.user)
             else:
                 if graphid is not None:
                     graph = Graph.objects.get(graphid=graphid)

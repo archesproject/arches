@@ -1,0 +1,222 @@
+@import "css/themes/default";
+
+#container.cls-container.arches-login {
+    background: $auth-background;
+}
+
+.arches-login>.cls-header {
+    background: $auth-background;
+}
+
+.arches-login div .cls-brand:after {
+    background: $auth-background;
+}
+
+.cls-content.arches-signin {
+    padding-top: 20px;
+}
+
+.login-panel-header.arches-signin {
+    font-size: 28px;
+}
+
+.arches-signin-subtext {
+    padding: 0px 5px 20px 5px;
+    color: #888;
+    font-size: 1em;
+    font-weight: normal;
+    border: none;
+}
+
+.floating-label-group {
+    position: relative;
+    display: flex;
+    align-items: start;
+}
+
+.floating-label-input {
+    &::placeholder {
+        color: transparent;
+    }
+}
+
+.floating-label-input:focus {
+    outline: 1;
+    box-shadow: 1;
+    background: transparent;    
+}
+
+.floating-label-input:focus ~ .floating-label, 
+.floating-label-input:valid ~ .floating-label {
+    top: -1.7em;
+    padding: 0px;
+}
+
+.floating-label-input.change-password:focus ~ .floating-label, 
+.floating-label-input.change-password:valid ~ .floating-label {
+    top: -0.55em; 
+    padding: 0px;
+}
+
+.floating-label {
+    position: absolute;
+    padding: 0.75em;
+    top: 0;
+    pointer-events: none;
+    user-select: none;
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition:0.2s ease all;
+}
+
+.floating-label.change-password {
+    top: 1.3em;
+    color: #888;
+}
+
+.arches-signin .login-panel {
+    border: 1px solid #ddd;
+}
+
+.arches-signin .panel-footer {
+    color: #888;
+    padding: 15px 0px;
+}
+
+.arches-signin .panel-footer a {
+    color: $link-color;
+    font-weight: 600;
+}
+
+.arches-signin-btn {
+    padding-top: 0px;
+    padding-bottom: 10px;
+}
+
+.account-management {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.cls-container .account-management a {
+    color: $link-color;
+}
+
+.account-link {
+    padding: 5px 0px;
+    display: block;
+}
+
+.account-link:first-child {
+    padding-top: 25px;
+}
+
+#login-form {
+    padding: 10px 5px;
+}
+
+.login-panel {
+    opacity: .9;
+}
+
+.login-panel-header {
+    font-size: 2.4em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    font-weight: 300;
+}
+
+.change-password-form.popover {
+    display: block;
+    margin-top: 65px;
+    width: 250px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    left: auto;
+}
+
+.popover.bottom > .arrow:after {
+    left: 50%;
+}
+
+.change-password-form .panel {
+    margin-bottom: 0px;
+}
+
+.profile-summary-page .password-success {
+    color: green;
+    position: absolute;
+    top: 50px;
+}
+
+.profile-toolbar {
+    top: 50px;
+    width: 100%;
+    height: 50px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
+.change-password-form .error-message {
+    font-size: 11px;
+    color: #880000;
+    padding: 2px;
+}
+
+.change-password-form .error-message-container {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.change-password-form .panel-body {
+    padding: 20px 15px;
+}
+
+.change-password-form .panel-heading {
+    text-align: start;
+    position: relative;
+    padding: 10px 15px;
+    margin: 0px;
+    height: 40px;
+    background-color: #f5f6f7;
+    color: #5c7174;
+    line-height: 1.1;
+    border-bottom: solid 0.5px #babebf;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.change-password-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.password-rules {
+    margin-top: -5px;
+    font-size: 12px;
+    color: #555;
+}
+
+.password-rule {
+    color: #888;
+    font-size: 13px;
+    padding-left: 5px;
+    padding-bottom: 3px;
+    display:flex;
+}
+
+.password-rule span {
+    padding-inline-start: 3px;
+    font-size: 12px;
+}
+
+.password-rule i {
+    font-size: 11px;
+}
+
+.password-rules > .list-unstyled {
+    padding-inline-start: initial;
+}
