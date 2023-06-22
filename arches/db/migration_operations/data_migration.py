@@ -1,18 +1,22 @@
+import json
+import uuid
+
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.executor import MigrationExecutor
 
 from arches.app.models import models
+from arches.app.models.graph import Graph
+from arches.app.models.system_settings import settings
 
 
-class UpdatePublicationId(Operation):
+class ArchesDataMigration(Operation):
     # If this is False, it means that this operation will be ignored by
     # sqlmigrate; if true, it will be run and the SQL collected for its output.
     reduces_to_sql = False
 
     # If this is False, Django will refuse to reverse past this operation.
-    reversible = True
+    reversible = False
 
     @staticmethod
     def get_current_migration_name(app_label):
@@ -28,15 +32,48 @@ class UpdatePublicationId(Operation):
 
         return migration
 
-    def __init__(self, current_publication_id, updated_publication_id):
-        self.current_publication_id = current_publication_id
-        self.updated_publication_id = updated_publication_id
+    def __init__(self, arg1, arg2):
+        # Operations are usually instantiated with arguments in migration
+        # files. Store the values of them on self for later use.
+        pass
 
     def state_forwards(self, app_label, state):
         # The Operation should take the 'state' parameter (an instance of
         # django.db.migrations.state.ProjectState) and mutate it to match
         # any schema changes that have occurred.
         pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # The Operation should use schema_editor to apply any changes it
+        # wants to make to the database.
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        # If reversible is True, this is called when the operation is reversed.
+        pass
+
+    def describe(self):
+        # This is used to describe what the operation does in console output.
+        return "Custom Operation"
+
+    @property
+    def migration_name_fragment(self):
+        # Optional. A filename part suitable for automatically naming a
+        # migration containing this operation, or None if not applicable.
+        return "custom_operation_%s_%s" % (self.arg1, self.arg2)
+    
+
+class UpdatePublicationId(ArchesDataMigration):
+    # If this is False, it means that this operation will be ignored by
+    # sqlmigrate; if true, it will be run and the SQL collected for its output.
+    reduces_to_sql = False
+
+    # If this is False, Django will refuse to reverse past this operation.
+    reversible = True
+
+    def __init__(self, current_publication_id, updated_publication_id):
+        self.current_publication_id = current_publication_id
+        self.updated_publication_id = updated_publication_id
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # The Operation should use schema_editor to apply any changes it
@@ -85,3 +122,144 @@ class UpdatePublicationId(Operation):
     def describe(self):
         # This is used to describe what the operation does in console output.
         return "Updates resources' publication_id from %s to %s" % (self.current_publication_id, self.updated_publication_id)
+    
+
+class UpdateTileData(ArchesDataMigration):
+    # If this is False, it means that this operation will be ignored by
+    # sqlmigrate; if true, it will be run and the SQL collected for its output.
+    reduces_to_sql = False
+
+    # If this is False, Django will refuse to reverse past this operation.
+    reversible = True
+
+    def __init__(self, publication_id):
+        self.publication_id = publication_id
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # The Operation should use schema_editor to apply any changes it
+        # wants to make to the database.
+        # current_migration_name = self.get_current_migration_name(app_label=app_label)
+        # operation_name = self.__class__.__name__
+
+        # data_migration = models.DataMigration.objects.create(
+        #     name=current_migration_name,
+        #     app=app_label,
+        #     operation = operation_name,
+        # )
+        # data_migration.save()
+
+        import pdb; pdb.set_trace()
+
+        resource_instance_ids = [str(resource_instance.pk) for resource_instance in models.ResourceInstance.objects.filter(graphpublicationid=self.publication_id)]
+
+        # for tile in models.TileModel.objects.filter(resourceinstanceid__in=resource_instance_ids, nodegroupid=self.nodegroup_id):
+        #     tile.data[]
+
+
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        # If reversible is True, this is called when the operation is reversed.
+        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        operation_name = self.__class__.__name__
+
+        data_migration = models.DataMigration.objects.filter(
+            name=current_migration_name, 
+            app=app_label,
+            operation=operation_name
+        ).last()
+
+        schema_editor.execute(
+            """
+            UPDATE resource_instances 
+            SET graphpublicationid = '%s' 
+            WHERE graphpublicationid = '%s'
+            AND resourceinstanceid = ANY(ARRAY%s::uuid[])
+            """ % (self.current_publication_id, self.updated_publication_id, data_migration.resource_instance_ids)
+        )
+
+        data_migration.delete()
+
+    def describe(self):
+        # This is used to describe what the operation does in console output.
+        return "Updates resources' publication_id from %s to %s" % (self.current_publication_id, self.updated_publication_id)
+    
+
+class UpdateGraphFromJSON(ArchesDataMigration):
+    # If this is False, it means that this operation will be ignored by
+    # sqlmigrate; if true, it will be run and the SQL collected for its output.
+    reduces_to_sql = False
+
+    # If this is False, Django will refuse to reverse past this operation.
+    reversible = True
+
+    def __init__(self, json_path):
+        self.json_path = json_path
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # The Operation should use schema_editor to apply any changes it
+        # wants to make to the database.
+        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        operation_name = self.__class__.__name__
+
+        with open(self.json_path, 'r') as f:
+            data = json.load(f)
+
+        graph_data = data['graph'][0]
+        # del graph_data['functions_x_graphs']  #TODO: This needs to be handled for and is likely already handled in the editable_future_graphs work
+
+        updated_graph = Graph(graph_data)
+        previous_graph = Graph.objects.get(pk=updated_graph.pk)
+
+        data_migration = models.DataMigration.objects.create(
+            name=current_migration_name,
+            app=app_label,
+            operation = operation_name,
+            metadata=json.dumps({
+                'previous_publication_id': str(previous_graph.publication_id),
+                'current_publication_id': str(updated_graph.publication_id)
+            })
+        )
+
+        data_migration.save()
+        # updated_graph.publication.save()  #TODO: This logic needs to be tightened up
+        updated_graph.save()
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        # If reversible is True, this is called when the operation is reversed.
+        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        operation_name = self.__class__.__name__
+
+        data_migration = models.DataMigration.objects.filter(
+            name=current_migration_name, 
+            app=app_label,
+            operation=operation_name
+        ).last()
+
+        metadata = json.loads(data_migration.metadata)
+        previous_publication_id = metadata['previous_publication_id']
+        published_graph = models.PublishedGraph.objects.get(publication_id=previous_publication_id, language=settings.LANGUAGE_CODE)
+
+        # TODO This logic needs to be tightened up after the editable_future_graph work is merged in
+        widget_dict = {}
+        for serialized_widget in published_graph.serialized_graph["widgets"]:
+            for key, value in serialized_widget.items():
+                try:
+                    serialized_widget[key] = uuid.UUID(value)
+                except:
+                    pass
+
+            updated_widget = models.CardXNodeXWidget(**serialized_widget)
+            updated_widget.save()
+
+            widget_dict[updated_widget.pk] = updated_widget
+
+        graph = Graph(published_graph.serialized_graph)
+        graph.widgets = widget_dict
+
+        graph.save()
+
+        data_migration.delete()
+
+    def describe(self):
+        # This is used to describe what the operation does in console output.
+        return "Updates a graph from exported JSON"
