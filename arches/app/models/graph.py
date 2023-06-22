@@ -542,7 +542,7 @@ class Graph(models.GraphModel):
                     functionxgraph.save()
 
             # edge case for instantiating a serialized_graph that has a publication
-            if not len(models.GraphXPublishedGraph.objects.filter(publicationid=self.publication_id)):
+            if self.publication and not len(models.GraphXPublishedGraph.objects.filter(publicationid=self.publication_id)):
                 self.publication.save()
 
                 for language_tuple in settings.LANGUAGES:
