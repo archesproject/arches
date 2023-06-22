@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
                 ('app', models.TextField()),
                 ('name', models.TextField()),
                 ('operation', models.TextField()),
+                ('metadata', models.JSONField(null=True)),
                 ('resource_instance_ids', django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(blank=True), size=None)),
                 ('applied', models.DateTimeField(auto_now_add=True)),
             ],
