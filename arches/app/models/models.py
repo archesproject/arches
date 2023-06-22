@@ -2829,6 +2829,7 @@ class DataMigration(models.Model):
     app = models.TextField()
     name = models.TextField()
     operation = models.TextField()
+    metadata = JSONField(null=True)
     resource_instance_ids = ArrayField(models.UUIDField(blank=True))
     applied = models.DateTimeField(auto_now_add=True, blank=True)
 
