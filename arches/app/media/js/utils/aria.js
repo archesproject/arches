@@ -12,7 +12,7 @@ define([], function(){
             ele.setAttribute("aria-expanded", x);
         },
 
-        onEscapeKey: function(toggleElement, listenerScope) {
+        handleEscKey: function(toggleElement, listenerScope) {
             /* 
             *   toggleElement: element that expands/contracts a panel, menu, etc. 
             *   listenerScope: when focus is within this element, an escape key press will close the element controled by toggleElement
