@@ -1,0 +1,10 @@
+// Name your breakpoints in a way that creates a ubiquitous language
+// across team members. It will improve communication between
+// stakeholders, designers, developers, and testers.
+$breakpoints: (
+    mobile: (min-width: 320px),
+    tablet: (min-width: 740px),
+    desktop: (min-width: 915px),
+    wide: (min-width: 1300px),
+    //mobileLandscape: 480px,
+);

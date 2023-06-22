@@ -298,7 +298,9 @@
                 </span>
                 <!-- /ko -->
             </div>
+            <!-- ko if: card.model.instructions -->
             <h5 class="card-instructions" data-bind="text: card.model.instructions"></h5>
+            <!-- /ko -->
 
             <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
             <h4 class="is-function-node" data-bind="text: card.isFuncNode()"></h4>

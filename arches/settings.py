@@ -573,6 +573,9 @@ DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 SPARQL_ENDPOINT_PROVIDERS = ({"SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"},)
 
 APP_NAME = "Arches"
+APP_VERSION = None
+MIN_ARCHES_VERSION = None
+MAX_ARCHES_VERSION = None
 
 APP_TITLE = "Arches | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
