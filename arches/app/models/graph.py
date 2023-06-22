@@ -539,8 +539,11 @@ class Graph(models.GraphModel):
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
                 if functionxgraph.function_id in [str(id) for id in models.Function.objects.values_list("functionid", flat=True)]:
-                    previous_functionxgraph = models.FunctionXGraph.objects.get(function_id=functionxgraph.function_id, graph_id=self.pk)
-                    previous_functionxgraph.delete()
+                    
+                    previous_functionxgraph_list = models.FunctionXGraph.objects.filter(function_id=functionxgraph.function_id, graph_id=self.pk)
+                    if len(previous_functionxgraph_list):
+                        previous_functionxgraph = previous_functionxgraph_list[0]
+                        previous_functionxgraph.delete()
                     
                     functionxgraph.save()
 
