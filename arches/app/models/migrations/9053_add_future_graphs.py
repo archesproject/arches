@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9585_map_layer_public_flag"),
+        ("models", "9477_fix_for_spatial_view_dbf_function_edtf_displaying_null"),
     ]
 
     operations = [

@@ -199,14 +199,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
         <div class="ep-form-toolbar-tools">
             <span class="graph-settings" data-bind="visible: graphSettingsVisible()" style="display: none;">
-                <!-- ko if: graphSettingsViewModel.dirty() -->
+                <!-- ko if: graphSettingsViewModel.dirty() && !isNodeDirty() -->
                     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: graphSettingsViewModel.reset"><span>{% trans "Discard Edits" %}</span></button>
                     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: graphSettingsViewModel.save"><span>{% trans "Save Edits" %}</span></button>
                 <!-- /ko -->
             </span>
 
             <span class="graph-settings" data-bind="visible: selectedNode() && activeTab() === 'graph'" style="display: none;">
-                <!-- ko if: selectedNode() && selectedNode().dirty() && selectedNode().istopnode == false -->
+                <!-- ko if: isNodeDirty() -->
                     <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: function(){graphModel.get('selectedNode')().reset()}"><span>{% trans "Discard Edits" %}</span></button>
                     <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: saveSelectedNode"><span>{% trans "Save Edits" %}</span></button>
                 <!-- /ko -->

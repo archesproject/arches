@@ -19,16 +19,16 @@
                 { text: $root.translations.hasNoValue, value: 'null' },
                 { text: $root.translations.hasAnyValue, value: 'not_null' },
             ],
+            attr: {'aria-label': $root.translations.searchCriteria},
         "
     ></select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input 
-        type="" 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.date},
+            attr: {placeholder: $root.translations.date, 'aria-label': $root.translations.date},
             value: searchValue, 
             datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}
         "
@@ -42,11 +42,9 @@
     <span data-bind="text: $root.translations.dateFormat"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select 
-        type="" 
-        id="" 
+    <select
         data-bind="
-            attr: {placeholder: $root.translations.dateFormat},
+            attr: {placeholder: $root.translations.dateFormat, 'aria-label': $root.translations.dateFormat},
             options:dateFormatOptions, 
             optionsText:'name', 
             optionsValue:'id', 

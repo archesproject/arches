@@ -6,6 +6,7 @@ define([
     'utils/ontology',
     'templates/views/components/datatypes/resource-instance.htm',
     'views/components/widgets/resource-instance-select',
+    'bindings/key-events-click',
 ], function(ko, _, arches, data, ontologyUtils, resourceInstanceDatatypeTemplate) {
     var name = 'resource-instance-datatype-config';
     const viewModel = function(params) {
