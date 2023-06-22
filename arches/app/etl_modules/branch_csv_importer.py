@@ -93,7 +93,7 @@ class BranchCsvImporter(BaseImportModule):
         return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
-        nodegroup_alias = cell_values[1].split(" ")[0].strip()
+        nodegroup_alias = cell_values[1].strip().split(" ")[0].strip()
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
         tile_valid = True
@@ -143,14 +143,20 @@ class BranchCsvImporter(BaseImportModule):
             if len(cell_values) == 0:
                 continue
             resourceid = cell_values[0]
+            if resourceid is None:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), self.loadid),
+                )
+                raise ValueError(_("All rows must have a valid resource id"))
             if str(resourceid).strip() in ("--", "resource_id"):
-                nodegroup_alias = cell_values[1][0:-4].split(" ")[0].strip()
+                nodegroup_alias = cell_values[1][0:-4].strip().split(" ")[0].strip()
                 data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
             elif cell_values[1] is not None:
                 node_values = cell_values[2:]
                 try:
                     row_count += 1
-                    nodegroup_alias = cell_values[1].split(" ")[0].strip()
+                    nodegroup_alias = cell_values[1].strip().split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
                     tileid = uuid.uuid4()
@@ -203,7 +209,7 @@ class BranchCsvImporter(BaseImportModule):
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-                raise ValueError("A graphid is not available in the metadata worksheet")
+                raise ValueError(_("A graphid is not available in the metadata worksheet"))
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
             for worksheet in workbook.worksheets:

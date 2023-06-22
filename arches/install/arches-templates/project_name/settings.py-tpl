@@ -7,6 +7,7 @@ import os
 import sys
 import arches
 import inspect
+import semantic_version
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -15,7 +16,15 @@ except ImportError:
     pass
 
 APP_NAME = '{{ project_name }}'
+APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+MIN_ARCHES_VERSION = arches.__version__
+MAX_ARCHES_VERSION = arches.__version__
+
+STATICFILES_DIRS =  (
+    os.path.join(APP_ROOT, 'media', 'build'),
+    os.path.join(APP_ROOT, 'media'),
+) + STATICFILES_DIRS
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -60,6 +69,11 @@ KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (serve
 
 LOAD_DEFAULT_ONTOLOGY = False
 LOAD_PACKAGE_ONTOLOGIES = True
+
+# This is the namespace to use for export of data (for RDF/XML for example)
+# It must point to the url where you host your site
+# Make sure to use a trailing slash
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 
 DATABASES = {
     "default": {

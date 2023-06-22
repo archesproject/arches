@@ -573,8 +573,11 @@ class CachedUserPermissionChecker:
             user_permissions = set()
 
             for group in user.groups.all():
-                for permission in group.permissions.all():
-                    user_permissions.add(permission.codename)
+                for group_permission in group.permissions.all():
+                    user_permissions.add(group_permission.codename)
+
+            for user_permission in user.user_permissions.all():
+                user_permissions.add(user_permission.codename)
 
             current_user_cached_permissions["user_permissions"] = user_permissions
             user_permission_cache.set(str(user.pk), current_user_cached_permissions)
