@@ -307,6 +307,8 @@
         custom-date-range='{% trans "Custom date range" as customDateRange %} "{{ customDateRange|escapejs }}"'
         search-all-dates='{% trans "Search all dates" as searchAllDates %} "{{ searchAllDates|escapejs }}"'
         date-type='{% trans "Date Type" as dateType %} "{{ dateType|escapejs }}"'
+        search-date-type='{% trans "Select a date node to search" as searchDateType %} "{{ searchDateType|escapejs }}"'
+        search-date-range='{% trans "Select a date range to search" as searchDateRange %} "{{ searchDateRange|escapejs }}"'
         date-interval='{% trans "Date Interval" as dateInterval %} "{{ dateInterval|escapejs }}"'
         minimum-date='{% trans "Minimum Date" as minimumDate %} "{{ minimumDate|escapejs }}"'
         maximum-date='{% trans "Maximum Date" as maximumDate %} "{{ maximumDate|escapejs }}"'
@@ -395,6 +397,10 @@
         no-saved-searches='{% trans "The Arches site administrator hasn't saved any searches yet." as noSavedSearches %} "{{ noSavedSearches|escapejs }}"'
         searching='{% trans "searching" as searching %} "{{ searching|escapejs }}"'
         search-facets='{% trans "Search Facets" as searchFacets %} "{{ searchFacets|escapejs }}"'
+        previous-page='{% trans "View previous page of results" as previousPage %} "{{ previousPage|escapejs }}"'
+        next-page='{% trans "View next page of results" as nextPage %} "{{ nextPage|escapejs }}"'
+        more-pages='{% trans "More results available" as morePages %} "{{ morePages|escapejs }}"'
+        page='{% trans "Page" as page %} "{{ page|escapejs }}"'
         analyze='{% trans "Analyze" as analyze %} "{{ analyze|escapejs }}"'
         settings='{% trans "Settings" as settings %} "{{ settings|escapejs }}"'
         legend='{% trans "Legend" as legend %} "{{ legend|escapejs }}"'
@@ -795,6 +801,8 @@
         expand-resource-report='(resource) => {return {% trans "Expand resource report for ${resource}" as expandResourceReport %} `{{ expandResourceReport|escapejs }}` }'
         expand-relatioship-ontology-options='(resource, relatedResource) => {return {% trans "Expand relationship ontology options between ${resource} and ${relatedResource}" as expandRelatioshipOntologyOptions %} `{{ expandRelatioshipOntologyOptions|escapejs }}` }'
         remove-related-resource-model='(resourceModel) => {return {% trans "Remove resource model ${resourceModel} from the related resource options" as removeRelatedResourceModel %} `{{ removeRelatedResourceModel|escapejs }}` }'
+        skip-to-content='{% trans "Skip to content" as skipToContent %} "{{ skipToContent|escapejs }}"'
+
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
