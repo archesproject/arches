@@ -28,6 +28,8 @@
     </div>
     <!-- /ko -->
 
+    <div id="skip-link-holder"><a id="skip-link" data-bind="text: $root.translations.skipToContent" tabindex="1" href="#skiptocontent"></a></div>
+
     <div id="container" class="base-manager-grid effect aside-left aside-bright navbar-fixed sidenav-sm"
         data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'sidenav-sm': !navExpanded(), 'sidenav-lg': navExpanded()}">
 
@@ -525,6 +527,11 @@
         </header>
         
         <main id="main-content" role="main">
+            <p id="skip-target-holder">
+                <a id="skiptocontent" name="skiptocontent" class="skip" tabindex="-1" data-bind="attr:{
+                    'aria-label': $root.translations.skipToContent,
+                    innertext: $root.translations.skipToContent}"></a>
+            </p>
             {% block main_content %}
             {% endblock main_content %}
         </main>
