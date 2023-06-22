@@ -334,8 +334,10 @@
                                     {% if user.username == 'anonymous' %}
                                         <span class="hidden-xs h5">{% trans "Login" %}</span>
                                     {% else %}
-                                        <span class="hidden-xs h5" aria-label="{% trans 'Edit your profile' %}.">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</span>
-                                        <i class="fa fa-sign-out"></i>
+                                        <!-- ko let: {user: '{{ user.first_name|default:user.username }}' }  -->
+                                        <span class="hidden-xs h5" data-bind="attr: {'aria-label': $root.translations.welcomeUserEditProfile(user) }"
+                                        >{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</span>
+                                        <!-- /ko -->
                                     {% endif %}
                                 </div>
                             </a>
@@ -344,7 +346,7 @@
 
                         {% if show_language_swtich %}
                         {% get_current_language as LANGUAGE_CODE %}
-                        <li aria-label="{% trans 'CHoose your language' %}">
+                        <li aria-label="{% trans 'Choose your language' %}">
                             <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" data-bind='component: {
                                 name: "views/components/language-switcher",
                                 params: {
