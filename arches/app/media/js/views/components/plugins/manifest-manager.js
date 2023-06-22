@@ -121,6 +121,9 @@ define([
             };
 
             this.submitToManifest = function(onSuccess, onError){
+                if (params.manifestManagerFormData) {
+                    params.manifestManagerFormData(self.formData);
+                }
                 $.ajax({
                     type: "POST",
                     url: arches.urls.manifest_manager,

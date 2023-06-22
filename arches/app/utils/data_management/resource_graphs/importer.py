@@ -65,7 +65,7 @@ class GraphImportException(Exception):
     pass
 
 
-def import_graph(graphs, overwrite_graphs=True):
+def import_graph(graphs, overwrite_graphs=True, user=None):
     reporter = GraphImportReporter(graphs)
 
     def check_default_configs(default_configs, configs):
@@ -157,7 +157,7 @@ def import_graph(graphs, overwrite_graphs=True):
                             defaults={
                                 "notes": publication_data.get("notes"),
                                 "graph_id": publication_data.get("graph_id"),
-                                "user_id": publication_data.get("user_id"),
+                                "user_id": user.id if user else None,
                                 "published_time": publication_data.get("published_time"),
                             },
                         )
