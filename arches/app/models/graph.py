@@ -539,6 +539,9 @@ class Graph(models.GraphModel):
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
                 if functionxgraph.function_id in [str(id) for id in models.Function.objects.values_list("functionid", flat=True)]:
+                    previous_functionxgraph = models.FunctionXGraph.objects.get(functionid=functionxgraph.function_id, graphid=self.pk)
+                    previous_functionxgraph.delete()
+                    
                     functionxgraph.save()
 
             # edge case for instantiating a serialized_graph that has a publication
