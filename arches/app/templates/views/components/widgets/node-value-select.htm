@@ -47,15 +47,18 @@
             <span data-bind="text: $root.translations.dropdownFormat"></span>
         </div>
         <div class="toggle-container">
-            <span class="switch switch-small" tabindex="0" role="switch"
+            <span class="switch switch-small" tabindex="0" role="switch" aria-describedby="description1 description2"
                 data-bind="css: {'on': displayOnlySelectedNode()}, 
                     onEnterkeyClick, onSpaceClick, click: toggleDisplayOnlySelected,
-                    attr: {'aria-label': $root.translations.dropdownFormat, 'aria-checked': displayOnlySelectedNode()}
+                    attr: {
+                        'aria-label': $root.translations.dropdownFormat, 
+                        'aria-checked': displayOnlySelectedNode(),
+                    }
             "><small></small></span>
                     <div style="display:flex; flex-direction:row;">
-                    <div class="arches-toggle-sm" data-bind="text:$root.translations.showOnlySelectedNodeInDropdown"></div>
+                        <div id="description1" class="arches-toggle-sm" data-bind="text: $root.translations.showOnlySelectedNodeInDropdown"></div>
                     </div>
-            <span class="arches-toggle-subtitle" data-bind="text:$root.translations.limitDropdownToWidgetNodes"></span>
+            <span id="description2" class="arches-toggle-subtitle" data-bind="text: $root.translations.limitDropdownToWidgetNodes"></span>
         </div>
         </div>
     </div>
