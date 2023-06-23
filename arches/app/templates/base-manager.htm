@@ -285,7 +285,10 @@
                     {% if nav.menu %}
                         <nav id="manage-top-left-nav" aria-label="{% trans 'Graph and Resource Management' %}">
                             <button id="menu-control" class="ep-tools ep-tool-title"
-                                data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false,
+                                data-bind="click:function(data, event) { 
+                                        menuActive(!menuActive()); 
+                                        handleEscKey(event.currentTarget, '.ep-menu-list'); 
+                                    }, clickBubble: false,
                                     attr: {
                                         'aria-expanded': menuActive().toString(),
                                         'aria-controls': '#menu-panel'

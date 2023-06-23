@@ -9,11 +9,12 @@ define([
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
+    'utils/aria',
     'bindings/scrollTo',
     'bootstrap',
     'bindings/slide',
     'jquery-ui',
-], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
+], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList, ariaUtils) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -64,6 +65,7 @@ define([
                 dirty: ko.observable(false),
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
+                handleEscKey: ariaUtils.handleEscKey,
                 urls: arches.urls,
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
