@@ -63,7 +63,7 @@ class ArchesDataMigration(Operation):
         return "custom_operation_%s_%s" % (self.arg1, self.arg2)
     
 
-class UpdatePublicationId(ArchesDataMigration):
+class UpdateResourceInstancesPublicationId(ArchesDataMigration):
     # If this is False, it means that this operation will be ignored by
     # sqlmigrate; if true, it will be run and the SQL collected for its output.
     reduces_to_sql = False
@@ -144,6 +144,8 @@ class AddNodeToTileData(ArchesDataMigration):
         current_migration_name = self.get_current_migration_name(app_label=app_label)
         operation_name = self.__class__.__name__
 
+        print(operation_name)
+
         data_migration = models.DataMigration.objects.create(
             name=current_migration_name,
             app=app_label,
@@ -154,7 +156,7 @@ class AddNodeToTileData(ArchesDataMigration):
         schema_editor.execute(
             """
             UPDATE tiles
-            SET tiledata = jsonb_set(tiledata, '{%s}', '"%s"')
+            SET tiledata = jsonb_set(tiledata, '{%s}', jsonb_build_object('en', jsonb_build_object('value', '%s', 'direction', 'ltr')))
             WHERE nodegroupid = '%s'
             AND resourceinstanceid = ANY(                
                 SELECT resourceinstanceid 
