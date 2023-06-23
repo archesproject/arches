@@ -74,8 +74,10 @@
                     placeholder: placeholder, 
                     ckeditorOptions: {},  
                     valueUpdate: 'afterkeydown', 
-                    attr: {disabled: disabled},
-                    title: label
+                    attr: {
+                        disabled: disabled,
+                        name: label(),
+                    },
                 "></textarea>
         </div>
     </div>
@@ -99,7 +101,10 @@
         placeholder: placeholder,
         ckeditorOptions: {},  
         valueUpdate: 'afterkeydown', 
-        attr: {disabled: disabled},
+        attr: {
+            disabled: disabled,
+            name: $root.translations.placeholderFor(label()),
+        },
         title: placeholder
     "
 ></textarea>

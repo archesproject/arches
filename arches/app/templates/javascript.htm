@@ -191,6 +191,7 @@
         related-resources-filter-text='{% trans "Arches keeps track of how resources are related. Click the 'related resources' link on a search result from the list on the left to see its relatives displayed in an interactive graph" as relatedResourcesFilterText %} "{{ relatedResourcesFilterText|escapejs }}"'
         report-date='{% trans "Report Date:" as reportDate %} "{{ reportDate|escapejs }}"'
         placeholder='{% trans "Placeholder" as placeholder %} "{{ placeholder|escapejs }}"'
+        placeholder-for='(label) => {return {% trans "Placeholder for ${label}" as placeholderFor %} `{{ placeholderFor|escapejs }}` }'
         x-coordinate-place-holder='{% trans "X Coordinate Placeholder" as xCoordinatePlaceHolder %} "{{ xCoordinatePlaceHolder|escapejs }}"'
         y-coordinate-place-holder='{% trans "Y Coordinate Placeholder" as yCoordinatePlaceHolder %} "{{ yCoordinatePlaceHolder|escapejs }}"'
         display-as-greyscale='{% trans "Display as Greyscale" as displayAsGreyscale %} "{{ displayAsGreyscale|escapejs }}"'
