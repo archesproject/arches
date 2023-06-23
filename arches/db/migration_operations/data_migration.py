@@ -124,7 +124,7 @@ class UpdatePublicationId(ArchesDataMigration):
         return "Updates resources' publication_id from %s to %s" % (self.current_publication_id, self.updated_publication_id)
     
 
-class UpdateTileData(ArchesDataMigration):
+class AddNodeToTileData(ArchesDataMigration):
     # If this is False, it means that this operation will be ignored by
     # sqlmigrate; if true, it will be run and the SQL collected for its output.
     reduces_to_sql = False
@@ -132,29 +132,38 @@ class UpdateTileData(ArchesDataMigration):
     # If this is False, Django will refuse to reverse past this operation.
     reversible = True
 
-    def __init__(self, publication_id):
+    def __init__(self, publication_id, nodegroup_id, node_id, value):
         self.publication_id = publication_id
+        self.nodegroup_id = nodegroup_id
+        self.node_id = node_id
+        self.value = value
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # The Operation should use schema_editor to apply any changes it
         # wants to make to the database.
-        # current_migration_name = self.get_current_migration_name(app_label=app_label)
-        # operation_name = self.__class__.__name__
+        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        operation_name = self.__class__.__name__
 
-        # data_migration = models.DataMigration.objects.create(
-        #     name=current_migration_name,
-        #     app=app_label,
-        #     operation = operation_name,
-        # )
-        # data_migration.save()
+        data_migration = models.DataMigration.objects.create(
+            name=current_migration_name,
+            app=app_label,
+            operation = operation_name,
+        )
+        data_migration.save()
 
-        import pdb; pdb.set_trace()
-
-        resource_instance_ids = [str(resource_instance.pk) for resource_instance in models.ResourceInstance.objects.filter(graphpublicationid=self.publication_id)]
-
-        # for tile in models.TileModel.objects.filter(resourceinstanceid__in=resource_instance_ids, nodegroupid=self.nodegroup_id):
-        #     tile.data[]
-
+        schema_editor.execute(
+            """
+            UPDATE tiles
+            SET tiledata = jsonb_set(tiledata, '{%s}', '"%s"')
+            WHERE nodegroupid = '%s'
+            AND resourceinstanceid = ANY(                
+                SELECT resourceinstanceid 
+                FROM resource_instances 
+                WHERE graphpublicationid = '%s'
+            )
+            AND NOT tiledata @> jsonb_build_array('%s')
+            """ % (self.node_id, self.value, self.nodegroup_id, self.publication_id, self.node_id)
+        )
 
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -170,11 +179,16 @@ class UpdateTileData(ArchesDataMigration):
 
         schema_editor.execute(
             """
-            UPDATE resource_instances 
-            SET graphpublicationid = '%s' 
-            WHERE graphpublicationid = '%s'
-            AND resourceinstanceid = ANY(ARRAY%s::uuid[])
-            """ % (self.current_publication_id, self.updated_publication_id, data_migration.resource_instance_ids)
+            UPDATE tiles
+            SET tiledata = tiledata - '%s'
+            WHERE nodegroupid = '%s'
+            AND resourceinstanceid = ANY(                
+                SELECT resourceinstanceid 
+                FROM resource_instances 
+                WHERE graphpublicationid = '%s'
+            )
+            AND NOT tiledata @> jsonb_build_array('%s')
+            """ % (self.node_id, self.nodegroup_id, self.publication_id, self.node_id)
         )
 
         data_migration.delete()
