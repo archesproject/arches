@@ -2201,7 +2201,7 @@ class Graph(models.GraphModel):
             card.save()
 
         widget_dict = {}
-        for serialized_widget in serialized_graph["widgets"]:
+        for serialized_widget in serialized_graph.get("widgets", serialized_graph.get("cards_x_nodes_x_widgets")):
             for key, value in serialized_widget.items():
                 try:
                     serialized_widget[key] = uuid.UUID(value)
@@ -2219,7 +2219,7 @@ class Graph(models.GraphModel):
         updated_graph.save()
         updated_graph.create_editable_future_graph()
 
-        return updated_graph
+        return Graph.objects.get(pk=updated_graph.pk)
 
     def update_published_graphs(self, user=None, notes=None):
         """
