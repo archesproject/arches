@@ -391,7 +391,7 @@
                         </a>
                         {% endif %}
 
-                        {% if nav.help %}
+                        {% if nav.help and nav.help.templates %}
                         <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
                             data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
