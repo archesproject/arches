@@ -144,8 +144,6 @@ class AddNodeToTileData(ArchesDataMigration):
         current_migration_name = self.get_current_migration_name(app_label=app_label)
         operation_name = self.__class__.__name__
 
-        print(operation_name)
-
         data_migration = models.DataMigration.objects.create(
             name=current_migration_name,
             app=app_label,
