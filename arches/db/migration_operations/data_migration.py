@@ -205,24 +205,22 @@ class UpdateGraphFromJSON(ArchesDataMigration):
             data = json.load(f)
 
         graph_data = data['graph'][0]
-        # del graph_data['functions_x_graphs']  #TODO: This needs to be handled for and is likely already handled in the editable_future_graphs work
+        graph = Graph.objects.get(pk=graph_data['graphid'])
+        previous_graph_publication_id = graph.publication_id
 
-        updated_graph = Graph(graph_data)
-        previous_graph = Graph.objects.get(pk=updated_graph.pk)
-
+        updated_graph = graph.restore_state_from_serialized_graph(graph_data)
+        
         data_migration = models.DataMigration.objects.create(
             name=current_migration_name,
             app=app_label,
             operation = operation_name,
             metadata=json.dumps({
-                'previous_publication_id': str(previous_graph.publication_id),
+                'previous_publication_id': str(previous_graph_publication_id),
                 'current_publication_id': str(updated_graph.publication_id)
             })
         )
 
         data_migration.save()
-        # updated_graph.publication.save()  #TODO: This logic needs to be tightened up
-        updated_graph.save()
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # If reversible is True, this is called when the operation is reversed.
@@ -239,24 +237,8 @@ class UpdateGraphFromJSON(ArchesDataMigration):
         previous_publication_id = metadata['previous_publication_id']
         published_graph = models.PublishedGraph.objects.get(publication_id=previous_publication_id, language=settings.LANGUAGE_CODE)
 
-        # TODO This logic needs to be tightened up after the editable_future_graph work is merged in
-        widget_dict = {}
-        for serialized_widget in published_graph.serialized_graph["widgets"]:
-            for key, value in serialized_widget.items():
-                try:
-                    serialized_widget[key] = uuid.UUID(value)
-                except:
-                    pass
-
-            updated_widget = models.CardXNodeXWidget(**serialized_widget)
-            updated_widget.save()
-
-            widget_dict[updated_widget.pk] = updated_widget
-
-        graph = Graph(published_graph.serialized_graph)
-        graph.widgets = widget_dict
-
-        graph.save()
+        previous_graph = Graph.objects.get(pk=published_graph.serialized_graph['graphid'])
+        previous_graph.restore_state_from_serialized_graph(published_graph.serialized_graph)
 
         data_migration.delete()
 
