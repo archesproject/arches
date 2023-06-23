@@ -36,7 +36,7 @@ define(['jquery'], function($){
                     $(toggleElement).focus();
                 }
             };
-            $(listenerScope).one('keydown', attachListener);
+            $(listenerScope).on('keydown', attachListener);
             $(listenerScope).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
         }
     };
