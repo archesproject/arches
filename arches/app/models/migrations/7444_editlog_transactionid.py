@@ -11,9 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="editlog",
-            name="transactionid",
-            field=models.UUIDField(default=uuid.uuid1),
-        ),
+        # migrations.AddField(
+        #     model_name="editlog",
+        #     name="transactionid",
+        #     field=models.UUIDField(default=uuid.uuid1),
+        # ),
     ]
