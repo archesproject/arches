@@ -9,16 +9,12 @@ from guardian.shortcuts import (
     get_group_perms,
     get_user_perms,
     get_users_with_perms,
+    get_groups_with_perms,
+    get_perms_for_model,
 )
 from guardian.exceptions import NotUserNorGroup
 from arches.app.models.resource import Resource
 
-from guardian.shortcuts import (
-    get_perms,
-    get_group_perms,
-    get_user_perms,
-    get_users_with_perms,
-)
 from guardian.models import GroupObjectPermission, UserObjectPermission
 from guardian.exceptions import WrongAppError
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
@@ -32,6 +28,9 @@ from arches.app.utils.permission_backend import PermissionFramework, NotUserNorG
 class ArchesStandardPermissionFramework(PermissionFramework):
     def setup(self):
         ...
+
+    def get_perms_for_model(self, cls):
+        return get_perms_for_model(cls)
 
     def assign_perm(self, perm, user_or_group, obj=None):
         try:
@@ -227,6 +226,12 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             return result
 
         return result
+
+    def get_users_with_perms(self, obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
+        return get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superuesrs, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+
+    def get_groups_with_perms(self, obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
+        return get_groups_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
 
     def get_restricted_users(self, resource):
         """
