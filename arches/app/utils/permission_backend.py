@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABCMeta
 import inspect
 
 from arches.app.models.models import *
@@ -332,6 +332,24 @@ def user_can_read_map_layers(user):
 
 def user_can_write_map_layers(user):
     return _get_permission_framework().user_can_write_map_layers(user)
+
+def get_users_with_perms(obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
+    return _get_permission_framework().get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superuesrs, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+
+def get_groups_with_perms(obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
+    return _get_permission_framework().get_groups_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+
+def get_user_perms(user, obj):
+    return _get_permission_framework().get_user_perms(user, obj)
+
+def get_group_perms(user_or_group, obj):
+    return _get_permission_framework().get_group_perms(user_or_group, obj)
+
+def get_perms_for_model(cls):
+    return _get_permission_framework().get_perms_for_model(cls)
+
+def get_perms(user_or_group, obj):
+    return _get_permission_framework().get_perms(user_or_group, obj)
 
 def process_new_user(instance, created):
     return _get_permission_framework().process_new_user(instance, created)
