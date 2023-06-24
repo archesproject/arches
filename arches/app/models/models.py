@@ -1529,6 +1529,12 @@ class UserXNotificationType(models.Model):
         managed = True
         db_table = "user_x_notification_types"
 
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    from arches.app.utils.permission_backend import process_new_user
+
+    if created:
+        process_new_user(instance, created)
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
