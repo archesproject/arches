@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.conf import LazySettings
 from django.db import ProgrammingError, OperationalError
 from django.utils.functional import empty
-from arches.app.models import models
+from arches.app.models import models, permissions
 
 
 class SystemSettings(LazySettings):

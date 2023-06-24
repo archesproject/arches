@@ -40,8 +40,7 @@ from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
-from guardian.shortcuts import assign_perm, remove_perm
-from guardian.exceptions import NotUserNorGroup
+from arches.app.utils.permission_backend import assign_perm, remove_perm, NotUserNorGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
     InvalidNodeNameException,
