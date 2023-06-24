@@ -454,7 +454,6 @@ class Resource(models.ResourceInstance):
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
 
                     for index, term in enumerate(node_terms):
-                        print("resource.py 370 term", term)
                         terms.append(
                             {
                                 "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang if hasattr(term, "lang") else "",

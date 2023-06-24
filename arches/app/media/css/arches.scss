@@ -5532,8 +5532,8 @@ div.card-grid-item.selected {
     font-size: 1.7rem;
     padding-left: 18px;
     padding-right: 20px;
-    min-width: 50px;
-    max-width: 120px;
+    max-width: 50px;
+    height: 49px;
 }
 
 .ep-tools-right a:first-child {
@@ -11108,12 +11108,12 @@ a.filter-tools:hover {
 }
 
 .iiif-gallery-content .panel-controls {
-    width: 250px;
+    width: 230px;
     border-right: 1px solid #ddd;
 }
 
 .iiif-gallery-content .panel-controls .hide-gallery-control {
-    width: 100%;
+    width: 230px;
     height: 50px;
     border-bottom: 1px solid #ddd;
     display: flex;
