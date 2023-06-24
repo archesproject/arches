@@ -20,7 +20,6 @@ from django.shortcuts import render
 from django.http import Http404
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
-from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
 from revproxy.views import ProxyView
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -30,7 +29,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object
+from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object, get_users_with_perms, get_groups_with_perms
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg, Term
 from arches.app.search.mappings import RESOURCES_INDEX
