@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('operation', models.TextField()),
                 ('metadata', models.JSONField(null=True)),
-                ('resource_instance_ids', django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(blank=True), size=None, default=[])),
+                ('resource_instance_ids', django.contrib.postgres.fields.ArrayField(base_field=models.UUIDField(blank=True), size=None, default=list)),
                 ('applied', models.DateTimeField(auto_now_add=True)),
             ],
             options={
