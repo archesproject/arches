@@ -1801,7 +1801,7 @@ class DataMigration(models.Model):
     name = models.TextField()
     operation = models.TextField()
     metadata = JSONField(null=True)
-    resource_instance_ids = ArrayField(models.UUIDField(blank=True), default=[])
+    resource_instance_ids = ArrayField(models.UUIDField(blank=True), default=list)
     applied = models.DateTimeField(auto_now_add=True, blank=True)
 
     class Meta:
