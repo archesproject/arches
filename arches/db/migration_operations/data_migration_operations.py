@@ -16,21 +16,22 @@ class ArchesDataMigration(Operation):
     reduces_to_sql = False
 
     # If this is False, Django will refuse to reverse past this operation.
-    reversible = False
+    reversible = True
 
     @staticmethod
-    def get_current_migration_name(app_label):
+    def get_migration_name_for_forwards_migration():
         connection = connections[DEFAULT_DB_ALIAS]
         connection.prepare_database()
         executor = MigrationExecutor(connection)
         targets = executor.loader.graph.leaf_nodes()
+        migrations = executor.migration_plan(targets)
 
-        migration = None
-        for target in targets:
-            if target[0] == app_label:
-                migration = target[1]
+        migration_name = None
+        if len(migrations):
+            migration = migrations[0]
+            migration_name = migration[0].name
 
-        return migration
+        return migration_name
 
     def __init__(self, arg1, arg2):
         # Operations are usually instantiated with arguments in migration
@@ -78,11 +79,11 @@ class UpdateResourceInstancesPublicationId(ArchesDataMigration):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # The Operation should use schema_editor to apply any changes it
         # wants to make to the database.
-        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        migration_name = self.get_migration_name_for_forwards_migration()
         operation_name = self.__class__.__name__
 
         data_migration = models.DataMigration.objects.create(
-            name=current_migration_name,
+            name=migration_name,
             app=app_label,
             operation = operation_name,
             resource_instance_ids=[ 
@@ -99,13 +100,8 @@ class UpdateResourceInstancesPublicationId(ArchesDataMigration):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # If reversible is True, this is called when the operation is reversed.
-        current_migration_name = self.get_current_migration_name(app_label=app_label)
-        operation_name = self.__class__.__name__
-
         data_migration = models.DataMigration.objects.filter(
-            name=current_migration_name, 
             app=app_label,
-            operation=operation_name
         ).last()
 
         schema_editor.execute(
@@ -141,11 +137,11 @@ class AddNodeToTileData(ArchesDataMigration):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # The Operation should use schema_editor to apply any changes it
         # wants to make to the database.
-        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        migration_name = self.get_migration_name_for_forwards_migration()
         operation_name = self.__class__.__name__
 
         data_migration = models.DataMigration.objects.create(
-            name=current_migration_name,
+            name=migration_name,
             app=app_label,
             operation = operation_name,
         )
@@ -168,13 +164,8 @@ class AddNodeToTileData(ArchesDataMigration):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # If reversible is True, this is called when the operation is reversed.
-        current_migration_name = self.get_current_migration_name(app_label=app_label)
-        operation_name = self.__class__.__name__
-
         data_migration = models.DataMigration.objects.filter(
-            name=current_migration_name, 
             app=app_label,
-            operation=operation_name
         ).last()
 
         schema_editor.execute(
@@ -212,7 +203,7 @@ class UpdateGraphFromJSON(ArchesDataMigration):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # The Operation should use schema_editor to apply any changes it
         # wants to make to the database.
-        current_migration_name = self.get_current_migration_name(app_label=app_label)
+        migration_name = self.get_migration_name_for_forwards_migration()
         operation_name = self.__class__.__name__
 
         with open(self.json_path, 'r') as f:
@@ -225,7 +216,7 @@ class UpdateGraphFromJSON(ArchesDataMigration):
         updated_graph = graph.restore_state_from_serialized_graph(graph_data)
         
         data_migration = models.DataMigration.objects.create(
-            name=current_migration_name,
+            name=migration_name,
             app=app_label,
             operation = operation_name,
             metadata=json.dumps({
@@ -238,13 +229,8 @@ class UpdateGraphFromJSON(ArchesDataMigration):
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         # If reversible is True, this is called when the operation is reversed.
-        current_migration_name = self.get_current_migration_name(app_label=app_label)
-        operation_name = self.__class__.__name__
-
         data_migration = models.DataMigration.objects.filter(
-            name=current_migration_name, 
             app=app_label,
-            operation=operation_name
         ).last()
 
         metadata = json.loads(data_migration.metadata)
@@ -259,3 +245,5 @@ class UpdateGraphFromJSON(ArchesDataMigration):
     def describe(self):
         # This is used to describe what the operation does in console output.
         return "Updates a graph from exported JSON"
+    
+
