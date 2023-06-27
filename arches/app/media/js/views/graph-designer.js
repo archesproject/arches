@@ -83,9 +83,6 @@ define([
                 if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     isDirty = true;
                 }
-                else if (viewModel.isNodeDirty()) {
-                    shouldShowGraphPublishButtons = false;
-                }
                 if (ko.unwrap(viewModel.cardTree.selection)) {
                     const selection = ko.unwrap(viewModel.cardTree.selection);
 
@@ -102,10 +99,6 @@ define([
             
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 return Boolean(!viewModel.isDirty() && viewModel.graphHasUnpublishedChanges());
-            });
-
-            viewModel.isNodeDirty = ko.pureComputed(function() {
-                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
             });
 
             viewModel.isNodeDirty = ko.pureComputed(function() {
