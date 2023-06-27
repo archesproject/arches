@@ -84,7 +84,7 @@ class ImportSingleCsv(BaseImportModule):
             csv_file_name = content.name
             csv_file_path = os.path.join(temp_dir, csv_file_name)
             default_storage.save(csv_file_path, content)
-        elif content.content_type == "application/zip":
+        elif content.name.split(".")[-1].lower() == 'zip':
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
