@@ -606,7 +606,7 @@ class ModelHistoryView(GraphBaseView):
                 "%Y-%m-%d | %I:%M %p %Z"
             )
 
-            if not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
+            if graph_x_published_graph.user and not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
                 user_ids_to_user_data[graph_x_published_graph.user.pk] = {
                     "username": graph_x_published_graph.user.username,
                     "first_name": graph_x_published_graph.user.first_name,
