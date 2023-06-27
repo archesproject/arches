@@ -1,5 +1,5 @@
 import json
-import uuid
+import copy
 
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.operations.base import Operation
@@ -17,6 +17,19 @@ class ArchesDataMigration(Operation):
 
     # If this is False, Django will refuse to reverse past this operation.
     reversible = True
+
+    @staticmethod
+    def localize_json(input, language_code):
+        if isinstance(input, dict):
+            if language_code in input:
+                input = input[language_code]
+            else:
+                for key, value in input.items():
+                    input[key] = ArchesDataMigration.localize_json(value, language_code)
+        elif isinstance(input, list):
+            for item in input:
+                ArchesDataMigration.localize_json(item, language_code)
+        return input
 
     @staticmethod
     def get_migration_name_for_forwards_migration():
@@ -210,10 +223,27 @@ class UpdateGraphFromJSON(ArchesDataMigration):
             data = json.load(f)
 
         graph_data = data['graph'][0]
-        graph = Graph.objects.get(pk=graph_data['graphid'])
-        previous_graph_publication_id = graph.publication_id
+        previous_graph = Graph.objects.get(pk=graph_data['graphid'])
+        previous_graph_publication_id = previous_graph.publication_id
 
-        updated_graph = graph.restore_state_from_serialized_graph(graph_data)
+        # first, update the json structure to the system default language
+        # and create a GraphXPublishedGraph entry
+        localized_graph_data = self.localize_json(copy.deepcopy(graph_data), settings.LANGUAGE_CODE)
+        updated_graph = previous_graph.restore_state_from_serialized_graph(localized_graph_data)
+
+        publication = models.GraphXPublishedGraph.objects.create(graph=updated_graph)
+        publication.save()
+
+        # then create a PublishedGraph entry for all languages in the json structure
+        for language_tuple in settings.LANGUAGES:
+            localized_graph_data = self.localize_json(copy.deepcopy(graph_data), language_tuple[0])
+
+            published_graph = models.PublishedGraph.objects.create(
+                publication=publication,
+                serialized_graph=localized_graph_data,
+                language=models.Language.objects.get(code=language_tuple[0]),
+            )
+            published_graph.save()
         
         data_migration = models.DataMigration.objects.create(
             name=migration_name,
@@ -234,11 +264,13 @@ class UpdateGraphFromJSON(ArchesDataMigration):
         ).last()
 
         metadata = json.loads(data_migration.metadata)
-        previous_publication_id = metadata['previous_publication_id']
-        published_graph = models.PublishedGraph.objects.get(publication_id=previous_publication_id, language=settings.LANGUAGE_CODE)
+        published_graph = models.PublishedGraph.objects.get(publication_id=metadata['previous_publication_id'], language=settings.LANGUAGE_CODE)
 
         previous_graph = Graph.objects.get(pk=published_graph.serialized_graph['graphid'])
         previous_graph.restore_state_from_serialized_graph(published_graph.serialized_graph)
+
+        out_of_date_publication = models.GraphXPublishedGraph.objects.get(publicationid=metadata['current_publication_id'])
+        out_of_date_publication.delete()
 
         data_migration.delete()
 
