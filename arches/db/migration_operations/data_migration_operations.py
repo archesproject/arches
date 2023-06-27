@@ -8,6 +8,8 @@ from django.db.migrations.executor import MigrationExecutor
 from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
 class ArchesDataMigration(Operation):
@@ -228,15 +230,20 @@ class UpdateGraphFromJSON(ArchesDataMigration):
 
         # first, update the json structure to the system default language
         # and create a GraphXPublishedGraph entry
-        localized_graph_data = self.localize_json(copy.deepcopy(graph_data), settings.LANGUAGE_CODE)
-        updated_graph = previous_graph.restore_state_from_serialized_graph(localized_graph_data)
-
-        publication = models.GraphXPublishedGraph.objects.create(graph=updated_graph)
+        publication = models.GraphXPublishedGraph.objects.create(graph=previous_graph)  # using previous_graph here because all we need is a graph_id for the foriegn key
         publication.save()
+
+        serialized_publication = JSONDeserializer().deserialize(JSONSerializer().serialize(publication))
+
+        localized_graph_data = self.localize_json(copy.deepcopy(graph_data), settings.LANGUAGE_CODE)
+        localized_graph_data['publication'] = serialized_publication
+
+        updated_graph = previous_graph.restore_state_from_serialized_graph(localized_graph_data)
 
         # then create a PublishedGraph entry for all languages in the json structure
         for language_tuple in settings.LANGUAGES:
             localized_graph_data = self.localize_json(copy.deepcopy(graph_data), language_tuple[0])
+            localized_graph_data['publication'] = serialized_publication
 
             published_graph = models.PublishedGraph.objects.create(
                 publication=publication,
