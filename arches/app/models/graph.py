@@ -539,7 +539,29 @@ class Graph(models.GraphModel):
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
                 if functionxgraph.function_id in [str(id) for id in models.Function.objects.values_list("functionid", flat=True)]:
+                    
+                    previous_functionxgraph_list = models.FunctionXGraph.objects.filter(function_id=functionxgraph.function_id, graph_id=self.pk)
+                    if len(previous_functionxgraph_list):
+                        previous_functionxgraph = previous_functionxgraph_list[0]
+                        previous_functionxgraph.delete()
+                    
                     functionxgraph.save()
+
+            # edge case for instantiating a serialized_graph that has a publication
+            if self.publication and not len(models.GraphXPublishedGraph.objects.filter(publicationid=self.publication_id)):
+                self.publication.save()
+
+                for language_tuple in settings.LANGUAGES:
+                    language = models.Language.objects.get(code=language_tuple[0])
+
+                    translation.activate(language=language_tuple[0])
+
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication=self.publication,
+                        serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(self, force_recalculation=True)),
+                        language=language,
+                    )
+                    published_graph.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
@@ -2179,7 +2201,7 @@ class Graph(models.GraphModel):
             card.save()
 
         widget_dict = {}
-        for serialized_widget in serialized_graph["widgets"]:
+        for serialized_widget in serialized_graph.get("widgets", serialized_graph.get("cards_x_nodes_x_widgets")):
             for key, value in serialized_widget.items():
                 try:
                     serialized_widget[key] = uuid.UUID(value)
@@ -2197,7 +2219,7 @@ class Graph(models.GraphModel):
         updated_graph.save()
         updated_graph.create_editable_future_graph()
 
-        return updated_graph
+        return Graph.objects.get(pk=updated_graph.pk)
 
     def update_published_graphs(self, user=None, notes=None):
         """

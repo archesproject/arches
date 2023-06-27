@@ -80,10 +80,7 @@ define([
                 if (viewModel.hasDirtyWidget()) {
                     isDirty = true;
                 }
-                else if (viewModel.isNodeDirty()) {
-                    shouldShowGraphPublishButtons = false;
-                }
-                if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     isDirty = true;
                 }
                 if (ko.unwrap(viewModel.cardTree.selection)) {
@@ -102,6 +99,10 @@ define([
             
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 return Boolean(!viewModel.isDirty() && viewModel.graphHasUnpublishedChanges());
+            });
+
+            viewModel.isNodeDirty = ko.pureComputed(function() {
+                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
             });
 
             viewModel.isNodeDirty = ko.pureComputed(function() {
@@ -732,7 +733,6 @@ define([
             viewModel.graphModel.on('select-node', function(node) {
                 viewModel.graphTree.expandParentNode(node);
             });
-
             function updateGraphUnpublishedChanges() {
                 $.ajax({
                     type: 'POST',
