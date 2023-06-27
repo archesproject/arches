@@ -80,8 +80,8 @@ define([
                 if (viewModel.hasDirtyWidget()) {
                     isDirty = true;
                 }
-                if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
-                    isDirty = true;
+                else if (viewModel.isNodeDirty()) {
+                    shouldShowGraphPublishButtons = false;
                 }
                 if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
                     isDirty = true;
@@ -102,6 +102,10 @@ define([
             
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 return Boolean(!viewModel.isDirty() && viewModel.graphHasUnpublishedChanges());
+            });
+
+            viewModel.isNodeDirty = ko.pureComputed(function() {
+                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
             });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
@@ -422,9 +426,9 @@ define([
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         }
 
-                        viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         viewModel.loading(false);
                     });
                 }

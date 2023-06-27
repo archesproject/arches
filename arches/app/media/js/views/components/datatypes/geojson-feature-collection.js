@@ -7,6 +7,7 @@ define([
     'bindings/color-picker',
     'bindings/mapbox-gl',
     'bindings/codemirror',
+    'bindings/key-events-click',
     'codemirror/mode/javascript/javascript',
     'bindings/ckeditor',
     'views/components/icon-selector'

@@ -4,6 +4,7 @@ define([
     'underscore', 
     'viewmodels/widget',
     'templates/views/components/widgets/switch.htm',
+    'bindings/key-events-click',
 ], function(arches, ko, _, WidgetViewModel, switchWidgetTemplate) {
     /**
     * knockout components namespace used in arches
@@ -61,12 +62,23 @@ define([
                 }
             }
         };
+
         this.getvalue = this.config().getvalue || ko.computed(function(){
             var result = null;
             if (this.value() === this.on) {
                 result = true;
             } else if (this.value() === false) {
                 result = false;
+            }
+            return result;
+        }, this);
+
+        this.getariavalue = ko.computed(function(){
+            var result = null;
+            if (this.getvalue() === null) {
+                result = "mixed";
+            } else {
+                result = this.getvalue();
             }
             return result;
         }, this);
@@ -87,6 +99,16 @@ define([
                 result = true;
             } else if (this.defaultValue() === false) {
                 result = false;
+            }
+            return result;
+        }, this);
+
+        this.getariadefault = ko.computed(function(){
+            var result = null;
+            if (this.getdefault() === null) {
+                result = "mixed";
+            } else {
+                result = this.getdefault();
             }
             return result;
         }, this);
