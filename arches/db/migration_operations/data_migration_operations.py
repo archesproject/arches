@@ -163,7 +163,7 @@ class AddNodeToTileData(ArchesDataMigration):
         schema_editor.execute(
             """
             UPDATE tiles
-            SET tiledata = jsonb_set(tiledata, '{%s}', jsonb_build_object('en', jsonb_build_object('value', '%s', 'direction', 'ltr')))
+            SET tiledata = jsonb_set(tiledata, '{%s}', '%s'::jsonb)
             WHERE nodegroupid = '%s'
             AND resourceinstanceid = ANY(                
                 SELECT resourceinstanceid 
