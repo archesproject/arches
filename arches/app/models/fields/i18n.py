@@ -22,6 +22,10 @@ class I18n_String(object):
         ret = {}
 
         if isinstance(value, str) and value != "null":
+            # issue #9623 
+            if value.startswith('"') and value.endswith('"'):
+                value = value.replace('"', r'\"')
+
             try:
                 ret = json.loads(value)
             except:
