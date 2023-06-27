@@ -19,7 +19,8 @@ from guardian.models import GroupObjectPermission, UserObjectPermission
 from guardian.exceptions import WrongAppError
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
-from arches.app.models.models import User, ContentType, ResourceInstance
+import inspect
+from arches.app.models.models import *
 from arches.app.models.models import ResourceInstance, MapLayer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -37,6 +38,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             return assign_perm(perm, user_or_group, obj=None)
         except NotUserNorGroup:
             raise ArchesNotUserNorGroup()
+
+    def get_permission_backend(self):
+        return PermissionBackend()
 
     def remove_perm(self, perm, user_or_group=None, obj=None):
         return remove_perm(perm, user_or_group=None, obj=None)
@@ -112,7 +116,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
     def user_can_read_map_layers(self, user):
 
-        map_layers_with_read_permission = get_map_layers_by_perm(user, ["models.read_maplayer"])
+        map_layers_with_read_permission = self.get_map_layers_by_perm(user, ["models.read_maplayer"])
         map_layers_allowed = []
 
         for map_layer in map_layers_with_read_permission:
@@ -125,7 +129,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
 
     def user_can_write_map_layers(self, user):
-        map_layers_with_write_permission = get_map_layers_by_perm(user, ["models.write_maplayer"])
+        map_layers_with_write_permission = self.get_map_layers_by_perm(user, ["models.write_maplayer"])
         map_layers_allowed = []
 
         for map_layer in map_layers_with_write_permission:
@@ -192,8 +196,8 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     result["permitted"] = False
                     return result
 
-                resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
-                result["resource"] = resource
+            resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+            result["resource"] = resource
 
             all_perms = self.get_perms(user, resource)
 
