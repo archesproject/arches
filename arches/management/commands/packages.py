@@ -864,6 +864,14 @@ class Command(BaseCommand):
                 except CommandError as e:
                     print(e)
 
+        def load_templates(package_dir):
+            templates = glob.glob(os.path.join(package_dir, "templates", "*_template.*"))
+            for template in templates:
+                try:
+                    management.call_command("load_template", "-s", template)
+                except CommandError as e:
+                    print(e) # ok to fail, template engine may not be installed
+
         def handle_source(source):
             if os.path.isdir(source):
                 return source
@@ -964,6 +972,8 @@ class Command(BaseCommand):
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
+        print('loading templates')
+        load_templates(package_location)
 
     def setup(self, package_name, es_install_location=None):
         """
