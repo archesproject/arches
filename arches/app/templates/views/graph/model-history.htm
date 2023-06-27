@@ -98,16 +98,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <div style="width: 240px; justify-content: center; display: flex;">
                     <div>
                         <span><strong>{% trans "Publisher:" %}</strong></span>
-                        <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
-                            <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['first_name']"></span>
+                        <!-- ko if: $parent['publishedUserData']()[$data.user_id] -->
+                            <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] -->
+                                <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['first_name']"></span>
+                            <!-- /ko -->
+                            <!-- ko if: $parent['publishedUserData']()[$data.user_id]['last_name'] -->
+                                <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['last_name']">,</span>
+                            <!-- /ko -->
+                            <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] || $parent['publishedUserData']()[$data.user_id]['last_name'] -->
+                                <span>|</span>
+                            <!-- /ko -->
+                            <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['username']"></span>
                         <!-- /ko -->
-                        <!-- ko if: $parent['publishedUserData']()[$data.user_id]['last_name'] -->
-                            <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['last_name']">,</span>
-                        <!-- /ko -->
-                        <!-- ko if: $parent['publishedUserData']()[$data.user_id]['first_name'] || $parent['publishedUserData']()[$data.user_id]['last_name'] -->
-                            <span>|</span>
-                        <!-- /ko -->
-                        <span data-bind="text: $parent['publishedUserData']()[$data.user_id]['username']"></span>
                     </div>
                 </div>
 
