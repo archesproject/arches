@@ -41,22 +41,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"
             ></span>
         </span>
-        <span>
-            <button
-                style="
-                    border: 1px solid #ddd; 
-                    border-radius: 4px;
-                    padding: 8px;
-                    font-size: 16px;
-                "
-                data-bind="click: $data.toggleLockedState"
-            >
-                <i 
-                    class="text-center" 
-                    data-bind="css: ($data.graph.source_identifier_id() ? 'fa fa-unlock' : 'fa fa-lock')" 
-                ></i>
-                <span data-bind="text: $data.graph.source_identifier_id() ? &quot;{% trans "Unlocked" %}&quot; : &quot;{% trans "Locked" %}&quot;"></span>
-            </button>
+        <span
+            style="
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 8px;
+                font-size: 14px;
+                background-color: #f6f6f6;
+                color: #666;
+            "
+        >
+            <span data-bind="text: $data.graph.source_identifier_id() ? {% quoted_trans 'Published on:' %} : {% quoted_trans 'Last Edit:' %}"></span>
+            <span data-bind="text: $data.graph.source_identifier_id() ? $data.sourceGraphPublicationDate : $data.sourceGraphPublicationMostRecentEditDate"></span>
         </span>
     </h1>
 </div>
@@ -172,6 +168,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </script>
             </div>
 
+            <div>
+                <button
+                    class="btn btn-link"
+                    data-bind="click: $data.toggleLockedState"
+                >
+                    <span 
+                        style="
+                            font-size: 14px;
+                            border-left: 1px solid #ddd;
+                            border-right: 1px solid #ddd;
+                            padding: 0px 15px;
+                        "
+                        data-bind="
+                            text: $data.graph.source_identifier_id() ? {% quoted_trans 'Make changes without publishing' %} : {% quoted_trans 'Make changes to new publication' %}
+                        "
+                    ></span>
+                </button>
+            </div>
+
             <div class="graph-active-switch-container">
                 <div 
                     style="display: flex; justify-content: center;"
@@ -185,13 +200,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- ko if: $data.isGraphActive() -->
                     <span 
                         style="font-size: 14px;" 
-                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Active Resource Model'%} : {% quoted_trans 'Active Branch'%}"
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Model state: Active'%} : {% quoted_trans 'Branch state: Active'%}"
                     ></span>
                 <!-- /ko -->
                 <!-- ko ifnot: $data.isGraphActive() -->
                     <span 
                         style="font-size: 14px;" 
-                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Inactive Resource Model'%} : {% quoted_trans 'Inactive Branch'%}"
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Model state: Inactive'%} : {% quoted_trans 'Branch state: Inactive'%}"
                     ></span>
                 <!-- /ko -->
             </div>
@@ -478,6 +493,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "graph": {{graph}},
         "source_graph": {{source_graph}},
         "source_graph_id": "{{source_graph_id}}",
+        "source_graph_publication": {{source_graph_publication}},
+        "source_graph_publication_most_recent_edit": {{source_graph_publication_most_recent_edit}},
         "editable_future_graph_id": "{{editable_future_graph_id}}",
         "publication_resource_instance_count": {{publication_resource_instance_count}},
         "ontology_namespaces": "{{ontology_namespaces}}",

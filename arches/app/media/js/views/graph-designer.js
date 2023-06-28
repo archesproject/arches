@@ -34,6 +34,9 @@ define([
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
+            viewModel.sourceGraph = koMapping.fromJS(data['source_graph']);
+            viewModel.sourceGraphPublicationDate = new Date(data['source_graph_publication']['published_time']).toLocaleString();
+            viewModel.sourceGraphPublicationMostRecentEditDate = new Date(data['source_graph_publication_most_recent_edit']['edit_time']).toLocaleString();
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
