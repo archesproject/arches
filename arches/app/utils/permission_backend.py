@@ -522,7 +522,10 @@ def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+        if EditLog.objects.filter(transactionid=transactionid).count() > 0:
+            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+                return True
+        else:
             return True
     return False
 
