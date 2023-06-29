@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
         TileModel = apps.get_model("models", "TileModel")
 
         for tile in TileModel.objects.all():
-            tile.save()
+            tile.save()  # should trigger new code in `TileModel.save` method that adds empty key/value pairs to tile data
 
     def reverse_func(apps, schema_editor):
         pass
