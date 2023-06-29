@@ -1,7 +1,19 @@
+body {
+    overflow-x: hidden;
+    @include break-at(desktop) {
+        overflow-x: auto;
+    }
+}
+
+header, main {
+    @include break-at(desktop-lg) {
+        max-width: calc(100vw - 65px);
+    }
+}
+
 .ep-help,
 .ep-notifs {
     width: 100%;
-
     @include break-at(desktop) {
         width: 40vw;
     }

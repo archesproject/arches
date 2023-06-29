@@ -1,0 +1,111 @@
+article.main-search-container {
+    @include break-at(desktop-lg) {
+        height: 100%;
+        overflow-x: hidden;
+    }
+    @include break-at(desktop-max) {
+        flex-direction: column;
+    }
+    .search-results-panel {
+        @include break-at(desktop-max) {
+            max-width: calc(100vw - 50px);
+        }
+        .search-tools-container {
+            @include break-at(desktop-max) {
+                width: 100%;
+            }
+        }
+        .search-control-container {
+            @include break-at(desktop-max) {
+                overflow-y: auto;
+            }
+            @include break-at(desktop-lg) {
+                flex: 1;
+            }
+            .search-results-container {
+                @include break-at(desktop-max) {
+                    width: 100%;
+                }
+                @include break-at(desktop-lg) {
+                    padding: 10px 10px 20px 10px;
+                    overflow-y: auto;
+                }
+                .search-listing {
+                    @include break-at(desktop-max) {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+    .search-map-container {
+        flex-direction: column;
+        .search-toolbar {
+            @include break-at(desktop-max) {
+                border-top: solid 1px #bbd1ea;
+                height: 52px;
+            }
+            @include break-at(desktop-max) {
+                flex-direction: column;
+            }
+            .search-type-btn-panel {
+                @include break-at(desktop-max) {
+                    margin-left: 5px;
+                }
+                .search-type-btn {
+                    @include break-at(desktop-max) {
+                        height: 20px;
+                        border-top: 1px solid #d8d8d8;
+                        border-bottom: 1px solid #d8d8d8;
+                        margin: 5px 2px;
+                    }
+                    .fa {
+                        @include break-at(desktop-max) {
+                            display: none;
+                        }
+                    }
+                }
+            }
+            .search-type-btn-popup-panel {
+                .popup-panel-row {
+                    @include break-at(desktop-max) {
+                        position: relative;
+                        margin-left: 4px;
+                        top: -2px;
+                    }
+                    .search-type-btn-popup {
+                        @include break-at(desktop-max) {
+                            min-width: 99px;
+                            height: 20px;
+                            border: 1px solid #d8d8d8;
+                            margin: 0 4px;
+                        }
+                        .fa {
+                            @include break-at(desktop-max) {
+                                display: none;
+                            }
+                        }
+                        p {
+                            @include break-at(desktop) {
+                                display: none;
+                            }
+                            @include break-at(desktop-max) {
+                                display: block;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .tab-pane-content {
+            height: calc(100vh - 100px);
+            .workbench-card-sidebar-tab {
+                @include break-at(desktop-max) {
+                    height: 3em;
+                    padding: 4px;
+                    min-height: 0;
+                }
+            }
+        }
+    }
+}

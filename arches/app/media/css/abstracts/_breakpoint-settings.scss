@@ -5,6 +5,8 @@ $breakpoints: (
     mobile: (min-width: 320px),
     tablet: (min-width: 740px),
     desktop: (min-width: 915px),
+    desktop-lg: (max-width: 915px),
+    desktop-max: (max-width: 1024px),
     wide: (min-width: 1300px),
     //mobileLandscape: 480px,
 );
