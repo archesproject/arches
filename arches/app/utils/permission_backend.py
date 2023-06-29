@@ -360,7 +360,7 @@ def user_has_resource_model_permissions(user, perms, resource):
 
     nodegroups = get_nodegroups_by_perm(user, perms)
     nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
-    return nodes.count() > 0
+    return nodes.exists()
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
@@ -405,7 +405,8 @@ def check_resource_instance_permissions(user, resourceid, permission):
                 return result
 
     except ObjectDoesNotExist:
-        return None
+        result["permitted"] = True # if the object does not exist, no harm in returning true - this prevents strange 403s.
+        return result
 
     return result
 
@@ -522,8 +523,8 @@ def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if EditLog.objects.filter(transactionid=transactionid).count() > 0:
-            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+        if EditLog.objects.filter(transactionid=transactionid).exists():
+            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).exists():
                 return True
         else:
             return True
