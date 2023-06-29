@@ -1101,10 +1101,13 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid4()
 
     def is_fully_provisional(self):
-        has_data = any(self.data.values())
-        self.provisionaledits is not None and has_data is False
+        return bool(self.provisionaledits and not any(self.data.values()))
 
     def save(self, *args, **kwargs):
+        for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+            if not str(node.pk) in self.data:
+                self.data[str(node.pk)] = None
+
         if self.sortorder is None or self.is_fully_provisional():
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
