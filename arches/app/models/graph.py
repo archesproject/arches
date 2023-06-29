@@ -2233,6 +2233,9 @@ class Graph(models.GraphModel):
         published_graph_edit = models.PublishedGraphEdit.objects.create(publication=self.publication, user=user, notes=notes)
         published_graph_edit.save()
 
+        self.publication.most_recent_edit = published_graph_edit
+        self.publication.save()
+
         published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 
         for language_tuple in settings.LANGUAGES:
