@@ -5,15 +5,15 @@
 <div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
 
     <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
-        <h3 
+        <p 
             class="search-listing-title" 
             data-bind="css: {'i18n-alt': $parent.alternativelanguage}"
         >
-            <a class="search-candidate-title" href="" data-bind="click: $parent.viewReport.bind($parent)">
+            <a class="search-candidate-title" href="#" data-bind="click: $parent.viewReport.bind($parent)">
                 <i class="search-listing-icon" data-bind="css: iconclass"></i> 
                 <span data-bind="text: displayname"></span>
             </a>
-        </h3>
+        </p>
 
         <div class="search-listing-body" data-bind="html: displaydescription">
         </div>
@@ -21,35 +21,35 @@
         <div class="search-listing-footer">
             <div style="flex-grow: 1;">
                 <!--ko if: provisional_resource == 'true' -->
-                <a class="provisional-edits" href="">
+                <a class="provisional-edits" href="#">
                     <i class="fa fa-exclamation-circle"></i>
                     <span data-bind="text: $root.translations.provisional"></span>
                 </a>
                 <!--/ko-->
 
                 <!--ko if: provisional_resource == 'partial' && $parent.userIsReviewer -->
-                <a class="provisional-edits" href="">
+                <a class="provisional-edits" href="#">
                     <i class="fa fa-exclamation-circle"></i>
                     <span data-bind="text: $root.translations.provisional"></span>
                 </a>
                 <!--/ko-->
 
                 <!-- ko if: !!$parent.details -->
-                <a class="search-candidate-link" href="" data-bind="click: showDetails">
+                <a class="search-candidate-link" href="#" data-bind="click: showDetails">
                     <i class="fa fa-info-circle"></i>
                     <span data-bind="text: $root.translations.details"></span>
                 </a>
                 <!-- /ko -->
 
                 <!--ko if: canEdit -->
-                <a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)">
+                <a class="search-candidate-link" href="#" data-bind="click: $parent.editResource.bind($parent)">
                     <i class="ion-ios-refresh-empty"></i>
                     <span data-bind="text: $root.translations.edit"></span>
                 </a>
                 <!--/ko-->
                 
                 <!-- ko if: !!$parent.mapFilter -->
-                <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked">
+                <a class="search-candidate-link" href="#" data-bind="visible: point, click: mapLinkClicked">
                     <i class="fa fa-map-marker"></i>
                     <span data-bind="text: $root.translations.map"></span>
                 </a>
@@ -59,7 +59,7 @@
             <div>
                 <!--ko ifnot: $root.resourceEditorContext -->
                     <!--ko if: !!$parent.relatedResourcesManager && canRead -->
-                    <a class="search-candidate-link" href="" data-bind="click: showrelated">
+                    <a class="search-candidate-link" href="#" data-bind="click: showrelated">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.relatedResources"></span>
                     </a>
@@ -68,13 +68,13 @@
 
                 <!--ko if: $root.resourceEditorContext -->
                     <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
-                    <a class="search-candidate-link" href="" data-bind="click: function(val){relationshipcandidacy(val); showrelated()}">
+                    <a class="search-candidate-link" href="#" data-bind="click: function(val){relationshipcandidacy(val); showrelated()}">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.relateResource"></span>
                     </a>
                     <!--/ko-->
                     <!--ko if: relatable == false || $root.editingInstanceId == resourceinstanceid -->
-                    <a class="search-candidate-link unrelatable-search-result" href="">
+                    <a class="search-candidate-link unrelatable-search-result" href="#">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.cannotBeRelated"></span>
                     </a>
