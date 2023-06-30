@@ -210,9 +210,8 @@ class Tile(models.TileModel):
         been approved by a user in the resource reviewer group
 
         """
-
         result = False
-        if self.provisionaledits is not None and len(self.data) == 0:
+        if self.provisionaledits is not None and not any(self.data.values()):
             result = True
 
         return result

@@ -1275,14 +1275,26 @@ class JsonLDImportTests(ArchesTestCase):
         tile1 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 6)
         tile1_parent = get_tile_by_id(tiles, tile1.parenttile_id)
 
-        self.assertEqual(tile1_parent.data, {})
+        self.assertEqual(
+            tile1_parent.data, 
+            {
+                'c5a9174c-1540-11ea-b353-acde48001122': None,
+                'd155a4c0-1540-11ea-b353-acde48001122': None,
+                'ddc44d9c-1540-11ea-b353-acde48001122': None
+            }
+        )
         tile1_grandparent = get_tile_by_id(tiles, tile1_parent.parenttile_id)
         self.assertEqual(tile1_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "second part"})
 
         tile2 = get_tiles_by_nodegroup(tiles, "e717dda0-1540-11ea-b353-acde48001122", "f025e108-1540-11ea-b353-acde48001122", 1)
         tile2_parent = get_tile_by_id(tiles, tile2.parenttile_id)
         self.assertEqual(
-            tile2_parent.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-03", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-05"}
+            tile2_parent.data, 
+            {
+                'c5a9174c-1540-11ea-b353-acde48001122': None,
+                "d155a4c0-1540-11ea-b353-acde48001122": "2019-12-03", 
+                "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-05"
+            }
         )
         tile2_grandparent = get_tile_by_id(tiles, tile2_parent.parenttile_id)
         self.assertEqual(tile2_grandparent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "asdf"})
@@ -1290,24 +1302,30 @@ class JsonLDImportTests(ArchesTestCase):
             tile2_grandparent.data["26927e22-1541-11ea-b353-acde48001122"][0]["resourceId"], "5e9baff0-109b-11ea-957a-acde48001122"
         )
         tile2_greatgrandparent = get_tile_by_id(tiles, tile2_grandparent.parenttile_id)
-        self.assertEqual(tile2_greatgrandparent.data, {})
+        self.assertEqual(tile2_greatgrandparent.data, {'af6c5d36-1540-11ea-b353-acde48001122': None})
 
         tile1_greatgrandparent = get_tile_by_id(tiles, tile1_grandparent.parenttile_id)
         self.assertEqual(tile2_greatgrandparent, tile1_greatgrandparent)
 
         tile3 = get_tiles_by_nodegroup(tiles, "c5a9174c-1540-11ea-b353-acde48001122", "d155a4c0-1540-11ea-b353-acde48001122", "2019-12-07")
         self.assertEqual(
-            tile3.data, {"d155a4c0-1540-11ea-b353-acde48001122": "2019-12-07", "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-08"}
+            tile3.data, 
+            {
+                'c5a9174c-1540-11ea-b353-acde48001122': None,
+                "d155a4c0-1540-11ea-b353-acde48001122": "2019-12-07", 
+                "ddc44d9c-1540-11ea-b353-acde48001122": "2019-12-08"
+            }
         )
         tile3_parent = get_tile_by_id(tiles, tile3.parenttile_id)
         self.assertEqual(tile3_parent.data["02ec0ace-1541-11ea-b353-acde48001122"]["en"], {"direction": "ltr", "value": "bar"})
         tile3_grandparent = get_tile_by_id(tiles, tile3_parent.parenttile_id)
-        self.assertEqual(tile3_grandparent.data, {})
+        self.assertEqual(tile3_grandparent.data, {'af6c5d36-1540-11ea-b353-acde48001122': None})
 
         tile4 = get_tiles_by_nodegroup(tiles, "48f3ab3a-1541-11ea-b353-acde48001122")[0]
         self.assertEqual(
             tile4.data,
             {
+                '48f3ab3a-1541-11ea-b353-acde48001122': None,
                 "54272cd4-1541-11ea-b353-acde48001122": ["d2908ab9-19a6-4a82-953d-5ebe8d164e85"],
                 "8e08a496-1541-11ea-b353-acde48001122": None,
             },
@@ -1472,17 +1490,21 @@ class JsonLDImportTests(ArchesTestCase):
             actual_tiledata.append(tile.data)
 
         expected_tiledata = [
-            {"f13ffd9c-3e76-11ec-9a49-faffc210b420": {"en": {"value": "ALLAN, DAVID", "direction": "ltr"}}},
             {
-                "f1420740-3e76-11ec-9a49-faffc210b420": None,
-                "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["b83cab06-1cfe-4aeb-9653-cb9f0cc45595"],
-            },
+                'f1403424-3e76-11ec-9a49-faffc210b420': None, 
+                'f1417e1a-3e76-11ec-9a49-faffc210b420': ['b83cab06-1cfe-4aeb-9653-cb9f0cc45595'], 
+                'f1420740-3e76-11ec-9a49-faffc210b420': None, 
+                'f1420f92-3e76-11ec-9a49-faffc210b420': None
+            }, 
             {
-                "f1420740-3e76-11ec-9a49-faffc210b420": None,
-                "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["fc3559c4-03c4-428c-a48e-0f480c8a3751"],
-            },
+                'f1403424-3e76-11ec-9a49-faffc210b420': None, 
+                'f1417e1a-3e76-11ec-9a49-faffc210b420': ['fc3559c4-03c4-428c-a48e-0f480c8a3751'], 
+                'f1420740-3e76-11ec-9a49-faffc210b420': None, 
+                'f1420f92-3e76-11ec-9a49-faffc210b420': None
+            }, 
+            {
+                'f13ffd9c-3e76-11ec-9a49-faffc210b420': {'en': {'value': 'ALLAN, DAVID', 'direction': 'ltr'}}
+            }
         ]
         self.assertCountEqual(actual_tiledata, expected_tiledata)
 
