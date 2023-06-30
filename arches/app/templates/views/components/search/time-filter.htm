@@ -4,7 +4,7 @@
     <div class="filter-title">
         <span data-bind="text: $root.translations.dateInterval"></span>
         <div class="btn-group">
-            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> 
+            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" data-bind="click: function () { clear(); }"> 
                 <i class="fa fa-close"></i>
                 <span data-bind="text: $root.translations.clear"></span>
             </button>
@@ -15,19 +15,20 @@
 
         <!-- Date Type -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.type"></span>
-            </h3>
+            </div>
             <select 
-                id="" class="resources" 
-                tabindex="-1" 
+                class="resources" 
+                tabindex="0" 
                 data-bind="
                     placeholder: $root.translations.dateType,
                     value: filter.dateNodeId, 
-                    chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} 
+                    chosen:{ width: '100%' }, 
+                    attr: {id:dateDropdownEleId, 'aria-label': $root.translations.searchDateType} 
                 "
             >
-                <option value="" data-bind="text: $root.translations.searchAllDates"></option>
+                <option data-bind="text: $root.translations.searchAllDates"></option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
                         <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
@@ -42,15 +43,14 @@
 
         <!-- Date Selector -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.within"></span>
-            </h3>
+            </div>
             <select 
-                id="" 
                 class="resources" 
-                tabindex="-1" 
+                tabindex="0" 
                 data-bind="
-                    attr: {placeholder: $root.translations.select},
+                    attr: {placeholder: $root.translations.select, 'aria-label': $root.translations.searchDateRange},
                     value: dateRangeType, 
                     chosen:{ width: '100%' },
                     optionsText: 'text',
@@ -74,28 +74,38 @@
     <div id="calendar">
         <!-- From Date -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.from"></span>
-            </h3>
+            </div>
             <div id="search-from-c" class="hide-datepicker-time-option">
-                <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+                <input class="form-control input-md" 
+                    data-bind="
+                        value: filter.fromDate, 
+                        datepicker: {format: format, keepInvalid: true}, 
+                        attr:{'placeholder': format, 'aria-label': $root.translations.fromDate}, 
+                        disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
         <!-- To Date -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.to"></span>
-            </h3>
+            </div>
             <div id="search-from-b" class="hide-datepicker-time-option">
-                <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+                <input class="form-control input-md" 
+                    data-bind="
+                        value: filter.toDate, 
+                        datepicker: {format: format, keepInvalid: true}, 
+                        attr:{'placeholder': format, 'aria-label': $root.translations.toDate}, 
+                        disable: dateRangeType() !== 'custom'">
             </div>
         </div>
     </div>
 
-    <h3 class="time-wheel-title">
+    <div class="time-wheel-title">
         <span data-bind="text: $root.translations.timeWheel"></span>
-    </h3>
+    </div>
     <div class="time-wheel-instructions">
         <span data-bind="text: '(' + $root.translations.timeWheelText + ')'"></span>
     </div>
