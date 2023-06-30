@@ -865,7 +865,7 @@ class Command(BaseCommand):
                     print(e)
 
         def load_templates(package_dir):
-            templates = glob.glob(os.path.join(package_dir, "templates", "*_template.*"))
+            templates = glob.glob(os.path.join(package_dir, "templates", "*_template*.*"))
             for template in templates:
                 try:
                     management.call_command("load_template", "-s", template)
@@ -965,6 +965,8 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
+        print('loading templates')
+        load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
             management.call_command("es", "reindex_database")
@@ -972,8 +974,6 @@ class Command(BaseCommand):
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
             print("package load complete")
-        print('loading templates')
-        load_templates(package_location)
 
     def setup(self, package_name, es_install_location=None):
         """
