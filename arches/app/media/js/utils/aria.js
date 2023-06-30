@@ -38,7 +38,13 @@ define(['jquery'], function($){
             };
             $(listenerScope).on('keydown', attachListener);
             $(listenerScope).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
-        }
+        },
+
+        shiftFocus: function(focusTarget) {
+            setTimeout(function() {
+                $(focusTarget).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
+            }, 1000);
+        },
     };
 
     return ariaUtils;

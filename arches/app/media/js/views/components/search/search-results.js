@@ -10,9 +10,10 @@ define([
     'models/graph',
     'view-data',
     'templates/views/components/search/search-results.htm',
+    'utils/aria',
     'bootstrap-datetimepicker',
     'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate) {
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate, ariaUtils) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -208,6 +209,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                             showDetails: this.showResourceSummaryReport(result),
+                            shiftFocus: ariaUtils.shiftFocus,
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
