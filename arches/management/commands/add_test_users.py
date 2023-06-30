@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from guardian.shortcuts import assign_perm
 from arches.app.models import models
 
@@ -46,6 +47,7 @@ class Command(BaseCommand):
                 "groups": [
                     "Graph Editor",
                     "Resource Editor",
+                    "Resource Exporter",
                     "Resource Reviewer",
                     "Application Administrator",
                     "Crowdsource Editor",
@@ -53,10 +55,20 @@ class Command(BaseCommand):
                     "RDM Administrator",
                     "Resource Reviewer",
                     "System Administrator",
+                    "Developer",
                 ],
             },
         )
 
+        try:
+            dev_group = Group.objects.create(name='Developer')
+            dev_perms = Permission.objects.all().values("id")
+            perm_ids = [int(perm['id']) for perm in dev_perms]
+            for permission in perm_ids:
+                dev_group.permissions.add(permission)
+        except Exception as e:
+            print(e)
+        
         for profile in profiles:
             try:
                 user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])

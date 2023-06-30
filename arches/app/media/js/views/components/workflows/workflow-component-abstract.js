@@ -294,11 +294,25 @@ define([
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
 
-                const resourceInstanceOrGraphId = self.componentData.parameters['resourceid'] || self.componentData.parameters['graphid'];
+                const resourceInstanceDataPromise = new Promise(function(resolve, _reject) {
+                    const resourceInstanceId = self.componentData.parameters['resourceid'];
+    
+                    if (resourceInstanceId) {
+                        $.getJSON(
+                            ( arches.urls.resource + `/${resourceInstanceId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}`),
+                            function(data) {
+                                resolve(data);
+                            }
+                        );
+                    }
+                    else {
+                        resolve(null);
+                    }
+                });
 
-                $.getJSON(( arches.urls.resource + `/${resourceInstanceOrGraphId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                resourceInstanceDataPromise.then( function(data) {
                     if (self.cardinality() === '1') {
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
                             self.complete(true);
                         }
@@ -306,7 +320,7 @@ define([
                     }
                     else if (self.cardinality() === 'n') {
                         MultipleTileBasedComponent.apply(self);
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.complete(true);
                         }
                         
@@ -338,6 +352,7 @@ define([
                         };
                     }
                 });
+
             });
         };
 
