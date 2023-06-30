@@ -1426,17 +1426,19 @@ class JsonLDImportTests(ArchesTestCase):
             actual_tiledata.append(tile.data)
 
         expected_tiledata = [
-            {"f13ffd9c-3e76-11ec-9a49-faffc210b420": {"en": {"value": "ALLAN, DAVID", "direction": "ltr"}}},
+            {'f13ffd9c-3e76-11ec-9a49-faffc210b420': {'en': {'value': 'ALLAN, DAVID', 'direction': 'ltr'}}}, 
             {
-                "f1420740-3e76-11ec-9a49-faffc210b420": None,
-                "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["b83cab06-1cfe-4aeb-9653-cb9f0cc45595"],
-            },
+                'f1403424-3e76-11ec-9a49-faffc210b420': None, 
+                'f1417e1a-3e76-11ec-9a49-faffc210b420': ['b83cab06-1cfe-4aeb-9653-cb9f0cc45595'], 
+                'f1420740-3e76-11ec-9a49-faffc210b420': None, 
+                'f1420f92-3e76-11ec-9a49-faffc210b420': None
+            }, 
             {
-                "f1420740-3e76-11ec-9a49-faffc210b420": None,
-                "f1420f92-3e76-11ec-9a49-faffc210b420": None,
-                "f1417e1a-3e76-11ec-9a49-faffc210b420": ["fc3559c4-03c4-428c-a48e-0f480c8a3751"],
-            },
+                'f1403424-3e76-11ec-9a49-faffc210b420': None, 
+                'f1417e1a-3e76-11ec-9a49-faffc210b420': ['fc3559c4-03c4-428c-a48e-0f480c8a3751'], 
+                'f1420740-3e76-11ec-9a49-faffc210b420': None, 
+                'f1420f92-3e76-11ec-9a49-faffc210b420': None
+            }
         ]
         self.assertCountEqual(actual_tiledata, expected_tiledata)
 
