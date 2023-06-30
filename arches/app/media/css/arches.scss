@@ -6323,7 +6323,7 @@ div.card-grid-item.selected {
     font-weight: 700;
 }
 
-.ep-help-topic-toggle>h4 {
+.ep-help-topic-toggle>.h4 {
     display: inline-block;
 }
 
@@ -9863,14 +9863,16 @@ a.search-query-link-captions:focus {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
     height: 50px;
-    width: 399px;
+    width: 100%;
     padding: 4px 0px;
     margin-top: -1px;
     border-top: 1px solid #ddd;
-}
-
-.search-tools-container .clear-filter {
-    margin-right: 5px;
+    .clear-filter {
+        margin-right: 5px;
+    }
+    .row {
+        margin: 0;
+    }
 }
 
 .search-count-container {
@@ -9994,37 +9996,6 @@ ul.pagination {
     color: #999;
 }
 
-.time-search-container {
-    padding: 20px;
-    background: #fff;
-}
-
-.time-search-container .calendar {
-    display: block;
-    width: inherit;
-    padding-left: 5px;
-    max-width: 152px;
-}
-
-.time-search-container #calendar {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.time-search-container #calendar .calendar .search-label {
-    margin-top: 10px;
-}
-
-.hide-datepicker-time-option .bootstrap-datetimepicker-widget table td span {
-    display: none;
-}
-
-.calendar.picker {
-    max-width: 175px;
-    min-width: 175px;
-    position: relative;
-}
-
 .dropdown-crud {
     right: 0px;
     padding-left: 15px;
@@ -10039,40 +10010,8 @@ ul.pagination {
 .search-results-container {
     padding: 10px 10px 60px 10px;
     bottom: 50px;
-    overflow-y: scroll;
-    width: 400px;
-}
-
-.calendar {
-    display: table-cell;
-    width: 180px;
-    padding-left: 5px;
-}
-
-.calendar div .form-control[disabled] {
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    color: #777;
-}
-
-.datepicker-inline {
-    background: #fff;
-    border-width: 0px;
-}
-
-.search-label {
-    font-weight: 400;
-    font-size: 15px;
-    margin-bottom: 3px;
-}
-
-#calendar .chosen-container-single .chosen-single {
-    height: 35px;
-    padding-top: 8px;
-}
-
-#calendar .chosen-container-single .chosen-single div b:before {
-    vertical-align: -70%;
+    overflow-y: auto;
+    width: 100%;
 }
 
 .rr-display-toggle {
@@ -10091,8 +10030,6 @@ ul.pagination {
     font-size: 19px;
     font-weight: 500;
 }
-
-.related-resources-relationship {}
 
 .related-resources-relationship .dropdown-menu {
     left: auto;
@@ -10150,22 +10087,19 @@ ul.pagination {
 }
 
 .search-listing {
-    width: 370px;
+    width: 100%;
     background: #fff;
     border: 1px solid #ddd;
     margin-bottom: 10px;
-}
-
-.search-listing:hover {
-    border: 1px solid steelblue;
-}
-
-.search-listing:active {
-    border: 1px solid steelblue;
-}
-
-.search-listing.selected {
-    border: 1px solid steelblue;
+    &:hover {
+        border: 1px solid steelblue;
+    }
+    &:active {
+        border: 1px solid steelblue;
+    }
+    &.selected {
+        border: 1px solid steelblue;
+    }
 }
 
 .search-listing-title {
@@ -10176,6 +10110,7 @@ ul.pagination {
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 10px 5px 0px 10px;
+    line-height: 1.1;
 }
 
 .search-listing-title.i18n-alt a span {
