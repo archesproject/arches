@@ -82,15 +82,15 @@ class Migration(migrations.Migration):
         language plpgsql;
     """
 
-    create_tileid_index_on_load_staging = """
-        CREATE INDEX IF NOT EXISTS load_staging_tileid ON load_staging;
+    create_index_on_load_staging_tileid = """
+        CREATE INDEX IF NOT EXISTS load_staging_tileid ON load_staging (tileid);
     """
 
-    drop_tileid_index_on_load_staging = """
+    drop_index_on_load_staging_tileid = """
         DROP INDEX IF EXISTS load_staging_tileid;
     """
 
     operations = [
         migrations.RunSQL(update_check_excess_tiles_trigger, restore_check_excess_tiles_trigger),
-        migrations.RunSQL(create_tileid_index_on_load_staging, drop_tileid_index_on_load_staging),
+        migrations.RunSQL(create_index_on_load_staging_tileid, drop_index_on_load_staging_tileid),
     ]
