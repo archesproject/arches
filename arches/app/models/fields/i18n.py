@@ -22,7 +22,7 @@ class I18n_String(object):
         ret = {}
 
         if isinstance(value, str) and value != "null":
-            # issue #9623 
+            # fix for issue #9623 
             if value.startswith('"') and value.endswith('"'):
                 value = value.replace('"', r'\"')
 
