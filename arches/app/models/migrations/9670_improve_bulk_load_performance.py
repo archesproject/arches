@@ -3,7 +3,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "8010_export_permissions"),
+        ("models", "9477_fix_for_spatial_view_dbf_function_edtf_displaying_null"),
     ]
 
     update_check_excess_tiles_trigger = """
