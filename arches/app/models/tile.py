@@ -242,7 +242,7 @@ class Tile(models.TileModel):
             return
         card = models.CardModel.objects.get(nodegroup=self.nodegroup)
         constraints = models.ConstraintModel.objects.filter(card=card)
-        if constraints.count() > 0:
+        if constraints.exists():
             for constraint in constraints:
                 if constraint.uniquetoallinstances is True:
                     tiles = models.TileModel.objects.filter(nodegroup=self.nodegroup)

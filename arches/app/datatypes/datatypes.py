@@ -992,8 +992,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
-        if not preview and (count < 1 or not node.config["layerActivated"]):
+        tile_exists = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).exists()
+        if not preview and (not tile_exists or not node.config["layerActivated"]):
             return None
 
         source_name = "resources-%s" % node.nodeid
@@ -1593,7 +1593,7 @@ class FileListDataType(BaseDataType):
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
+                if models.TileModel.objects.filter(pk=tile.tileid).exists():
                     original_storage = file_model.path.storage
                     # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
                     if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
