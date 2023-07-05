@@ -10072,6 +10072,11 @@ a.search-query-link-captions:focus {
     padding-right: 7px;
 }
 
+button.search-candidate-link{
+    background: none;
+    border: none;
+}
+
 .search-control-container.slide {
     margin-left: -400px;
     transition: all .5s;

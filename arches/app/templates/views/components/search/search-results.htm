@@ -21,24 +21,24 @@
         <div class="search-listing-footer">
             <div style="flex-grow: 1;">
                 <!--ko if: provisional_resource == 'true' -->
-                <a class="provisional-edits" href="#">
+                <span class="provisional-edits">
                     <i class="fa fa-exclamation-circle"></i>
                     <span data-bind="text: $root.translations.provisional"></span>
-                </a>
+                </span>
                 <!--/ko-->
 
                 <!--ko if: provisional_resource == 'partial' && $parent.userIsReviewer -->
-                <a class="provisional-edits" href="#">
+                <span class="provisional-edits">
                     <i class="fa fa-exclamation-circle"></i>
                     <span data-bind="text: $root.translations.provisional"></span>
-                </a>
+                </span>
                 <!--/ko-->
 
                 <!-- ko if: !!$parent.details -->
-                <a class="search-candidate-link" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: function(){showDetails(); shiftFocus('.card-form-preview-container');}">
+                <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(){showDetails();}">
                     <i class="fa fa-info-circle"></i>
                     <span data-bind="text: $root.translations.details"></span>
-                </a>
+                </button>
                 <!-- /ko -->
 
                 <!--ko if: canEdit -->
@@ -49,35 +49,35 @@
                 <!--/ko-->
                 
                 <!-- ko if: !!$parent.mapFilter -->
-                <a class="search-candidate-link" href="#" data-bind="visible: point, click: function(){mapLinkClicked(); shiftFocus('.card-form-preview-container')}">
+                <button class="search-candidate-link" data-bind="visible: point, click: function(){mapLinkClicked();}">
                     <i class="fa fa-map-marker"></i>
                     <span data-bind="text: $root.translations.map"></span>
-                </a>
+                </button>
                 <!-- /ko -->
             </div>
 
             <div>
                 <!--ko ifnot: $root.resourceEditorContext -->
                     <!--ko if: !!$parent.relatedResourcesManager && canRead -->
-                    <a class="search-candidate-link" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: showrelated">
+                    <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: showrelated">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.relatedResources"></span>
-                    </a>
+                    </button>
                     <!--/ko-->
                 <!--/ko-->
 
                 <!--ko if: $root.resourceEditorContext -->
                     <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
-                    <a class="search-candidate-link" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: function(val){relationshipcandidacy(val); showrelated()}">
+                    <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(val){relationshipcandidacy(val); showrelated()}">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.relateResource"></span>
-                    </a>
+                    </button>
                     <!--/ko-->
                     <!--ko if: relatable == false || $root.editingInstanceId == resourceinstanceid -->
-                    <a class="search-candidate-link unrelatable-search-result" href="#">
+                    <span class="search-candidate-link unrelatable-search-result">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.cannotBeRelated"></span>
-                    </a>
+                    </span>
                     <!--/ko-->
                 <!--/ko-->
             </div>
