@@ -905,9 +905,8 @@ class Command(BaseCommand):
             raise Exception("this is an invalid package source")
 
         if setup_db:
-            management.call_command("setup_db", force=True)
-        if dev:
-            management.call_command("add_test_users")
+            management.call_command("setup_db", force=True, dev=dev)
+
         load_ontologies(package_location)
         print("loading Kibana objects")
         load_kibana_objects(package_location)
