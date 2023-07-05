@@ -7,8 +7,9 @@ define([
     'viewmodels/alert',
     'search-components',
     'views/base-manager',
+    'utils/aria',
     'datatype-config-components'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
+], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, ariaUtils) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -55,6 +56,7 @@ define([
             return filter.type === 'filter' && filter.enabled === true;
         }, this);
         this.selectedTab = ko.observable(firstEnabledFilter.componentname);
+        this.shiftFocus = ariaUtils.shiftFocus;
         this.selectedPopup = ko.observable('');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());

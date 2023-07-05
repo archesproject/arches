@@ -64,6 +64,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
                 this.bulkResourceReportCache = ko.observable({});
                 this.bulkDisambiguatedResourceInstanceCache = ko.observable({});
+                this.shiftFocus = ariaUtils.shiftFocus;
             },
 
             mouseoverInstance: function() {
@@ -87,6 +88,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     if (self.selectedTab() !== 'related-resources-filter') {
                         self.selectedTab('related-resources-filter');
                     }
+                    self.shiftFocus('#related-resources-filter-tabpanel');
                 };
             },
 
@@ -111,11 +113,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             });
 
                             reportDataLoaded(true);
+                            self.shiftFocus('.resource-report');
                             self.bulkDisambiguatedResourceInstanceCache(instanceCache);
                         });
                     }
                     else {
                         reportDataLoaded(true);
+                        self.shiftFocus('.resource-report');
                     }
                     
                     reportDataLoaded.subscribe(loaded => {
@@ -209,7 +213,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             iconclass: graphdata ? graphdata.iconclass : '',
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                             showDetails: this.showResourceSummaryReport(result),
-                            shiftFocus: ariaUtils.shiftFocus,
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
@@ -221,6 +224,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                                     self.selectedTab('map-filter');
                                 }
                                 self.mapLinkData({'properties':result._source});
+                                self.shiftFocus('canvas.mapboxgl-canvas');
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
