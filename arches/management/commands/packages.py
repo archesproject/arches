@@ -865,7 +865,7 @@ class Command(BaseCommand):
                     print(e)
 
         def load_templates(package_dir):
-            templates = glob.glob(os.path.join(package_dir, "templates", "*_template*.*"))
+            templates = glob.glob(os.path.join(package_dir, "templates", "*.yaml"))
             for template in templates:
                 try:
                     management.call_command("load_template", "-s", template)
