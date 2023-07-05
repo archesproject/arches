@@ -74,7 +74,10 @@
                     {% if user_can_read %}
                     <button class="search-type-btn relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                         css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, 
-                        click: function(){$parent.sharedStateObject.selectedTab(filter.componentname)},
+                        click: function(){
+                            $parent.sharedStateObject.selectedTab(filter.componentname); 
+                            $parent.sharedStateObject.shiftFocus('#' + filter.componentname + '-tabpanel');
+                        },
                         attr: {
                             'aria-selected': ($parent.sharedStateObject.selectedTab() === filter.componentname).toString(), 
                             'aria-controls': filter.componentname + '-tabpanel'
@@ -93,9 +96,12 @@
                         {% if user_can_read %}
                         <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                             css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, 
-                            click: function(){$parent.sharedStateObject.selectPopup(filter.componentname); },
+                            click: function(){
+                                $parent.sharedStateObject.selectPopup(filter.componentname); 
+                                $parent.sharedStateObject.shiftFocus('#' + filter.componentname + '-popup-tabpanel');
+                            },
                             attr: {
-                                'aria-selected': ($parent.sharedStateObject.selectedPopup() === filter.componentname).toString(),
+                                'aria-expanded': ($parent.sharedStateObject.selectedPopup() === filter.componentname).toString(),
                                 'aria-label': filter.name,
                                 'aria-controls': filter.componentname + '-popup-tabpanel'
                             }
@@ -114,7 +120,13 @@
                 <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                        <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, attr: {id: filter.componentname + '-tabpanel'}">
+                        <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, 
+                            attr: {
+                                id: filter.componentname + '-tabpanel',
+                                'aria-label': filter.name,
+                            },
+                        ">
+                        <span data-bind="text: console.log(filter)"></span>
                             <div style="height: calc(100vh - 100px)" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
@@ -125,7 +137,13 @@
 
                     <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: sharedStateObject.selectedPopup() !== ''">
                         <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, attr: {id: filter.componentname + '-popup-tabpanel'}">
+                        <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, 
+                            attr: {
+                                id: filter.componentname + '-popup-tabpanel',
+                                'aria-label': filter.name,
+                            },
+                        ">
+                        <span data-bind="text: console.log(filter)"></span>
                             <div data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
