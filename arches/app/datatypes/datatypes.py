@@ -1535,7 +1535,7 @@ class FileListDataType(BaseDataType):
             for f in tile.data[str(nodeid)]:
                 val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 document["strings"].append(val)
-        except KeyError as e:
+        except (KeyError, TypeError) as e:
             for k, pe in tile.provisionaledits.items():
                 for f in pe["value"][nodeid]:
                     val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
