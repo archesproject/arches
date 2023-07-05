@@ -41,9 +41,10 @@ define(['jquery'], function($){
         },
 
         shiftFocus: function(focusTarget) {
-            setTimeout(function() {
-                $(focusTarget).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
-            }, 1000);
+            /* 
+            *   focusTarget: element to which focus will be moved. Should have tabindex="-1" or 0 and an aria-label
+            */
+            $(focusTarget).focus();
         },
     };
 
