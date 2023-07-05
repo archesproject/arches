@@ -9,7 +9,7 @@
 
     <!-- ko ifnot: loading() -->
         <!--ko if: report() -->
-        <div class="resource-report" data-bind="component: {
+        <div class="resource-report" tabindex="-1" data-bind="component: {
             name: 'resource-report-abstract',
             params: {
                 report: report(),
