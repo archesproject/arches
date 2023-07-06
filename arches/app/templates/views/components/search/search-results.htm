@@ -2,7 +2,7 @@
 {% load template_tags %}
 {% load i18n %}
 
-<div id="search-results-list" style="display: none;" role="list" data-bind="foreach: results, visible: true,
+<div id="search-results-list" style="display: none;" role="list" tabindex="-1" data-bind="foreach: results, visible: true,
     attr: {'aria-label': $root.translations.searchResults}
 ">
 
