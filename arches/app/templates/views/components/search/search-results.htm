@@ -2,14 +2,18 @@
 {% load template_tags %}
 {% load i18n %}
 
-<div id="search-results-list" data-bind="foreach: results, visible: true" style="display: none;">
+<div id="search-results-list" style="display: none;" role="list" data-bind="foreach: results, visible: true,
+    attr: {'aria-label': $root.translations.searchResults}
+">
 
-    <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
+    <div class="search-listing" role="listitem" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
         <p 
             class="search-listing-title" 
             data-bind="css: {'i18n-alt': $parent.alternativelanguage}"
         >
-            <a class="search-candidate-title" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.viewReport.bind($parent)">
+            <a class="search-candidate-title" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.viewReport.bind($parent),
+                attr: {'aria-label': $root.translations.viewResourceReport(displayname)},
+            ">
                 <i class="search-listing-icon" data-bind="css: iconclass"></i> 
                 <span data-bind="text: displayname"></span>
             </a>
@@ -35,21 +39,27 @@
                 <!--/ko-->
 
                 <!-- ko if: !!$parent.details -->
-                <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(){showDetails();}">
+                <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(){showDetails();},
+                    attr: {'aria-label': $root.translations.viewResourceDetails(displayname)},
+                ">
                     <i class="fa fa-info-circle"></i>
                     <span data-bind="text: $root.translations.details"></span>
                 </button>
                 <!-- /ko -->
 
                 <!--ko if: canEdit -->
-                <a class="search-candidate-link" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.editResource.bind($parent)">
+                <a class="search-candidate-link" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.editResource.bind($parent),
+                    attr: {'aria-label': $root.translations.editResource(displayname)},
+                ">
                     <i class="ion-ios-refresh-empty"></i>
                     <span data-bind="text: $root.translations.edit"></span>
                 </a>
                 <!--/ko-->
                 
                 <!-- ko if: !!$parent.mapFilter -->
-                <button class="search-candidate-link" data-bind="visible: point, click: function(){mapLinkClicked();}">
+                <button class="search-candidate-link" data-bind="visible: point, click: function(){mapLinkClicked();}, 
+                    attr:{'aria-label': $root.translations.viewMap},
+                ">
                     <i class="fa fa-map-marker"></i>
                     <span data-bind="text: $root.translations.map"></span>
                 </button>
@@ -59,7 +69,9 @@
             <div>
                 <!--ko ifnot: $root.resourceEditorContext -->
                     <!--ko if: !!$parent.relatedResourcesManager && canRead -->
-                    <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: showrelated">
+                    <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: showrelated, 
+                        attr: {'aria-label': $root.translations.viewRelatedResources(displayname)},
+                    ">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.relatedResources"></span>
                     </button>
@@ -68,7 +80,9 @@
 
                 <!--ko if: $root.resourceEditorContext -->
                     <!--ko if: relatable & $root.editingInstanceId != resourceinstanceid -->
-                    <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(val){relationshipcandidacy(val); showrelated()}">
+                    <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(val){relationshipcandidacy(val); showrelated()},
+                        attr: {'aria-label': $root.translations.viewRelatedResources(displayname)},
+                    ">
                         <i class="fa fa-code-fork"></i>
                         <span data-bind="text: $root.translations.relateResource"></span>
                     </button>
