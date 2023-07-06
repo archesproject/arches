@@ -802,7 +802,7 @@
         expand-relatioship-ontology-options='(resource, relatedResource) => {return {% trans "Expand relationship ontology options between ${resource} and ${relatedResource}" as expandRelatioshipOntologyOptions %} `{{ expandRelatioshipOntologyOptions|escapejs }}` }'
         remove-related-resource-model='(resourceModel) => {return {% trans "Remove resource model ${resourceModel} from the related resource options" as removeRelatedResourceModel %} `{{ removeRelatedResourceModel|escapejs }}` }'
         skip-to-content='{% trans "Skip to content" as skipToContent %} "{{ skipToContent|escapejs }}"'
-
+        toggle-navigation='{% trans "Toggle navigation bar" as toggleNavigation %} "{{ toggleNavigation|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}

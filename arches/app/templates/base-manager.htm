@@ -35,8 +35,10 @@
 
         <nav class="sidenav" role="navigation">
             {% block navheader %}
-            <a href="#" class="sidenav-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
-                <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
+            <a href="#" class="sidenav-brand" data-bind="onEnterkeyClick, onSpaceClick, click: function () { navExpanded(!navExpanded()) },
+                attr: {'aria-label': $root.translations.toggleNavigation, 'aria-expanded': navExpanded().toString()}
+            ">
+                <img src="{{ STATIC_URL }}img/arches_logo_light.png" class="brand-icon" alt="">
                 <div class="brand-title">
                     <span class="brand-text">{{ app_name }}</span>
                 </div>
