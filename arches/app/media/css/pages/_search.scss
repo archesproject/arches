@@ -148,29 +148,6 @@ article.main-search-container {
                     padding: 5px 0 0 0;
                 }
             }
-            .advanced-search-container {
-                @include break-at(desktop-max) {
-                    flex-direction: column-reverse;
-                }
-                .facets-search-container {
-                    @include break-at(desktop-max) {
-                        flex: 1;
-                        width: 100%;
-                    }
-                }
-                .facets-container {
-                    @include break-at(desktop-max) {
-                        flex: 1;
-                        width: 100%;
-                    }
-                    .search-facets {
-                        @include break-at(desktop-max) {
-                            height: auto;
-                            overflow-y: hidden;
-                        }
-                    }
-                }
-            }
         }
     }
 }
