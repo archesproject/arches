@@ -58,6 +58,7 @@ article.main-search-container {
                         border-top: 1px solid #d8d8d8;
                         border-bottom: 1px solid #d8d8d8;
                         margin: 5px 2px;
+                        min-width: 80px;
                     }
                     .fa {
                         @include break-at(desktop-max) {
@@ -75,10 +76,15 @@ article.main-search-container {
                     }
                     .search-type-btn-popup {
                         @include break-at(desktop-max) {
-                            min-width: 99px;
+                            min-width: 90px;
                             height: 20px;
                             border: 1px solid #d8d8d8;
                             margin: 0 4px;
+                        }
+                        &.active {
+                            @include break-at(desktop-max) {
+                                line-height: inherit;
+                            }
                         }
                         .fa {
                             @include break-at(desktop-max) {
@@ -135,7 +141,7 @@ article.main-search-container {
             #rr-splash {
                 @include break-at(desktop-max) {
                     padding: 20px;
-                    margin: 20px;
+                    margin: 20px;   
                 }
                 .rr-splash-description:last-child {
                     @include break-at(desktop-max) {
@@ -147,6 +153,22 @@ article.main-search-container {
                 @include break-at(desktop-max) {
                     padding: 5px 0 0 0;
                 }
+                .rr-splash {
+                    @include break-at(desktop-max) {
+                        margin: 20px;
+                        padding: 20px;
+                    }
+                    .rr-splash-description:last-child {
+                        @include break-at(desktop-max) {
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
+        }
+        .search-popup-panel {
+            @include break-at(desktop-lg) {
+                width: 100%;
             }
         }
     }

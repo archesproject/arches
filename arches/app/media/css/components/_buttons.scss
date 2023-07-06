@@ -1,4 +1,29 @@
-.resource-filter .resource-selector-button div .btn,
-.qa-filter .resource-selector-button div .btn {
-    padding: 2px 10px;
+.resource-filter {
+	.resource-selector-button {
+		div {
+			.btn {
+				padding: 2px 10px;
+			}
+		}
+	}
+}
+
+.qa-filter {
+	.resource-selector-button {
+		div {
+			.btn {
+				padding: 2px 10px;
+			}
+		}
+	}
+}
+
+.ep-toolbar {
+    .top-right-nav {
+        .ep-tools-login {
+            @include break-at(desktop-lg) {
+                display: none;
+            }
+        }
+    }
 }
