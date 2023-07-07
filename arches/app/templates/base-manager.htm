@@ -36,7 +36,11 @@
         <nav class="sidenav" role="navigation">
             {% block navheader %}
             <a href="#" class="sidenav-brand" data-bind="onEnterkeyClick, onSpaceClick, click: function () { navExpanded(!navExpanded()) },
-                attr: {'aria-label': $root.translations.toggleNavigation, 'aria-expanded': navExpanded().toString()}
+                attr: {
+                    'aria-label': $root.translations.toggleNavigation, 
+                    'aria-description': $root.translations.toggleNavigationDescription, 
+                    'aria-expanded': navExpanded().toString()
+                }
             ">
                 <img src="{{ STATIC_URL }}img/arches_logo_light.png" class="brand-icon" alt="">
                 <div class="brand-title">
