@@ -79,6 +79,8 @@
         font-weight:bold;
         color:#828b94;
         background-color: #00000030;
+        margin: 0;
+        font-size: inherit;
     }
     .link-submenu-item {
         a {
@@ -136,6 +138,9 @@
                 z-index: 100;
                 height: 41px;
             }
+        }
+        ul > ul > li {
+            padding: 0;
         }
         .active-sub > a {
             background-color: #2986b8;
