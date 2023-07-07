@@ -52,6 +52,9 @@ article.main-search-container {
                 @include break-at(desktop-max) {
                     margin-left: 5px;
                 }
+                @include break-at(tablet-max) {
+                    display: flex;
+                }
                 .search-type-btn {
                     @include break-at(desktop-max) {
                         height: 20px;
@@ -129,10 +132,19 @@ article.main-search-container {
                         width: 100%;
                         overflow-y: auto;
                     }
-                    .overlay-listing {
-                        .overlay-name {
-                            @include break-at(desktop-max) {
-                                width: 100%;
+                    .overlays-listing-container {
+                        @include break-at(desktop-max) {
+                            padding: 0 0 16px;
+                        }
+                        .overlay-listing {
+                            .overlay-name {
+                                @include break-at(desktop-max) {
+                                    width: 100%;
+                                    white-space: normal;
+                                }
+                            }
+                            .overlay-opacity-control {
+                                position: relative;
                             }
                         }
                     }
@@ -163,6 +175,12 @@ article.main-search-container {
                             margin-bottom: 0;
                         }
                     }
+                }
+            }
+            .mapboxgl-ctrl-geocoder {
+                @include break-at(tablet-max) {
+                    width: 48vw;
+                    min-width: 0;
                 }
             }
         }
