@@ -59,7 +59,7 @@
                         </li>
 
                         <!-- Tools -->
-                        <h2 id="tools-header-label" class="list-header">{% trans "Tools" %}</h2>
+                        <div id="tools-header-label" class="list-header">{% trans "Tools" %}</div>
 
                         <ul aria-labelledby="tools-header-label">
                             <!-- System Settings list item -->
@@ -213,52 +213,60 @@
                         <div class="list-divider-dark"></div>
 
                         <!-- Modules -->
-                        <h2 class="list-header">{% trans "Modules" %}</h2>
+                        <div id="modules-header-label" class="list-header">{% trans "Modules" %}</div>
 
-                        {% if request.user|has_group:"RDM Administrator" %}
-                        <!--Menu list item-->
-                        <li {% if main_script == "rdm" %} class="active-sub" {% endif %}>
-                            <a href="{% url 'rdm' '' %}"
-                                data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
-                                <i class="fa fa-align-left"></i>
-                                <span class="menu-title">
-                                    <strong>{% trans "Reference Data Manager" %}</strong>
-                                </span>
-                            </a>
-                        </li>
-                        {% endif %}
+                        <ul aria-labelledby="modules-header-label">
 
-                        {% for p in plugins %}
-                            {% if p.config is not None %}
-                                {% if p.config.show is not False %}
-                                <li {% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
-                                    {% if p.slug is not None %}
-                                    <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
-                                    {% else %}
-                                    <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
-                                    {% endif %}
-                                        <i class="{{p.icon}}"></i>
-                                        <span class="menu-title">
-                                            <strong>{{p.name}}</strong>
-                                        </span>
-                                    </a>
-                                </li>
-                                {% endif %}
-                            {% else %}
-                            <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
-                                {% if p.slug is not None %}
-                                <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
-                                {% else %}
-                                <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
-                                {% endif %}
-                                    <i class="{{p.icon}}"></i>
+                            {% if request.user|has_group:"RDM Administrator" %}
+                            <!-- Reference Data Manager -->
+                            <li {% if main_script == "rdm" %} class="active-sub" {% endif %} aria-labelledby="rdm-link-label">
+                                <a href="{% url 'rdm' '' %}"
+                                    data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
+                                    <i class="fa fa-align-left"></i>
                                     <span class="menu-title">
-                                        <strong>{{p.name}}</strong>
+                                        <strong id="rdm-link-label">{% trans "Reference Data Manager" %}</strong>
                                     </span>
                                 </a>
                             </li>
                             {% endif %}
-                        {% endfor %}
+
+                            {% for p in plugins %}
+                                {% if p.config is not None %}
+                                    {% if p.config.show is not False %}
+                                    <!-- ko let: {uid: Math.random().toString()} -->
+                                    <li {% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
+                                        {% if p.slug is not None %}
+                                        <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}'), attr: {'aria-labelledby': uid}">
+                                        {% else %}
+                                        <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}'), attr: {'aria-labelledby': uid}">
+                                        {% endif %}
+                                            <i class="{{p.icon}}"></i>
+                                            <span class="menu-title">
+                                                <strong data-bind="attr: {id: uid}">{{p.name}}</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <!-- /ko -->
+                                    {% endif %}
+                                {% else %}
+                                <!-- ko let: {uid: Math.random().toString()} -->
+                                <li {% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
+                                    {% if p.slug is not None %}
+                                    <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}'), attr: {'aria-labelledby': uid}">
+                                    {% else %}
+                                    <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}'), attr: {'aria-labelledby': uid}">
+                                    {% endif %}
+                                        <i class="{{p.icon}}"></i>
+                                        <span class="menu-title">
+                                            <strong data-bind="attr: {id: uid}">{{p.name}}</strong>
+                                        </span>
+                                    </a>
+                                </li>
+                                <!-- /ko -->
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+
                     </ul>
                     {% endblock navbar %}
                 </div>
