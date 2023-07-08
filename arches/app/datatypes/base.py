@@ -193,7 +193,7 @@ class BaseDataType(object):
         except:
             data = tile["data"]
             provisionaledits = tile["provisionaledits"]
-        if data is not None and len(list(data.keys())) > 0:
+        if data is not None and any(data.values()):
             return data
         elif provisionaledits is not None and len(list(provisionaledits.keys())) > 0:
             if len(list(provisionaledits.keys())) > 1:
