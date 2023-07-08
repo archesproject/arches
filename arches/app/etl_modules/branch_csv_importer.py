@@ -257,7 +257,7 @@ class BranchCsvImporter(BaseImportModule):
                 "title": _("Invalid excel file/zip specified"),
                 "message": _("Upload a valid excel file"),
             }
-        if content.content_type == "application/zip":
+        if content.name.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
