@@ -56,7 +56,7 @@ class ArchesUserCreationForm(UserCreationForm):
     def clean(self):
         cleaned_data = super(ArchesUserCreationForm, self).clean()
         if "email" in cleaned_data:
-            if User.objects.filter(email=cleaned_data["email"]).count() > 0:
+            if User.objects.filter(email=cleaned_data["email"]).exists():
                 self.add_error(
                     "email",
                     forms.ValidationError(
@@ -97,7 +97,7 @@ class ArchesUserProfileForm(ArchesUserCreationForm):
             user.first_name = self.cleaned_data["first_name"]
             user.last_name = self.cleaned_data["last_name"]
             user.email = self.cleaned_data["email"]
-            if models.UserProfile.objects.filter(user=user).count() == 0:
+            if not models.UserProfile.objects.filter(user=user).exists():
                 models.UserProfile.objects.create(user=user)
             user.userprofile.phone = self.cleaned_data["phone"]
             user.userprofile.save()
