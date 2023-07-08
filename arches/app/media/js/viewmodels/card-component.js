@@ -12,7 +12,6 @@ define([
             params.card = ko.unwrap(params.form.card);
         }
 
-         
         this.inResourceEditor = location.pathname.includes(arches.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
@@ -152,7 +151,14 @@ define([
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
-            self.tile.resourceinstance_id = self.tile.resourceinstance_id || ko.unwrap(params.form?.resourceId);
+
+            if (params.resourceid) {
+                self.tile.resourceinstance_id = params.resourceid;
+            }
+            else if (ko.unwrap(params.form?.resourceId)){
+                self.tile.resourceinstance_id = ko.unwrap(params.form.resourceId);
+            }
+
             self.tile.save(function(response) {
                 self.loading(false);
                 if(params?.form?.error){
