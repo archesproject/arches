@@ -147,7 +147,7 @@ class ArchesFileReader(Reader):
         errors = []
         for resource in business_data["resources"]:
             if resource["resourceinstance"] is not None:
-                if GraphModel.objects.filter(graphid=str(resource["resourceinstance"]["graph_id"])).count() > 0:
+                if GraphModel.objects.filter(graphid=str(resource["resourceinstance"]["graph_id"])).exists():
                     resourceinstanceid = uuid.UUID(str(resource["resourceinstance"]["resourceinstanceid"]))
                     defaults = {
                         "graph_id": uuid.UUID(str(resource["resourceinstance"]["graph_id"])),
