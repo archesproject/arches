@@ -329,7 +329,7 @@ class Concept(object):
             for relation in conceptrelations:
                 relation.delete()
 
-            if models.Relation.objects.filter(relations_filter).count() == 0:
+            if not models.Relation.objects.filter(relations_filter).exists():
                 # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
                 concept = models.Concept.objects.get(pk=self.id)
                 concept.nodetype_id = "ConceptScheme"
