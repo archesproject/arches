@@ -1,7 +1,11 @@
 @import "number";
 @import "checkbox";
 @import "datepicker";
-
+@import "file";
+@import "edtf";
+@import "radio";
+@import "switch";
+@import "text";
 
 .widgets {
     border-bottom-width: 1px;
@@ -119,4 +123,70 @@ div.row.widget-wrapper {
     margin-right: -10px;
     border: 1px solid #ddd;
     border-radius: 2px;
+}
+
+.widget-inline-tools-collapser {
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    z-index: 1;
+    margin-bottom: 5px;
+}
+
+.widget-inline-tools-collapser>.widget-input-label {
+    flex-grow: 1;
+}
+
+.widget-inline-tools-collapser>span {
+    padding-inline-end: 12px;
+}
+
+.widget-help-panel {
+    padding: 5px 10px;
+}
+
+.widget-help-panel h2 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel-h2 {
+    font-size: 1.0em;
+    font-weight: 600;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.widget-help-panel a {
+    color: steelblue;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.widget-help-panel h3 {
+    font-size: 1.0em;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel-h3 {
+    font-size: 1.0em;
+    font-weight: 400;
+    margin-top: 0px;
+    color: #777;
+}
+
+.widget-help-panel .text-thin {
+    color: #666;
+    font-weight: 400;
+}
+
+// base styling for expandable panels for language selection and edtf info
+.edtf-style-tools-panel, .i18n-style-tools-panel {
+    background: #fbfbfb;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    border-radius: 2px;
+    max-height: 200px;
 }

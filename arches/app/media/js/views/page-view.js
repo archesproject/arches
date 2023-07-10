@@ -84,17 +84,18 @@ define([
                     self.viewModel.loading(true);
                     window.location.assign(url);
                 },
-                getHelp: function() {
+                getHelp: function(template) {
                     self.viewModel.helploading(true);
-                    var el = $('.ep-help-content');
+                    var el = document.createElement('div');
+                    $('.ep-help-content').append(el);
                     $.ajax({
                         type: "GET",
                         url: arches.urls.help_template,
-                        data: {'template': self.viewModel.helpTemplate()}
+                        data: {'template': template}
                     }).done(function(data) {
-                        el.html(data);
+                        $(el).html(data);
                         self.viewModel.helploading(false);
-                        $('.ep-help-topic-toggle').click(function() {
+                        $(el).find('.ep-help-topic-toggle').click(function() {
                             var sectionEl = $(this).closest('div');
                             var iconEl = $(this).find('i');
                             if (iconEl.hasClass("fa-chevron-right")) {
@@ -105,12 +106,24 @@ define([
                                 iconEl.addClass("fa-chevron-right");
                             }
                             var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                            let contentExpanded = contentEl.css('display');
+                            if (contentExpanded) {
+                                if (contentExpanded === 'none') {
+                                    $(this).attr('aria-expanded', 'true');
+                                } else if (contentExpanded === 'block') {
+                                    $(this).attr('aria-expanded', 'false');
+                                }
+                            }
                             contentEl.slideToggle();
                         });
-                        $('.reloadable-img').click(function(){
+                        $(el).find('.reloadable-img').click(function(){
                             $(this).attr('src', $(this).attr('src'));
                         });
                     });
+                },
+                closeHelp: function() {
+                    var el = $('.ep-help-content');
+                    el.empty();
                 },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();

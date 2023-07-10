@@ -26,6 +26,7 @@ from django.core.validators import RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -334,6 +335,19 @@ class File(models.Model):
         db_table = "files"
 
 
+class TempFile(models.Model):
+    fileid = models.UUIDField(primary_key=True)
+    path = models.FileField(upload_to="archestemp")
+
+    def __init__(self, *args, **kwargs):
+        super(TempFile, self).__init__(*args, **kwargs)
+        if not self.fileid:
+            self.fileid = uuid.uuid4()
+
+    class Meta:
+        managed = True
+        db_table = "files_temporary"
+
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
 @receiver(post_delete, sender=File)
@@ -459,6 +473,17 @@ class GraphModel(models.Model):
             return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
         else:
             return True
+
+    def get_published_graph(self, language=None):
+        if not language:
+            language = translation.get_language()
+
+        try:
+            graph = PublishedGraph.objects.get(publication=self.publication, language=language)
+        except PublishedGraph.DoesNotExist:
+            graph = None
+
+        return graph
 
     def __str__(self):
         return str(self.name)
@@ -737,7 +762,7 @@ class OntologyClass(models.Model):
 class PublishedGraph(models.Model):
     language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
     publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
-    serialized_graph = JSONField(blank=True, null=True, db_column="serialized_graph")
+    serialized_graph = models.JSONField(blank=True, null=True, db_column="serialized_graph")
 
     class Meta:
         managed = True
@@ -922,12 +947,15 @@ class ResourceInstance(models.Model):
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
     name = I18n_TextField(blank=True, null=True)
-    descriptors = JSONField(blank=True, null=True)
+    descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.graph_publication = self.graph.publication
+        try:
+            self.graph_publication = self.graph.publication
+        except ResourceInstance.graph.RelatedObjectDoesNotExist:
+            pass
         super(ResourceInstance, self).save()
 
     def __init__(self, *args, **kwargs):
@@ -1072,8 +1100,15 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
 
+    def is_fully_provisional(self):
+        return bool(self.provisionaledits and not any(self.data.values()))
+
     def save(self, *args, **kwargs):
-        if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
+        if self.sortorder is None or self.is_fully_provisional():
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+                if not str(node.pk) in self.data:
+                    self.data[str(node.pk)] = None
+
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
@@ -1244,6 +1279,7 @@ class MapLayer(models.Model):
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
     sortorder = models.IntegerField(default=0)
+    ispublic = models.BooleanField(default=True)
 
     @property
     def layer_json(self):
@@ -1262,6 +1298,13 @@ class MapLayer(models.Model):
         managed = True
         ordering = ("sortorder", "name")
         db_table = "map_layers"
+        default_permissions = ()
+        permissions = (
+            ("no_access_to_maplayer", "No Access"),
+            ("read_maplayer", "Read"),
+            ("write_maplayer", "Create/Update"),
+            ("delete_maplayer", "Delete"),
+        )
 
 
 class GraphXMapping(models.Model):
@@ -1508,6 +1551,7 @@ class Plugin(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    helptemplate = models.TextField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super(Plugin, self).__init__(*args, **kwargs)
@@ -1536,7 +1580,7 @@ class IIIFManifest(models.Model):
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
-    transactionid = models.UUIDField(default=uuid.uuid4)
+    transactionid = models.UUIDField(default=uuid.uuid4, null=True)
 
     def __str__(self):
         return self.label
@@ -1622,6 +1666,8 @@ class ETLModule(models.Model):
     config = JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
+    helptemplate = models.TextField(blank=True, null=True)
+    helpsortorder = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -1647,6 +1693,7 @@ class LoadEvent(models.Model):
     load_start_time = models.DateTimeField(blank=True, null=True)
     load_end_time = models.DateTimeField(blank=True, null=True)
     indexed_time = models.DateTimeField(blank=True, null=True)
+    taskid = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -1678,7 +1725,7 @@ class LoadErrors(models.Model):
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
     source = models.TextField(blank=True, null=True)
-    error = models.TextField(blank=True, null=True)
+    value = models.TextField(blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     datatype = models.TextField(blank=True, null=True)
 

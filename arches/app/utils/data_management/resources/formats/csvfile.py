@@ -464,8 +464,8 @@ class CsvReader(Reader):
             match = column_regex.match(column)
             if match is not None:
                 new_language_candidate = match.groups()[0]
-                existing_language_count = Language.objects.filter(code=new_language_candidate).count()
-                if existing_language_count == 0:
+                language_exists = Language.objects.filter(code=new_language_candidate).exists()
+                if not language_exists:
                     new_languages.append(new_language_candidate)
 
         return new_languages
@@ -909,7 +909,7 @@ class CsvReader(Reader):
 
                     row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
 
-                    missing_display_nodes = set(row_keys[0]).intersection_update(display_nodes)
+                    missing_display_nodes = set(row_keys[0]).intersection_update(display_nodes) if len(row_keys) else None
                     if missing_display_nodes is not None:
                         errors = []
                         for mdn in missing_display_nodes:

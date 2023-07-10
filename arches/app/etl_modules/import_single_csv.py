@@ -84,7 +84,7 @@ class ImportSingleCsv(BaseImportModule):
             csv_file_name = content.name
             csv_file_path = os.path.join(temp_dir, csv_file_name)
             default_storage.save(csv_file_path, content)
-        elif content.content_type == "application/zip":
+        elif content.name.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
@@ -191,9 +191,14 @@ class ImportSingleCsv(BaseImportModule):
         csv_file_name = request.POST.get("csvFileName")
         id_label = "resourceid"
 
-        tasks.load_single_csv.apply_async(
+        load_task = tasks.load_single_csv.apply_async(
             (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label),
         )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def start(self, request):
         graphid = request.POST.get("graphid")

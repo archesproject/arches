@@ -129,10 +129,18 @@ class GraphSettingsView(GraphBaseView):
         if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
 
+        nodegroup_ids_to_serialized_nodegroups = {}
+        for serialized_nodegroup in data["graph"]["nodegroups"]:
+            nodegroup_ids_to_serialized_nodegroups[serialized_nodegroup["nodegroupid"]] = serialized_nodegroup
+
         try:
             with transaction.atomic():
                 graph.save()
                 node.save()
+
+                for nodegroup in models.NodeGroup.objects.filter(nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()):
+                    nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[str(nodegroup.nodegroupid)]["cardinality"]
+                    nodegroup.save()
 
             return JSONResponse(
                 {"success": True, "graph": graph, "relatable_resource_ids": [res.nodeid for res in node.get_relatable_resources()]}
@@ -153,7 +161,7 @@ class GraphManagerView(GraphBaseView):
             context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
-            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "template": "arches-designer-help"}
+            context["nav"]["help"] = {"title": _("Using the Arches Designer"), "templates": ["arches-designer-help"]}
             return render(request, "views/graph.htm", context)
 
 
@@ -264,7 +272,7 @@ class GraphDesignerView(GraphBaseView):
         if not self.graph.isresource:
             help_title = _("Designing a Branch")
 
-        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+        context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
 
         return render(request, "views/graph-designer.htm", context)
 
@@ -337,7 +345,7 @@ class GraphDataView(View):
             if self.action == "import_graph":
                 graph_file = request.FILES.get("importedGraph").read()
                 graphs = JSONDeserializer().deserialize(graph_file)["graph"]
-                ret = GraphImporter.import_graph(graphs)
+                ret = GraphImporter.import_graph(graphs, user=request.user)
             else:
                 if graphid is not None:
                     graph = Graph.objects.get(graphid=graphid)
@@ -437,6 +445,10 @@ class GraphDataView(View):
             data = JSONDeserializer().deserialize(request.body)
             try:
                 graph = Graph.objects.get(graphid=graphid)
+                if graph.publication:
+                    return JSONErrorResponse(
+                        _("Unable to delete nodes of a published graph"), _("Please unpublish your graph before deleting a node")
+                    )
                 graph.delete_node(node=data.get("nodeid", None))
                 return JSONResponse({})
             except GraphValidationError as e:
@@ -489,7 +501,8 @@ class GraphPublicationView(View):
             elif self.action == "unpublish":
                 graph.unpublish()
         except Exception as e:
-            return JSONErrorResponse(e)
+            logger.exception(e)
+            return JSONErrorResponse(_("Unable to process publication"), _("Please contact your administrator if issue persists"))
 
         return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
 
@@ -543,7 +556,7 @@ class FunctionManagerView(GraphBaseView):
             )
             context["nav"]["title"] = self.graph.name
             context["nav"]["menu"] = True
-            context["nav"]["help"] = {"title": _("Managing Functions"), "template": "function-help"}
+            context["nav"]["help"] = {"title": _("Managing Functions"), "templates": ["function-help"]}
 
             return render(request, "views/graph/function-manager.htm", context)
         else:

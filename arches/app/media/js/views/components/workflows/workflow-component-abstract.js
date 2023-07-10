@@ -284,21 +284,33 @@ define([
 
     function AbstractCardAdapter() {  // CURRENTLY IN DEVLEOPMENT, USE AT YOUR OWN RISK!
         var self = this;
-         
-
         this.cardinality = ko.observable();
 
         this.initialize = function() {
             self.loading(true);
-
+            
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
 
-                const resourceInstanceOrGraphId = self.componentData.parameters['resourceid'] || self.componentData.parameters['graphid'];
+                const resourceInstanceDataPromise = new Promise(function(resolve, _reject) {
+                    const resourceInstanceId = self.componentData.parameters['resourceid'];
+    
+                    if (resourceInstanceId) {
+                        $.getJSON(
+                            ( arches.urls.resource + `/${resourceInstanceId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}`),
+                            function(data) {
+                                resolve(data);
+                            }
+                        );
+                    }
+                    else {
+                        resolve(null);
+                    }
+                });
 
-                $.getJSON(( arches.urls.resource + `/${resourceInstanceOrGraphId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                resourceInstanceDataPromise.then( function(data) {
                     if (self.cardinality() === '1') {
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
                             self.complete(true);
                         }
@@ -306,7 +318,7 @@ define([
                     }
                     else if (self.cardinality() === 'n') {
                         MultipleTileBasedComponent.apply(self);
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.complete(true);
                         }
                         
@@ -319,25 +331,42 @@ define([
                         self.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
                             if (!(savedData instanceof Array)) { savedData = [savedData]; }
 
-                            self.card().getNewTile();
-            
-                            self.savedData(savedData.map(function(savedDatum) {
-                                return {
-                                    tileData: savedDatum._tileData(),
-                                    tileId: savedDatum.tileid,
-                                    nodegroupId: savedDatum.nodegroup_id,
-                                    resourceInstanceId: savedDatum.resourceinstance_id,
-                                };
-                            }));
+                            let previouslySavedData = self.savedData();
+                            if (!previouslySavedData) {
+                                previouslySavedData = [];
+                            }
+
+                            self.savedData(
+                                previouslySavedData.concat(
+                                    savedData.map(function(savedDatum) {
+                                        return {
+                                            tileData: savedDatum._tileData(),
+                                            tileId: savedDatum.tileid,
+                                            nodegroupId: savedDatum.nodegroup_id,
+                                            resourceInstanceId: savedDatum.resourceinstance_id,
+                                        };
+                                    })
+                                )
+                            );
+
+                            self.value(self.savedData());
 
                             self.componentData.parameters.dirty(false);
+                            self.card().getNewTile(true);  // `true` is forceNewTile
                             self.card().selected(true);
                             self.dirty(false);
                             self.saving(false);
                             self.complete(true);
+
+                            /**
+                             * TODO: this is a hack to get around previous data autofilling forms when creating a new tile in cardinality n cards
+                             * It should be removed when we're able to figure out how to prevent that logic
+                             * */ 
+                            window.location.reload();  
                         };
                     }
                 });
+
             });
         };
 
@@ -699,15 +728,15 @@ define([
             }
 
             if (self.componentData.componentType === 'card') {
-                const previouslySavedValue = self.getFromLocalStorage('value');
+                let previouslySavedValue = self.getFromLocalStorage('value');
                 let previouslySavedResourceInstanceId;
-    
+
                 if (previouslySavedValue) {
                     if (!(previouslySavedValue instanceof Array)) { previouslySavedValue = [previouslySavedValue]; }
     
                     if (previouslySavedValue[0]['resourceInstanceId']) {
                         previouslySavedResourceInstanceId = previouslySavedValue[0]['resourceInstanceId'];
-                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId
+                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId;
                     }
                 }
 

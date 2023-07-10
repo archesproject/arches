@@ -201,68 +201,26 @@ class StringDataType(BaseDataType):
         """
         Appends the search query dsl to search for fields that have not been populated or are empty strings
         """
-        base_query = Bool()
-        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
-        data_exists = Bool()
+        query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
         data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value")
-        nested_query = Nested(path="tiles", query=data_exists_query)
-        data_exists.must(nested_query)
+        tiles_w_node_exists = Nested(path="tiles", query=data_exists_query)
 
         if value["op"] == "not_null":
-            query.must(base_query)
-            query.must(data_exists)
+            query.must(tiles_w_node_exists)
             non_blank_string_query = Wildcard(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
             query.must(Nested(path="tiles", query=non_blank_string_query))
 
-        if value["op"] == "null":
-            # search for resources that could have tiles with that data but don't
-            exists_query = Bool()
-            exists_query.must_not(data_exists)
-            base_query.should(exists_query)
+        elif value["op"] == "null":
+            # search for tiles that don't exist
+            not_exists_query = Bool()
+            not_exists_query.must_not(tiles_w_node_exists)
+            query.should(not_exists_query)
 
-            # search for tiles that do exist, but that have null, [], or "" as values
-            func_query = Dsl()
-            func_query.dsl = {
-                "function_score": {
-                    "min_score": 1,
-                    "query": {"match_all": {}},
-                    "functions": [
-                        {
-                            "script_score": {
-                                "script": {
-                                    "source": """
-                                    int null_docs = 0;
-                                    for(tile in params._source.tiles){
-                                        if(tile.data.containsKey(params.node_id)){
-                                            if(tile.data.get(params.node_id).containsKey(params.lang)){
-                                                def val = tile.data.get(params.node_id).get(params.lang).value;
-                                                if (val == null || (val instanceof List && val.length==0) || val == "") {
-                                                    null_docs++;
-                                                    break;
-                                                }
-                                            }
-                                            else{
-                                                null_docs++;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    return null_docs;
-                                """,
-                                    "lang": "painless",
-                                    "params": {"node_id": f"{str(node.pk)}", "lang": f"{value['lang']}"},
-                                }
-                            }
-                        }
-                    ],
-                    "score_mode": "max",
-                    "boost": 1,
-                    "boost_mode": "replace",
-                }
-            }
-            base_query.should(func_query)
-            query.must(base_query)
+            # search for tiles that do exist, but have empty strings
+            non_blank_string_query = Term(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value.keyword", query="")
+            query.should(Nested(path="tiles", query=non_blank_string_query))
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -743,12 +701,12 @@ class DateDataType(BaseDataType):
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
-            og_value = data[str(node.pk)]
+            og_value = data[str(node.nodeid)]
             valid_date_format, valid = self.get_valid_date_format(og_value)
             new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
             value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
         except TypeError:
-            value = data[str(node.pk)]
+            value = data[str(node.nodeid)]
         return value
 
 
@@ -775,9 +733,9 @@ class EDTFDataType(BaseDataType):
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
-            value = data[str(node.pk)]["value"]
+            value = data[str(node.nodeid)]["value"]
         except TypeError:
-            value = data[str(node.pk)]
+            value = data[str(node.nodeid)]
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1034,8 +992,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
-        if not preview and (count < 1 or not node.config["layerActivated"]):
+        tile_exists = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).exists()
+        if not preview and (not tile_exists or not node.config["layerActivated"]):
             return None
 
         source_name = "resources-%s" % node.nodeid
@@ -1577,7 +1535,7 @@ class FileListDataType(BaseDataType):
             for f in tile.data[str(nodeid)]:
                 val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 document["strings"].append(val)
-        except KeyError as e:
+        except (KeyError, TypeError) as e:
             for k, pe in tile.provisionaledits.items():
                 for f in pe["value"][nodeid]:
                     val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
@@ -1593,7 +1551,7 @@ class FileListDataType(BaseDataType):
 
     def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
-        files = data[str(node.pk)]
+        files = data[str(node.nodeid)]
         file_urls = ""
         if files is not None:
             file_urls = " | ".join([file["url"] for file in files])
@@ -1603,7 +1561,7 @@ class FileListDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return self.compile_json(tile, node, file_details=data[str(node.pk)])
+            return self.compile_json(tile, node, file_details=data[str(node.nodeid)])
 
     def post_tile_save(self, tile, nodeid, request):
         if request is not None:
@@ -1635,7 +1593,7 @@ class FileListDataType(BaseDataType):
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
+                if models.TileModel.objects.filter(pk=tile.tileid).exists():
                     original_storage = file_model.path.storage
                     # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
                     if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
@@ -2479,7 +2437,7 @@ class NodeValueDataType(BaseDataType):
         try:
             value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
             data = self.get_tile_data(tile)
-            tileid = data[str(node.pk)]
+            tileid = data[str(node.nodeid)]
             if tileid:
                 value_tile = models.TileModel.objects.get(tileid=tileid)
                 datatype = datatype_factory.get_instance(value_node.datatype)

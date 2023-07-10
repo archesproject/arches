@@ -1,0 +1,60 @@
+.columns label {
+    .form-radio {
+        display: flex;
+        align-items: center;
+    }
+}
+
+label.form-radio.form-normal{
+    cursor: pointer;
+    margin: 2px 0px;
+
+    &::before{
+        top: 22px;
+        content: '';
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #c3cedb;
+        left: auto;
+        bottom: auto;
+        display: block;
+        border-radius: 50%;
+        background-color: transparent;
+        padding-bottom:4px;
+        &:hover{
+            padding-bottom: 0;
+        }
+    }
+
+    &:not(.disabled):not(.active):hover::after {
+        opacity: .3;
+    }
+    &::after{
+        content: '';
+        position: relative;
+        display: block;
+        width: 8px;
+        height: 8px;
+    }
+
+    &.active::after, &:not(.disabled):hover::after{
+        bottom: 13px;
+        position: relative;
+        border: none;
+        display: block;
+        left: auto;
+        border-radius: 50%;
+        background-color: #515151;
+        margin: 0 4px;
+    }
+}
+
+.form-text.form-radio:not(.btn),
+.form-text.form-radio:not(.btn),
+.form-text.form-radio:not(.btn) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-inline-end: 40px;
+}
