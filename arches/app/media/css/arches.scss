@@ -1126,7 +1126,7 @@ div.wf-multi-tile-card-info div {
 }
 
 .workflow-select-plugin {
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
 }
 
 #workflow-container {
@@ -6491,7 +6491,7 @@ th.notif-type {
     font-weight: 700;
 }
 
-.ep-help-topic-toggle>h4 {
+.ep-help-topic-toggle>.h4 {
     display: inline-block;
 }
 
@@ -10031,14 +10031,16 @@ a.search-query-link-captions:focus {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
     height: 50px;
-    width: 399px;
+    width: 100%;
     padding: 4px 0px;
     margin-top: -1px;
     border-top: 1px solid #ddd;
-}
-
-.search-tools-container .clear-filter {
-    margin-right: 5px;
+    .clear-filter {
+        margin-right: 5px;
+    }
+    .row {
+        margin: 0;
+    }
 }
 
 .search-count-container {
@@ -10162,37 +10164,6 @@ ul.pagination {
     color: #999;
 }
 
-.time-search-container {
-    padding: 20px;
-    background: #fff;
-}
-
-.time-search-container .calendar {
-    display: block;
-    width: inherit;
-    padding-left: 5px;
-    max-width: 152px;
-}
-
-.time-search-container #calendar {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.time-search-container #calendar .calendar .search-label {
-    margin-top: 10px;
-}
-
-.hide-datepicker-time-option .bootstrap-datetimepicker-widget table td span {
-    display: none;
-}
-
-.calendar.picker {
-    max-width: 175px;
-    min-width: 175px;
-    position: relative;
-}
-
 .dropdown-crud {
     right: 0px;
     padding-left: 15px;
@@ -10207,40 +10178,8 @@ ul.pagination {
 .search-results-container {
     padding: 10px 10px 60px 10px;
     bottom: 50px;
-    overflow-y: scroll;
-    width: 400px;
-}
-
-.calendar {
-    display: table-cell;
-    width: 180px;
-    padding-left: 5px;
-}
-
-.calendar div .form-control[disabled] {
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    color: #777;
-}
-
-.datepicker-inline {
-    background: #fff;
-    border-width: 0px;
-}
-
-.search-label {
-    font-weight: 400;
-    font-size: 15px;
-    margin-bottom: 3px;
-}
-
-#calendar .chosen-container-single .chosen-single {
-    height: 35px;
-    padding-top: 8px;
-}
-
-#calendar .chosen-container-single .chosen-single div b:before {
-    vertical-align: -70%;
+    overflow-y: auto;
+    width: 100%;
 }
 
 .rr-display-toggle {
@@ -10259,8 +10198,6 @@ ul.pagination {
     font-size: 19px;
     font-weight: 500;
 }
-
-.related-resources-relationship {}
 
 .related-resources-relationship .dropdown-menu {
     left: auto;
@@ -10318,22 +10255,19 @@ ul.pagination {
 }
 
 .search-listing {
-    width: 370px;
+    width: 100%;
     background: #fff;
     border: 1px solid #ddd;
     margin-bottom: 10px;
-}
-
-.search-listing:hover {
-    border: 1px solid steelblue;
-}
-
-.search-listing:active {
-    border: 1px solid steelblue;
-}
-
-.search-listing.selected {
-    border: 1px solid steelblue;
+    &:hover {
+        border: 1px solid steelblue;
+    }
+    &:active {
+        border: 1px solid steelblue;
+    }
+    &.selected {
+        border: 1px solid steelblue;
+    }
 }
 
 .search-listing-title {
@@ -10344,6 +10278,7 @@ ul.pagination {
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 10px 5px 0px 10px;
+    line-height: 1.1;
 }
 
 .search-listing-title.i18n-alt a span {
@@ -13647,7 +13582,7 @@ ul.select2-choices:after {
 }
 
 .etl-manager-filter-container {
-    margin: 50px 50px 0px 50px;
+    margin: 25px 50px 0px 50px;
 }
 
 .etl-manager-filter-button {
@@ -13703,11 +13638,48 @@ ul.select2-choices:after {
 }
 
 .etl-module-body {
-    padding: 15px 25px;
+    padding: 15px 45px;
     width: 100%;
     flex: 1 1 0px;
     overflow: auto;
 }
+
+.etl-module-body h2 {
+    font-size: 17px;
+    color: #565656;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.etl-module-body p {
+    font-size: 14px;
+    color: #999;
+    font-weight: 400;
+}
+
+.etl-module-body section h3 {
+    font-size: 15px;
+    color: #565656;
+    font-weight: 300;
+    margin: 10px 0px 5px 0px;
+}
+
+.etl-module-body section .etl-module-component-block {
+    padding-bottom: 15px;
+}
+
+.etl-module-component-block .form-check {
+    padding: 5px 0px 0px 5px;
+}
+
+.etl-module-component-block label {
+    margin-bottom: 0px;
+}
+
+.etl-module-body p.pad-btm {
+    padding-bottom: 5px;
+}
+
 
 .etl-module-status {
     border-right: 1px solid rgba(0,0,0,0.14);
@@ -13809,7 +13781,7 @@ ul.select2-choices:after {
 }
 
 .etl-module-component {
-    margin-top: 30px;
+    padding-top: 0px;
     padding-bottom: 5px;
 }
 
@@ -13829,6 +13801,26 @@ ul.select2-choices:after {
     font-size: 15px;
     padding-right: 3px;
     color: rgb(4, 4, 45);
+}
+
+.etl-preview {
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+.etl-preview h3 {
+    padding-top: 0px;
+    padding-bottom: 5px;
+    color: #454545;
+}
+
+section .etl-preview table {
+    padding-top: 5px;
+}
+
+.etl-from-to {
+    display: inline-block;
+    width: 240px;
 }
 
 .csv-mapping-table-container {
