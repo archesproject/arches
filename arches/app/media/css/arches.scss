@@ -10030,14 +10030,16 @@ a.search-query-link-captions:focus {
     background: #f4f4f4;
     border-bottom: 1px solid #ddd;
     height: 50px;
-    width: 399px;
+    width: 100%;
     padding: 4px 0px;
     margin-top: -1px;
     border-top: 1px solid #ddd;
-}
-
-.search-tools-container .clear-filter {
-    margin-right: 5px;
+    .clear-filter {
+        margin-right: 5px;
+    }
+    .row {
+        margin: 0;
+    }
 }
 
 .search-count-container {
@@ -10175,8 +10177,8 @@ ul.pagination {
 .search-results-container {
     padding: 10px 10px 60px 10px;
     bottom: 50px;
-    overflow-y: scroll;
-    width: 400px;
+    overflow-y: auto;
+    width: 100%;
 }
 
 .rr-display-toggle {
@@ -10252,22 +10254,19 @@ ul.pagination {
 }
 
 .search-listing {
-    width: 370px;
+    width: 100%;
     background: #fff;
     border: 1px solid #ddd;
     margin-bottom: 10px;
-}
-
-.search-listing:hover {
-    border: 1px solid steelblue;
-}
-
-.search-listing:active {
-    border: 1px solid steelblue;
-}
-
-.search-listing.selected {
-    border: 1px solid steelblue;
+    &:hover {
+        border: 1px solid steelblue;
+    }
+    &:active {
+        border: 1px solid steelblue;
+    }
+    &.selected {
+        border: 1px solid steelblue;
+    }
 }
 
 .search-listing-title {
@@ -10278,6 +10277,7 @@ ul.pagination {
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 10px 5px 0px 10px;
+    line-height: 1.1;
 }
 
 .search-listing-title.i18n-alt a span {

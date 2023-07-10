@@ -216,7 +216,7 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
     """
 
     if not isinstance(perms, list):
-            perms = [perms]
+        perms = [perms]
 
     formatted_perms = []
     # in some cases, `perms` can have a `model.` prefix
@@ -250,24 +250,29 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
 
         return permitted_map_layers
 
+
 def user_can_read_map_layers(user):
 
-    map_layers_with_read_permission = get_map_layers_by_perm(user, ['models.read_maplayer'])
+    map_layers_with_read_permission = get_map_layers_by_perm(user, ["models.read_maplayer"])
     map_layers_allowed = []
 
     for map_layer in map_layers_with_read_permission:
-        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+        if ("no_access_to_maplayer" not in get_user_perms(user, map_layer)) or (
+            map_layer.addtomap is False and map_layer.isoverlay is False
+        ):
             map_layers_allowed.append(map_layer)
 
     return map_layers_allowed
 
 
 def user_can_write_map_layers(user):
-    map_layers_with_write_permission = get_map_layers_by_perm(user, ['models.write_maplayer'])
+    map_layers_with_write_permission = get_map_layers_by_perm(user, ["models.write_maplayer"])
     map_layers_allowed = []
 
     for map_layer in map_layers_with_write_permission:
-        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+        if ("no_access_to_maplayer" not in get_user_perms(user, map_layer)) or (
+            map_layer.addtomap is False and map_layer.isoverlay is False
+        ):
             map_layers_allowed.append(map_layer)
 
     return map_layers_allowed
@@ -360,7 +365,7 @@ def user_has_resource_model_permissions(user, perms, resource):
 
     nodegroups = get_nodegroups_by_perm(user, perms)
     nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
-    return nodes.count() > 0
+    return nodes.exists()
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
@@ -405,7 +410,8 @@ def check_resource_instance_permissions(user, resourceid, permission):
                 return result
 
     except ObjectDoesNotExist:
-        return None
+        result["permitted"] = True # if the object does not exist, no harm in returning true - this prevents strange 403s.
+        return result
 
     return result
 
@@ -522,7 +528,10 @@ def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+        if EditLog.objects.filter(transactionid=transactionid).exists():
+            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).exists():
+                return True
+        else:
             return True
     return False
 
@@ -573,8 +582,11 @@ class CachedUserPermissionChecker:
             user_permissions = set()
 
             for group in user.groups.all():
-                for permission in group.permissions.all():
-                    user_permissions.add(permission.codename)
+                for group_permission in group.permissions.all():
+                    user_permissions.add(group_permission.codename)
+
+            for user_permission in user.user_permissions.all():
+                user_permissions.add(user_permission.codename)
 
             current_user_cached_permissions["user_permissions"] = user_permissions
             user_permission_cache.set(str(user.pk), current_user_cached_permissions)

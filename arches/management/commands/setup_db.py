@@ -41,6 +41,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--force", action="store_true", default=False, help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
+        
+        parser.add_argument("-dev", "--dev", action="store_true", dest="dev", help="Add users for development")
 
     def handle(self, *args, **options):
 
@@ -49,7 +51,7 @@ class Command(BaseCommand):
             if not proceed:
                 exit()
 
-        self.setup_db()
+        self.setup_db(development=options["dev"])
 
     def get_connection(self):
         """This method acquires a connection to the database, first trying to use
@@ -171,7 +173,7 @@ To create it, use:
                 print(msg)
             exit()
 
-    def setup_db(self):
+    def setup_db(self, development=False):
         """
         Drops and re-installs the database found at "arches_<package_name>"
         WARNING: This will destroy data
@@ -208,3 +210,6 @@ To create it, use:
             management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
 
         management.call_command("graph", operation="publish")
+
+        if development:
+            management.call_command("add_test_users")

@@ -147,6 +147,15 @@ class Command(BaseCommand):
             help="Changes the process pool size when using use_multiprocessing. Default is ceil(cpu_count()/2)",
         )
 
+        parser.add_argument(
+            "-rd",
+            "--recalculate-descriptors",
+            action="store_true",
+            dest="recalculate_descriptors",
+            default=False,
+            help="forces the primary descriptors to be recalculated before (re)indexing",
+        )
+
     def handle(self, *args, **options):
         if options["operation"] == "setup_indexes":
             self.setup_indexes(name=options["name"])
@@ -168,6 +177,7 @@ class Command(BaseCommand):
                 quiet=options["quiet"],
                 use_multiprocessing=options["use_multiprocessing"],
                 max_subprocesses=options["max_subprocesses"],
+                recalculate_descriptors=options["recalculate_descriptors"],
             )
 
         if options["operation"] == "reindex_database":
@@ -177,6 +187,7 @@ class Command(BaseCommand):
                 quiet=options["quiet"],
                 use_multiprocessing=options["use_multiprocessing"],
                 max_subprocesses=options["max_subprocesses"],
+                recalculate_descriptors=options["recalculate_descriptors"],
             )
 
         if options["operation"] == "index_concepts":
@@ -189,6 +200,7 @@ class Command(BaseCommand):
                 quiet=options["quiet"],
                 use_multiprocessing=options["use_multiprocessing"],
                 max_subprocesses=options["max_subprocesses"],
+                recalculate_descriptors=options["recalculate_descriptors"],
             )
 
         if options["operation"] == "index_resources_by_type":
@@ -199,6 +211,7 @@ class Command(BaseCommand):
                 quiet=options["quiet"],
                 use_multiprocessing=options["use_multiprocessing"],
                 max_subprocesses=options["max_subprocesses"],
+                recalculate_descriptors=options["recalculate_descriptors"],
             )
 
         if options["operation"] == "index_resources_by_transaction":
@@ -212,6 +225,7 @@ class Command(BaseCommand):
                 quiet=options["quiet"],
                 use_multiprocessing=options["use_multiprocessing"],
                 max_subprocesses=options["max_subprocesses"],
+                recalculate_descriptors=options["recalculate_descriptors"],
             )
 
     def register_index(self, name):
@@ -222,7 +236,16 @@ class Command(BaseCommand):
         es_index = get_index(name)
         es_index.delete_index()
 
-    def index_database(self, batch_size, clear_index=True, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0):
+    def index_database(
+        self,
+        batch_size,
+        clear_index=True,
+        name=None,
+        quiet=False,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+        recalculate_descriptors=False,
+    ):
         if name is not None:
             index_database_util.index_custom_indexes(
                 index_name=name,
@@ -239,15 +262,11 @@ class Command(BaseCommand):
                 quiet=quiet,
                 use_multiprocessing=use_multiprocessing,
                 max_subprocesses=max_subprocesses,
+                recalculate_descriptors=recalculate_descriptors,
             )
 
     def reindex_database(
-        self,
-        batch_size,
-        name=None,
-        quiet=False,
-        use_multiprocessing=False,
-        max_subprocesses=0,
+        self, batch_size, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0, recalculate_descriptors=False
     ):
         self.delete_indexes(name=name)
         self.setup_indexes(name=name)
@@ -258,6 +277,7 @@ class Command(BaseCommand):
             quiet=quiet,
             use_multiprocessing=use_multiprocessing,
             max_subprocesses=max_subprocesses,
+            recalculate_descriptors=recalculate_descriptors,
         )
 
     def setup_indexes(self, name=None):
