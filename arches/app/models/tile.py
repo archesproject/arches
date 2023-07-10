@@ -106,10 +106,13 @@ class Tile(models.TileModel):
                         tile = Tile(tile_obj)
                         tile.parenttile = self
                         self.tiles.append(tile)
+        self.load_serialized_graph()
+
+    def load_serialized_graph(self):
         try:
             published_graph = self.resourceinstance.graph.get_published_graph()
             self.serialized_graph = published_graph.serialized_graph
-        except:
+        except Exception as e:
             self.serialized_graph = None
 
     def save_edit(
@@ -330,7 +333,10 @@ class Tile(models.TileModel):
 
         tile_errors = []
         for nodeid, value in self.data.items():
-            node = models.Node.objects.get(nodeid=nodeid)
+            try:
+                node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+            except:
+                node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
             error = datatype.validate(value, node=node, strict=strict, request=request)
             tile_errors += error
@@ -392,8 +398,7 @@ class Tile(models.TileModel):
         oldprovisionalvalue = None
 
         if not self.serialized_graph:
-            published_graph = self.resourceinstance.graph.get_published_graph()
-            self.serialized_graph = published_graph.serialized_graph
+            self.load_serialized_graph()
         try:
             if user is None and request is not None:
                 user = request.user
@@ -525,7 +530,10 @@ class Tile(models.TileModel):
             try:
                 super(Tile, self).delete(*args, **kwargs)
                 for nodeid in self.data.keys():
-                    node = models.Node.objects.get(nodeid=nodeid)
+                    try:
+                        node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+                    except:
+                        node = models.Node.objects.get(nodeid=nodeid)
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid, index=index)
                 if index:
@@ -557,8 +565,16 @@ class Tile(models.TileModel):
         return tiles
 
     def after_update_all(self):
-        nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
-        for node in nodegroup.node_set.all():
+        try:
+            nodegroup = SimpleNamespace(**next((x for x in self.serialized_graph["nodegroups"] if x["nodegroupid"] == self.nodegroup_id), None))
+                    
+            nodes = [(node for node in self.serialized_graph["nodes"] if node["nodegroup_id"] == self.nodegroup_id)]
+            nodes = [SimpleNamespace(**next(node, None)) for node in nodes]
+        except:
+            nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
+            nodes = nodegroup.node_set.all()
+
+        for node in nodes:
             datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.after_update_all(tile=self)
         for tile in self.tiles:
@@ -598,8 +614,14 @@ class Tile(models.TileModel):
         tile.resourceinstance_id = resourceid
         tile.parenttile = parenttile
         tile.data = {}
+        tile.load_serialized_graph()
+        try:
+            nodes = [(node for node in tile.serialized_graph["nodes"] if node["nodegroupid"] == nodegroup_id)]
+            nodes = [SimpleNamespace(**next(node, None)) for node in nodes]
+        except:
+            nodes = models.Node.objects.filter(nodegroup=nodegroup_id)
 
-        for node in models.Node.objects.filter(nodegroup=nodegroup_id):
+        for node in nodes:
             if node.datatype != "semantic":
                 tile.data[str(node.nodeid)] = None
 
