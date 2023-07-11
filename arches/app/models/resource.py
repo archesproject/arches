@@ -351,8 +351,6 @@ class Resource(models.ResourceInstance):
                         doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                         es_index.index_document(document=doc, id=doc_id)
 
-            #super(Resource, self).save()
-
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """
         Gets all the documents nessesary to index a single resource
