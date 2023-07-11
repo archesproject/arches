@@ -191,10 +191,10 @@ class Command(BaseCommand):
             else:
                 self.reset_db(cursor)
 
+            management.call_command("createcachetable")
+            
         if migration:
             management.call_command("migrate", "models", migration)
         else:
             management.call_command("migrate", "models")
 
-        if not preserve_database:
-            management.call_command("createcachetable")
