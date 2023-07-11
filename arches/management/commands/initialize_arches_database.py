@@ -37,21 +37,19 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-
         parser.add_argument(
             "--force", action="store_true", default=False, help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
-        
-        parser.add_argument("-dev", "--dev", action="store_true", dest="dev", help="Add users for development")
+        parser.add_argument("--migration", action="store", default=None, dest="migration", help="Specifies which migration to stop the migration process after applying")
+        parser.add_argument("--preserve_database", action="store_true", dest="preserve_database", help="Specifies if the database should be destroyed then recreated")
 
     def handle(self, *args, **options):
-
         if options["force"] is False:
             proceed = get_yn_input(msg="Are you sure you want to destroy and rebuild your database?", default="N")
             if not proceed:
                 exit()
 
-        self.setup_db(development=options["dev"])
+        self.setup_db(migration=options["migration"], preserve_database=options["preserve_database"])
 
     def get_connection(self):
         """This method acquires a connection to the database, first trying to use
@@ -176,33 +174,27 @@ class Command(BaseCommand):
                 print(msg)
             exit()
 
-    def setup_db(self, development=False):
+    def setup_db(self, migration=None, preserve_database=False):
         """
         Drops and re-installs the database found at "arches_<package_name>"
         WARNING: This will destroy data
         """
 
-        conninfo = self.get_connection()
-        conn = conninfo["connection"]
-        can_create_db = conninfo["can_create_db"]
+        if not preserve_database:
+            conninfo = self.get_connection()
+            conn = conninfo["connection"]
+            can_create_db = conninfo["can_create_db"]
 
-        cursor = conn.cursor()
-        if can_create_db is True:
-            self.drop_and_recreate_db(cursor)
+            cursor = conn.cursor()
+            if can_create_db is True:
+                self.drop_and_recreate_db(cursor)
+            else:
+                self.reset_db(cursor)
+
+        if migration:
+            management.call_command("migrate", "models", migration)
         else:
-            self.reset_db(cursor)
+            management.call_command("migrate", "models")
 
-        management.call_command("migrate")
-        management.call_command("createcachetable")
-
-        # import system settings graph and any saved system settings data
-        settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")
-        management.call_command("packages", operation="import_graphs", source=settings_graph)
-
-        settings_data = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json")
-        management.call_command("packages", operation="import_business_data", source=settings_data, overwrite="overwrite")
-
-        management.call_command("graph", operation="publish")
-
-        if development:
-            management.call_command("add_test_users")
+        if not preserve_database:
+            management.call_command("createcachetable")
