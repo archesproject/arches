@@ -14,7 +14,7 @@ define(
             var self = this;
             let mapboxgl;
 
-            require(['mapbox-gl'], (mapbox) => {
+            require(['maplibre-gl'], (mapbox) => {
                 mapboxgl = mapbox;
             });
             

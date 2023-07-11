@@ -87,7 +87,7 @@ define([
 
     ko.bindingHandlers.mapboxgl = {
         init: (element, valueAccessor) => {
-            require(['mapbox-gl'], (mapbox) => {
+            require(['maplibre-gl'], (mapbox) => {
                 initialize(element, valueAccessor, mapbox);
             });
         }

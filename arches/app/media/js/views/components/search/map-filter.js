@@ -28,7 +28,7 @@ define([
                 }
             }
 
-            require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
+            require(['maplibre-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
                 self.mapboxgl = mapbox;
                 self.MapboxDraw = mbdraw;
                 self.dependenciesLoaded(true);
