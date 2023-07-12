@@ -5,6 +5,7 @@ article.main-search-container {
     }
     @include break-at(desktop-max) {
         flex-direction: column;
+        overflow-x: hidden;
     }
     .search-results-panel {
         @include break-at(desktop-max) {
