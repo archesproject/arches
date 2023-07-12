@@ -14,6 +14,18 @@ article.main-search-container {
             @include break-at(desktop-max) {
                 width: 100%;
             }
+            .clear-filter {
+                @include break-at(tablet-max) {
+                    width: auto;
+                }
+                span {
+                    @include break-at(tablet-max) {
+                        text-wrap: wrap;
+                        line-height: 13px;
+                        padding: 0;
+                    }
+                }
+            }
         }
         .search-control-container {
             @include break-at(desktop-max) {
