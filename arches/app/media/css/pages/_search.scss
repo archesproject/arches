@@ -32,7 +32,7 @@ article.main-search-container {
             @include break-at(desktop-max) {
                 overflow-y: auto;
             }
-            @include break-at(desktop-lg) {
+            @include break-at(desktop-max) {
                 flex: 1;
             }
             .search-results-container {
