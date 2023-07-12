@@ -42,9 +42,7 @@ from arches.setup import unzip_file
 
 class Command(BaseCommand):
     """
-    Command to setup and refresh the database. Can be used initially to create
-    the database for the first time, or iteratively to wipe and recreate it
-    during development.
+    Command to load business data.
     """
 
     def add_arguments(self, parser):
