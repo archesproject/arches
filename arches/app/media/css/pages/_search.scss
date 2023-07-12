@@ -1,26 +1,26 @@
 article.main-search-container {
-    @include break-at(desktop-lg) {
+    @include break-at(mobile-max) {
         height: 100%;
         overflow-x: hidden;
     }
-    @include break-at(desktop-max) {
+    @include break-at(small-desktop-max) {
         flex-direction: column;
         overflow-x: hidden;
     }
     .search-results-panel {
-        @include break-at(desktop-max) {
+        @include break-at(small-desktop-max) {
             max-width: calc(100vw - 50px);
         }
         .search-tools-container {
-            @include break-at(desktop-max) {
+            @include break-at(small-desktop-max) {
                 width: 100%;
             }
             .clear-filter {
-                @include break-at(tablet-max) {
+                @include break-at(mobile-max) {
                     width: auto;
                 }
                 span {
-                    @include break-at(tablet-max) {
+                    @include break-at(mobile-max) {
                         text-wrap: wrap;
                         line-height: 13px;
                         padding: 0;
@@ -29,22 +29,22 @@ article.main-search-container {
             }
         }
         .search-control-container {
-            @include break-at(desktop-max) {
+            @include break-at(small-desktop-max) {
                 overflow-y: auto;
             }
-            @include break-at(desktop-max) {
+            @include break-at(small-desktop-max) {
                 flex: 1;
             }
             .search-results-container {
-                @include break-at(desktop-max) {
+                @include break-at(small-desktop-max) {
                     width: 100%;
                 }
-                @include break-at(desktop-lg) {
+                @include break-at(mobile-max) {
                     padding: 10px 10px 20px 10px;
                     overflow-y: auto;
                 }
                 .search-listing {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         width: 100%;
                     }
                 }
@@ -54,35 +54,21 @@ article.main-search-container {
     .search-map-container {
         flex-direction: column;
         .search-toolbar {
-            @include break-at(desktop-max) {
+            @include break-at(small-desktop-max) {
                 border-top: solid 1px #bbd1ea;
                 height: auto;
             }
-            @include break-at(desktop-lg) {
+            @include break-at(mobile-max) {
                 flex-direction: column;
                 height: 52px;
             }
             .search-type-btn-panel {
-                @include break-at(desktop-max) {
+                @include break-at(small-desktop-max) {
                     margin-left: 5px;
                     height: auto;
                 }
-            /*@include break-at(desktop-max) {
-                border-top: solid 1px #bbd1ea;
-                height: 52px;
-            }
-            @include break-at(desktop-max) {
-                flex-direction: column;
-            }
-            .search-type-btn-panel {
-                @include break-at(desktop-max) {
-                    margin-left: 5px;
-                }
-                @include break-at(tablet-max) {
-                    display: flex;
-                }*/
                 .search-type-btn {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         height: 20px;
                         border-top: 1px solid #d8d8d8;
                         border-bottom: 1px solid #d8d8d8;
@@ -90,7 +76,7 @@ article.main-search-container {
                         min-width: 69px;
                     }
                     .fa {
-                        @include break-at(desktop-max) {
+                        @include break-at(small-desktop-max) {
                             display: none;
                         }
                     }
@@ -98,36 +84,36 @@ article.main-search-container {
             }
             .search-type-btn-popup-panel {
                 .popup-panel-row {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         position: relative;
                         margin-left: 4px;
                         top: 5px;
                     }
-                    @include break-at(desktop-lg) {
+                    @include break-at(mobile-max) {
                         top: -2px;
                     }
                     .search-type-btn-popup {
-                        @include break-at(desktop-max) {
+                        @include break-at(small-desktop-max) {
                             min-width: 90px;
                             height: 20px;
                             border: 1px solid #d8d8d8;
                             margin: 0 4px;
                         }
                         &.active {
-                            @include break-at(desktop-max) {
+                            @include break-at(small-desktop-max) {
                                 line-height: inherit;
                             }
                         }
                         .fa {
-                            @include break-at(desktop-max) {
+                            @include break-at(small-desktop-max) {
                                 display: none;
                             }
                         }
                         p {
-                            @include break-at(desktop) {
+                            @include break-at(small-desktop) {
                                 display: none;
                             }
-                            @include break-at(desktop-max) {
+                            @include break-at(small-desktop-max) {
                                 display: block;
                             }
                         }
@@ -139,7 +125,7 @@ article.main-search-container {
             height: calc(100vh - 100px);
             .workbench-card-sidebar {
                 .workbench-card-sidebar-tab {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         height: 3em;
                         padding: 4px;
                         min-height: 0;
@@ -147,27 +133,27 @@ article.main-search-container {
                 }
             }
             .workbench-card-sidepanel {
-                @include break-at(desktop-max) {
+                @include break-at(small-desktop-max) {
                     height: 100%;
                     width: calc(100% - 75px);
                 }
                 .workbench-card-sidepanel-header-container {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         width: 100%;
                     }
                 }
                 .workbench-card-sidepanel-body {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         width: 100%;
                         overflow-y: auto;
                     }
                     .overlays-listing-container {
-                        @include break-at(desktop-max) {
+                        @include break-at(small-desktop-max) {
                             padding: 0 0 16px;
                         }
                         .overlay-listing {
                             .overlay-name {
-                                @include break-at(desktop-max) {
+                                @include break-at(small-desktop-max) {
                                     width: 100%;
                                     white-space: normal;
                                 }
@@ -180,41 +166,41 @@ article.main-search-container {
                 }
             }
             #rr-splash {
-                @include break-at(desktop-max) {
+                @include break-at(small-desktop-max) {
                     padding: 20px;
                     margin: 20px;   
                 }
                 .rr-splash-description:last-child {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         margin-bottom: 0;
                     }
                 }
             }
             .search-result-details-splash {
-                @include break-at(desktop-max) {
+                @include break-at(small-desktop-max) {
                     padding: 5px 0 0 0;
                 }
                 .rr-splash {
-                    @include break-at(desktop-max) {
+                    @include break-at(small-desktop-max) {
                         margin: 20px;
                         padding: 20px;
                     }
                     .rr-splash-description:last-child {
-                        @include break-at(desktop-max) {
+                        @include break-at(small-desktop-max) {
                             margin-bottom: 0;
                         }
                     }
                 }
             }
             .mapboxgl-ctrl-geocoder {
-                @include break-at(tablet-max) {
+                @include break-at(mobile-max) {
                     width: 48vw;
                     min-width: 0;
                 }
             }
         }
         .search-popup-panel {
-            @include break-at(desktop-lg) {
+            @include break-at(mobile-max) {
                 width: 100%;
             }
         }

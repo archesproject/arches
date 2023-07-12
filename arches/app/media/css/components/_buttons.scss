@@ -22,7 +22,7 @@
     .top-right-nav {
         .ep-tools-login {
             p {
-				@include break-at(desktop-lg) {
+				@include break-at(tablet-max) {
 					display: none;
 				}
 			}
@@ -30,7 +30,7 @@
 				display: inline-block;
 				font-size: 17px;
     			margin-top: 2px;
-				@include break-at(desktop) {
+				@include break-at(small-desktop) {
 					display: none;
 				}
 			}

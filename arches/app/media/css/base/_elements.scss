@@ -1,12 +1,12 @@
 body {
     overflow-x: hidden;
-    @include break-at(desktop) {
+    @include break-at(small-desktop) {
         overflow-x: auto;
     }
 }
 
 header, main {
-    @include break-at(desktop-lg) {
+    @include break-at(tablet-max) {
         max-width: calc(100vw - 65px);
     }
 }
@@ -14,7 +14,7 @@ header, main {
 .ep-help,
 .ep-notifs {
     width: 100%;
-    @include break-at(desktop) {
+    @include break-at(small-desktop) {
         width: 40vw;
     }
 }
