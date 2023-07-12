@@ -37,21 +37,22 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-
         parser.add_argument(
-            "--force", action="store_true", default=False, help='used to force a yes answer to any user input "continue? y/n" prompt'
+            "-y", "--yes", action="store_true", dest="yes", help='used to force a yes answer to any user input "continue? y/n" prompt'
         )
         
         parser.add_argument("-dev", "--dev", action="store_true", dest="dev", help="Add users for development")
+        parser.add_argument("--migration", action="store", default=None, dest="migration", help="Specifies which migration to stop the migration process after applying")
+        parser.add_argument("--preserve_database", action="store_true", dest="preserve_database", help="Specifies if the database should be destroyed then recreated")
 
     def handle(self, *args, **options):
 
-        if options["force"] is False:
+        if options["yes"] is False:
             proceed = get_yn_input(msg="Are you sure you want to destroy and rebuild your database?", default="N")
             if not proceed:
                 exit()
 
-        self.setup_db(development=options["dev"])
+        self.setup_db(development=options["dev"], migration=options["migration"], preserve_database=options["preserve_database"])
 
     def get_connection(self):
         """This method acquires a connection to the database, first trying to use
@@ -112,7 +113,6 @@ class Command(BaseCommand):
         return {"connection": conn, "can_create_db": any([cancreate, superuser])}
 
     def reset_db(self, cursor):
-
         # flush is needed here to remove the admin user from the auth tables
         management.call_command("flush", "--noinput")
 
@@ -126,31 +126,31 @@ class Command(BaseCommand):
             cursor.execute("DROP TABLE IF EXISTS {} CASCADE".format(t))
 
     def drop_and_recreate_db(self, cursor):
-
         arches_db = settings.DATABASES["default"]
 
         print("Drop and recreate the database...")
         terminate_sql = """
-SELECT pg_terminate_backend(pid) FROM pg_stat_activity
-    WHERE datname IN ('{}', '{}');""".format(
+            SELECT pg_terminate_backend(pid) FROM pg_stat_activity
+            WHERE datname IN ('{}', '{}');""".format(
             arches_db["NAME"], arches_db["POSTGIS_TEMPLATE"]
         )
         print(terminate_sql)
         cursor.execute(terminate_sql)
 
         drop_query = """
-DROP DATABASE IF EXISTS {0};""".format(
+            DROP DATABASE IF EXISTS {0};""".format(
             arches_db["NAME"]
         )
         print(drop_query)
         cursor.execute(drop_query)
 
         create_query = """
-CREATE DATABASE {}
-    WITH OWNER = {}
-        ENCODING = 'UTF8'
-        CONNECTION LIMIT=-1
-        TEMPLATE = {};""".format(
+            CREATE DATABASE {}
+            WITH OWNER = {}
+            ENCODING = 'UTF8'
+            CONNECTION LIMIT=-1
+            TEMPLATE = {};
+        """.format(
             arches_db["NAME"], arches_db["USER"], arches_db["POSTGIS_TEMPLATE"]
         )
         print(create_query + "\n")
@@ -160,57 +160,69 @@ CREATE DATABASE {}
         except psycopg2.ProgrammingError as e:
             print(e.pgerror)
             if "template database" in e.pgerror:
-                msg = """It looks like your PostGIS template database is not correctly referenced in
-settings.py/settings_local.py, or it has not yet been created.
+                msg = """
+                    It looks like your PostGIS template database is not correctly referenced in
+                    settings.py/settings_local.py, or it has not yet been created.
 
-To create it, use:
+                    To create it, use:
 
-    psql -U {0} -c "CREATE DATABASE {1};"
-    psql -U {0} -d {1} -c "CREATE EXTENSION postgis;"
-""".format(
+                    psql -U {0} -c "CREATE DATABASE {1};"
+                    psql -U {0} -d {1} -c "CREATE EXTENSION postgis;"
+                """.format(
                     arches_db["USER"], arches_db["POSTGIS_TEMPLATE"]
                 )
                 print(msg)
             exit()
 
-    def setup_db(self, development=False):
+    def setup_db(self, development=False, migration=None, preserve_database=False):
         """
         Drops and re-installs the database found at "arches_<package_name>"
         WARNING: This will destroy data
         """
 
-        conninfo = self.get_connection()
-        conn = conninfo["connection"]
-        can_create_db = conninfo["can_create_db"]
+        if not preserve_database:
+            conninfo = self.get_connection()
+            conn = conninfo["connection"]
+            can_create_db = conninfo["can_create_db"]
 
-        cursor = conn.cursor()
-        if can_create_db is True:
-            self.drop_and_recreate_db(cursor)
-        else:
-            self.reset_db(cursor)
+            cursor = conn.cursor()
+            if can_create_db is True:
+                self.drop_and_recreate_db(cursor)
+            else:
+                self.reset_db(cursor)
+
+            management.call_command("createcachetable")
+
+            management.call_command("migrate", "admin")
+            management.call_command("migrate", "auth")
+            management.call_command("migrate", "django_celery_results")
+            management.call_command("migrate", "guardian")
+            management.call_command("migrate", "oauth2_provider")
+            management.call_command("migrate", "sessions")
+
         # delete existing indexes
         management.call_command("es", operation="delete_indexes")
-
         # setup initial Elasticsearch indexes
         management.call_command("es", operation="setup_indexes")
 
-        management.call_command("migrate")
-        management.call_command("createcachetable")
+        if migration:
+            management.call_command("migrate", "models", migration)
+        else:
+            management.call_command("migrate", "models")
 
-        # import system settings graph and any saved system settings data
-        settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")
-        management.call_command("packages", operation="import_graphs", source=settings_graph)
+            # import system settings graph and any saved system settings data
+            settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")
+            management.call_command("packages", operation="import_graphs", source=settings_graph)
 
-        management.call_command("graph", operation="publish")
+            management.call_command("graph", operation="publish")
 
-        settings_data = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json")
-        management.call_command("packages", operation="import_business_data", source=settings_data, overwrite="overwrite")
+            settings_data = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json")
+            management.call_command("packages", operation="import_business_data", source=settings_data, overwrite="overwrite")
 
-        settings_data_local = settings.SYSTEM_SETTINGS_LOCAL_PATH
+            settings_data_local = settings.SYSTEM_SETTINGS_LOCAL_PATH
 
-        if os.path.isfile(settings_data_local):
-            management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
-
+            if os.path.isfile(settings_data_local):
+                management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
 
         if development:
             management.call_command("add_test_users")
