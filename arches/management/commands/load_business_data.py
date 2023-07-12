@@ -94,7 +94,7 @@ class Command(BaseCommand):
         )
 
 
-    def handle_source(source):
+    def handle_source(self, source):
         if os.path.isdir(source):
             return source
 
