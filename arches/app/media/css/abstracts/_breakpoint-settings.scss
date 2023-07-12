@@ -2,20 +2,6 @@
 // across team members. It will improve communication between
 // stakeholders, designers, developers, and testers.
 
-/*
-OLD breakpoints:
-
-$breakpoints: (
-    mobile: (min-width: 320px),
-    tablet: (min-width: 740px),
-    tablet-max: (max-width: 740px),
-    desktop: (min-width: 915px),
-    desktop-lg: (max-width: 915px),
-    desktop-max: (max-width: 1024px),
-    wide: (min-width: 1300px),
-);
-*/
-
 $breakpoints: (
     mobile: (min-width: 320px),
     mobile-max: (max-width: 740px),
