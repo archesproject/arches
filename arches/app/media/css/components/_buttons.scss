@@ -21,9 +21,19 @@
 .ep-toolbar {
     .top-right-nav {
         .ep-tools-login {
-            @include break-at(desktop-lg) {
-                display: none;
-            }
+            p {
+				@include break-at(desktop-lg) {
+					display: none;
+				}
+			}
+			i {
+				display: inline-block;
+				font-size: 17px;
+    			margin-top: 2px;
+				@include break-at(desktop) {
+					display: none;
+				}
+			}
         }
     }
 }

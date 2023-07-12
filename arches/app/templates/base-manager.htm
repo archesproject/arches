@@ -322,7 +322,8 @@
                                 data-toggle="tooltip"
                                 data-original-title="{% if user.username != 'anonymous' %}{% trans 'Profile' %}{% else %}{% trans 'Login' %}{% endif %}">
                                 {% if user.username == 'anonymous' %}
-                                    <h5 class="hidden-xs">{% trans "Login" %}</h5>
+                                    <p class="h5">{% trans "Login" %}</p>
+                                    <i class="fa fa-sign-in"></i>
                                 {% else %}
                                     <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</h5>
                                     <i class="fa fa-sign-out"></i>
