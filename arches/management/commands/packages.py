@@ -2,7 +2,6 @@ import json
 import pyprind
 import csv
 import shutil
-import subprocess
 import glob
 import uuid
 import sys
@@ -10,7 +9,6 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import imp
 import logging
-import requests
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -25,17 +23,13 @@ from arches.app.utils.data_management.resources.formats.csvfile import (
     MissingConfigException,
     TileCsvReader,
 )
-from arches.app.utils.data_management.resources.formats.format import MissingGraphException
-from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
 from arches.app.models import models
 from arches.app.models.fields.i18n import I18n_String
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
-import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.task_management as task_management
-from django.forms.models import model_to_dict
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
 from django.utils.module_loading import import_string
@@ -91,8 +85,6 @@ class Command(BaseCommand):
                 "create_mapping_file",
                 "import_reference_data",
                 "import_graphs",
-                "import_business_data",
-                "import_business_data_relations",
                 "import_mapping_file",
                 "save_system_settings",
                 "add_mapbox_layer",
@@ -283,47 +275,8 @@ class Command(BaseCommand):
         if options["operation"] == "export_graphs":
             self.export_graphs(options["dest_dir"], options["graphs"], options["type"])
 
-        if options["operation"] == "import_business_data":
-            defer_indexing = True
-            if "defer_indexing" in options:
-                if isinstance(options["defer_indexing"], bool):
-                    defer_indexing = options["defer_indexing"]
-                elif str(options["defer_indexing"])[0].lower() == "f":
-                    defer_indexing = False
-
-            defer_indexing = defer_indexing and not options["bulk_load"] and not celery_worker_running
-            prevent_indexing = True if options["prevent_indexing"] else defer_indexing
-
-            if defer_indexing:
-                concept_count = models.Value.objects.count()
-                relation_count = models.ResourceXResource.objects.count()
-
-            self.import_business_data(
-                options["source"],
-                options["config_file"],
-                options["overwrite"],
-                options["bulk_load"],
-                options["create_concepts"],
-                use_multiprocessing=options["use_multiprocessing"],
-                force=options["yes"],
-                prevent_indexing=prevent_indexing,
-            )
-
-            if defer_indexing and not prevent_indexing:
-                # index concepts if new concepts created
-                if concept_count != models.Value.objects.count():
-                    management.call_command("es", "index_concepts")
-                # index resources of this model only
-                path = utils.get_valid_path(options["config_file"])
-                mapping = json.load(open(path, "r"))
-                graphid = mapping["resource_model_id"]
-                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
-
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
-
-        if options["operation"] == "import_business_data_relations":
-            self.import_business_data_relations(options["source"])
 
         if options["operation"] == "import_mapping_file":
             self.import_mapping_file(options["source"])
@@ -690,79 +643,6 @@ class Command(BaseCommand):
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
 
-        def load_business_data(package_dir, prevent_indexing):
-            config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
-            configs = {}
-            if len(config_paths) > 0:
-                configs = json.load(open(config_paths[0]))
-
-            business_data = []
-            if dev and os.path.isdir(os.path.join(package_dir, "business_data", "dev_data")):
-                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
-                    for f in configs["business_data_load_order"]:
-                        business_data.append(os.path.join(package_dir, "business_data", "dev_data", f))
-                else:
-                    for ext in ["*.json", "*.jsonl", "*.csv"]:
-                        business_data += glob.glob(os.path.join(package_dir, "business_data", "dev_data", ext))
-            else:
-                if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
-                    for f in configs["business_data_load_order"]:
-                        business_data.append(os.path.join(package_dir, "business_data", f))
-                else:
-                    for ext in ["*.json", "*.jsonl", "*.csv"]:
-                        business_data += glob.glob(os.path.join(package_dir, "business_data", ext))
-
-            erring_csvs = [
-                path
-                for path in business_data
-                if os.path.splitext(path)[1] == ".csv" and os.path.isfile(os.path.splitext(path)[0] + ".mapping") is False
-            ]
-            message = (
-                f"The following .csv files will not load because they are missing accompanying .mapping files: \n\t {','.join(erring_csvs)}"
-            )
-            if len(erring_csvs) > 0:
-                print(message)
-            if yes is False and len(erring_csvs) > 0:
-                response = input("Proceed with package load without loading indicated csv files? (Y/N): ")
-                if response.lower() in ("t", "true", "y", "yes"):
-                    print("Proceeding with package load")
-                else:
-                    print("Aborting operation: Package Load")
-                    sys.exit()
-
-            if celery_worker_running:
-                from celery import chord
-                from arches.app.tasks import import_business_data, package_load_complete, on_chord_error
-
-                valid_resource_paths = [
-                    path
-                    for path in business_data
-                    if (".csv" in path and os.path.exists(path.replace(".csv", ".mapping"))) or (".json" in path)
-                ]
-
-                # assumes resources in csv do not depend on data being loaded prior from json in same dir
-                chord(
-                    [
-                        import_business_data.s(data_source=path, overwrite=True, bulk_load=bulk_load, prevent_indexing=False)
-                        for path in valid_resource_paths
-                    ]
-                )(package_load_complete.signature(kwargs={"valid_resource_paths": valid_resource_paths}).on_error(on_chord_error.s()))
-            else:
-                for path in business_data:
-                    if path not in erring_csvs:
-                        self.import_business_data(path, overwrite=True, bulk_load=bulk_load, prevent_indexing=prevent_indexing)
-
-            relations = glob.glob(os.path.join(package_dir, "business_data", "relations", "*.relations"))
-            for relation in relations:
-                self.import_business_data_relations(relation)
-
-            uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
-            dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
-            if os.path.exists(dest_files_dir) is False:
-                os.makedirs(dest_files_dir)
-            for f in uploaded_files:
-                shutil.copy(f, dest_files_dir)
-
         def load_extensions(package_dir, ext_type, cmd):
             extensions = glob.glob(os.path.join(package_dir, "extensions", ext_type, "*"))
             root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
@@ -933,8 +813,6 @@ class Command(BaseCommand):
         load_map_layers(package_location)
         print("loading search indexes")
         load_indexes(package_location)
-        print("loading business data - resource instances and relationships")
-        load_business_data(package_location, defer_indexing)
         print("loading resource views")
         load_resource_views(package_location)
         print("loading apps")
@@ -1188,21 +1066,6 @@ class Command(BaseCommand):
                 pass the locations in manually with the '-s' parameter."
             )
             sys.exit()
-
-    def import_business_data_relations(self, data_source):
-        """
-        Imports business data relations
-        """
-        if isinstance(data_source, str):
-            data_source = [data_source]
-
-        for path in data_source:
-            if os.path.isfile(os.path.join(path)):
-                relations = csv.DictReader(open(path, "r"))
-                RelationImporter().import_relations(relations)
-            else:
-                utils.print_message("No file found at indicated location: {0}".format(path))
-                sys.exit()
 
     def import_graphs(self, data_source="", overwrite_graphs=True):
         """
