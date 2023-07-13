@@ -4145,12 +4145,14 @@ div.dropdown-menu.open {
     cursor: default;
     background-color: #fafafa;
     margin: 15% auto;
-    max-width: 600px;
-    padding: 18px;
+    width: 680px;
+    padding: 25px;
     z-index: 9999;
     border: 1px solid #ddd;
     border-radius: 5px;
-    width: 70%;
+    min-height: 360px;
+    display: flex;
+    position: relative;
 }
 
 .loading-mask {

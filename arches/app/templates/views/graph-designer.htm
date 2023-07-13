@@ -115,7 +115,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 align-items: center;
             "
         >
-            <div style="display: flex;">
+            <div style="display: flex; padding-bottom: 10px;">
                 <h4>
                     <span 
                         data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Resource Model:'%} : {% quoted_trans 'Branch:'%}"
@@ -127,7 +127,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ></h4>
             </div>
 
-            <div style="padding: 0 50px;">
+            <div style="padding: 0 25px;">
                 <h5
                     data-bind="
                         text: $data.graph.isresource() 
@@ -147,7 +147,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- /ko -->
             </div>
 
-
             <div
                 style="
                     width: 100%;
@@ -163,7 +162,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </label>
                 <textarea 
                     data-bind="textInput: $data.graphPublicationNotes"
-                    style="margin-bottom: 12px; max-width: 560px;"
+                    style="margin-bottom: 12px; resize: vertical; min-height: 120px;"
                     class="form-control textarea textarea-resizable" 
                     rows="4" 
                     type="text" 
@@ -173,20 +172,56 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
                     
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-                <span style="align-self: flex-end;">
-                    <button 
-                        style="transition: none;" 
-                        class="btn btn-sm btn-primary btn-labeled fa fa-check" 
-                        data-bind="click: $data.shouldShowUpdatePublishedGraphsButton() ? $data.updatePublishedGraphs : $data.publishGraph"
-                    >
-                        <!-- ko if: $data.shouldShowUpdatePublishedGraphsButton() -->
-                        <span>{% trans "Update Published Graphs" %}</span>
-                        <!-- /ko -->
-                        <!-- ko ifnot: $data.shouldShowUpdatePublishedGraphsButton() -->
-                        <span>{% trans "Publish" %}</span>
-                        <!-- /ko -->
-                    </button>
-                </span>
+                <div style="display: flex; align-items: center; align-self: flex-end;">    
+                    <!-- ko if: $data.publicationResourceInstanceCount() -->
+                        <div style="display: flex;">
+
+                            <!-- workaround becuase standard checkbox implemtation isn't working -->
+                            <!-- ko if: $data.shouldUpdateResourceInstanceData -->
+                                <input 
+                                    style="cursor: pointer; margin:0px;" 
+                                    id="update-resource-instance-data-checkbox" 
+                                    type="checkbox" 
+                                    data-bind="checked: $data.shouldUpdateResourceInstanceData" 
+                                    checked
+                                />
+                            <!-- /ko -->
+                            <!-- ko ifnot: $data.shouldUpdateResourceInstanceData -->
+                                <input 
+                                    style="cursor: pointer; margin:0px;" 
+                                    id="update-resource-instance-data-checkbox" 
+                                    type="checkbox" 
+                                    data-bind="checked: $data.shouldUpdateResourceInstanceData"
+                                />
+                            <!-- /ko -->
+
+                            <label for="update-resource-instance-data-checkbox">
+                                {% blocktrans %}
+                                    <h5 style="margin: 10px;">
+                                        Checking this box will update all associated Resource Instance data automatically.
+                                        This action will follow the rules outlined <a href="">here.</a>
+                                        <span style="color: red;">This action cannot be undone.</span>
+                                    </h5>
+                                {% endblocktrans %}
+                            </label>
+                        </div>
+                    <!-- /ko -->
+
+                    <span>
+                        <button 
+                            style="transition: none;" 
+                            class="btn btn-sm btn-primary btn-labeled fa fa-check" 
+                            data-bind="click: $data.shouldShowUpdatePublishedGraphsButton() ? $data.updatePublishedGraphs : $data.publishGraph"
+                        >
+                            <!-- ko if: $data.shouldShowUpdatePublishedGraphsButton() -->
+                            <span>{% trans "Update Published Graphs" %}</span>
+                            <!-- /ko -->
+                            <!-- ko ifnot: $data.shouldShowUpdatePublishedGraphsButton() -->
+                            <span>{% trans "Publish" %}</span>
+                            <!-- /ko -->
+                        </button>
+                    </span>
+                </div>
             <!-- /ko -->
         </div>
     </div>
