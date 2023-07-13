@@ -8,6 +8,7 @@ $search-tab-buttons-bg: #FFF;
 $general-txt: #000;
 $btn-primary: #2B4E6D;
 $btn-clear-filters: #15503F;
+$btn-danger-warning: #943725;
 $profile-txt-general: #595959;
 $debug: #FFF;
 $leftnav-active: #184E6C;
@@ -57,7 +58,8 @@ a {
 .related-resources-graph-controls-instructions,
 .related-resources-graph-controls span,
 .rp-card-section .rp-no-data,
-.related-reasources-search-container input::placeholder {
+.related-reasources-search-container input::placeholder,
+.workbench-card-sidepanel-header:before {
     color: $general-txt!important;
 }
 
@@ -114,6 +116,10 @@ a {
 
 .btn-mint {
     background-color: $btn-clear-filters!important;
+}
+
+.btn-danger, .btn-warning {
+    background-color: $btn-danger-warning!important;
 }
 
 .filter-flag {
