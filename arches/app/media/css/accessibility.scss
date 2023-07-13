@@ -12,6 +12,8 @@ $profile-txt-general: #595959;
 $debug: #FFF;
 $leftnav-active: #184E6C;
 $leftnav-active-pointer: transparent #FFF transparent transparent;
+$search-dropdown-pill-bg: #1C6615;
+$adv-search-facet-btn-txt: #000;
 
 a {
     &.search-candidate-title,
@@ -45,7 +47,17 @@ a {
 .time-wheel-instructions,
 .search-facet-item.header input::placeholder,
 .time-search-container #search-from-c .input-md::placeholder,
-.time-search-container #search-from-b .input-md::placeholder {
+.time-search-container #search-from-b .input-md::placeholder,
+.related-resource-graph-information-content,
+.relationships-list-item-type,
+.relationships-list-count,
+.report-print-date,
+.rp-tile-title,
+.rp-report-section-title,
+.related-resources-graph-controls-instructions,
+.related-resources-graph-controls span,
+.rp-card-section .rp-no-data,
+.related-reasources-search-container input::placeholder {
     color: $general-txt!important;
 }
 
@@ -102,4 +114,40 @@ a {
 
 .btn-mint {
     background-color: $btn-clear-filters!important;
+}
+
+.filter-flag {
+    background: $search-dropdown-pill-bg!important;
+}
+
+.advanced-search-container {
+    .facets-search-container {
+        .facet-btn-group {
+            .facet-btn {
+                color: $adv-search-facet-btn-txt;
+            }
+        }
+    }
+}
+
+.edge-node-links span,
+.relationships-list-count a {
+    color: $search-links!important;
+    &:hover {
+        text-decoration: underline;
+    }
+    &:focus {
+        text-decoration: underline;
+    }
+}
+
+.map-card-zoom-tool {
+    a {
+        &:hover {
+            text-decoration: underline;
+        }
+        &:focus {
+            text-decoration: underline;
+        }
+    }
 }
