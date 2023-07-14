@@ -162,7 +162,10 @@ define([
 
                 $.ajax({
                     type: "POST",
-                    data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
+                    data: JSON.stringify({
+                        'notes': viewModel.graphPublicationNotes(), 
+                        'shouldUpdateResourceInstanceData': viewModel.shouldUpdateResourceInstanceData()
+                    }),
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         let alert;

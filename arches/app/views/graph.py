@@ -35,6 +35,7 @@ from django.contrib.contenttypes.models import ContentType
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+from arches.app.utils.update_resource_instance_data_based_on_graph_diff import update_resource_instance_data_based_on_graph_diff
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
@@ -518,9 +519,22 @@ class GraphPublicationView(View):
         if self.action == "publish":
             try:
                 data = JSONDeserializer().deserialize(request.body)
+                notes = data.get("notes")
+                should_update_resource_instance_data = data.get('shouldUpdateResourceInstanceData')
+
+                if should_update_resource_instance_data:
+                    published_source_graph = source_graph.get_published_graph(language=settings.LANGUAGE_CODE)
 
                 source_graph.update_from_editable_future_graph()
-                source_graph.publish(notes=data.get("notes"), user=request.user)
+                source_graph.publish(notes=notes, user=request.user)
+
+                if should_update_resource_instance_data:
+                    updated_published_source_graph = source_graph.get_published_graph(language=settings.LANGUAGE_CODE)
+                    
+                    update_resource_instance_data_based_on_graph_diff(
+                        initial_graph=published_source_graph.serialized_graph,
+                        updated_graph=updated_published_source_graph.serialized_graph
+                    )
 
                 return JSONResponse(
                     {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully updated.")}

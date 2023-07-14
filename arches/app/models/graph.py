@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+import jsondiff
 import logging
 import pyprind
 import uuid
@@ -2131,16 +2132,6 @@ class Graph(models.GraphModel):
 
         return graph_from_database
 
-    def revert(self):
-        """
-        Reverts a Graph's editable_future_graph to represent the source,
-        discarding all changes
-        """
-        self.has_unpublished_changes = False
-        self.save()
-
-        self.create_editable_future_graph()
-
     def restore_state_from_serialized_graph(self, serialized_graph):
         """
         Restores a Graph's state from a serialized graph, and creates a
@@ -2282,6 +2273,16 @@ class Graph(models.GraphModel):
                 published_graph.save()
 
             translation.deactivate()
+
+    def revert(self):
+        """
+        Reverts a Graph's editable_future_graph to represent the source,
+        discarding all changes
+        """
+        self.has_unpublished_changes = False
+        self.save()
+
+        self.create_editable_future_graph()
 
 
 class GraphValidationError(Exception):

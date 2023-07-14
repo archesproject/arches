@@ -279,6 +279,12 @@ def reverse_etl_load(loadid):
     module.reverse_load(loadid)
 
 
+@shared_task
+def foo(initial_graph, updated_graph):
+    for resource_instance in models.ResourceInstance.objects.filter(graph_publication_id=initial_graph['publication_id']):
+        pass
+
+
 def create_user_task_record(taskid, taskname, userid):
     try:
         user = User.objects.get(id=userid)
