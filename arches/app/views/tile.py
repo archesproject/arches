@@ -139,8 +139,8 @@ class TileData(View):
                                     try:
                                         tile.save(request=request, transaction_id=transaction_id)
                                     except TileValidationError as e:
-                                        resource_tiles = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance)
-                                        if resource_tiles.count() == 0:
+                                        resource_tiles_exist = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance).exists()
+                                        if not resource_tiles_exist:
                                             Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
                                         title = _("Unable to save. Please verify your input is valid")
                                         return self.handle_save_error(e, tile_id, title=title)
