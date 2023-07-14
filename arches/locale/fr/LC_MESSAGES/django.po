@@ -759,7 +759,7 @@ msgstr "Fonds de carte"
 #: app/templates/javascript.htm:482
 #: app/templates/views/map-layer-manager.htm:90
 msgid "Overlays"
-msgstr "Superpositions"
+msgstr "Couches"
 
 #: app/templates/base-manager.htm:201 app/templates/views/edit-history.htm:5
 #: app/views/resource.py:572
