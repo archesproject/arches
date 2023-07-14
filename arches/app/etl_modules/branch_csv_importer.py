@@ -140,7 +140,7 @@ class BranchCsvImporter(BaseImportModule):
         row_count = 0
         for row in worksheet.rows:
             cell_values = [cell.value for cell in row]
-            if len(cell_values) == 0:
+            if len(cell_values) == 0 or any(cell_values) is False:
                 continue
             resourceid = cell_values[0]
             if resourceid is None:
@@ -257,7 +257,7 @@ class BranchCsvImporter(BaseImportModule):
                 "title": _("Invalid excel file/zip specified"),
                 "message": _("Upload a valid excel file"),
             }
-        if content.content_type == "application/zip":
+        if content.name.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
