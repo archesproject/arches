@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9477_fix_for_spatial_view_dbf_function_edtf_displaying_null"),
+        ("models", "9648_add_empty_key_value_pairs_to_tiles"),
     ]
 
     operations = [
