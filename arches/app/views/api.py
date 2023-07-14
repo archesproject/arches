@@ -1441,10 +1441,12 @@ class BulkDisambiguatedResourceInstance(APIBase):
         version = request.GET.get("v")
         hide_hidden_nodes = bool(request.GET.get("hidden", "true").lower() == "false")
         compact = bool(request.GET.get("uncompacted", "false").lower() == "false")
+        user = request.user
+        perm = "read_nodegroup"
 
         return JSONResponse(
             {
-                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes)
+                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm)
                 for resource in Resource.objects.filter(pk__in=resource_ids)
             }
         )
