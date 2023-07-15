@@ -210,9 +210,8 @@ class Tile(models.TileModel):
         been approved by a user in the resource reviewer group
 
         """
-
         result = False
-        if self.provisionaledits is not None and len(self.data) == 0:
+        if self.provisionaledits is not None and not any(self.data.values()):
             result = True
 
         return result
@@ -242,7 +241,7 @@ class Tile(models.TileModel):
             return
         card = models.CardModel.objects.get(nodegroup=self.nodegroup)
         constraints = models.ConstraintModel.objects.filter(card=card)
-        if constraints.count() > 0:
+        if constraints.exists():
             for constraint in constraints:
                 if constraint.uniquetoallinstances is True:
                     tiles = models.TileModel.objects.filter(nodegroup_id=self.nodegroup_id)
@@ -566,7 +565,7 @@ class Tile(models.TileModel):
 
     def is_blank(self):
         if self.data != {}:
-            if len([item for item in list(self.data.values()) if item is not None]) > 0:
+            if any(self.data.values()):
                 return False
 
         child_tiles_are_blank = True
