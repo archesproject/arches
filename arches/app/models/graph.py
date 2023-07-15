@@ -890,6 +890,9 @@ class Graph(models.GraphModel):
                 node.nodegroup = None
 
         for widget in copy_of_self.widgets.values():
+            if set_source:
+                widget.source_identifier_id = widget.pk
+                
             widget.pk = uuid.uuid1()
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
@@ -2232,6 +2235,9 @@ class Graph(models.GraphModel):
 
         published_graph_edit = models.PublishedGraphEdit.objects.create(publication=self.publication, user=user, notes=notes)
         published_graph_edit.save()
+
+        self.publication.most_recent_edit = published_graph_edit
+        self.publication.save()
 
         published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 

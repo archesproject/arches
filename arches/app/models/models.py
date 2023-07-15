@@ -151,6 +151,7 @@ class CardXNodeXWidget(models.Model):
     label = I18n_TextField(blank=True, null=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
@@ -1143,8 +1144,15 @@ class TileModel(models.Model):  # Tile
         nodegroup_query = NodeGroup.objects.filter(pk=self.nodegroup_id)
         return nodegroup_query.first()
 
+    def is_fully_provisional(self):
+        return bool(self.provisionaledits and not any(self.data.values()))
+
     def save(self, *args, **kwargs):
-        if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
+        if self.sortorder is None or self.is_fully_provisional():
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+                if not str(node.pk) in self.data:
+                    self.data[str(node.pk)] = None
+
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]

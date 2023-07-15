@@ -464,8 +464,8 @@ class CsvReader(Reader):
             match = column_regex.match(column)
             if match is not None:
                 new_language_candidate = match.groups()[0]
-                existing_language_count = Language.objects.filter(code=new_language_candidate).count()
-                if existing_language_count == 0:
+                language_exists = Language.objects.filter(code=new_language_candidate).exists()
+                if not language_exists:
                     new_languages.append(new_language_candidate)
 
         return new_languages

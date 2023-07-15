@@ -275,6 +275,10 @@ class GraphDesignerView(GraphBaseView):
 
         context["source_graph"] = JSONSerializer().serialize(self.source_graph, force_recalculation=True)
         context["source_graph_id"] = self.source_graph.pk
+
+        context["source_graph_publication"] = JSONSerializer().serialize(self.source_graph.publication)
+        context["source_graph_publication_most_recent_edit"] = JSONSerializer().serialize(self.source_graph.publication.most_recent_edit if self.source_graph.publication else {})
+
         context["editable_future_graph_id"] = self.editable_future_graph.pk if self.editable_future_graph else None
 
         context["nav"]["menu"] = True
@@ -606,7 +610,7 @@ class ModelHistoryView(GraphBaseView):
                 "%Y-%m-%d | %I:%M %p %Z"
             )
 
-            if not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
+            if graph_x_published_graph.user and not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
                 user_ids_to_user_data[graph_x_published_graph.user.pk] = {
                     "username": graph_x_published_graph.user.username,
                     "first_name": graph_x_published_graph.user.first_name,

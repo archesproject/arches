@@ -864,6 +864,14 @@ class Command(BaseCommand):
                 except CommandError as e:
                     print(e)
 
+        def load_templates(package_dir):
+            templates = glob.glob(os.path.join(package_dir, "templates", "*.yaml"))
+            for template in templates:
+                try:
+                    management.call_command("load_template", "-s", template)
+                except CommandError as e:
+                    print(e) # ok to fail, template engine may not be installed
+
         def handle_source(source):
             if os.path.isdir(source):
                 return source
@@ -956,6 +964,8 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
+        print('loading templates')
+        load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
             management.call_command("es", "reindex_database")
