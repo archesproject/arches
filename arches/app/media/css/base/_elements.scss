@@ -18,3 +18,23 @@ header, main {
         width: 40vw;
     }
 }
+
+#myBtn {
+    display: none;
+    opacity: 0;
+    position: fixed;
+    bottom: 55px;
+    right: 5px;
+    z-index: 1100;
+    border: none;
+    outline: none;
+    background-color: #404449;
+    color: white;
+    cursor: pointer;
+    padding: 12px 15px;
+    border-radius: 2px;
+    font-size: 18px;
+    &:hover {
+        opacity: 1!important;    
+    }
+}
