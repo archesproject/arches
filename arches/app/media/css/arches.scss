@@ -6015,7 +6015,6 @@ div.card-grid-item.selected {
         }
     }
 
-    .ep-notifs-toggle,
     .ep-tools-search,
     .tabbed-workflow-step-information-box-container.seen,
     .workflow-nav-tab-container,
@@ -10216,6 +10215,24 @@ ul.pagination {
     flex-grow: 1;
 }
 
+.close-popup-panel:before {
+    content: "\f00d";
+    font-family: FontAwesome;
+    margin-right: 6px;
+    color: rgb(158, 158, 158);
+    font-weight: lighter;
+}
+
+.close-popup-panel:hover:before {
+    color: rgb(33, 62, 95);
+}
+
+.close-popup-panel-container {
+    display: flex;
+    font-size: 17px;
+    margin-bottom: 15px;
+}
+
 .title-underline {
     margin: 3px 0px;
     background: #ddd;
@@ -10543,7 +10560,7 @@ table.table.dataTable {
     font-size: 12px;
     font-weight: 600;
     color: #888;
-    min-width: 150px;
+    min-width: 100px;
     border-color: #BBD1EA;
     border-top: none;
     border-right: 1px solid;
