@@ -1870,7 +1870,7 @@ class Graph(models.GraphModel):
 
             if future_widget.source_identifier_id:
                 for key in vars(source_widget).keys():
-                    if key not in ["_state", "node_id", "card_id", "source_identifier_id"]:
+                    if key not in ["_state", "id", "node_id", "card_id", "source_identifier_id"]:
                         setattr(source_widget, key, getattr(future_widget, key))
 
                 if future_widget.card.source_identifier_id:
@@ -2013,7 +2013,7 @@ class Graph(models.GraphModel):
             ]:
                 setattr(self, key, value)
 
-        self.root = models.Node.objects.get(pk=editable_future_graph.root.source_identifier_id)  # refresh from db
+        self.root = self.nodes[self.root.pk]
         # END copy attrs from editable_future_graph to source_graph
 
         # BEGIN save related models
@@ -2021,6 +2021,14 @@ class Graph(models.GraphModel):
         for widget in editable_future_graph.widgets.values():
             widget.delete()
         for widget in self.widgets.values():
+            try:
+                widget_from_database = models.CardXNodeXWidget.objects.get(
+                    card_id=widget.card_id, node_id=widget.node_id, widget_id=widget.widget_id
+                )
+                widget_from_database.delete()
+            except models.CardXNodeXWidget.DoesNotExist:
+                pass
+
             widget.save()
 
         for card in editable_future_graph.cards.values():
