@@ -1867,13 +1867,29 @@ class Graph(models.GraphModel):
         # has been newly created; we update the `graph_id` to match the source graph. We are
         # not saving in this block so updates can accur in any order.
         for future_widget in list(editable_future_graph.widgets.values()):
-            # deep handling of card and node are happenening in below iterations
-            if future_widget.card.source_identifier_id:
-                future_widget.card = Card.objects.get(pk=future_widget.card.source_identifier_id)
-            if future_widget.node.source_identifier_id:
-                future_widget.node = models.Node.objects.get(pk=future_widget.node.source_identifier_id)
+            source_widget = future_widget.source_identifier
 
-            self.widgets[future_widget.pk] = future_widget
+            if future_widget.source_identifier_id:
+                for key in vars(source_widget).keys():
+                    if key not in ["_state", "id", "node_id", "card_id", "source_identifier_id"]:
+                        setattr(source_widget, key, getattr(future_widget, key))
+
+                if future_widget.card.source_identifier_id:
+                    source_widget.card_id = future_widget.card.source_identifier_id
+                if future_widget.node.source_identifier_id:
+                    source_widget.node_id = future_widget.node.source_identifier_id
+
+                self.widgets[source_widget.pk] = source_widget
+            else:  # newly-created widget
+                future_widget.source_identifier_id = None
+
+                if future_widget.card.source_identifier_id:
+                    future_widget.card_id = future_widget.card.source_identifier_id
+                if future_widget.node.source_identifier_id:
+                    future_widget.node_id = future_widget.node.source_identifier_id
+
+                del editable_future_graph.widgets[future_widget.pk]
+                self.widgets[future_widget.pk] = future_widget
 
         for future_card in list(editable_future_graph.cards.values()):
             future_card_nodegroup_node = models.Node.objects.get(pk=future_card.nodegroup.pk)
@@ -1998,11 +2014,13 @@ class Graph(models.GraphModel):
             ]:
                 setattr(self, key, value)
 
-        self.root = models.Node.objects.get(pk=editable_future_graph.root.source_identifier_id)  # refresh from db
+        self.root = self.nodes[self.root.pk]
         # END copy attrs from editable_future_graph to source_graph
 
         # BEGIN save related models
         # save order is _very_ important!
+        for widget in editable_future_graph.widgets.values():
+            widget.delete()
         for widget in self.widgets.values():
             try:
                 widget_from_database = models.CardXNodeXWidget.objects.get(

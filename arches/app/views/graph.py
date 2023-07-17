@@ -515,7 +515,7 @@ class GraphPublicationView(View):
                 return JSONResponse({"graph": graph, "title": "Success!", "message": "The graph has been successfully updated."})
             except Exception as e:
                 logger.exception(e)
-                return JSONErrorResponse(str(_("Unable to process publication"), _("Please contact your administrator if issue persists")))
+                return JSONErrorResponse(_("Unable to process publication"), _("Please contact your administrator if issue persists"))
 
         elif self.action == "revert":
             try:
