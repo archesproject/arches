@@ -59,7 +59,8 @@ a {
 .related-resources-graph-controls span,
 .rp-card-section .rp-no-data,
 .related-reasources-search-container input::placeholder,
-.workbench-card-sidepanel-header:before {
+.workbench-card-sidepanel-header:before,
+.search-listing-footer .provisional-edits {
     color: $general-txt!important;
 }
 
