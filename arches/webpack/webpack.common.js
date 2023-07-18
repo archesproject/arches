@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 const fetch = require('cross-fetch');
+const fs = require('fs');
 const Path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -222,6 +223,24 @@ module.exports = () => {
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
                     new VueLoaderPlugin(),
+                    {
+                        apply: (compiler) => {
+                            compiler.hooks.afterEmit.tap("webpack", () => {
+                                fs.writeFile(
+                                    Path.resolve(__dirname, APP_ROOT, 'media', 'build', '.gitignore'), 
+                                    "# Ignore everything in this directory\n*\n# Except this file\n!.gitignore\n",
+                                     err => {
+                                        if (err) {
+                                            console.error(
+                                                '\x1b[31m%s\x1b[0m',  // red
+                                                err
+                                            );
+                                        }
+                                    }
+                                );
+                            });
+                        },
+                    },
                 ],
                 resolveLoader: {
                     alias: {
