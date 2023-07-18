@@ -1,3 +1,20 @@
 // Use this stylesheet to apply style specific to accessibility that can be 
 // applied over all other styles.  The admin can choose to run the site in
 // "accessibility mode" to apply these styles site-wide.
+
+a[href]:focus-visible,
+area[href]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+iframe:focus-visible,
+object:focus-visible,
+embed:focus-visible,
+*[tabindex]:focus-visible,
+*[contenteditable]:focus-visible {
+    border: 5px solid #fae619 !important;
+    outline: 2.5px solid #000 !important;
+    outline-offset: -2.5px !important;
+    box-sizing: border-box;
+}
