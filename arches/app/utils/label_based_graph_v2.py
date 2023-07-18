@@ -305,7 +305,7 @@ class LabelBasedGraph(object):
         # if the serialized_node is unable to collect data, let's explicitly say so
         if datatype_factory.datatypes[serialized_node["datatype"]].defaultwidget is None:
             display_value = NON_DATA_COLLECTING_NODE
-        elif tile.data:
+        elif tile.data or tile.provisionaledits:
             datatype = datatype_factory.get_instance(serialized_node["datatype"])
 
             node_copy = copy.deepcopy(serialized_node)
