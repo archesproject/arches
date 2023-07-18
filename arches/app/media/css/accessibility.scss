@@ -119,7 +119,7 @@ a {
     background-color: $btn-clear-filters!important;
 }
 
-.btn-danger, .btn-warning {
+.btn-danger, .btn-warning:not(.facet-btn) {
     background-color: $btn-danger-warning!important;
 }
 
