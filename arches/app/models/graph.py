@@ -1110,9 +1110,6 @@ class Graph(models.GraphModel):
                     break
 
             if not found:
-                import pdb
-
-                pdb.set_trace()
                 raise GraphValidationError(_("Ontology rules don't allow this graph to be appended"))
         return True
 
