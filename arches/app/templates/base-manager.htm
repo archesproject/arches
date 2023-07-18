@@ -216,6 +216,7 @@
                             {% endif %}
                         </ul>
 
+                        {% if request.user|has_group:"RDM Administrator" or plugins|length > 0 %}
                         <hr class="list-divider-dark"></hr>
 
                         <!-- Modules -->
@@ -272,6 +273,7 @@
                                 {% endif %}
                             {% endfor %}
                         </ul>
+                        {% endif %}
 
                     </ul>
                     {% endblock navbar %}
