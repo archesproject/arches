@@ -2,7 +2,11 @@
 <div class="search-container time-search-container">
 
     <div class="filter-title">
-        <span data-bind="text: $root.translations.dateInterval"></span>
+        <span class="close-popup-panel" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function(){selectedPopup('');},
+            attr: {'aria-label': $root.translations.closeTimeFilter},
+            text: $root.translations.dateInterval,
+        "></span>
         <div class="btn-group">
             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" data-bind="click: function () { clear(); }"> 
                 <i class="fa fa-close"></i>
