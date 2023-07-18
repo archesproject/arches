@@ -8,10 +8,12 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { spawn } = require("child_process");
+const { VueLoaderPlugin } = require("vue-loader");
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
+const { buildVueFilePathLookup } = require('./webpack-utils/build-vue-filepath-lookup');
 const { PROJECT_NODE_MODULES_ALIASES } = require('./webpack-node-modules-aliases');
 
 
@@ -167,12 +169,33 @@ module.exports = () => {
             };
 
             // END create image filepath lookup
+            // BEGIN create vue filepath lookup
+            
+            const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'frontend'), {});
+            const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'frontend'), {});
+
+            const installedPackagesVuePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {                
+                return {
+                    ...acc,
+                    ...buildVueFilePathLookup(Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'frontend'), {})
+                };
+            }, {});
+
+            // order is important! Arches core files are overwritten by project files, project files are overwritten by installedPackage files
+            const vueFilepathLookup = { 
+                ...coreArchesVuePathConfiguration,
+                ...projectVuePathConfiguration,
+                ...installedPackagesVuePathConfiguration
+            };
+
+            // END create vue filepath lookup
             
             resolve({
                 entry: { 
                     ...archesCoreEntryPointConfiguration,
                     ...projectEntryPointConfiguration,
-                    ...installedPackagesEntrypointConfiguration
+                    ...installedPackagesEntrypointConfiguration,
+                    ...vueFilepathLookup
                 },
                 devServer: {
                     port: WEBPACK_DEVELOPMENT_SERVER_PORT,
@@ -198,6 +221,7 @@ module.exports = () => {
                     }),
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
+                    new VueLoaderPlugin(),
                 ],
                 resolveLoader: {
                     alias: {
@@ -210,11 +234,16 @@ module.exports = () => {
                         ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                         ...templateFilepathLookup,
                         ...imageFilepathLookup,
+                        ...vueFilepathLookup,
                         ...nodeModulesAliases,
                     },
                 },
                 module: {
                     rules: [
+                        {
+                            test: /\.vue$/,
+                            loader: Path.join(APP_ROOT, 'media', 'node_modules', 'vue-loader'),
+                        },
                         {
                             test: /\.mjs$/,
                             include: /node_modules/,
@@ -230,7 +259,18 @@ module.exports = () => {
                             }
                         },
                         {
-                            test: /\.s?css$/i,
+                            test: /\.css$/,
+                            use: [
+                                {
+                                    'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'style-loader'),
+                                },
+                                {
+                                    'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'css-loader'),
+                                },
+                            ],
+                        },
+                        {
+                            test: /\.scss$/i,
                             use: [
                                 {
                                     'loader': MiniCssExtractPlugin.loader,
