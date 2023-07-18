@@ -1,4 +1,39 @@
-.resource-filter .resource-selector-button div .btn,
-.qa-filter .resource-selector-button div .btn {
-    padding: 2px 10px;
+.resource-filter {
+	.resource-selector-button {
+		div {
+			.btn {
+				padding: 2px 10px;
+			}
+		}
+	}
+}
+
+.qa-filter {
+	.resource-selector-button {
+		div {
+			.btn {
+				padding: 2px 10px;
+			}
+		}
+	}
+}
+
+.ep-toolbar {
+    .top-right-nav {
+        .ep-tools-login {
+            p {
+				@include break-at(tablet-max) {
+					display: none;
+				}
+			}
+			i {
+				display: inline-block;
+				font-size: 17px;
+    			margin-top: 2px;
+				@include break-at(small-desktop) {
+					display: none;
+				}
+			}
+        }
+    }
 }
