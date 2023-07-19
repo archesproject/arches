@@ -406,7 +406,7 @@ module.exports = () => {
         };
 
         let projectSettings = spawn(
-            'python3',
+            'python',
             [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
         );
         projectSettings.stderr.on("data", process.stderr.write);
@@ -414,7 +414,7 @@ module.exports = () => {
 
         projectSettings.on('error', () => {
             projectSettings = spawn(
-                'python',
+                'python3',
                 [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
             );
             projectSettings.stderr.on("data", process.stderr.write);
