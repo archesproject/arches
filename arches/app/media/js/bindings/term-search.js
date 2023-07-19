@@ -44,8 +44,7 @@ define([
                         let term = requestParams.term || '';
                         return {
                             q: term, // search term
-                            lang: language().code,
-                            page_limit: 30
+                            lang: language().code
                         };
                     },
                     processResults: function(data, params) {
@@ -64,34 +63,31 @@ define([
                                 }
                             });
                         }, 2000);
-                        var results = [];
-                        searchbox.groups = [];
+                        // var results = [];
+                        // searchbox.groups = [];
                         _.each(data, function(value, searchType) {
-                            if (value.length > 0) {
-                                searchbox.groups.unshift(searchType);
-                            }
+                            // if (value.length > 0) {
+                            //     searchbox.groups.unshift(searchType);
+                            // }
                             _.each(value, function(val) {
                                 val.inverted = ko.observable(false);
                                 val.id = val.type + val.value + val.context_label;
-                                results.push(val);
+                                // results.push(val);
                             }, this);
                         }, this);
                         //res = _.groupBy(results, 'type');
                         var res = [];
+                        // res.push({
+                        //     inverted: ko.observable(false),
+                        //     type: 'group',
+                        //     context: '',
+                        //     context_label: '',
+                        //     id: '',
+                        //     text: searchbox.groups,
+                        //     value: '',
+                        //     disabled: true
+                        // });
                         res.push({
-                            inverted: ko.observable(false),
-                            type: 'group',
-                            context: '',
-                            context_label: '',
-                            id: '',
-                            text: searchbox.groups,
-                            value: '',
-                            disabled: true
-                        });
-                        _.each(_.groupBy(results, 'type'), function(value, group){
-                            res = res.concat(value);
-                        });
-                        res.unshift({
                             inverted: ko.observable(false),
                             type: 'string',
                             context: '',
@@ -100,6 +96,15 @@ define([
                             text: params.term,
                             value: params.term
                         });
+                        if(data.terms.length > 0){
+                            res.push({"text": "Terms", "children": data.terms});
+                        }
+                        if(data.concepts.length > 0){
+                            res.push({"text": "Concepts", "children": data.concepts});
+                        }
+                        // _.each(_.groupBy(results, 'type'), function(value, group){
+                        //     res = res.concat(value);
+                        // });
                         return {
                             results: res
                         };
@@ -109,16 +114,16 @@ define([
                 //     return item.type + item.value + item.context_label;
                 // },
                 templateResult: function(result, container) {
-                    if (result.loading) {
+                    if (result.loading || result.children) {
                         return result.text;
                     }
-                    if (searchbox?.groups?.length > 0) {
-                        if (searchbox.groups[0] === 'concepts'){
-                            $('.term').hide();
-                        } else {
-                            $('.concept').hide();
-                        }
-                    }
+                    // if (searchbox?.groups?.length > 0) {
+                    //     if (searchbox.groups[0] === 'concepts'){
+                    //         $('.term').hide();
+                    //     } else {
+                    //         $('.concept').hide();
+                    //     }
+                    // }
                     var markup = [];
                     var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                     if (result.type === 'group') {
@@ -134,17 +139,17 @@ define([
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
                     var formatedresult = '<span class="' + result.type + '"><span class="' + indent + '">' + markup.join("") + '</span>' + context + '</span>';
                     container.className = container.className + ' ' + result.type;
-                    if (searchbox.groups.length > 0) {
-                        if(result.type === 'concept' || result.type === 'terms'){
-                            $(container).hide();
-                        }
-                        if (searchbox.groups[0] === 'concepts' && result.type === 'concept'){
-                            $(container).show();
-                        }
-                        if (searchbox.groups[0] === 'terms' && result.type === 'term'){
-                            $(container).show();
-                        }
-                    }
+                    // if (searchbox.groups.length > 0) {
+                    //     if(result.type === 'concept' || result.type === 'terms'){
+                    //         $(container).hide();
+                    //     }
+                    //     if (searchbox.groups[0] === 'concepts' && result.type === 'concept'){
+                    //         $(container).show();
+                    //     }
+                    //     if (searchbox.groups[0] === 'terms' && result.type === 'term'){
+                    //         $(container).show();
+                    //     }
+                    // }
                     $(container).click(function(event){
                         var btn = event.target.closest('button');
                         if(!!btn && btn.id === 'termsgroup') {
