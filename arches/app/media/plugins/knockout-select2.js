@@ -1,4 +1,4 @@
-define(['jquery', 'knockout', 'underscore', 'select2'], function($, ko, _) {
+define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var allBindings = allBindingsAccessor().select2;

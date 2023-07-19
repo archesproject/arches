@@ -2,7 +2,6 @@ define([
     'jquery',
     'knockout',
     'underscore',
-    'jquery',
     'arches',
     'viewmodels/widget',
     'utils/ontology',
@@ -410,9 +409,9 @@ define([
                 },
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(selectWooParams) {
-                    let term = selectWooParams.term || '';
-                    let page = selectWooParams.page || 1;
+                data: function(requestParams) {
+                    let term = requestParams.term || '';
+                    let page = requestParams.page || 1;
                     //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
                     // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                     // var regex = new RegExp(expression);

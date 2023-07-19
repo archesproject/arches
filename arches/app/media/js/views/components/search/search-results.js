@@ -4,7 +4,7 @@ define([
     'views/components/search/base-filter',
     'bootstrap',
     'arches',
-    'select2',
+    'select-woo',
     'knockout',
     'knockout-mapping',
     'models/graph',

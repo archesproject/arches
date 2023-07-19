@@ -11,12 +11,11 @@
         <div class="col-xs-12 resource-instance-wrapper">
             <select style="display:inline-block;"
                 data-bind="
-                    value: value,
                     disable: disabled,
                     select2Query: {
                         select2Config: select2Config
                     },
-                    attr: {'aria-label': label}
+                    attr: {'data-label': label}
                 ">
         </div>
     </div>
@@ -47,11 +46,10 @@
         <div class="col-xs-12 resource-instance-wrapper">
             <select style="display:inline-block;"
                 data-bind="
-                    value: defaultValue,
                     select2Query: {
                         select2Config: select2Config
                     },
-                    attr: {'aria-label': $root.translations.defaultValue}
+                    attr: {'data-label': $root.translations.defaultValue}
                 ">
         </div>
     </div>

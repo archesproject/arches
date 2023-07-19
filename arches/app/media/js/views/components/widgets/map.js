@@ -8,7 +8,7 @@ define([
     'templates/views/components/widgets/map.htm',
     'bindings/chosen',
     'bindings/codemirror',
-    'select2',
+    'select-woo',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',

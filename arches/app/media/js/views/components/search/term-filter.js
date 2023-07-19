@@ -86,15 +86,17 @@ define([
         },
 
         addTag: function(term, type, inverted){
-            this.filter.tags.unshift({
-                inverted: inverted,
-                type: type,
-                context: '',
-                context_label: '',
-                id: term,
-                text: term,
-                value: term
-            });
+            if(!this.hasTag(term)){
+                this.filter.tags.unshift({
+                    inverted: inverted,
+                    type: type,
+                    context: '',
+                    context_label: '',
+                    id: term,
+                    text: term,
+                    value: term
+                });
+            }
         },
 
         removeTag: function(term){
@@ -105,7 +107,7 @@ define([
 
         hasTag: function(tag_text){
             var has_tag = false;
-            this.filter.terms().forEach(function(term_item){
+            this.filter.tags().forEach(function(term_item){
                 if (term_item.text == tag_text) {
                     has_tag = true;
                 }

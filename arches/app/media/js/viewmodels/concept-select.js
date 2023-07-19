@@ -89,9 +89,9 @@ define([
                 url: arches.urls.paged_dropdown,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(selectWooParams) {
-                    let term = selectWooParams.term || '';
-                    let page = selectWooParams.page || 1;
+                data: function(requestParams) {
+                    let term = requestParams.term || '';
+                    let page = requestParams.page || 1;
                     return {
                         conceptid: ko.unwrap(params.node.config.rdmCollection),
                         query: term,
@@ -123,6 +123,21 @@ define([
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();
             }),
+            // init: function(el){
+            //     valueData.forEach(function(data) {
+            //         var option = new Option(data.text, data.id, true, true);
+            //         $(el).append(option).trigger('change');
+
+            //         // manually trigger the `select2:select` event
+            //         $(el).trigger({
+            //             type: 'select2:select',
+            //             params: {
+            //                 data: data
+            //             }
+            //         });
+            //     });
+            // },
+            initComplete: false,
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
                 
@@ -154,31 +169,51 @@ define([
                             valueData.reverse();
                         }
 
-                    }
-                    else {
+                        if(!self.select2Config.initComplete){
+                            valueData.forEach(function(data) {
+                                var option = new Option(data.text, data.id, true, true);
+                                $(el).append(option);//.trigger('change');
+            
+                                // manually trigger the `select2:select` event
+                                // $(el).trigger({
+                                //     type: 'select2:select',
+                                //     params: {
+                                //         data: data
+                                //     }
+                                // });
+                            });
+                            self.select2Config.initComplete = true;
+                        }
+                    } else {
                         valueData = {
                             id: data,
                             text: NAME_LOOKUP[data],
                         };
                     }
 
-                    if (valueData) { callback(valueData); }
+
+                    callback(valueData);
                 };
 
-                valueList.forEach(function(value) {
-                    if (ko.unwrap(value)) {
-                        if (NAME_LOOKUP[value]) {
-                            setSelectionData(value);
-                        } else {
-                            $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
-                                dataType: "json"
-                            }).done(function(data) {
-                                NAME_LOOKUP[value] = data.value;
+                if (valueList.length > 0) {
+                    valueList.forEach(function(value) {
+                        if (ko.unwrap(value)) {
+                            if (NAME_LOOKUP[value]) {
                                 setSelectionData(value);
-                            });
+                            } else {
+                                $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
+                                    dataType: "json"
+                                }).done(function(data) {
+                                    NAME_LOOKUP[value] = data.value;
+                                    setSelectionData(value);
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }else{
+                    callback([]);
+                }
+
 
             }
         };
