@@ -140,7 +140,7 @@ class BranchCsvImporter(BaseImportModule):
         row_count = 0
         for row in worksheet.rows:
             cell_values = [cell.value for cell in row]
-            if len(cell_values) == 0:
+            if len(cell_values) == 0 or any(cell_values) is False:
                 continue
             resourceid = cell_values[0]
             if resourceid is None:
