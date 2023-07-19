@@ -6,7 +6,7 @@
 {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
 
 {% block main_content %}
-    <article class="content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;" aria-label="{% trans 'Search page contents' %}">
+    <article class="main-search-container content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;" aria-label="{% trans 'Search page contents' %}">
         <section class="flex search-results-panel" aria-label="{% trans 'Search results' %}">
             <div class="search-attribute-widget">
                 <div class="search-dropdown" data-bind="component: {
@@ -66,7 +66,7 @@
             </div>
         </section>
 
-        <section class="flex" style="flex-direction: column" aria-label="{% trans 'Map and filters' %}">
+        <section class="flex search-map-container" aria-label="{% trans 'Map and filters' %}">
             <!-- Title Block -->
             <div class="search-toolbar">
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
@@ -101,7 +101,7 @@
                             }
                         ">
                             <i data-bind="css: filter.icon"></i>
-                            <!-- <p data-bind="text: filter.name"></p> -->
+                            <p data-bind="text: filter.name"></p>
                         </button>
                         {% endif %}
                         <!-- /ko -->
@@ -115,7 +115,7 @@
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
                         <!-- ko if: filter.type === 'filter' && filter.enabled -->
                         <div class="tab-pane" role="tabpanel" data-bind="css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, attr: {id: filter.componentname + '-tabpanel'}">
-                            <div style="height: calc(100vh - 100px)" data-bind="component: {
+                            <div class="tab-pane-content" data-bind="component: {
                                 name: filter.componentname,
                                 params: $parent.sharedStateObject
                             }"></div>
