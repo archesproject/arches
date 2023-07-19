@@ -2,11 +2,13 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('filter');
+<div tabindex="0" id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+    toggleTab('filter'); toggleAriaExpanded('toggle-map-filter-panel');
 }, css: {
     'active': activeTab() === 'filter'
-}">
+}, attr: {
+    'aria-label': $root.translations.openMapFilter
+}" aria-controls="side-panel" aria-expanded="false">
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">
         <span data-bind="text: $root.translations.filter"></span>
@@ -18,102 +20,98 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'filter' -->
     <div class="workbench-card-sidepanel-header-container">
-        <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+        <p tabindex="0" class="h4 workbench-card-sidepanel-header" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel">
             <span data-bind="text: $root.translations.mapSearch"></span>
-        </h4>
+        </p>
     </div>
     <div class="workbench-card-sidepanel-border"></div>
 
     <div class="workbench-card-sidepanel-body">
-    <!-- ko if: geoJSONString() === undefined -->
-    <div class="spatial-filter-container">
+        <!-- ko if: geoJSONString() === undefined -->
+        <div class="spatial-filter-container">
 
-        <!-- Buffer Definition -->
-        <div class="buffer-control form-control">
-            <h5 class="">
-                <span data-bind="text: $root.translations.buffer"></span>
-            </h5>
-            <div class="form-inline">
-                <label for="buffer-input">
-                    <span data-bind="text: $root.translations.distance"></span>
-                </label>
-                <input 
-                    type="number" 
-                    min=0.0 
-                    id="buffer-input" 
-                    class="buffer-input" 
-                    data-bind="
-                        attr: {placeholder: $root.translations.buffer},
-                        textInput: buffer
-                    "
-                >
-                <select class="form-control" style="vertical-align: top;" data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit"></select>
+            <!-- Buffer Definition -->
+            <div class="buffer-control form-control">
+                <span class="h5" data-bind="text: $root.translations.buffer"></span>
+                <div class="form-inline">
+                    <label for="buffer-input">
+                        <span data-bind="text: $root.translations.distance"></span>
+                    </label>
+                    <input 
+                        type="number" 
+                        min=0.0 
+                        id="buffer-input" 
+                        class="buffer-input" 
+                        data-bind="
+                            attr: {placeholder: $root.translations.buffer},
+                            textInput: buffer
+                        "
+                    >
+                    <select class="form-control" style="vertical-align: top;" data-bind="options: bufferUnits, optionsText:'name', optionsValue:'val', value: bufferUnit, attr: {'aria-label': $root.translations.selectBufferUnits}"></select>
+                </div>
             </div>
-        </div>
 
-        <!-- Geometry -->
-        <div class="add-new-feature buffer-control" style="">
-            <h5 class="">
-                <span data-bind="text: $root.translations.selectAFilter"></span>
-            </h5>
-            <select 
-                data-bind="
-                    placeholder: $root.translations.drawA,
-                    value: selectedTool,
-                    valueAllowUnset: true,
-                    options: spatialFilterTypes,
-                    optionsText: 'title',
-                    optionsValue: 'drawMode',
-                    chosen: {
-                        'width': '100%',
-                        'disable_search_threshold': 10,
-                        'allow_single_deselect': true
-                    }
-                "
-            ></select>
-        </div>
+            <!-- Geometry -->
+            <div class="add-new-feature buffer-control">
+                <label for="filter-select" class="h5" data-bind="text: $root.translations.selectAFilter"></label>
+                <select 
+                    id="filter-select"
+                    data-bind="
+                        placeholder: $root.translations.drawA,
+                        value: selectedTool,
+                        valueAllowUnset: true,
+                        options: spatialFilterTypes,
+                        optionsText: 'title',
+                        optionsValue: 'drawMode',
+                        chosen: {
+                            'width': '100%',
+                            'disable_search_threshold': 10,
+                            'allow_single_deselect': true
+                        },
+                        attr: {'aria-label': $root.translations.selectAFilter}
+                    "
+                ></select>
+            </div>
 
-    </div>
-    <!-- /ko-->
-
-    <!-- ko if: geoJSONString() !== undefined -->
-    <div class="geojson-card">
-        <div class="geojson-editor" data-bind="codemirror: {
-            value: geoJSONString,
-            mode: { name: 'javascript', json: true },
-            lineNumbers: true
-        }"></div>
-        <!-- ko if: geoJSONErrors().length !== 0 -->
-        <div class="geojson-error-list">
-            <span data-bind="text: $root.translations.geojsonErrors"></span>
-            <ul>
-                <!-- ko foreach: geoJSONErrors() -->
-                <li data-bind="text: message"></li>
-                <!-- /ko-->
-            </ul>
         </div>
         <!-- /ko-->
-        
-    </div>
-    <!-- /ko-->
-    <div class="map-card-zoom-tool">
-        <a href="javascript:void(0);" data-bind="click: function(){
-            editGeoJSON(filter.feature_collection);}">
-            <i class="fa fa-pencil map-card-feature-edit"></i>
-            <span data-bind="text: $root.translations.editGeoJSON"></span>
-        </a>
-        |
-        <a href="javascript:void(0);" data-bind="click: fitToAggregationBounds">
-            <i class="fa fa-search map-card-feature-edit"></i>
-            <span data-bind="text: $root.translations.zoomToAllFeatures"></span>
-        </a>
-        |
-        <a href="javascript:void(0);" data-bind="click: clear">
-            <i class="fa fa-trash map-card-feature-edit"></i>
-            <span data-bind="text: $root.translations.clearFilter"></span>
-        </a>
 
-    </div>
+        <!-- ko if: geoJSONString() !== undefined -->
+        <div class="geojson-card">
+            <div class="geojson-editor" data-bind="codemirror: {
+                value: geoJSONString,
+                mode: { name: 'javascript', json: true },
+                lineNumbers: true
+            }"></div>
+            <!-- ko if: geoJSONErrors().length !== 0 -->
+            <div class="geojson-error-list">
+                <span data-bind="text: $root.translations.geojsonErrors"></span>
+                <ul>
+                    <!-- ko foreach: geoJSONErrors() -->
+                    <li data-bind="text: message"></li>
+                    <!-- /ko-->
+                </ul>
+            </div>
+            <!-- /ko-->
+        </div>
+        <!-- /ko-->
+        <div class="map-card-zoom-tool">
+            <a href="javascript:void(0);" data-bind="click: function(){
+                editGeoJSON(filter.feature_collection);}">
+                <i class="fa fa-pencil map-card-feature-edit"></i>
+                <span data-bind="text: $root.translations.editGeoJson"></span>
+            </a>
+            |
+            <a href="javascript:void(0);" data-bind="click: fitToAggregationBounds">
+                <i class="fa fa-search map-card-feature-edit"></i>
+                <span data-bind="text: $root.translations.zoomToAllFeatures"></span>
+            </a>
+            |
+            <a href="javascript:void(0);" data-bind="click: clear">
+                <i class="fa fa-trash map-card-feature-edit"></i>
+                <span data-bind="text: $root.translations.clearFilter"></span>
+            </a>
+        </div>
     </div>
 
     <!-- ko if: geoJSONString() !== undefined -->
