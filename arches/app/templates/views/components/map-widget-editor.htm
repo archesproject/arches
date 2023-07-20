@@ -156,35 +156,27 @@
                                         <span data-bind="text: $root.translations.editGeoJson"></span>
                                     </button>
                                     |
-                                    <!-- ko if: canEditCoordinates() -->
-                                    <button data-bind="click: function() {
-                                        self.coordinateEditing(true);
-                                    }">
+                                    <button data-bind="click: canEditCoordinates() ? function(){self.coordinateEditing(true)} : null, 
+                                        css: {
+                                            'inactive': !canEditCoordinates() 
+                                        }, attr: {
+                                            'aria-disabled': (!canEditCoordinates()).toString()
+                                        }
+                                    ">
                                         <i class="fa fa-list map-card-feature-edit"></i>
                                         <span data-bind="text: $root.translations.editCoordinates"></span>
                                     </button>
-                                    <!-- /ko -->
-                                    <!-- ko if: !canEditCoordinates() -->
-                                    <span>
-                                        <i class="fa fa-list map-card-feature-edit"></i>
-                                        <span data-bind="text: $root.translations.editCoordinates"></span>
-                                    </span>
-                                    <!-- /ko -->
                                     |
-                                    <!-- ko if: self.bufferFeature() -->
-                                    <button data-bind="click: function() {
-                                        self.bufferNodeId(widget.node_id());
-                                    }">
+                                    <button data-bind="click: self.bufferFeature() ? function() {self.bufferNodeId(widget.node_id())} : null,
+                                        css: {
+                                            'inactive': !self.bufferFeature() 
+                                        }, attr: {
+                                            'aria-disabled': !self.bufferFeature() && (!self.bufferFeature()).toString()
+                                        }
+                                    ">
                                         <i class="fa fa-list map-card-feature-edit"></i>
                                         <span data-bind="text: $root.translations.addBuffer"></span>
                                     </button>
-                                    <!-- /ko -->
-                                    <!-- ko if: !self.bufferFeature() -->
-                                    <span>
-                                        <i class="fa fa-list map-card-feature-edit"></i>
-                                        <span data-bind="text: $root.translations.addBuffer"></span>
-                                    </span>
-                                    <!-- /ko -->
                                     <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                     |
                                     <button data-bind="click: function() {

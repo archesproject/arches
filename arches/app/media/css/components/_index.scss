@@ -332,6 +332,11 @@
     background-color: rgba(0,0,0,0);
 }
 
+.map-card-zoom-tool button.inactive {
+    color: #454545;
+    cursor: default;
+}
+
 .map-card-zoom-tool {
     float: right;
     padding: 10px;
