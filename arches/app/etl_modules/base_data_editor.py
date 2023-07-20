@@ -367,7 +367,7 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
-            data_updated = self.save_to_tiles(loadid)
+            data_updated = self.save_to_tiles(loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:
