@@ -98,19 +98,7 @@ class Reader(object):
             else:
                 return ret[0].resourceinstanceid
 
-        start = time()
-        bulk_relations = []
-        for i, relation in enumerate(relations):
-            relation_count = i + 2
-            relid = None
-            exists = False
-            if relation_count % 500 == 0:
-                print("{0} relations saved".format(str(relation_count)))
-                if bulk:
-                    ResourceXResource.bulk_save(bulk_relations)
-                    del bulk_relations[:]
-
-            def validate_resourceinstanceid(resourceinstanceid, key):
+        def validate_resourceinstanceid(resourceinstanceid, key):
                 # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
                 try:
                     # Test if resourceinstanceid from relations file is a UUID.
@@ -144,62 +132,88 @@ class Reader(object):
 
                 return newresourceinstanceid
 
+        start = time()
+        bulk_relations = []
+        relation_count = 2
+        preexisting_count = 0
+        for i, relation in enumerate(relations):
+            relation_count += 1
+            relid = None
+            exists = False
+            if relation_count % 500 == 0:
+                print("{0} relations saved".format(str(relation_count)))
+                if bulk:
+                    ResourceXResource.bulk_save(bulk_relations)
+                    del bulk_relations[:]
+
             resourceinstancefrom = validate_resourceinstanceid(relation["resourceinstanceidfrom"], "resourceinstanceidfrom")
             resourceinstanceto = validate_resourceinstanceid(relation["resourceinstanceidto"], "resourceinstanceidto")
-            if resourceinstancefrom is not None and resourceinstanceto is not None:
-                if (
-                    "resourceinstancefrom_graphid" not in relation
-                    or relation["resourceinstancefrom_graphid"] == ""
-                    or relation["resourceinstancefrom_graphid"] == "None"
-                ):
-                    try:
-                        relation["resourceinstancefrom_graphid"] = models.ResourceInstance.objects.get(
-                            resourceinstanceid=resourceinstancefrom
-                        ).graph_id
-                    except ObjectDoesNotExist:
-                        relation["resourceinstancefrom_graphid"] = None
-                if (
-                    "resourceinstanceto_graphid" not in relation
-                    or relation["resourceinstanceto_graphid"] == ""
-                    or relation["resourceinstanceto_graphid"] == "None"
-                ):
-                    try:
-                        relation["resourceinstanceto_graphid"] = models.ResourceInstance.objects.get(
-                            resourceinstanceid=resourceinstanceto
-                        ).graph_id
-                    except ObjectDoesNotExist:
-                        relation["resourceinstanceto_graphid"] = None
-                if relation["datestarted"] == "" or relation["datestarted"] == "None":
-                    relation["datestarted"] = None
-                if relation["dateended"] == "" or relation["dateended"] == "None":
-                    relation["dateended"] = None
-                if "nodeid" not in relation or relation["nodeid"] == "" or relation["nodeid"] == "None":
-                    relation["nodeid"] = None
-                if "tileid" not in relation or relation["tileid"] == "" or relation["tileid"] == "None":
-                    relation["tileid"] = None
+            if resourceinstancefrom and resourceinstanceto:
+                if "relationshiptype" in relation and relation["relationshiptype"] != "" and relation["relationshiptype"]:
+                    relationshiptype = str(relation["relationshiptype"])
+                else:
+                    relationshiptype = None
                 if "resourcexid" in relation:
                     relid = uuid.UUID(relation["resourcexid"])
-                relation = ResourceXResource(
-                    resourceinstanceidfrom=Resource(resourceinstancefrom),
-                    resourceinstanceidto=Resource(resourceinstanceto),
-                    resourceinstancefrom_graphid_id=relation["resourceinstancefrom_graphid"],
-                    resourceinstanceto_graphid_id=relation["resourceinstanceto_graphid"],
-                    relationshiptype=str(relation["relationshiptype"]),
-                    nodeid=relation["nodeid"],
-                    tileid=relation["tileid"],
-                    datestarted=relation["datestarted"],
-                    dateended=relation["dateended"],
-                    notes=relation["notes"],
-                )
                 if relid:
-                    relation.resourcexid = relid
+                    # relation.resourcexid = relid
                     exists = ResourceXResource.objects.filter(pk=relid).exists()
-                if bulk and not exists:
-                    bulk_relations.append(relation)
-                elif not exists:
-                    relation.save()
                 else:
+                    exists = ResourceXResource.objects.filter(resourceinstanceidfrom_id=resourceinstancefrom, resourceinstanceidto_id=resourceinstanceto, relationshiptype=relationshiptype).exists()
+                if not exists:
+                    if (
+                        "resourceinstancefrom_graphid" not in relation
+                        or relation["resourceinstancefrom_graphid"] == ""
+                        or relation["resourceinstancefrom_graphid"] == "None"
+                    ):
+                        try:
+                            relation["resourceinstancefrom_graphid"] = models.ResourceInstance.objects.get(
+                                resourceinstanceid=resourceinstancefrom
+                            ).graph_id
+                        except ObjectDoesNotExist:
+                            relation["resourceinstancefrom_graphid"] = None
+                    if (
+                        "resourceinstanceto_graphid" not in relation
+                        or relation["resourceinstanceto_graphid"] == ""
+                        or relation["resourceinstanceto_graphid"] == "None"
+                    ):
+                        try:
+                            relation["resourceinstanceto_graphid"] = models.ResourceInstance.objects.get(
+                                resourceinstanceid=resourceinstanceto
+                            ).graph_id
+                        except ObjectDoesNotExist:
+                            relation["resourceinstanceto_graphid"] = None
+                    if "datestarted" not in relation or relation["datestarted"] == "" or relation["datestarted"] == "None":
+                        relation["datestarted"] = None
+                    if "dateended" not in relation or relation["dateended"] == "" or relation["dateended"] == "None":
+                        relation["dateended"] = None
+                    if "nodeid" not in relation or relation["nodeid"] == "" or relation["nodeid"] == "None":
+                        relation["nodeid"] = None
+                    if "tileid" not in relation or relation["tileid"] == "" or relation["tileid"] == "None":
+                        relation["tileid"] = None
+                    if "notes" not in relation or relation["notes"] == "" or relation["notes"] == "None":
+                        relation["notes"] = None
+                    relation = ResourceXResource(
+                        resourceinstanceidfrom=Resource(resourceinstancefrom),
+                        resourceinstanceidto=Resource(resourceinstanceto),
+                        resourceinstancefrom_graphid_id=relation["resourceinstancefrom_graphid"],
+                        resourceinstanceto_graphid_id=relation["resourceinstanceto_graphid"],
+                        relationshiptype=relationshiptype,
+                        nodeid=relation["nodeid"],
+                        tileid=relation["tileid"],
+                        datestarted=relation["datestarted"],
+                        dateended=relation["dateended"],
+                        notes=relation["notes"],
+                    )
+                    relation.resourcexid = relid # defaults to None, will be assigned on model.save
+                    if bulk:
+                        # relation.resourcexid = relid
+                        bulk_relations.append(relation)
+                    else:
+                        relation.save()
+                else: # resourcexresource already exists
                     relation_count -= 1
+                    preexisting_count += 1
             else:
                 self.errors.append(
                         {
@@ -212,6 +226,10 @@ class Reader(object):
             ResourceXResource.bulk_save(bulk_relations)
             print("{0} relations saved".format(str(relation_count)))
             del bulk_relations[:]
+        if preexisting_count:
+            print("{0} pre-existing relations detected".format(str(preexisting_count)))
+        else:
+            print("no pre-existing relations")
         elapsed = time() - start
         bulk_str = " bulk" if bulk else ""
         print(f"Time to{bulk_str} import resource relations = {datetime.timedelta(seconds=elapsed)}")
