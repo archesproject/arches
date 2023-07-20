@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.core.management.base import BaseCommand
 from openpyxl import Workbook, styles
+from operator import itemgetter
 from django.db import connection
 from arches.app.models.models import Node
 
@@ -82,7 +83,7 @@ def style_header(length, width, sheet):
             sheet.cell(row=row, column=column).border = border
 
 
-def create_workbook(graphid) -> Workbook:
+def create_workbook(graphid, tiledata=None) -> Workbook:
     wb = Workbook()
     columns = ("root_nodegroupid", "nodegroupid", "parent_nodegroupid", "alias", "name", "depth", "path", "cardinality")
     with connection.cursor() as cursor:
@@ -111,13 +112,30 @@ def create_workbook(graphid) -> Workbook:
                 sheet[f"B2"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
                 for i, node in enumerate(nodes):
                     sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
+                sheet.cell(column=i + 4, row=row_number, value="tileid")
             else:
                 row_number += 1
                 sheet[f"A{row_number}"] = "--"
                 sheet[f"B{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
                 for i, node in enumerate(nodes):
                     sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
+                sheet.cell(column=i + 4, row=row_number, value="tileid")
             column_length = len(nodes) if len(nodes) > column_length else column_length
-            style_header(row_number, column_length + 2, sheet)
+            style_header(row_number, column_length + 3, sheet)
+
+        if tiledata is not None:
+            for root_nodegroup, tiles in tiledata.items():
+                sheet = wb[root_nodegroup]
+                tiles.sort(key=itemgetter('resourceinstanceid','depth'))
+                for tile in tiles:
+                    row_number = sheet.max_row + 1
+                    tab = "    " * tile["depth"]
+                    sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
+                    sheet[f"B{row_number}"] = f'{tab}{tile["alias"]}'
+                    nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
+                    for i, node in enumerate(nodes):
+                        sheet.cell(column=i + 3, row=row_number, value=f"{tile[node['alias']]}")
+                    sheet.cell(column=i + 4, row=row_number, value=str(tile["tileid"]))
+
         write_metadata(wb, metadata)
         return wb

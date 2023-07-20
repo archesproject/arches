@@ -1,0 +1,95 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+<div class="etl-module-component-container">
+    <div class="etl-module-body">
+        <h2>
+            <span>{% trans "Export Branch Excel" %}</span>
+        </h2>
+        <section class="etl-module-component">
+            <!-- <div class="etl-module-component-block">
+                <h3>
+                    <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+                </h3>
+                <textarea id="search-url-input"
+                    style="min-height: 100px; width: 80%;"
+                    class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
+                ></textarea>
+            </div> -->
+            <div class="etl-module-component-block">
+                <h3>
+                    <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
+                </h3>
+                <select id="resource-model-select" data-bind="
+                    value: selectedGraph,
+                    options: graphs,
+                    optionsText: 'name',
+                    optionsValue: 'graphid',
+                    optionsCaption: $root.translations.select,
+                    valueAllowUnset: true,
+                    chosen: {width: '500px'}"
+                ></select>
+            </div>
+        </section>
+    </div>
+    <div class="tabbed-workflow-footer, etl-module-footer">
+        <button class="btn btn-success" style="margin-right: 8px;" data-bind="click: exportResources, css: {disabled: !selectedGraph()}">
+            <span data-bind="text: $root.translations.start"></span>
+        </button>
+    </div>
+</div>
+<!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.importBranchExcelSummary"></span>
+    </h4>
+    <!-- ko if: ko.unwrap(loadDetails) -->
+    <div class="branch-csv-etl-load-summmary">
+        <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+            <div class="summary-header">
+                <span data-bind="text: $root.translations.excelFile"></span>
+            </div>
+            <div class="summary-header">
+                <span data-bind="text: $root.translations.size"></span>
+            </div>   
+
+            <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
+            <div class="etl-loading-metadata-value" data-bind="text: file"></div>
+                <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
+                <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                <div class="summary-header" style="margin-top: 10px;">
+                    <span data-bind="text: $root.translations.worksheets"></span>
+                </div>
+                <div class="summary-header" style="margin-top: 10px;">
+                    <span data-bind="text: $root.translations.tiles"></span>
+                </div>
+                <!--ko foreach: $data.worksheets-->
+                <div class="etl-loading-metadata-value" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.name"></div>
+                <div class="etl-loading-metadata-key" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.rows"></div>
+                <!-- /ko -->
+                <!-- /ko -->
+                    
+            <!-- /ko -->
+
+            <div class="branch-csv-etl-load-files" style="margin-top: 25px; display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                <div class="etl-loading-metadata-value" data-bind="text: loadDetails.name"></div>
+                <div class="etl-loading-metadata-key" data-bind="text: loadDetails.size"></div>
+                <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
+                    <div class="etl-loading-metadata-value" data-bind="text: file"></div>
+                    <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
+                    <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+            
+        </div>
+    </div>
+    <!--/ko-->
+</div>
+{% endblock etl_status %}
+
