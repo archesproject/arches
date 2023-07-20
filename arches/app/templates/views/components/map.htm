@@ -95,7 +95,10 @@
                                 onMap(!onMap());
                                 updateParent($parent);
                             }, onEnterkeyClick, onSpaceClick,
-                            attr: {'aria-label': name, 'aria-checked': onMap()}
+                            attr: {
+                                'aria-label': name, 
+                                'aria-checked': onMap().toString(),
+                            },
                         ">
                             <i data-bind="css: icon" class="layer-listing-icon"></i>
                             <span data-bind="text: name"></span>
@@ -106,7 +109,7 @@
                                 <div class="overlay-opacity-slider">
                                     <input type="range" min="0" max="100" step="1"
                                         data-bind="value: opacity, valueUpdate: 'input',
-                                            attr: {'aria-label': $root.translations.opacity}
+                                            attr: {'aria-label': $root.translations.layerOpacity(name)},
                                     ">
                                 </div>
                             </div>

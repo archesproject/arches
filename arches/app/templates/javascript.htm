@@ -442,6 +442,7 @@
         default-color='{% trans "Default Color" as defaultColor %} "{{ defaultColor|escapejs }}"'
         layer-color-palette='{% trans "Layer Color Palette" as layerColorPalette %} "{{ layerColorPalette|escapejs }}"'
         opacity='{% trans "Opacity" as opacity %} "{{ opacity|escapejs }}"'
+        layer-opacity='(layer) => {return {% trans "${layer} opacity" as layerOpacity %} `{{ layerOpacity|escapejs }}` }'
         fill-opacity='{% trans "Fill Opacity" as fillOpacity %} "{{ fillOpacity|escapejs }}"'
         fill-color='{% trans "Fill Color" as fillColor %} "{{ fillColor|escapejs }}"'
         overview-zoom='{% trans "Overview Zoom" as overviewZoom %} "{{ overviewZoom|escapejs }}"'

@@ -158,7 +158,8 @@
 }
 
 .overlay-opacity-control:hover .overlay-opacity-slider input,
-.overlay-opacity-control:focus .overlay-opacity-slider input {
+.overlay-opacity-control:focus .overlay-opacity-slider input,
+.overlay-opacity-control:focus-within .overlay-opacity-slider input {
     width: 150px;
     height: 20px;
 }
@@ -177,14 +178,16 @@
 }
 
 .overlay-listing .overlay-opacity-control:hover,
-.overlay-listing .overlay-opacity-control:focus {
+.overlay-listing .overlay-opacity-control:focus,
+.overlay-listing .overlay-opacity-control:focus-within {
     border: 1px solid rgb(217, 217, 217);
     background-color: white;
     width: 200px;
 }
 
 .overlay-listing .overlay-opacity-control:hover .overlay-opacity-slider,
-.overlay-listing .overlay-opacity-control:focus .overlay-opacity-slider {
+.overlay-listing .overlay-opacity-control:focus .overlay-opacity-slider,
+.overlay-listing .overlay-opacity-control:focus-within .overlay-opacity-slider {
     transition-delay: 400ms;
     transition: 200ms;
     -webkit-transition-delay: 400ms;
