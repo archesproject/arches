@@ -320,8 +320,14 @@
 }
 
 .map-card-zoom-tool a,
-.map-card-feature-tool a {
+.map-card-feature-tool a,
+.map-card-zoom-tool button {
     color: #2f527a;
+}
+
+.map-card-zoom-tool button {
+    border: 2px;
+    background-color: rgba(0,0,0,0);
 }
 
 .map-card-zoom-tool {
