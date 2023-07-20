@@ -67,8 +67,7 @@ class BaseImportModule(object):
                 }
             finally:
                 try:
-                    cursor.execute("""alter table tiles enable trigger __arches_check_excess_tiles_trigger;""")
-                    cursor.execute("""alter table tiles enable trigger __arches_trg_update_spatial_attributes;""")
+                    cursor.execute("""CALL __arches_complete_bulk_load();""")
 
                     if finalize_import:
                         cursor.execute("""SELECT __arches_refresh_spatial_views();""")

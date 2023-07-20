@@ -14,32 +14,6 @@ class Migration(migrations.Migration):
             BEGIN
                 alter table tiles enable trigger __arches_check_excess_tiles_trigger;
                 alter table tiles enable trigger __arches_trg_update_spatial_attributes;
-
-                if (not __arches_refresh_spatial_views()) then
-                    Raise EXCEPTION 'Unable to refresh spatial views';
-                end if;
-
-            with cardinality_violations as (SELECT t.resourceinstanceid,
-                                                    t.nodegroupid,
-                                                    COALESCE(t.parenttileid::text, '') parent_tileid,
-                                                    count(*)
-                                            FROM tiles t,
-                                                    node_groups ng
-                                            WHERE t.nodegroupid = ng.nodegroupid
-                                                AND ng.cardinality = '1'
-                                            group by t.resourceinstanceid, t.nodegroupid, parent_tileid
-                                            having count(*) > 1
-                                            LIMIT 1)
-            select count(*)
-            into cardinality_violations
-            from cardinality_violations;
-
-                if (cardinality_violations > 0) then
-                    Raise Exception 'Cardinality violations found. Run `%` to list violations',
-                        'select * from __arches_get_tile_cardinality_violations()';
-                else
-                    Raise Notice 'No cardinality violations found';
-                end if;
             END
         $$
         language plpgsql;
