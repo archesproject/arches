@@ -133,36 +133,36 @@
                                                 <span class="map-card-feature-name" data-bind="text: feature.geometry.type"></span>
                                             </td>
                                             <td class="map-card-feature-tool">
-                                                <a href="javascript:void(0);" data-bind="click: function() { self.editFeature(feature) }, clickBubble: false">
+                                                <button data-bind="click: function() { self.editFeature(feature) }, clickBubble: false" style="display: contents;">
                                                     <i class="fa fa-pencil map-card-feature-edit"></i>
                                                     <span data-bind="text: $root.translations.edit"></span>
-                                                </a>
+                                                </button>
                                             </td>
                                             <td class="map-card-feature-tool">
-                                                <a href="javascript:void(0);" data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false">
+                                                <button data-bind="click: function() { self.deleteFeature(feature) }, clickBubble: false" style="display: contents;">
                                                     <i class="fa fa-trash map-card-feature-delete"></i>
                                                     <span data-bind="text: $root.translations.delete"></span>
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                         <!-- /ko -->
                                     </tbody>
                                 </table>
                                 <div class="map-card-zoom-tool">
-                                    <a href="javascript:void(0);" data-bind="click: function() {
+                                    <button data-bind="click: function() {
                                         self.editGeoJSON(self.featureLookup[widget.node_id()].features(), widget.node_id());
                                     }">
                                         <i class="fa fa-pencil map-card-feature-edit"></i>
                                         <span data-bind="text: $root.translations.editGeoJson"></span>
-                                    </a>
+                                    </button>
                                     |
                                     <!-- ko if: canEditCoordinates() -->
-                                    <a href="javascript:void(0);" data-bind="click: function() {
+                                    <button data-bind="click: function() {
                                         self.coordinateEditing(true);
                                     }">
                                         <i class="fa fa-list map-card-feature-edit"></i>
                                         <span data-bind="text: $root.translations.editCoordinates"></span>
-                                    </a>
+                                    </button>
                                     <!-- /ko -->
                                     <!-- ko if: !canEditCoordinates() -->
                                     <span>
@@ -172,12 +172,12 @@
                                     <!-- /ko -->
                                     |
                                     <!-- ko if: self.bufferFeature() -->
-                                    <a href="javascript:void(0);" data-bind="click: function() {
+                                    <button data-bind="click: function() {
                                         self.bufferNodeId(widget.node_id());
                                     }">
                                         <i class="fa fa-list map-card-feature-edit"></i>
                                         <span data-bind="text: $root.translations.addBuffer"></span>
-                                    </a>
+                                    </button>
                                     <!-- /ko -->
                                     <!-- ko if: !self.bufferFeature() -->
                                     <span>
@@ -187,12 +187,12 @@
                                     <!-- /ko -->
                                     <!-- ko if: self.featureLookup[widget.node_id()].features().length > 0 -->
                                     |
-                                    <a href="javascript:void(0);" data-bind="click: function() {
+                                    <button data-bind="click: function() {
                                         self.fitFeatures(self.featureLookup[widget.node_id()].features());
                                     }">
                                         <i class="fa fa-search map-card-feature-edit"></i>
                                         <span data-bind="text: $root.translations.zoomToAll"></span>
-                                    </a>
+                                    </button>
                                     <!-- /ko -->
                                 </div>
                             </div>
