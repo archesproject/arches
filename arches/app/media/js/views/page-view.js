@@ -87,6 +87,7 @@ define([
                 getHelp: function(template) {
                     self.viewModel.helploading(true);
                     var el = document.createElement('div');
+                    $('.ep-help-content').empty()
                     $('.ep-help-content').append(el);
                     $.ajax({
                         type: "GET",
