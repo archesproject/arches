@@ -392,6 +392,7 @@
         no-email-saved-for-user='{% trans "No Email saved for User" as noEmailSavedForUser %} "{{ noEmailSavedForUser|escapejs }}"'
         drag-geo-json-kml='{% trans "Drag GeoJSON or KML files here to add" as dragGeoJsonKml %} "{{ dragGeoJsonKml|escapejs }}"'
         following-errors-occurred='{% trans "The following errors occurred:" as followingErrorsOccurred %} "{{ followingErrorsOccurred|escapejs }}"'
+        shown-total-search-results='(shown, total) => {return {% trans "Results: ${shown} of ${total}" as shownTotalSearchResults %} `{{ shownTotalSearchResults|escapejs }}` }'
         search='{% trans "Search" as search %} "{{ search|escapejs }}"'
         search-criteria='{% trans "Search Criteria" as searchCriteria %} "{{ searchCriteria|escapejs }}"'
         enter-search-string-here='{% trans "Enter Search String here" as enterSearchStringHere %} "{{ enterSearchStringHere|escapejs }}"'
