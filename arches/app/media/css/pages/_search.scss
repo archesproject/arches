@@ -143,9 +143,9 @@ article.main-search-container {
                     }
                 }
                 .workbench-card-sidepanel-body {
+                    overflow-y: auto;
                     @include break-at(small-desktop-max) {
                         width: 100%;
-                        overflow-y: auto;
                     }
                     .overlays-listing-container {
                         @include break-at(small-desktop-max) {
