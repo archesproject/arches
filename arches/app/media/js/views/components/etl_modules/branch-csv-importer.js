@@ -90,10 +90,10 @@ define([
                 const response = await fetch(arches.urls.graphs_api);
                 if (response.ok) {
                     let graphs = await response.json();
-                    let templates = graphs.map(function(graph){
-                        return {text: graph.name, id: graph.graphid};
-                    });
-                    self.templates(templates);
+                    self.templates(graphs
+                        .filter(graph => graph.isresource)
+                        .map(resource => ({text: resource.name, id: resource.graphid}))
+                    );
                 }
             };
 
