@@ -94,6 +94,13 @@
     padding: 16px 20px;
     min-height: 60px;
     border-bottom: 1px solid rgb(216, 216, 216);
+    font-size: 14px;
+    color: rgb(158, 158, 158);
+    display: flex;
+
+    span {
+        padding-top: 3px;
+    }
 }
 
 .basemap-listing,
@@ -107,16 +114,47 @@
     cursor: grab;
 }
 
-.basemap-listing,
-.overlay-listing {
-    font-size: 14px;
-    color: rgb(158, 158, 158);
-}
-
 .basemap-listing-container,
 .overlays-listing-container,
 .legend-listing-container{
     padding: 0px 16px 16px 16px;
+}
+
+.basemap-listing.active-basemap,
+.basemap-listing:hover,
+.overlay-listing.active-overlay,
+.overlay-listing:hover,
+.legend-listing .legend-name {
+    color: rgb(33, 62, 95);
+}
+
+.basemap-listing.active-basemap,
+.basemap-listing:hover,
+.overlay-listing:hover {
+    background-color: rgb(247, 247, 247);
+}
+
+.basemap-listing:before,
+.overlay-listing .overlay-name:before {
+    margin: 0px 8px;
+    font-family: FontAwesome;
+    padding-top: 3px;
+}
+
+.basemap-listing:before {
+    content: "\f10c";
+}
+
+.overlay-listing .overlay-name:before {
+    content: "\f204";
+}
+
+.basemap-listing.active-basemap:before {
+    content: "\f05d";
+}
+
+.overlay-listing.active-overlay .overlay-name:before {
+    content: "\f205";
 }
 
 .overlay-listing .overlay-name {
@@ -189,14 +227,6 @@
     opacity: 1;
 }
 
-.legend-listing .legend-name {
-    font-size: 14px;
-}
-
-.legend-listing .legend-content {
-    padding: 10px 10px 0;
-}
-
 .layer-listing-icon {
     display: inline-block;
     padding-inline-end: 4px;
@@ -211,28 +241,6 @@
     border: solid 1px rgb(216, 216, 216);
     border-radius: 100%;
     background-color: rgb(247, 247, 247);
-}
-
-.basemap-listing.active-basemap,
-.basemap-listing:hover,
-.overlay-listing.active-overlay,
-.overlay-listing:hover,
-.legend-listing .legend-name {
-    color: rgb(33, 62, 95);
-}
-
-.basemap-listing.active-basemap,
-.basemap-listing:hover,
-.overlay-listing:hover {
-    background-color: rgb(247, 247, 247);
-}
-
-.basemap-listing.active-basemap:before {
-    content: "\f05d";
-}
-
-.overlay-listing.active-overlay .overlay-name:before {
-    content: "\f205";
 }
 
 .map-card-feature-item {
@@ -257,55 +265,6 @@
 
 .map-card-feature-tool.intersect {
     width: 80px;
-}
-
-.basemap-listing,
-.overlay-listing,
-.legend-listing {
-    padding: 20px;
-    border-bottom: 1px solid rgb(216, 216, 216);
-}
-
-.basemap-listing,
-.overlay-listing .overlay-opacity-control,
-.overlay-listing .overlay-name {
-    cursor: pointer;
-}
-
-.overlay-listing,
-.legend-listing {
-    cursor: grab;
-}
-
-.basemap-listing,
-.overlay-listing {
-    font-size: 16px;
-    color: rgb(158, 158, 158);
-    display: flex;
-
-    span {
-        padding-top: 3px;
-    }
-}
-
-.basemap-listing:before,
-.overlay-listing .overlay-name:before {
-    margin: 0px 8px;
-    font-family: FontAwesome;
-    padding-top: 3px;
-}
-
-.basemap-listing:before {
-    content: "\f10c";
-}
-
-.overlay-listing .overlay-name:before {
-    content: "\f204";
-}
-
-.overlay-listing {
-    position: relative;
-    display: flex;
 }
 
 .map-card-zoom-tool,
