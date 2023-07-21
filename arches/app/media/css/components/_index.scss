@@ -113,18 +113,11 @@
     color: rgb(158, 158, 158);
 }
 
-.basemap-listing-container {
-    padding: 0 16px 16px;
+.basemap-listing-container,
+.overlays-listing-container,
+.legend-listing-container{
+    padding: 0px 16px 16px 16px;
 }
-
-// .overlays-listing-container {
-//     padding: 0 16px 16px;
-// }
-
-.legend-listing-container {
-    padding: 0 16px 16px;
-}
-
 
 .overlay-listing .overlay-name {
     display: flex;
