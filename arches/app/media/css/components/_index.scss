@@ -4,6 +4,7 @@
 @import "links";
 @import "search";
 @import "widgets";
+@import "map";
 
 .workbench-card-sidepanel .install-buttons {
     background: #f9f9f9;
@@ -116,9 +117,9 @@
     padding: 0 16px 16px;
 }
 
-.overlays-listing-container {
-    padding: 0 16px 16px;
-}
+// .overlays-listing-container {
+//     padding: 0 16px 16px;
+// }
 
 .legend-listing-container {
     padding: 0 16px 16px;
