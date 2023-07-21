@@ -94,11 +94,11 @@ module.exports = () => {
             let parsedInstalledPackagesNodeModulesAliases = {};
             for (const installedPackage of INSTALLED_PACKAGES) {
                 try {
-                    const { installedPackageNodeModuleAliases } = require(
+                    const { INSTALLED_PACKAGE_NODE_MODULES_ALIASES } = require(
                         Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'webpack', 'webpack-node-modules-aliases.js')
                     );
                     
-                    for (const [alias, executeableString] of Object.entries(JSON.parse(installedPackageNodeModuleAliases))) {
+                    for (const [alias, executeableString] of Object.entries(JSON.parse(INSTALLED_PACKAGE_NODE_MODULES_ALIASES))) {
                         if (
                             parsedInstalledPackagesNodeModulesAliases[alias]
                             || parsedProjectNodeModulesAliases[alias]
