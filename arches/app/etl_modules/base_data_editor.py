@@ -1,18 +1,17 @@
 from datetime import datetime
 import json
 import logging
-import requests
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlsplit, parse_qs
 import uuid
 from django.db import connection
-from django.db.models.functions import Lower
+from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
-from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.views.search import search_results
 
 logger = logging.getLogger(__name__)
 
@@ -101,11 +100,16 @@ class BaseBulkEditor(BaseImportModule):
         )
 
     def get_resourceids_from_search_url(self, search_url):
-        parsed_url = urlparse(search_url)
-        search_result_url = urlunparse(parsed_url._replace(path="/search/resources"))
-        response = requests.get(search_result_url + "&export=true")
-        search_results = response.json()["results"]["hits"]["hits"]
-        return [result["_source"]["resourceinstanceid"] for result in search_results]
+        request = HttpRequest()
+        request.user = self.request.user
+        request.method = "GET"
+        request.GET["export"] = True
+        params = parse_qs(urlsplit(search_url).query)
+        for k, v in params.items():
+            request.GET.__setitem__(k, v[0])
+        response = search_results(request)
+        results = json.loads(response.content)['results']['hits']['hits']
+        return [result["_source"]["resourceinstanceid"] for result in results]
 
     def validate(self, request):
         return {"success": True, "data": {}}
