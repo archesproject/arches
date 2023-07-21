@@ -5904,6 +5904,8 @@ th.notif-type {
 .ep-toolbar .top-right-nav {
     display: flex;
     float: right;
+    list-style-type: none;
+    margin-bottom: 0;
 }
 
 .editor-tools {
@@ -6230,6 +6232,7 @@ th.notif-type {
 
 .ep-tools-right {
     border-right: none;
+    border-top: none;
     border-left: 1px solid #ddd;
     background: #fff;
     font-size: 17px;
