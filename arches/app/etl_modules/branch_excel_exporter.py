@@ -139,10 +139,16 @@ class BranchExcelExporter(BranchCsvImporter):
                         tile_data = json.loads(tile['tiledata'])
                         for key, value in tile_data.items():
                             alias = node_lookup_by_id[key]["alias"]
-                            tile[alias] = value
                             if node_lookup_by_id[key]["datatype"] == "file-list":
+                                file_names_to_export = []
                                 for file in value:
                                     files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
+                                    file_names_to_export.append(file["name"])
+                                tile[alias] = ",".join(file_names_to_export)
+                            elif node_lookup_by_id[key]["datatype"] == "geojson-feature-collection":
+                                tile[alias] = json.dumps(value)
+                            else:
+                                tile[alias] = value
                         tiles_to_export.setdefault(root_alias, []).append(tile)
 
         download_files, skipped_files = self.get_related_files(files_to_download)
@@ -154,7 +160,7 @@ class BranchExcelExporter(BranchCsvImporter):
             for f in download_files:
                 f["downloadfile"].seek(0)
                 zip.writestr(f["name"], f["downloadfile"].read())
-            zip.writestr("export.xlsx", wb_file)
+            zip.writestr("export.xlsx", save_virtual_workbook(wb))
 
         zip.close()
         buffer.flush()
