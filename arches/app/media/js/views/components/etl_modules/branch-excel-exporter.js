@@ -51,7 +51,7 @@ define([
                 const a = window.document.createElement('a');
                 window.document.body.appendChild(a);
                 a.href = urlObject;
-                a.download = 'export.xlsx';
+                a.download = 'export.zip';
                 a.click();
 
                 setTimeout(() => {

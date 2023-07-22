@@ -1,13 +1,15 @@
+from io import BytesIO
 import json
 import logging
+import zipfile
+from openpyxl.writer.excel import save_virtual_workbook
 from django.http import HttpResponse
 from django.db import connection
 from django.utils.translation import ugettext as _
-from arches.app.models.models import GraphModel, Node
+from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
+from arches.app.models.models import GraphModel, Node, File
 from arches.app.models.system_settings import settings
 from arches.management.commands.etl_template import create_workbook
-from openpyxl.writer.excel import save_virtual_workbook
-from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +58,23 @@ class BranchExcelExporter(BranchCsvImporter):
             dict(zip([col[0] for col in desc], row)) 
             for row in cursor.fetchall() 
         ]
+    
+    def get_related_files(self, files):
+        file_ids = [file["file_id"] for file in files]
+        file_objects = list(File.objects.filter(pk__in=file_ids))
+        for file in files:
+            for file_object in file_objects:
+                if str(file_object.fileid) == file["file_id"]:
+                    file["file"] = file_object.path
+        download_files = []
+        skipped_files = []
+        size_limit = 104857600  # 100MByte
+        for file in files:
+            if file["file"].size >= size_limit:
+                skipped_files.append({"name": file["name"], "fileid": file["file_id"]})
+            else:
+                download_files.append({"name": file["name"], "downloadfile": file["file"]})
+        return download_files, skipped_files
 
     def export(self, request):
         load_id = request.POST.get("load_id")
@@ -74,7 +93,8 @@ class BranchExcelExporter(BranchCsvImporter):
 
             nodes = Node.objects.filter(graph_id=graph_id)
             node_lookup_by_id = self.get_node_lookup_by_id(nodes)
-            tile_collection = dict()
+            tiles_to_export = {}
+            files_to_download = []
 
             tile_tree_query = """
                 WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, depth) AS (
@@ -120,9 +140,27 @@ class BranchExcelExporter(BranchCsvImporter):
                         for key, value in tile_data.items():
                             alias = node_lookup_by_id[key]["alias"]
                             tile[alias] = value
-                        tile_collection.setdefault(root_alias, []).append(tile)
+                            if node_lookup_by_id[key]["datatype"] == "file-list":
+                                for file in value:
+                                    files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
+                        tiles_to_export.setdefault(root_alias, []).append(tile)
 
-        wb = create_workbook(graph_id, tile_collection)
-        response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
+        download_files, skipped_files = self.get_related_files(files_to_download)
+        wb = create_workbook(graph_id, tiles_to_export)
+        wb_file = save_virtual_workbook(wb)
+
+        buffer = BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
+            for f in download_files:
+                f["downloadfile"].seek(0)
+                zip.writestr(f["name"], f["downloadfile"].read())
+            zip.writestr("export.xlsx", wb_file)
+
+        zip.close()
+        buffer.flush()
+        zip_stream = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(zip_stream, content_type="application/zip")
         response["Content-Disposition"] = "attachment"
         return {"success": True, "raw": response}
