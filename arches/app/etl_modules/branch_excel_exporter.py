@@ -153,7 +153,6 @@ class BranchExcelExporter(BranchCsvImporter):
 
         download_files, skipped_files = self.get_related_files(files_to_download)
         wb = create_workbook(graph_id, tiles_to_export)
-        wb_file = save_virtual_workbook(wb)
 
         buffer = BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
