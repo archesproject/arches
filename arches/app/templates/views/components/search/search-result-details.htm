@@ -15,7 +15,7 @@
                 report: report(),
                 summary: true
             }
-        }, attr: {'aria-label': report().report_json.displayname + ' ' + $root.translations.resourceDetails}"></div>
+        }, attr: {'aria-label': $root.translations.resourceDetailsReport( report().report_json.displayname )}"></div>
         <!--/ko-->
         <!--ko ifnot: report() -->
         <div class="search-result-details-splash">

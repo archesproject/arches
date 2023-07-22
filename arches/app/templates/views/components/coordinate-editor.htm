@@ -19,41 +19,48 @@
                 'width': '210px',
                 'disable_search_threshold': 10,
                 'allow_single_deselect': false
-            }
+            },
+            attr: {'aria-label': $root.translations.coordinateReference}
         "></select>
     </div>
     <hr/>
-    <div class="map-coordinate-editor-list" data-bind="sortable: {
+    <div class="map-coordinate-editor-list" role="list" data-bind="sortable: {
         data: coordinates
-    }">
-        <div class="map-coordinate-editor-pair">
+    }, attr: {'aria-label': $root.translations.featureCoordinateList}">
+        <div class="map-coordinate-editor-pair" role="listitem">
             <!-- ko if: !$parent.hideNewCoordinates() -->
             <i class="fa fa-unsorted map-coordinate-editor-drag-handler"></i>
             <!-- /ko-->
             <span class="coordinate-entry-label">X:</span>
-            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[0]"></input>
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" 
+                data-bind="valueUpdate: 'keyup', value: $data[0], attr: {'aria-label': $root.translations.xValue}"></input>
             <span class="coordinate-entry-label">Y:</span>
             <!-- ko if: $parent.coordinates().length-1 === $index() -->
-            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1]"></input>
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" 
+                data-bind="hasFocus: $parent.focusLatestY, valueUpdate: 'keyup', value: $data[1], attr: {'aria-label': $root.translations.yValue}"></input>
             <!-- /ko-->
             <!-- ko if: $parent.coordinates().length-1 !== $index() -->
-            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: $data[1]"></input>
+            <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" 
+                data-bind="valueUpdate: 'keyup', value: $data[1], attr: {'aria-label': $root.translations.yValue}"></input>
             <!-- /ko-->
             <!-- ko if: $parent.allowDeleteCoordinates() -->
-            <a href="javascript:void(0);" class="map-coordinate-editor-delete-button" data-bind="click: function() {
-                $parent.coordinates.remove($data);
-            }"><i class="fa fa-trash"></i></a>
+            <button class="map-coordinate-editor-delete-button" data-bind="click: function() {
+                    $parent.coordinates.remove($data);
+                }, attr: {'aria-label': $root.translations.deleteVertex($data[0](), $data[1]())}
+            "><i class="fa fa-trash"></i></button>
             <!-- /ko-->
             <hr/>
         </div>
     </div>
     <!-- ko if: !hideNewCoordinates() -->
-    <div class="map-coordinate-editor-pair map-coordinate-editor-new-coordinates">
+    <div class="map-coordinate-editor-pair map-coordinate-editor-new-coordinates" data-bind="attr: {'aria-label': $root.translations.addNewVertex}">
         <i class="fa fa-plus"></i>
         <span class="coordinate-entry-label">X:</span>
-        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="hasFocus: true, valueUpdate: 'keyup', value: newX"></input>
+        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" 
+            data-bind="hasFocus: true, valueUpdate: 'keyup', value: newX, attr: {'aria-label': $root.translations.xValue}"></input>
         <span class="coordinate-entry-label">Y:</span>
-        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" data-bind="valueUpdate: 'keyup', value: newY"></input>
+        <input type="number" step="any" class="coordinate-input form-control input-lg widget-input" 
+            data-bind="valueUpdate: 'keyup', value: newY, attr: {'aria-label': $root.translations.yValue}"></input>
     </div>
     <!-- /ko-->
     <div class="map-coordinate-editor-button-container">

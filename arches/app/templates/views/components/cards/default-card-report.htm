@@ -13,11 +13,10 @@
                 attr: {
                     'aria-expanded': reportExpanded().toString(),
                     'aria-controls': uid,
-                    'aria-label': $root.translations.toggleReport + ' ' + card.model.get('name')(),
+                    'aria-label': $root.translations.toggleCardReport( card.model.get('name')() ),
                 }
             "
         ></i>
-        <span data-bind="text: console.log(card.model.get('name')())"></span>
         <!-- ko if: reportExpanded() -->
         <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
 
