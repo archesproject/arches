@@ -76,21 +76,51 @@ class BranchExcelExporter(BranchCsvImporter):
             node_lookup_by_id = self.get_node_lookup_by_id(nodes)
             tile_collection = dict()
 
+            tile_tree_query = """
+                WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, depth) AS (
+                    SELECT
+                        t.tileid,
+                        t.parenttileid,
+                        t.tiledata,
+                        t.nodegroupid,
+                        0
+                    FROM
+                        tiles t
+                    WHERE tileid = (%s)
+                    UNION
+                        SELECT
+                            t.tileid,
+                            t.parenttileid,
+                            t.tiledata,
+                            t.nodegroupid,
+                            tt.depth + 1
+                        FROM
+                            tile_tree tt, tiles t
+                        WHERE
+                            t.parenttileid = tt.tileid
+                )
+                SEARCH DEPTH FIRST BY tileid SET ordercol
+                SELECT * FROM tile_tree ORDER BY ordercol;
+            """
+
             for resource_id in resource_ids:
-                cursor.execute("""SELECT * FROM tiles WHERE resourceinstanceid = (%s)""", [resource_id])
-                tiles = self.dictfetchall(cursor)
-                for tile in tiles:
-                    root_nodegroup, depth, nodegroup_alias = [
-                        (ng["root_nodegroup"], ng["depth"], ng["alias"]) for ng in nodegroup_lookup if ng["nodegroupid"] == tile["nodegroupid"]
-                    ][0]
-                    root_alias = [ng["alias"] for ng in nodegroup_lookup if ng["root_nodegroup"] == root_nodegroup][0]
-                    tile["depth"] = depth
-                    tile["alias"] = nodegroup_alias
-                    tile_data = json.loads(tile['tiledata'])
-                    for key, value in tile_data.items():
-                        alias = node_lookup_by_id[key]["alias"]
-                        tile[alias] = value
-                    tile_collection.setdefault(root_alias, []).append(tile)
+                cursor.execute("""SELECT * FROM tiles WHERE parenttileid IS null AND resourceinstanceid = (%s)""", [resource_id])
+                root_tiles = self.dictfetchall(cursor)
+                for root_tile in root_tiles:
+                    cursor.execute(tile_tree_query, [root_tile["tileid"]])
+                    tile_tree = self.dictfetchall(cursor)
+                    for tile in tile_tree:
+                        root_nodegroup, nodegroup_alias = [
+                            (ng["root_nodegroup"], ng["alias"]) for ng in nodegroup_lookup if ng["nodegroupid"] == tile["nodegroupid"]
+                        ][0]
+                        root_alias = [ng["alias"] for ng in nodegroup_lookup if ng["root_nodegroup"] == root_nodegroup][0]
+                        tile["alias"] = nodegroup_alias
+                        tile["resourceinstanceid"] = resource_id
+                        tile_data = json.loads(tile['tiledata'])
+                        for key, value in tile_data.items():
+                            alias = node_lookup_by_id[key]["alias"]
+                            tile[alias] = value
+                        tile_collection.setdefault(root_alias, []).append(tile)
 
         wb = create_workbook(graph_id, tile_collection)
         response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")

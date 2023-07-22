@@ -126,13 +126,12 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         if tiledata is not None:
             for root_nodegroup, tiles in tiledata.items():
                 sheet = wb[root_nodegroup]
-                tiles.sort(key=itemgetter('resourceinstanceid','depth'))
                 for tile in tiles:
                     row_number = sheet.max_row + 1
                     tab = "    " * tile["depth"]
                     sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
                     sheet[f"B{row_number}"] = f'{tab}{tile["alias"]}'
-                    nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
+                    nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("alias")
                     for i, node in enumerate(nodes):
                         sheet.cell(column=i + 3, row=row_number, value=f"{tile[node['alias']]}")
                     sheet.cell(column=i + 4, row=row_number, value=str(tile["tileid"]))
