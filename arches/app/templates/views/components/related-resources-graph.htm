@@ -101,7 +101,7 @@
 <div id="infoTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.resourceInformation}">
 <div class="workbench-card-sidepanel-header-container">
     <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
-        data-bind="click: hideSidePanel, attr: {'aria-label': $root.translations.closeResourceInformation, 'aria-description': $root.translations.resourceInformationDescription}">
+        data-bind="click:hideSidePanel, onEnterkeyClick, onSpaceClick, attr: {'aria-label': $root.translations.closeResourceInformation, 'aria-description': $root.translations.resourceInformationDescription}">
         <span data-bind="text: $root.translations.resourceInformation"></span>
     </div>
 </div>
@@ -120,7 +120,7 @@
         }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().source.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().sourceGraph.fillColor}"></div>
         <div class="edge-node-title">
-            <div class="edge-node-display-name" tabindex="0" role="button" data-bind="text: $parent.edgeInformation().source.displayname, click: function() {
+            <div class="edge-node-display-name" tabindex="0" role="button" data-bind="text: $parent.edgeInformation().source.displayname, onEnterkeyClick, onSpaceClick, click: function() {
                 $parent.informationElement($parent.edgeInformation().source);
             }, attr: {'aria-label': $root.translations.returnToRelatedResources($parent.edgeInformation().source.displayname) }"></div>
             <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().sourceGraph.name"></div>
