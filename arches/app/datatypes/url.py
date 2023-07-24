@@ -101,7 +101,10 @@ class URLDataType(BaseDataType):
                 return ast.literal_eval(value)
             except:
                 # this will probably fail validation, but that is ok. We need the error to report the value.
-                return value
+                if isinstance(value, dict):
+                    return value
+                else:
+                    return {"url": value, "url_label": ""}
         except BaseException:
             if isinstance(value, dict):
                 return value
