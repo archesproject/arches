@@ -1,5 +1,6 @@
 Django==3.2.20
 psycopg2==2.9.6
+urllib3<2
 elasticsearch>=8.3.1,<9.0.0
 rdflib==4.2.2
 django-guardian==2.3.0
