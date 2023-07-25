@@ -13,21 +13,6 @@ from arches.management.commands.etl_template import create_workbook
 
 logger = logging.getLogger(__name__)
 
-details = {
-    "etlmoduleid": "357d11c8-ca38-40ec-926f-1946ccfceb92",
-    "name": "Branch Excel Exporter",
-    "description": "Export a Branch Excel file from Arches",
-    "etl_type": "export",
-    "component": "views/components/etl_modules/branch-excel-exporter",
-    "componentname": "branch-excel-exporter",
-    "modulename": "branch_excel_exporter.py",
-    "classname": "BranchExcelExporter",
-    "config": {"bgColor": "#f5c60a", "circleColor": "#f9dd6c"},
-    "icon": "fa fa-upload",
-    "slug": "branch-excel-exporter",
-    "helpsortorder": 6,
-    "helptemplate": "branch-excel-exporter-help"
-}
 
 class BranchExcelExporter(BranchCsvImporter):
     def __init__(self, request):
