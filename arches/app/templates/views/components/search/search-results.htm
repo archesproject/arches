@@ -39,7 +39,7 @@
                 <!--/ko-->
 
                 <!-- ko if: !!$parent.details -->
-                <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: function(){showDetails();},
+                <button class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: showDetails,
                     attr: {'aria-label': $root.translations.viewResourceDetails(displayname)},
                 ">
                     <i class="fa fa-info-circle"></i>
@@ -57,7 +57,7 @@
                 <!--/ko-->
                 
                 <!-- ko if: !!$parent.mapFilter -->
-                <button class="search-candidate-link" data-bind="visible: point, click: function(){mapLinkClicked();}, 
+                <button class="search-candidate-link" data-bind="visible: point, click: mapLinkClicked, 
                     attr:{'aria-label': $root.translations.viewMap},
                 ">
                     <i class="fa fa-map-marker"></i>
