@@ -233,6 +233,26 @@ class Resource(models.ResourceInstance):
                 new_resource_created=False
             )
             tiles.clear()
+        elif overwrite == "insert_new":
+            existing_resources_ids = set(
+                list(Resource.objects.filter(resourceinstanceid__in=resourceids).values_list(
+                    "resourceinstanceid", flat=True
+                ))
+            )
+            resources = [resource for resource in resources if resource.resourceinstanceid not in existing_resources_ids]
+            Resource.objects.bulk_create(resources)
+            tiles = [t for t in tiles if t.resourceinstance_id not in existing_resources_ids]
+            TileModel.objects.bulk_create(tiles)
+            Tile.bulk_save_edits(
+                tiles=tiles,
+                note=f"Bulk created - {overwrite}",
+                edit_type="bulk_create",
+                transaction_id=transaction_id,
+                new_resource_created=True
+            )
+            tiles.clear()
+            fetchTiles = False
+
         else: # unknown overwrite -- assume mixed
             existing_resources_ids = set(
                 list(Resource.objects.filter(resourceinstanceid__in=resourceids).values_list(
