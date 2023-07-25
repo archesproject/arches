@@ -27,7 +27,7 @@ from arches.app.search.search_term import SearchTerm
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")

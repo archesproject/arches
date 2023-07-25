@@ -7,7 +7,7 @@ import uuid
 from revproxy.views import ProxyView
 from django.core.files.storage import default_storage
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models

@@ -27,7 +27,7 @@ from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType

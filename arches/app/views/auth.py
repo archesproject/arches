@@ -34,7 +34,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.html import strip_tags
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.http import urlencode
 from django.core.mail import EmailMultiAlternatives
 from django.urls import reverse

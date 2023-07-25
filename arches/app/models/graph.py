@@ -31,7 +31,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation

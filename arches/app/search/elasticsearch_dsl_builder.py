@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class Dsl(object):

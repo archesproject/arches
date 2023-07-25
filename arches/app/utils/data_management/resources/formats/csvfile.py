@@ -35,7 +35,7 @@ import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import gettext as _, get_language
 
 logger = logging.getLogger(__name__)
 

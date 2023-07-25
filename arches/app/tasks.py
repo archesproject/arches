@@ -9,7 +9,7 @@ from django.core import management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
 from tempfile import NamedTemporaryFile

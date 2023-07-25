@@ -3,7 +3,7 @@ import uuid
 import csv
 import logging
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models import concept
 from django.core.cache import cache

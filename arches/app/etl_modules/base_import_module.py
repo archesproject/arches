@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 from django.core.files.storage import default_storage
 from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
 from arches.app.utils.decorators import user_created_transaction_match
