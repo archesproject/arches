@@ -115,6 +115,7 @@ define([
         initialize: function(options) {
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             this.viewModel.total = ko.observable();
+            this.viewModel.hits = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
@@ -161,6 +162,7 @@ define([
                     this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
                     this.viewModel.sharedStateObject.userid(response.userid);
                     this.viewModel.total(response.total_results);
+                    this.viewModel.hits(response.results.hits.hits.length);
                     this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {

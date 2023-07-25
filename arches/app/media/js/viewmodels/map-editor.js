@@ -675,7 +675,7 @@ define([
         };
 
         self.dropZoneClickHandler = function(data, e) {
-            var fileInput = e.target.parentNode.querySelector('.hidden-file-input input');
+            var fileInput = e.target.parentNode.parentNode.querySelector('.hidden-file-input input');
             var event = window.document.createEvent("MouseEvents");
             event.initEvent("click", true, false);
             fileInput.dispatchEvent(event);

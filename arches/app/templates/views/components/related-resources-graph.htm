@@ -5,71 +5,105 @@
 {% block workbench_wrapper_classes %}related-resources-graph-workbench{% endblock workbench_wrapper_classes %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('information');
-}, css: {
-    'active': activeTab() === 'information'
-}">
-    <i class="fa fa-info"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.info"
-    ></span>
-</div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('search');
-}, css: {
-    'active': activeTab() === 'search'
-}">
-    <i class="fa fa-search"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.search"
-    ></span>
-</div>
-{% comment %} Uncomment this section to show additional tabs...
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('analyze');
-}, css: {
-    'active': activeTab() === 'analyze'
-}">
-    <i class="fa fa-line-chart"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.analyze"
-    ></span>
-</div>
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('settings');
-}, css: {
-    'active': activeTab() === 'settings'
-}">
-    <i class="fa fa-cog"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.settings"
-    ></span>
-</div>
-{% endcomment %}
-<div class="workbench-card-sidebar-tab" data-bind="click: function() {
-    toggleTab('legend');
-}, css: {
-    'active': activeTab() === 'legend'
-}">
-    <i class="fa fa-list"></i>
-    <span 
-        class="map-sidebar-text"
-        data-bind="text: $root.translations.legend"
-    ></span>
+<div role="tablist">
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('information');
+        }, css: {
+            'active': activeTab() === 'information'
+        }, attr: {
+            'aria-label': $root.translations.info,
+            'aria-expanded': (activeTab() === 'information').toString(),
+            'aria-controls': 'infoTabId',
+        }"
+    >
+        <i class="fa fa-info"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.info"
+        ></span>
+    </div>
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('search');
+        }, css: {
+            'active': activeTab() === 'search'
+        }, attr: {
+            'aria-label': $root.translations.search,
+            'aria-expanded': (activeTab() === 'search').toString(),
+            'aria-controls': 'searchTabId',
+        }"
+    >
+        <i class="fa fa-search"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.search"
+        ></span>
+    </div>
+    {% comment %} Uncomment this section to show additional tabs...
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('analyze');
+        }, css: {
+            'active': activeTab() === 'analyze'
+        }, attr: {
+            'aria-label': $root.translations.analyze,
+            'aria-expanded': (activeTab() === 'analyze').toString(),
+            'aria-controls': 'analyzeTabId',
+        }"
+    >
+        <i class="fa fa-line-chart"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.analyze"
+        ></span>
+    </div>
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('settings');
+        }, css: {
+            'active': activeTab() === 'settings'
+        }, attr: {
+            'aria-label': $root.translations.settings,
+            'aria-expanded': (activeTab() === 'settings').toString(),
+            'aria-controls': 'settingsTabId',
+        }"
+    >
+        <i class="fa fa-cog"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.settings"
+        ></span>
+    </div>
+    {% endcomment %}
+    <div class="workbench-card-sidebar-tab" tabindex="0" role="tab" 
+        data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+            toggleTab('legend');
+        }, css: {
+            'active': activeTab() === 'legend'
+        }, attr: {
+            'aria-label': $root.translations.legend,
+            'aria-expanded': (activeTab() === 'legend').toString(),
+            'aria-controls': 'legendTabId',
+        }"
+    >
+        <i class="fa fa-list"></i>
+        <span 
+            class="map-sidebar-text"
+            data-bind="text: $root.translations.legend"
+        ></span>
+    </div>
 </div>
 {% endblock tabs %}
 
 {% block sidepanel %}
 <!--ko if: activeTab() === 'information' -->
+<div id="infoTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.resourceInformation}">
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
+        data-bind="click:hideSidePanel, onEnterkeyClick, onSpaceClick, attr: {'aria-label': $root.translations.closeResourceInformation, 'aria-description': $root.translations.resourceInformationDescription}">
         <span data-bind="text: $root.translations.resourceInformation"></span>
-    </h4>
+    </div>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 
@@ -86,9 +120,9 @@
         }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().source.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().sourceGraph.fillColor}"></div>
         <div class="edge-node-title">
-            <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().source.displayname, click: function() {
+            <div class="edge-node-display-name" tabindex="0" role="button" data-bind="text: $parent.edgeInformation().source.displayname, onEnterkeyClick, onSpaceClick, click: function() {
                 $parent.informationElement($parent.edgeInformation().source);
-            }"></div>
+            }, attr: {'aria-label': $root.translations.returnToRelatedResources($parent.edgeInformation().source.displayname) }"></div>
             <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().sourceGraph.name"></div>
         </div>
     </div>
@@ -123,26 +157,32 @@
         }, css: {'element-hover': $parent.hoverElementId() === $parent.edgeInformation().target.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.edgeInformation().targetGraph.fillColor}"></div>
         <div class="edge-node-title">
-            <div class="edge-node-display-name" data-bind="text: $parent.edgeInformation().target.displayname, click: function() {
+            <div class="edge-node-display-name" tabindex="0" role="button" data-bind="text: $parent.edgeInformation().target.displayname, onEnterkeyClick, onSpaceClick, 
+            click: function() {
                 $parent.informationElement($parent.edgeInformation().target);
-            }"></div>
+            }, attr: {'aria-label': $root.translations.expandRelatedResource($parent.edgeInformation().source.displayname) }"></div>
             <div class="edge-node-graph-name" data-bind="text: $parent.edgeInformation().targetGraph.name"></div>
         </div>
     </div>
     <!--/ko -->
     <!--ko if: !$data.source -->
+    <!--ko let: { relationshipsListCountId: Math.random() }-->
     <div class="edge-node-information node-display-name-header">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: $parent.informationGraph().fillColor}"></div>
         <div class="edge-node-title">
             <div class="edge-node-display-name" data-bind="text: displayname"></div>
             <div class="edge-node-graph-name" data-bind="text: $parent.informationGraph().name"></div>
             <div class="edge-node-links">
-                <span data-bind="click: $parent.viewInformationNodeReport">
+                <span tabindex="0" role="link" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.viewInformationNodeReport, 
+                    attr: {'aria-label': $root.translations.visitResourceReport(displayname) }"
+                >
                     <i class="fa fa-info"></i>
                     <span data-bind="text: $root.translations.report"></span>
                 </span>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <span data-bind="click: $parent.editInformationNode">
+                <span tabindex="0" role="link" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.editInformationNode, 
+                    attr: {'aria-label': $root.translations.edit + ' ' + displayname}"
+                >
                     <i class="fa fa-pencil"></i>
                     <span data-bind="text: $root.translations.edit"></span>
                 </span>
@@ -153,70 +193,91 @@
         <span data-bind="text: $root.translations.relationships"></span>
     </div>
     <div class="relationships-list-count">
-        <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
-        <span data-bind="text: $root.translations.relationshipsShown"></span>
+        <span data-bind="attr: {id: relationshipsListCountId}">
+            <span data-bind="text: $parent.informationElementRelationships().length"></span> / <span data-bind="text: totalRelations"></span>
+            <span data-bind="text: $root.translations.relationshipsShown"></span>
+        </span>
         <!--ko if: $parent.informationElementRelationships().length !== totalRelations -->
-        <a href="javascript:void(0);" data-bind="click: function() {
+        <a href="javascript:void(0);" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
             $parent.expandNode($data);
+        }, attr: {
+            'aria-label': $root.translations.loadMoreResources,
+            'aria-describedby': relationshipsListCountId
         }">
             <span data-bind="text: $root.translations.loadMore"></span>
         </a>
         <!--/ko -->
     </div>
-    <div class="relationships-list" data-bind="foreach: $parent.informationElementRelationships">
-        <div class="relationships-list-item">
-            <span data-bind="text: label || 'Related to', click: function() {
-                informationElement(edge);
-            }, event: {
-                mouseover: function() {
-                    hoverElementId(edge.id)
-                },
-                mouseout: function() {
-                    hoverElementId(null);
-                }
-            }, css: {'element-hover': hoverElementId() === edge.id}" class="relationships-list-item-type"></span>
-            <i class="relationships-list-icon fa fa-angle-right"></i>
-            <span class="relationships-list-item-name" data-bind="click: function() {
-                informationElement(node);
-            }, event: {
-                mouseover: function() {
-                    hoverElementId(node.id)
-                },
-                mouseout: function() {
-                    hoverElementId(null);
-                }
-            }, css: {'element-hover': hoverElementId() === node.id}">
-                <span data-bind="text: node.displayname"></span>
+    <div class="relationships-list" role="table" data-bind="foreach: $parent.informationElementRelationships">
+        <div class="relationships-list-item" role="row">
+            <span role="cell">
+                <span tabindex="0" role="button" class="relationships-list-item-type" data-bind="text: label || 'Related to', onEnterkeyClick, onSpaceClick,
+                click: function() {
+                    informationElement(edge);
+                }, event: {
+                    mouseover: function() {
+                        hoverElementId(edge.id)
+                    },
+                    mouseout: function() {
+                        hoverElementId(null);
+                    }
+                }, css: {
+                    'element-hover': hoverElementId() === edge.id
+                }, attr: {
+                    'aria-label': $root.translations.expandRelationship($parent.displayname, (label || $root.translations.relatedTo), node.displayname),
+                    'aria-describedby': relationshipsListCountId
+                }"></span>
+            </span>
+            <span role="cell"><i class="relationships-list-icon fa fa-angle-right"></i></span>
+            <span role="cell">
+                <span tabindex="0" role="button" class="relationships-list-item-name" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+                    informationElement(node);
+                }, event: {
+                    mouseover: function() {
+                        hoverElementId(node.id)
+                    },
+                    mouseout: function() {
+                        hoverElementId(null);
+                    }
+                }, css: {
+                    'element-hover': hoverElementId() === node.id
+                }, attr: {
+                    'aria-label': $root.translations.expandRelatedResource(node.displayname),
+                }">
+                    <span data-bind="text: node.displayname"></span>
+                </span>
             </span>
         </div>
     </div>
     <!--/ko -->
     <!--/ko -->
+    <!--/ko -->
+</div>
 </div>
 <!--/ko -->
 
 <!--ko if: activeTab() === 'search' -->
+<div id="searchTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.searchNetwork}">
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, 
+        attr: {'aria-label': $root.translations.closeSearchNetwork, 'aria-description': $root.translations.resourceSearchDescription}">
         <span data-bind="text: $root.translations.searchNetwork"></span>
-    </h4>
-</div>
-<div class="workbench-card-sidepanel-border"></div>
-<div class="related-resources-search-body">
+    </div>
 <div class="related-reasources-search-container">
     <input 
         type="text" 
         class="form-control" 
         data-bind="
-            attr: {placeholder: $root.translations.filter + '...'},
+            attr: {placeholder: $root.translations.filter + '...', 'aria-label': $root.translations.filterNetwork},
             value: nodeSearchFilter, 
             valueUpdate: 'afterkeydown'
         "
     >
-    <span class="clear-node-search" data-bind="click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
+    <span class="clear-node-search" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, 
+        click: function() { nodeSearchFilter(''); }, visible: nodeSearchFilter() !== ''"><i class="fa fa-times-circle"></i></span>
 </div>
-<div class="related-reasources-search-list" data-bind="foreach: searchNodes">
-    <div class="edge-node-information" data-bind="event: {
+<div class="related-reasources-search-list" role="list" data-bind="foreach: searchNodes">
+    <div role="listitem" class="edge-node-information" data-bind="event: {
             mouseover: function() {
                 $parent.hoverElementId($data.id)
             },
@@ -226,17 +287,17 @@
         }, css: {'element-hover': $parent.hoverElementId() === $data.id}">
         <div class="edge-node-graph-color" data-bind="style: {backgroundColor: graph.fillColor}"></div>
         <div class="edge-node-title">
-            <div class="edge-node-display-name" data-bind="text: displayname, click: function() {
+            <div class="edge-node-display-name" tabindex="0" role="button" data-bind="text: displayname, onEnterkeyClick, onSpaceClick, click: function() {
                 $parent.informationElement($data);
-            }"></div>
+            }, attr: {'aria-label': $root.translations.expandRelatedResource(displayname) }"></div>
             <div class="edge-node-graph-name" data-bind="text: graph.name"></div>
             <div class="relationships-list-count shim">
                 <span data-bind="text: shownRelationsCount"></span> / <span data-bind="text: totalRelations"></span>
                 <span data-bind="text: $root.translations.relationshipsShown"></span>
                 <!--ko if: shownRelationsCount() !== totalRelations -->
-                <a href="javascript:void(0);" data-bind="click: function() {
+                <a href="javascript:void(0);" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
                     $parent.expandNode($data);
-                }">
+                }, attr: {'aria-label': $root.translations.loadMore }">
                     <span data-bind="text: $root.translations.loadMore"></span>
                 </a>
                 <!--/ko -->
@@ -245,26 +306,31 @@
     </div>
 </div>
 </div>
+</div>
 <!--/ko -->
 <!--ko if: activeTab() === 'analyze' -->
-<div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+<div class="workbench-card-sidepanel-header-container" id="analyzeTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.analyzeNetwork}">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
+        data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, attr: {'aria-label': $root.translations.closeAnalyzeNetwork}">
         <span data-bind="text: $root.translations.analyzeNetwork"></span>
-    </h4>
+    </div>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'settings' -->
-<div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+<div class="workbench-card-sidepanel-header-container" id="settingsTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.settings}">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button"
+        data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, attr: {'aria-label': $root.translations.closeSettings}">
         <span data-bind="text: $root.translations.settings"></span>
-    </h4>
+    </div>
 </div>
 <!--/ko -->
 <!--ko if: activeTab() === 'legend' -->
+<div id="legendTabId" role="tabpanel" data-bind="attr: {'aria-label': $root.translations.legend}">
 <div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="click: hideSidePanel">
+    <div class="h4 workbench-card-sidepanel-header" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, 
+            attr: {'aria-label': $root.translations.closeLegend, 'aria-description': $root.translations.resourceLegendDescription}">
         <span data-bind="text: $root.translations.legend"></span>
-    </h4>
+    </div>
 </div>
 <div class="workbench-card-sidepanel-border"></div>
 <div class="legend-listing-container" data-bind="foreach: legendEntries">
@@ -276,6 +342,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <!--/ko -->
 {% endblock sidepanel %}
