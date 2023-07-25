@@ -252,6 +252,7 @@ class Resource(models.ResourceInstance):
             )
             tiles.clear()
             fetchTiles = False
+            # print(f"Saved {len(resources)} new resources out of {len(resourceids)} total redsources")
 
         else: # unknown overwrite -- assume mixed
             existing_resources_ids = set(
