@@ -235,10 +235,6 @@ LOCALE_PATHS = [
     os.path.join(ROOT_DIR, "locale"),
 ]
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
-
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
