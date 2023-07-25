@@ -47,7 +47,9 @@ setup(
         "Topic :: Software Development :: Build Tools",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
-        "Framework :: Django :: 1.11",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Framework :: Django :: 4.0",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
     # What does your project relate to?
