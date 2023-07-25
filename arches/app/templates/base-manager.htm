@@ -560,12 +560,11 @@
             {% endblock main_content %}
         </main>
 
-        <!--<button id="scroll-top" class="btn" aria-label="Go to top of page"><i class="fa fa-chevron-up"></i></button>-->
-        <button onclick="topFunction()" onkeyup="topFunction()" id="myBtn" title="Go to top">
-            <i class="fa fa-chevron-up"></i>
-        </button>
-
     </div>
+
+    <button onclick="backToTopHandler()" onkeyup="backToTopHandler()" id="backToTopBtn" aria-hidden="true" data-bind="attr: {'aria-label': $root.translations.goToTop}">
+        <i class="fa fa-chevron-up"></i>
+    </button>
 
 {% endblock body %}
 
