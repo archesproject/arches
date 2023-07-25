@@ -338,6 +338,8 @@ class File(models.Model):
 class TempFile(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to="archestemp")
+    created = models.DateTimeField(auto_now_add=True)
+    source = models.TextField()
 
     def __init__(self, *args, **kwargs):
         super(TempFile, self).__init__(*args, **kwargs)
