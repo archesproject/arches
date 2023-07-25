@@ -66,6 +66,7 @@ define([
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
                 handleEscKey: ariaUtils.handleEscKey,
+                shiftFocus: ariaUtils.shiftFocus,
                 urls: arches.urls,
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
