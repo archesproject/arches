@@ -6,6 +6,7 @@ define([
     'viewmodels/widget',
     'viewmodels/map-editor',
     'templates/views/components/widgets/map.htm',
+    'templates/views/components/map-widget-editor.htm',
     'bindings/chosen',
     'bindings/codemirror',
     'select2',
@@ -13,7 +14,8 @@ define([
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/color-picker',
-], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel, mapWidgetTemplate) {
+    'bindings/key-events-click',
+], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel, mapWidgetTemplate, mapWidgetEditorTemplate) {
     var viewModel = function(params) {
          
         this.context = params.type;
