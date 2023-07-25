@@ -29,11 +29,23 @@
         <!-- ko foreach: filter.facets -->
 
         <!-- ko if: $index  -->
-        <div class="btn-group btn-group-sm facet-btn-group">
-            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'and'}, click: function () { value.op('and'); }">
+        <div class="btn-group btn-group-sm facet-btn-group" data-bind="let: {previousCardName: $parent.filter.facets()[$index()-1].card.name}">
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="onEnterkeyClick, onSpaceClick, click: function () { value.op('and'); }, 
+                css: {'selected': value.op() === 'and'},
+                attr: {
+                    'aria-label': $root.translations.currentAndPrevious(card.name, previousCardName),
+                    'aria-pressed': (value.op() === 'and').toString()
+                }
+            ">
                 <span data-bind="text: $root.translations.and"></span>
             </button>
-            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="css: {'selected': value.op() === 'or'}, click: function () { value.op('or'); }">
+            <button class="btn btn-warning btn-active-dark facet-btn" data-bind="onEnterkeyClick, onSpaceClick, click: function () { value.op('or'); }, 
+                css: {'selected': value.op() === 'or'},
+                attr: {
+                    'aria-label': $root.translations.currentOrPrevious(card.name, previousCardName),
+                    'aria-pressed': (value.op() === 'or').toString()
+                }
+            ">
                 <span data-bind="text: $root.translations.or"></span>
             </button>
         </div>
@@ -61,7 +73,9 @@
                 <!-- /ko -->
 
                 <div class="facet-search-button">
-                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">
+                    <button class="btn btn-sm btn-primary" data-bind="onEnterkeyClick, onSpaceClick, click: function (facet) { self.filter.facets.remove(facet); },
+                        attr: {'aria-label': $root.translations.removeFacet(card.name) }
+                    ">
                         <span data-bind="text: $root.translations.remove"></span>
                     </button>
                 </div>
@@ -86,28 +100,46 @@
                             value: facetFilterText, 
                             valueUpdate: 'keyup'
                         "
-                        aria-label="{% trans 'Search facets' %}"
+                        aria-label="{% trans 'Filter search facets' %}"
                     >
                     <!-- Clear Filter -->
-                    <span tabindex="0" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }" aria-label="{% trans 'Clear facet filter' %}"><i class="fa fa-times-circle"></i></span>
+                    <span tabindex="0" role="button" class="clear-node-search" aria-label="{% trans 'Clear facet filter' %}" 
+                        data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }"
+                    ><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
                 <!-- ko if: cards().length > 0  -->
-                <div tabindex="0" class="search-facet-item disabled" data-bind="onEnterkeyClick, onSpaceClick, click: function () { collapsed(!collapsed()) }">
+                <!-- ko let: {uid: Math.random().toString()} -->
+                <div tabindex="0" role="button" class="search-facet-item disabled" data-bind="onEnterkeyClick, onSpaceClick, 
+                    click: function () { collapsed(!collapsed()) },
+                    attr: {
+                        'aria-expanded': (!collapsed()).toString(),
+                        'aria-controls': uid,
+                        'aria-label': $root.translations.resourceTypeSearchFacets(name),
+                    }
+                ">
                     <div class="search-facet-item-heading">
                         <strong data-bind="text: name"></strong>
                         <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
                     </div>
                 </div>
-                <div data-bind="visible: !collapsed()">
+                <div data-bind="visible: !collapsed()" role="list">
                     <!-- ko foreach: cards -->
-                    <a href="#" class="search-facet-item" data-bind="click: addFacet">
-                        <p class="search-facet-item-heading" data-bind="text: name"></p>
-                        <p class="list-group-item-text"></p>
-                    </a>
+                    <div role="listitem">
+                        <a href="#" class="search-facet-item" role="button" data-bind="onEnterkeyClick, onSpaceClick, 
+                            click: addFacet, 
+                            attr: {
+                                id: uid,
+                                'aria-label': $root.translations.addCardToSearchQuery(name, $parent.name)
+                            }">
+                            <p class="search-facet-item-heading" data-bind="text: name"></p>
+                            <p class="list-group-item-text"></p>
+                        </a>
+                    </div>
                     <!-- /ko -->
                 </div>
+                <!-- /ko -->
                 <!-- /ko -->
             <!-- /ko -->
         </div>
