@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9648_add_empty_key_value_pairs_to_tiles"),
+        ("models", "9746_related_resource_post_save_bug"),
     ]
 
     operations = [
