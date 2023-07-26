@@ -5,10 +5,13 @@ from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.db.models.sql.compiler import SQLInsertCompiler
+from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
 
 
-class I18n_String(object):
+class I18n_String(NothingNode):
+    """Subclassing NothingNode works around https://code.djangoproject.com/ticket/34745."""
+
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
@@ -213,7 +216,7 @@ class I18n_TextField(JSONField):
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
 
 
-class I18n_JSON(object):
+class I18n_JSON(NothingNode):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
