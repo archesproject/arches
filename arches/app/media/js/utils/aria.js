@@ -34,6 +34,7 @@ define(['jquery'], function($){
                 if (isEscape) {
                     $(toggleElement).click();
                     $(toggleElement).focus();
+                    $(listenerScope).off('keydown', attachListener);
                 }
             };
             $(listenerScope).on('keydown', attachListener);
