@@ -562,7 +562,7 @@
 
     </div>
 
-    <button onclick="backToTopHandler()" onkeyup="backToTopHandler()" id="backToTopBtn" aria-hidden="true" data-bind="attr: {'aria-label': $root.translations.goToTop}">
+    <button id="backToTopBtn" aria-hidden="true" data-bind="attr: {'aria-label': $root.translations.goToTop}, click: backToTopHandler, event:{keyup: backToTopHandler}">
         <i class="fa fa-chevron-up"></i>
     </button>
 
