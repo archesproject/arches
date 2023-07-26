@@ -124,7 +124,7 @@ class BranchExcelExporter(BranchCsvImporter):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
-        use_celery = False
+        use_celery = True
 
         with connection.cursor() as cursor:
             cursor.execute(
