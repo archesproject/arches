@@ -217,7 +217,13 @@ class BranchExcelExporter(BranchCsvImporter):
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
 
-        tasks.export_branch_csv.apply_async(
+        export_task = tasks.export_branch_csv.apply_async(
             (self.userid, load_id, graph_id, graph_name, resource_ids),
         )
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (export_task.task_id, self.loadid),
+            )
 
