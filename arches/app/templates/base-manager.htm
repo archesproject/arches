@@ -457,7 +457,7 @@
                                 aria-label="{% trans 'Show help' %}" aria-controls="ep-help-panel" aria-expanded="false"
                                 data-bind="click: function(){ 
                                     {{ nav.help.templates }}.forEach(template => getHelp(template)); 
-                                    helpOpen(true);
+                                    helpOpen(!helpOpen());
                                     $root.handleEscKey(event.currentTarget, '#ep-help-panel');
                                 },
                             ">
