@@ -153,14 +153,36 @@ define([
         initialize: function() {
             ko.applyBindings(this.viewModel);
             this.viewModel.getNotifications();
+
+            let helpOpen = false;
+            let editsOpen = false;
+            let notifsOpen = false;
+            const conditionalShiftFocus = function(isPanelOpen, focusTarget) {
+                if(isPanelOpen){
+                    ariaUtils.shiftFocus(focusTarget);
+                }
+            };
+
             $('[data-toggle="tooltip"]').tooltip();
 
+            $('.ep-help-toggle').click(function(){
+                let helpPanel = '#ep-help-panel';
+                helpOpen = !helpOpen;
+                conditionalShiftFocus(helpOpen, helpPanel);
+            });
+
             $('.ep-edits-toggle').click(function(){
-                $('#ep-edits-panel').toggle('slide', { direction: 'right' });
+                let editsPanel = '#ep-edits-panel';
+                $(editsPanel).toggle('slide', { direction: 'right' });
+                editsOpen = !editsOpen;
+                conditionalShiftFocus(editsOpen, editsPanel);
             });
 
             $('.ep-notifs-toggle').click(function(){
-                $('#ep-notifs-panel').toggle('slide', { direction: 'right' });
+                let notifsPanel = '#ep-notifs-panel';
+                $(notifsPanel).toggle('slide', { direction: 'right' });
+                notifsOpen = !notifsOpen;
+                conditionalShiftFocus(notifsOpen, notifsPanel);
             });
         }
     });
