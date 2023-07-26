@@ -7,7 +7,7 @@
         data-bind="
             css: {'on': getvalue}, 
             onEnterkeyClick, onSpaceClick, 
-            click: setvalue, attr: {'aria-checked': getvalue, 'aria-label': config().label}
+            click: setvalue, attr: {'aria-checked': getvalue, 'aria-label': config().label, 'aria-description': config().subtitle}
         "><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
@@ -36,7 +36,7 @@
         data-bind="
             css: {'on': getvalue}, 
             onEnterkeyClick, onSpaceClick,
-            click: setvalue, attr: {'aria-checked': getvalue, 'aria-label': config().label}
+            click: setvalue, attr: {'aria-checked': getvalue, 'aria-label': config().label, 'aria-description': config().subtitle}
         "><small></small></span>
             <div style="display:flex; flex-direction:row;">
             <div class="arches-toggle-sm" data-bind="text:label"></div>
