@@ -44,6 +44,8 @@ define([
             this.viewModel.helploaded = ko.observable(false);
             this.viewModel.helploading = ko.observable(false);
             this.viewModel.helpOpen = ko.observable(false);
+            this.viewModel.editsOpen = ko.observable(false);
+            this.viewModel.notifsOpen = ko.observable(false);
             this.viewModel.provisionalHistoryList = new ProvisionalHistoryList({
                 items: ko.observableArray(),
                 helploading: this.viewModel.helploading
@@ -154,36 +156,7 @@ define([
             ko.applyBindings(this.viewModel);
             this.viewModel.getNotifications();
 
-            let helpOpen = false;
-            let editsOpen = false;
-            let notifsOpen = false;
-            const conditionalShiftFocus = function(isPanelOpen, focusTarget) {
-                if(isPanelOpen){
-                    ariaUtils.shiftFocus(focusTarget);
-                }
-            };
-
             $('[data-toggle="tooltip"]').tooltip();
-
-            $('.ep-help-toggle').click(function(){
-                let helpPanel = '#ep-help-panel';
-                helpOpen = !helpOpen;
-                conditionalShiftFocus(helpOpen, helpPanel);
-            });
-
-            $('.ep-edits-toggle').click(function(){
-                let editsPanel = '#ep-edits-panel';
-                $(editsPanel).toggle('slide', { direction: 'right' });
-                editsOpen = !editsOpen;
-                conditionalShiftFocus(editsOpen, editsPanel);
-            });
-
-            $('.ep-notifs-toggle').click(function(){
-                let notifsPanel = '#ep-notifs-panel';
-                $(notifsPanel).toggle('slide', { direction: 'right' });
-                notifsOpen = !notifsOpen;
-                conditionalShiftFocus(notifsOpen, notifsPanel);
-            });
         }
     });
     return PageView;
