@@ -25,7 +25,6 @@ define([
 
             this.graphs = ko.observable();
             this.selectedGraph = ko.observable();
-            this.selectedGraph.subscribe(val=>console.log(val));
             this.resourceids = ko.observable();
     
             this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
@@ -42,22 +41,34 @@ define([
                 self.loading(false);
             };
 
+            this.getGraphName = (selectedGraphId) => {
+                if (self.graphs()) {
+                    return self.graphs().find((graph) => graph.graphid === selectedGraphId).name;
+                }
+            };
+
             this.exportResources = async function() {
                 self.formData.append('graph_id', self.selectedGraph());
-
+                self.formData.append('graph_name', self.getGraphName(self.selectedGraph()));
                 const response = await self.submit('export');
-                const blob = await response.blob();
-                const urlObject = window.URL.createObjectURL(blob);
-                const a = window.document.createElement('a');
-                window.document.body.appendChild(a);
-                a.href = urlObject;
-                a.download = 'export.zip';
-                a.click();
+                params.activeTab("import");
 
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(urlObject);
-                    window.document.body.removeChild(a);
-                }, 0);
+                if (response.ok) {
+                    const json = await response.json();
+                    console.log(json.result);
+                }
+                else {
+                    const err = await response.json();
+                    console.log(err);
+                    self.alert(
+                        new JsonErrorAlertViewModel(
+                            'ep-alert-red',
+                            err.responseJSON["data"],
+                            null,
+                            function(){}
+                        )
+                    );
+                }
                 this.loading(false);
             };
 

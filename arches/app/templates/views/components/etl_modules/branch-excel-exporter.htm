@@ -46,47 +46,50 @@
 {% block etl_status %}
 <div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
     <h4 class="summary-title">
-        <span data-bind="text: $root.translations.importBranchExcelSummary"></span>
+        <span data-bind="text: $root.translations.exportBranchExcelSummary"></span>
     </h4>
     <!-- ko if: ko.unwrap(loadDetails) -->
     <div class="branch-csv-etl-load-summmary">
-        <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
-            <div class="summary-header">
-                <span data-bind="text: $root.translations.excelFile"></span>
+        <div class="summary-header">
+            <span data-bind="text: $root.translations.downloadExportedZipFile"></span>
+        </div>
+        <div class="summary-contents">
+            <div class="etl-loading-metadata-value">
+                <a class="file-listing-link" download data-bind="text: loadDetails.zipfile.name, attr: { href: loadDetails.zipfile.url }"></a>
             </div>
-            <div class="summary-header">
-                <span data-bind="text: $root.translations.size"></span>
-            </div>   
+        </div>
 
-            <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
-            <div class="etl-loading-metadata-value" data-bind="text: file"></div>
-                <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
-                <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
-                <div class="summary-header" style="margin-top: 10px;">
-                    <span data-bind="text: $root.translations.worksheets"></span>
-                </div>
-                <div class="summary-header" style="margin-top: 10px;">
-                    <span data-bind="text: $root.translations.tiles"></span>
-                </div>
-                <!--ko foreach: $data.worksheets-->
-                <div class="etl-loading-metadata-value" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.name"></div>
-                <div class="etl-loading-metadata-key" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.rows"></div>
-                <!-- /ko -->
-                <!-- /ko -->
-                    
+        <!-- ko if: loadDetails.skipped_files.length > 0 -->
+        <div class="summary-header">
+            <span data-bind="text: $root.translations.downloadAdditionalFiles"></span>
+        </div>
+        <div class="summary-contents">
+            <!-- ko foreach: { data: loadDetails.skipped_files, as: 'file' } -->
+            <div class="etl-loading-metadata-value">
+                <a class="file-listing-link" data-bind="text: file.name, attr: { download: file.name, href: '/files/'+file.fileid }"></a>
+            </div>
             <!-- /ko -->
+        </div>
+        <!-- /ko -->
 
-            <div class="branch-csv-etl-load-files" style="margin-top: 25px; display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
-                <div class="etl-loading-metadata-value" data-bind="text: loadDetails.name"></div>
-                <div class="etl-loading-metadata-key" data-bind="text: loadDetails.size"></div>
-                <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
-                    <div class="etl-loading-metadata-value" data-bind="text: file"></div>
-                    <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
-                    <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
-                    <!-- /ko -->
-                <!-- /ko -->
-            </div>
-            
+        <div class="summary-header">
+            <span data-bind="text: $root.translations.exportDetails"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModel + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.graph"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesExported + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_resources"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRelatedFiles + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_files + loadDetails.skipped_files.length"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRelatedFilesInZip + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_files"></span>
         </div>
     </div>
     <!--/ko-->

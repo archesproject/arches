@@ -224,6 +224,30 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
 
 
 @shared_task
+def export_branch_csv(user_id, load_id, graph_id, graph_name, resource_ids):
+    from arches.app.etl_modules import branch_excel_exporter
+
+    logger = logging.getLogger(__name__)
+
+    status = _("Failed")
+    try:
+        BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None)
+        BranchExcelExporter.run_export_task(load_id, graph_id, graph_name, resource_ids)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+    finally:
+        msg = _("Branch Excel Export: {}").format(status)
+        user = User.objects.get(id=user_id)
+        notify_completion(msg, user)
+
+
+@shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
     from arches.app.etl_modules import import_single_csv
 

@@ -1,14 +1,18 @@
+from datetime import datetime
 from io import BytesIO
 import json
 import logging
+import os
 import zipfile
 from openpyxl.writer.excel import save_virtual_workbook
+from django.core.files import File as DjangoFile
 from django.http import HttpResponse
 from django.db import connection
 from django.utils.translation import ugettext as _
 from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
-from arches.app.models.models import GraphModel, Node, File
+from arches.app.models.models import GraphModel, Node, File, TempFile
 from arches.app.models.system_settings import settings
+import arches.app.tasks as tasks
 from arches.management.commands.etl_template import create_workbook
 
 logger = logging.getLogger(__name__)
@@ -64,8 +68,24 @@ class BranchExcelExporter(BranchCsvImporter):
     def export(self, request):
         load_id = request.POST.get("load_id")
         graph_id = request.POST.get("graph_id", None)
+        graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
+        use_celery = True
 
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
+                (load_id, False, "running", self.moduleid, datetime.now(), self.userid),
+            )
+
+        if use_celery:
+            response = self.load_data_async(request)
+        else:
+            response = self.run_export_task(load_id, graph_id, graph_name, resource_ids)
+
+        return response
+
+    def run_export_task(self, load_id, graph_id, graph_name, resource_ids):
         if resource_ids is None:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT resourceinstanceid FROM resource_instances WHERE graphid = (%s)""", [graph_id])
@@ -139,18 +159,61 @@ class BranchExcelExporter(BranchCsvImporter):
         download_files, skipped_files = self.get_related_files(files_to_download)
         wb = create_workbook(graph_id, tiles_to_export)
 
+        load_details = {
+            "graph": graph_name,
+            "number_of_resources": len(resource_ids),
+            "number_of_files": len(download_files),
+            "skipped_files": skipped_files
+        }
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET load_details = (%s) WHERE loadid = (%s)""",
+                (json.dumps(load_details), load_id)
+            )
+
         buffer = BytesIO()
+        excel_file_name = "{}_export.xlsx".format(graph_name.replace(" ", "_"))
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
             for f in download_files:
                 f["downloadfile"].seek(0)
                 zip.writestr(f["name"], f["downloadfile"].read())
-            zip.writestr("export.xlsx", save_virtual_workbook(wb))
+            zip.writestr(excel_file_name, save_virtual_workbook(wb))
 
         zip.close()
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
+        f = BytesIO(zip_stream)
 
-        response = HttpResponse(zip_stream, content_type="application/zip")
-        response["Content-Disposition"] = "attachment"
-        return {"success": True, "raw": response}
+        now = datetime.now().isoformat()
+        name = "{0}-{1}.zip".format(graph_name.replace(" ", "_"), now)
+
+        download = DjangoFile(f)
+        zip_file = TempFile()
+        zip_file.source = "branch-excel-exporter"
+        zip_file.path.save(name, download)
+
+        zip_file_name = os.path.basename(zip_file.path.name)
+        zip_file_url = settings.MEDIA_URL + zip_file.path.name
+
+        load_details["zipfile"] = { "name": zip_file_name, "url": zip_file_url, "fileid": str(zip_file.fileid) }
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET (complete, status, load_details, load_end_time) = (%s, %s, %s, %s) WHERE  loadid = (%s)""",
+                (True, "indexed", json.dumps(load_details), datetime.now(), load_id),
+            )
+
+        return { "success": True, "data": "success" }
+
+    def run_load_task_async(self, request):
+        load_id = request.POST.get("load_id")
+        graph_id = request.POST.get("graph_id", None)
+        graph_name = request.POST.get("graph_name", None)
+        resource_ids = request.POST.get("resource_ids", None)
+
+        tasks.export_branch_csv.apply_async(
+            (self.userid, load_id, graph_id, graph_name, resource_ids),
+        )
+
