@@ -172,26 +172,15 @@ class BulkStringEditor(BaseBulkEditor):
             + text_query
         )
 
-        tile_sub_query = (
+        resource_count_query = (
             """
-            AND resourceinstanceid IN (SELECT DISTINCT t.resourceinstanceid FROM tiles t, nodes n
+            SELECT count(DISTINCT t.resourceinstanceid) FROM tiles t, nodes n
             WHERE t.nodegroupid = n.nodegroupid
         """
             + node_id_query
             + graph_id_query
             + resourceids_query
             + text_query
-            + ")"
-        )
-
-        resource_count_query = (
-            """
-            SELECT count(n.resourceinstanceid) FROM resource_instances n
-            WHERE 0 = 0
-        """
-            + graph_id_query
-            + resourceids_query
-            + tile_sub_query
         )
 
         with connection.cursor() as cursor:
