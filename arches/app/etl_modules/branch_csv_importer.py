@@ -295,9 +295,14 @@ class BranchCsvImporter(BaseImportModule):
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
 
-        tasks.load_branch_csv.apply_async(
+        load_task = tasks.load_branch_csv.apply_async(
             (self.userid, files, summary, result, self.temp_dir, self.loadid),
         )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def write(self, request):
         self.loadid = request.POST.get("load_id")
