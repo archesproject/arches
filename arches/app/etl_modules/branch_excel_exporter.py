@@ -17,6 +17,32 @@ from arches.management.commands.etl_template import create_workbook
 
 logger = logging.getLogger(__name__)
 
+tile_tree_query = """
+    WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, depth) AS (
+        SELECT
+            t.tileid,
+            t.parenttileid,
+            t.tiledata,
+            t.nodegroupid,
+            0
+        FROM
+            tiles t
+        WHERE tileid = (%s)
+        UNION
+            SELECT
+                t.tileid,
+                t.parenttileid,
+                t.tiledata,
+                t.nodegroupid,
+                tt.depth + 1
+            FROM
+                tile_tree tt, tiles t
+            WHERE
+                t.parenttileid = tt.tileid
+    )
+    SEARCH DEPTH FIRST BY tileid SET ordercol
+    SELECT * FROM tile_tree ORDER BY ordercol;
+"""
 
 class BranchExcelExporter(BranchCsvImporter):
     def __init__(self, request):
@@ -48,7 +74,7 @@ class BranchExcelExporter(BranchCsvImporter):
             for row in cursor.fetchall() 
         ]
     
-    def get_related_files(self, files):
+    def get_files_in_zip_file(self, files, graph_name, wb):
         file_ids = [file["file_id"] for file in files]
         file_objects = list(File.objects.filter(pk__in=file_ids))
         for file in files:
@@ -58,19 +84,47 @@ class BranchExcelExporter(BranchCsvImporter):
         download_files = []
         skipped_files = []
         size_limit = 104857600  # 100MByte
+        size_limit = 102400  # 10MByte
         for file in files:
             if file["file"].size >= size_limit:
-                skipped_files.append({"name": file["name"], "fileid": file["file_id"]})
+                skipped_files.append({
+                    "name": file["name"],
+                    "url": settings.MEDIA_URL + file['file'].name,
+                    "fileid": file["file_id"]
+                })
             else:
                 download_files.append({"name": file["name"], "downloadfile": file["file"]})
-        return download_files, skipped_files
+
+        buffer = BytesIO()
+        excel_file_name = "{}_export.xlsx".format(graph_name.replace(" ", "_"))
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
+            for f in download_files:
+                f["downloadfile"].seek(0)
+                zip.writestr(f["name"], f["downloadfile"].read())
+            zip.writestr(excel_file_name, save_virtual_workbook(wb))
+
+        zip.close()
+        buffer.flush()
+        zip_stream = buffer.getvalue()
+        buffer.close()
+        f = BytesIO(zip_stream)
+
+        now = datetime.now().isoformat()
+        name = "{0}-{1}.zip".format(graph_name.replace(" ", "_"), now)
+
+        download = DjangoFile(f)
+        zip_file = TempFile()
+        zip_file.source = "branch-excel-exporter"
+        zip_file.path.save(name, download)
+
+        return zip_file, download_files, skipped_files
 
     def export(self, request):
         load_id = request.POST.get("load_id")
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
-        use_celery = True
+        use_celery = False
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -101,33 +155,6 @@ class BranchExcelExporter(BranchCsvImporter):
             tiles_to_export = {}
             files_to_download = []
 
-            tile_tree_query = """
-                WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, depth) AS (
-                    SELECT
-                        t.tileid,
-                        t.parenttileid,
-                        t.tiledata,
-                        t.nodegroupid,
-                        0
-                    FROM
-                        tiles t
-                    WHERE tileid = (%s)
-                    UNION
-                        SELECT
-                            t.tileid,
-                            t.parenttileid,
-                            t.tiledata,
-                            t.nodegroupid,
-                            tt.depth + 1
-                        FROM
-                            tile_tree tt, tiles t
-                        WHERE
-                            t.parenttileid = tt.tileid
-                )
-                SEARCH DEPTH FIRST BY tileid SET ordercol
-                SELECT * FROM tile_tree ORDER BY ordercol;
-            """
-
             for resource_id in resource_ids:
                 cursor.execute("""SELECT * FROM tiles WHERE parenttileid IS null AND resourceinstanceid = (%s)""", [resource_id])
                 root_tiles = self.dictfetchall(cursor)
@@ -150,54 +177,31 @@ class BranchExcelExporter(BranchCsvImporter):
                                     files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
                                     file_names_to_export.append(file["name"])
                                 tile[alias] = ",".join(file_names_to_export)
-                            elif node_lookup_by_id[key]["datatype"] == "geojson-feature-collection":
-                                tile[alias] = json.dumps(value)
                             else:
-                                tile[alias] = value
+                                try:
+                                    value.keys() # to check if it is a dictionary
+                                    tile[alias] = json.dumps(value)
+                                except AttributeError:
+                                    tile[alias] = value
                         tiles_to_export.setdefault(root_alias, []).append(tile)
 
-        download_files, skipped_files = self.get_related_files(files_to_download)
         wb = create_workbook(graph_id, tiles_to_export)
+
+        zip_file, download_files, skipped_files = self.get_files_in_zip_file(files_to_download, graph_name, wb)
+        zip_file_name = os.path.basename(zip_file.path.name)
+        zip_file_url = settings.MEDIA_URL + zip_file.path.name
 
         load_details = {
             "graph": graph_name,
             "number_of_resources": len(resource_ids),
             "number_of_files": len(download_files),
-            "skipped_files": skipped_files
+            "skipped_files": skipped_files,
+            "zipfile": {
+                "name": zip_file_name,
+                "url": zip_file_url,
+                "fileid": str(zip_file.fileid)
+            }
         }
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET load_details = (%s) WHERE loadid = (%s)""",
-                (json.dumps(load_details), load_id)
-            )
-
-        buffer = BytesIO()
-        excel_file_name = "{}_export.xlsx".format(graph_name.replace(" ", "_"))
-        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zip:
-            for f in download_files:
-                f["downloadfile"].seek(0)
-                zip.writestr(f["name"], f["downloadfile"].read())
-            zip.writestr(excel_file_name, save_virtual_workbook(wb))
-
-        zip.close()
-        buffer.flush()
-        zip_stream = buffer.getvalue()
-        buffer.close()
-        f = BytesIO(zip_stream)
-
-        now = datetime.now().isoformat()
-        name = "{0}-{1}.zip".format(graph_name.replace(" ", "_"), now)
-
-        download = DjangoFile(f)
-        zip_file = TempFile()
-        zip_file.source = "branch-excel-exporter"
-        zip_file.path.save(name, download)
-
-        zip_file_name = os.path.basename(zip_file.path.name)
-        zip_file_url = settings.MEDIA_URL + zip_file.path.name
-
-        load_details["zipfile"] = { "name": zip_file_name, "url": zip_file_url, "fileid": str(zip_file.fileid) }
 
         with connection.cursor() as cursor:
             cursor.execute(
