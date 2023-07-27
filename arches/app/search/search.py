@@ -102,7 +102,7 @@ class SearchEngine(object):
                     raise detail
         else:
             try:
-                return self.es.delete(ignore=[404], **kwargs)
+                return self.es.options(ignore_status=404).delete(**kwargs)
             except Exception as detail:
                 self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), body, detail))
                 raise detail
@@ -115,7 +115,7 @@ class SearchEngine(object):
 
         kwargs = self._add_prefix(**kwargs)
         print("deleting index : %s" % kwargs.get("index"))
-        return self.es.indices.delete(ignore=[400, 404], **kwargs)
+        return self.es.options(ignore_status=[400, 404]).indices.delete(**kwargs)
 
     def search(self, **kwargs):
         """
@@ -160,7 +160,7 @@ class SearchEngine(object):
         """
 
         index = self._add_prefix(index)
-        self.es.indices.create(index=index, ignore=400)
+        self.es.options(ignore_status=400).indices.create(index=index)
         self.es.indices.put_mapping(index=index, **body)
 
     def create_index(self, **kwargs):
