@@ -191,9 +191,8 @@ define([
             }
 
             self.addAllFormData();
-            self.loading(true);
+            params.activeTab("import");
             self.submit('write').then(data => {
-                params.activeTab("import");
                 console.log(data.result);
             }).fail( function(err) {
                 self.alert(

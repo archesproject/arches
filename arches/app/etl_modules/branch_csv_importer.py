@@ -140,7 +140,7 @@ class BranchCsvImporter(BaseImportModule):
         row_count = 0
         for row in worksheet.rows:
             cell_values = [cell.value for cell in row]
-            if len(cell_values) == 0:
+            if len(cell_values) == 0 or any(cell_values) is False:
                 continue
             resourceid = cell_values[0]
             if resourceid is None:
@@ -268,6 +268,11 @@ class BranchCsvImporter(BaseImportModule):
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
                         default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
+        elif content.name.split(".")[-1] == "xlsx":
+            self.cumulative_excel_files_size += content.size
+            result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
+            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+            default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
         return {"success": result, "data": result}
 
     def start(self, request):

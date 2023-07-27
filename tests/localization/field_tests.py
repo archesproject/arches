@@ -183,6 +183,23 @@ class Customi18nTextFieldTests(ArchesTestCase):
         self.assertEqual(str(m.name), "Marco")
         self.assertEqual(m.name.raw_value, {"en": "Marco"})
 
+    def test_quoted_string_i18n_text_field_data_consistency_before_and_after_save(self):
+        # re https://github.com/archesproject/arches/issues/9623
+        translation.activate("en")
+        m = self.LocalizationTestModel()
+        m.name = "\"Hello World\""
+        m.id = 11
+        self.assertEqual(str(m.name),"\"Hello World\"")
+        m.save()
+
+        # test that post save everything is the same
+        self.assertEqual(str(m.name), "\"Hello World\"")
+
+        # test that the object retrieved from the database is the same
+        m = self.LocalizationTestModel.objects.get(pk=11)
+        self.assertEqual(str(m.name), "\"Hello World\"")
+        self.assertEqual(m.name.raw_value, {"en": "\"Hello World\""})
+
     def test_equality(self):
         value = I18n_String("toast")
         self.assertEqual(value, "toast")
