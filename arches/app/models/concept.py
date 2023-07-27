@@ -1189,7 +1189,7 @@ class Concept(object):
         cursor.execute(
             """
             WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, c.languageid, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
                     FROM relations d
                     JOIN values c ON(c.conceptid = d.conceptidto)
                     JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
@@ -1198,7 +1198,7 @@ class Concept(object):
                     and c.valuetype in ('prefLabel', 'sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                     UNION
-                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
+                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, v.languageid, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
                     FROM relations  d
                     JOIN children b ON(b.conceptidto = d.conceptidfrom)
                     JOIN values v ON(v.conceptid = d.conceptidto)
@@ -1206,7 +1206,7 @@ class Concept(object):
                     WHERE  v2.valuetype = 'prefLabel'
                     and v.valuetype in ('prefLabel','sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
+                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, languageid, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
             """,
             [conceptid],
         )
@@ -1219,6 +1219,7 @@ class Concept(object):
             "valueid",
             "valueto",
             "valueidto",
+            "languageid",
             "depth",
             "idpath",
             "conceptpath",
@@ -1264,8 +1265,18 @@ class Concept(object):
                             _findNarrower(child, path, rec)
                 val.children.sort(key=lambda x: (x.sortorder, x.text))
 
-        for row in rows:
-            rec = dict(list(zip(column_names, row)))
+        def best_language_last(rec):
+            """_findNarrower updates via recursive search, so sort the best language last."""
+            if rec["languageid"] == get_language():
+                language_priority = 2
+            elif rec["languageid"] == settings.LANGUAGE_CODE:
+                language_priority = 1
+            else:
+                language_priority = 0
+            return (rec["depth"], rec["conceptpath"], language_priority)
+
+        records = [dict(list(zip(column_names, row))) for row in rows]
+        for rec in sorted(records, key=best_language_last):
             path = rec["conceptpath"][1:-1].split(",")
             _findNarrower(result, path, rec)
 
