@@ -21,22 +21,23 @@ define([
 
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
-            this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
             this.loadStatus = ko.observable('ready');
             this.downloadMode = ko.observable(false);
-
+            
             this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
             this.validationErrors = params.validationErrors || ko.observable();
             this.validated = params.validated || ko.observable();
             this.getErrorReport = params.getErrorReport;
             this.getNodeError = params.getNodeError;
+            
+            
+            this.templates = ko.observableArray(
+                arches.resources.map(resource => ({text: resource.name, id: resource.graphid}))
+                );
 
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
-                if (this.downloadMode() && !ko.unwrap(this.templates).length) {
-                    getGraphs();
-                }
             };
 
             function getCookie(name) {
@@ -84,17 +85,6 @@ define([
                     window.document.body.removeChild(a);
                 }, 0);
                 this.loading(false);
-            };
-
-            const getGraphs = async function() {
-                const response = await fetch(arches.urls.graphs_api);
-                if (response.ok) {
-                    let graphs = await response.json();
-                    self.templates(graphs
-                        .filter(graph => graph.isresource)
-                        .map(resource => ({text: resource.name, id: resource.graphid}))
-                    );
-                }
             };
 
             this.addFile = async function(file){
