@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "7.4.0",
+    "version": "7.5.0",
     "scripts": {
         "build_production": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
         "build_development": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
@@ -12,7 +12,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.4.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.5.x"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
@@ -51,7 +51,7 @@
         "jquery-validation": "1.19.5",
         "jqueryui": "1.11.1",
         "js-cookie": "2.1.1",
-        "knockout": "~3.5.1",
+        "knockout": "3.5.0",
         "knockout-mapping": "~2.6.0",
         "knockstrap": "1.3.2",
         "latlon-geohash": "1.1.0",

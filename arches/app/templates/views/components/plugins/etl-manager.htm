@@ -143,6 +143,12 @@
                                         <i class="fa fa-spin fa-spinner" data-bind="visible: event.loading()"></i>
                                     </button>
                                     <!-- /ko -->
+                                    <!-- ko if: event.status == "unindexed" -->
+                                    <button class="btn btn-success" style="width:150px;">
+                                        <span data-bind="text: $root.translations.loadedButUnindexed"></span>
+                                        <i class="fa fa-spin fa-spinner" data-bind="visible: event.loading()"></i>
+                                    </button>
+                                    <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->
                                     <button class="btn btn-danger" style="width:150px;">
                                         <span data-bind="text: $root.translations.failed"></span>
