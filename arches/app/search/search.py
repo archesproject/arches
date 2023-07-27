@@ -209,13 +209,17 @@ class SearchEngine(object):
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.pop("body", None)
+        query = kwargs.pop("query", None)
 
-        # need to only pass in the query key as other keys (eg: _source) are not allowed
-        if body:
-            query = body.pop("query", None)
-            if query:
-                kwargs["body"] = {"query": query}
+        # need to only pass in the query and index keys
+        # as other keys (eg: _source) are not allowed
+        if query:
+            index = None
+            if 'index' in kwargs:
+                index = kwargs["index"]
+            kwargs = {"query": query}
+            if index:
+                kwargs["index"] = index
 
         count = self.es.count(**kwargs)
         if count is not None:

@@ -98,7 +98,7 @@ class Query(Dsl):
             return self.se.search(index=index, scroll=self.scroll, **self.dsl)
 
     def count(self, index="", **kwargs):
-        return self.se.count(index=index, body=self.dsl)
+        return self.se.count(index=index, **self.dsl)
 
     def delete(self, index="", **kwargs):
         return self.se.delete(index=index, body=self.dsl, **kwargs)
