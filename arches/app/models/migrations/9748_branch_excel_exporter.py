@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9477_fix_for_spatial_view_dbf_function_edtf_displaying_null'),
+        ('models', '9746_related_resource_post_save_bug'),
     ]
 
     add_branch_excel_exporter = """
