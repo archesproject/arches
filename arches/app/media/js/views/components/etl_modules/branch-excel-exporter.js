@@ -32,6 +32,7 @@ define([
             this.validated = params.validated || ko.observable();
             this.getErrorReport = params.getErrorReport;
             this.getNodeError = params.getNodeError;
+            this.alert = params.alert;
 
             this.getGraphs = async function(){
                 self.loading(true);
@@ -63,7 +64,7 @@ define([
                     self.alert(
                         new JsonErrorAlertViewModel(
                             'ep-alert-red',
-                            err.responseJSON["data"],
+                            err.data,
                             null,
                             function(){}
                         )
