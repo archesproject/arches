@@ -10,11 +10,12 @@ define([
     'views/provisional-history-list',
     'views/notifications-list',
     'utils/aria',
+    'utils/back-to-top',
     'bindings/scrollTo',
     'bootstrap',
     'bindings/slide',
     'jquery-ui',
-], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList, ariaUtils) {
+], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList, ariaUtils, backToTop) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -69,6 +70,7 @@ define([
                 navDestination: ko.observable(''),
                 handleEscKey: ariaUtils.handleEscKey,
                 shiftFocus: ariaUtils.shiftFocus,
+                backToTopHandler: backToTop.backToTopHandler,
                 urls: arches.urls,
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
@@ -92,7 +94,7 @@ define([
                 getHelp: function(template) {
                     self.viewModel.helploading(true);
                     var el = document.createElement('div');
-                    $('.ep-help-content').empty()
+                    $('.ep-help-content').empty();
                     $('.ep-help-content').append(el);
                     $.ajax({
                         type: "GET",
@@ -183,6 +185,8 @@ define([
             this.viewModel.getNotifications();
 
             $('[data-toggle="tooltip"]').tooltip();
+
+            backToTop.scrollToTopHandler();
         }
     });
     return PageView;
