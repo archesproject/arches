@@ -45,10 +45,11 @@ tile_tree_query = """
 """
 
 class BranchExcelExporter(BranchCsvImporter):
-    def __init__(self, request):
+    def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
         self.moduleid = request.POST.get("module") if request else None
+        self.loadid = loadid if loadid else None
 
     def get_graphs(self, request):
         graph_name_i18n = "name__" + settings.LANGUAGE_CODE
@@ -120,7 +121,7 @@ class BranchExcelExporter(BranchCsvImporter):
         return zip_file, download_files, skipped_files
 
     def export(self, request):
-        load_id = request.POST.get("load_id")
+        self.loadid = request.POST.get("load_id")
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
@@ -129,13 +130,13 @@ class BranchExcelExporter(BranchCsvImporter):
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (load_id, False, "running", self.moduleid, datetime.now(), self.userid),
+                (self.loadid, False, "validated", self.moduleid, datetime.now(), self.userid),
             )
 
         if use_celery:
             response = self.load_data_async(request)
         else:
-            response = self.run_export_task(load_id, graph_id, graph_name, resource_ids)
+            response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids)
 
         return response
 
@@ -212,13 +213,13 @@ class BranchExcelExporter(BranchCsvImporter):
         return { "success": True, "data": "success" }
 
     def run_load_task_async(self, request):
-        load_id = request.POST.get("load_id")
+        self.loadid = request.POST.get("load_id")
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
 
         export_task = tasks.export_branch_csv.apply_async(
-            (self.userid, load_id, graph_id, graph_name, resource_ids),
+            (self.userid, self.loadid, graph_id, graph_name, resource_ids),
         )
 
         with connection.cursor() as cursor:

@@ -231,7 +231,7 @@ def export_branch_csv(user_id, load_id, graph_id, graph_name, resource_ids):
 
     status = _("Failed")
     try:
-        BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None)
+        BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None, loadid=load_id)
         BranchExcelExporter.run_export_task(load_id, graph_id, graph_name, resource_ids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
