@@ -1444,7 +1444,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                 }
             }
 
-    concept_label_results = se.search(index=CONCEPTS_INDEX, body=exact_val_match(label, conceptid))
+    concept_label_results = se.search(index=CONCEPTS_INDEX, **exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return

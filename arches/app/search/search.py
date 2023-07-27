@@ -161,11 +161,11 @@ class SearchEngine(object):
 
         index = self._add_prefix(index)
         self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, body=body)
+        self.es.indices.put_mapping(index=index, **body)
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        self.es.indices.create(ignore=400, **kwargs)
+        self.es.options(ignore_status=400).indices.create(**kwargs)
         print("creating index : %s" % kwargs.get("index", ""))
 
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
@@ -191,7 +191,7 @@ class SearchEngine(object):
                     id = getattr(document, idfield)
 
             try:
-                self.es.index(index=index, body=document, id=id)
+                self.es.index(index=index, document=document, id=id)
             except Exception as detail:
                 self.logger.warning(
                     "%s: WARNING: failed to index document: %s \nException detail: %s\n" % (datetime.now(), document, detail)

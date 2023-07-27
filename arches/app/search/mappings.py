@@ -57,7 +57,7 @@ def prepare_terms_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index=TERMS_INDEX, body=index_settings)
+        se.create_index(index=TERMS_INDEX, **index_settings)
 
     return index_settings
 
@@ -90,7 +90,7 @@ def prepare_concepts_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index=CONCEPTS_INDEX, body=index_settings)
+        se.create_index(index=CONCEPTS_INDEX, **index_settings)
 
     return index_settings
 
@@ -253,7 +253,7 @@ def prepare_search_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index=RESOURCES_INDEX, body=index_settings)
+        se.create_index(index=RESOURCES_INDEX, **index_settings)
 
     return index_settings
 
