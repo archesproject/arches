@@ -31,7 +31,7 @@ define([
             this.getNodeError = params.getNodeError;
             this.templates = ko.observableArray(
                 arches.resources.map(resource => ({text: resource.name, id: resource.graphid}))
-                );
+            );
 
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
