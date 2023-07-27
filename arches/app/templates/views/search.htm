@@ -96,11 +96,16 @@
                         {% if user_can_read %}
                         <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                             css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, 
-                            click: function(){
+                            click: function(data, event){
                                 $parent.sharedStateObject.selectPopup(filter.componentname); 
-                                $parent.sharedStateObject.shiftFocus('#' + filter.componentname + '-popup-tabpanel');
+                                $root.handleEscKey(
+                                    event.currentTarget,
+                                    '#' + filter.componentname + '-popup-tabpanel',
+                                    '#' + filter.componentname + '-close-btn'
+                                );
                             },
                             attr: {
+                                id: filter.componentname + '-open-btn',
                                 'aria-expanded': ($parent.sharedStateObject.selectedPopup() === filter.componentname).toString(),
                                 'aria-label': filter.name,
                                 'aria-controls': filter.componentname + '-popup-tabpanel'

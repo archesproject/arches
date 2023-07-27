@@ -2,8 +2,9 @@
 {% load i18n %}
 
 <div class="search-container time-search-container relative" style="overflow-y: scroll;">
-    <div class="close-popup-panel-container" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function(){selectedPopup('');},
-        attr: {'aria-label': $root.translations.closeExportSearchResults},
+    <div class="close-popup-panel-container" tabindex="0" role="button" id="search-export-close-btn"
+        data-bind="onEnterkeyClick, onSpaceClick, click: function(){selectedPopup('');},
+            attr: {'aria-label': $root.translations.closeExportSearchResults},
     ">
         <span class="close-popup-panel" data-bind="text: $root.translations.exportSearchResults"></span>
     </div>
