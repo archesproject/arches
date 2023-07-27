@@ -12,12 +12,13 @@ define(['jquery'], function($){
             ele.setAttribute("aria-expanded", x);
         },
 
-        handleEscKey: function(toggleElement, listenerScope) {
+        handleEscKey: function(openElement, escListenerScope, closeElement) {
             /* 
-            *   toggleElement: element that expands/contracts a panel, menu, etc. 
-            *   listenerScope: when focus is within this element, an escape key press will close the element controled by toggleElement
+            *   openElement: element that expands/contracts a panel, menu, etc. 
+            *   escListenerScope: when focus is within this element, an escape key press will close the element controled by openElement
+            *   closeElement: [OPTIONAL] element that closes the panel, menu, etc. when clicked - use this param when panel is not removed from DOM on close
             * 
-            *   Implement this function within the toggleElement's click event handler, passing event.currentTarget as toggleElement
+            *   Implement this function within the openElement's click event handler, passing event.currentTarget as openElement
             */
             let attachListener = function(evt) {
                 evt = evt || window.event;
@@ -31,14 +32,17 @@ define(['jquery'], function($){
                 }
 
                 // Handle escape key press
-                if (isEscape) {
-                    $(toggleElement).click();
-                    $(toggleElement).focus();
-                    $(listenerScope).off('keydown', attachListener);
+                if (isEscape && closeElement) {
+                    $(closeElement).click();
+                    $(openElement).focus();
+                } else if (isEscape) {
+                    $(openElement).click();
+                    $(openElement).focus();
                 }
             };
-            $(listenerScope).on('keydown', attachListener);
-            $(listenerScope).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
+            $(escListenerScope).off('keydown', attachListener);
+            $(escListenerScope).on('keydown', attachListener);
+            $(escListenerScope).find('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])').eq(0).focus();
         },
 
         shiftFocus: function(focusTarget) {
