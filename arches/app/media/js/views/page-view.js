@@ -127,16 +127,42 @@ define([
                         });
                     });
                 },
-                closeHelp: function() {
-                    var el = $('.ep-help-content');
-                    el.empty();
-                },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();
                 },
                 getNotifications: function() {
                     self.viewModel.notifsList.updateList();
-                }
+                },
+                openNotifs: function(openButton, escListenScope, closeButton) {
+                    self.viewModel.getNotifications();
+                    self.viewModel.notifsOpen(!(self.viewModel.notifsOpen()));
+                    self.viewModel.handleEscKey(openButton, escListenScope, closeButton);
+                },
+                openEdits: function(openButton, escListenScope, closeButton) {
+                    self.viewModel.getProvisionalHistory();
+                    self.viewModel.editsOpen(!(self.viewModel.editsOpen()));
+                    self.viewModel.handleEscKey(openButton, escListenScope, closeButton);
+                },
+                openHelp: function(helpTemplates, openButton, escListenScope, closeButton) {
+                    helpTemplates.forEach(template => self.viewModel.getHelp(template));
+                    self.viewModel.helpOpen(!(self.viewModel.helpOpen()));
+                    self.viewModel.handleEscKey(openButton, escListenScope, closeButton);
+                },
+                closeNotifs: function() {
+                    self.viewModel.getNotifications();
+                    self.viewModel.notifsOpen(false);
+                    self.viewModel.shiftFocus('#ep-notifs-button');
+                },
+                closeEdits: function() {
+                    self.viewModel.editsOpen(false);
+                    self.viewModel.shiftFocus('#ep-edits-button');
+                },
+                closeHelp: function() {
+                    let el = $('.ep-help-content');
+                    el.empty();
+                    self.viewModel.helpOpen(false);
+                    self.viewModel.shiftFocus('#ep-help-button');
+                },
             });
             self.viewModel.notifsList.items.subscribe(function(list) {
                 self.viewModel.unreadNotifs((list.length > 0));

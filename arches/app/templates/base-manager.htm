@@ -307,8 +307,7 @@
                                 data-bind="click:function(data, event) { 
                                         menuActive(!menuActive()); 
                                         handleEscKey(event.currentTarget, '.ep-menu-list'); 
-                                    }, clickBubble: false,
-                                    attr: {
+                                    }, attr: {
                                         'aria-expanded': menuActive().toString(),
                                         'aria-controls': '#menu-panel'
                                     }
@@ -383,10 +382,8 @@
                         <li>
                             <button id="ep-notifs-button" class="ep-tools ep-notifs-toggle ep-tools-right" data-toggle="collapse" data-target="#ep-notifs-panel"
                                 aria-label="{% trans 'Show recent notifications' %}" aria-controls="ep-notifs-panel"
-                                data-bind="click: function() {
-                                    getNotifications();
-                                    notifsOpen(!notifsOpen());
-                                    $root.handleEscKey(event.currentTarget, '#ep-notifs-panel');
+                                data-bind="click: function(data, event) { 
+                                    openNotifs(event.currentTarget, '#ep-notifs-panel', '#ep-close-notifs-button'); 
                                 }, attr: {'aria-expanded': notifsOpen().toString()},
                             ">
                                 <div data-placement="bottom" data-toggle="tooltip"
@@ -419,10 +416,8 @@
                         <li>
                             <button id="ep-edits-button" class="ep-edits-toggle ep-tools ep-tools-right" data-toggle="collapse" data-target="#ep-edits-panel"
                                 aria-label="{% trans 'Show my recent edits' %}" aria-controls="ep-edits-panel"
-                                data-bind="click:function () { 
-                                    getProvisionalHistory();
-                                    editsOpen(!editsOpen());
-                                    $root.handleEscKey(event.currentTarget, '#ep-edits-panel');
+                                data-bind="click:function (data, event) { 
+                                    openEdits(event.currentTarget, '#ep-edits-panel', '#ep-close-edits-button');
                                 }, attr: {'aria-expanded': editsOpen().toString()},
                             ">
                                 <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "My Recent Edits" %}">
@@ -457,10 +452,8 @@
                         <li>
                             <button id="ep-help-button" class="ep-help-toggle ep-tools ep-tools-right" data-toggle="collapse" data-target="#ep-help-panel"
                                 aria-label="{% trans 'Show help' %}" aria-controls="ep-help-panel"
-                                data-bind="click: function(){ 
-                                    {{ nav.help.templates }}.forEach(template => getHelp(template)); 
-                                    helpOpen(!helpOpen());
-                                    $root.handleEscKey(event.currentTarget, '#ep-help-panel');
+                                data-bind="click: function(data, event){ 
+                                    openHelp({{ nav.help.templates }}, event.currentTarget, '#ep-help-panel', '#ep-close-help-button');
                                 }, attr: { 'aria-expanded': helpOpen().toString()},
                             ">
                                 <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Help" %}">
@@ -497,8 +490,8 @@
                     <div class="ep-help-title">
                         <span>{% trans 'Notifications' %}</span>
                     </div>
-                    <a href="javascript:void(0);" role="button" class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right"
-                        data-bind="click: function() {getNotifications(); notifsOpen(false); shiftFocus('#ep-notifs-button')}"
+                    <a href="javascript:void(0);" id="ep-close-notifs-button" role="button" aria-label="{% trans 'Close Notifications' %}"
+                        class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" data-bind="click: closeNotifs"
                     >
                         <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
@@ -522,8 +515,9 @@
                     <div class="ep-edits-title">
                         <span>{% trans 'My Edit History' %}</span>
                     </div>
-                    <a href="javascript:void(0);" role="button" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right"
-                        style="border:none;" data-bind="click: function(){editsOpen(false); shiftFocus('#ep-edits-button')}">
+                    <a href="javascript:void(0);" id="ep-close-edits-button" role="button" style="border:none;" aria-label="{% trans 'Close Edit History' %}"
+                        class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" data-bind="click: closeEdits"
+                    >
                         <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
@@ -545,8 +539,9 @@
                     <div class="ep-help-title">
                         <span>{% trans nav.help.title %}</span>
                     </div>
-                    <a href="javascript:void(0);" role="button" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" 
-                        style="border:none" data-bind="click: function(){closeHelp(); helpOpen(false); shiftFocus('#ep-help-button')}">
+                    <a href="javascript:void(0);" id="ep-close-help-button" role="button" style="border:none" aria-label="{% trans 'Close Help' %}"
+                        class="ep-help-toggle ep-help-close ep-tools ep-tools-right" data-bind="click: closeHelp"
+                    >
                         <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close Help" %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
