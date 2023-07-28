@@ -33,6 +33,7 @@ define([
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
         this.loading(true);
+        this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
         this.selectedLanguage = ko.observable();
         this.graphs = ko.observable();
@@ -147,6 +148,9 @@ define([
             if (!self.ready()) {
                 return;
             }
+
+            self.previewing(true);
+
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -169,6 +173,7 @@ define([
             }).fail(function(err) {
                 console.log(err);
             }).always(function() {
+                self.previewing(false);
                 self.deleteAllFormData();
             });
         };
