@@ -17,15 +17,18 @@
 }
 
 .login-panel-header.arches-signin {
-    font-size: 28px;
+    font-size: 2.8rem;
 }
 
 .arches-signin-subtext {
     padding: 0px 5px 20px 5px;
     color: #888;
-    font-size: 1em;
+    font-size: 1.6rem;
     font-weight: normal;
     border: none;
+    .input-group-addon {
+        font-size: 1.4rem;
+    }
 }
 
 .floating-label-group {
@@ -121,7 +124,7 @@
 }
 
 .login-panel-header {
-    font-size: 2.4em;
+    font-size: 2.8rem;
     margin-top: 0;
     padding-bottom: 5px;
     font-weight: 300;
@@ -158,7 +161,7 @@
 }
 
 .change-password-form .error-message {
-    font-size: 11px;
+    font-size: 1.1rem;
     color: #880000;
     padding: 2px;
 }
@@ -184,7 +187,7 @@
     line-height: 1.1;
     border-bottom: solid 0.5px #babebf;
     font-weight: 300;
-    font-size: 14px;
+    font-size: 1.4rem;
 }
 
 .change-password-buttons {
@@ -196,13 +199,13 @@
 
 .password-rules {
     margin-top: -5px;
-    font-size: 12px;
+    font-size: 1.2rem;
     color: #555;
 }
 
 .password-rule {
     color: #888;
-    font-size: 13px;
+    font-size: 1.3rem;
     padding-left: 5px;
     padding-bottom: 3px;
     display:flex;
@@ -210,11 +213,11 @@
 
 .password-rule span {
     padding-inline-start: 3px;
-    font-size: 12px;
+    font-size: 1.2rem;
 }
 
 .password-rule i {
-    font-size: 11px;
+    font-size: 1.1rem;
 }
 
 .password-rules > .list-unstyled {
