@@ -202,7 +202,6 @@ define([
             self.loading(true);
             self.submit('write').then(data => {
                 params.activeTab("import");
-                console.log(data.result);
             }).fail( function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
