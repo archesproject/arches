@@ -84,6 +84,7 @@ define([
         this.ready = ko.computed(() => {
             const ready = !!self.selectedGraph() &&
                 !!self.selectedNode() &&
+                !self.previewing() &&
                 ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
             return ready;
         });
