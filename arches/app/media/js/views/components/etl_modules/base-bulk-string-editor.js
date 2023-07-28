@@ -151,6 +151,7 @@ define([
             }
 
             self.previewing(true);
+            self.previewValue([]);
 
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
