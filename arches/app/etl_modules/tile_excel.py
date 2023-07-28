@@ -20,6 +20,7 @@ from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ details = {
     "slug": "import-tile-excel"    
 }
 
-class ImportTileExcel(BaseImportModule):
+class ImportTileExcel(BranchCsvImporter):
     def __init__(self, request=None, loadid=None, temp_dir=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -48,62 +49,6 @@ class ImportTileExcel(BaseImportModule):
         self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
 
-    def filesize_format(self, bytes):
-        """Convert bytes to readable units"""
-        bytes = int(bytes)
-        if bytes == 0:
-            return "0 kb"
-        log = math.floor(math.log(bytes, 1024))
-        return "{0:.2f} {1}".format(bytes / math.pow(1024, log), ["bytes", "kb", "mb", "gb"][int(log)])
-
-    def get_graph_tree(self, graphid):
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
-            rows = cursor.fetchall()
-            node_lookup = {str(row[1]): {"depth": int(row[5])} for row in rows}
-            nodes = Node.objects.filter(graph_id=graphid)
-            for node in nodes:
-                nodeid = str(node.nodeid)
-                if nodeid in node_lookup:
-                    node_lookup[nodeid]["alias"] = node.alias
-                    node_lookup[nodeid]["datatype"] = node.datatype
-                    node_lookup[nodeid]["config"] = node.config
-            return node_lookup, nodes
-
-    def get_parent_tileid(self, depth, tileid, previous_tile, nodegroup, nodegroup_tile_lookup):
-        parenttileid = None
-        if depth == 0:
-            previous_tile["tileid"] = tileid
-            previous_tile["depth"] = depth
-            return parenttileid
-        if len(previous_tile.keys()) == 0:
-            previous_tile["tileid"] = tileid
-            previous_tile["depth"] = depth
-            previous_tile["parenttile"] = None
-            nodegroup_tile_lookup[nodegroup] = tileid
-        if previous_tile["depth"] < depth:
-            parenttileid = previous_tile["tileid"]
-            nodegroup_tile_lookup[nodegroup] = parenttileid
-            previous_tile["parenttile"] = parenttileid
-        if previous_tile["depth"] > depth:
-            parenttileid = nodegroup_tile_lookup[nodegroup]
-        if previous_tile["depth"] == depth:
-            parenttileid = previous_tile["parenttile"]
-
-        previous_tile["tileid"] = tileid
-        previous_tile["depth"] = depth
-        return parenttileid
-
-    def set_legacy_id(self, resourceid):
-        try:
-            uuid.UUID(resourceid)
-            legacyid = None
-        except (AttributeError, ValueError):
-            legacyid = resourceid
-            if legacyid not in self.legacyid_lookup:
-                self.legacyid_lookup[legacyid] = uuid.uuid4()
-            resourceid = self.legacyid_lookup[legacyid]
-        return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, nodegroup_alias, row_details, cursor):
         node_value_keys = data_node_lookup[nodegroup_alias]
@@ -116,9 +61,6 @@ class ImportTileExcel(BaseImportModule):
                 datatype = node_details["datatype"]
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row_details[key]
-                # if datatype_instance.datatype_name == 'concept-list' and row_details[key] is not None:
-                #     source_value = '''"{0}"'''.format(row_details[key])
-                # # source_value = row_details[key] if datatype_instance.datatype_name != 'concept-list' and row_details[key] is not None else '''"{0}"'''.format(row_details[key])
                 config = node_details["config"]
                 config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
                 config["loadid"] = self.loadid
@@ -239,134 +181,3 @@ class ImportTileExcel(BaseImportModule):
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
             )
-
-    def get_node_lookup(self, nodes):
-        lookup = {}
-        for node in nodes:
-            lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
-        return lookup
-
-    def validate(self, loadid):
-        success = True
-        with connection.cursor() as cursor:
-            error_message = _("Legacy id(s) already exist. Legacy ids must be unique")
-            cursor.execute(
-                """UPDATE load_event SET error_message = %s, status = 'failed' WHERE  loadid = %s::uuid
-            AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""",
-                (error_message, self.loadid, self.loadid),
-            )
-        row = self.get_validation_result(loadid)
-        return {"success": success, "data": row}
-
-    def read(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.cumulative_excel_files_size = 0
-        content = request.FILES["file"]
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        try:
-            self.delete_from_default_storage(self.temp_dir)
-        except (FileNotFoundError):
-            pass
-        result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
-        validator = FileValidator()
-        if len(validator.validate_file_type(content)) > 0:
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Invalid excel file/zip specified"),
-                "message": _("Upload a valid excel file"),
-            }
-        if content.name.split(".")[-1].lower() == "zip":
-            with zipfile.ZipFile(content, "r") as zip_ref:
-                files = zip_ref.infolist()
-                for file in files:
-                    if file.filename.split(".")[-1] == "xlsx":
-                        self.cumulative_excel_files_size += file.file_size
-                    if not file.filename.startswith("__MACOSX"):
-                        if not file.is_dir():
-                            result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-                        default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
-        return {"success": result, "data": result}
-
-    def start(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        result = {"started": False, "message": ""}
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute(
-                    """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
-                )
-                result["started"] = True
-            except Exception:
-                result["message"] = _("Unable to initialize load")
-        return {"success": result["started"], "data": result}
-
-    def run_load_task_async(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        self.file_details = request.POST.get("load_details", None)
-        result = {}
-        if self.file_details:
-            details = json.loads(self.file_details)
-            files = details["result"]["summary"]["files"]
-            summary = details["result"]["summary"]
-
-        tasks.load_branch_csv.apply_async(
-            (self.userid, files, summary, result, self.temp_dir, self.loadid),
-        )
-
-    def write(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        self.file_details = request.POST.get("load_details", None)
-        result = {}
-        if self.file_details:
-            details = json.loads(self.file_details)
-            files = details["result"]["summary"]["files"]
-            summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
-            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
-                response = self.load_data_async(request)
-            else:
-                response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
-
-            return response
-
-    def run_load_task(self, files, summary, result, temp_dir, loadid):
-        with connection.cursor() as cursor:
-            for file in files.keys():
-                self.stage_excel_file(file, summary, cursor)
-            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-            cursor.execute(
-                """
-                INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
-                SELECT 'tile', source_description, error_message, loadid, nodegroupid
-                FROM load_staging
-                WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-                """,
-                [loadid],
-            )
-            result["validation"] = self.validate(loadid)
-            if len(result["validation"]["data"]) == 0:
-                self.save_to_tiles(loadid, multiprocessing=False)
-            else:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), loadid),
-                )
-        self.delete_from_default_storage(temp_dir)
-        result["summary"] = summary
-        return {"success": result["validation"]["success"], "data": result}
-
-    def download(self, request):
-        format = request.POST.get("format")
-        if format == "xls":
-            wb = create_workbook(request.POST.get("id"))
-            response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = "attachment"
-            return {"success": True, "raw": response}
-        else:
-            return {"success": False, "data": "failed"}
