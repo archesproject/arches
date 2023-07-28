@@ -170,8 +170,8 @@ object:focus-visible,
 embed:focus-visible,
 *[tabindex]:focus-visible,
 *[contenteditable]:focus-visible {
-    border: 5px solid #fae619 !important;
     outline: 2.5px solid #000 !important;
     outline-offset: -2.5px !important;
+    box-shadow: inset 0 0 0 5px #fae619 !important;
     box-sizing: border-box;
 }
