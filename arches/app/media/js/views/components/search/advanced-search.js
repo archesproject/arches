@@ -63,6 +63,7 @@ define([
                             }
                         }).sort((a, b) => a.sortorder - b.sortorder);
                         self.newFacet(card);
+                        $('#facet-filter-'+(self.filter.facets().length-1)).focus();
                     };
                 }, this);
                 var graphs = response.graphs.sort(function(a,b) {
