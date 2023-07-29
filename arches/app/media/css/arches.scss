@@ -9357,11 +9357,6 @@ a.clear-geojson-button:hover {
     color: steelblue;
 }
 
-.saved-search-container {
-    padding: 5px;
-    background: #fff;
-}
-
 .saved-search-grid {
     height: calc(100vh - 105px);
     width: 100%;
@@ -9862,16 +9857,6 @@ ul.pagination {
 
 .time-wheel-wrap {
     width: 100%;
-}
-
-.filter-title {
-    display: flex;
-    font-size: 17px;
-    margin-top: 3px 0px 15px 0px;
-}
-
-.filter-title>span {
-    flex-grow: 1;
 }
 
 .close-popup-panel:before {
@@ -10405,6 +10390,7 @@ table.table.dataTable {
     width: 400px;
     height: calc(100vh - 100px);
     border-left: solid 1px #dcdcdc;
+    padding: 20px;
 }
 
 .rr-splash-img-container .fa {

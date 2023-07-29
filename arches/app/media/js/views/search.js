@@ -56,7 +56,6 @@ define([
             return filter.type === 'filter' && filter.enabled === true;
         }, this);
         this.selectedTab = ko.observable(firstEnabledFilter.componentname);
-        this.shiftFocus = ariaUtils.shiftFocus;
         this.selectedPopup = ko.observable('');
         this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
@@ -112,7 +111,7 @@ define([
             };
         };
     };
-
+    
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
@@ -124,10 +123,11 @@ define([
             this.viewModel.sharedStateObject.resources = this.viewModel.resources;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
+            this.shiftFocus = ariaUtils.shiftFocus;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
-
+            
             this.queryString.subscribe(function() {
                 this.doQuery();
             }, this);
