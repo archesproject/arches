@@ -76,7 +76,7 @@
                         css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, 
                         click: function(){
                             $parent.sharedStateObject.selectedTab(filter.componentname); 
-                            $parent.sharedStateObject.shiftFocus('#' + filter.componentname + '-tabpanel');
+                            $root.shiftFocus('#' + filter.componentname + '-tabpanel');
                         },
                         attr: {
                             'aria-selected': ($parent.sharedStateObject.selectedTab() === filter.componentname).toString(), 
