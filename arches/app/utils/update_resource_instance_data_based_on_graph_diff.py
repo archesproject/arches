@@ -1,6 +1,5 @@
 from django.utils.translation import ugettext as _
 
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 import arches.app.utils.task_management as task_management
@@ -37,8 +36,6 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
     updated_node_ids_to_default_values = {}
     for updated_widget in updated_graph['widgets']:
         updated_node_ids_to_default_values[updated_widget['node_id']] = updated_widget['config']['defaultValue']
-
-    datatype_factory = DataTypeFactory()
 
     # first, explicity move nodes between nodegroups
     # for resource_instance in resource_instances:
