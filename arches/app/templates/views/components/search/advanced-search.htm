@@ -61,7 +61,7 @@
                 <!-- /ko -->
 
                 <div class="facet-search-button">
-                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">
+                    <button class="btn btn-sm btn-primary" data-bind="click: self.removeFacet">
                         <span data-bind="text: $root.translations.remove"></span>
                     </button>
                 </div>
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Advanced Search Panel -->
-    <div class="facets-container" style="">
+    <div class="facets-container">
         <div class="list-group search-facets">
             <div class="search-facet-item header">
                 <h4 class="search-facet-item-heading">
@@ -88,7 +88,7 @@
                         "
                     >
                     <!-- Clear Filter -->
-                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
+                    <span role="button" tabindex="0" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
