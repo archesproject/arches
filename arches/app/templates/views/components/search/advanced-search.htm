@@ -39,7 +39,7 @@
         </div>
         <!-- /ko -->
 
-        <div class="faceted-search-card-container">
+        <div class="faceted-search-card-container" tabindex="0" data-bind="attr:{'id': 'facet-filter-' + $index()}">
             <div class="facet-name" data-bind="text: ko.unwrap(card.getGraph().name) + ' - ' + card.name"></div>
             <div class="row facet-search-criteria">
                 <!-- ko foreach: card.nodes -->
@@ -61,7 +61,7 @@
                 <!-- /ko -->
 
                 <div class="facet-search-button">
-                    <button class="btn btn-sm btn-primary" data-bind="click: function (facet) { self.filter.facets.remove(facet); }">
+                    <button class="btn btn-sm btn-primary" data-bind="click: self.removeFacet">
                         <span data-bind="text: $root.translations.remove"></span>
                     </button>
                 </div>
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Advanced Search Panel -->
-    <div class="facets-container" style="">
+    <div class="facets-container">
         <div class="list-group search-facets">
             <div class="search-facet-item header">
                 <h4 class="search-facet-item-heading">
@@ -88,12 +88,12 @@
                         "
                     >
                     <!-- Clear Filter -->
-                    <span class="clear-node-search" data-bind="click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
+                    <span role="button" tabindex="0" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }"><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
                 <!-- ko if: cards().length > 0  -->
-                <div tabindex="0" class="search-facet-item disabled" data-bind="click: function () { collapsed(!collapsed()) }">
+                <div tabindex="0" class="search-facet-item disabled" data-bind="onEnterkeyClick, onSpaceClick, click: function () { collapsed(!collapsed()) }">
                     <h4 class="search-facet-item-heading">
                         <strong data-bind="text: name"></strong>
                         <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
@@ -101,7 +101,7 @@
                 </div>
                 <div data-bind="visible: !collapsed()">
                     <!-- ko foreach: cards -->
-                    <a href="#" class="search-facet-item" data-bind="click: addFacet">
+                    <a href="#" class="search-facet-item" data-bind="onEnterkeyClick, onSpaceClick, click: addFacet">
                         <h4 class="search-facet-item-heading" data-bind="text: name"></h4>
                         <p class="list-group-item-text"></p>
                     </a>

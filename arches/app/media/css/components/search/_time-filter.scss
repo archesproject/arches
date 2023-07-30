@@ -1,6 +1,9 @@
-.time-search-container {
-    padding: 20px;
-    background: #fff;
+.time-filter-title {
+    margin-bottom: 8px;
+
+    >span{
+        flex-grow: 1;
+    }
 }
 
 .time-search-container .calendar {
@@ -13,6 +16,7 @@
 .time-search-container #calendar {
     display: flex;
     flex-wrap: wrap;
+    margin-top: 10px;
 }
 
 .time-search-container #calendar .calendar .search-label {

@@ -7,8 +7,9 @@ define([
     'viewmodels/alert',
     'search-components',
     'views/base-manager',
+    'utils/aria',
     'datatype-config-components'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
+], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, ariaUtils) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -110,7 +111,7 @@ define([
             };
         };
     };
-
+    
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
@@ -122,10 +123,11 @@ define([
             this.viewModel.sharedStateObject.resources = this.viewModel.resources;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
+            this.shiftFocus = ariaUtils.shiftFocus;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
-
+            
             this.queryString.subscribe(function() {
                 this.doQuery();
             }, this);

@@ -2,13 +2,14 @@
 {% load i18n %}
 
 {% block tabs %}
-<div class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel"
+<div id="toggle-editor-panel-button" class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel"
     data-bind="onEnterkeyClick, onSpaceClick, click: function() {
         toggleTab('editor');
+        $root.handleEscKey(event.currentTarget, '#side-panel');
     }, css: {
         'active': activeTab() === 'editor'
     }, attr: {
-        'aria-label': $root.translations.openMapEditor,
+        'aria-label': $root.translations.mapEditor,
         'aria-expanded': (activeTab() === 'editor').toString() 
     },
 ">
@@ -23,7 +24,8 @@
 <!--ko if: activeTab() === 'editor' -->
     <div class="workbench-card-sidepanel-header-container">
         <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button" 
-            data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel, text: label, 
+            data-bind="onEnterkeyClick, onSpaceClick, text: label,
+                click: function(){hideSidePanel('#toggle-editor-panel-button')},  
                 attr: {'aria-label': $root.translations.hideEditor},
         "></p>
     </div>
