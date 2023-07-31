@@ -51,7 +51,7 @@
         </div>
         <!-- /ko -->
 
-        <div class="faceted-search-card-container" tabindex="0" data-bind="attr:{'id': 'facet-filter-' + $index()}">
+        <div class="faceted-search-card-container" tabindex="-1" data-bind="attr:{'id': 'facet-filter-' + $index()}">
             <div class="facet-name" data-bind="text: ko.unwrap(card.getGraph().name) + ' - ' + card.name"></div>
             <div class="row facet-search-criteria">
                 <!-- ko foreach: card.nodes -->
