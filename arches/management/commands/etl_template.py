@@ -107,19 +107,20 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                     sheet = wb.create_sheet(title=details["alias"])
                 row_number = 2
                 sheet[f"A1"] = "resource_id"
-                sheet[f"B1"] = "nodegroup"
+                sheet[f"B1"] = "tileid"
+                sheet[f"C1"] = "nodegroup"
                 sheet[f"A{row_number}"] = "--"
-                sheet[f"B2"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                sheet[f"B{row_number}"] = "--"
+                sheet[f"C2"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
                 for i, node in enumerate(nodes):
-                    sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
-                sheet.cell(column=i + 4, row=row_number, value="tileid")
+                    sheet.cell(column=i + 4, row=row_number, value=f"{node['alias']}")
             else:
                 row_number += 1
                 sheet[f"A{row_number}"] = "--"
-                sheet[f"B{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                sheet[f"B{row_number}"] = "--"
+                sheet[f"C{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
                 for i, node in enumerate(nodes):
-                    sheet.cell(column=i + 3, row=row_number, value=f"{node['alias']}")
-                sheet.cell(column=i + 4, row=row_number, value="tileid")
+                    sheet.cell(column=i + 4, row=row_number, value=f"{node['alias']}")
             column_length = len(nodes) if len(nodes) > column_length else column_length
             style_header(row_number, column_length + 3, sheet)
 
@@ -130,11 +131,11 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                     row_number = sheet.max_row + 1
                     tab = "    " * tile["depth"]
                     sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
-                    sheet[f"B{row_number}"] = f'{tab}{tile["alias"]}'
+                    sheet[f"B{row_number}"] = str(tile["tileid"])
+                    sheet[f"C{row_number}"] = f'{tab}{tile["alias"]}'
                     nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("alias")
                     for i, node in enumerate(nodes):
-                        sheet.cell(column=i + 3, row=row_number, value=f"{tile[node['alias']]}")
-                    sheet.cell(column=i + 4, row=row_number, value=str(tile["tileid"]))
+                        sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
 
         write_metadata(wb, metadata)
         return wb
