@@ -9,21 +9,20 @@ import arches.app.tasks as tasks
 def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_graph):
     resource_instances = models.ResourceInstance.objects.filter(graph_publication_id=initial_graph['publication_id'])
 
-    # initial_node_ids_to_nodegroup_ids = {}
-    # for initial_node in initial_graph['nodes']:
-    #     initial_node_ids_to_nodegroup_ids[initial_node['nodeid']] = initial_node['nodegroup_id']
+    initial_nodegroup_ids_to_cardinality = {}
+    for initial_nodegroup in initial_graph['nodegroups']:
+        initial_nodegroup_ids_to_cardinality[initial_nodegroup['nodegroupid']] = initial_nodegroup['cardinality']
 
-    # moved_nodes = {}  # node_id: {'from': nodegroup_id, 'to': nodegroup_id}
+    updated_nodegroup_ids_to_cardinality = {}
+    for updated_nodegroup in updated_graph['nodegroups']:
+        updated_nodegroup_ids_to_cardinality[updated_nodegroup['nodegroupid']] = updated_nodegroup['cardinality']
+
     updated_nodegroup_ids_to_node_ids = {}
     for updated_node in updated_graph['nodes']:
         if not updated_nodegroup_ids_to_node_ids.get(updated_node['nodegroup_id']):
             updated_nodegroup_ids_to_node_ids[updated_node['nodegroup_id']] = []
 
         updated_nodegroup_ids_to_node_ids[updated_node['nodegroup_id']].append(updated_node['nodeid'])
-
-        # initial_nodegroup_id = initial_node_ids_to_nodegroup_ids.get(updated_node['nodeid'])
-        # if initial_nodegroup_id is not None and initial_nodegroup_id != updated_node['nodegroup_id']:
-        #     moved_nodes[updated_node['nodeid']] = {'from': initial_nodegroup_id, 'to': updated_node['nodegroup_id']}
 
     updated_node_ids_to_datatypes = {}
     for updated_node in updated_graph['nodes']:
@@ -36,18 +35,6 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
     updated_node_ids_to_default_values = {}
     for updated_widget in updated_graph['widgets']:
         updated_node_ids_to_default_values[updated_widget['node_id']] = updated_widget['config']['defaultValue']
-
-    # first, explicity move nodes between nodegroups
-    # for resource_instance in resource_instances:
-    #     for key, value in moved_nodes.items():
-    #         from_tile = models.TileModel.objects.get(nodegroup_id=value['from'], resource_instance=resource_instance)
-    #         to_tile = models.TileModel.objects.get(nodegroup_id=value['to'], resource_instance=resource_instance)
-
-    #         to_tile.tiledata[key] = from_tile.tiledata[key]
-    #         del from_tile.tiledata[key]
-
-    #         from_tile.save()
-    #         to_tile.save()
 
     # then, add/remove nodes and change default values
     for tile in models.TileModel.objects.filter(resourceinstance__in=resource_instances):
