@@ -75,12 +75,8 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
 # Set the ELASTIC_PASSWORD environment variable in either the docker-compose.yml or .env file to the password you set for the elastic user,
 # otherwise a random password will be generated.
 
-# An API key can be generated using a POST to http://localhost:9200/_security/api_key with a minimum body of { "name": "<API_NAME>" }
-# ensuring you specify the basic authorization username and password credentials e.g. "elastic", "E1asticSearchforArche5". <API_NAME>
-# can be whatever you like e.g. "Arches API Key".
-
-# The response will return "api_key" and "encoded" - use "encoded" as <API_KEY>, not "api_key" as it has already been base64 encoded.
-# Alternatively, an API key can be generated in Kibaba - go to Management, Stack Management, Security, API keys and create a new API key.
+# API keys can be generated via the Elasticsearch API: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html
+# Or Kibana: https://www.elastic.co/guide/en/kibana/current/api-keys.html
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
