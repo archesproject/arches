@@ -85,7 +85,6 @@ class BranchExcelExporter(BranchCsvImporter):
         download_files = []
         skipped_files = []
         size_limit = 104857600  # 100MByte
-        size_limit = 102400  # 10MByte
         for file in files:
             if file["file"].size >= size_limit:
                 skipped_files.append({
