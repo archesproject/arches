@@ -2,13 +2,19 @@
 {% load i18n %}
 
 {% block tabs %}
-<div tabindex="0" id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
-    toggleTab('filter'); toggleAriaExpanded('toggle-map-filter-panel');
-}, css: {
-    'active': activeTab() === 'filter'
-}, attr: {
-    'aria-label': $root.translations.openMapFilter
-}" aria-controls="side-panel" aria-expanded="false">
+<div tabindex="0" id="toggle-map-filter-panel" class="workbench-card-sidebar-tab" aria-controls="side-panel" 
+    data-bind="onEnterkeyClick, onSpaceClick, 
+        click: function(data, event) { 
+            toggleTab('filter');
+            $root.handleEscKey(event.currentTarget, '#side-panel');
+        }, css: {
+            'active': activeTab() === 'filter'
+        }, attr: {
+            'aria-label': $root.translations.mapFilter,
+            'aria-expanded': (activeTab() === 'filter').toString(),
+        },
+    "
+>
     <i class="fa fa-pencil"></i>
     <span class="map-sidebar-text">
         <span data-bind="text: $root.translations.filter"></span>
@@ -20,7 +26,10 @@
 {% block sidepanel %}
 <!--ko if: activeTab() === 'filter' -->
     <div class="workbench-card-sidepanel-header-container">
-        <p tabindex="0" class="h4 workbench-card-sidepanel-header" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel">
+        <p tabindex="0" class="h4 workbench-card-sidepanel-header" data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function(){ hideSidePanel('#toggle-map-filter-panel'); },
+            attr: {'aria-label': $root.translations.closeMapFilter}
+        ">
             <span data-bind="text: $root.translations.mapSearch"></span>
         </p>
     </div>

@@ -33,6 +33,18 @@ define([
             };
             self.widgetLookup = null;
 
+            this.filter.facets.subscribe(function(facets){
+                if(facets.length === 0){
+                    $('.facets-container .list-filter input').focus();
+                }else{
+                    $('#facet-filter-'+(facets.length-1)).focus();
+                }
+            });
+
+            this.removeFacet = function(facet){
+                self.filter.facets.remove(facet);
+            };
+
             $.ajax({
                 type: "GET",
                 url: arches.urls.api_search_component_data + componentName,
@@ -64,6 +76,7 @@ define([
                             }
                         }).sort((a, b) => a.sortorder - b.sortorder);
                         self.newFacet(card);
+                        $('#facet-filter-'+(self.filter.facets().length-1)).focus();
                     };
                 }, this);
                 var graphs = response.graphs.sort(function(a,b) {
