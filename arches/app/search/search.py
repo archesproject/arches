@@ -41,6 +41,8 @@ class SearchEngine(object):
         self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
         warnings.filterwarnings("ignore", category=ElasticsearchWarning)
+        if "cloud_id" in settings.ELASTICSEARCH_CONNECTION_OPTIONS:
+            serializer.utf_encode = True
 
     def _add_prefix(self, *args, **kwargs):
         if args:
@@ -149,7 +151,8 @@ class SearchEngine(object):
             ret = self.es.search(**kwargs).body
         except RequestError as detail:
             self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
-
+        except Exception as detail:
+            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
         return ret
 
     def create_mapping(self, index, fieldname="", fieldtype="string", fieldindex=None, body=None):

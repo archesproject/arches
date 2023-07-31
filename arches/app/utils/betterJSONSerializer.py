@@ -21,7 +21,7 @@ from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 
 
 class UnableToSerializeError(Exception):
-    """ Error for not implemented classes """
+    """Error for not implemented classes"""
 
     def __init__(self, value):
         self.value = value
@@ -32,7 +32,7 @@ class UnableToSerializeError(Exception):
 
 
 class UnableToSerializeMethodTypesError(Exception):
-    """ Error for not implemented classes """
+    """Error for not implemented classes"""
 
     def __init__(self, value):
         self.value = value
@@ -79,7 +79,9 @@ class JSONSerializer(object):
         options.pop("fields", None)
         options.pop("exclude", None)
         options.pop("force_recalculation", False)
-        return json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
+        result = json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
+
+        return result.encode("utf-8") if hasattr(self, "utf_encode") else result
 
     def handle_object(self, object, **kwargs):
         """Called to handle everything, looks for the correct handling"""
@@ -163,7 +165,7 @@ class JSONSerializer(object):
             try:
                 # print key + ': ' + str(type(value))
                 obj[str(key)] = self.handle_object(value)
-            except (UnableToSerializeMethodTypesError):
+            except UnableToSerializeMethodTypesError:
                 pass
 
         return obj
@@ -268,7 +270,7 @@ class JSONDeserializer(object):
         return ret
 
     def handle_object(self, object, fields=None, exclude=None):
-        """ Called to handle everything, looks for the correct handling """
+        """Called to handle everything, looks for the correct handling"""
         if isinstance(object, dict):
             if "pk" in object and "model" in object and "fields" in object:
                 # assume that this is a serialized django model
