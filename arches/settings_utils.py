@@ -21,16 +21,16 @@ def build_staticfiles_dirs(root_dir, app_root=None, installed_packages=None, add
     if additional_directories:
         for additional_directory in additional_directories:
             directories.append(additional_directory)
+    
+    if app_root:
+        directories.append(os.path.join(app_root, "media", "build"))
+        directories.append(os.path.join(app_root, "media"))
 
     if installed_packages:
         site_package_path = site.getsitepackages()[0]
 
         for package in installed_packages:
             directories.append(os.path.join(site_package_path, package, "media"))  # packages should never have a build directory
-
-    if app_root:
-        directories.append(os.path.join(app_root, "media", "build"))
-        directories.append(os.path.join(app_root, "media"))
 
     directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
@@ -52,19 +52,19 @@ def build_templates_config(root_dir, debug, app_root=None, installed_packages=No
     context_processors -- list of strings representing desired context processors
     """
     directories = []
-
+    
     if additional_directories:
         for additional_directory in additional_directories:
             directories.append(additional_directory)
+
+    if app_root:
+        directories.append(os.path.join(app_root, "templates"))
 
     if installed_packages:
         site_package_path = site.getsitepackages()[0]
 
         for package in installed_packages:
             directories.append(os.path.join(site_package_path, package, "templates"))
-
-    if app_root:
-        directories.append(os.path.join(app_root, "app", "templates"))
 
     directories.append(os.path.join(root_dir, "app", "templates"))
 
