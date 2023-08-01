@@ -101,6 +101,38 @@ def get_localized_value(obj, lang=None, return_lang=False):
         return {found_lang: obj[found_lang]} if return_lang else obj[found_lang]
 
 
+def rank_label(value, *, kind='prefLabel', label_lang, sought_lang=None):
+    """Rank a label (value, label kind, and label language), preferring
+    the sought language over the system language, prefLabels over
+    altLabels, and both of those over anything else.
+    """
+
+    if kind == "prefLabel":
+        rank = 10
+    elif kind == "altLabel":
+        rank = 4
+    else:
+        rank = 1
+
+    label_language_exact = label_lang
+    label_language_fuzzy = label_lang.split("-")[0]
+    user_language_exact = sought_lang or get_language()
+    user_language_fuzzy = user_language_exact.split("-")[0]
+    system_language_exact = settings.LANGUAGE_CODE
+    system_language_fuzzy = settings.LANGUAGE_CODE.split("-")[0]
+
+    if label_language_exact == user_language_exact:
+        rank *= 10
+    elif label_language_fuzzy == user_language_fuzzy:
+        rank *= 5
+    elif label_language_exact == system_language_exact:
+        rank *= 3
+    elif label_language_fuzzy == system_language_fuzzy:
+        rank *= 2
+
+    return rank
+
+
 class ArchesPOFileFetcher:
     """Gets PO files for processing"""
 
