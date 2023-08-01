@@ -93,7 +93,7 @@ class BranchCsvImporter(BaseImportModule):
         return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
-        nodegroup_alias = cell_values[1].strip().split(" ")[0].strip()
+        nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
         tile_valid = True
@@ -150,16 +150,17 @@ class BranchCsvImporter(BaseImportModule):
                 )
                 raise ValueError(_("All rows must have a valid resource id"))
             if str(resourceid).strip() in ("--", "resource_id"):
-                nodegroup_alias = cell_values[1][0:-4].strip().split(" ")[0].strip()
+                nodegroup_alias = cell_values[2][0:-4].strip().split(" ")[0].strip()
                 data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
-            elif cell_values[1] is not None:
+            elif cell_values[2] is not None:
                 node_values = cell_values[2:]
                 try:
                     row_count += 1
-                    nodegroup_alias = cell_values[1].strip().split(" ")[0].strip()
+                    nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
-                    tileid = uuid.uuid4()
+                    tileid = cell_values[1] if cell_values[1] else uuid.uuid4()
+                    print(tileid)
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
                     parenttileid = None if "None" else row_details["parenttile_id"]
                     parenttileid = self.get_parent_tileid(
