@@ -151,9 +151,9 @@ class BranchCsvImporter(BaseImportModule):
                 raise ValueError(_("All rows must have a valid resource id"))
             if str(resourceid).strip() in ("--", "resource_id"):
                 nodegroup_alias = cell_values[2][0:-4].strip().split(" ")[0].strip()
-                data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
+                data_node_lookup[nodegroup_alias] = [val for val in cell_values[3:] if val]
             elif cell_values[2] is not None:
-                node_values = cell_values[2:]
+                node_values = cell_values[3:]
                 try:
                     row_count += 1
                     nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
