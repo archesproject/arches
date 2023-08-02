@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         DELETE FROM load_staging WHERE loadid IN (SELECT loadid FROM load_event WHERE etl_module_id = '357d11c8-ca38-40ec-926f-1946ccfceb92');
         DELETE FROM load_event WHERE etl_module_id = '357d11c8-ca38-40ec-926f-1946ccfceb92';
         DELETE FROM etl_modules WHERE etlmoduleid = '357d11c8-ca38-40ec-926f-1946ccfceb92';
-        """
+    """
 
     operations = [
         migrations.AlterModelOptions(
@@ -62,6 +62,11 @@ class Migration(migrations.Migration):
             name='source',
             field=models.TextField(default=django.utils.timezone.now),
             preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='loadstaging',
+            name='operation',
+            field=models.TextField(blank=True, null=True),
         ),
         migrations.RunSQL(
             add_branch_excel_exporter,
