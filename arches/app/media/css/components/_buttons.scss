@@ -41,6 +41,26 @@
     }
 }
 
+#backToTopBtn {
+	background-color: #404449;
+    color: #fff;
+    cursor: pointer;
+    position: fixed;
+    bottom: 55px;
+    font-size: 20px;
+    right: 20px;
+    border-radius: 2px;
+    opacity: 0;
+    z-index: 1100;
+    -webkit-transition: opacity .3s;
+    transition: opacity .3s;
+	&:hover {
+		opacity: 1!important;
+    	-webkit-transition: opacity .3s!important;
+    	transition: opacity .3s!important;
+	}
+}
+
 .btn-sm, .btn-icon.btn-sm {
     font-size: 1.1rem;
 }

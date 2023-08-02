@@ -6,12 +6,10 @@ define([
     'templates/views/components/map.htm',
     'bindings/mapbox-gl',
     'bindings/sortable',
-    'utils/aria',
-], function($, _, ko, MapViewModel, mapTemplate, ariaUtils) {
+], function($, _, ko, MapViewModel, mapTemplate) {
     ko.components.register('arches-map', {
         viewModel: MapViewModel,
         template: mapTemplate,
-        toggleAriaExpanded: ariaUtils.toggleAriaExpanded,
     });
     return MapViewModel;
 });

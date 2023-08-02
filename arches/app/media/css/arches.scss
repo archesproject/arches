@@ -9384,11 +9384,6 @@ a.clear-geojson-button:hover {
     color: steelblue;
 }
 
-.saved-search-container {
-    padding: 5px;
-    background: #fff;
-}
-
 .saved-search-grid {
     height: calc(100vh - 105px);
     width: 100%;
@@ -9584,6 +9579,8 @@ a.search-query-link-captions:focus {
 .search-candidate-link {
     color: steelblue;
     padding-right: 7px;
+    background: none;
+    border: none;
 }
 
 .search-control-container.slide {
@@ -10426,11 +10423,12 @@ table.table.dataTable {
     position: absolute;
     top: 0;
     right: 0px;
-    z-index: 1100;
+    z-index: 11000;
     background-color: #fff;
     width: 400px;
     height: calc(100vh - 100px);
     border-left: solid 1px #dcdcdc;
+    padding: 20px;
 }
 
 .rr-splash-img-container .fa {
@@ -12437,7 +12435,7 @@ ul.select2-choices:after {
     }
     .related-resources-graph-controls,
     .related-resources-graph-controls-instructions {
-        z-index: 10000;
+        z-index: 1000;
         position: absolute;
         right: $controls-right;
     }

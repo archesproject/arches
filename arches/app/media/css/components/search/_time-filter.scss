@@ -1,3 +1,11 @@
+.time-filter-title {
+    margin-bottom: 8px;
+
+    >span{
+        flex-grow: 1;
+    }
+}
+
 .time-search-container {
     padding: 20px;
     background: #fff;
