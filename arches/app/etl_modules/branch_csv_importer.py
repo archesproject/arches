@@ -13,7 +13,7 @@ from django.db import connection
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node
+from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.index_database import index_resources_by_transaction
@@ -47,7 +47,7 @@ class BranchCsvImporter(BaseImportModule):
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
             rows = cursor.fetchall()
-            node_lookup = {str(row[1]): {"depth": int(row[5])} for row in rows}
+            node_lookup = {str(row[1]): {"depth": int(row[5]), "cardinality": row[7]} for row in rows}
             nodes = Node.objects.filter(graph_id=graphid)
             for node in nodes:
                 nodeid = str(node.nodeid)
@@ -160,7 +160,29 @@ class BranchCsvImporter(BaseImportModule):
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
                     tileid = cell_values[1] if cell_values[1] else uuid.uuid4()
-                    print(tileid)
+                    nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
+
+                    operation = 'append'
+                    if cell_values[1]:
+                        if node_values == [] or node_values.count(None) == len(node_values):
+                            operation = 'delete'
+                        # try:
+                        #     TileModel.objects.get(pk=cell_values[1])
+                        #     operation = 'overwrite'
+                        # except TileModel.DoesNotExist:
+                        #     pass
+                        elif nodegroup_cardinality == 'n':
+                            # let the db handle it if tileid isn't available
+                            operation = 'overwrite'
+                        elif nodegroup_cardinality == '1':
+                            try:
+                                TileModel.objects.get(pk=cell_values[1])
+                                operation = 'overwrite'
+                            except TileModel.DoesNotExist:
+                                # we don't know if there is any tile for the nodegroup yet
+                                # let check_cardinality_violation handle it
+                                pass
+
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
                     parenttileid = None if "None" else row_details["parenttile_id"]
                     parenttileid = self.get_parent_tileid(
@@ -171,7 +193,7 @@ class BranchCsvImporter(BaseImportModule):
                         cell_values, data_node_lookup, node_lookup, row_details, cursor
                     )
                     cursor.execute(
-                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (
                             row_details["nodegroup_id"],
                             legacyid,
@@ -183,6 +205,7 @@ class BranchCsvImporter(BaseImportModule):
                             nodegroup_depth,
                             "worksheet:{0}, row:{1}".format(worksheet.title, row[0].row),  # source_description
                             passes_validation,
+                            operation,
                         ),
                     )
                 except KeyError:
