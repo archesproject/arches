@@ -377,7 +377,18 @@ class GraphDataView(View):
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
-                        graph.save(nodeid=data["nodeid"])
+                        try:
+                            graph.save(nodeid=data["nodeid"])
+                        except RequestError:  # handles changing node datatype
+                            node = models.Node.objects.get(pk=data['nodeid'])
+                            node.delete()
+
+                            del data['is_collector']
+                            del data['parentproperty']
+                            updated_node = models.Node(**data)
+                            updated_node.save()
+
+                            graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
                     ret = JSONSerializer().serializeToPython(graph, force_recalculation=True)
@@ -451,14 +462,6 @@ class GraphDataView(View):
             return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except RequestError as e:
-            return JSONErrorResponse(
-                _("Elasticsearch indexing error"),
-                _(
-                    """If you want to change the datatype of an existing node.
-                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
-                ),
-            )
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
