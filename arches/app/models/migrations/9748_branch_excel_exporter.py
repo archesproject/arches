@@ -46,6 +46,53 @@ class Migration(migrations.Migration):
         DELETE FROM etl_modules WHERE etlmoduleid = '357d11c8-ca38-40ec-926f-1946ccfceb92';
     """
 
+    update_check_cardinality_violation_function = """
+        CREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)
+        AS $$
+            UPDATE load_staging
+                SET error_message = 'excess tile error', passes_validation = false
+                WHERE loadid = load_id
+                AND operation = 'append'
+                AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
+                    SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
+                        FROM tiles t, node_groups ng
+                        WHERE t.nodegroupid = ng.nodegroupid
+                        AND ng.cardinality = '1'
+                    UNION
+                    SELECT ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, '')
+                        FROM load_staging ls, node_groups ng
+                        WHERE ls.nodegroupid = ng.nodegroupid
+                        AND ng.cardinality = '1'
+                        GROUP BY ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, ''), ls.loadid
+                        HAVING count(*) > 1
+                        AND ls.loadid = load_id
+                );
+        $$ LANGUAGE SQL;
+    """
+
+    revert_check_cardinality_violation_function = """
+        CREATE OR REPLACE PROCEDURE public.__arches_check_tile_cardinality_violation_for_load(load_id uuid)
+        AS $$
+            UPDATE load_staging
+                SET error_message = 'excess tile error', passes_validation = false
+                WHERE loadid = load_id
+                AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
+                    SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
+                        FROM tiles t, node_groups ng
+                        WHERE t.nodegroupid = ng.nodegroupid
+                        AND ng.cardinality = '1'
+                    UNION
+                    SELECT ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, '')
+                        FROM load_staging ls, node_groups ng
+                        WHERE ls.nodegroupid = ng.nodegroupid
+                        AND ng.cardinality = '1'
+                        GROUP BY ls.resourceid, ls.nodegroupid, COALESCE(ls.parenttileid::text, ''), ls.loadid
+                        HAVING count(*) > 1
+                        AND ls.loadid = load_id
+                );
+        $$ LANGUAGE SQL;
+    """
+
     operations = [
         migrations.AlterModelOptions(
             name='maplayer',
@@ -71,5 +118,9 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             add_branch_excel_exporter,
             remove_branch_excel_exporter,
+        ),
+        migrations.RunSQL(
+            update_check_cardinality_violation_function,
+            revert_check_cardinality_violation_function,
         ),
     ]
