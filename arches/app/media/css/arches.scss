@@ -2493,6 +2493,10 @@ a.select2-choice {
     color: #9e1515;
 }
 
+.select2-results .select2-no-results {
+    font-size: 1.3rem;
+}
+
 .select2-container-multi .select2-choices .select2-search-choice {
     padding: 3px 10px 5px 18px;
     margin: 4px 0 0px 5px;
@@ -7139,6 +7143,10 @@ div .switch label:hover,
     font-weight: 400;
 }
 
+.file-select-window .h2 {
+    font-size: 2.8rem;
+}
+
 .btn-file-select {
     background: rgb(138, 115, 255);
     color: #fff;
@@ -10053,6 +10061,7 @@ table.table.dataTable {
 
     .panel-title {
         flex: 1;
+        font-size: 1.84rem;
     }
     .service-buttons-heading {
         margin: 0 20px;
@@ -10682,6 +10691,7 @@ a.filter-tools:hover {
 
 .nav-tabs li a.graph-designer-tab {
     padding: 15px 10px 15px 10px;
+    font-size: 1.3rem;
 }
 
 .graph-selector-panel {
