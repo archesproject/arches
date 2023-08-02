@@ -383,11 +383,13 @@ class GraphDataView(View):
                             node = models.Node.objects.get(pk=data['nodeid'])
                             node.delete()
 
+                            # graph.delete_node(node=data.get("nodeid", None))
                             del data['is_collector']
                             del data['parentproperty']
                             updated_node = models.Node(**data)
                             updated_node.save()
 
+                            graph.update_node(data)
                             graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
