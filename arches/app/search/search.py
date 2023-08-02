@@ -151,8 +151,6 @@ class SearchEngine(object):
             ret = self.es.search(**kwargs).body
         except RequestError as detail:
             self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
-        except Exception as detail:
-            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
         return ret
 
     def create_mapping(self, index, fieldname="", fieldtype="string", fieldindex=None, body=None):
