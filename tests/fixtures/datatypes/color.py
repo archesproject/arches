@@ -23,7 +23,7 @@ details = {
 
 class ColorDataType(BaseDataType):
 
-    def validate(self, value, row_number=None, source=None, node=None, strict=False):
+    def validate(self, value, row_number=None, source=None, node=None, strict=False, **kwargs):
         errors = []
         try:
             value.upper()

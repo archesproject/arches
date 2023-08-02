@@ -1,4 +1,5 @@
 {% load i18n %}
+<div class="loading-mask" data-bind="visible: loading"></div>
 
 <!-- card container -->
 <div class="resource-instance-card-component-container">
@@ -27,7 +28,7 @@
                 <span data-bind="text: graphName"></span>
             </div>
             <div class="close-new-step">
-                <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary" data-bind="click: function(){close()}, clickBubble: false">Return</button>
+                <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary" data-bind="click: function(){close()}, clickBubble: false">{% trans "Return" %}</button>
             </div>
         </div>
         <div>

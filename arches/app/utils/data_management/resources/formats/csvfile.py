@@ -45,45 +45,6 @@ class MissingConfigException(Exception):
     def __str__(self):
         return repr(self.value)
 
-
-class ConceptLookup:
-    def __init__(self, create=False):
-        self.lookups = {}
-        self.create = create
-        self.add_domain_values_to_lookups()
-
-    def lookup_label(self, label, collectionid):
-        ret = label
-        collection_values = self.lookups[collectionid]
-        for concept in collection_values:
-            if label == concept[1]:
-                ret = concept[2]
-        return ret
-
-    def lookup_labelid_from_label(self, value, collectionid):
-        ret = []
-        for val in csv.reader([value], delimiter=",", quotechar='"'):
-            for v in val:
-                v = v.strip()
-                try:
-                    ret.append(self.lookup_label(v, collectionid))
-                except:
-                    self.lookups[collectionid] = Concept().get_child_collections(collectionid)
-                    ret.append(self.lookup_label(v, collectionid))
-        output = StringIO()
-        writer = csv.writer(output)
-        writer.writerow(ret)
-        for v in [output.getvalue()]:
-            return v.strip("\r\n")
-
-    def add_domain_values_to_lookups(self):
-        for node in Node.objects.filter(Q(datatype="domain-value") | Q(datatype="domain-value-list")):
-            domain_collection_id = str(node.nodeid)
-            self.lookups[domain_collection_id] = []
-            for val in node.config["options"]:
-                self.lookups[domain_collection_id].append(("0", val["text"], val["id"]))
-
-
 class CsvWriter(Writer):
     def __init__(self, **kwargs):
         super(CsvWriter, self).__init__(**kwargs)
@@ -166,7 +127,12 @@ class CsvWriter(Writer):
                                 concept_export_value_type = None
                                 if k in concept_export_value_lookup:
                                     concept_export_value_type = concept_export_value_lookup[k]
-                                value = self.transform_value_for_export(self.node_datatypes[k], tile.data[k], concept_export_value_type, k,)
+                                value = self.transform_value_for_export(
+                                    self.node_datatypes[k],
+                                    tile.data[k],
+                                    concept_export_value_type,
+                                    k,
+                                )
                                 other_group_record[mapping[k]] = value
                         else:
                             del tile.data[k]
@@ -440,12 +406,9 @@ class CsvReader(Reader):
                     save_count = save_count - 1
 
         else:
-            errors.append(
-                {
-                    "type": "WARNING",
-                    "message": f"No tiles to save; no resource created for legacyid: {legacyid} resourceid: {resourceinstanceid}. Make sure there is data to be imported \
-                    for this resource and it is mapped properly in your mapping file.",
-                }
+            logger.warn(
+                "No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
+                    for this resource and it is mapped properly in your mapping file."
             )
 
         if len(errors) > 0:
@@ -544,23 +507,27 @@ class CsvReader(Reader):
 
         def get_display_nodes(graphid):
             display_nodeids = []
-            functions = FunctionXGraph.objects.filter(function_id="60000000-0000-0000-0000-000000000001", graph_id=graphid)
+            functions = FunctionXGraph.objects.filter(function__functiontype="primarydescriptors", graph_id=graphid)
             for function in functions:
                 f = function.config
                 del f["triggering_nodegroups"]
 
-                for k, v in f.items():
+                for k, v in f["descriptor_types"].items():
                     v["node_ids"] = []
-                    v["string_template"] = v["string_template"].replace("<", "").replace(">", "").split(", ")
+                    v["string_template"] = (
+                        v["string_template"].replace("<", "").replace(">", "").split(", ")
+                        if "string_template" in v
+                        else ""
+                    )
                     if "nodegroup_id" in v and v["nodegroup_id"] != "":
                         nodes = Node.objects.filter(nodegroup_id=v["nodegroup_id"])
                         for node in nodes:
                             if node.name in v["string_template"]:
                                 display_nodeids.append(str(node.nodeid))
 
-                for k, v in f.items():
+                for k, v in f["descriptor_types"].items():
                     if "string_template" in v and v["string_template"] != [""]:
-                        print(
+                        logger.warn(
                             "The {0} {1} in the {2} display function.".format(
                                 ", ".join(v["string_template"]),
                                 "nodes participate" if len(v["string_template"]) > 1 else "node participates",
@@ -568,7 +535,7 @@ class CsvReader(Reader):
                             )
                         )
                     else:
-                        print("No nodes participate in the {0} display function.".format(k))
+                        logger.warn("No nodes participate in the {0} display function.".format(k))
 
             return display_nodeids
 
@@ -779,19 +746,12 @@ class CsvReader(Reader):
                         if collection_id is not None:
                             value = concept_lookup.lookup_labelid_from_label(value, collection_id)
                 try:
-                    value = datatype_instance.transform_value_for_tile(value, tileid=tileid)
-                    errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
-                except Exception as e:
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "datatype: {0} value: {1} {2} - {3}".format(
-                                datatype_instance.datatype_model.classname,
-                                value,
-                                source,
-                                str(e) + " or is not a prefLabel in the given collection.",
-                            ),
-                        }
+                    resourceinstanceid = process_resourceid(business_data[0]["ResourceID"], overwrite)
+                except KeyError:
+                    print("*" * 80)
+                    logger.error(
+                        "No column 'ResourceID' found in business data file. \
+                        Please add a 'ResourceID' column with a unique resource identifier."
                     )
                 if len(errors) > 0:
                     error_types = [error["type"] for error in errors]
@@ -1293,8 +1253,8 @@ class CsvReader(Reader):
                 if len(non_contiguous_resource_ids) > 0:
                     print("*" * 80)
                     for non_contiguous_resource_id in non_contiguous_resource_ids:
-                        print("ResourceID: " + non_contiguous_resource_id)
-                    print(
+                        logger.error("ResourceID: " + non_contiguous_resource_id)
+                    logger.error(
                         "ERROR: The preceding ResourceIDs are non-contiguous in your csv file. \
                         Please sort your csv file by ResourceID and try import again."
                     )
@@ -1302,11 +1262,235 @@ class CsvReader(Reader):
                     if celery_worker_running is False:  # prevents celery chord from breaking on WorkerLostError
                         sys.exit()
 
+                def create_reference_data(new_concepts, create_collections):
+                    errors = []
+                    candidates = Concept().get(id="00000000-0000-0000-0000-000000000006")
+                    for arches_nodeid, concepts in new_concepts.items():
+                        collectionid = str(uuid.uuid4())
+                        topconceptid = str(uuid.uuid4())
+                        node = Node.objects.get(nodeid=arches_nodeid)
+
+                        # if node.datatype is concept or concept-list create concepts and collections
+                        if node.datatype in ["concept", "concept-list"]:
+                            # create collection if create_collections = create, otherwise append to collection already assigned to node
+                            if create_collections == True:
+                                collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
+                                # check to see that there is not already a collection for this node
+                                if node.config["rdmCollection"] is not None:
+                                    logger.warn(
+                                        "A collection already exists for the {node.name} node. \
+                                            Use the add option to add concepts to this collection."
+                                    )
+                                    if len(errors) > 0:
+                                        self.errors += errors
+                                    collection = None
+                                else:
+                                    # if there is no collection assigned to this node, create one and assign it to the node
+                                    try:
+                                        # check to see that a collection with this legacyid does not already exist
+                                        collection = Concept().get(legacyoid=collection_legacyoid)
+                                    except:
+                                        collection = Concept(
+                                            {"id": collectionid, "legacyoid": collection_legacyoid, "nodetype": "Collection"}
+                                        )
+                                        collection.addvalue(
+                                            {
+                                                "id": str(uuid.uuid4()),
+                                                "value": node.name + "_import",
+                                                "language": settings.LANGUAGE_CODE,
+                                                "type": "prefLabel",
+                                            }
+                                        )
+                                        node.config["rdmCollection"] = collectionid
+                                        node.save()
+                                        collection.save()
+                            else:
+                                # if create collection = add check that there is a collection associated with node,
+                                # if no collection associated with node create a collection and associated with the node
+                                try:
+                                    collection = Concept().get(id=node.config["rdmCollection"])
+                                except:
+                                    collection = Concept(
+                                        {
+                                            "id": collectionid,
+                                            "legacyoid": node.name + "_" + str(node.graph_id) + "_import",
+                                            "nodetype": "Collection",
+                                        }
+                                    )
+                                    collection.addvalue(
+                                        {
+                                            "id": str(uuid.uuid4()),
+                                            "value": node.name + "_import",
+                                            "language": settings.LANGUAGE_CODE,
+                                            "type": "prefLabel",
+                                        }
+                                    )
+                                    node.config["rdmCollection"] = collectionid
+                                    node.save()
+                                    collection.save()
+
+                            if collection is not None:
+                                topconcept_legacyoid = node.name + "_" + str(node.graph_id)
+                                # Check if top concept already exists, if not create it and add to candidates scheme
+                                try:
+                                    topconcept = Concept().get(legacyoid=topconcept_legacyoid)
+                                except:
+                                    topconcept = Concept({"id": topconceptid, "legacyoid": topconcept_legacyoid, "nodetype": "Concept"})
+                                    topconcept.addvalue(
+                                        {
+                                            "id": str(uuid.uuid4()),
+                                            "value": node.name + "_import",
+                                            "language": settings.LANGUAGE_CODE,
+                                            "type": "prefLabel",
+                                        }
+                                    )
+                                    topconcept.save()
+                                candidates.add_relation(topconcept, "narrower")
+
+                                # create child concepts and relate to top concept and collection accordingly
+                                for conceptid, value in concepts.items():
+                                    concept_legacyoid = value + "_" + node.name + "_" + str(node.graph_id)
+                                    # check if concept already exists, if not create and add to topconcept and collection
+                                    try:
+                                        conceptid = [
+                                            concept for concept in topconcept.get_child_concepts(topconcept.id) if concept[1] == value
+                                        ][0][0]
+                                        concept = Concept().get(id=conceptid)
+                                    except:
+                                        concept = Concept({"id": conceptid, "legacyoid": concept_legacyoid, "nodetype": "Concept"})
+                                        concept.addvalue(
+                                            {
+                                                "id": str(uuid.uuid4()),
+                                                "value": value,
+                                                "language": settings.LANGUAGE_CODE,
+                                                "type": "prefLabel",
+                                            }
+                                        )
+                                        concept.save()
+                                    collection.add_relation(concept, "member")
+                                    topconcept.add_relation(concept, "narrower")
+
+                        # if node.datatype is domain or domain-list create options array in node.config
+                        elif node.datatype in ["domain-value", "domain-value-list"]:
+                            for domainid, value in new_concepts[arches_nodeid].items():
+                                # check if value already exists in domain
+                                if value not in [t["text"] for t in node.config["options"]]:
+                                    domainvalue = {"text": value, "selected": False, "id": domainid}
+                                    node.config["options"].append(domainvalue)
+                                    node.save()
+
                 if create_concepts == True:
                     create_reference_data(concepts_to_create, create_collections)
-                # if concepts are created on import concept_lookup must be instatiated afterward
-                concept_lookup = ConceptLookup()
 
+                def cache(blank_tile):
+                    if blank_tile.data != {}:
+                        for key in list(blank_tile.data.keys()):
+                            if key not in blanktilecache:
+                                blanktilecache[str(key)] = blank_tile
+                    else:
+                        for tile in blank_tile.tiles:
+                            for key in list(tile.data.keys()):
+                                if key not in blanktilecache:
+                                    blanktilecache[str(key)] = blank_tile
+
+                def column_names_to_targetids(row, mapping, row_number):
+                    errors = []
+                    new_row = []
+                    if "ADDITIONAL" in row or "MISSING" in row:
+                        logger.warn(
+                            "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
+                                row["ResourceID"], str(int(row_number.split("on line ")[1]))
+                            )
+                        )
+                        if len(errors) > 0:
+                            self.errors += errors
+                    for key, value in row.items():
+                        if value != "":
+                            for row in mapping["nodes"]:
+                                if key.upper() == row["file_field_name"].upper():
+                                    new_row.append({row["arches_nodeid"]: value})
+                    return new_row
+
+                def transform_value(datatype, value, source, nodeid):
+                    """
+                    Transforms values from probably string/wkt representation to specified datatype in arches.
+                    This code could probably move to somehwere where it can be accessed by other importers.
+                    """
+                    request = ""
+                    if datatype != "":
+                        errors = []
+                        datatype_instance = datatype_factory.get_instance(datatype)
+                        try:
+                            value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid)
+                            errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
+                        except Exception as e:
+                            logger.warn(
+                                "The following value could not be interpreted as a {0} value: {1}".format(
+                                    datatype_instance.datatype_model.classname, value
+                                )
+                            )
+                        if len(errors) > 0:
+                            error_types = [error["type"] for error in errors]
+                            if "ERROR" in error_types:
+                                value = None
+                            self.errors += errors
+                    else:
+                        logger.error(_("No datatype detected for {0}".format(value)))
+
+                    return {"value": value, "request": request}
+
+                def get_blank_tile(source_data, child_only=False):
+                    if len(source_data) > 0:
+                        if source_data[0] != {}:
+                            key = str(list(source_data[0].keys())[0])
+                            source_node = node_dict[key]
+                            if child_only:
+                                blank_tile = Tile.get_blank_tile_from_nodegroup_id(str(source_node.nodegroup_id))
+                                blank_tile.tiles = []
+                                blank_tile.tileid = None
+                            elif key not in blanktilecache:
+                                blank_tile = Tile.get_blank_tile(key)
+                                cache(blank_tile)
+                            else:
+                                blank_tile = blanktilecache[key]
+                        else:
+                            blank_tile = None
+                    else:
+                        blank_tile = None
+                    # return deepcopy(blank_tile)
+                    return pickle.loads(pickle.dumps(blank_tile, -1))
+
+                def check_required_nodes(tile, parent_tile, required_nodes, all_nodes):
+                    # Check that each required node in a tile is populated.
+                    if settings.BYPASS_REQUIRED_VALUE_TILE_VALIDATION:
+                        return
+                    errors = []
+                    if len(required_nodes) > 0:
+                        if bool(tile.data):
+                            for target_k, target_v in tile.data.items():
+                                if target_k in list(required_nodes.keys()) and target_v is None:
+                                    if parent_tile in populated_tiles:
+                                        populated_tiles.pop(populated_tiles.index(parent_tile))
+                                    errors.append(
+                                        {
+                                            "type": "WARNING",
+                                            "message": "The {0} node is required and must be populated in \
+                                            order to populate the {1} nodes. \
+                                            This data was not imported.".format(
+                                                required_nodes[target_k],
+                                                ", ".join(
+                                                    all_nodes.filter(nodegroup_id=str(target_tile.nodegroup_id)).values_list(
+                                                        "name", flat=True
+                                                    )
+                                                ),
+                                            ),
+                                        }
+                                    )
+                        elif bool(tile.tiles):
+                            for tile in tile.tiles:
+                                check_required_nodes(tile, parent_tile, required_nodes, all_nodes)
+                    if len(errors) > 0:
+                        self.errors += errors
 
                 resources = []
                 missing_display_values = {}
@@ -1386,7 +1570,7 @@ class CsvReader(Reader):
                                 target_resource_model = self.lookup_node(nodeid).graph_id
                             except ObjectDoesNotExist as e:
                                 print("*" * 80)
-                                print(
+                                logger.error(
                                     "ERROR: No resource model found. Please make sure the resource model \
                                     this business data is mapped to has been imported into Arches."
                                 )
@@ -1656,17 +1840,6 @@ class CsvReader(Reader):
 
                 # check for missing display value nodes.
                 errors = []
-                for k, v in missing_display_values.items():
-                    if len(v) > 0:
-                        errors.append(
-                            {
-                                "type": "INFO",
-                                "message": "{0} is null or not mapped on rows {1} and \
-                                participates in a display value function.".format(
-                                    k, ",".join(v)
-                                ),
-                            }
-                        )
                 if len(errors) > 0:
                     self.errors += errors
 

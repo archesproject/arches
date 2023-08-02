@@ -4,28 +4,22 @@
     <div class="tabbed-workflow">
 
         <div class="tabbed-workflow-title-bar">
-            <div
-                style="
-                    display: flex;
-                    flex-direction: row;
-                "
-            >
+            <div class="workflow-name-container">
                 <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'">{% trans "Insert Workflow Name" %}</div>
             </div>
 
-            <div style="
-                display: inline-flex;
-                width: 335px;
-                justify-content: flex-end;"
-                >
+            <div class="workflow-top-control">
                 <!-- ko if: (activeStep()._index === steps().length - 1) || isWorkflowFinished() -->
                 <button 
                     data-bind="click: finishWorkflow"
                     class="btn btn-success"
                 >
                 <i class="fa fa-check"></i>
-                <span>
+                <span class="verbose">
                     {% trans "Save and Complete Workflow" %}
+                </span>
+                <span class="succinct">
+                    {% trans "Complete" %}
                 </span>
                 </button>
                 <!-- /ko -->
@@ -35,7 +29,7 @@
                 >
                     <i class=" ion-android-cancel"></i>
                     <span>
-                        {% trans "Delete Workflow" %}
+                        {% trans "Delete" %}
                     </span>
                 </button>
             </div>
@@ -121,40 +115,17 @@
                 </div>
             <div class="workflow-tab-controls left" data-bind="click: function(){ updatePan('right') }"><i class="fa fa-angle-right"></i></div>
         </div>
-        
+        <div class="workflow-step-title">
+            <h2>
+                <i class="fa fa-list-ol text-center icon-wrap bg-gray ep-graph-title-icon"></i>
+                <span data-bind="text: activeStep().title"></span>
+            </h2>
+        </div>
         <div class="tabbed-workflow-step-container">
             <workflow-step params='step: activeStep()'></workflow-step>
         </div>
 
         <div class="tabbed-workflow-footer">
-            <div style="display: flex;">
-                <div class="step-counter">
-                    <span 
-                        style="padding-right: 2px;"
-                        data-bind="text:activeStep()['_index'] + 1"
-                    ></span>
-                    <span data-bind="text:`/ ${steps().length}`"></span>
-                    
-                </div>
-    
-                <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
-                <div
-                    data-bind="{
-                        component: { 
-                            name: 'views/components/simple-switch', 
-                            params: {
-                                value: activeStep().informationBoxData()['displayed'], 
-                                config:{
-                                    label: '{% trans "Detailed Step Information" %}',
-                                    setvalue: activeStep().toggleInformationBox,
-                                    getvalue: activeStep().informationBoxData()['displayed'],
-                                }
-                            }
-                        }
-                    }"
-                ></div>
-                <!-- /ko -->
-            </div>
 
             <div class="tabbed-workflow-footer-button-container">
                 <!-- ko if: activeStep()._index > 0 -->
@@ -163,15 +134,18 @@
                     data-bind="click: back"
                 >
                     <i class="fa fa-caret-left"></i>
-                    <span>
+                    <span class="verbose">
                         {% trans  "Previous Step" %}
+                    </span>
+                    <span class="succinct">
+                        {% trans  "Previous" %}
                     </span>
                 </button>
                 <!-- /ko -->
                 <!-- ko if: activeStep().hasUnsavedData() -->
-                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') -->
+                    <!-- ko if: !$data.hiddenWorkflowButtons().includes('undo') && !activeStep().saveWithoutProgressing()  -->
                     <button
-                        class="btn btn-danger"
+                        class="btn btn-danger static-save-button"
                         data-bind="{
                             css: {
                                 disabled: !activeStep().hasUnsavedData(),
@@ -186,24 +160,41 @@
                     </button>
                     <!-- /ko -->
                     <!-- ko if: !$data.hiddenWorkflowButtons().includes('save') -->
-                    <button
-                        class="btn btn-success"
-                        data-bind="
-                            click: function() {
-                                $data.saveActiveStep().then(function() {
-                                    $data.next();
-                                });
-                            },
-                        "
-                    >
-                        <i class="ion-android-cloud-done"></i>
-                        <span>
-                            {% trans  "Save and Continue" %}
-                        </span>
-                        <i class="fa fa-caret-right"></i>
-                    </button>
+                        <!-- ko if: activeStep().saveWithoutProgressing() -->
+                            <button
+                                class="btn btn-success"
+                                data-bind="
+                                    click: $data.staticSaveActiveStep
+                                "
+                            >
+                                <i class="ion-android-cloud-done"></i>
+                                <span class="verbose">
+                                        {% trans "Save" %}
+                                </span>
+                                <span class="succinct">
+                                    {% trans  "Save" %}
+                                </span>
+                            </button>
+                        <!-- /ko -->
+                        <!-- ko ifnot: activeStep().saveWithoutProgressing() -->
+                            <button
+                                class="btn btn-success"
+                                data-bind="
+                                    click: $data.saveActiveStep
+                                "
+                            >
+                                <i class="ion-android-cloud-done"></i>
+                                <span class="verbose">
+                                    {% trans  "Save and Continue" %}
+                                </span>
+                                <span class="succinct">
+                                    {% trans  "Next" %}
+                                </span>
+                                <i class="fa fa-caret-right"></i>
+                            </button>
+                        <!-- /ko -->
                     <!-- /ko -->
-                    <!-- ko if: $data.hiddenWorkflowButtons().includes('save') -->
+                    <!-- ko if: $data.hiddenWorkflowButtons().includes('save') || activeStep().saveWithoutProgressing() -->
                         <!-- ko if: activeStep()._index < steps().length - 1 -->
                         <button
                             class="btn btn-primary"
@@ -214,8 +205,11 @@
                                 }
                             "
                         >
-                            <span>
+                            <span class="verbose">
                                 {% trans  "Next Step" %}
+                            </span>
+                            <span class="succinct">
+                                {% trans  "Next" %}
                             </span>
                             <i class="fa fa-caret-right"></i>
                         </button>
@@ -233,14 +227,49 @@
                             }
                         "
                     >
-                        <span>
+                        <span class="verbose">
                             {% trans  "Next Step" %}
+                        </span>
+                        <span class="succinct">
+                            {% trans  "Next" %}
                         </span>
                         <i class="fa fa-caret-right"></i>
                     </button>
                     <!-- /ko -->
                 <!-- /ko -->
             </div>
+
+
+            <div class="step-metadata">
+                <div class="step-counter">
+                    <span 
+                        style="padding-right: 2px;"
+                        data-bind="text:activeStep()['_index'] + 1"
+                    ></span>
+                    <span data-bind="text:`/ ${steps().length}`"></span>
+                    
+                </div>
+    
+                <!--ko if: ko.unwrap(activeStep().informationBoxData) -->
+                <div
+                    data-bind="{
+                        component: { 
+                            name: 'views/components/simple-switch', 
+                            params: {
+                                value: activeStep().informationBoxData()['displayed'], 
+                                config:{
+                                    label: '{% trans "Show Step Information" %}',
+                                    setvalue: activeStep().toggleInformationBox,
+                                    getvalue: activeStep().informationBoxData()['displayed'],
+                                }
+                            }
+                        }
+                    }"
+                ></div>
+                <!-- /ko -->
+            </div>
+
+
 
         </div>
     </div>

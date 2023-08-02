@@ -4,8 +4,7 @@ define([
     'viewmodels/card-component',
     'viewmodels/map-editor',
     'bindings/chosen',
-    'bindings/codemirror',
-    'codemirror/mode/javascript/javascript'
+    'bindings/codemirror'
 ], function(arches, ko, CardComponentViewModel, MapEditorViewModel) {
     var viewModel = function(params) {
         var self = this;

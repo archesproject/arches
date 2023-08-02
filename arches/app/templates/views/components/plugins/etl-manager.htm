@@ -1,0 +1,242 @@
+{% load i18n %}
+
+<!-- ko if: !loading() -->
+<div class="etl-manager-container">
+    <div class="etl-manager-tab-container">
+        <div class="etl-manager-tabs" style="height: 50px;">
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('start')}, css: {active: activeTab() === 'start', 'disabled': false}, text: 'Start'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('details')}, css: {active: activeTab() === 'details', 'disabled': !selectedModule()}, text: 'Task Details'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('import');}, css: {active: activeTab() === 'import', 'disabled': false}, text: 'Task Status'"></div>
+            <div class="etl-manager-tab" data-bind="click: function(){activeTab('export')}, css: {active: activeTab() === 'export', 'disabled': true}, text: 'Templates'"></div>
+        </div>
+    </div>
+    <div data-bind="if: activeTab() === 'start'">
+        <div class="etl-manager-filter-container">
+            <div class="etl-manager-filter-button" data-bind="click: function() { isImport(true); }, css: {active: isImport() }">Import</div>
+            <div class="etl-manager-filter-button" data-bind="click: function() { isImport(false); }, css: {active: !isImport() }">Export</div>
+            <input class="etl-manager-filter-input etl-model-filter" type="text" placeholder = "Filter Modules..." data-bind="textInput: moduleSearchString">
+        </div>
+        <!-- ko ifnot: loading() -->
+        <div class="workflow-select-plugin">
+            <div class="workflow-select-card-container">
+                <!-- ko foreach: {data: etlModules, as: 'etlmodule', noChildContext: true} -->
+                    <!-- ko if: isImport() && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) ) -->
+                    <a href="#" data-bind="if: etlmodule.etl_type === 'import', click: function() { selectModule(etlmodule) }">
+                        <div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
+                            <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
+                            <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
+                                <span><i data-bind="attr:{class: ('fa '+etlmodule.icon +' workflow-select-wf-icon')}"></i></span>
+                            </div>
+                            <p data-bind="text: etlmodule.description" class="workflow-select-desc"></p>
+                        </div>
+                    </a>
+                    <!-- /ko -->
+                    <!-- ko if: !isImport() && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) )-->
+                    <a href="#" data-bind="if: etlmodule.etl_type === 'export', click: function() { selectModule(etlmodule) }">
+                        <div data-bind="style: {'background-color': etlmodule.config.bgColor}" class="workflow-select-card">
+                            <h4 class="workflow-select-title" data-bind="text: etlmodule.name"></h4>
+                            <div data-bind="style: {'background-color': etlmodule.config.circleColor}" class="workflow-select-wf-circle">
+                                <span><i data-bind="attr:{class: ('fa '+etlmodule.icon +' workflow-select-wf-icon')}"></i></span>
+                            </div>
+                            <p data-bind="text: etlmodule.description" class="workflow-select-desc"></p>
+                        </div>
+                    </a>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+    <div style="height:100%" data-bind="if: activeTab() === 'details'">
+        <!-- ko if: selectedModule() -->
+        <div style="width: 100%; height: inherit">
+            <div style="height: inherit;">
+                <div style="height: inherit;" data-bind="component: {
+                    name: selectedModule().componentname,
+                    params: {
+                                alert: alert,
+                                state: 'details',
+                                activeTab: activeTab,
+                                ...selectedModule()
+                            }
+                }"></div>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+    <div data-bind="if: activeTab() === 'import'">
+        <div class="etl-module-status-container">
+            <div class="etl-module-preview-container" style="display: inline-flex; flex-direction: row;">
+                <div class="etl-module-status">
+                    <div class="etl-manager-status-filter-container">
+                        <input class="etl-manager-filter-input" type="text" placeholder="{% trans 'Filter Tasks...' %}" data-bind="textInput: taskSearchString">
+                    </div>
+
+                    <div class="etl-jobs-container" data-bind="foreach: {data: loadEvents, as: 'event'}">
+                        <!-- ko if: !$parent.taskSearchString() || event.etl_module.name.toLowerCase().includes($parent.taskSearchString().toLowerCase()) || $parent.formatUserName(event.user).toLowerCase().includes($parent.taskSearchString().toLowerCase()) -->
+                       
+                        <div class="etl-job" data-bind="css: {'selected': event.loadid == $parent.selectedLoadEvent()?.loadid}">
+                            <div class="etl-job-metadata" data-bind="click: function(){$parent.selectedLoadEvent(event)}" style="padding: 10px 15px; flex-direction: column; justify-content: space-between; cursor: pointer; height: 85px;">
+                                <div>
+                                    <div data-bind="text: event.etl_module.name" style="font-size: 15px; color: rgb(4, 4, 45)"></div>
+                                </div>
+                                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                                    <div>
+                                        <div data-bind="text: $parent.formatUserName(event.user)"></div>
+                                        <div> {% trans "Start: " %} <span data-bind="text: $parent.formatTime(event.load_start_time)"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="etl-job-task-bar">
+                                <div class="task">
+                                    <!-- ko if: event.status == "completed" -->
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, '{% trans "Warning" %}', '{% trans "Are you sure you want to delete this load?" %}')}">{% trans "undo import" %}</a>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "indexed" -->
+                                    <a data-bind="click: function() { $parent.reverseTransactions(event, '{% trans "Warning" %}', '{% trans "Are you sure you want to delete this load?" %}')}">{% trans "undo import" %}</a>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "unloaded" -->
+                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "failed" -->
+                                    <a data-bind="click: function() { $parent.cleanLoadEvent(event.loadid) }">{% trans "remove from history" %}</a>
+                                    <!-- /ko -->
+                                </div>
+                                <div class="status">
+                                    <!-- ko if: event.status == "completed" -->
+                                    <button class="btn btn-warning" style="width:150px;">{% trans "indexing" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "indexed" -->
+                                    <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "failed" -->
+                                    <button class="btn btn-danger" style="width:150px;">{% trans "failed" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "running" -->
+                                    <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "reversing" -->
+                                    <button class="btn btn-warning" style="width:150px;">{% trans "unloading" %}</button>
+                                    <!-- /ko -->
+                                    <!-- ko if: event.status == "unloaded" -->
+                                    <button class="btn btn-success" style="width:150px;">{% trans "unloaded" %}</button>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- /ko -->
+                    </div>
+
+                    <div style="height:50px; background: #f4f4f4; border-top: 1px solid #ddd;">
+                        <div id="paginator" data-bind="with: paginator">
+                            <div class="text-center">
+                                <ul class="pagination" style="margin-top: 8px;">
+                                    <li><a data-bind="css: {'disabled': !has_previous}, click: $parent.newPage.bind($parent, previous_page_number)" href="#">«</a></li>
+                                    <!-- ko foreach: { data: pages, as: 'page' } -->
+                                        <!-- ko if: page -->
+                                        <li class="page" data-bind="click: $parents[1].newPage.bind($parents[1]), css: {'current active': (page == $parent.current_page)}">
+                                            <a href="#" data-bind="text: page, attr:{'data-page':page}"></a>
+                                        </li>
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: page -->
+                                        <li class="disabled"><a href="#">...</a></li>
+                                        <!-- /ko -->
+                                    <!-- /ko -->
+                                    <li><a data-bind="css: {'disabled': !has_next}, click: $parent.newPage.bind($parent, next_page_number)" href="#">»</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="etl-module-preview">
+                    <div class="etl-module-info" data-bind="if: selectedLoadEvent()">
+                        <div class="" data-bind="component: {
+                            name: selectedLoadEvent().etl_module.componentname,
+                            params: {
+                                        state: 'status',
+                                        load_details: selectedLoadEvent().load_details,
+                                        ...selectedModule(),
+                                    },
+                            }">    
+                        </div>
+                        <div class="etl-module-component">
+                            <!-- ko if: validated -->
+                            <h4>{% trans "Validation Errors" %}</h4>
+                            <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th data-bind="text: 'Error'"></th>
+                                        <th data-bind="text: 'Source'"></th>
+                                    </tr>
+                                </thead>
+                                <!-- ko if: selectedLoadEvent().error_message -->
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" data-bind="text: selectedLoadEvent().error_message"></td>
+                                    </tr>
+                                </tbody>
+                                <!-- /ko --> 
+                                <!-- ko if: validationError().length -->
+                                <tbody>
+                                    <!-- ko foreach: validationError -->
+                                    <tr>
+                                        <td data-bind="text: $data[1]"></td>
+                                        <td data-bind="text: $data[0]"></td>
+                                    </tr>
+                                    <!-- /ko -->
+                                </tbody>
+                                <!-- /ko -->
+                                <!-- ko ifnot: validationError().length || selectedLoadEvent().error_message -->
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3">{% trans "No Error Found" %}</td>
+                                    </tr>
+                                </tbody>
+                                <!-- /ko -->            
+                            </table>
+                            <!-- /ko -->
+                        </div>
+                        <div data-bind="if: selectedLoadEvent()">
+                            <h4>{% trans "Loading data" %}</h4>
+                            <div>
+                                <span class="etl-loading-metadata-key">{% trans 'Loading status:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="
+                                    text:
+                                        selectedLoadEvent().status == 'indexed' ? '{% trans "Completed" %}' 
+                                        : selectedLoadEvent().status == 'completed' ? '{% trans "Indexing" %}' 
+                                        : selectedLoadEvent().status == 'failed' ? '{% trans "Failed" %}' 
+                                        : '{% trans "Running" %}'
+                                "></span>  
+                            </div>
+                            <div>
+                                <span class="etl-loading-metadata-key">{% trans 'Loading started:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().load_end_time">
+                                <span class="etl-loading-metadata-key">{% trans 'Loading ended:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().load_end_time">
+                                <span class="etl-loading-metadata-key">{% trans 'Load duration:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().indexed_time">
+                                <span class="etl-loading-metadata-key">{% trans 'Indexing ended:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
+                            </div>
+                            <div data-bind="if: selectedLoadEvent().indexed_time">
+                                <span class="etl-loading-metadata-key">{% trans 'Indexing duration:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div data-bind="if: activeTab() === 'export'">
+         <h1>export</h1>
+    </div>
+</div>
+<!-- /ko -->

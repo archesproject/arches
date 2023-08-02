@@ -1,4 +1,4 @@
-define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko, ConceptSelectViewModel) {
+define(['arches', 'knockout', 'underscore', 'viewmodels/concept-select'], function(arches, ko, _, ConceptSelectViewModel) {
     var name = 'concept-datatype-config';
     ko.components.register(name, {
         viewModel: function(params) {
@@ -44,7 +44,7 @@ define(['arches', 'knockout', 'viewmodels/concept-select'], function (arches, ko
                     var self = this;
                     $.ajax({
                         url: arches.urls.get_concept_collections,
-                        type: 'json'
+                        dataType: 'json'
                     }).done(function(data){
                         arches.conceptCollections = data;
                         self.conceptCollections(data);

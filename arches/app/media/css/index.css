@@ -226,6 +226,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     font-weight: 300;
     color: #fff;
     line-height: 0.7;
+    padding: 0px 20px;
 }
 
 .navbar-brand-v5 {
@@ -419,6 +420,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 .app-info-block.intro-section h2 {
     color: #fff;
     font-size: 55px;
+    padding: 10px 20px;
 }
 
 .app-info-block-header {

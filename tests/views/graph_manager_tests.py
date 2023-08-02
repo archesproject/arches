@@ -169,11 +169,11 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
+        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.save()
 
         graph.root.name = "ROOT NODE"
         graph.root.description = "Test Root Node"
-        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.root.datatype = "semantic"
         graph.root.save()
         graph = Graph.objects.get(graphid=graph.pk)
@@ -339,7 +339,7 @@ class GraphManagerViewTests(ArchesTestCase):
         node_count = len(graph_json["graph"][0]["nodes"])
         self.assertTrue(response._container[0])
         self.assertEqual(node_count, self.NODE_COUNT)
-        self.assertEqual(list(response._headers["content-type"])[1], "json/plain")
+        self.assertEqual(response.headers["content-type"], "json/plain")
 
     def test_graph_import(self):
         """

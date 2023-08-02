@@ -5,19 +5,18 @@ define([
     'knockout',
     'knockout-mapping',
     'uuid',
-    'mapbox-gl-draw',
     'geojson-extent',
     'geojsonhint',
     'togeojson',
     'proj4',
     'views/components/map',
     'views/components/cards/select-feature-layers',
-    'text!templates/views/components/cards/map-popup.htm'
-], function(arches, $, _, ko, koMapping, uuid, MapboxDraw, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory, popupTemplate) {
+], function(arches, $, _, ko, koMapping, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory) {
     var viewModel = function(params) {
         var self = this;
         var padding = 40;
         var drawFeatures;
+        
         var resourceId = params.tile ? params.tile.resourceinstance_id : '';
         if (this.widgets === undefined) { // could be [], so checking specifically for undefined
             this.widgets = params.widgets || [];
@@ -384,72 +383,74 @@ define([
         };
 
         var setupDraw = function(map) {
-            var modes = MapboxDraw.modes;
-            modes.static = {
-                onSetup: function() {
-                    this.setActionableState();
-                    return {};
-                },
-                toDisplayFeatures: function(state, geojson, display) {
-                    display(geojson);
-                }
-            };
-            self.draw = new MapboxDraw({
-                displayControlsDefault: false,
-                modes: modes
-            });
-            map.addControl(self.draw);
-            self.draw.set({
-                type: 'FeatureCollection',
-                features: getDrawFeatures()
-            });
-            map.on('draw.create', function(e) {
-                e.features.forEach(function(feature) {
-                    self.draw.setFeatureProperty(feature.id, 'nodeId', self.newNodeId);
+            require(['mapbox-gl-draw'], (MapboxDraw) => {
+                var modes = MapboxDraw.modes;
+                modes.static = {
+                    onSetup: function() {
+                        this.setActionableState();
+                        return {};
+                    },
+                    toDisplayFeatures: function(state, geojson, display) {
+                        display(geojson);
+                    }
+                };
+                self.draw = new MapboxDraw({
+                    displayControlsDefault: false,
+                    modes: modes
                 });
-                self.updateTiles();
-            });
-            map.on('draw.update', function() {
-                self.updateTiles();
-                if (self.coordinateEditing()) {
-                    var editingFeature = self.draw.getSelected().features[0];
-                    if (editingFeature) updateCoordinatesFromFeature(editingFeature);
-                }
-                if (self.bufferNodeId()) self.updateBufferFeature();
-            });
-            map.on('draw.delete', self.updateTiles);
-            map.on('draw.modechange', function(e) {
-                self.updateTiles();
-                self.setSelectLayersVisibility(false);
-                map.draw_mode = e.mode;
-            });
-            map.on('draw.selectionchange', function(e) {
-                self.selectedFeatureIds(e.features.map(function(feature) {
-                    return feature.id;
-                }));
-                if (e.features.length > 0) {
-                    _.each(self.featureLookup, function(value) {
-                        value.selectedTool(null);
+                map.addControl(self.draw);
+                self.draw.set({
+                    type: 'FeatureCollection',
+                    features: getDrawFeatures()
+                });
+                map.on('draw.create', function(e) {
+                    e.features.forEach(function(feature) {
+                        self.draw.setFeatureProperty(feature.id, 'nodeId', self.newNodeId);
                     });
-                }
-                self.setSelectLayersVisibility(false);
-            });
+                    self.updateTiles();
+                });
+                map.on('draw.update', function() {
+                    self.updateTiles();
+                    if (self.coordinateEditing()) {
+                        var editingFeature = self.draw.getSelected().features[0];
+                        if (editingFeature) updateCoordinatesFromFeature(editingFeature);
+                    }
+                    if (self.bufferNodeId()) self.updateBufferFeature();
+                });
+                map.on('draw.delete', self.updateTiles);
+                map.on('draw.modechange', function(e) {
+                    self.updateTiles();
+                    self.setSelectLayersVisibility(false);
+                    map.draw_mode = e.mode;
+                });
+                map.on('draw.selectionchange', function(e) {
+                    self.selectedFeatureIds(e.features.map(function(feature) {
+                        return feature.id;
+                    }));
+                    if (e.features.length > 0) {
+                        _.each(self.featureLookup, function(value) {
+                            value.selectedTool(null);
+                        });
+                    }
+                    self.setSelectLayersVisibility(false);
+                });
 
-            if (self.form) self.form.on('tile-reset', function() {
-                var style = self.map().getStyle();
-                if (style) {
-                    self.draw.set({
-                        type: 'FeatureCollection',
-                        features: getDrawFeatures()
+                if (self.form) self.form.on('tile-reset', function() {
+                    var style = self.map().getStyle();
+                    if (style) {
+                        self.draw.set({
+                            type: 'FeatureCollection',
+                            features: getDrawFeatures()
+                        });
+                    }
+                    _.each(self.featureLookup, function(value) {
+                        if (value.selectedTool()) value.selectedTool('');
                     });
-                }
-                _.each(self.featureLookup, function(value) {
-                    if (value.selectedTool()) value.selectedTool('');
                 });
+                if (self.draw) {
+                    self.drawAvailable(true);
+                }
             });
-            if (self.draw) {
-                self.drawAvailable(true);
-            }
         };
 
         if (this.provisionalTileViewModel) {
@@ -534,8 +535,6 @@ define([
             if (tool && tool !== 'select_feature') return false;
             return feature.properties.resourceinstanceid || self.isSelectable(feature);
         };
-
-        this.popupTemplate = popupTemplate;
 
         self.isSelectable = function(feature) {
             var selectLayerIds = selectFeatureLayers.map(function(layer) {

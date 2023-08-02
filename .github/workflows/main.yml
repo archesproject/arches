@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgis/postgis:10-2.5
+        image: postgis/postgis:13-3.0
         env:
           POSTGRES_PASSWORD: postgis
           POSTGRES_DB: arches

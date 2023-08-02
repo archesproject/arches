@@ -45,7 +45,12 @@
                         <!-- ko if: tile.parent.selected() && tile.parent.cardinality == 'n' -->
                         <i class="fa fa-copy" data-bind="click: function(){tile.parent.copyTile(tile)}"></i>
                         <!-- /ko -->
-                        <i class="fa fa-pencil" data-bind="click: function(){tile.selected(true)}"></i>
+                        <i 
+                            class="fa fa-pencil" 
+                            data-bind="
+                                click: function(){if ($parent?.form?.workflowId) { $parent.selectWorkflowTile(tile); } else { tile.selected(true); } }
+                            "
+                        ></i>
                         <i class="fa fa-trash" data-bind="click: function(){console.log(tile); tile.deleteTile()}"></i>
                     </div>
                     <!-- /ko -->

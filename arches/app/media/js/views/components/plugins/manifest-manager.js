@@ -36,11 +36,15 @@ define([
                 self.canvas(canvas.images[0].resource.service['@id']);
             };
 
-            IIIFViewerViewmodel.apply(this, [params]);
+            IIIFViewerViewmodel.apply(this, [{...params, renderContext: params?.renderContext ? params.renderContext: 'manifestManager'}]);
             this.showTabs(false);
             this.mainMenu.subscribe(function(val){
                 val || self.showTabs(true);
             });
+
+            if(this.renderContext() == "manifest-workflow"){
+                this.showModeSelector(false)
+            }
             this.isManifestDirty = ko.computed(function() {
                 return ((ko.unwrap(self.manifestName) !== self.origManifestName) ||
                         (ko.unwrap(self.manifestDescription) !== self.origManifestDescription) ||
@@ -68,7 +72,9 @@ define([
             });
 
             this.updateMetadata = function(){
-                this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                if (!!self.metadataLabel() || !!self.metadataValues()) {
+                    this.manifestMetadata.unshift(koMapping.fromJS(this.stagedMetadata()));
+                }
                 self.metadataLabel(null);
                 self.metadataValues(null);
             };
@@ -203,6 +209,7 @@ define([
             };
 
             this.updateManifest = function() {
+                self.updateMetadata();
                 self.formData.append("manifest_title", ko.unwrap(self.manifestName));
                 self.formData.append("manifest_description", ko.unwrap(self.manifestDescription));
                 self.formData.append("manifest_attribution", ko.unwrap(self.manifestAttribution));

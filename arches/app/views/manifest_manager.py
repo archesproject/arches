@@ -81,6 +81,9 @@ class ManifestManagerView(View):
         def create_canvas(image_json, file_url, file_name, image_id):
             canvas_id = f"{self.cantaloupe_uri}/manifest/canvas/{image_id}.json"
             image_id = f"{self.cantaloupe_uri}/manifest/annotation/{image_id}.json"
+            thumbnail_width = 300 if image_json["width"] >= 300 else image_json["width"]
+            thumbnail_height = 300 if image_json["height"] >= 300 else image_json["height"]
+            thumbnail_id = f"{file_url}/full/!{thumbnail_width},{thumbnail_height}/0/default.jpg"
 
             return {
                 "@id": canvas_id,
@@ -110,7 +113,7 @@ class ManifestManagerView(View):
                 "label": f"{file_name}",
                 "license": "TBD",
                 "thumbnail": {
-                    "@id": file_url + "/full/!300,300/0/default.jpg",
+                    "@id": thumbnail_id,
                     "@type": "dctypes:Image",
                     "format": "image/jpeg",
                     "service": {
@@ -192,9 +195,15 @@ class ManifestManagerView(View):
 
         files = request.FILES.getlist("files")
         name = request.POST.get("manifest_title")
+        if name == "null" or name == "undefined":
+            try:
+                name = os.path.splitext(files[0].name)[0]
+            except:
+                pass
+
         attribution = request.POST.get("manifest_attribution", "")
         logo = request.POST.get("manifest_logo", "")
-        desc = request.POST.get("manifest_description")
+        desc = request.POST.get("manifest_description", "")
         operation = request.POST.get("operation")
         manifest_url = request.POST.get("manifest")
         canvas_label = request.POST.get("canvas_label")
@@ -223,7 +232,7 @@ class ManifestManagerView(View):
                 else:
                     logger.warn("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest(canvases=canvases)
+            pres_dict = create_manifest(name=name, canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
 
@@ -267,8 +276,7 @@ class ManifestManagerView(View):
                 logger.warning("You have to select a manifest to add images")
                 return None
 
-        if metadata:
-            change_manifest_metadata(manifest)
+        change_manifest_metadata(manifest)
 
         manifest.save()
         return JSONResponse(manifest)

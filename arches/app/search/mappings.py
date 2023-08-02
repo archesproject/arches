@@ -250,41 +250,10 @@ def delete_search_index():
     se.delete_index(index=RESOURCES_INDEX)
 
 
-def prepare_resource_relations_index(create=False):
-    """
-    Creates the settings and mappings in Elasticsearch to support related resources
-    """
-
-    index_settings = {
-        "mappings": {
-            "_doc": {
-                "properties": {
-                    "resourcexid": {"type": "keyword"},
-                    "notes": {"type": "text"},
-                    "relationshiptype": {"type": "keyword"},
-                    "inverserelationshiptype": {"type": "keyword"},
-                    "resourceinstanceidfrom": {"type": "keyword"},
-                    "resourceinstancefrom_graphid": {"type": "keyword"},
-                    "resourceinstanceidto": {"type": "keyword"},
-                    "resourceinstanceto_graphid": {"type": "keyword"},
-                    "created": {"type": "keyword"},
-                    "modified": {"type": "keyword"},
-                    "datestarted": {"type": "date"},
-                    "dateended": {"type": "date"},
-                    "tileid": {"type": "keyword"},
-                    "nodeid": {"type": "keyword"},
-                }
-            }
-        }
-    }
-
-    if create:
-        se = SearchEngineFactory().create()
-        se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings)
-
-    return index_settings
-
-
+# the RESOURCE_RELATIONS_INDEX is now deprecated
+# leaving this method here so users can still remove it
+# during a reindex operation
+# TODO: remove in Arches v8
 def delete_resource_relations_index():
     se = SearchEngineFactory().create()
     se.delete_index(index=RESOURCE_RELATIONS_INDEX)

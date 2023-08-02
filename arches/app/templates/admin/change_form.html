@@ -1,0 +1,83 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block content %}
+    {{ block.super }}
+
+    {% if not request.session.has_cleared_cache %}
+        <div
+            class='permission-modal'
+            style="
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(221, 217, 217, 0.5);
+            "
+        >
+            <div
+                style="
+                    margin: 10% auto;
+                    background-color: #fefefe;
+                    border: 1px solid #888;
+                    width: 70vw;
+                    height: 40vh;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                "
+            >
+                <div
+                    style="
+                        width: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    "
+                >
+                    <h2 style="text-align: center;">
+                        {% trans "Attention:" %}
+                    </h2>
+                    <div style="display: flex; justify-content: center;">
+                        <p
+                            style=" text-align: center; width: 600px;"
+                        >
+                            {% trans "The user permission cache must be cleared before making any changes to Users, Groups, or Models. This may temporarily slow performance for some users. To continue, please clear the cache by clicking the button below." %}
+                        </p>
+                    </div>
+                </div>
+
+                <p style="text-align: center; margin-top: 20px;">{% csrf_token %}<button style="cursor: pointer;" onclick="clearUserPermissionCache(this)">Clear User Permission cache</button></p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function clearUserPermissionCache(self) {
+                var request = new XMLHttpRequest();
+
+                request.onreadystatechange = function() {
+                    if (request.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                        if (request.status == 200) {
+                            var modal = document.querySelector('.permission-modal');
+                            modal.style.display = "none";
+                        }
+                        else {
+                            alert('An error occured when attempting to clear the User Permission Cache.');
+                        }
+                    }
+                };
+
+                request.open("POST", "{% url 'clear_user_permission_cache' %}", true);
+
+                var csrftoken=self.parentElement.firstChild.value;
+                request.setRequestHeader("X-CSRFToken", csrftoken );
+
+                request.send();
+            }
+        </script>
+    {% endif %}
+
+{% endblock content %}

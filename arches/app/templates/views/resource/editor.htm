@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "views/resource/resource-base.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% block graph_header_title %}
@@ -156,7 +156,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                     <!-- Image -->
                     <div class="img-lg img-circle rr-splash-img-container">
-                        <img class="rr-splash-img" src="{% static "/img/inspection.png" %}" alt="Resource Editor">
+                        <img class="rr-splash-img" src="{% static "img/inspection.png" %}" alt="Resource Editor">
                     </div>
 
                     <!-- Splash Title -->
@@ -307,6 +307,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 relationship_types: {{ relationship_types }},
                 datatypes: {{datatypes_json}},
                 appliedFunctions: {{applied_functions}},
+                primaryDescriptorFunction: {{ primary_descriptor_function }},
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),

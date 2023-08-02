@@ -1,6 +1,11 @@
 import importlib
 
 
+def get_module(path, modulename=""):
+    module = importlib.machinery.SourceFileLoader(modulename, path).load_module()
+    return module
+
+
 def get_class_from_modulename(modulename, classname, directory_list):
     mod_path = modulename.replace(".py", "")
     module = None

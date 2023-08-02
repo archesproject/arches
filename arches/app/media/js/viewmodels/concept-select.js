@@ -18,7 +18,7 @@ define([
         WidgetViewModel.apply(this, [params]);
 
         this.valueList = ko.computed(function() {
-            var valueList = self.value();
+            var valueList = self.value() || self.defaultValue();
             self.displayName();
             
             if (!self.multiple && valueList) {

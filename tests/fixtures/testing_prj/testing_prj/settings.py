@@ -38,7 +38,8 @@ ELASTICSEARCH_PREFIX = "testing_prj"
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
 #     'module': 'testing_prj.search_indexes.sample_index.SampleIndex',
-#     'name': 'my_new_custom_index' <-- follow ES index naming rules
+#     'name': 'my_new_custom_index', <-- follow ES index naming rules
+#     'should_update_asynchronously': False  <-- denotes if asynchronously updating the index would affect custom functionality within the project.
 # }]
 
 LOAD_DEFAULT_ONTOLOGY = False

@@ -112,6 +112,8 @@ class GraphSettingsView(GraphBaseView):
         node.ontologyclass = data.get("ontology_class") if data.get("graph").get("ontology_id") is not None else None
         node.name = graph.name
         graph.root.name = node.name
+        if node.ontologyclass:
+            graph.root.ontologyclass = node.ontologyclass
 
         if graph.isresource is False and "root" in data["graph"]:
             node.config = data["graph"]["root"]["config"]
@@ -171,7 +173,16 @@ class GraphDesignerView(GraphBaseView):
         datatypes = models.DDataType.objects.all()
         datatypes_json = JSONSerializer().serialize(datatypes, exclude=["modulename", "isgeometric"])
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
+
+        primary_descriptor_functions = models.FunctionXGraph.objects.filter(
+            graph=self.graph
+        ).filter(function__functiontype="primarydescriptors")
+        primary_descriptor_function = JSONSerializer().serialize(
+            primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
+        )
+
         applied_functions = JSONSerializer().serialize(models.FunctionXGraph.objects.filter(graph=self.graph))
+
         cards = self.graph.cardmodel_set.order_by("sortorder").prefetch_related("cardxnodexwidget_set")
         constraints = []
         for card in cards:
@@ -219,6 +230,7 @@ class GraphDesignerView(GraphBaseView):
             map_markers=map_markers,
             map_sources=map_sources,
             applied_functions=applied_functions,
+            primary_descriptor_function=primary_descriptor_function,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
             restricted_nodegroups=[str(nodegroup) for nodegroup in restricted_nodegroups],
@@ -397,7 +409,7 @@ class GraphDataView(View):
             return JSONErrorResponse(
                 _("Elasticsearch indexing error"),
                 _(
-                    """If you want to change the datatype of an existing node.  
+                    """If you want to change the datatype of an existing node.
                     Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
                 ),
             )

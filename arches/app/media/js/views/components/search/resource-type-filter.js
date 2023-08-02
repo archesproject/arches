@@ -1,16 +1,31 @@
 define([
     'knockout',
+    'arches',
     'views/components/search/base-filter'
-], function(ko, BaseFilter) {
+], function(ko, arches, BaseFilter) {
     var componentName = 'resource-type-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
-            initialize: function(options) {
+            initialize: async function(options) {
                 options.name = 'Resource Type Filter';
                 this.requiredFilters = ['term-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
-                
+                this.resourceModels = ko.observableArray();
                 this.filter = ko.observableArray();
+                const self = this;
+
+                const response = await fetch(arches.urls.api_search_component_data + componentName);
+                if (response.ok) {
+                    const data = await response.json();
+                    data.resources.forEach(function(res) {
+                        if (res.isactive === true) {
+                            self.resourceModels.push(res);
+                        }
+                    });
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log('Failed to fetch resource instance list');
+                }
 
                 var filterUpdated = ko.computed(function() {
                     return JSON.stringify(ko.toJS(this.filter()));
@@ -64,8 +79,8 @@ define([
                 }, this);
                 if(!!item){
                     var inverted = ko.observable(false);
-                    this.getFilter('term-filter').addTag(item.name(), this.name, inverted);
-                    this.filter([{graphid:item.graphid, name: item.name(), inverted: inverted}]);
+                    this.getFilter('term-filter').addTag(item.name, this.name, inverted);
+                    this.filter([{graphid:item.graphid, name: item.name, inverted: inverted}]);
                 }else{
                     this.clear();
                 }

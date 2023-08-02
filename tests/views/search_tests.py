@@ -38,7 +38,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from guardian.shortcuts import assign_perm
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
-from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX
+from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/search_tests.py --pattern="*.py" --settings="tests.test_settings"
@@ -49,7 +49,7 @@ class SearchTests(ArchesTestCase):
     def setUpClass(cls):
         se = SearchEngineFactory().create()
         q = Query(se=se)
-        for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCE_RELATIONS_INDEX, RESOURCES_INDEX]:
+        for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
             q.delete(index=indexname, refresh=True)
 
         cls.client = Client()
