@@ -42,7 +42,7 @@ class ArchesUserCreationForm(UserCreationForm):
                 self.fields["captcha"] = ReCaptchaField(attrs)
             except Exception as e:
                 logger = logging.getLogger(__name__)
-                logger.warn(e)
+                logger.warning(e)
 
     first_name = forms.CharField()
     last_name = forms.CharField()

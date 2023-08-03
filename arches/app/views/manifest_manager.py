@@ -216,7 +216,7 @@ class ManifestManagerView(View):
                     canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                     canvases.append(canvas)
                 else:
-                    logger.warn("filetype unacceptable: " + f.name)
+                    logger.warning("filetype unacceptable: " + f.name)
 
             pres_dict = create_manifest(name=name, canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
@@ -257,7 +257,7 @@ class ManifestManagerView(View):
                         canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                         canvases.append(canvas)
                     else:
-                        logger.warn("filetype unacceptable: " + f.name)
+                        logger.warning("filetype unacceptable: " + f.name)
                 add_canvases(manifest, canvases)
             except:
                 logger.warning("You have to select a manifest to add images")
@@ -273,7 +273,7 @@ class ManifestManagerView(View):
             resp = requests.get(url)
             return resp.json()
         except:
-            logger.warn("Manifest not created. Check if Cantaloupe running")
+            logger.warning("Manifest not created. Check if Cantaloupe running")
             return None
 
     def on_import(self, tile):

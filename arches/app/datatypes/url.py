@@ -41,7 +41,7 @@ default_url_widget = None
 try:
     default_url_widget = Widget.objects.get(name=default_widget_name)
 except Widget.DoesNotExist as e:
-    logger.warn("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
+    logger.warning("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
 
 details = {
     "datatype": "url",

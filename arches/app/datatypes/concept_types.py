@@ -184,7 +184,7 @@ class ConceptDataType(BaseConceptDataType):
                 try:
                     value = self.lookup_labelid_from_label(value, kwargs)
                 except:
-                    logger.warn(_("Unable to convert {0} to concept label".format(value)))
+                    logger.warning(_("Unable to convert {0} to concept label".format(value)))
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -328,7 +328,7 @@ class ConceptListDataType(BaseConceptDataType):
                             ret.append(self.lookup_labelid_from_label(v, kwargs))
                         except:
                             ret.append(v)
-                            logger.warn(_("Unable to convert {0} to concept label".format(v)))
+                            logger.warning(_("Unable to convert {0} to concept label".format(v)))
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):

@@ -43,7 +43,7 @@ class BaseImportModule(object):
         except Exception as e:
             response["data"] = e
             logger.error(e)
-        logger.warn(response)
+        logger.warning(response)
         return response
 
     def save_to_tiles(self, loadid, finalize_import=True, multiprocessing=True):
