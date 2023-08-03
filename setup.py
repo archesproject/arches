@@ -34,6 +34,7 @@ setup(
     scripts=["arches/install/arches-project"],
     cmdclass={"install": post_install},
     install_requires=requirements,
+    python_requires=">=3.8",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -46,9 +47,9 @@ setup(
         "Intended Audience :: Information Technology",
         "Topic :: Software Development :: Build Tools",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Framework :: Django :: 4.0",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
