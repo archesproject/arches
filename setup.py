@@ -50,7 +50,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
-        "Framework :: Django :: 4.0",
+        "Framework :: Django :: 4.1",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
     # What does your project relate to?
