@@ -37,12 +37,8 @@ class Migration(migrations.Migration):
                 print("Updated {} rows".format(counter))
                 modified_rows = []
                 
-
         if len(modified_rows) > 0:
             ResourceXResource.objects.using(db_alias).bulk_update(modified_rows, ["resourceinstanceto_graphid","resourceinstancefrom_graphid"])
-            counter += len(modified_rows)
-        
-        print("finished updating {} rows".format(counter))
 
     operations = [
         migrations.AddField(
