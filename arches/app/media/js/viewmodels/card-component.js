@@ -148,6 +148,17 @@ define([
             params.dirty(true);
         };
 
+        // ctrl+S saves any edited/dirty tiles in resource view 
+        document.addEventListener("keydown", e => {
+            if (e.ctrlKey && e.key === "s") {
+                e.preventDefault();
+                if (self.tile && self.tile.dirty() == true) {
+                    self.saveTile();
+                };
+
+            }
+        })
+
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
