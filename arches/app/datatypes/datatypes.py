@@ -1676,6 +1676,7 @@ class FileListDataType(BaseDataType):
                         filename = fs.save(os.path.join("uploadedfiles", os.path.basename(f.name)), File(f))
                         current_file.path = os.path.join(filename)
                         current_file.save()
+                        tile_file["size"] = current_file.path.size
                 except FileNotFoundError:
                     logger.exception(_("File does not exist"))
 
