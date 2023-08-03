@@ -29,8 +29,6 @@ class Migration(migrations.Migration):
             except:
                 pass
             
-            #row.save()
-
             modified_rows.append(row)
 
             if len(modified_rows) == batch_size:
