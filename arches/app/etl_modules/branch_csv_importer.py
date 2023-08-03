@@ -159,7 +159,7 @@ class BranchCsvImporter(BaseImportModule):
                     nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
-                    user_tileid = cell_values[1].strip()
+                    user_tileid = cell_values[1].strip() if cell_values[1] else None
                     tileid = user_tileid if user_tileid else uuid.uuid4()
                     nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
 
