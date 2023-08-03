@@ -109,7 +109,7 @@ class Migration(migrations.Migration):
                             tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                         END LOOP;
 
-                        IF op = 'overwrite' OR source = 'bulk_edit' THEN -- if bulk-editor is updated 'bulk_edit' check can be removed
+                        IF op = 'overwrite' THEN
                             SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id;
                             IF NOT FOUND THEN -- this only happens if cardinlaity == 'n' and the tile isn't in the system when importing
                                 old_data = null;
@@ -129,6 +129,7 @@ class Migration(migrations.Migration):
                                 VALUES (tile_id, tile_data, nodegroup_id, parent_id, instance_id);
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
                                 VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
+                        END IF;
                     END IF;
                 END LOOP;
                 FOR staged_value, tile_id IN
@@ -320,6 +321,120 @@ class Migration(migrations.Migration):
         $$ LANGUAGE SQL;
     """
 
+    update_staging_for_edit_function = """
+        CREATE OR REPLACE FUNCTION __arches_stage_string_data_for_bulk_edit(
+            load_id uuid,
+            graph_id uuid,
+            node_id uuid,
+            module_id uuid,
+            resourceinstance_ids uuid[],
+            text_replacing text,
+            language_code text,
+            case_insensitive boolean
+        )
+        RETURNS VOID
+        LANGUAGE 'plpgsql'
+        AS $$
+            DECLARE
+                tile_id uuid;
+                tile_data jsonb;
+                nodegroup_id uuid;
+                parenttile_id uuid;
+                resourceinstance_id uuid;
+                text_replacing_like text;
+            BEGIN
+                IF text_replacing IS NOT NULL THEN
+                    text_replacing_like = FORMAT('%%%s%%', text_replacing);
+                END IF;
+                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', 'overwrite', true
+                    FROM tiles t, nodes n
+                    WHERE t.nodegroupid = n.nodegroupid
+                    AND CASE
+                        WHEN graph_id IS NULL THEN true
+                        ELSE n.graphid = graph_id
+                        END
+                    AND CASE
+                        WHEN node_id IS NULL THEN n.datatype = 'string'
+                        ELSE n.nodeid = node_id
+                        END
+                    AND CASE
+                        WHEN resourceinstance_ids IS NULL THEN true
+                        ELSE t.resourceinstanceid = ANY(resourceinstance_ids)
+                        END
+                    AND CASE
+                        WHEN text_replacing IS NULL
+                            THEN true
+                        WHEN language_code IS NOT NULL AND case_insensitive
+                            THEN t.tiledata -> nodeid::text -> language_code ->> 'value' ilike text_replacing_like
+                        WHEN language_code IS NOT NULL AND NOT case_insensitive
+                            THEN t.tiledata -> nodeid::text -> language_code ->> 'value' like text_replacing_like
+                        WHEN language_code IS NULL AND case_insensitive
+                            THEN t.tiledata::text ilike text_replacing_like
+                        WHEN language_code IS NULL AND NOT case_insensitive
+                            THEN t.tiledata::text like text_replacing_like
+                        END;
+            END;
+        $$;
+    """
+
+    revert_staging_for_edit_function = """
+        CREATE OR REPLACE FUNCTION __arches_stage_string_data_for_bulk_edit(
+            load_id uuid,
+            graph_id uuid,
+            node_id uuid,
+            module_id uuid,
+            resourceinstance_ids uuid[],
+            text_replacing text,
+            language_code text,
+            case_insensitive boolean
+        )
+        RETURNS VOID
+        LANGUAGE 'plpgsql'
+        AS $$
+            DECLARE
+                tile_id uuid;
+                tile_data jsonb;
+                nodegroup_id uuid;
+                parenttile_id uuid;
+                resourceinstance_id uuid;
+                text_replacing_like text;
+            BEGIN
+                IF text_replacing IS NOT NULL THEN
+                    text_replacing_like = FORMAT('%%%s%%', text_replacing);
+                END IF;
+                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, passes_validation)
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', true
+                    FROM tiles t, nodes n
+                    WHERE t.nodegroupid = n.nodegroupid
+                    AND CASE
+                        WHEN graph_id IS NULL THEN true
+                        ELSE n.graphid = graph_id
+                        END
+                    AND CASE
+                        WHEN node_id IS NULL THEN n.datatype = 'string'
+                        ELSE n.nodeid = node_id
+                        END
+                    AND CASE
+                        WHEN resourceinstance_ids IS NULL THEN true
+                        ELSE t.resourceinstanceid = ANY(resourceinstance_ids)
+                        END
+                    AND CASE
+                        WHEN text_replacing IS NULL
+                            THEN true
+                        WHEN language_code IS NOT NULL AND case_insensitive
+                            THEN t.tiledata -> nodeid::text -> language_code ->> 'value' ilike text_replacing_like
+                        WHEN language_code IS NOT NULL AND NOT case_insensitive
+                            THEN t.tiledata -> nodeid::text -> language_code ->> 'value' like text_replacing_like
+                        WHEN language_code IS NULL AND case_insensitive
+                            THEN t.tiledata::text ilike text_replacing_like
+                        WHEN language_code IS NULL AND NOT case_insensitive
+                            THEN t.tiledata::text like text_replacing_like
+                        END;
+            END;
+        $$;
+    """
+
     operations = [
         migrations.AlterModelOptions(
             name='maplayer',
@@ -353,5 +468,9 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             update_check_cardinality_violation_function,
             revert_check_cardinality_violation_function,
+        ),
+        migrations.RunSQL(
+            update_staging_for_edit_function,
+            revert_staging_for_edit_function,
         ),
     ]
