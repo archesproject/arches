@@ -168,7 +168,7 @@ class BranchCsvImporter(BaseImportModule):
                         if nodegroup_cardinality == "n":                            
                             operation = "overwrite" # db will "append" if tileid does not exist
                         elif nodegroup_cardinality == "1":
-                            if TileModel.objects.exists(pk=cell_values[1]):
+                            if TileModel.objects.filter(pk=cell_values[1]).exists():
                                 operation = "overwrite"
 
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
