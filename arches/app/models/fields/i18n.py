@@ -215,6 +215,11 @@ class I18n_TextField(JSONField):
 
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
 
+    def get_db_prep_save(self, value, connection):
+        """Override to avoid the optimization from Django 4.2 that
+        immediately returns `value` if it is None."""
+        return self.get_db_prep_value(value, connection)
+
 
 class I18n_JSON(NothingNode):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
@@ -400,3 +405,8 @@ class I18n_JSONField(JSONField):
         """
 
         return I18n_JSON(value, attname=self.attname)
+
+    def get_db_prep_save(self, value, connection):
+        """Override to avoid the optimization from Django 4.2 that
+        immediately returns `value` if it is None."""
+        return self.get_db_prep_value(value, connection)
