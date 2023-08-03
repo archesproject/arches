@@ -159,29 +159,17 @@ class BranchCsvImporter(BaseImportModule):
                     nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
-                    tileid = cell_values[1] if cell_values[1] else uuid.uuid4()
+                    user_tileid = cell_values[1].strip()
+                    tileid = user_tileid if user_tileid else uuid.uuid4()
                     nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
 
-                    operation = 'append'
-                    if cell_values[1]:
-                        if node_values == [] or node_values.count(None) == len(node_values):
-                            operation = 'delete'
-                        # try:
-                        #     TileModel.objects.get(pk=cell_values[1])
-                        #     operation = 'overwrite'
-                        # except TileModel.DoesNotExist:
-                        #     pass
-                        elif nodegroup_cardinality == 'n':
-                            # let the db handle it if tileid isn't available
-                            operation = 'overwrite'
-                        elif nodegroup_cardinality == '1':
-                            try:
-                                TileModel.objects.get(pk=cell_values[1])
-                                operation = 'overwrite'
-                            except TileModel.DoesNotExist:
-                                # we don't know if there is any tile for the nodegroup yet
-                                # let check_cardinality_violation handle it
-                                pass
+                    operation = "append"
+                    if user_tileid:
+                        if nodegroup_cardinality == "n":                            
+                            operation = "overwrite" # db will "append" if tileid does not exist
+                        elif nodegroup_cardinality == "1":
+                            if TileModel.objects.exists(pk=cell_values[1]):
+                                operation = "overwrite"
 
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
                     parenttileid = None if "None" else row_details["parenttile_id"]

@@ -129,22 +129,6 @@ class Migration(migrations.Migration):
                                 VALUES (tile_id, tile_data, nodegroup_id, parent_id, instance_id);
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
                                 VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
-                        ELSIF op = 'delete' THEN
-                            FOR tile_id_tree IN 
-                                WITH RECURSIVE tile_tree(tileid, parenttileid) AS (
-                                    SELECT t.tileid, t.parenttileid FROM tiles t WHERE tileid = tile_id
-                                        UNION
-                                    SELECT t.tileid, t.parenttileid FROM tile_tree tt, tiles t WHERE t.parenttileid = tt.tileid
-                                )
-                                SEARCH BREADTH FIRST BY tileid SET ordercol
-                                SELECT tileid FROM tile_tree ORDER BY ordercol DESC
-                            LOOP
-                                SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id_tree;
-                                DELETE FROM tiles WHERE tileid = tile_id_tree;
-                                INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
-                                VALUES (graph_id, instance_id, nodegroup_id, tile_id_tree, 'tile delete', null, old_data, now(), 'deleted from bulk data manager', load_id);
-                            END LOOP;
-                        END IF;
                     END IF;
                 END LOOP;
                 FOR staged_value, tile_id IN
