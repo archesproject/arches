@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                                         UNION
                                     SELECT t.tileid, t.parenttileid FROM tile_tree tt, tiles t WHERE t.parenttileid = tt.tileid
                                 )
-                                SEARCH DEPTH FIRST BY tileid SET ordercol
+                                SEARCH BREADTH FIRST BY tileid SET ordercol
                                 SELECT tileid FROM tile_tree ORDER BY ordercol DESC
                             LOOP
                                 SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id_tree;
