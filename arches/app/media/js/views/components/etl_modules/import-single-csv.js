@@ -52,6 +52,8 @@ define([
         this.validated = params.validated || ko.observable();
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
+        this.formatTime = params.formatTime
+        this.timeDifference = params.timeDifference
 
         this.createTableConfig = function(col) {
             return {

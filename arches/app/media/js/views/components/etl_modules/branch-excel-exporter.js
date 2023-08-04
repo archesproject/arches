@@ -19,6 +19,8 @@ define([
             this.state = params.state;
             this.loading = params.loading || ko.observable();
             this.moduleId = params.etlmoduleid;
+            this.formatTime = params.formatTime
+            this.timeDifference = params.timeDifference
             this.loadId = params.loadId || uuid.generate();
             this.formData = new window.FormData();
             this.searchUrl = ko.observable();
