@@ -109,14 +109,13 @@ class Migration(migrations.Migration):
                             tile_data = jsonb_set(tile_data, format('{"%s"}', _key)::text[], coalesce(tile_data_value, 'null'));
                         END LOOP;
 
-                        IF op = 'overwrite' THEN
+                        IF op = 'update' THEN
                             SELECT tiledata FROM tiles INTO old_data WHERE resourceinstanceid = instance_id AND tileid = tile_id;
-                            IF NOT FOUND THEN -- this only happens if cardinlaity == 'n' and the tile isn't in the system when importing
-                                old_data = null;
+                            IF NOT FOUND THEN
                                 INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
                                     VALUES (tile_id, tile_data, nodegroup_id, parent_id, instance_id);
-                                INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
-                                    VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
+                                INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, timestamp, note, transactionid)
+                                    VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, now(), 'loaded from staging_table', load_id);
                             ELSE
                                 UPDATE tiles
                                     SET tiledata = tile_data
@@ -124,11 +123,11 @@ class Migration(migrations.Migration):
                                 INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
                                     VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile edit', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
                             END IF;
-                        ELSIF op = 'append' THEN
+                        ELSIF op = 'insert' THEN
                             INSERT INTO tiles(tileid, tiledata, nodegroupid, parenttileid, resourceinstanceid)
                                 VALUES (tile_id, tile_data, nodegroup_id, parent_id, instance_id);
-                            INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, oldvalue, timestamp, note, transactionid)
-                                VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, old_data, now(), 'loaded from staging_table', load_id);
+                            INSERT INTO edit_log (resourceclassid, resourceinstanceid, nodegroupid, tileinstanceid, edittype, newvalue, timestamp, note, transactionid)
+                                VALUES (graph_id, instance_id, nodegroup_id, tile_id, 'tile create', tile_data::jsonb, now(), 'loaded from staging_table', load_id);
                         END IF;
                     END IF;
                 END LOOP;
@@ -280,7 +279,7 @@ class Migration(migrations.Migration):
             UPDATE load_staging
                 SET error_message = 'excess tile error', passes_validation = false
                 WHERE loadid = load_id
-                AND operation = 'append'
+                AND operation = 'insert'
                 AND (resourceid, nodegroupid, COALESCE(parenttileid::text, '')) IN (
                     SELECT t.resourceinstanceid, t.nodegroupid, COALESCE(t.parenttileid::text, '')
                         FROM tiles t, node_groups ng
@@ -455,7 +454,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='loadstaging',
             name='operation',
-            field=models.TextField(blank=True, null=True),
+            field=models.TextField(blank=True, default='insert', null=True),
         ),
         migrations.RunSQL(
             add_branch_excel_exporter,

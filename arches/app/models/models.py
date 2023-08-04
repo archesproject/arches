@@ -1712,7 +1712,7 @@ class LoadStaging(models.Model):
     nodegroup_depth = models.IntegerField(default=1)
     source_description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
-    operation = models.TextField(blank=True, null=True)
+    operation = models.TextField(default="insert", blank=True, null=True)
 
     class Meta:
         managed = True
