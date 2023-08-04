@@ -454,7 +454,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='loadstaging',
             name='operation',
-            field=models.TextField(blank=True, default='insert', null=True),
+            field=models.TextField(default='insert'),
         ),
         migrations.RunSQL(
             add_branch_excel_exporter,
