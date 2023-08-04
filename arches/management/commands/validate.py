@@ -86,6 +86,9 @@ class Command(BaseCommand):
                             self.stdout.write("\t\t(truncated...)")
                             break
 
+        if not count:
+            return
+
         if self.options["fix_all"] or errno in self.options["fix"]:
             if fix_action:
                 self.stdout.write("\tFixing ...")
