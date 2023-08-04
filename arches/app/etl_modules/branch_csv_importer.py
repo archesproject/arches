@@ -163,13 +163,13 @@ class BranchCsvImporter(BaseImportModule):
                     tileid = user_tileid if user_tileid else uuid.uuid4()
                     nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
 
-                    operation = "append"
+                    operation = "insert"
                     if user_tileid:
                         if nodegroup_cardinality == "n":                            
-                            operation = "overwrite" # db will "append" if tileid does not exist
+                            operation = "update" # db will "insert" if tileid does not exist
                         elif nodegroup_cardinality == "1":
                             if TileModel.objects.filter(pk=cell_values[1]).exists():
-                                operation = "overwrite"
+                                operation = "update"
 
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
                     parenttileid = None if "None" else row_details["parenttile_id"]
