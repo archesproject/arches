@@ -283,8 +283,22 @@ define([
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
             viewModel.updatedCardinalityData = ko.observable();
 
+
+            // listener to allow for ctrl+S to run save on dirty nodes 
+            document.addEventListener("keydown", e => {
+                if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    console.log("HEREEEEEEEEEE")
+                    if (viewModel.isNodeDirty()) {
+                        console.log("IS NODE DIRTY")}
+                    //viewModel.saveSelectedNode()}
+                }
+            })
+
+
             viewModel.saveNode = function(node) {
                 if (node) {
+                    console.log("NODE SAVED")
                     viewModel.loading(true);
                     node.save(function(data) {
                         if (data.responseJSON.success === false || data.status === 500) {

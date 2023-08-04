@@ -153,6 +153,8 @@ define([
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
                 if (self.tile && self.tile.dirty() == true) {
+                    console.log(self.tile)
+                    console.log(self.tile.dirty)
                     self.saveTile();
                 };
 
