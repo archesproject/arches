@@ -1066,7 +1066,7 @@ class Graph(models.GraphModel):
         """
 
         found = False
-        if graphToAppend.publication:
+        if nodeToAppendTo.graph.publication:
             raise GraphValidationError(
                 _("Please unpublish your graph before adding a branch."),
                 1012,
