@@ -16,6 +16,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from datetime import datetime
+
+from arches import __version__
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from django.core.management.base import BaseCommand
@@ -43,8 +46,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.options = options
         if self.options["verbosity"] > 0:
-            print("Error\tDescription")
-            print()
+            self.stdout.write()
+            self.stdout.write("Arches integrity report")
+            self.stdout.write(f"Prepared by Arches {__version__} on {datetime.today()}")
+            self.stdout.write()
+            self.stdout.write("\t".join(["", "Error", "Rows", "Description"]))
+            self.stdout.write()
         
         # add checks here in numerical order
         self.check_integrity(
@@ -65,26 +72,24 @@ class Command(BaseCommand):
 
     def check_integrity(self, *, errno, name, queryset, fix_action):
         count = len(queryset)
+        result = self.style.ERROR("FAIL") if count else self.style.SUCCESS("PASS")
 
         if self.options["verbosity"] > 0:
-            print(f"{errno}\t{name}:\t{count}")
+            self.stdout.write("\t".join([result, str(errno), str(count), name]))
             if self.options["verbosity"] > 1:
-                print("\t" + "-" * 36)
+                self.stdout.write("\t" + "-" * 36)
                 if queryset:
                     for i, n in enumerate(queryset):
                         if i < self.options["limit"]:
-                            print(f"\t{n.pk}")
+                            self.stdout.write(f"\t{n.pk}")
                         else:
-                            print("\t\t(truncated...)")
+                            self.stdout.write("\t\t(truncated...)")
                             break
-                else:
-                    print("\tPASS")
 
         if self.options["fix_all"] or errno in self.options["fix"]:
-            print("\tFixing ...")
+            if fix_action:
+                self.stdout.write("\tFixing ...")
             if fix_action == DELETE_QUERYSET:
                 with transaction.atomic():
                     queryset.delete()
-                print(f"\tDELETED.")
-        elif self.options["verbosity"] > 0:
-            print()  # trailing empty line
+                self.stdout.write(f"\tDELETED.")
