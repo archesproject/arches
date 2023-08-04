@@ -48,6 +48,13 @@ class Command(BaseCommand):
         
         # add checks here in numerical order
         self.check_integrity(
+            errno=IntegrityCheck.NODE_HAS_ONTOLOGY_GRAPH_DOES_NOT.value,  # 1005
+            name="Nodes with ontologies found in graphs without ontologies",
+            queryset=models.Node.objects.only("ontologyclass", "graph").filter(
+                ontologyclass__isnull=False).filter(graph__ontology=None),
+            fix_action=None,
+        )
+        self.check_integrity(
             errno=IntegrityCheck.NODELESS_NODE_GROUP.value,  # 1012
             name="Nodeless node groups",
             queryset=models.NodeGroup.objects.filter(
