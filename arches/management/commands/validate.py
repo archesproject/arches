@@ -40,8 +40,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--fix-all", action="store_true", dest="fix_all", default=False,
                             help="Apply all fix actions.")
-        parser.add_argument("--fix", action="extend", nargs="+", type=int, default=[])
-        parser.add_argument("--limit", action="store", type=int, default=500)
+        parser.add_argument("--fix", action="extend", nargs="+", type=int, default=[],
+                            help="List the error codes to fix, e.g. --fix 1001 1002 ...")
+        parser.add_argument("--limit", action="store", type=int, default=500,
+                            help="Maximum number of rows to print; does not affect fix actions")
 
     def handle(self, *args, **options):
         self.options = options
