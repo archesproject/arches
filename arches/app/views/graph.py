@@ -377,7 +377,7 @@ class GraphDataView(View):
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
-                            graph.save(nodeid=data["nodeid"])
+                        graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
                     ret = JSONSerializer().serializeToPython(graph, force_recalculation=True)

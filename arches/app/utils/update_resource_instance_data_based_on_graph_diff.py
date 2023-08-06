@@ -13,27 +13,12 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
     for initial_nodegroup in initial_graph['nodegroups']:
         initial_nodegroup_ids_to_cardinality[initial_nodegroup['nodegroupid']] = initial_nodegroup['cardinality']
 
-    updated_nodegroup_ids_to_cardinality = {}
-    for updated_nodegroup in updated_graph['nodegroups']:
-        updated_nodegroup_ids_to_cardinality[updated_nodegroup['nodegroupid']] = updated_nodegroup['cardinality']
-
-    initial_node_ids_to_datatypes = {}
-    for initial_node in initial_graph['nodes']:
-        initial_node_ids_to_datatypes[initial_node['nodeid']] = initial_node['datatypes']
-
-    updated_node_ids_to_dataypes = {}
     updated_nodegroup_ids_to_node_ids = {}
     for updated_node in updated_graph['nodes']:
-        updated_node_ids_to_dataypes[updated_node['nodeid']] = updated_node['datatypes']
-
         if not updated_nodegroup_ids_to_node_ids.get(updated_node['nodegroup_id']):
             updated_nodegroup_ids_to_node_ids[updated_node['nodegroup_id']] = []
 
         updated_nodegroup_ids_to_node_ids[updated_node['nodegroup_id']].append(updated_node['nodeid'])
-
-    updated_node_ids_to_datatypes = {}
-    for updated_node in updated_graph['nodes']:
-        updated_node_ids_to_datatypes[updated_node['nodeid']] = updated_node['datatype']
 
     initial_node_ids_to_default_values = {}
     for initial_widget in initial_graph['widgets']:
@@ -43,7 +28,14 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
     for updated_widget in updated_graph['widgets']:
         updated_node_ids_to_default_values[updated_widget['node_id']] = updated_widget['config']['defaultValue']
 
-    # then, add/remove nodes and change default values
+    # delete extra tiles on nodegroup cardinality change
+    for updated_nodegroup in updated_graph['nodegroups']:
+        if updated_nodegroup['cardinality'] == '1' and initial_nodegroup_ids_to_cardinality.get(updated_nodegroup['nodegroupid']) == 'n':
+            for tile in models.TileModel.objects.filter(nodegroup_id=updated_nodegroup['nodegroupid']):
+                if tile.sortorder != 0:
+                    tile.delete()
+
+    # add/remove nodes and change default values
     for tile in models.TileModel.objects.filter(resourceinstance__in=resource_instances):
         updated_node_ids = updated_nodegroup_ids_to_node_ids[str(tile.nodegroup_id)]
         
@@ -57,7 +49,6 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
         for node_id in updated_node_ids:
             if (
                 node_id not in tile.data.keys()  # node added to tile
-                or initial_node_ids_to_datatypes[node_id] != updated_node_ids_to_datatypes[node_id]  # datatype change
                 or tile.data[node_id] == initial_node_ids_to_default_values.get(node_id)  # default value change
             ):
                 tile.data[node_id] = updated_node_ids_to_default_values.get(node_id)
