@@ -7,11 +7,22 @@ import arches.app.tasks as tasks
 
 
 def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_graph):
-    resource_instances = models.ResourceInstance.objects.filter(graph_publication_id=initial_graph['publication_id'])
-
+    # delete extra tiles on nodegroup cardinality change
     initial_nodegroup_ids_to_cardinality = {}
     for initial_nodegroup in initial_graph['nodegroups']:
         initial_nodegroup_ids_to_cardinality[initial_nodegroup['nodegroupid']] = initial_nodegroup['cardinality']
+
+    nodegroups_with_extra_tiles = []
+    for updated_nodegroup in updated_graph['nodegroups']:
+        if updated_nodegroup['cardinality'] == '1' and initial_nodegroup_ids_to_cardinality.get(updated_nodegroup['nodegroupid']) == 'n':
+            nodegroups_with_extra_tiles.append(updated_nodegroup['nodegroupid'])
+
+    for tile in models.TileModel.objects.exclude(sortorder=0).filter(nodegroup_id__in=nodegroups_with_extra_tiles):
+        tile.delete()
+
+
+    # add/remove nodes and change default values
+    resource_instances = models.ResourceInstance.objects.filter(graph_publication_id=initial_graph['publication_id'])
 
     updated_nodegroup_ids_to_node_ids = {}
     for updated_node in updated_graph['nodes']:
@@ -28,14 +39,6 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
     for updated_widget in updated_graph['widgets']:
         updated_node_ids_to_default_values[updated_widget['node_id']] = updated_widget['config']['defaultValue']
 
-    # delete extra tiles on nodegroup cardinality change
-    for updated_nodegroup in updated_graph['nodegroups']:
-        if updated_nodegroup['cardinality'] == '1' and initial_nodegroup_ids_to_cardinality.get(updated_nodegroup['nodegroupid']) == 'n':
-            for tile in models.TileModel.objects.filter(nodegroup_id=updated_nodegroup['nodegroupid']):
-                if tile.sortorder != 0:
-                    tile.delete()
-
-    # add/remove nodes and change default values
     for tile in models.TileModel.objects.filter(resourceinstance__in=resource_instances):
         updated_node_ids = updated_nodegroup_ids_to_node_ids[str(tile.nodegroup_id)]
         
@@ -55,7 +58,7 @@ def update_resource_instance_data_based_on_graph_diff(initial_graph, updated_gra
                     
         tile.save()
 
-
+    # update resource_instance publication_id
     for resource_instance in resource_instances:
         resource_instance.graph_publication_id = updated_graph['publication_id']
         resource_instance.save()
