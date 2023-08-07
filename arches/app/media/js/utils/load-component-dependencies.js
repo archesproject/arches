@@ -18,20 +18,20 @@ define([], function() {
                             require(`${INSTALLED_PACKAGES_DIRECTORY}/${installedPackage}/media/js/${componentPath}`);
                         }
                         catch(e) { // handles egg files, cannot access them programatically hence manual access
-                            // try {
+                            try {
                                 require(`${EGG_FILE_PATH_0}/${installedPackage}/media/js/${componentPath}`);
-                            // }
-                            // catch {  // handles egg files, cannot access them programatically hence manual access
-                            //     try {
-                            //         require(`${EGG_FILE_PATH_1}/${installedPackage}/media/js/${componentPath}`);
-                            //     }
-                            //     catch { // handles egg files, cannot access them programatically hence manual access
-                            //         try {
-                            //             require(`${EGG_FILE_PATH_2}/${installedPackage}/media/js/${componentPath}`);
-                            //         }
-                            //         catch {}
-                            //     }
-                            // }
+                            }
+                            catch {  // handles egg files, cannot access them programatically hence manual access
+                                try {
+                                    require(`${EGG_FILE_PATH_1}/${installedPackage}/media/js/${componentPath}`);
+                                }
+                                catch { // handles egg files, cannot access them programatically hence manual access
+                                    try {
+                                        require(`${EGG_FILE_PATH_2}/${installedPackage}/media/js/${componentPath}`);
+                                    }
+                                    catch {}
+                                }
+                            }
                         }
                     }
                 }
