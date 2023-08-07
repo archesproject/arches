@@ -2,14 +2,15 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
-<div class="search-container saved-search-container relative" style="overflow-y: scroll;">
+<div class="saved-search-container relative" style="overflow-y: scroll;">
 
-    <div class="close-popup-panel-container" style="margin: 10px;" tabindex="0" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: function(){selectedPopup('');},
-        attr: {'aria-label': $root.translations.closeSavedSearches},
+    <div class="close-popup-panel-container" tabindex="0" role="button" id="saved-searches-close-btn"
+        data-bind="onEnterkeyClick, onSpaceClick, click: function(){selectedPopup(''); $root.shiftFocus('#saved-searches-open-btn');},
+            attr: {'aria-label': $root.translations.closeSavedSearches},
     ">
         <span class="close-popup-panel" data-bind="text: $root.translations.savedSearches"></span>
     </div>
-    <hr class="title-underline" style="margin: 3px 5px;">
+    <hr class="title-underline">
 
     <!-- ko if: items().length === 0 -->
         <div id="rr-splash" class="rr-splash">

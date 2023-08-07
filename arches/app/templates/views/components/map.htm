@@ -3,39 +3,42 @@
 <div class="workbench-card-wrapper">
     <div class="workbench-card-sidebar">
         {% block tabs %}
-        <div class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel" 
+        <div id="toggle-basemap-panel-button" class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel" 
             data-bind="onEnterkeyClick, onSpaceClick, click: function() {
                 toggleTab('basemap');
+                $root.handleEscKey(event.currentTarget, '#side-panel');
             }, css: {
                 'active': activeTab() === 'basemap'
             }, attr: {
-                'aria-label': $root.translations.openBasemapFilter, 
+                'aria-label': $root.translations.basemapFilter, 
                 'aria-expanded': (activeTab() === 'basemap').toString(), 
             },
         ">
             <i class="fa fa-globe"></i>
             <span data-bind="text: $root.translations.basemap" class="map-sidebar-text"></span>
         </div>
-        <div class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel" 
+        <div id="toggle-overlays-panel-button" class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel" 
             data-bind="onEnterkeyClick, onSpaceClick, click: function() {
                 toggleTab('overlays');
+                $root.handleEscKey(event.currentTarget, '#side-panel');
             }, css: {
                 'active': activeTab() === 'overlays'
             }, attr: {
-                'aria-label': $root.translations.openOverlaysFilter, 
+                'aria-label': $root.translations.overlaysFilter, 
                 'aria-expanded': (activeTab() === 'overlays').toString(), 
             },
         ">
             <i class="fa fa-list"></i>
             <span data-bind="text: $root.translations.overlays" class="map-sidebar-text"></span>
         </div>
-        <div class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel" 
+        <div id="toggle-legend-panel-button" class="workbench-card-sidebar-tab" tabindex="0" role="button" aria-controls="side-panel" 
             data-bind="onEnterkeyClick, onSpaceClick, click: function() {
                 toggleTab('legend');
+                $root.handleEscKey(event.currentTarget, '#side-panel');
             }, css: {
                 'active': activeTab() === 'legend'
             }, attr: {
-                'aria-label': $root.translations.openLegendFilter,
+                'aria-label': $root.translations.legendFilter,
                 'aria-expanded': (activeTab() === 'legend').toString(), 
             },
         ">
@@ -45,14 +48,16 @@
         {% endblock tabs %}
     </div>
     <!--ko if: activeTab() -->
-        <div id="side-panel" class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
+        <div id="side-panel" tabindex="-1" class="workbench-card-sidepanel" data-bind="css:{'expanded': expandSidePanel()}">
             {% block sidepanel %}
             <!--ko if: activeTab() === 'basemap' -->
                 <div class="workbench-card-sidepanel-header-container">
                     <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
-                        data-bind="click: hideSidePanel, onEnterkeyClick, onSpaceClick,
-                        attr: {'aria-label': $root.translations.hideBasemaps}
-                    ">
+                        data-bind="onEnterkeyClick, onSpaceClick, 
+                            click: function(){hideSidePanel('#toggle-basemap-panel-button')},
+                            attr: {'aria-label': $root.translations.hideBasemaps}
+                        "
+                    >
                         <span data-bind="text: $root.translations.basemaps" ></span>
                     </p>
                 </div>
@@ -78,9 +83,11 @@
             <!--ko if: activeTab() === 'overlays' -->
                 <div class="workbench-card-sidepanel-header-container">
                     <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
-                        data-bind="click: hideSidePanel, onEnterkeyClick, onSpaceClick,
+                        data-bind="onEnterkeyClick, onSpaceClick, 
+                            click: function(){hideSidePanel('#toggle-overlays-panel-button')},
                             attr: {'aria-label': $root.translations.hideOverlays}
-                    ">
+                        "
+                    >
                         <span data-bind="text: $root.translations.overlays" ></span>
                     </p>
                 </div>
@@ -122,9 +129,11 @@
             <!--ko if: activeTab() === 'legend' -->
                 <div class="workbench-card-sidepanel-header-container">
                     <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
-                        data-bind="click: hideSidePanel, onEnterkeyClick, onSpaceClick,
-                        attr: {'aria-label': $root.translations.hideLegend}
-                    ">
+                        data-bind="onEnterkeyClick, onSpaceClick, 
+                            click: function(){hideSidePanel('#toggle-legend-panel-button')},
+                            attr: {'aria-label': $root.translations.hideLegend}
+                        "
+                    >
                         <span data-bind="text: $root.translations.legend" ></span>
                     </p>
                 </div>
