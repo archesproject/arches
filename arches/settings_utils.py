@@ -46,7 +46,6 @@ def build_staticfiles_dirs(root_dir, app_root=None, installed_packages=None, add
                     original_path = original_path.strip()
                     directories.append(os.path.join(original_path, package, 'media'))
 
-
     directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
 
