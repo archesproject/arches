@@ -101,10 +101,10 @@ def get_localized_value(obj, lang=None, return_lang=False):
         return {found_lang: obj[found_lang]} if return_lang else obj[found_lang]
 
 
-def rank_label(value, *, kind='prefLabel', label_lang, sought_lang=None):
-    """Rank a label (value, label kind, and label language), preferring
-    the sought language over the system language, prefLabels over
-    altLabels, and both of those over anything else.
+def rank_label(kind='prefLabel', value_lang="", sought_lang=""):
+    """Rank a label language, preferring prefLabel over altLabel,
+    the sought language over the system language, and both of those
+    languages over other languages.
     """
 
     if kind == "prefLabel":
@@ -114,8 +114,8 @@ def rank_label(value, *, kind='prefLabel', label_lang, sought_lang=None):
     else:
         rank = 1
 
-    label_language_exact = label_lang
-    label_language_fuzzy = label_lang.split("-")[0]
+    label_language_exact = value_lang
+    label_language_fuzzy = value_lang.split("-")[0]
     user_language_exact = sought_lang or get_language()
     user_language_fuzzy = user_language_exact.split("-")[0]
     system_language_exact = settings.LANGUAGE_CODE
