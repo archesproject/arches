@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 const fetch = require('cross-fetch');
+const fs = require('fs');
 const Path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -29,15 +30,43 @@ module.exports = () => {
             const PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS']
             const WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT']
 
+            // BEGIN build config to handle eggfiles
+            let eggFilePaths;
+
+            try {
+                eggFilePaths = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
+                    const installedPackageEggFile = installedPackage.replaceAll('_', '-').concat('.egg-link'); 
+
+                    let updatedFilepath = fs.readFileSync(
+                        Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackageEggFile), { encoding: 'utf8' }
+                    )
+                    updatedFilepath = updatedFilepath.replace(/(\r\n|\n|\r)/gm, "");  // remove newlines
+                    updatedFilepath = updatedFilepath.replace(/\./g, "");  // remove dots
+
+                    return {
+                        ...acc,
+                        [installedPackage]: updatedFilepath,
+                    }
+                }, {});
+            }
+            catch{}
+
+            // END build config to handle eggfiles
+
             // BEGIN create entry point configurations
         
             const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'), {});
             const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'), {});
 
-            const installedPackagesEntrypointConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {                
+            const installedPackagesEntrypointConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
+                let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'media', 'js');
+
+                if (eggFilePaths && installedPackage in eggFilePaths) {
+                    filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'media', 'js');
+                }
                 return {
                     ...acc,
-                    ...buildJavascriptFilepathLookup(Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'media', 'js'), {})
+                    ...buildJavascriptFilepathLookup(filepath, {})
                 };
             }, {});
 
@@ -94,9 +123,13 @@ module.exports = () => {
             let parsedInstalledPackagesNodeModulesAliases = {};
             for (const installedPackage of INSTALLED_PACKAGES) {
                 try {
-                    const { INSTALLED_PACKAGE_NODE_MODULES_ALIASES } = require(
-                        Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'webpack', 'webpack-node-modules-aliases.js')
-                    );
+                    let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'webpack', 'webpack-node-modules-aliases.js')
+
+                    if (eggFilePaths && installedPackage in eggFilePaths) {
+                        filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'webpack', 'webpack-node-modules-aliases.js');
+                    }
+
+                    const { INSTALLED_PACKAGE_NODE_MODULES_ALIASES } = require(filepath);
                     
                     for (const [alias, executeableString] of Object.entries(JSON.parse(INSTALLED_PACKAGE_NODE_MODULES_ALIASES))) {
                         if (
@@ -118,7 +151,7 @@ module.exports = () => {
                     continue;
                 }
             }
-            
+
             // order is important! Arches core files are overwritten by project files, project files are overwritten by installedPackage files
             const nodeModulesAliases = {
                 ...parsedArchesCoreNodeModulesAliases,
@@ -132,10 +165,16 @@ module.exports = () => {
             const coreArchesTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'templates'), {});
             const projectTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'templates'), {});
 
-            const installedPackagesTemplatePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {                
+            const installedPackagesTemplatePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
+                let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'templates');
+
+                if (eggFilePaths && installedPackage in eggFilePaths) {
+                    filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'templates');
+                }
+
                 return {
                     ...acc,
-                    ...buildTemplateFilePathLookup(Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'templates'), {})
+                    ...buildTemplateFilePathLookup(filepath, {})
                 };
             }, {});
 
@@ -152,10 +191,16 @@ module.exports = () => {
             const coreArchesImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'img'), {});
             const projectImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, APP_ROOT, 'media', 'img'), {});
 
-            const installedPackagesImagePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {                
+            const installedPackagesImagePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
+                let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'media', 'img');
+
+                if (eggFilePaths && installedPackage in eggFilePaths) {
+                    filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'media', 'img');
+                }
+
                 return {
                     ...acc,
-                    ...buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'media', 'img'), {})
+                    ...buildImageFilePathLookup(STATIC_URL, filepath, {})
                 };
             }, {});
 
@@ -167,6 +212,19 @@ module.exports = () => {
             };
 
             // END create image filepath lookup
+            // BEGIN create universal constants
+            const universalConstants = {
+                APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g ,'/'),
+                ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g ,'/'),
+                INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES),
+                INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH).replace(/\\/g ,'/'),
+            }
+            let eggFileCount = 0;
+            for (const [key, value] of Object.entries(eggFilePaths)) {
+                universalConstants[`EGG_FILE_PATH_${eggFileCount}`] = JSON.stringify(value).replace(/\\/g ,'/');
+                eggFileCount += 1;
+            }
+            // END create universal constants
             
             resolve({
                 entry: { 
@@ -185,12 +243,7 @@ module.exports = () => {
                 },
                 plugins: [
                     new CleanWebpackPlugin(),
-                    new webpack.DefinePlugin({
-                        APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g ,'/'),
-                        ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g ,'/'),
-                        INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES),
-                        INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH).replace(/\\/g ,'/')
-                    }),
+                    new webpack.DefinePlugin(universalConstants),
                     new webpack.ProvidePlugin({
                         $:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
                         jQuery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
@@ -258,15 +311,24 @@ module.exports = () => {
                                     const resourcePath = loaderContext['resourcePath'];
 
                                     let templatePath;
-                                    if (resourcePath.includes(INSTALLED_PACKAGES_PATH)) {  // installed package component
+
+                                    if (eggFilePaths) {  // handles egg files
+                                        for (const eggFilePath of Object.keys(eggFilePaths)) {
+                                            if (resourcePath.includes(eggFilePath)) {
+                                                templatePath = resourcePath.split(eggFilePath)[2];
+                                            }
+                                        }
+                                    }
+
+                                    if (!templatePath && resourcePath.includes(INSTALLED_PACKAGES_PATH)) {  // installed package component
                                         const packagePath = resourcePath.split(INSTALLED_PACKAGES_PATH)[1];  // first split off installed packages path
                                         const [_emptyValueBeforeFirstSlash, _packageName, ...subPath] = packagePath.split('/') // then split off package name
                                         templatePath = '/' + subPath.join('/');
                                     }
-                                    else if (resourcePath.includes(APP_ROOT)) {  // project-level component
+                                    else if (!templatePath && resourcePath.includes(APP_ROOT)) {  // project-level component
                                         templatePath = resourcePath.split(APP_ROOT)[1];
                                     }
-                                    else {  // arches core component
+                                    else if (!templatePath) {  // arches core component
                                         templatePath = resourcePath.split(Path.join(ROOT_DIR, 'app'))[1];
                                     }
 
