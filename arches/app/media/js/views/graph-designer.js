@@ -290,15 +290,15 @@ define([
                     e.preventDefault();
                     console.log("HEREEEEEEEEEE")
                     if (viewModel.isNodeDirty()) {
-                        console.log("IS NODE DIRTY")}
-                    //viewModel.saveSelectedNode()}
+                        console.log("IS NODE DIRTY")
+                        viewModel.saveSelectedNode()
+                    }
                 }
             })
 
 
             viewModel.saveNode = function(node) {
                 if (node) {
-                    console.log("NODE SAVED")
                     viewModel.loading(true);
                     node.save(function(data) {
                         if (data.responseJSON.success === false || data.status === 500) {
@@ -503,6 +503,7 @@ define([
                         });
                     }
                 }
+                //console.log(res)
                 return res;
 
             };
