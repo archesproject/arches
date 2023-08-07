@@ -622,9 +622,10 @@ class CsvReader(Reader):
                                     for concept_value in concept:
                                         concepts_to_create[node["arches_nodeid"]][str(uuid.uuid4())] = concept_value
                                 # if collection in concepts to create then add child concept to collection
-                                elif row[node["file_field_name"]] not in list(concepts_to_create[node["arches_nodeid"]].values()):
+                                else:
                                     for concept_value in concept:
-                                        concepts_to_create[node["arches_nodeid"]][str(uuid.uuid4())] = concept_value
+                                        if concept_value not in list(concepts_to_create[node["arches_nodeid"]].values()):
+                                            concepts_to_create[node["arches_nodeid"]][str(uuid.uuid4())] = concept_value
 
                 if len(non_contiguous_resource_ids) > 0:
                     print("*" * 80)
