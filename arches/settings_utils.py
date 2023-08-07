@@ -3,6 +3,8 @@ import os
 import site
 import sys
 
+from pathlib import Path
+
 
 def build_staticfiles_dirs(root_dir, app_root=None, installed_packages=None, additional_directories=None):
     """
@@ -30,7 +32,20 @@ def build_staticfiles_dirs(root_dir, app_root=None, installed_packages=None, add
         site_package_path = site.getsitepackages()[0]
 
         for package in installed_packages:
-            directories.append(os.path.join(site_package_path, package, "media"))  # packages should never have a build directory
+            package_path = os.path.join(site_package_path, package)
+
+            if os.path.exists(package_path):
+                directories.append(os.path.join(package_path, "media"))  # packages should never have a build directory
+            else:
+                egg_link_path = package_path.replace('_', '-')
+                egg_link_path += '.egg-link'
+
+                if os.path.exists(egg_link_path):
+                    original_path = Path(egg_link_path).read_text()
+                    original_path = original_path.replace('.', '')
+                    original_path = original_path.strip()
+                    directories.append(os.path.join(original_path, package, 'media'))
+
 
     directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
@@ -64,7 +79,19 @@ def build_templates_config(root_dir, debug, app_root=None, installed_packages=No
         site_package_path = site.getsitepackages()[0]
 
         for package in installed_packages:
-            directories.append(os.path.join(site_package_path, package, "templates"))
+            package_path = os.path.join(site_package_path, package)
+
+            if os.path.exists(package_path):
+                directories.append(os.path.join(package_path, "templates"))
+            else:
+                egg_link_path = package_path.replace('_', '-')
+                egg_link_path += '.egg-link'
+
+                if os.path.exists(egg_link_path):
+                    original_path = Path(egg_link_path).read_text()
+                    original_path = original_path.replace('.', '')
+                    original_path = original_path.strip()
+                    directories.append(os.path.join(original_path, package, 'templates'))
 
     directories.append(os.path.join(root_dir, "app", "templates"))
 
