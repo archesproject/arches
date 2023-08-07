@@ -94,7 +94,7 @@ class Command(BaseCommand):
         if self.options["fix_all"] or errno in self.options["fix"]:
             if fix_action:
                 self.stdout.write("\tFixing ...")
-            if fix_action == DELETE_QUERYSET:
+            if fix_action is DELETE_QUERYSET:
                 with transaction.atomic():
                     queryset.delete()
                 self.stdout.write(f"\tDELETED.")
