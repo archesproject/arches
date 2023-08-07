@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import glob
 import uuid
+import site
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
@@ -43,6 +44,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from datetime import datetime, timedelta
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +98,7 @@ class Command(BaseCommand):
                 "import_mapping_file",
                 "save_system_settings",
                 "add_mapbox_layer",
+                "load_arches_app",
                 "load_package",
                 "create_package",
                 "update_package",
@@ -353,6 +356,34 @@ class Command(BaseCommand):
                 options["yes"],
                 options["dev"],
                 defer_indexing,
+            )
+
+        if options["operation"] == "load_arches_app":
+            package = options['source']
+
+            site_package_path = site.getsitepackages()[0]
+            package_path = os.path.join(site_package_path, package)
+
+            if not os.path.exists(package_path):
+                egg_link_path = package_path.replace('_', '-')
+                egg_link_path += '.egg-link'
+
+                if os.path.exists(egg_link_path):
+                    original_path = Path(egg_link_path).read_text()
+                    original_path = original_path.replace('.', '')
+                    original_path = original_path.strip()
+
+                    package_path = os.path.join(original_path, package)
+
+            self.load_package(
+                os.path.join(package_path, 'pkg'),
+                options["setup_db"],
+                options["overwrite"],
+                options["bulk_load"],
+                options["stage"],
+                options["yes"],
+                options["dev"],
+                False if str(options["defer_indexing"])[0].lower() == "f" else True,
             )
 
         if options["operation"] in ["create", "create_package"]:
