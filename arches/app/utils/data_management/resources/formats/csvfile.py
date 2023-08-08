@@ -731,22 +731,20 @@ class CsvReader(Reader):
             if datatype != "":
                 errors = []
                 datatype_instance = self.datatype_factory.get_instance(datatype)
-                if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
-                    if len(str(value)) == 37:
-                        value = str(value)
-                        value = value[0:36]
-                        logger.warn(f"Extra character removed {row_number} from index 36 of UUID {value}")
-                    try:
-                        uuid.UUID(value)
-                    except:
-                        if datatype in ["domain-value", "domain-value-list"]:
-                            collection_id = nodeid
-                        else:
-                            collection_id = self.lookup_node(nodeid).config["rdmCollection"]
-                        if collection_id is not None:
-                            value = concept_lookup.lookup_labelid_from_label(value, collection_id)
+                # if datatype in ["concept", "domain-value", "concept-list", "domain-value-list"]:
+                #     if len(str(value)) == 37:
+                #         value = str(value)
+                #         value = value[0:36]
+                #         logger.warn(f"Extra character removed {row_number} from index 36 of UUID {value}")
+                
+                #     uuid.UUID(value)
+                # except:
+                #     if datatype in ["domain-value", "domain-value-list"]:
+                #         collection_id = nodeid
+                #     else:
+                #         collection_id = self.lookup_node(nodeid).config["rdmCollection"]
                 try:
-                    value = datatype_instance.transform_value_for_tile(value, tileid=tileid)
+                    value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid, tileid=tileid)
                     errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                 except Exception as e:
                     errors.append(
@@ -766,7 +764,7 @@ class CsvReader(Reader):
                         value = None
                     self.errors += errors
             else:
-                print(_("No datatype detected for {0}".format(value)))
+                logger.error(_("No datatype detected for {0}".format(value)))
 
             return {"value": value, "request": request}
         
