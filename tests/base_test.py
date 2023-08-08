@@ -27,8 +27,9 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 from tests import test_settings
 from arches.app.utils.context_processors import app_settings
 from django.db import connection
-from django.contrib.auth.models import User
 from django.core import management
+from django.test.runner import DiscoverRunner
+from django.test.utils import teardown_databases as _teardown_databases
 from arches.app.search.mappings import (
     prepare_terms_index,
     delete_terms_index,
@@ -51,55 +52,50 @@ CREATE_TOKEN_SQL = """
     """
 
 
-def setUpTestPackage():
-    """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
-    this is called from __init__.py
-    """
+class ArchesTestRunner(DiscoverRunner):
+    def setup_databases(self, **kwargs):
+        ret = super().setup_databases(**kwargs)
 
-    cursor = connection.cursor()
-    sql = """
-        INSERT INTO public.oauth2_provider_application(
-            id,client_id, redirect_uris, client_type, authorization_grant_type,
-            client_secret,
-            name, user_id, skip_authorization, created, updated)
-        VALUES (
-            44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-            '{oauth_client_secret}',
-            'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
-    """
+        cursor = connection.cursor()
+        sql = """
+            INSERT INTO public.oauth2_provider_application(
+                id,client_id, redirect_uris, client_type, authorization_grant_type,
+                client_secret,
+                name, user_id, skip_authorization, created, updated, algorithm)
+            VALUES (
+                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+                '{oauth_client_secret}',
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}');
+        """
 
-    sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-    cursor.execute(sql)
+        cursor = connection.cursor()
+        sql = """
+            INSERT INTO public.oauth2_provider_application(
+                id,client_id, redirect_uris, client_type, authorization_grant_type,
+                client_secret,
+                name, user_id, skip_authorization, created, updated)
+            VALUES (
+                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+                '{oauth_client_secret}',
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
+        """
 
-    app_settings()  # adds languages to system
-    prepare_terms_index(create=True)
-    prepare_concepts_index(create=True)
-    prepare_search_index(create=True)
+        sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
+        cursor.execute(sql)
 
+        app_settings()  # adds languages to system
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
+        prepare_search_index(create=True)
 
-def tearDownTestPackage():
-    """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
-    this is called from __init__.py
-    """
+        return ret
 
-    delete_terms_index()
-    delete_concepts_index()
-    delete_search_index()
+    def teardown_databases(self, old_config, **kwargs):
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
-
-def setUpModule():
-    # This doesn't appear to be called because ArchesTestCase is never called directly
-    # See setUpTestPackage above
-    pass
-
-
-def tearDownModule():
-    # This doesn't appear to be called because ArchesTestCase is never called directly
-    # See tearDownTestPackage above
-    pass
-
+        super().teardown_databases(old_config, **kwargs)
 
 class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):

@@ -64,8 +64,7 @@ CACHES = {
 
 ELASTICSEARCH_PREFIX = "test"
 
-# Use nose to run all tests
-TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
+TEST_RUNNER = "tests.base_test.ArchesTestRunner"
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
@@ -99,11 +98,6 @@ OVERRIDE_RESOURCE_MODEL_LOCK = True
 
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
-
-# Tell nose to measure coverage on the 'foo' and 'bar' apps
-NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
-
-INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
 ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
