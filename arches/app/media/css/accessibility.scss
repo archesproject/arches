@@ -16,7 +16,7 @@ $leftnav-active-pointer: transparent #FFF transparent transparent;
 $search-dropdown-pill-bg: #1C6615;
 $adv-search-facet-btn-txt: #000;
 
-a {
+a, button {
     &.search-candidate-title,
     &.search-candidate-link {
         color: $search-links;
