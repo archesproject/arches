@@ -28,11 +28,14 @@
 			}
 			i {
 				display: inline-block;
-				font-size: 17px;
+				font-size: 1.7rem;
     			margin-top: 2px;
 				@include break-at(small-desktop) {
 					display: none;
 				}
+			}
+			.h5 {
+				font-size: 1.2rem;
 			}
         }
     }
@@ -56,4 +59,12 @@
     	-webkit-transition: opacity .3s!important;
     	transition: opacity .3s!important;
 	}
+}
+
+.btn-sm, .btn-icon.btn-sm {
+    font-size: 1.1rem;
+}
+
+.btn-group-sm>.btn {
+	font-size: 1.2rem;	
 }
