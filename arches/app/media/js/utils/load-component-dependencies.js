@@ -12,7 +12,7 @@ define([], function() {
                 }
                 catch(e) {  // if arches-core path fails, look in each arches application for path
                     // eslint-disable-next-line no-undef
-                    for (const archesApp of ARCHES_APPLICATION) {
+                    for (const archesApp of ARCHES_APPLICATIONS) {
                         // eslint-disable-next-line no-undef
                         try {
                             require(`${ARCHES_APPLICATIONS_DIRECTORY}/${archesApp}/media/js/${componentPath}`);

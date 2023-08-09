@@ -128,7 +128,7 @@ def transmit_webpack_django_config(
         json.dumps(
             {
                 "APP_ROOT": app_root,
-                "ARCHES_APPLICATION": list(arches_applications) if arches_applications else [],
+                "ARCHES_APPLICATIONS": list(arches_applications) if arches_applications else [],
                 "ARCHES_APPLICATIONS_PATH": site.getsitepackages()[0],
                 "PUBLIC_SERVER_ADDRESS": public_server_address,
                 "ROOT_DIR": root_dir,
