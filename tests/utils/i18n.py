@@ -4,6 +4,8 @@ from django.utils import translation
 from arches.app.models.system_settings import settings
 from arches.app.utils.i18n import rank_label
 
+# these tests can be run from the command line via
+# python manage.py test tests/utils/i18n.py --pattern="*.py" --settings="tests.test_settings"
 
 class I18nTests(SimpleTestCase):
     def test_rank_label(self):
@@ -52,6 +54,6 @@ class I18nTests(SimpleTestCase):
 
         # TODO(jtw): when we drop nose, add subTest for friendlier output
         for case in cases:
-            score, kind, label_lang, sought_lang = case
-            result = rank_label(kind, label_lang, sought_lang)
+            score, kind, source_lang, target_lang = case
+            result = rank_label(kind, source_lang, target_lang)
             self.assertEqual(score, result)

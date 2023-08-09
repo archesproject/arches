@@ -804,7 +804,7 @@ class Concept(object):
 
         ranked_labels = sorted(
             concept.values,
-            key=lambda label: rank_label(kind=label.type, value_lang=label.language, sought_lang=lang),
+            key=lambda label: rank_label(kind=label.type, source_lang=label.language, target_lang=lang),
             reverse=True,
         )
         if len(ranked_labels) == 0:
@@ -1257,7 +1257,7 @@ class Concept(object):
 
         def best_language_last(rec):
             """_findNarrower updates via recursive search, so sort the best language last."""
-            label_rank = rank_label(kind=rec["vtype"], value_lang=rec["languageid"])
+            label_rank = rank_label(kind=rec["vtype"], source_lang=rec["languageid"])
             return (rec["depth"], rec["conceptpath"], label_rank)
 
         records = [dict(list(zip(column_names, row))) for row in rows]
@@ -1415,8 +1415,8 @@ def get_preflabel_from_conceptid(conceptid, lang):
     ranked = sorted(
         preflabels,
         key=lambda prefLabel: rank_label(kind=prefLabel["_source"]["type"],
-                                         value_lang=prefLabel["_source"]["language"],
-                                         sought_lang=lang,
+                                         source_lang=prefLabel["_source"]["language"],
+                                         target_lang=lang,
                                          ),
         reverse=True,
     )
