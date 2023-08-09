@@ -98,7 +98,6 @@ class Command(BaseCommand):
                 "import_mapping_file",
                 "save_system_settings",
                 "add_mapbox_layer",
-                "load_arches_app",
                 "load_package",
                 "create_package",
                 "update_package",
@@ -113,6 +112,10 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
+        )
+
+        parser.add_argument(
+            "-a", "--arches-application", action="store", dest="arches_application", default="", help="Name of Arches Application",
         )
 
         parser.add_argument(
@@ -346,37 +349,28 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
-            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
-            self.load_package(
-                options["source"],
-                options["setup_db"],
-                options["overwrite"],
-                options["bulk_load"],
-                options["stage"],
-                options["yes"],
-                options["dev"],
-                defer_indexing,
-            )
+            arches_application = options['arches_application']
+            arches_application_path = None
 
-        if options["operation"] == "load_arches_app":
-            package = options['source']
+            if arches_application:
+                site_package_path = site.getsitepackages()[0]
+                arches_application_path = os.path.join(site_package_path, arches_application)
 
-            site_package_path = site.getsitepackages()[0]
-            package_path = os.path.join(site_package_path, package)
+                if not os.path.exists(arches_application_path):
+                    egg_link_path = arches_application_path.replace('_', '-')
+                    egg_link_path += '.egg-link'
 
-            if not os.path.exists(package_path):
-                egg_link_path = package_path.replace('_', '-')
-                egg_link_path += '.egg-link'
+                    if os.path.exists(egg_link_path):
+                        original_path = Path(egg_link_path).read_text()
+                        original_path = original_path.replace('.', '')
+                        original_path = original_path.strip()
 
-                if os.path.exists(egg_link_path):
-                    original_path = Path(egg_link_path).read_text()
-                    original_path = original_path.replace('.', '')
-                    original_path = original_path.strip()
+                        arches_application_path = os.path.join(original_path, arches_application)
 
-                    package_path = os.path.join(original_path, package)
+                arches_application_path = os.path.join(arches_application_path, 'pkg')
 
             self.load_package(
-                os.path.join(package_path, 'pkg'),
+                arches_application_path or options["source"],
                 options["setup_db"],
                 options["overwrite"],
                 options["bulk_load"],
