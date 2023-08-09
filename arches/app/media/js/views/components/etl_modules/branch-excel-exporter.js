@@ -25,7 +25,7 @@ define([
             this.formData = new window.FormData();
             this.searchUrl = ko.observable();
 
-            this.graphs = ko.observable();
+            this.graphs = arches.resources.map(resource => ({name: resource.name, graphid: resource.graphid}));
             this.selectedGraph = ko.observable();
             this.resourceids = ko.observable();
     
@@ -36,17 +36,9 @@ define([
             this.getNodeError = params.getNodeError;
             this.alert = params.alert;
 
-            this.getGraphs = async function(){
-                self.loading(true);
-                const response = await self.submit('get_graphs');
-                const json = await response.json();
-                self.graphs(json.result);
-                self.loading(false);
-            };
-
             this.getGraphName = (selectedGraphId) => {
-                if (self.graphs()) {
-                    return self.graphs().find((graph) => graph.graphid === selectedGraphId).name;
+                if (self.graphs) {
+                    return self.graphs.find((graph) => graph.graphid === selectedGraphId).name;
                 }
             };
 
@@ -88,12 +80,6 @@ define([
                     }
                 });
             };
-
-            this.init = function(){
-                self.getGraphs();
-            };
-    
-            this.init();    
         },
         template: branchExcelExporterTemplate,
     });
