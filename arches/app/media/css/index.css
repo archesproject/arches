@@ -3,6 +3,11 @@
 html, body {
     overflow-x: hidden;
     height: auto;
+    font-size: 1.3rem;
+}
+
+h2 {
+    font-size: 1.15rem;
 }
 
 .auth-options {
@@ -11,7 +16,7 @@ html, body {
 
 .lang-switch {
     padding-top: 5px;
-    font-size: 14px;    
+    font-size: 0.68rem;
     font-weight: 300;
     background: #041b33;
 }
@@ -72,7 +77,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 
 .navbar-nav>li>a {
     color: #fff;
-    font-size: 14px;
+    font-size: 0.68rem;
     font-weight: 300;
     padding: 18px 20px;
 }
@@ -109,7 +114,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 
 .disco-caption h2 a {
     color: #CAFF00;
-    font-size: 24px;
+    font-size: 1.15rem;
     font-weight: 500;
     display: inline-flex;
     margin-bottom: 12px;
@@ -122,7 +127,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 .disco-caption p {
     color: white;
     font-weight: 400;
-    font-size: 17px;
+    font-size: 0.82rem;
     display: inline-flex;
     white-space: normal;
     word-wrap: break-word;
@@ -133,7 +138,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 .disco-caption a {
     color: #25476A;
     font-weight: 500;
-    font-size: 20px;
+    font-size: 0.97rem;
     display: inline-flex;
 }
 
@@ -192,7 +197,7 @@ ul.splash-list > li > a:focus, ul.splash-list > li > a:hover {
 }
 
 .v5-splash-list li a {
-    font-size: 15px;
+    font-size: 0.73rem;
     font-weight: 400;
     color: #fff;
     padding: 10px 15px;
@@ -240,13 +245,13 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .navbar-brand-v5 span {
-    font-size: 16px;
+    font-size: 0.77rem;
     display: block;
     /*font-family: "Open Sans",Arial,sans-serif;*/
 }
 
 .navbar-brand-disco span {
-    font-size: 16px;
+    font-size: 0.77rem;
     display: block;
     /*font-family: "Open Sans",Arial,sans-serif;*/
 }
@@ -259,14 +264,14 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .application-name h1 {
     color: #fff;
-    font-size: 24px;
+    font-size: 1.15rem;
 }
 
 .navbar-brand-disco h2 {
     margin-bottom: 8px;
     margin-top: 0px;
     margin-left: -12px;
-    font-size: 28px;
+    font-size: 1.35rem;
     color: #25476A;
     display: inline-block;
 }
@@ -316,23 +321,23 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .splash-nav a {
-    font-size: 24px;
+    font-size: 1.15rem;
 }
 
 .cons-splash-nav a {
-    font-size: 24px;
+    font-size: 1.15rem;
 }
 
 .splash-nav ul > li > a {
     text-transform: none;
-    font-size: 20px;
+    font-size: 0.96rem;
     font-family: "Open Sans",Arial,sans-serif;
     color: #594b4b;
 }
 
 .cons-splash-nav ul > li > a {
     text-transform: none;
-    font-size: 19px;
+    font-size: 0.91rem;
     font-weight: 300;
     color: #493b3c;
     margin-right: 5px;
@@ -352,11 +357,11 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .splash-nav .auth-welcome {
-    font-size: 26px;
+    font-size: 1.25rem;
 }
 
 .cons-splash-nav .auth-welcome {
-    font-size: 26px;
+    font-size: 1.25rem;
 }
 
 .splash-list li:hover {
@@ -402,11 +407,11 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .app-info-block-header {
-    font-size: 20px;
+    font-size: 0.95rem;
 }
 
 .app-info-block-title {
-    font-size: 32px;
+    font-size: 1.54rem;
     font-weight: 300;
     color: #25476A;
 }
@@ -417,7 +422,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block-text {
     color: #555;
-    font-size: 16px;
+    font-size: 0.77rem;
 }
 
 .sub-block-container {
@@ -435,7 +440,7 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 }
 
 .sub-block-description {
-    font-size: 15px;
+    font-size: 0.72rem;
     color: #555;
     padding: 20px 0px 30px 0px;
 }
@@ -467,7 +472,7 @@ footer .footer-links {
 }
 
 .app-footer-heading {
-    font-size: 23px;
+    font-size: 1.1rem;
     font-weight: 200;
     color: #dcdcdc;
     margin-top: 27px;
@@ -479,7 +484,7 @@ footer .footer-links {
 }
 
 .organization-address {
-    font-size: 17px;
+    font-size: 0.82rem;
     font-weight: 300;
     line-height: 1.5;
     margin-top: 20px;
@@ -492,7 +497,7 @@ footer .footer-links {
 }
 
 .app-footer-links {
-    font-size: 15px;
+    font-size: 0.72rem;
     color: #041B33;
 }
 
@@ -575,7 +580,7 @@ footer .footer-links {
     margin-right: 20px;
     line-height: 1.4;
     padding: 0px 5px;
-    font-size: 13px;
+    font-size: 0.63rem;
     font-weight: 400;
     color: #041B33;
     float: right;
@@ -601,7 +606,7 @@ footer .footer-links {
 }
 
 .down-button-icon {
-    font-size: 43px;
+    font-size: 2.1rem;
     padding-top: 4px;
     padding-left: 10px;
     height: 50px;
@@ -616,7 +621,7 @@ footer .footer-links {
     margin-bottom: 10px;
     color: #fff;
     background: #041B33;
-    font-size: 31px;
+    font-size: 1.49rem;
     padding-top: 12px;
     padding-left: 3px;
     border: 1px solid #fff;
@@ -660,7 +665,7 @@ footer .footer-links {
 
 .wide-box .box-highlight {
     background: #fff;
-    font-size: 15px;
+    font-size: 0.72rem;
 }
 
 .wide-box .box-highlight p {
@@ -672,7 +677,7 @@ footer .footer-links {
 }
 
 .splash-link-address {
-    font-size: 17px;
+    font-size: 0.82rem;
     font-weight: 300;
     line-height: 1.5;
     color: #fff;
@@ -806,7 +811,7 @@ footer .footer-links {
         bottom: 11.7vh;
     }
     .down-button-icon {
-        font-size: 2em;
+        font-size: 2.6rem;
         padding-top: 1vh;
         padding-left: 2vh;
         height: 7vh;
@@ -930,5 +935,5 @@ footer .footer-links {
 
 body.dark p, li, .auth-options li a {
     color: #eee;
-    font-size: 12.5px;
+    font-size: 0.61rem;
 }
