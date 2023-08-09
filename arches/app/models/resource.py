@@ -236,6 +236,7 @@ class Resource(models.ResourceInstance):
         elif overwrite == "append_replace":
             # Resource.objects.bulk_create(resources)
             nodegroups_to_delete_from = list({str(t.nodegroup_id) for t in tiles})
+            # WARNING: THIS DELETES PARENT TILES AS WELL AS CHILDREN
             TileModel.objects.filter(resourceinstance_id__in=resourceids, nodegroup_id__in=nodegroups_to_delete_from).delete()
             TileModel.objects.bulk_create(tiles)
             fetchTiles = True
