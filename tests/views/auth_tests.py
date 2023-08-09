@@ -68,6 +68,7 @@ class AuthTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
+        super().tearDownClass()
 
     def tearDown(self):
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = False
