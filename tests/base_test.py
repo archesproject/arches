@@ -61,18 +61,6 @@ class ArchesTestRunner(DiscoverRunner):
             INSERT INTO public.oauth2_provider_application(
                 id,client_id, redirect_uris, client_type, authorization_grant_type,
                 client_secret,
-                name, user_id, skip_authorization, created, updated, algorithm)
-            VALUES (
-                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-                '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}');
-        """
-
-        cursor = connection.cursor()
-        sql = """
-            INSERT INTO public.oauth2_provider_application(
-                id,client_id, redirect_uris, client_type, authorization_grant_type,
-                client_secret,
                 name, user_id, skip_authorization, created, updated)
             VALUES (
                 44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
