@@ -23,8 +23,8 @@ module.exports = () => {
             console.log('Data imported from settings.py:', parsedData)
             
             const APP_ROOT = parsedData['APP_ROOT'];
-            const INSTALLED_PACKAGES = parsedData['INSTALLED_PACKAGES'];
-            const INSTALLED_PACKAGES_PATH = parsedData['INSTALLED_PACKAGES_PATH'];
+            const ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
+            const ARCHES_APPLICATIONS_PATH = parsedData['ARCHES_APPLICATIONS_PATH'];
             const ROOT_DIR = parsedData['ROOT_DIR'];
             const STATIC_URL = parsedData['STATIC_URL']
             const PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS']
@@ -34,18 +34,18 @@ module.exports = () => {
             let eggFilePaths;
 
             try {
-                eggFilePaths = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
-                    const installedPackageEggFile = installedPackage.replaceAll('_', '-').concat('.egg-link'); 
+                eggFilePaths = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
+                    const archesApplicationEggFile = archesApplication.replaceAll('_', '-').concat('.egg-link'); 
 
                     let updatedFilepath = fs.readFileSync(
-                        Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackageEggFile), { encoding: 'utf8' }
+                        Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplicationEggFile), { encoding: 'utf8' }
                     )
                     updatedFilepath = updatedFilepath.replace(/(\r\n|\n|\r)/gm, "");  // remove newlines
                     updatedFilepath = updatedFilepath.replace(/\./g, "");  // remove dots
 
                     return {
                         ...acc,
-                        [installedPackage]: updatedFilepath,
+                        [archesApplication]: updatedFilepath,
                     }
                 }, {});
             }
@@ -58,11 +58,11 @@ module.exports = () => {
             const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'), {});
             const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'), {});
 
-            const installedPackagesEntrypointConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
-                let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'media', 'js');
+            const archesApplicationsEntrypointConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
+                let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'media', 'js');
 
-                if (eggFilePaths && installedPackage in eggFilePaths) {
-                    filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'media', 'js');
+                if (eggFilePaths && archesApplication in eggFilePaths) {
+                    filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'media', 'js');
                 }
                 return {
                     ...acc,
@@ -81,16 +81,16 @@ module.exports = () => {
                 acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
                 return acc;
             }, {});
-            const installedPackagesJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(installedPackagesEntrypointConfiguration).reduce((acc, [path, config]) => {
+            const archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(archesApplicationsEntrypointConfiguration).reduce((acc, [path, config]) => {
                 acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
                 return acc;
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by installedPackage files
+            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
             const javascriptRelativeFilepathToAbsoluteFilepathLookup = { 
                 ...archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup,
                 ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup,
-                ...installedPackagesJavascriptRelativeFilepathToAbsoluteFilepathLookup
+                ...archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup
             };
 
             // END create JavaScript filepath lookups
@@ -120,31 +120,31 @@ module.exports = () => {
                 }, {});
             }
 
-            let parsedInstalledPackagesNodeModulesAliases = {};
-            for (const installedPackage of INSTALLED_PACKAGES) {
+            let parsedArchesApplicationsNodeModulesAliases = {};
+            for (const archesApplication of ARCHES_APPLICATIONS) {
                 try {
-                    let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'webpack', 'webpack-node-modules-aliases.js')
+                    let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'webpack', 'webpack-node-modules-aliases.js')
 
-                    if (eggFilePaths && installedPackage in eggFilePaths) {
-                        filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'webpack', 'webpack-node-modules-aliases.js');
+                    if (eggFilePaths && archesApplication in eggFilePaths) {
+                        filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'webpack', 'webpack-node-modules-aliases.js');
                     }
 
-                    const { INSTALLED_PACKAGE_NODE_MODULES_ALIASES } = require(filepath);
+                    const { ARCHES_APPLICATION_NODE_MODULES_ALIASES } = require(filepath);
                     
-                    for (const [alias, executeableString] of Object.entries(JSON.parse(INSTALLED_PACKAGE_NODE_MODULES_ALIASES))) {
+                    for (const [alias, executeableString] of Object.entries(JSON.parse(ARCHES_APPLICATION_NODE_MODULES_ALIASES))) {
                         if (
-                            parsedInstalledPackagesNodeModulesAliases[alias]
+                            parsedArchesApplicationsNodeModulesAliases[alias]
                             || parsedProjectNodeModulesAliases[alias]
                             || parsedArchesCoreNodeModulesAliases[alias]
                         ) {
                             console.warn(
                                 '\x1b[33m%s\x1b[0m',  // yellow
-                                `"${alias}" has failed to load, it has already been defined in the project, another installed package, or the Arches application.`
+                                `"${alias}" has failed to load, it has already been defined in the project, another arches application, or the Arches application.`
                             )
                         }
                         else {
                             // eval() should be safe here, it's running developer-defined code during build
-                            parsedInstalledPackagesNodeModulesAliases[alias] = eval(executeableString);
+                            parsedArchesApplicationsNodeModulesAliases[alias] = eval(executeableString);
                         }
                     }
                 } catch (error) {
@@ -152,11 +152,11 @@ module.exports = () => {
                 }
             }
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by installedPackage files
+            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
             const nodeModulesAliases = {
                 ...parsedArchesCoreNodeModulesAliases,
                 ...parsedProjectNodeModulesAliases,
-                ...parsedInstalledPackagesNodeModulesAliases
+                ...parsedArchesApplicationsNodeModulesAliases
             };
 
             // END create node modules aliases
@@ -165,11 +165,11 @@ module.exports = () => {
             const coreArchesTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'templates'), {});
             const projectTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'templates'), {});
 
-            const installedPackagesTemplatePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
-                let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'templates');
+            const archesApplicationsTemplatePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
+                let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'templates');
 
-                if (eggFilePaths && installedPackage in eggFilePaths) {
-                    filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'templates');
+                if (eggFilePaths && archesApplication in eggFilePaths) {
+                    filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'templates');
                 }
 
                 return {
@@ -178,11 +178,11 @@ module.exports = () => {
                 };
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by installedPackage files
+            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
             const templateFilepathLookup = { 
                 ...coreArchesTemplatePathConfiguration,
                 ...projectTemplatePathConfiguration,
-                ...installedPackagesTemplatePathConfiguration
+                ...archesApplicationsTemplatePathConfiguration
             };
 
             // END create template filepath lookup
@@ -191,11 +191,11 @@ module.exports = () => {
             const coreArchesImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'img'), {});
             const projectImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, APP_ROOT, 'media', 'img'), {});
 
-            const installedPackagesImagePathConfiguration = INSTALLED_PACKAGES.reduce((acc, installedPackage) => {   
-                let filepath = Path.resolve(__dirname, INSTALLED_PACKAGES_PATH, installedPackage, 'media', 'img');
+            const archesApplicationsImagePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
+                let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'media', 'img');
 
-                if (eggFilePaths && installedPackage in eggFilePaths) {
-                    filepath = Path.resolve(__dirname, eggFilePaths[installedPackage], installedPackage, 'media', 'img');
+                if (eggFilePaths && archesApplication in eggFilePaths) {
+                    filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'media', 'img');
                 }
 
                 return {
@@ -204,11 +204,11 @@ module.exports = () => {
                 };
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by installedPackage files
+            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
             const imageFilepathLookup = { 
                 ...coreArchesImagePathConfiguration,
                 ...projectImagePathConfiguration,
-                ...installedPackagesImagePathConfiguration
+                ...archesApplicationsImagePathConfiguration
             };
 
             // END create image filepath lookup
@@ -216,8 +216,8 @@ module.exports = () => {
             const universalConstants = {
                 APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g ,'/'),
                 ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g ,'/'),
-                INSTALLED_PACKAGES: JSON.stringify(INSTALLED_PACKAGES),
-                INSTALLED_PACKAGES_DIRECTORY: JSON.stringify(INSTALLED_PACKAGES_PATH).replace(/\\/g ,'/'),
+                ARCHES_APPLICATIONS: JSON.stringify(ARCHES_APPLICATIONS),
+                ARCHES_APPLICATIONS_DIRECTORY: JSON.stringify(ARCHES_APPLICATIONS_PATH).replace(/\\/g ,'/'),
             }
             let eggFileCount = 0;
             for (const [key, value] of Object.entries(eggFilePaths)) {
@@ -230,7 +230,7 @@ module.exports = () => {
                 entry: { 
                     ...archesCoreEntryPointConfiguration,
                     ...projectEntryPointConfiguration,
-                    ...installedPackagesEntrypointConfiguration
+                    ...archesApplicationsEntrypointConfiguration
                 },
                 devServer: {
                     port: WEBPACK_DEVELOPMENT_SERVER_PORT,
@@ -320,9 +320,9 @@ module.exports = () => {
                                         }
                                     }
 
-                                    if (!templatePath && resourcePath.includes(INSTALLED_PACKAGES_PATH)) {  // installed package component
-                                        const packagePath = resourcePath.split(INSTALLED_PACKAGES_PATH)[1];  // first split off installed packages path
-                                        const [_emptyValueBeforeFirstSlash, _packageName, ...subPath] = packagePath.split('/') // then split off package name
+                                    if (!templatePath && resourcePath.includes(ARCHES_APPLICATIONS_PATH)) {  // arches application component
+                                        const archesAppPath = resourcePath.split(ARCHES_APPLICATIONS_PATH)[1];  // first split off arches applications path
+                                        const [_emptyValueBeforeFirstSlash, _appName, ...subPath] = archesAppPath.split('/') // then split off arches application name
                                         templatePath = '/' + subPath.join('/');
                                     }
                                     else if (!templatePath && resourcePath.includes(APP_ROOT)) {  // project-level component
@@ -378,7 +378,7 @@ module.exports = () => {
                                                     new Promise((resolve, _reject) => {
                                                         /*
                                                             if run in a test environment, failures will return a empty string which will
-                                                            still allow the package to build.
+                                                            still allow the bundle to build.
                                                         */ 
                                                         
                                                         resolve(isTestEnvironment ? '' : content);  
