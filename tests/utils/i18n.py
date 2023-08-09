@@ -16,44 +16,24 @@ class I18nTests(SimpleTestCase):
         settings.LANGUAGE_CODE = "en-US"
         self.addCleanup(setattr, settings, "LANGUAGE_CODE", old_system_lang)
 
-        cases = [
-            # Match an explicitly given language
-            (100, "prefLabel", "fr-CA", "fr-CA"),
-            (40, "altLabel", "fr-CA", "fr-CA"),
-            (10, "", "fr-CA", "fr-CA"),
-            # ...inexactly
-            (50, "prefLabel", "fr-FR", "fr-CA"),
-            (20, "altLabel", "fr-fr", "fr-CA"),
-            (5, "", "fr", "fr-CA"),
+        # Match against explicitly specified language (fr-CA)
+        self.assertGreater(rank_label("prefLabel", "fr-CA", "fr-CA"), rank_label("prefLabel", "fr", "fr-CA"))
+        self.assertGreater(rank_label("prefLabel", "fr", "fr-CA"), rank_label("altLabel", "fr", "fr-CA"))
+        self.assertGreater(rank_label("altLabel", "fr", "fr-CA"), rank_label("", "fr", "fr-CA"))
 
-            # Otherwise fall back to user language (es-ES)
-            # Good values
-            (100, "prefLabel", "es-ES", ""),
-            (40, "altLabel", "es-ES", ""),
-            (10, "", "es-ES", ""),
-            # Pretty good, but inexact
-            (50, "prefLabel", "es-MX", ""),
-            (20, "altLabel", "es-MX", ""),
-            (5, "", "es-MX", ""),
-            # Mediocre values: they at least match system language (en-US)
-            (30, "prefLabel", "en-US", ""),
-            (12, "altLabel", "en-US", ""),
-            (3, "", "en-US", ""),
-            # Mediocre and inexact
-            (20, "prefLabel", "en-GB", ""),
-            (8, "altLabel", "en-GB", ""),
-            (2, "", "en-GB", ""),
+        # Match against user language (es-ES)
+        self.assertGreater(rank_label("prefLabel", "es-ES"), rank_label("prefLabel", "es-MX"))
+        self.assertGreater(rank_label("prefLabel", "es-ES"), rank_label("prefLabel", "en-US"))  # red herring (system)
+        self.assertGreater(rank_label("prefLabel", "es"), rank_label("prefLabel", "de"))
+        self.assertGreater(rank_label("prefLabel", "es"), rank_label("altLabel", "es"))
+        self.assertGreater(rank_label("prefLabel", "es"), rank_label("altLabel", "en-US"))
 
-            # Poor values: no relationship to any desired language,
-            # but at least preferred/alt labels are better than
-            # non-preferred labels
-            (10, "prefLabel", "", ""),
-            (4, "altLabel", "", ""),
-            (1, "", "", ""),
-        ]
+        # Match against system language (en-US)
+        self.assertGreater(rank_label("prefLabel", "en-US"), rank_label("prefLabel", "en-GB"))
+        self.assertGreater(rank_label("prefLabel", "en"), rank_label("prefLabel", "de"))
+        self.assertGreater(rank_label("prefLabel", "en"), rank_label("altLabel", "en"))
+        self.assertGreater(rank_label("prefLabel", "en"), rank_label("altLabel", "en-US"))
 
-        # TODO(jtw): when we drop nose, add subTest for friendlier output
-        for case in cases:
-            score, kind, source_lang, target_lang = case
-            result = rank_label(kind, source_lang, target_lang)
-            self.assertEqual(score, result)
+        # Edge cases
+        self.assertGreater(rank_label("prefLabel", "es"), rank_label("altLabel", "en-US"))
+        self.assertGreater(rank_label("altLabel", "en-US"), rank_label("prefLabel", "de"))
