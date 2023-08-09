@@ -434,6 +434,70 @@ class Migration(migrations.Migration):
         $$;
     """
 
+    update_get_tile_errors_functions = """
+        CREATE OR REPLACE FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb)
+        RETURNS text
+        LANGUAGE plpgsql AS
+
+        $func$
+        DECLARE
+            _key   text;
+            _value jsonb;
+            _result text;
+            _note text;
+
+        BEGIN
+            FOR _key, _value IN
+                SELECT * FROM jsonb_each_text($1)
+            LOOP
+                IF _value ->> 'valid' = 'false' THEN
+                    IF _value ->> 'notes' IS NULL THEN
+                        _note = 'unspecified error';
+                    END IF;
+                    IF _result IS NULL THEN
+                        _result := _value ->> 'notes';
+                    ELSE
+                        _result := _result || '|' || (_value ->> 'notes');
+                    END IF;
+                END IF;
+            END LOOP;
+            RETURN _result;
+        END;
+        $func$;
+    """
+
+    revert_get_tile_errors_functions = """
+        CREATE OR REPLACE FUNCTION public.__arches_load_staging_get_tile_errors(json_obj jsonb)
+        RETURNS text
+        LANGUAGE plpgsql AS
+
+        $func$
+        DECLARE
+            _key   text;
+            _value jsonb;
+            _result text;
+            _note text;
+
+        BEGIN
+            FOR _key, _value IN
+                SELECT * FROM jsonb_each_text($1)
+            LOOP
+                IF _value ->> 'valid' = 'false' THEN
+                    IF _value ->> 'notes' IS NULL THEN
+                        _note = 'unspecified error';
+                    END IF;
+                    IF _result IS NULL THEN
+                    _result := _value ->> 'notes';
+                    ELSE
+                    _result := '|' || _value ->> 'notes';
+                    END IF;
+                END IF;
+            END LOOP;
+            RETURN _result;
+        END;
+        $func$;
+    """
+
     operations = [
         migrations.AlterModelOptions(
             name='maplayer',
@@ -467,6 +531,10 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             update_check_cardinality_violation_function,
             revert_check_cardinality_violation_function,
+        ),
+        migrations.RunSQL(
+            update_staging_for_edit_function,
+            revert_staging_for_edit_function,
         ),
         migrations.RunSQL(
             update_staging_for_edit_function,
