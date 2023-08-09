@@ -177,6 +177,8 @@ class BranchExcelExporter(BranchCsvImporter):
                                     files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
                                     file_names_to_export.append(file["name"])
                                 tile[alias] = ",".join(file_names_to_export)
+                            elif node_lookup_by_id[key]["datatype"] in ["concept-list", "domain-value-list"]:
+                                tile[alias] = ",".join(value)
                             else:
                                 try:
                                     value.keys() # to check if it is a dictionary
