@@ -26,6 +26,8 @@ from pyld.jsonld import expand
 class JsonLDImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         # This runs once per instantiation
         cls.loadOntology()
         cls.factory = RequestFactory()

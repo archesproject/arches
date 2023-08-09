@@ -46,6 +46,8 @@ from arches.app.utils.middleware import SetAnonymousUser
 class AuthTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         cls.factory = RequestFactory()
         cls.client = Client()
 

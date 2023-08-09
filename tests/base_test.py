@@ -56,21 +56,6 @@ class ArchesTestRunner(DiscoverRunner):
     def setup_databases(self, **kwargs):
         ret = super().setup_databases(**kwargs)
 
-        cursor = connection.cursor()
-        sql = """
-            INSERT INTO public.oauth2_provider_application(
-                id,client_id, redirect_uris, client_type, authorization_grant_type,
-                client_secret,
-                name, user_id, skip_authorization, created, updated)
-            VALUES (
-                44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-                '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
-        """
-
-        sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-        cursor.execute(sql)
-
         app_settings()  # adds languages to system
         prepare_terms_index(create=True)
         prepare_concepts_index(create=True)
@@ -104,11 +89,26 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pass
+        cursor = connection.cursor()
+        sql = """
+            INSERT INTO public.oauth2_provider_application(
+                id, client_id, redirect_uris, client_type, authorization_grant_type,
+                client_secret,
+                name, user_id, skip_authorization, created, updated)
+            VALUES (
+                44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+                '{oauth_client_secret}',
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
+        """
+
+        sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
+        cursor.execute(sql)
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        cursor = connection.cursor()
+        sql = "DELETE FROM public.oauth2_provider_application WHERE id = 44;"
+        cursor.execute(sql)
 
     @classmethod
     def deleteGraph(cls, root):
