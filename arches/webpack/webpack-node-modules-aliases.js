@@ -6,8 +6,6 @@ module.exports = {
         "plugins/knockout-select2": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'knockout-select2.js')",
         "nifty": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'nifty')",
         "leaflet-side-by-side": "Path.resolve(__dirname, `${ROOT_DIR}/app/media/plugins`, 'leaflet-side-by-side/index')",
-        "themepunch-tools": "Path.resolve(__dirname, `${APP_ROOT}/media/plugins`, 'revolution-slider/rs-plugin/js/jquery.themepunch.tools.min')",
-        "revolution-slider": "Path.resolve(__dirname, `${APP_ROOT}/media/plugins`, 'revolution-slider')",
         "async": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/requirejs-plugins/src/async`)",
         "text": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/requirejs-text/text`)",
         "jquery": "Path.resolve(__dirname, `${APP_ROOT}/media/node_modules/jquery/dist/jquery.min`)",
