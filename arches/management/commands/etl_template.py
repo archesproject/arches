@@ -135,7 +135,8 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                     sheet[f"C{row_number}"] = f'{tab}{tile["alias"]}'
                     nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("alias")
                     for i, node in enumerate(nodes):
-                        sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
+                        if tile[node['alias']] is not None:
+                            sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
 
         write_metadata(wb, metadata)
         return wb
