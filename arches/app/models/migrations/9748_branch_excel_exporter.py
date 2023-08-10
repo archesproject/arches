@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9746_related_resource_post_save_bug'),
+        ('models', '9744_add_tile_excel_importer'),
     ]
 
     add_branch_excel_exporter = """
