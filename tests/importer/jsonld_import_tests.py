@@ -7,7 +7,7 @@ from django.test.client import RequestFactory, Client
 from django.urls import reverse
 from django.db import connection
 from arches.app.utils.i18n import LanguageSynchronizer
-from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
+from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL, DELETE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
@@ -130,6 +130,10 @@ class JsonLDImportTests(ArchesTestCase):
         ]:
             graph = Graph.objects.get(pk=graph_id)
             graph.publish(user=User.objects.get(pk=1))
+
+    def tearDownClass(self):
+        cursor = connection.cursor()
+        cursor.execute(DELETE_TOKEN_SQL)
 
     def setUp(self):
         pass
