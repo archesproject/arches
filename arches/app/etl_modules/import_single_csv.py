@@ -249,35 +249,35 @@ class ImportSingleCsv(BaseImportModule):
                             config["nodeid"] = node
                             config["path"] = temp_dir
 
-                            if datatype == "string":
-                                try:
-                                    code = csv_mapping[i]["language"]["code"]
-                                    direction = csv_mapping[i]["language"]["default_direction"]
-                                    transformed_value = {code: {"value": row[i], "direction": direction}}
-                                except:
-                                    transformed_value = source_value
-                                value = (
-                                    datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
-                                )
-                                errors = datatype_instance.validate(value, nodeid=node)
-                            else:
-                                value, errors = self.prepare_data_for_loading(datatype_instance, source_value, config)
+                            if source_value:
+                                if datatype == "string":
+                                    try:
+                                        code = csv_mapping[i]["language"]["code"]
+                                        direction = csv_mapping[i]["language"]["default_direction"]
+                                        transformed_value = {code: {"value": row[i], "direction": direction}}
+                                    except:
+                                        transformed_value = source_value
+                                    value = (
+                                        datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
+                                    )
+                                    errors = datatype_instance.validate(value, nodeid=node)
+                                else:
+                                    value, errors = self.prepare_data_for_loading(datatype_instance, source_value, config)
 
-                            valid = True if len(errors) == 0 else False
-                            error_message = ""
-                            for error in errors:
-                                error_message = (
-                                    "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
-                                )
-                                cursor.execute(
-                                    """
-                                    INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
-                                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                                    ("node", source_value, csv_file_name, error["title"], error["message"], datatype, loadid, node),
-                                )
+                                valid = True if len(errors) == 0 else False
+                                error_message = ""
+                                for error in errors:
+                                    error_message = (
+                                        "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                                    )
+                                    cursor.execute(
+                                        """
+                                        INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
+                                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                        ("node", source_value, csv_file_name, error["title"], error["message"], datatype, loadid, node),
+                                    )
 
-                            if nodegroupid in dict_by_nodegroup:
-                                if value:
+                                if nodegroupid in dict_by_nodegroup:
                                     dict_by_nodegroup[nodegroupid].append(
                                         {
                                             node: {
@@ -289,8 +289,7 @@ class ImportSingleCsv(BaseImportModule):
                                             }
                                         }
                                     )
-                            else:
-                                if value:
+                                else:
                                     dict_by_nodegroup[nodegroupid] = [
                                         {
                                             node: {
@@ -336,8 +335,9 @@ class ImportSingleCsv(BaseImportModule):
                                 loadid,
                                 nodegroup_depth,
                                 source_description,
+                                operation,
                                 passes_validation
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                             (
                                 nodegroup,
                                 legacyid,
@@ -347,6 +347,7 @@ class ImportSingleCsv(BaseImportModule):
                                 loadid,
                                 node_depth,
                                 csv_file_name,
+                                'insert',
                                 passes_validation,
                             ),
                         )

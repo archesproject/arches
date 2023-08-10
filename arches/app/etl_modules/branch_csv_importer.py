@@ -13,7 +13,7 @@ from django.db import connection
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node
+from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.index_database import index_resources_by_transaction
@@ -47,7 +47,7 @@ class BranchCsvImporter(BaseImportModule):
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
             rows = cursor.fetchall()
-            node_lookup = {str(row[1]): {"depth": int(row[5])} for row in rows}
+            node_lookup = {str(row[1]): {"depth": int(row[5]), "cardinality": row[7]} for row in rows}
             nodes = Node.objects.filter(graph_id=graphid)
             for node in nodes:
                 nodeid = str(node.nodeid)
@@ -93,7 +93,7 @@ class BranchCsvImporter(BaseImportModule):
         return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
-        nodegroup_alias = cell_values[1].strip().split(" ")[0].strip()
+        nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
         node_value_keys = data_node_lookup[nodegroup_alias]
         tile_value = {}
         tile_valid = True
@@ -150,16 +150,27 @@ class BranchCsvImporter(BaseImportModule):
                 )
                 raise ValueError(_("All rows must have a valid resource id"))
             if str(resourceid).strip() in ("--", "resource_id"):
-                nodegroup_alias = cell_values[1][0:-4].strip().split(" ")[0].strip()
-                data_node_lookup[nodegroup_alias] = [val for val in cell_values[2:] if val]
-            elif cell_values[1] is not None:
-                node_values = cell_values[2:]
+                nodegroup_alias = cell_values[2][0:-4].strip().split(" ")[0].strip()
+                data_node_lookup[nodegroup_alias] = [val for val in cell_values[3:] if val]
+            elif cell_values[2] is not None:
+                node_values = cell_values[3:]
                 try:
                     row_count += 1
-                    nodegroup_alias = cell_values[1].strip().split(" ")[0].strip()
+                    nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
                     row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                     row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
-                    tileid = uuid.uuid4()
+                    user_tileid = cell_values[1].strip() if cell_values[1] else None
+                    tileid = user_tileid if user_tileid else uuid.uuid4()
+                    nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
+
+                    operation = "insert"
+                    if user_tileid:
+                        if nodegroup_cardinality == "n":                            
+                            operation = "update" # db will "insert" if tileid does not exist
+                        elif nodegroup_cardinality == "1":
+                            if TileModel.objects.filter(pk=cell_values[1]).exists():
+                                operation = "update"
+
                     nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
                     parenttileid = None if "None" else row_details["parenttile_id"]
                     parenttileid = self.get_parent_tileid(
@@ -170,7 +181,7 @@ class BranchCsvImporter(BaseImportModule):
                         cell_values, data_node_lookup, node_lookup, row_details, cursor
                     )
                     cursor.execute(
-                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (
                             row_details["nodegroup_id"],
                             legacyid,
@@ -182,6 +193,7 @@ class BranchCsvImporter(BaseImportModule):
                             nodegroup_depth,
                             "worksheet:{0}, row:{1}".format(worksheet.title, row[0].row),  # source_description
                             passes_validation,
+                            operation,
                         ),
                     )
                 except KeyError:
@@ -300,9 +312,14 @@ class BranchCsvImporter(BaseImportModule):
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
 
-        tasks.load_branch_csv.apply_async(
+        load_task = tasks.load_branch_csv.apply_async(
             (self.userid, files, summary, result, self.temp_dir, self.loadid),
         )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def write(self, request):
         self.loadid = request.POST.get("load_id")

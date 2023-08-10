@@ -22,8 +22,9 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
+from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
+from arches.app.views.file import FileView, TempFileView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -103,6 +104,8 @@ urlpatterns = [
     url(r"^rdm/(?P<conceptid>%s|())$" % uuid_regex, RDMView.as_view(), name="rdm"),
     url(r"^admin/reindex/resources$", ReIndexResources.as_view(), name="reindex"),
     url(r"^files/(?P<fileid>%s)$" % uuid_regex, FileView.as_view(), name="file_access"),
+    url(r"^temp_file/(?P<file_id>[^\/]+)", TempFileView.as_view(), name="temp_file"),
+    url(r"^temp_file$", TempFileView.as_view(), name="temp_file"),
     url(r"^concepts/(?P<conceptid>%s)/manage_parents/$" % uuid_regex, concept.manage_parents, name="concept_manage_parents"),
     url(r"^concepts/(?P<conceptid>%s)/confirm_delete/$" % uuid_regex, concept.confirm_delete, name="confirm_delete"),
     url(r"^concepts/(?P<conceptid>%s)/make_collection/$" % uuid_regex, concept.make_collection, name="make_collection"),
