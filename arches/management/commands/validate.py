@@ -21,7 +21,7 @@ from datetime import datetime
 from arches import __version__
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 
@@ -51,6 +51,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.options = options
+        if self.options["limit"] < 1:
+            raise CommandError("Limit must be a positive integer.")
         if self.options["limit"] and self.options["verbosity"] < 2:
             # Limit is meaningless w/o the higher verbosity output
             self.options["verbosity"] = 2
@@ -81,6 +83,7 @@ class Command(BaseCommand):
     def check_integrity(self, check, queryset, fix_action):
         needs_fix = queryset.exists()
         fix_status = ""
+        # Not set as a default: None distinguishes whether verbose output implied
         limit = self.options["limit"] or 500
 
         if needs_fix:
