@@ -7137,13 +7137,6 @@ ul div .card-tree-list span .card-tree-list-item .card-tree-list-icon {
     }
 }
 
-.iiif-clear-search.clear-node-search {
-    position: absolute;
-    top: 4px;
-    right: 2px;
-    font-size: 14px;
-}
-
 .new-card.disabled {
     background-color: #ccc;
 }
@@ -12647,12 +12640,16 @@ ul.select2-choices:after {
 }
 
 .iiif-gallery-header .list-filter {
-    display: inline-block;
     margin-bottom: 0px;
 }
 
 .iiif-gallery-header > div > div {
     margin-right: 20px;
+}
+
+.iiif-list-filter {
+    display: inline-flex;
+    align-items: center;
 }
 
 .iiif-gallery-canvas {
