@@ -6,6 +6,7 @@ from arches.app.utils.file_validator import FileValidator
 import filetype
 import base64
 import re
+import itertools
 import logging
 import os
 from pathlib import Path
@@ -161,6 +162,13 @@ class StringDataType(BaseDataType):
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
             tile.data[nodeid] = None
+        elif isinstance(tile.data[nodeid], dict):
+            for language_dict in tile.data[nodeid].values():
+                if language_dict["value"]:
+                    break
+            else:
+                # No non-empty value was found.
+                tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue is not None:
