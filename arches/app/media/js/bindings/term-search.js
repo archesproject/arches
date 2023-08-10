@@ -11,6 +11,7 @@ define([
             var terms = valueAccessor().terms;
             var tags = valueAccessor().tags;
             var language = valueAccessor().language;
+            var placeholder = valueAccessor().placeholder;
 
             tags.subscribe(function(tags) {
                 // first clear any existing tags
@@ -34,6 +35,7 @@ define([
 
             var searchbox = $(el).selectWoo({
                 dropdownCssClass: ':all:',
+                placeholder: placeholder,
                 multiple: true,
                 minimumInputLength: 2,
                 data:ko.unwrap(terms).concat(ko.unwrap(tags)),  // initial selection
