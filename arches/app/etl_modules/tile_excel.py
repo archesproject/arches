@@ -24,19 +24,6 @@ from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
 
 logger = logging.getLogger(__name__)
 
-details = {
-    "etlmoduleid": "",
-    "name": "Import Tile Excel",
-    "description": "Import tile excel to Arches",
-    "etl_type": "import",
-    "component": "views/components/etl_modules/tile-excel",
-    "componentname": "tile-excel",
-    "modulename": "tile_excel.py",
-    "classname": "ImportTileExcel",
-    "config": {"bgColor": "#f5c60a", "circleColor": "#f9dd6c"},
-    "icon": "fa fa-upload",
-    "slug": "import-tile-excel"    
-}
 
 class ImportTileExcel(BranchCsvImporter):
     def __init__(self, request=None, loadid=None, temp_dir=None):
