@@ -160,7 +160,7 @@ class BranchExcelExporter(BranchCsvImporter):
                                     file_names_to_export.append(file["name"])
                                 tile[alias] = ",".join(file_names_to_export)
                             elif node_lookup_by_id[key]["datatype"] in ["concept-list", "domain-value-list"]:
-                                if type(value) == "list":
+                                if type(value) == list:
                                     value = ",".join(value)
                                 tile[alias] = value
                             else:
