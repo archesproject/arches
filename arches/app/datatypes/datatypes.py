@@ -6,7 +6,6 @@ from arches.app.utils.file_validator import FileValidator
 import filetype
 import base64
 import re
-import itertools
 import logging
 import os
 from pathlib import Path
