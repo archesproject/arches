@@ -8,7 +8,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from django.core.files import File as DjangoFile
 from django.db import connection
 from django.utils.translation import ugettext as _
-from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
+from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
 from arches.app.models.models import Node, File, TempFile
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
@@ -44,7 +44,7 @@ tile_tree_query = """
     SELECT * FROM tile_tree ORDER BY ordercol;
 """
 
-class BranchExcelExporter(BranchCsvImporter):
+class BranchExcelExporter(BranchExcelImporter):
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None

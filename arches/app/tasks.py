@@ -201,13 +201,13 @@ def on_chord_error(request, exc, traceback):
 
 @shared_task
 def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
-    from arches.app.etl_modules import branch_csv_importer
+    from arches.app.etl_modules import branch_excel_importer
 
     logger = logging.getLogger(__name__)
 
     try:
-        BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
-        BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+        BranchExcelImporter = branch_excel_importer.BranchExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+        BranchExcelImporter.run_load_task(files, summary, result, temp_dir, loadid)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
