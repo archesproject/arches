@@ -135,6 +135,8 @@ class JsonLDImportTests(ArchesTestCase):
         cursor = connection.cursor()
         cursor.execute(DELETE_TOKEN_SQL)
 
+        super().tearDownClass()
+
     def setUp(self):
         pass
 
