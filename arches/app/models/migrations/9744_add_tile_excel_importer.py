@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             helptemplate)
         VALUES (
             'b96b8078-23b7-484f-b9d0-8ca304a5f7b6',
-            'Tile Excel Exporter',
+            'Tile Excel Importer',
             'Import a Tile Excel file from Arches',
             'import',
             'views/components/etl_modules/tile-excel',
