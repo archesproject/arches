@@ -131,7 +131,7 @@ class JsonLDImportTests(ArchesTestCase):
             graph = Graph.objects.get(pk=graph_id)
             graph.publish(user=User.objects.get(pk=1))
 
-    def tearDownClass(self):
+    def tearDownClass(cls):
         cursor = connection.cursor()
         cursor.execute(DELETE_TOKEN_SQL)
 
