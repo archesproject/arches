@@ -118,7 +118,9 @@ define([
                     return formatedresult;
                 },
                 formatSelection: function(result, container) {
-                    var text = result.text;
+                    var resultStr = JSON.stringify(result);
+                    result = JSON.parse(resultStr.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "[removed]"));
+                    var text = ko.unwrap(result.text);
                     if (result.type === "Advanced Search Filter" && result.graphs_filtered)
                         text = result.graphs_filtered.join() + " (Advanced Search)";
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
