@@ -9,10 +9,12 @@ const BundleTracker = require('webpack-bundle-tracker');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { spawn } = require("child_process");
+const { VueLoaderPlugin } = require("vue-loader");
 
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
+const { buildVueFilePathLookup } = require('./webpack-utils/build-vue-filepath-lookup');
 const { PROJECT_NODE_MODULES_ALIASES } = require('./webpack-node-modules-aliases');
 
 
@@ -212,6 +214,26 @@ module.exports = () => {
             };
 
             // END create image filepath lookup
+            // BEGIN create vue filepath lookup
+            
+            const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'frontend'), {});
+            const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'frontend'), {});
+
+            const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {                
+                return {
+                    ...acc,
+                    ...buildVueFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'frontend'), {})
+                };
+            }, {});
+
+            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
+            const vueFilepathLookup = { 
+                ...coreArchesVuePathConfiguration,
+                ...projectVuePathConfiguration,
+                ...archesApplicationsVuePathConfiguration
+            };
+
+            // END create vue filepath lookup
             // BEGIN create universal constants
             const universalConstants = {
                 APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g ,'/'),
@@ -220,7 +242,7 @@ module.exports = () => {
                 ARCHES_APPLICATIONS_DIRECTORY: JSON.stringify(ARCHES_APPLICATIONS_PATH).replace(/\\/g ,'/'),
             }
             let eggFileCount = 0;
-            for (const [key, value] of Object.entries(eggFilePaths)) {
+            for (const value of Object.values(eggFilePaths)) {
                 universalConstants[`EGG_FILE_PATH_${eggFileCount}`] = JSON.stringify(value).replace(/\\/g ,'/');
                 eggFileCount += 1;
             }
@@ -230,7 +252,8 @@ module.exports = () => {
                 entry: { 
                     ...archesCoreEntryPointConfiguration,
                     ...projectEntryPointConfiguration,
-                    ...archesApplicationsEntrypointConfiguration
+                    ...archesApplicationsEntrypointConfiguration,
+                    ...vueFilepathLookup,
                 },
                 devServer: {
                     port: WEBPACK_DEVELOPMENT_SERVER_PORT,
@@ -251,6 +274,25 @@ module.exports = () => {
                     }),
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
+                    new VueLoaderPlugin(),
+                    {
+                        apply: (compiler) => {
+                            compiler.hooks.afterEmit.tap("webpack", () => {
+                                fs.writeFile(
+                                    Path.resolve(__dirname, APP_ROOT, 'media', 'build', '.gitignore'), 
+                                    "# Ignore everything in this directory\n*\n# Except this file\n!.gitignore\n",
+                                     err => {
+                                        if (err) {
+                                            console.error(
+                                                '\x1b[31m%s\x1b[0m',  // red
+                                                err
+                                            );
+                                        }
+                                    }
+                                );
+                            });
+                        },
+                    },
                 ],
                 resolveLoader: {
                     alias: {
@@ -263,11 +305,16 @@ module.exports = () => {
                         ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                         ...templateFilepathLookup,
                         ...imageFilepathLookup,
+                        ...vueFilepathLookup,
                         ...nodeModulesAliases,
                     },
                 },
                 module: {
                     rules: [
+                        {
+                            test: /\.vue$/,
+                            loader: Path.join(APP_ROOT, 'media', 'node_modules', 'vue-loader'),
+                        },
                         {
                             test: /\.mjs$/,
                             include: /node_modules/,
@@ -283,7 +330,18 @@ module.exports = () => {
                             }
                         },
                         {
-                            test: /\.s?css$/i,
+                            test: /\.css$/,
+                            use: [
+                                {
+                                    'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'style-loader'),
+                                },
+                                {
+                                    'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'css-loader'),
+                                },
+                            ],
+                        },
+                        {
+                            test: /\.scss$/i,
                             use: [
                                 {
                                     'loader': MiniCssExtractPlugin.loader,

@@ -74,6 +74,7 @@
         "select2": "3.5.1",
         "underscore": "~1.13.6",
         "uuidjs": "^3.3.0",
+        "vue": "^3.3.4",
         "webpack-bundle-tracker": "^1.4.0"
     }
 }
