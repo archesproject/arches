@@ -33,7 +33,7 @@ class Command(BaseCommand):
     Validate an Arches database against a set of data integrity checks.
     Takes no action by default (other than printing a summary).
 
-    Provide --verbosity=2 to get a richer output (list of affected nodes).
+    Provide --verbosity=2 to get a richer output (list of affected rows).
 
     Example: python manage.py validate --fix-all
     """
