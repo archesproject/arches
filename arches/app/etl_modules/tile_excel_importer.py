@@ -67,7 +67,7 @@ class TileExcelImporter(BranchExcelImporter):
                         """
                         INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        ("node", source_value, "something here", error["title"], error["message"], datatype, self.loadid, nodeid),
+                        ("node", source_value, "", error["title"], error["message"], datatype, self.loadid, nodeid),
                     )
 
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
