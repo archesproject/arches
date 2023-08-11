@@ -104,17 +104,18 @@ class Command(BaseCommand):
             if not self.options["fix_all"] and check.value not in self.options["fix"]:
                 # User didn't request this specific check.
                 return
-            # Fixed?
-            if queryset.exists():
-                fix_status = self.style.ERROR("No")  # until actually fixed below
 
-                if fix_action is None:
-                    if self.options["fix_all"]:
-                        fix_status = self.style.MIGRATE_HEADING("N/A")
-                    else:
-                        raise CommandError(f"Requested fixing unfixable {check.value}: {check}")
+            if fix_action is None:
+                if self.options["fix_all"]:
+                    fix_status = self.style.MIGRATE_HEADING("N/A")
+                else:
+                    raise CommandError(f"Requested fixing unfixable {check.value}: {check}")
+
+            # Fixed?
+            if fix_action and queryset.exists():
+                fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
-                elif fix_action is DELETE_QUERYSET:
+                if fix_action is DELETE_QUERYSET:
                     with transaction.atomic():
                         queryset.delete()
                     fix_status = self.style.SUCCESS("Yes")
