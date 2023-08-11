@@ -25,6 +25,11 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 
+# Command modes
+FIX = "fix"
+VALIDATE = "validate"
+
+# Fix actions
 DELETE_QUERYSET = "delete queryset"
 
 
@@ -51,18 +56,26 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.options = options
-        if self.options["limit"] < 1:
+        limit = self.options["limit"]
+        if limit is not None and limit < 1:
             raise CommandError("Limit must be a positive integer.")
-        if self.options["limit"] and self.options["verbosity"] < 2:
+        if limit and self.options["verbosity"] < 2:
             # Limit is meaningless w/o the higher verbosity output
             self.options["verbosity"] = 2
+
+        if self.options["fix_all"] or self.options["fix"]:
+            self.mode = FIX
+            fix_heading = "Fixed?"
+        else:
+            self.mode = VALIDATE
+            fix_heading = "Fixable?"
 
         if self.options["verbosity"] > 0:
             self.stdout.write()
             self.stdout.write("Arches integrity report")
             self.stdout.write(f"Prepared by Arches {__version__} on {datetime.today().strftime('%c')}")
             self.stdout.write()
-            self.stdout.write("\t".join(["", "Error", "Rows", "Fixed", "Description"]))
+            self.stdout.write("\t".join(["", "Error", "Rows", fix_heading, "Description"]))
             self.stdout.write()
 
         # Add checks here in numerical order
@@ -81,27 +94,37 @@ class Command(BaseCommand):
         )
 
     def check_integrity(self, check, queryset, fix_action):
-        needs_fix = queryset.exists()
-        fix_status = ""
-        # Not set as a default: None distinguishes whether verbose output implied
+        # 500 not set as a default earlier: None distinguishes whether verbose output implied
         limit = self.options["limit"] or 500
 
-        if needs_fix:
-            if self.options["fix_all"] or check.value in self.options["fix"]:
-                if fix_action:
-                    if fix_action is DELETE_QUERYSET:
-                        with transaction.atomic():
-                            queryset.delete()
-                        fix_status = self.style.SUCCESS("FIXED")
+        if self.mode == VALIDATE:
+            # Fixable?
+            fix_status = self.style.MIGRATE_HEADING("Yes") if fix_action else self.style.NOTICE("No")
+        else:
+            if not self.options["fix_all"] and check.value not in self.options["fix"]:
+                # User didn't request this specific check.
+                return
+            # Fixed?
+            if queryset.exists():
+                fix_status = self.style.ERROR("No")  # until actually fixed below
 
-                    # Implement other fix actions here, e.g. pass in a callable
+                if fix_action is None:
+                    if self.options["fix_all"]:
+                        fix_status = self.style.MIGRATE_HEADING("N/A")
                     else:
-                        raise NotImplementedError
+                        raise CommandError(f"Requested fixing unfixable {check.value}: {check}")
+                # Perform fix action
+                elif fix_action is DELETE_QUERYSET:
+                    with transaction.atomic():
+                        queryset.delete()
+                    fix_status = self.style.SUCCESS("Yes")
                 else:
-                    fix_status = self.style.NOTICE("N/A")
+                    raise NotImplementedError
             else:
-                fix_status = self.style.NOTICE("Skipped")
+                # Nothing to do.
+                fix_status = self.style.MIGRATE_HEADING("N/A")
 
+        # Print the report (after any requested fixes are made)
         if self.options["verbosity"] > 0:
             count = len(queryset)
             result = self.style.ERROR("FAIL") if count else self.style.SUCCESS("PASS")
