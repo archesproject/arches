@@ -50,6 +50,7 @@ class Migration(migrations.Migration):
 
 
     reverse_sql = """
+        DELETE FROM load_errors WHERE loadid IN (SELECT loadid FROM load_event WHERE etl_module_id = 'b96b8078-23b7-484f-b9d0-8ca304a5f7b6');
         DELETE FROM load_staging WHERE loadid IN (SELECT loadid FROM load_event WHERE etl_module_id = 'b96b8078-23b7-484f-b9d0-8ca304a5f7b6');
         DELETE FROM load_event WHERE etl_module_id = 'b96b8078-23b7-484f-b9d0-8ca304a5f7b6';
         DELETE FROM etl_modules WHERE etlmoduleid = 'b96b8078-23b7-484f-b9d0-8ca304a5f7b6';
