@@ -100,6 +100,8 @@ class Command(BaseCommand):
         if self.mode == VALIDATE:
             # Fixable?
             fix_status = self.style.MIGRATE_HEADING("Yes") if fix_action else self.style.NOTICE("No")
+            if not queryset.exists():
+                fix_status = "--"
         else:
             if not self.options["fix_all"] and check.value not in self.options["fix"]:
                 # User didn't request this specific check.
