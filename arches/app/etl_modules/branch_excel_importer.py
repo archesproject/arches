@@ -24,7 +24,7 @@ from arches.app.etl_modules.base_import_module import BaseImportModule
 logger = logging.getLogger(__name__)
 
 
-class BranchCsvImporter(BaseImportModule):
+class BranchExcelImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -123,7 +123,7 @@ class BranchCsvImporter(BaseImportModule):
                         """
                         INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        ("node", source_value, "something here", error["title"], error["message"], datatype, self.loadid, nodeid),
+                        ("node", source_value, "", error["title"], error["message"], datatype, self.loadid, nodeid),
                     )
 
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}

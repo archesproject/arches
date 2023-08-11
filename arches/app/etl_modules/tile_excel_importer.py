@@ -20,12 +20,12 @@ from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from arches.app.etl_modules.base_import_module import BaseImportModule
-from arches.app.etl_modules.branch_csv_importer import BranchCsvImporter
+from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
 
 logger = logging.getLogger(__name__)
 
 
-class ImportTileExcel(BranchCsvImporter):
+class TileExcelImporter(BranchExcelImporter):
     def __init__(self, request=None, loadid=None, temp_dir=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -67,7 +67,7 @@ class ImportTileExcel(BranchCsvImporter):
                         """
                         INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        ("node", source_value, "something here", error["title"], error["message"], datatype, self.loadid, nodeid),
+                        ("node", source_value, "", error["title"], error["message"], datatype, self.loadid, nodeid),
                     )
 
                 tile_value[nodeid] = {"value": value, "valid": valid, "source": source_value, "notes": error_message, "datatype": datatype}
@@ -116,8 +116,9 @@ class ImportTileExcel(BranchCsvImporter):
                 tile_value_json, passes_validation = self.create_tile_value(
                     cell_values, data_node_lookup, node_lookup, nodegroup_alias, row_details, cursor
                 )
+                operation = 'insert'
                 cursor.execute(
-                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (
                         row_details["nodegroup_id"],
                         legacyid,
@@ -129,6 +130,7 @@ class ImportTileExcel(BranchCsvImporter):
                         nodegroup_depth,
                         "worksheet:{0}, row:{1}".format(worksheet.title, row[0].row),  # source_description
                         passes_validation,
+                        operation,
                     ),
                 )
             except KeyError:
