@@ -12,7 +12,7 @@ from django.db import connection
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node, TileModel
+from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.management.commands.etl_template import create_workbook
@@ -41,55 +41,6 @@ class BranchExcelImporter(BaseImportModule):
             return "0 kb"
         log = math.floor(math.log(bytes, 1024))
         return "{0:.2f} {1}".format(bytes / math.pow(1024, log), ["bytes", "kb", "mb", "gb"][int(log)])
-
-    def get_graph_tree(self, graphid):
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
-            rows = cursor.fetchall()
-            node_lookup = {str(row[1]): {"depth": int(row[5]), "cardinality": row[7]} for row in rows}
-            nodes = Node.objects.filter(graph_id=graphid)
-            for node in nodes:
-                nodeid = str(node.nodeid)
-                if nodeid in node_lookup:
-                    node_lookup[nodeid]["alias"] = node.alias
-                    node_lookup[nodeid]["datatype"] = node.datatype
-                    node_lookup[nodeid]["config"] = node.config
-            return node_lookup, nodes
-
-    def get_parent_tileid(self, depth, tileid, previous_tile, nodegroup, nodegroup_tile_lookup):
-        parenttileid = None
-        if depth == 0:
-            previous_tile["tileid"] = tileid
-            previous_tile["depth"] = depth
-            return parenttileid
-        if len(previous_tile.keys()) == 0:
-            previous_tile["tileid"] = tileid
-            previous_tile["depth"] = depth
-            previous_tile["parenttile"] = None
-            nodegroup_tile_lookup[nodegroup] = tileid
-        if previous_tile["depth"] < depth:
-            parenttileid = previous_tile["tileid"]
-            nodegroup_tile_lookup[nodegroup] = parenttileid
-            previous_tile["parenttile"] = parenttileid
-        if previous_tile["depth"] > depth:
-            parenttileid = nodegroup_tile_lookup[nodegroup]
-        if previous_tile["depth"] == depth:
-            parenttileid = previous_tile["parenttile"]
-
-        previous_tile["tileid"] = tileid
-        previous_tile["depth"] = depth
-        return parenttileid
-
-    def set_legacy_id(self, resourceid):
-        try:
-            uuid.UUID(resourceid)
-            legacyid = None
-        except (AttributeError, ValueError):
-            legacyid = resourceid
-            if legacyid not in self.legacyid_lookup:
-                self.legacyid_lookup[legacyid] = uuid.uuid4()
-            resourceid = self.legacyid_lookup[legacyid]
-        return legacyid, resourceid
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
         nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
@@ -231,12 +182,6 @@ class BranchExcelImporter(BaseImportModule):
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
             )
-
-    def get_node_lookup(self, nodes):
-        lookup = {}
-        for node in nodes:
-            lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
-        return lookup
 
     def validate(self, loadid):
         success = True

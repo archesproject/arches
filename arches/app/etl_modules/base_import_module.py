@@ -1,19 +1,26 @@
-from datetime import datetime
+import logging
 import os
+import uuid
+
 from django.core.files.storage import default_storage
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
+
+from arches.app.models.models import Node
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.transaction import reverse_edit_log_entries
 import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
-import logging
 
 logger = logging.getLogger(__name__)
 
 
-class BaseImportModule(object):
+class BaseImportModule:
+    def __init__(self, loadid=None):
+        self.loadid = loadid
+        self.legacyid_lookup = {}
+
     def reverse_load(self, loadid):
         with connection.cursor() as cursor:
             cursor.execute(
@@ -75,3 +82,58 @@ class BaseImportModule(object):
             errors = [datatype_instance.create_error_message(value, "", "", message, title)]
 
         return value, errors
+
+    def get_graph_tree(self, graphid):
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+            rows = cursor.fetchall()
+            node_lookup = {str(row[1]): {"depth": int(row[5]), "cardinality": row[7]} for row in rows}
+            nodes = Node.objects.filter(graph_id=graphid)
+            for node in nodes:
+                nodeid = str(node.nodeid)
+                if nodeid in node_lookup:
+                    node_lookup[nodeid]["alias"] = node.alias
+                    node_lookup[nodeid]["datatype"] = node.datatype
+                    node_lookup[nodeid]["config"] = node.config
+            return node_lookup, nodes
+
+    def get_parent_tileid(self, depth, tileid, previous_tile, nodegroup, nodegroup_tile_lookup):
+        parenttileid = None
+        if depth == 0:
+            previous_tile["tileid"] = tileid
+            previous_tile["depth"] = depth
+            return parenttileid
+        if len(previous_tile.keys()) == 0:
+            previous_tile["tileid"] = tileid
+            previous_tile["depth"] = depth
+            previous_tile["parenttile"] = None
+            nodegroup_tile_lookup[nodegroup] = tileid
+        if previous_tile["depth"] < depth:
+            parenttileid = previous_tile["tileid"]
+            nodegroup_tile_lookup[nodegroup] = parenttileid
+            previous_tile["parenttile"] = parenttileid
+        if previous_tile["depth"] > depth:
+            parenttileid = nodegroup_tile_lookup[nodegroup]
+        if previous_tile["depth"] == depth:
+            parenttileid = previous_tile["parenttile"]
+
+        previous_tile["tileid"] = tileid
+        previous_tile["depth"] = depth
+        return parenttileid
+
+    def set_legacy_id(self, resourceid):
+        try:
+            uuid.UUID(resourceid)
+            legacyid = None
+        except (AttributeError, ValueError):
+            legacyid = resourceid
+            if legacyid not in self.legacyid_lookup:
+                self.legacyid_lookup[legacyid] = uuid.uuid4()
+            resourceid = self.legacyid_lookup[legacyid]
+        return legacyid, resourceid
+
+    def get_node_lookup(self, nodes):
+        lookup = {}
+        for node in nodes:
+            lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
+        return lookup

@@ -1,31 +1,18 @@
 from datetime import datetime
 import json
-import logging
-import math
 import os
-import uuid
-import zipfile
-import arches.app.tasks as tasks
-from django.core.files import File
-from django.http import HttpResponse
-from openpyxl import load_workbook
-from django.db import connection
+
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
+from openpyxl import load_workbook
+
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node, NodeGroup
+from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.file_validator import FileValidator
-from arches.app.utils.index_database import index_resources_by_transaction
-from arches.management.commands.etl_template import create_workbook
-from openpyxl.writer.excel import save_virtual_workbook
 from arches.app.etl_modules.base_import_module import BaseImportModule
-from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
-
-logger = logging.getLogger(__name__)
 
 
-class TileExcelImporter(BranchExcelImporter):
+class TileExcelImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
