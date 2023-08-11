@@ -65,7 +65,7 @@ class Command(BaseCommand):
 
         if self.options["fix_all"] or self.options["fix"]:
             self.mode = FIX
-            fix_heading = "Fixed?"
+            fix_heading = "Fixed?\t"  # Lengthen to match wider "Fixable?" heading
         else:
             self.mode = VALIDATE
             fix_heading = "Fixable?"
@@ -129,7 +129,8 @@ class Command(BaseCommand):
         if self.options["verbosity"] > 0:
             count = len(queryset)
             result = self.style.ERROR("FAIL") if count else self.style.SUCCESS("PASS")
-            self.stdout.write("\t".join(str(x) for x in (result, check.value, count, fix_status, check)))
+            # Fix status takes two "columns" so add a tab
+            self.stdout.write("\t".join(str(x) for x in (result, check.value, count, fix_status + "\t", check)))
 
             if self.options["verbosity"] > 1:
                 self.stdout.write("\t" + "-" * 36)
