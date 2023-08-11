@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import glob
 import uuid
+import site
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
@@ -43,6 +44,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
 from datetime import datetime, timedelta
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -110,6 +112,10 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
+        )
+
+        parser.add_argument(
+            "-a", "--arches-application", action="store", dest="arches_application", default="", help="Name of Arches Application",
         )
 
         parser.add_argument(
@@ -343,16 +349,35 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
-            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
+            arches_application = options['arches_application']
+            arches_application_path = None
+
+            if arches_application:
+                site_package_path = site.getsitepackages()[0]
+                arches_application_path = os.path.join(site_package_path, arches_application)
+
+                if not os.path.exists(arches_application_path):
+                    egg_link_path = arches_application_path.replace('_', '-')
+                    egg_link_path += '.egg-link'
+
+                    if os.path.exists(egg_link_path):
+                        original_path = Path(egg_link_path).read_text()
+                        original_path = original_path.replace('.', '')
+                        original_path = original_path.strip()
+
+                        arches_application_path = os.path.join(original_path, arches_application)
+
+                arches_application_path = os.path.join(arches_application_path, 'pkg')
+
             self.load_package(
-                options["source"],
+                arches_application_path or options["source"],
                 options["setup_db"],
                 options["overwrite"],
                 options["bulk_load"],
                 options["stage"],
                 options["yes"],
                 options["dev"],
-                defer_indexing,
+                False if str(options["defer_indexing"])[0].lower() == "f" else True,
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -400,7 +425,8 @@ class Command(BaseCommand):
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
                 graph_json = JSONSerializer().serialize(output_graph, indent=4)
                 if graph["graphid"] not in existing_resource_graphs:
-                    output_file = os.path.join(dest_dir, str(I18n_String(graph["name"])) + ".json")
+                    graph_name = str(I18n_String(graph["name"])).replace("/", "-")
+                    output_file = os.path.join(dest_dir, graph_name + ".json")
                     with open(output_file, "w") as f:
                         print("writing", output_file)
                         f.write(graph_json)

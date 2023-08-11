@@ -117,7 +117,7 @@ INSTALLED_APPS = (
     "{{ project_name }}",
 )
 
-INSTALLED_PACKAGES = ()
+ARCHES_APPLICATIONS = ()
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -139,14 +139,14 @@ MIDDLEWARE = [
 STATICFILES_DIRS =  build_staticfiles_dirs(
     root_dir=ROOT_DIR,
     app_root=APP_ROOT,
-    installed_packages=INSTALLED_PACKAGES,
+    arches_applications=ARCHES_APPLICATIONS,
 )
 
 TEMPLATES = build_templates_config(
     root_dir=ROOT_DIR,
     debug=DEBUG,
     app_root=APP_ROOT,
-    installed_packages=INSTALLED_PACKAGES,
+    arches_applications=ARCHES_APPLICATIONS,
 )
 
 ALLOWED_HOSTS = []
@@ -359,7 +359,7 @@ if __name__ == "__main__":
     transmit_webpack_django_config(
         root_dir=ROOT_DIR,
         app_root=APP_ROOT,
-        installed_packages=INSTALLED_PACKAGES,
+        arches_applications=ARCHES_APPLICATIONS,
         public_server_address=PUBLIC_SERVER_ADDRESS,
         static_url=STATIC_URL,
         webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
