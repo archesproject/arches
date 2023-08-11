@@ -1,25 +1,19 @@
 from datetime import datetime
 import json
-import math
 import os
 import uuid
-import zipfile
-import arches.app.tasks as tasks
-from django.core.files import File
+
 from django.http import HttpResponse
 from openpyxl import load_workbook
-from django.db import connection
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
+
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.file_validator import FileValidator
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from arches.app.etl_modules.base_import_module import BaseImportModule
-from arches.app.etl_modules.decorators import load_data_async
-from arches.app.etl_modules.save import save_to_tiles
 
 
 
@@ -33,14 +27,6 @@ class BranchExcelImporter(BaseImportModule):
         self.temp_path = ""
         self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
-
-    def filesize_format(self, bytes):
-        """Convert bytes to readable units"""
-        bytes = int(bytes)
-        if bytes == 0:
-            return "0 kb"
-        log = math.floor(math.log(bytes, 1024))
-        return "{0:.2f} {1}".format(bytes / math.pow(1024, log), ["bytes", "kb", "mb", "gb"][int(log)])
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
         nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()
@@ -182,133 +168,6 @@ class BranchExcelImporter(BaseImportModule):
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
             )
-
-    def validate(self, loadid):
-        success = True
-        with connection.cursor() as cursor:
-            error_message = _("Legacy id(s) already exist. Legacy ids must be unique")
-            cursor.execute(
-                """UPDATE load_event SET error_message = %s, status = 'failed' WHERE  loadid = %s::uuid
-            AND EXISTS (SELECT legacyid FROM load_staging where loadid = %s::uuid and legacyid is not null INTERSECT SELECT legacyid from resource_instances);""",
-                (error_message, self.loadid, self.loadid),
-            )
-        row = self.get_validation_result(loadid)
-        return {"success": success, "data": row}
-
-    def read(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.cumulative_excel_files_size = 0
-        content = request.FILES["file"]
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        try:
-            self.delete_from_default_storage(self.temp_dir)
-        except (FileNotFoundError):
-            pass
-        result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
-        validator = FileValidator()
-        if len(validator.validate_file_type(content)) > 0:
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("Invalid excel file/zip specified"),
-                "message": _("Upload a valid excel file"),
-            }
-        if content.name.split(".")[-1].lower() == "zip":
-            with zipfile.ZipFile(content, "r") as zip_ref:
-                files = zip_ref.infolist()
-                for file in files:
-                    if file.filename.split(".")[-1] == "xlsx":
-                        self.cumulative_excel_files_size += file.file_size
-                    if not file.filename.startswith("__MACOSX"):
-                        if not file.is_dir():
-                            result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-                        default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
-        elif content.name.split(".")[-1] == "xlsx":
-            self.cumulative_excel_files_size += content.size
-            result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
-            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-            default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
-        return {"success": result, "data": result}
-
-    def start(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        result = {"started": False, "message": ""}
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute(
-                    """INSERT INTO load_event (loadid, etl_module_id, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (self.loadid, self.moduleid, False, "running", datetime.now(), self.userid),
-                )
-                result["started"] = True
-            except Exception:
-                result["message"] = _("Unable to initialize load")
-        return {"success": result["started"], "data": result}
-
-    @load_data_async
-    def run_load_task_async(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        self.file_details = request.POST.get("load_details", None)
-        result = {}
-        if self.file_details:
-            details = json.loads(self.file_details)
-            files = details["result"]["summary"]["files"]
-            summary = details["result"]["summary"]
-
-        load_task = tasks.load_branch_csv.apply_async(
-            (self.userid, files, summary, result, self.temp_dir, self.loadid),
-        )
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
-                (load_task.task_id, self.loadid),
-            )
-
-    def write(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        self.file_details = request.POST.get("load_details", None)
-        result = {}
-        if self.file_details:
-            details = json.loads(self.file_details)
-            files = details["result"]["summary"]["files"]
-            summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
-            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
-                response = self.run_load_task_async(request, self.loadid)
-            else:
-                response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
-
-            return response
-
-    def run_load_task(self, files, summary, result, temp_dir, loadid):
-        with connection.cursor() as cursor:
-            for file in files.keys():
-                self.stage_excel_file(file, summary, cursor)
-            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-            cursor.execute(
-                """
-                INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
-                SELECT 'tile', source_description, error_message, loadid, nodegroupid
-                FROM load_staging
-                WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-                """,
-                [loadid],
-            )
-            result["validation"] = self.validate(loadid)
-            if len(result["validation"]["data"]) == 0:
-                self.loadid = loadid  # currently redundant, but be certain
-                save_to_tiles(loadid, multiprocessing=False)
-            else:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), loadid),
-                )
-        self.delete_from_default_storage(temp_dir)
-        result["summary"] = summary
-        return {"success": result["validation"]["success"], "data": result}
 
     def download(self, request):
         format = request.POST.get("format")
