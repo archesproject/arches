@@ -17,6 +17,7 @@ import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.etl_modules.save import save_to_tiles
 
 logger = logging.getLogger(__name__)
 
@@ -171,7 +172,8 @@ class ImportSingleCsv(BaseImportModule):
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
                     ("validated", loadid),
                 )
-            response = self.save_to_tiles(loadid, multiprocessing=False)
+            self.loadid = loadid  # currently redundant, but be certain
+            response = save_to_tiles(loadid, multiprocessing=False)
             return response
         else:
             with connection.cursor() as cursor:

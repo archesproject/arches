@@ -1,12 +1,10 @@
 from datetime import datetime
 import os
 from django.core.files.storage import default_storage
-from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
 from arches.app.utils.decorators import user_created_transaction_match
-from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.utils.transaction import reverse_edit_log_entries
 import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
@@ -45,67 +43,6 @@ class BaseImportModule(object):
             logger.error(e)
         logger.warn(response)
         return response
-
-    def save_to_tiles(self, loadid, finalize_import=True, multiprocessing=True):
-        self.loadid = loadid
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute("""CALL __arches_prepare_bulk_load();""")
-                cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
-                saved = cursor.fetchone()[0]
-            except (IntegrityError, ProgrammingError) as e:
-                logger.error(e)
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                return {
-                    "status": 400,
-                    "success": False,
-                    "title": _("Failed to complete load"),
-                    "message": _("Unable to insert record into staging table"),
-                }
-            finally:
-                try:
-                    cursor.execute("""CALL __arches_complete_bulk_load();""")
-
-                    if finalize_import:
-                        cursor.execute("""SELECT __arches_refresh_spatial_views();""")
-                        refresh_successful = cursor.fetchone()[0]
-                        if not refresh_successful:
-                            raise Exception('Unable to refresh spatial views')
-                except Exception as e:
-                    logger.exception(e)
-                    cursor.execute(
-                        """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                        ("unindexed", datetime.now(), True, True, loadid),
-                    )
-
-            if saved:
-                cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                    ("completed", datetime.now(), loadid),
-                )
-                try:
-                    index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
-                    cursor.execute(
-                        """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                        ("indexed", datetime.now(), True, True, loadid),
-                    )
-                    return {"success": True, "data": "indexed"}
-                except Exception as e:
-                    logger.exception(e)
-                    cursor.execute(
-                        """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                        ("unindexed", datetime.now(), loadid),
-                    )
-                    return {"success": False, "data": "saved"}
-            else:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                return {"success": False, "data": "failed"}
 
     def load_data_async(self, request):
         if task_management.check_if_celery_available():

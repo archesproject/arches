@@ -12,6 +12,7 @@ from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.views.search import search_results
+from arches.app.etl_modules.save import save_to_tiles
 
 logger = logging.getLogger(__name__)
 
@@ -360,7 +361,8 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
-            data_updated = self.save_to_tiles(loadid, finalize_import=False)
+            self.loadid = loadid  # currently redundant, but be certain
+            data_updated = save_to_tiles(loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:

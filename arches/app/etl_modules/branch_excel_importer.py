@@ -20,6 +20,7 @@ from arches.app.utils.index_database import index_resources_by_transaction
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.etl_modules.save import save_to_tiles
 
 logger = logging.getLogger(__name__)
 
@@ -354,7 +355,8 @@ class BranchExcelImporter(BaseImportModule):
             )
             result["validation"] = self.validate(loadid)
             if len(result["validation"]["data"]) == 0:
-                self.save_to_tiles(loadid, multiprocessing=False)
+                self.loadid = loadid  # currently redundant, but be certain
+                save_to_tiles(loadid, multiprocessing=False)
             else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
