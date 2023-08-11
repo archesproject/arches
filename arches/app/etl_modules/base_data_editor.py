@@ -7,7 +7,6 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
@@ -18,7 +17,7 @@ from arches.app.views.search import search_results
 logger = logging.getLogger(__name__)
 
 
-class BaseBulkEditor(BaseImportModule):
+class BaseBulkEditor:
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
