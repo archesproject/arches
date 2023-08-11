@@ -44,21 +44,6 @@ class BaseImportModule(object):
         logger.warn(response)
         return response
 
-    def load_data_async(self, request):
-        if task_management.check_if_celery_available():
-            logger.info(_("Delegating load to Celery task"))
-            self.run_load_task_async(request)
-            result = _("delegated_to_celery")
-            return {"success": True, "data": result}
-        else:
-            err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-            return {"success": False, "data": {"title": _("Error"), "message": err}}
-
     def delete_from_default_storage(self, directory):
         dirs, files = default_storage.listdir(directory)
         for dir in dirs:

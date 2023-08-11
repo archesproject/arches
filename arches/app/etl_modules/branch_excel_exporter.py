@@ -1,21 +1,18 @@
 from datetime import datetime
 from io import BytesIO
 import json
-import logging
 import os
 import zipfile
 from openpyxl.writer.excel import save_virtual_workbook
 from django.core.files import File as DjangoFile
 from django.db import connection
-from django.utils.translation import ugettext as _
+from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.branch_excel_importer import BranchExcelImporter
 from arches.app.models.models import Node, File, TempFile
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.db_utils import dictfetchall
 from arches.management.commands.etl_template import create_workbook
-
-logger = logging.getLogger(__name__)
 
 tile_tree_query = """
     WITH RECURSIVE tile_tree(tileid, parenttileid, tiledata, nodegroupid, depth) AS (
@@ -115,7 +112,7 @@ class BranchExcelExporter(BranchExcelImporter):
             )
 
         if use_celery:
-            response = self.load_data_async(request)
+            response = self.run_load_task_async(request, self.loadid)
         else:
             response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids)
 
@@ -197,6 +194,7 @@ class BranchExcelExporter(BranchExcelImporter):
 
         return { "success": True, "data": "success" }
 
+    @load_data_async
     def run_load_task_async(self, request):
         self.loadid = request.POST.get("load_id")
         graph_id = request.POST.get("graph_id", None)
