@@ -107,14 +107,13 @@ class Command(BaseCommand):
                 # User didn't request this specific check.
                 return
 
+            # Fixed?
             if fix_action is None:
                 if self.options["fix_all"]:
                     fix_status = self.style.MIGRATE_HEADING("N/A")
                 else:
                     raise CommandError(f"Requested fixing unfixable {check.value}: {check}")
-
-            # Fixed?
-            if fix_action and queryset.exists():
+            elif queryset.exists():
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
                 if fix_action is DELETE_QUERYSET:
