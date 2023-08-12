@@ -6,7 +6,6 @@ from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
@@ -173,7 +172,7 @@ class ETLManagerView(View):
     def post(self, request):
         """
         instantiate the proper module with proper action and pass the request
-        possible actions are "import", "validate", "return first line", ""
+        possible actions are "write", "validate", "read", "start"
         """
         action = request.POST.get("action")
         moduleid = request.POST.get("module")
