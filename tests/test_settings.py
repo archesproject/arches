@@ -109,10 +109,15 @@ LANGUAGES = [
     ("ar", _("Arabic")),
 ]
 
+DOCKER = False
+
 try:
-    from .settings_local import *
+    from arches.settings_local import *
 except ImportError:
+    pass
+
+if DOCKER:
     try:
-        from .settings_docker import *
+        from arches.settings_docker import *
     except ImportError:
         pass
