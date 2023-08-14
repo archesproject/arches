@@ -50,6 +50,7 @@ class JSONSerializer(object):
 
     def __init__(self, **options):
         self._options = options
+        self.utf_encode = False
 
     def encode(self, obj):
         return self.serializeToPython(obj, **self._options)
@@ -81,7 +82,7 @@ class JSONSerializer(object):
         options.pop("force_recalculation", False)
         result = json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
 
-        return result.encode("utf-8") if hasattr(self, "utf_encode") else result
+        return result.encode("utf-8") if self.utf_encode else result
 
     def handle_object(self, object, **kwargs):
         """Called to handle everything, looks for the correct handling"""
