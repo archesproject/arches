@@ -112,19 +112,23 @@ module.exports = () => {
                 return acc;
             }, {});
 
-            const projectPackageJSON = require(Path.resolve(__dirname, APP_ROOT, 'package.json'));
-            let parsedProjectNodeModulesAliases = Object.entries(projectPackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
-                if (parsedArchesCoreNodeModulesAliases[alias]) {
-                    console.warn(
-                        '\x1b[33m%s\x1b[0m',  // yellow
-                        `"${alias}" has failed to load, it has already been defined in the Arches application.`
-                    )
-                }
-                else {
-                    acc[alias] = Path.resolve(__dirname, APP_ROOT, 'media', subPath);
-                }
-                return acc;
-            }, {});
+            const projectJSONFilepath = Path.resolve(__dirname, APP_ROOT, 'package.json');
+            let parsedProjectNodeModulesAliases = {}
+            if (fs.existsSync(projectJSONFilepath)) {  // handles running Arches without a project
+                const projectPackageJSON = require(projectJSONFilepath);
+                parsedProjectNodeModulesAliases = Object.entries(projectPackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
+                    if (parsedArchesCoreNodeModulesAliases[alias]) {
+                        console.warn(
+                            '\x1b[33m%s\x1b[0m',  // yellow
+                            `"${alias}" has failed to load, it has already been defined in the Arches application.`
+                        )
+                    }
+                    else {
+                        acc[alias] = Path.resolve(__dirname, APP_ROOT, 'media', subPath);
+                    }
+                    return acc;
+                }, {});
+            }
 
             let parsedArchesApplicationsNodeModulesAliases = {};
             for (const archesApplication of ARCHES_APPLICATIONS) {
