@@ -101,7 +101,7 @@ class Command(BaseCommand):
             # Fixable?
             fix_status = self.style.MIGRATE_HEADING("Yes") if fix_action else self.style.NOTICE("No")
             if not queryset.exists():
-                fix_status = "--"
+                fix_status = self.style.MIGRATE_HEADING("N/A")
         else:
             if not self.options["fix_all"] and check.value not in self.options["fix"]:
                 # User didn't request this specific check.
@@ -112,7 +112,7 @@ class Command(BaseCommand):
                 if self.options["fix_all"]:
                     fix_status = self.style.MIGRATE_HEADING("N/A")
                 else:
-                    raise CommandError(f"Requested fixing unfixable {check.value}: {check}")
+                    raise CommandError(f"Requested fixing unfixable - {check.value}: {check}")
             elif queryset.exists():
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
@@ -124,7 +124,10 @@ class Command(BaseCommand):
                     raise NotImplementedError
             else:
                 # Nothing to do.
-                fix_status = self.style.MIGRATE_HEADING("N/A")
+                if self.options["fix_all"]:
+                    fix_status = self.style.MIGRATE_HEADING("N/A")
+                else:
+                    raise CommandError(f"Nothing to fix - {check.value}: {check}")
 
         # Print the report (after any requested fixes are made)
         if self.options["verbosity"] > 0:
