@@ -13,7 +13,6 @@ const { spawn } = require("child_process");
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
-const { PROJECT_NODE_MODULES_ALIASES } = require('./webpack-node-modules-aliases');
 
 
 module.exports = () => {
@@ -95,43 +94,50 @@ module.exports = () => {
 
             // END create JavaScript filepath lookups
             // BEGIN create node modules aliases
-            
-            const { ARCHES_CORE_NODE_MODULES_ALIASES } = require(Path.resolve(__dirname, ROOT_DIR, 'webpack', 'webpack-node-modules-aliases.js'));
-            const parsedArchesCoreNodeModulesAliases = Object.entries(JSON.parse(ARCHES_CORE_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
-                // eval() should be safe here, it's running developer-defined code during build
-                acc[alias] = eval(executeableString);
+            let archesCorePackageJSONFilepath = Path.resolve(__dirname, ROOT_DIR, '../package.json')
+            if (!fs.existsSync(archesCorePackageJSONFilepath)) {
+                archesCorePackageJSONFilepath = Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'arches', 'package.json')
+            }
+
+            const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
+            const parsedArchesCoreNodeModulesAliases = Object.entries(archesCorePackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
+                if (subPath.slice(0, 7) === 'plugins') {  // handles for node_modules -esque plugins in arches core
+                    acc[alias] = Path.resolve(__dirname, ROOT_DIR, 'app', 'media', subPath);
+                }
+                else {
+                    acc[alias] = Path.resolve(__dirname, APP_ROOT, 'media', subPath);
+                }
                 return acc;
             }, {});
 
-            let parsedProjectNodeModulesAliases = {};
-            if (PROJECT_NODE_MODULES_ALIASES) {
-                parsedProjectNodeModulesAliases = Object.entries(JSON.parse(PROJECT_NODE_MODULES_ALIASES)).reduce((acc, [alias, executeableString]) => {
-                    if (parsedArchesCoreNodeModulesAliases[alias]) {
-                        console.warn(
-                            '\x1b[33m%s\x1b[0m',  // yellow
-                            `"${alias}" has failed to load, it has already been defined in the Arches application.`
-                        )
-                    }
-                    else {
-                        // eval() should be safe here, it's running developer-defined code during build
-                        acc[alias] = eval(executeableString);
-                    }
-                    return acc;
-                }, {});
-            }
+            const projectPackageJSON = require(Path.resolve(__dirname, APP_ROOT, 'package.json'));
+            let parsedProjectNodeModulesAliases = Object.entries(projectPackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
+                if (parsedArchesCoreNodeModulesAliases[alias]) {
+                    console.warn(
+                        '\x1b[33m%s\x1b[0m',  // yellow
+                        `"${alias}" has failed to load, it has already been defined in the Arches application.`
+                    )
+                }
+                else {
+                    acc[alias] = Path.resolve(__dirname, APP_ROOT, 'media', subPath);
+                }
+                return acc;
+            }, {});
 
             let parsedArchesApplicationsNodeModulesAliases = {};
             for (const archesApplication of ARCHES_APPLICATIONS) {
                 try {
-                    let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'webpack', 'webpack-node-modules-aliases.js')
+                    let filepath;
 
                     if (eggFilePaths && archesApplication in eggFilePaths) {
-                        filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'webpack', 'webpack-node-modules-aliases.js');
+                        filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], 'package.json');
+                    }
+                    else {
+                        filepath = Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', archesApplication, 'package.json')
                     }
 
-                    const { ARCHES_APPLICATION_NODE_MODULES_ALIASES } = require(filepath);
-                    
-                    for (const [alias, executeableString] of Object.entries(JSON.parse(ARCHES_APPLICATION_NODE_MODULES_ALIASES))) {
+                    const archesApplicationPackageJSON = require(filepath);
+                    for (const [alias, subPath] of Object.entries(archesApplicationPackageJSON['nodeModulesPaths'])) {
                         if (
                             parsedArchesApplicationsNodeModulesAliases[alias]
                             || parsedProjectNodeModulesAliases[alias]
@@ -143,8 +149,7 @@ module.exports = () => {
                             )
                         }
                         else {
-                            // eval() should be safe here, it's running developer-defined code during build
-                            parsedArchesApplicationsNodeModulesAliases[alias] = eval(executeableString);
+                            parsedArchesApplicationsNodeModulesAliases[alias] = Path.resolve(__dirname, APP_ROOT, 'media', subPath);
                         }
                     }
                 } catch (error) {
@@ -219,10 +224,12 @@ module.exports = () => {
                 ARCHES_APPLICATIONS: JSON.stringify(ARCHES_APPLICATIONS),
                 ARCHES_APPLICATIONS_DIRECTORY: JSON.stringify(ARCHES_APPLICATIONS_PATH).replace(/\\/g ,'/'),
             }
-            let eggFileCount = 0;
-            for (const [key, value] of Object.entries(eggFilePaths)) {
-                universalConstants[`EGG_FILE_PATH_${eggFileCount}`] = JSON.stringify(value).replace(/\\/g ,'/');
-                eggFileCount += 1;
+            if (eggFilePaths) {
+                let eggFileCount = 0;
+                for (const value of Object.values(eggFilePaths)) {
+                    universalConstants[`EGG_FILE_PATH_${eggFileCount}`] = JSON.stringify(value).replace(/\\/g ,'/');
+                    eggFileCount += 1;
+                }
             }
             // END create universal constants
             
