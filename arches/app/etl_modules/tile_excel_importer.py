@@ -1,13 +1,13 @@
 from datetime import datetime
 import json
 import os
-
+import uuid
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from openpyxl import load_workbook
 
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node
+from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import BaseImportModule
 
@@ -93,17 +93,22 @@ class TileExcelImporter(BaseImportModule):
                 row_count += 1
                 row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                 row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
-                tileid = cell_values[0]
+                user_tileid = cell_values[0].strip() if cell_values[0] and cell_values[0] != 'None' else None
+                tileid = user_tileid if user_tileid else uuid.uuid4()
                 nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
-                parenttileid = None if "None" else cell_values[1]
-                parenttileid = self.get_parent_tileid(
-                    nodegroup_depth, str(tileid), previous_tile, nodegroup_alias, nodegroup_tile_lookup
-                )
+                parenttileid = cell_values[1].strip() if cell_values[1] and cell_values[1] != 'None' else None
                 legacyid, resourceid = self.set_legacy_id(resourceid)
                 tile_value_json, passes_validation = self.create_tile_value(
                     cell_values, data_node_lookup, node_lookup, nodegroup_alias, row_details, cursor
                 )
+                nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
                 operation = 'insert'
+                if user_tileid:
+                    if nodegroup_cardinality == "n":                            
+                        operation = "update" # db will "insert" if tileid does not exist
+                    elif nodegroup_cardinality == "1":
+                        if TileModel.objects.filter(pk=tileid).exists():
+                            operation = "update"
                 cursor.execute(
                     """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (
