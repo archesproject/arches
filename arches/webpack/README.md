@@ -21,4 +21,3 @@ To avoid losing your customizations or changes, we recommend following these bes
 ## Contact and Support
 
 If you have any questions, concerns, or need assistance, don't hesitate to reach out to us [on our project forums](https://community.archesproject.org/). We are here to help you navigate the upgrade process and address any challenges you might encounter.
-
