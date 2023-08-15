@@ -1,7 +1,6 @@
 [report]
 omit =
     */python?.?/*
-    */site-packages/nose/*
     */models/migrations/*
     
 show_missing = true
