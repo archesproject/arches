@@ -2,14 +2,17 @@ from datetime import datetime
 import json
 import os
 import uuid
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from openpyxl import load_workbook
+from openpyxl.writer.excel import save_virtual_workbook
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.management.commands.etl_template import create_tile_excel_workbook
 
 
 class TileExcelImporter(BaseImportModule):
@@ -66,16 +69,12 @@ class TileExcelImporter(BaseImportModule):
 
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
         data_node_lookup = {}
-        nodegroup_tile_lookup = {}
-        previous_tile = {}
         row_count = 0
-        
 
         nodegroupid_column = int(worksheet.max_column)
         nodegroup_alias = nodegroup_lookup[worksheet.cell(row=2,column=nodegroupid_column).value]['alias']
         data_node_lookup[nodegroup_alias] = [val.value for val in worksheet[1][3:-3]]
 
-        
         for row in worksheet.iter_rows(min_row=2):
             cell_values = [cell.value for cell in row]
             if len(cell_values) == 0 or any(cell_values) is False:
@@ -155,10 +154,19 @@ class TileExcelImporter(BaseImportModule):
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
             for worksheet in workbook.worksheets:
-                if worksheet.title.lower() != "metadata":
-                    details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
-                    summary["files"][file]["worksheets"].append(details)
+                details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
+                summary["files"][file]["worksheets"].append(details)
             cursor.execute(
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
             )
+
+    def download(self, request):
+        format = request.POST.get("format")
+        if format == "xls":
+            wb = create_tile_excel_workbook(request.POST.get("id"))
+            response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
+            response["Content-Disposition"] = "attachment"
+            return {"success": True, "raw": response}
+        else:
+            return {"success": False, "data": "failed"}
