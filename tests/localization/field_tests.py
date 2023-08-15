@@ -6,7 +6,7 @@ from django.utils import translation
 from django.db import connection
 
 # these tests can be run from the command line via
-# python manage.py test tests/localization/field_tests.py --settings="tests.test_settings"
+# python manage.py test tests/localization/field_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class Customi18nTextFieldTests(ArchesTestCase):
