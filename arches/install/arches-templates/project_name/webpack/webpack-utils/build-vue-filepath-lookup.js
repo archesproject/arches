@@ -17,7 +17,7 @@ const buildVueFilePathLookup = function(path, outerAcc, vueDirectoryPath) {
             );
         }
         else {
-            let subPath = (Path.join(path, name)).split(/frontend(.*)/s)[1];  // splits only on first occurance
+            let subPath = (Path.join(path, name)).split(/src(.*)/s)[1];  // splits only on first occurance
             subPath = subPath.substring(1);
 
             const parsedPath = Path.parse(subPath);
@@ -29,7 +29,7 @@ const buildVueFilePathLookup = function(path, outerAcc, vueDirectoryPath) {
             else {
                 return { 
                     ...acc, 
-                    [Path.join('frontend', filename).replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
+                    [filename.replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
                 };
             }
         }

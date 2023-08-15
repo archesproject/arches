@@ -225,13 +225,13 @@ module.exports = () => {
             // END create image filepath lookup
             // BEGIN create vue filepath lookup
 
-            const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'frontend'), {});
-            const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'frontend'), {});
+            const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'src'), {});
+            const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'src'), {});
 
             const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {                
                 return {
                     ...acc,
-                    ...buildVueFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'frontend'), {})
+                    ...buildVueFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'src'), {})
                 };
             }, {});
 
