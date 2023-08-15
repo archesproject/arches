@@ -7,12 +7,18 @@ define([
     const viewModel = function(params) {
         this.config = params.config;
         this.search = params.search;
-         
+
         this.maxFiles = ko.observable(params.config.maxFiles());
         this.maxFiles.subscribe(function(val) {
             var int = parseInt(val);
             if(int > 0) { params.config.maxFiles(int); }
         });
+
+        this.imagesOnly = ko.observable(params.config.imagesOnly());
+        this.imagesOnly.subscribe(function(val) {
+            params.config.imagesOnly(val);
+        });
+
         this.activated = params.config.activateMax;
     };
 
