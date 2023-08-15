@@ -149,6 +149,12 @@ class RdfWriter(Writer):
             # Nothing to do here
             if pkg["r_uri"] is None and pkg["range_tile_data"] is None:
                 return
+            
+            # JSON-LD fails assert if domain node empty while range node has data. 
+            # Unknown!=Undefined, but reasonable substitution to omit edge from null domain.
+            if pkg["d_uri"] is None and pkg["range_tile_data"]:
+                self.logger.warn(_("Unable to return range value because domain is None, re https://github.com/archesproject/arches/pull/9783/files"))
+                return
 
             # FIXME:  Why is this not in datatype.to_rdf()
 
