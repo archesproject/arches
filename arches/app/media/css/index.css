@@ -87,7 +87,8 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     border-radius: 2px;
 }
 
-.v5-splash-navbar .navbar-nav>li>a:hover {
+.v5-splash-navbar .navbar-nav>li>a:hover,
+.v5-splash-navbar .navbar-nav>li>a:focus {
     background: #000;
     color: #13ce67;
 }
@@ -596,24 +597,22 @@ footer .footer-links {
 
 .down-button {
     position: absolute;
-    bottom: 10vh;
+    bottom: 12vh;
     left: calc(50% - 26px);
     z-index: 100;
     color: #fff;
     background: #2a2a2a;
     border: 1px solid #fff;
     border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    text-align: center;
 }
 
 .down-button-icon {
     font-size: 2.1rem;
-    padding-top: 4px;
-    padding-left: 10px;
-    height: 50px;
-    width: 50px;
-    align-items: center;
-    justify-content: center;
     opacity: .7;
+    line-height: 50px;
 }
 
 .data-type-icon {
@@ -704,6 +703,11 @@ footer .footer-links {
     padding: 0 10px;
 }
 
+body.dark p, li, .auth-options li a {
+    color: #eee;
+    font-size: 0.61rem;
+}
+
 /* ################################################ Slider - Start */
 
 .home-slider {
@@ -729,7 +733,7 @@ footer .footer-links {
 .slick-prev .fa, .slick-next .fa {
     color: #fff!important;
     opacity: 0.75!important;
-    font-size: 2.8rem!important;
+    font-size: 1.5rem;
     -webkit-text-stroke: 2px #000;
 }
 
@@ -774,13 +778,13 @@ footer .footer-links {
 
 .slide-caption {
     position: absolute;
-    bottom: 19vh;
+    bottom: 22vh;
     background: rgba(0, 0, 0, 0.5);
     padding: 10px;
 }
 
 .slide-caption h2 {
-    font-size: 55px;
+    font-size: 2.7rem;
     font-weight: 300;
     color: #fff;
     padding-bottom: 5px;
@@ -788,7 +792,7 @@ footer .footer-links {
 }
 
 .slide-caption p {
-    font-size: 29px;
+    font-size: 1.38rem;
     font-weight: 300;
     color: #fff;
     line-height: 0.7;
@@ -801,14 +805,17 @@ footer .footer-links {
     padding: 10px;
     background: rgba(0,0,0,.5);
     text-align: start;
-    font-size: 1.4rem;
+    font-size: 0.65rem;
 }
 
 /* ################################################ Slider - End */
 
-@media screen and (max-height: 640px) {
-    .down-button {
-        bottom: 11.7vh;
+@media screen and (max-height: 819px) {
+    .down-button,
+    .vertical-nav-container,
+    .slide-caption,
+    .slide-img-attribution {
+        display: none;
     }
     .down-button-icon {
         font-size: 2.6rem;
@@ -817,11 +824,8 @@ footer .footer-links {
         height: 7vh;
         width: 7vh;
     }
-}
-
-@media screen and (max-height: 640px) {
-    .down-button {
-        display: none;
+    #info-block-1 {
+        padding-top: 0;
     }
 }
 
@@ -870,6 +874,7 @@ footer .footer-links {
     }
     .slide-img-attribution {
         font-size: 3vw;
+        max-width: 100vw;
     }
 }
 
@@ -931,9 +936,4 @@ footer .footer-links {
     .copyright-container {
         padding: 30px 70px;
     }
-}
-
-body.dark p, li, .auth-options li a {
-    color: #eee;
-    font-size: 0.61rem;
 }

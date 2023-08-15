@@ -139,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <ul class="vertical-nav-list">
                         <li class="active">
                             <a class="vertical-nav-list-link" href="#info-block-0" data-number="1" aria-label="{% trans 'Go to the top of the page' %}"
-                                data-bind="click: function() { document.QuerySelector('#info-block-0').focus; }"
+                                data-bind="click: function() { $('.navbar-nav a:first-child').trigger('focus'); }"
                             >
                                 <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
                             </a>
@@ -189,12 +189,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
-                        <div class="slide-img-attribution">{% trans "Info to be added" %}</div>
+                        <div class="slide-img-attribution">{% trans "Potala Palace, Lhasa, Tibet" %}</div>
                     </div>
                 </div>
 
                 <!-- Down button -->
-                <a href="#info-block-1" class="down-button"><i class="fa fa-angle-down down-button-icon"></i></a>
+                <a href="#info-block-1" class="down-button" aria-label="{% trans 'Go to content' %}"><i class="fa fa-angle-down down-button-icon"></i></a>
                 
             </section>
             <!-- End Intro Section -->
@@ -469,7 +469,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 App.init();
                 
                 var contentSections = $('.app-info-block'),
-                    navigationItems = $('#cd-vertical-nav a');
+                    navigationItems = $('#cd-vertical-nav a, .down-button, .navbar-nav a');
 
                 updateNavigation();
                 $(window).on('scroll', function () {
@@ -503,7 +503,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 //slider
                 $('.home-slider').slick({
-                    accessibility: true,
                     arrowsPlacement: 'split',
                     dots: true,
                     autoplay: true,
