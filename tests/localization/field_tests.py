@@ -6,7 +6,7 @@ from django.utils import translation
 from django.db import connection
 
 # these tests can be run from the command line via
-# python manage.py test tests/localization/field_tests.py --settings="tests.test_settings"
+# python manage.py test tests/localization/field_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class Customi18nTextFieldTests(ArchesTestCase):
@@ -182,6 +182,23 @@ class Customi18nTextFieldTests(ArchesTestCase):
         m = self.LocalizationTestModel.objects.get(pk=10)
         self.assertEqual(str(m.name), "Marco")
         self.assertEqual(m.name.raw_value, {"en": "Marco"})
+
+    def test_quoted_string_i18n_text_field_data_consistency_before_and_after_save(self):
+        # re https://github.com/archesproject/arches/issues/9623
+        translation.activate("en")
+        m = self.LocalizationTestModel()
+        m.name = "\"Hello World\""
+        m.id = 11
+        self.assertEqual(str(m.name),"\"Hello World\"")
+        m.save()
+
+        # test that post save everything is the same
+        self.assertEqual(str(m.name), "\"Hello World\"")
+
+        # test that the object retrieved from the database is the same
+        m = self.LocalizationTestModel.objects.get(pk=11)
+        self.assertEqual(str(m.name), "\"Hello World\"")
+        self.assertEqual(m.name.raw_value, {"en": "\"Hello World\""})
 
     def test_equality(self):
         value = I18n_String("toast")
