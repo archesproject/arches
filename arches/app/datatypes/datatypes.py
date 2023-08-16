@@ -15,6 +15,7 @@ from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 
+from django.core.files.images import get_image_dimensions
 from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -1480,9 +1481,13 @@ class FileListDataType(BaseDataType):
         if request:
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
-        if len(file_type_errors) > 0:
+        def add_invalid_file_type_error(errors):
             title = _("Invalid File Type")
             errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
+
+        if len(file_type_errors) > 0:
+            add_invalid_file_type_error(errors)
+
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1506,6 +1511,14 @@ class FileListDataType(BaseDataType):
             config = node.config
             limit = config["maxFiles"]
             max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
+
+            images_only = config.get("imagesOnly", False)
+            if images_only and request:
+                files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
+                for file in files:
+                    width, height = get_image_dimensions(file.file)
+                    if not width or not height:
+                        add_invalid_file_type_error(errors)
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
