@@ -322,6 +322,27 @@ class Resource(models.ResourceInstance):
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
+    
+    @staticmethod
+    def bulk_index(resources):
+        datatype_factory = DataTypeFactory()
+        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        documents = []
+        term_list = []
+
+        for resource in resources:
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+            )
+
+            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+
+            term_list.extend([se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]) for term in terms])
+
+        se.bulk_index(documents)
+        se.bulk_index(term_list)
+
+
     def index(self, context=None):
         """
         Indexes all the nessesary items values of a resource to support search
