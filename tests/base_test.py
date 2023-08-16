@@ -27,8 +27,11 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 from tests import test_settings
 from arches.app.utils.context_processors import app_settings
 from django.db import connection
-from django.contrib.auth.models import User
 from django.core import management
+from django.test.runner import DiscoverRunner
+from django.test.utils import teardown_databases as _teardown_databases
+from oauth2_provider.models import Application
+
 from arches.app.search.mappings import (
     prepare_terms_index,
     delete_terms_index,
@@ -49,57 +52,26 @@ CREATE_TOKEN_SQL = """
             token, expires, scope, application_id, user_id, created, updated)
             VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
     """
+DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
 
 
-def setUpTestPackage():
-    """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
-    this is called from __init__.py
-    """
+class ArchesTestRunner(DiscoverRunner):
+    def setup_databases(self, **kwargs):
+        ret = super().setup_databases(**kwargs)
 
-    cursor = connection.cursor()
-    sql = """
-        INSERT INTO public.oauth2_provider_application(
-            id,client_id, redirect_uris, client_type, authorization_grant_type,
-            client_secret,
-            name, user_id, skip_authorization, created, updated)
-        VALUES (
-            44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-            '{oauth_client_secret}',
-            'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
-    """
+        app_settings()  # adds languages to system
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
+        prepare_search_index(create=True)
 
-    sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-    cursor.execute(sql)
+        return ret
 
-    app_settings()  # adds languages to system
-    prepare_terms_index(create=True)
-    prepare_concepts_index(create=True)
-    prepare_search_index(create=True)
+    def teardown_databases(self, old_config, **kwargs):
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
-
-def tearDownTestPackage():
-    """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
-    this is called from __init__.py
-    """
-
-    delete_terms_index()
-    delete_concepts_index()
-    delete_search_index()
-
-
-def setUpModule():
-    # This doesn't appear to be called because ArchesTestCase is never called directly
-    # See setUpTestPackage above
-    pass
-
-
-def tearDownModule():
-    # This doesn't appear to be called because ArchesTestCase is never called directly
-    # See tearDownTestPackage above
-    pass
-
+        super().teardown_databases(old_config, **kwargs)
 
 class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):
@@ -120,11 +92,35 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pass
+        # Account for the fact that some test classes may be failing to call
+        # super().tearDownClass() in their tearDownClass() implementations.
+        try:
+            Application.objects.get(id=44)
+        except Application.DoesNotExist:
+            pass
+        else:
+            return
+
+        cursor = connection.cursor()
+        sql = """
+            INSERT INTO public.oauth2_provider_application(
+                id, client_id, redirect_uris, client_type, authorization_grant_type,
+                client_secret,
+                name, user_id, skip_authorization, created, updated)
+            VALUES (
+                44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+                '{oauth_client_secret}',
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
+        """
+
+        sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
+        cursor.execute(sql)
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        cursor = connection.cursor()
+        sql = "DELETE FROM public.oauth2_provider_application WHERE id = 44;"
+        cursor.execute(sql)
 
     @classmethod
     def deleteGraph(cls, root):
