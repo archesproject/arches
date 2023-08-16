@@ -218,7 +218,7 @@ def load_excel_data(import_module, importer_name, userid, files, summary, result
 
 
 @shared_task
-def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
+def load_branch_excel(userid, files, summary, result, temp_dir, loadid):
     from arches.app.etl_modules import branch_excel_importer
 
     BranchExcelImporter = branch_excel_importer.BranchExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
@@ -234,7 +234,7 @@ def load_tile_excel(userid, files, summary, result, temp_dir, loadid):
 
 
 @shared_task
-def export_branch_csv(user_id, load_id, graph_id, graph_name, resource_ids):
+def export_branch_excel(user_id, load_id, graph_id, graph_name, resource_ids):
     from arches.app.etl_modules import branch_excel_exporter
 
     logger = logging.getLogger(__name__)

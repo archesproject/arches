@@ -42,7 +42,7 @@ class BranchExcelImporter(BaseImportModule):
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
 
-        load_task = tasks.load_branch_csv.apply_async(
+        load_task = tasks.load_branch_excel.apply_async(
             (self.userid, files, summary, result, self.temp_dir, self.loadid),
         )
         with connection.cursor() as cursor:
