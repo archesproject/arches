@@ -400,7 +400,8 @@ class Command(BaseCommand):
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
                 graph_json = JSONSerializer().serialize(output_graph, indent=4)
                 if graph["graphid"] not in existing_resource_graphs:
-                    output_file = os.path.join(dest_dir, str(I18n_String(graph["name"])) + ".json")
+                    graph_name = str(I18n_String(graph["name"])).replace("/", "-")
+                    output_file = os.path.join(dest_dir, graph_name + ".json")
                     with open(output_file, "w") as f:
                         print("writing", output_file)
                         f.write(graph_json)

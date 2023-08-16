@@ -33,9 +33,13 @@ class SearchEngineFactory(object):
         components = backend.split(".")
         classname = components[len(components) - 1]
         modulename = (".").join(components[0 : len(components) - 1])
-        # _temp = __import__(modulename, globals(), locals(), [classname], -1)
         _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
-        return getattr(_temp, classname)(hosts=hosts, prefix=prefix, **connection_options)
+        args = {}
+        args["prefix"] = prefix
+        if "cloud_id" not in settings.ELASTICSEARCH_CONNECTION_OPTIONS:
+            args["hosts"] = hosts
+
+        return getattr(_temp, classname)(**args, **connection_options)
 
 
 SearchEngineInstance = SearchEngineFactory().create()
