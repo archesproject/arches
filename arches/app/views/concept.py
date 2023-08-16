@@ -275,7 +275,7 @@ def concept(request, conceptid):
 
                 return JSONResponse(concept)
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()
 
 
 def export(request, conceptid):
@@ -571,4 +571,4 @@ def concept_value(request):
         value = models.Value.objects.get(pk=valueid)
         return JSONResponse(value)
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()

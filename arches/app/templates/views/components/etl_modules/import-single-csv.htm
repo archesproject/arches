@@ -130,10 +130,10 @@
         </table>
         </div>
         <!-- ko if: csvExample().length >= 5-->
-        <div data-bind="text: $root.translations.showingFirst + ' ' + csvExample().length + $root.translations.rows"></div>
+        <div data-bind="text: $root.translations.showingFirst + ' ' + csvExample().length + ' ' + $root.translations.rows"></div>
         <!-- /ko -->
         <!-- ko ifnot: csvExample().length >= 5 -->
-        <div data-bind="text: $root.translations.showingAll + ' ' + csvExample().length + $root.translations.rows"></div>
+        <div data-bind="text: $root.translations.showingAll + ' ' + csvExample().length + ' ' + $root.translations.rows"></div>
         <!-- /ko -->
     </div>
     <!-- /ko -->
