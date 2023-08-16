@@ -1328,6 +1328,7 @@ class CsvReader(Reader):
                     source_data = column_names_to_targetids(row, mapping, row_number)
                     group_no = False
                     group_valid = "GROUP_NO" in row and row["GROUP_NO"] and row["GROUP_NO"] != ""
+                    preexisting_parenttile_created_for_resource_group_nodegroup = None
                     prefix = None
 
                     # row_keys = [list(b) for b in zip(*[list(a.keys()) for a in source_data])]
@@ -1560,7 +1561,10 @@ class CsvReader(Reader):
                                 source_data.pop(0)  # TODO TEMPORARY: remove Details components that have a component type
                             while len(source_data) > 0:
                                 target_tile = get_blank_tile(source_data)
-                                preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid)
+                                if preexisting_parenttile_created_for_resource_group_nodegroup:
+                                    preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid, tileid=group_no_to_tileids[group_no][str(target_tile.nodegroup_id)]["tileid"])
+                                else:
+                                    preexisting_tile_for_nodegroup = get_preexisting_tile(target_tile, populated_tiles, resourceinstanceid)
                                 if preexisting_tile_for_nodegroup and str(target_tile.nodegroup_id) != component_nodegroupid:
                                     target_tile = get_blank_tile(source_data, child_only=True)
                                     target_tile.parenttile = preexisting_tile_for_nodegroup
