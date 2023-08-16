@@ -1,17 +1,19 @@
 from datetime import datetime
 import json
+from openpyxl import load_workbook
+from openpyxl.writer.excel import save_virtual_workbook
 import os
 import uuid
+from django.db import connection
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
-from openpyxl import load_workbook
-from openpyxl.writer.excel import save_virtual_workbook
-
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import BaseImportModule
+import arches.app.tasks as tasks
 from arches.management.commands.etl_template import create_tile_excel_workbook
 
 
@@ -26,6 +28,25 @@ class TileExcelImporter(BaseImportModule):
         self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
 
+    @load_data_async
+    def run_load_task_async(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.file_details = request.POST.get("load_details", None)
+        result = {}
+        if self.file_details:
+            details = json.loads(self.file_details)
+            files = details["result"]["summary"]["files"]
+            summary = details["result"]["summary"]
+
+        load_task = tasks.load_tile_excel.apply_async(
+            (self.userid, files, summary, result, self.temp_dir, self.loadid),
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, nodegroup_alias, row_details, cursor):
         node_value_keys = data_node_lookup[nodegroup_alias]

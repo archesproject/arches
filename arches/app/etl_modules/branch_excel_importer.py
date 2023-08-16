@@ -7,9 +7,12 @@ from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
+from django.db import connection
 
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import TileModel
+import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
@@ -27,6 +30,26 @@ class BranchExcelImporter(BaseImportModule):
         self.temp_path = ""
         self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
+
+    @load_data_async
+    def run_load_task_async(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.file_details = request.POST.get("load_details", None)
+        result = {}
+        if self.file_details:
+            details = json.loads(self.file_details)
+            files = details["result"]["summary"]["files"]
+            summary = details["result"]["summary"]
+
+        load_task = tasks.load_branch_csv.apply_async(
+            (self.userid, files, summary, result, self.temp_dir, self.loadid),
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, row_details, cursor):
         nodegroup_alias = cell_values[2].strip().split(" ")[0].strip()

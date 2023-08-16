@@ -156,26 +156,6 @@ class BaseImportModule:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
 
-    @load_data_async
-    def run_load_task_async(self, request):
-        self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
-        self.file_details = request.POST.get("load_details", None)
-        result = {}
-        if self.file_details:
-            details = json.loads(self.file_details)
-            files = details["result"]["summary"]["files"]
-            summary = details["result"]["summary"]
-
-        load_task = tasks.load_branch_csv.apply_async(
-            (self.userid, files, summary, result, self.temp_dir, self.loadid),
-        )
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
-                (load_task.task_id, self.loadid),
-            )
-
     def run_load_task(self, files, summary, result, temp_dir, loadid):
         with connection.cursor() as cursor:
             for file in files.keys():
@@ -278,7 +258,7 @@ class BaseImportModule:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
+            use_celery_file_size_threshold_in_MB = 0.001
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 response = self.run_load_task_async(request, self.loadid)
             else:
