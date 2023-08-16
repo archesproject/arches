@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9648_add_empty_key_value_pairs_to_tiles"),
+        ("models", "9747_alter_maplayer_options"),
     ]
 
     operations = [
