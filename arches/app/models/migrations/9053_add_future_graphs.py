@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9746_related_resource_post_save_bug"),
+        ("models", "9747_alter_maplayer_options"),
     ]
 
     operations = [

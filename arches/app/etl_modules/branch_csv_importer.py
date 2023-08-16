@@ -268,6 +268,11 @@ class BranchCsvImporter(BaseImportModule):
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
                         default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
+        elif content.name.split(".")[-1] == "xlsx":
+            self.cumulative_excel_files_size += content.size
+            result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
+            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+            default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
         return {"success": result, "data": result}
 
     def start(self, request):
