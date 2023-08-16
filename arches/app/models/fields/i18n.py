@@ -24,6 +24,18 @@ class I18n_String(object):
         if isinstance(value, str) and value != "null":
             try:
                 ret = json.loads(value)
+
+                # the following is a fix for issue #9623 - using double quotation marks in i18n input
+                # re https://github.com/archesproject/arches/issues/9623
+                # the reason we have to do this next check is that we assumed that if the 
+                # json.loads method doesn't fail we have a python dict.  That's usually 
+                # true unless you have a simple string wrapped in quotes 
+                # eg: '"hello world"' rather than simply 'hello world'
+                # the quoted string loads without error but is not a dict
+                # hence the need for this check
+                if not isinstance(ret, dict):
+                    ret = {}
+                    raise Exception("value is not a json object")
             except:
                 ret[lang] = value
                 self.value_is_primitive = True
