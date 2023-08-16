@@ -182,6 +182,15 @@ define([
                 //console.log('disposing CardModel');
                 dispose(self);
             };
+
+            document.addEventListener("keydown", e => {
+                if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    if (this.dirty()) {
+                        this.save()
+                    }
+                }})
+
         },
 
         /**

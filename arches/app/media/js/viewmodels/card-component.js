@@ -152,17 +152,15 @@ define([
         document.addEventListener("keydown", e => {
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
-                console.log("CONTROL S HAS BEEN PRESSED")
-                if (self?.tile && self?.tile?.dirty() == true) {
-                        console.log("TILE",self.tile)
-                        console.log("DIRTY",self.tile.dirty())
-                        self.saveTile();
+                if (self?.tile && 
+                    self?.tile?.dirty() == true && 
+                    self?.tile?.parent?.isWritable === true) {
+                        self.saveTile()
                 };
-            }
+            };
         })
 
         this.saveTile = function(callback) {
-            console.log("SAVETILE STARTED")
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
 
@@ -172,16 +170,11 @@ define([
             else if (ko.unwrap(params.form?.resourceId)){
                 self.tile.resourceinstance_id = ko.unwrap(params.form.resourceId);
             }
-            console.log(" IN TILE SAVE FUNCTION")
             self.tile.save(function(response) {
-                console.log("IN SELF TILE SAVE INNER FUNCT")
-                console.log(response)
                 self.loading(false);
                 if(params?.form?.error){
                     params.form.error(response.responseJSON.message);
                 }
-                console.log(response.responseJSON.title)
-                console.log(response.responseJSON.message)
                 params.pageVm.alert(
                     new AlertViewModel(
                         'ep-alert-red',
