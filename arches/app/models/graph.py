@@ -742,17 +742,6 @@ class Graph(models.GraphModel):
         temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
-
-        if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
-            tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
-            if tile_count > 0:
-                raise GraphValidationError(
-                    _("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.").format(
-                        self.name
-                    ),
-                    1006,
-                )
-
         nodegroup = None
 
         if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
