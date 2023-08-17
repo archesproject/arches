@@ -80,6 +80,16 @@ define([
             this.loading(false);
         };
 
+        this.showAlert = (data) => {
+            self.alert(new AlertViewModel(
+                'ep-alert-red',
+                data["data"]["title"],
+                data["data"]["message"],
+                null,
+                function(){}
+            ));
+        };
+
         this.addFile = async function(file){
             self.loading(true);
             self.fileInfo({name: file.name, size: file.size});
@@ -94,13 +104,7 @@ define([
             } else {
                 self.loading(false);
                 const data = await response.json();
-                self.alert(new AlertViewModel(
-                    'ep-alert-red',
-                    data["data"]["title"],
-                    data["data"]["message"],
-                    null,
-                    function(){}
-                ));
+                self.showAlert(data);
             }
         };
 
@@ -128,13 +132,7 @@ define([
             }
             else {
                 const data = await response.json();
-                this.alert(new AlertViewModel(
-                    'ep-alert-red',
-                    data["data"]["title"],
-                    data["data"]["message"],
-                    null,
-                    function(){}
-                ));
+                self.showAlert(data);
             }
         };
     };
