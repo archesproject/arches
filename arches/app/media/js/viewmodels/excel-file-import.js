@@ -15,8 +15,6 @@ define([
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.data2 = ko.observable(false);
-        this.formatTime = params.formatTime;
-        this.timeDifference = params.timeDifference;
         this.moduleId = params.etlmoduleid;
         ImporterViewModel.apply(this, arguments);
         this.selectedTemplate = ko.observable();
