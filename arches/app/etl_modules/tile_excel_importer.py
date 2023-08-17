@@ -145,7 +145,6 @@ class TileExcelImporter(BaseImportModule):
                     break
                 except: # IndexError, ValidationError
                     pass
-        print("graphid: ", graphid)
         return graphid
 
     def stage_excel_file(self, file, summary, cursor):
