@@ -146,16 +146,15 @@ class Card(models.CardModel):
                         card_id = widget.get("card_id", None)
                         widget_id = widget.get("widget_id", None)
                         if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
-                            try:
-                                wm = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id)
-                                cardxnodexwidgetid = wm.pk
-                            except:
-                                pass
-                        widget_model = models.CardXNodeXWidget()
-                        widget_model.pk = cardxnodexwidgetid
-                        widget_model.node_id = node_id
-                        widget_model.card_id = card_id
-                        widget_model.widget_id = widget_id
+                            widget_model, _ = models.CardXNodeXWidget.objects.get_or_create(
+                                node_id=node_id, card_id=card_id, widget_id=widget_id
+                            )
+                        else:
+                            widget_model = models.CardXNodeXWidget()
+                            widget_model.pk = cardxnodexwidgetid
+                            widget_model.node_id = node_id
+                            widget_model.card_id = card_id
+                            widget_model.widget_id = widget_id
                         widget_model.config = widget.get("config", {})
                         widget_model.label = widget.get("label", "")
                         widget_model.visible = widget.get("visible", None)
