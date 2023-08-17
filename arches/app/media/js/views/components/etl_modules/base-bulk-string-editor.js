@@ -33,6 +33,7 @@ define([
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
         this.loading(true);
+        this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
         this.selectedLanguage = ko.observable();
         this.graphs = ko.observable();
@@ -83,6 +84,7 @@ define([
         this.ready = ko.computed(() => {
             const ready = !!self.selectedGraph() &&
                 !!self.selectedNode() &&
+                !self.previewing() &&
                 ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
             return ready;
         });
@@ -147,6 +149,11 @@ define([
             if (!self.ready()) {
                 return;
             }
+
+            self.previewing(true);
+            self.showPreview(false);
+            self.previewValue([]);
+
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -169,6 +176,7 @@ define([
             }).fail(function(err) {
                 console.log(err);
             }).always(function() {
+                self.previewing(false);
                 self.deleteAllFormData();
             });
         };
@@ -193,7 +201,7 @@ define([
             self.addAllFormData();
             params.activeTab("import");
             self.submit('write').then(data => {
-                console.log(data.result);
+                //console.log(data.result);
             }).fail( function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
