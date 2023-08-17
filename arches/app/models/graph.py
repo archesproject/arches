@@ -720,12 +720,6 @@ class Graph(models.GraphModel):
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
 
-        if self.publication:
-            raise GraphValidationError(
-                _("Please unpublish your graph before adding a node."),
-                1012,
-            )
-
         if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
             tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
             if tile_count > 0:
@@ -1095,11 +1089,7 @@ class Graph(models.GraphModel):
         """
 
         found = False
-        if nodeToAppendTo.graph.publication:
-            raise GraphValidationError(
-                _("Please unpublish your graph before adding a branch."),
-                1012,
-            )
+
         if self.ontology is not None and graphToAppend.ontology is None:
             raise GraphValidationError(_("The graph you wish to append needs to define an ontology"))
 

@@ -1069,28 +1069,6 @@ class GraphTests(ArchesTestCase):
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
 
-    def test_appending_to_published_graph(self):
-        graph = Graph.objects.get(node=self.rootNode)
-        admin = User.objects.get(username="admin")
-        graph.publish(user=admin)
-        self.addCleanup(graph.unpublish)
-
-        with self.assertRaises(GraphValidationError) as cm:
-            graph.append_node()
-        self.assertEqual(cm.exception.code, 1012)
-        with self.assertRaises(GraphValidationError) as cm:
-            graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)
-        self.assertEqual(cm.exception.code, 1012)
-
-    def test_appending_published_branch_to_unpublished_graph(self):
-        graph = Graph.objects.get(node=self.rootNode)
-        admin = User.objects.get(username="admin")
-        branch = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
-        branch.publish(user=admin)
-        self.addCleanup(branch.unpublish)
-
-        graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)
-
     def test_update_empty_graph_from_editable_future_graph(self):
         source_graph = Graph.new(name="TEST RESOURCE")
         editable_future_graph = source_graph.create_editable_future_graph()  # TODO: replace with db lookup after 9114 signal work
