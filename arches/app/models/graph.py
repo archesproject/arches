@@ -24,6 +24,7 @@ from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
+from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.resource import Resource
@@ -706,6 +707,17 @@ class Graph(models.GraphModel):
         temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
+
+        if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
+            tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
+            if tile_count > 0:
+                raise GraphValidationError(
+                    _("Your resource model: {0}, already has instances saved. You cannot modify a Resource Model with instances.").format(
+                        self.name
+                    ),
+                    1006,
+                )
+
         nodegroup = None
 
         if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
@@ -1049,7 +1061,7 @@ class Graph(models.GraphModel):
 
     def can_append(self, graphToAppend, nodeToAppendTo):
         """
-        can_append - test to see whether or not a graph can be appened to this graph at a specific location
+        can_append - test to see whether or not a graph can be appended to this graph at a specific location
 
         returns true if the graph can be appended, false otherwise
 
@@ -1060,6 +1072,7 @@ class Graph(models.GraphModel):
         """
 
         found = False
+
         if self.ontology is not None and graphToAppend.ontology is None:
             raise GraphValidationError(_("The graph you wish to append needs to define an ontology"))
 
@@ -1657,7 +1670,8 @@ class Graph(models.GraphModel):
             for node_id, node in self.nodes.items():
                 if node.ontologyclass is not None:
                     raise GraphValidationError(
-                        _("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005
+                        _("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."),
+                        IntegrityCheck.NODE_HAS_ONTOLOGY_GRAPH_DOES_NOT.value,
                     )
 
         # make sure the supplied json-ld context is valid
