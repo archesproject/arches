@@ -118,10 +118,10 @@ class ArchesProjectCommand(TemplateCommand):
 
     def handle(self, options):
         project_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(project_name, "project")
 
         # Check that the project_name cannot be imported.
         try:
-            self.validate_name(project_name, "project")
             import_module(project_name)
         except ImportError:
             pass
