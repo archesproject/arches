@@ -485,9 +485,7 @@ class GraphModel(models.Model):
         return False
 
     def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-            return True
-        elif self.isresource:
+        if self.isresource:
             return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
         else:
             return True
