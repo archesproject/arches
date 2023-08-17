@@ -92,9 +92,15 @@ define([
                 self.response(data);
                 self.loadDetails(data);
             } else {
-                // eslint-disable-next-line no-console
-                console.log('error');
                 self.loading(false);
+                const data = await response.json();
+                self.alert(new AlertViewModel(
+                    'ep-alert-red',
+                    data["data"]["title"],
+                    data["data"]["message"],
+                    null,
+                    function(){}
+                ));
             }
         };
 
@@ -132,5 +138,5 @@ define([
             }
         };
     };
-    return ExcelFileImportViewModel
+    return ExcelFileImportViewModel;
 });
