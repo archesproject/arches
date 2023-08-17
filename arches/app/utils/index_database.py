@@ -197,13 +197,12 @@ def index_resources_using_singleprocessing(
                 resource.set_node_datatypes(node_datatypes)
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if recalculate_descriptors:
-                    resource.calculate_descriptors()
+                    resource.calculate_descriptors(resave=True)
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
-                resource.save(index=False)
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])

@@ -149,7 +149,7 @@ class Resource(models.ResourceInstance):
         self.calculate_descriptors(context=context)
         return self.descriptors[language][descriptor]
 
-    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None, resave=False):
         """
         descriptors -- iterator with descriptors to be calculated
         context -- Dictionary which may have:
@@ -159,23 +159,25 @@ class Resource(models.ResourceInstance):
 
         """
 
-        language = self.get_descriptor_language(context)
+        for lang in settings.LANGUAGES:
+            language = self.get_descriptor_language({"language":lang[0]})
+            if not self.descriptor_function:
+                self.descriptor_function = models.FunctionXGraph.objects.filter(
+                    graph_id=self.graph_id, function__functiontype="primarydescriptors"
+                ).select_related("function")
 
-        if not self.descriptor_function:
-            self.descriptor_function = models.FunctionXGraph.objects.filter(
-                graph_id=self.graph_id, function__functiontype="primarydescriptors"
-            ).select_related("function")
-
-        for descriptor in descriptors:
-            if len(self.descriptor_function) == 1:
-                module = self.descriptor_function[0].function.get_class_module()()
-                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
-                )
-                if descriptor == "name" and self.descriptors[language][descriptor] is not None:
-                    self.name[language] = self.descriptors[language][descriptor]
-            else:
-                self.descriptors[language][descriptor] = None
+            for descriptor in descriptors:
+                if len(self.descriptor_function) == 1:
+                    module = self.descriptor_function[0].function.get_class_module()()
+                    self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                        self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
+                    )
+                    if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                        self.name[language] = self.descriptors[language][descriptor]
+                else:
+                    self.descriptors[language][descriptor] = None
+        if resave:
+            super(Resource, self).save()
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -322,12 +324,7 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            for lang in settings.LANGUAGES:
-                if context is None:
-                    context = {}
-                context["language"] = lang[0]
-                self.calculate_descriptors(context=context)
-
+            self.calculate_descriptors(resave=True)
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
