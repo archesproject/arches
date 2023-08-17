@@ -147,9 +147,7 @@ class BranchExcelImporter(BaseImportModule):
         return {"name": worksheet.title, "rows": row_count}
 
     def validate_uploaded_file(self, file):
-        print("++++++++++++++++++++++ before trying to open")
         workbook = load_workbook(filename=default_storage.open(file))
-        print("++++++++++++++++++++++ after trying to open")
         graphid = None
         try:
             graphid = workbook.get_sheet_by_name("metadata")["B1"].value
