@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os, json, uuid
+from django.contrib.auth.models import User
 from django.core import management
 from tests import test_settings
 from tests.base_test import ArchesTestCase
