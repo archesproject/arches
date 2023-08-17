@@ -275,7 +275,7 @@ def concept(request, conceptid):
 
                 return JSONResponse(concept)
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()
 
 
 def export(request, conceptid):
@@ -443,7 +443,7 @@ def search(request):
     searchString = request.GET["q"]
     removechildren = request.GET.get("removechildren", None)
     query = Query(se, start=0, limit=100)
-    phrase = Match(field="value", query=searchString.lower(), type="phrase_prefix")
+    phrase = Match(field="value.folded", query=searchString.lower(), type="phrase_prefix")
     query.add_query(phrase)
     results = query.search(index=CONCEPTS_INDEX)
 
@@ -571,4 +571,4 @@ def concept_value(request):
         value = models.Value.objects.get(pk=valueid)
         return JSONResponse(value)
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()
