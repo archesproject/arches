@@ -146,20 +146,26 @@ class BranchExcelImporter(BaseImportModule):
         )
         return {"name": worksheet.title, "rows": row_count}
 
+    def validate_uploaded_file(self, file):
+        print("++++++++++++++++++++++ before trying to open")
+        workbook = load_workbook(filename=default_storage.open(file))
+        print("++++++++++++++++++++++ after trying to open")
+        graphid = None
+        try:
+            graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+        except: # KeyError
+            pass
+        return graphid
+
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            workbook = load_workbook(filename=default_storage.open(os.path.join("uploadedfiles", "tmp", self.loadid, file)))
-            try:
-                graphid = workbook.get_sheet_by_name("metadata")["B1"].value
-            except KeyError:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                raise ValueError(_("A graphid is not available in the metadata worksheet"))
+            uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
+            graphid = self.validate_uploaded_file(uploaded_file_path)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
+
+            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
             for worksheet in workbook.worksheets:
                 if worksheet.title.lower() != "metadata":
                     details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)

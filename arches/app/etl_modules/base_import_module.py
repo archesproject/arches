@@ -203,6 +203,9 @@ class BaseImportModule:
         result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
 
+    def validate_uploaded_file(self, file, kwarg):
+        pass
+
     ### Actions ###
 
     def validate(self, loadid):
@@ -251,6 +254,16 @@ class BaseImportModule:
             result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
             default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
+
+        for file in result["summary"]["files"]:
+            if file.split(".")[-1] == "xlsx":
+                uploaded_file_path = os.path.join(self.temp_dir, file)
+                graphid = self.validate_uploaded_file(uploaded_file_path)
+                if graphid is None:
+                    title = _("Invalid Uploaded File")
+                    message = _("The key information is missing. Make sure the uploaded excel template is in the right format.")
+                    return {"success": False, "data": {"title": title, "message": message}}
+
         return {"success": result, "data": result}
 
     def start(self, request):

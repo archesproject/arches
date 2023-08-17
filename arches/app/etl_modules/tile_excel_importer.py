@@ -133,22 +133,30 @@ class TileExcelImporter(BaseImportModule):
             [self.loadid],
         )
         return {"name": worksheet.title, "rows": row_count}
+    
+    def validate_uploaded_file(self, file):
+        workbook = load_workbook(filename=default_storage.open(file))
+        graphid = None
+        for worksheet in workbook.worksheets:
+            if worksheet.cell(2, worksheet.max_column).value:
+                try:
+                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id)
+                    break
+                except: # IndexError, ValidationError
+                    pass
+        print("graphid: ", graphid)
+        return graphid
 
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            workbook = load_workbook(filename=default_storage.open(os.path.join("uploadedfiles", "tmp", self.loadid, file)))
-            try:
-                nodegroup_id = workbook.active.cell(2, workbook.active.max_column).value
-                graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[:1].values_list('graph_id', flat=True)[0])
-            except KeyError:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                raise ValueError(_("A graphid is not available in the metadata worksheet"))
+            uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
+            graphid = self.validate_uploaded_file(uploaded_file_path)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
+
+            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
             for worksheet in workbook.worksheets:
                 if worksheet.title.lower() != "metadata":
                     details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
