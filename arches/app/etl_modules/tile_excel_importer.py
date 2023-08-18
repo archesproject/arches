@@ -1,15 +1,20 @@
 from datetime import datetime
 import json
+from openpyxl import load_workbook
+from openpyxl.writer.excel import save_virtual_workbook
 import os
-
+import uuid
+from django.db import connection
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
-from openpyxl import load_workbook
-
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node
+from arches.app.etl_modules.decorators import load_data_async
+from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import BaseImportModule
+import arches.app.tasks as tasks
+from arches.management.commands.etl_template import create_tile_excel_workbook
 
 
 class TileExcelImporter(BaseImportModule):
@@ -23,6 +28,25 @@ class TileExcelImporter(BaseImportModule):
         self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
 
+    @load_data_async
+    def run_load_task_async(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.file_details = request.POST.get("load_details", None)
+        result = {}
+        if self.file_details:
+            details = json.loads(self.file_details)
+            files = details["result"]["summary"]["files"]
+            summary = details["result"]["summary"]
+
+        load_task = tasks.load_tile_excel.apply_async(
+            (self.userid, files, summary, result, self.temp_dir, self.loadid),
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET taskid = %s WHERE loadid = %s""",
+                (load_task.task_id, self.loadid),
+            )
 
     def create_tile_value(self, cell_values, data_node_lookup, node_lookup, nodegroup_alias, row_details, cursor):
         node_value_keys = data_node_lookup[nodegroup_alias]
@@ -66,16 +90,12 @@ class TileExcelImporter(BaseImportModule):
 
     def process_worksheet(self, worksheet, cursor, node_lookup, nodegroup_lookup):
         data_node_lookup = {}
-        nodegroup_tile_lookup = {}
-        previous_tile = {}
         row_count = 0
-        
 
         nodegroupid_column = int(worksheet.max_column)
         nodegroup_alias = nodegroup_lookup[worksheet.cell(row=2,column=nodegroupid_column).value]['alias']
         data_node_lookup[nodegroup_alias] = [val.value for val in worksheet[1][3:-3]]
 
-        
         for row in worksheet.iter_rows(min_row=2):
             cell_values = [cell.value for cell in row]
             if len(cell_values) == 0 or any(cell_values) is False:
@@ -93,17 +113,22 @@ class TileExcelImporter(BaseImportModule):
                 row_count += 1
                 row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
                 row_details["nodegroup_id"] = node_lookup[nodegroup_alias]["nodeid"]
-                tileid = cell_values[0]
+                user_tileid = cell_values[0].strip() if cell_values[0] and cell_values[0] != 'None' else None
+                tileid = user_tileid if user_tileid else uuid.uuid4()
                 nodegroup_depth = nodegroup_lookup[row_details["nodegroup_id"]]["depth"]
-                parenttileid = None if "None" else cell_values[1]
-                parenttileid = self.get_parent_tileid(
-                    nodegroup_depth, str(tileid), previous_tile, nodegroup_alias, nodegroup_tile_lookup
-                )
+                parenttileid = cell_values[1].strip() if cell_values[1] and cell_values[1] != 'None' else None
                 legacyid, resourceid = self.set_legacy_id(resourceid)
                 tile_value_json, passes_validation = self.create_tile_value(
                     cell_values, data_node_lookup, node_lookup, nodegroup_alias, row_details, cursor
                 )
+                nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
                 operation = 'insert'
+                if user_tileid:
+                    if nodegroup_cardinality == "n":                            
+                        operation = "update" # db will "insert" if tileid does not exist
+                    elif nodegroup_cardinality == "1":
+                        if TileModel.objects.filter(pk=tileid).exists():
+                            operation = "update"
                 cursor.execute(
                     """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (
@@ -150,10 +175,19 @@ class TileExcelImporter(BaseImportModule):
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
             for worksheet in workbook.worksheets:
-                if worksheet.title.lower() != "metadata":
-                    details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
-                    summary["files"][file]["worksheets"].append(details)
+                details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
+                summary["files"][file]["worksheets"].append(details)
             cursor.execute(
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
             )
+
+    def download(self, request):
+        format = request.POST.get("format")
+        if format == "xls":
+            wb = create_tile_excel_workbook(request.POST.get("id"))
+            response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
+            response["Content-Disposition"] = "attachment"
+            return {"success": True, "raw": response}
+        else:
+            return {"success": False, "data": "failed"}

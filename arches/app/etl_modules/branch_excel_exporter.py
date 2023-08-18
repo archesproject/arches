@@ -200,7 +200,7 @@ class BranchExcelExporter:
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
 
-        export_task = tasks.export_branch_csv.apply_async(
+        export_task = tasks.export_branch_excel.apply_async(
             (self.userid, self.loadid, graph_id, graph_name, resource_ids),
         )
 

@@ -22,7 +22,10 @@ from django.core.management.base import BaseCommand
 from openpyxl import Workbook, styles
 from operator import itemgetter
 from django.db import connection
+from arches.app.models.card import Card
 from arches.app.models.models import Node
+from arches.app.models.system_settings import settings
+from arches.app.utils.db_utils import dictfetchall
 
 
 class Command(BaseCommand):
@@ -57,9 +60,15 @@ class Command(BaseCommand):
         wb = create_workbook(graphid)
         wb.save(filename=dest)
 
+    def create_tilexls_template(self, dest, graphid):
+        wb = create_tile_excel_workbook(graphid)
+        wb.save(filename=dest)
+
     def create_template(self, template, dest, graphid):
         if template == "branchcsv":
             self.create_branchcsv_template(dest, graphid)
+        elif template == "tilexls":
+            self.create_tilexls_template(dest, graphid)
 
 
 def write_metadata(workbook, metadata):
@@ -140,3 +149,29 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
 
         write_metadata(wb, metadata)
         return wb
+
+def create_tile_excel_workbook(graphid, tiledata=None):
+    wb = Workbook()
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+        rows = dictfetchall(cursor)
+        first_sheet = True
+        for row in rows:
+            card_name = str(Card.objects.get(nodegroup=row["nodegroupid"]).name)
+            if first_sheet is True:
+                sheet = wb.active
+                sheet.title = card_name
+                first_sheet = False
+            else:
+                sheet = wb.create_sheet(title=card_name)
+            sheet[f"A1"] = "tileid"
+            sheet[f"B1"] = "parenttile_id"
+            sheet[f"C1"] = "resourceinstance_id"
+            nodes = Node.objects.filter(nodegroup_id=row["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
+            for i, node in enumerate(nodes):
+                sheet.cell(column=i + 4, row=1, value=node["alias"])
+            sheet.cell(column=i+5, row=1, value="sortorder")
+            sheet.cell(column=i+6, row=1, value="provisionaledits")
+            sheet.cell(column=i+7, row=1, value="nodegroup_id")
+
+    return wb
