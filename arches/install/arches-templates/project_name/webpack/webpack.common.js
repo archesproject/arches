@@ -228,10 +228,14 @@ module.exports = () => {
             const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'src'), {});
             const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'src'), {});
 
-            const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {                
+            const archesApplicationsVuePaths = []
+            const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
+                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'src');
+                archesApplicationsVuePaths.push(path)
+
                 return {
                     ...acc,
-                    ...buildVueFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'src'), {})
+                    ...buildVueFilePathLookup(path, {})
                 };
             }, {});
 
@@ -318,6 +322,7 @@ module.exports = () => {
                         ...imageFilepathLookup,
                         ...vueFilepathLookup,
                         ...nodeModulesAliases,
+                        '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')]
                     },
                 },
                 module: {
