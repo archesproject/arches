@@ -32,7 +32,7 @@ class BaseIndex(object):
         """
 
         if self.index_metadata is not None:
-            self.se.create_index(index=self.index_name, body=self.index_metadata)
+            self.se.create_index(index=self.index_name, **self.index_metadata)
         else:
             raise SearchIndexError("No index metadata defined.")
 
