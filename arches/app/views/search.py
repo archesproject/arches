@@ -172,7 +172,10 @@ def search_terms(request):
                 if len(result["top_concept"]["buckets"]) > 0:
                     for top_concept in result["top_concept"]["buckets"]:
                         top_concept_id = top_concept["key"]
-                        top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
+                        top_concept_label = get_preflabel_from_conceptid(
+                            top_concept["key"],
+                            lang=lang if lang != "*" else None
+                        )["value"]
                         for concept in top_concept["conceptid"]["buckets"]:
                             ret[index].append(
                                 {
