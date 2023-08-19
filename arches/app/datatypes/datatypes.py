@@ -48,7 +48,6 @@ from django.core.cache import cache
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, default_storage
-from django.utils.translation import gettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
