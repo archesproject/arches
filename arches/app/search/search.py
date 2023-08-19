@@ -72,12 +72,12 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.pop("body", None)
-        if body is not None:
+        query = kwargs.pop("query", None)
+        if query is not None:
             try:
                 data = []
                 refresh = kwargs.pop("refresh", False)
-                for hit in helpers.scan(self.es, query=body, **kwargs):
+                for hit in helpers.scan(self.es, query=query, **kwargs):
                     hit["_op_type"] = "delete"
                     data.append(hit)
 
@@ -97,14 +97,14 @@ class SearchEngine(object):
                         pass
                 except:
                     self.logger.warning(
-                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), body, detail)
+                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), query, detail)
                     )
                     raise detail
         else:
             try:
                 return self.es.options(ignore_status=404).delete(**kwargs)
             except Exception as detail:
-                self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), body, detail))
+                self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), kwargs, detail))
                 raise detail
 
     def delete_index(self, **kwargs):

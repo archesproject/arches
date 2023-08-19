@@ -101,7 +101,7 @@ class Query(Dsl):
         return self.se.count(index=index, **self.dsl)
 
     def delete(self, index="", **kwargs):
-        return self.se.delete(index=index, **self.dsl, **kwargs)
+        return self.se.delete(index=index, query=self.dsl, **kwargs)
 
     def prepare(self, scroll=False):
         if self.scroll is None:
