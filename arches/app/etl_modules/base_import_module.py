@@ -261,7 +261,7 @@ class BaseImportModule:
                 graphid = self.validate_uploaded_file(uploaded_file_path)
                 if graphid is None:
                     title = _("Invalid Uploaded File")
-                    message = _("The key information is missing. Make sure the uploaded excel template is in the right format.")
+                    message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
                     return {"success": False, "data": {"title": title, "message": message}}
 
         return {"success": result, "data": result}
