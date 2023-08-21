@@ -622,8 +622,8 @@ class Command(BaseCommand):
                             resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
                         )
                 except json.decoder.JSONDecodeError as e:
-                    logger.warn("Invalid syntax in package_config.json. Please inspect and then re-run command.")
-                    logger.warn(e)
+                    logger.warning("Invalid syntax in package_config.json. Please inspect and then re-run command.")
+                    logger.warning(e)
                     sys.exit()
 
         @transaction.atomic

@@ -23,7 +23,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.system_settings import settings

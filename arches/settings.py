@@ -63,10 +63,22 @@ SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 
 # Comment out this line for a development setup after running the ubuntu_setup.sh script
-ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
+ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
 
 # Uncomment this line for a development setup after running the ubuntu_setup.sh script (do not use in production)
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+
+# If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+
+# Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
+
+# Set the ELASTIC_PASSWORD environment variable in either the docker-compose.yml or .env file to the password you set for the elastic user,
+# otherwise a random password will be generated.
+
+# API keys can be generated via the Elasticsearch API: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html
+# Or Kibana: https://www.elastic.co/guide/en/kibana/current/api-keys.html
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
@@ -237,10 +249,6 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 LOCALE_PATHS = [
     os.path.join(ROOT_DIR, "locale"),
 ]
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
 
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
@@ -724,13 +732,6 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
-try:
-    from .settings_local import *
-except ImportError:
-    try:
-        from arches.settings_local import *
-    except ImportError:
-        pass
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
