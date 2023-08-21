@@ -100,6 +100,9 @@ define([
                 _.map(filesForUpload, function(file, i) {
                     return {
                         name: file.name,
+                        title: '',
+                        caption: '',
+                        description: '',
                         accepted: file.accepted,
                         height: file.height,
                         lastModified: file.lastModified,
