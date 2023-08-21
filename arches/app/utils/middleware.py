@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User, AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import Http401Response
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer

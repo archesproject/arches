@@ -62,10 +62,10 @@ SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 
 # Comment out this line for a development setup after running the ubuntu_setup.sh script
-ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
+ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
 
 # Uncomment this line for a development setup after running the ubuntu_setup.sh script (do not use in production)
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
 # ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
@@ -246,10 +246,6 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 LOCALE_PATHS = [
     os.path.join(ROOT_DIR, "locale"),
 ]
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
 
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640

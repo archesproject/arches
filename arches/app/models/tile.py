@@ -30,7 +30,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.resource import EditLog
