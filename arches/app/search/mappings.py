@@ -292,7 +292,7 @@ def prepare_resource_relations_index(create=False):
 
     if create:
         se = SearchEngineFactory().create()
-        se.create_index(index=RESOURCE_RELATIONS_INDEX, body=index_settings)
+        se.create_index(index=RESOURCE_RELATIONS_INDEX, **index_settings)
 
     return index_settings
 
