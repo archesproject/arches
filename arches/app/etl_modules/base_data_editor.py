@@ -129,7 +129,7 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_preview_data(self, graph_id, node_id, resourceids, language_code, old_text, case_insensitive):
+    def get_preview_data(self, graph_id, node_id, search_url, language_code, old_text, case_insensitive):
         request = HttpRequest()
         request.user = self.request.user
         request.method = "GET"
@@ -138,6 +138,11 @@ class BulkStringEditor(BaseBulkEditor):
 
         if language_code is None:
             language_code = "en"
+
+        if search_url:
+            params = parse_qs(urlsplit(search_url).query)
+            for k, v in params.items():
+                request.GET.__setitem__(k, v[0])
 
         if old_text:
             op = "i~" if case_insensitive else "~"
@@ -192,7 +197,7 @@ class BulkStringEditor(BaseBulkEditor):
             operation = operation + "_trim"
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+            graph_id, node_id, search_url, language_code, old_text, case_insensitive
         )
         return_list = []
         with connection.cursor() as cursor:
