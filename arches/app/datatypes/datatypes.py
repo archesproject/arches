@@ -236,7 +236,13 @@ class StringDataType(BaseDataType):
             elif value["val"] != "":
                 exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
                 if exact_terms:
-                    if "~" in value["op"]:
+                    if "i~" in value["op"]:
+                        match_query = Wildcard(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=f"*{exact_terms.group('search_string')}*",
+                            case_insensitive=True,
+                        )
+                    elif "~" in value["op"]:
                         match_query = Wildcard(
                             field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
                             query=f"*{exact_terms.group('search_string')}*",

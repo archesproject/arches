@@ -130,72 +130,42 @@ class BulkStringEditor(BaseBulkEditor):
         return result
 
     def get_preview_data(self, graph_id, node_id, resourceids, language_code, old_text, case_insensitive):
-        node_id_query = " AND nodeid = %(node_id)s" if node_id else ""
-        graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
-        resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
-        like_operator = "ilike" if case_insensitive == "true" else "like"
-        old_text_like = "%" + old_text + "%" if old_text else ""
-        text_query = (
-            " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
-        )
+        request = HttpRequest()
+        request.user = self.request.user
+        request.method = "GET"
+        request.GET["paging-filter"] = 1
+        request.GET["tiles"] = True
+
         if language_code is None:
             language_code = "en"
 
-        request_parmas_dict = {
-            "node_id": node_id,
-            "language_code": language_code,
-            "graph_id": graph_id,
-            "resourceids": resourceids,
-            "old_text": old_text_like,
-        }
+        if old_text:
+            op = "i~" if case_insensitive else "~"
+            advanced_search_object = [{
+                "op":"and",
+                node_id:{"op":op,"lang":language_code,"val": f'"{old_text}"'}
+            }]
+        else:
+            advanced_search_object = [{
+                "op":"and",
+                node_id:{"op":"not_null","lang":language_code}
+            }]
 
-        sql_query = (
-            """
-            SELECT t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-            + " LIMIT 5;"
-        )
+        request.GET["advanced-search"] = json.dumps(advanced_search_object)
 
-        tile_count_query = (
-            """
-            SELECT count(t.tileid) FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-        )
 
-        resource_count_query = (
-            """
-            SELECT count(DISTINCT t.resourceinstanceid) FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-        )
+        response = search_results(request)
+        results = json.loads(response.content)['results']
+        values = []
+        for hit in results['hits']['hits']:
+            for tile in hit['_source']['tiles']:
+                if node_id in tile['data']:
+                    values.append(tile['data'][node_id][language_code]['value'])
 
-        with connection.cursor() as cursor:
-            cursor.execute(sql_query, request_parmas_dict)
-            row = [value[0] for value in cursor.fetchall()]
+        number_of_resources = results['hits']['total']['value']
+        number_of_tiles = 0
 
-            cursor.execute(tile_count_query, request_parmas_dict)
-            count = cursor.fetchall()
-            (number_of_tiles,) = count[0]
-
-            cursor.execute(resource_count_query, request_parmas_dict)
-            count = cursor.fetchall()
-            (number_of_resources,) = count[0]
-
-        return row, number_of_tiles, number_of_resources
+        return values, number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
