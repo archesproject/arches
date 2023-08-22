@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import os
 
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from django.core.files.storage import default_storage
 from openpyxl import load_workbook
@@ -134,8 +135,7 @@ class TileExcelImporter(BaseImportModule):
         )
         return {"name": worksheet.title, "rows": row_count}
     
-    def validate_uploaded_file(self, file):
-        workbook = load_workbook(filename=default_storage.open(file))
+    def validate_uploaded_file(self, workbook):
         graphid = None
         for worksheet in workbook.worksheets:
             if worksheet.cell(2, worksheet.max_column).value:
@@ -143,7 +143,19 @@ class TileExcelImporter(BaseImportModule):
                     nodegroup_id = worksheet.cell(2, worksheet.max_column).value
                     graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id)
                     break
-                except: # IndexError, ValidationError
+                except (IndexError, ValidationError):
+                    pass
+        if graphid is None:
+            raise ValueError() 
+
+    def get_graphid(self, workbook):
+        for worksheet in workbook.worksheets:
+            if worksheet.cell(2, worksheet.max_column).value:
+                try:
+                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id)
+                    break
+                except (IndexError, ValidationError):
                     pass
         return graphid
 
@@ -151,11 +163,11 @@ class TileExcelImporter(BaseImportModule):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
             uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
-            graphid = self.validate_uploaded_file(uploaded_file_path)
+            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
 
-            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
             for worksheet in workbook.worksheets:
                 if worksheet.title.lower() != "metadata":
                     details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)

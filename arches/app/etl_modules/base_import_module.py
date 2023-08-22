@@ -5,6 +5,7 @@ import math
 import os
 import uuid
 import zipfile
+from openpyxl import load_workbook
 
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -257,9 +258,11 @@ class BaseImportModule:
 
         for file in result["summary"]["files"]:
             if file.split(".")[-1] == "xlsx":
-                uploaded_file_path = os.path.join(self.temp_dir, file)
-                graphid = self.validate_uploaded_file(uploaded_file_path)
-                if graphid is None:
+                try:
+                    uploaded_file_path = os.path.join(self.temp_dir, file)
+                    workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+                    self.validate_uploaded_file(workbook)
+                except:
                     title = _("Invalid Uploaded File")
                     message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
                     return {"success": False, "data": {"title": title, "message": message}}

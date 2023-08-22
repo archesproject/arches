@@ -146,24 +146,25 @@ class BranchExcelImporter(BaseImportModule):
         )
         return {"name": worksheet.title, "rows": row_count}
 
-    def validate_uploaded_file(self, file):
-        workbook = load_workbook(filename=default_storage.open(file))
-        graphid = None
+    def validate_uploaded_file(self, workbook):
         try:
-            graphid = workbook.get_sheet_by_name("metadata")["B1"].value
-        except: # KeyError
-            pass
+            workbook.get_sheet_by_name("metadata")["B1"].value
+        except KeyError:
+            raise ValueError()
+
+    def get_graphid(self, workbook):
+        graphid = workbook.get_sheet_by_name("metadata")["B1"].value
         return graphid
 
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
             uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
-            graphid = self.validate_uploaded_file(uploaded_file_path)
+            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
 
-            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
             for worksheet in workbook.worksheets:
                 if worksheet.title.lower() != "metadata":
                     details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
