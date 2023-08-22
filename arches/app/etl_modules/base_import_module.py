@@ -256,18 +256,22 @@ class BaseImportModule:
             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
             default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
 
+        has_valid_excel_file = False
         for file in result["summary"]["files"]:
             if file.split(".")[-1] == "xlsx":
                 try:
                     uploaded_file_path = os.path.join(self.temp_dir, file)
                     workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
                     self.validate_uploaded_file(workbook)
+                    has_valid_excel_file = True
                 except:
-                    title = _("Invalid Uploaded File")
-                    message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
-                    return {"success": False, "data": {"title": title, "message": message}}
+                    pass
+        if not has_valid_excel_file:
+            title = _("Invalid Uploaded File")
+            message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
+            return {"success": False, "data": {"title": title, "message": message}}
 
-        return {"success": result, "data": result}
+        return {"success": True, "data": result}
 
     def start(self, request):
         self.loadid = request.POST.get("load_id")
