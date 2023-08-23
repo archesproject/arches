@@ -30,8 +30,7 @@ from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.i18n import rank_label
-from django.utils.translation import ugettext as _
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext as _
 from django.db import IntegrityError
 from psycopg2.extensions import AsIs
 
@@ -1441,7 +1440,7 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                 }
             }
 
-    concept_label_results = se.search(index=CONCEPTS_INDEX, body=exact_val_match(label, conceptid))
+    concept_label_results = se.search(index=CONCEPTS_INDEX, **exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return
