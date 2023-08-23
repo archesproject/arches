@@ -22,7 +22,14 @@ import os
 import sys
 
 try:
-    from arches.settings_utils import *
+    from settings_utils import *
+except ModuleNotFoundError:
+    try:
+        from .settings_utils import *
+    except ModuleNotFoundError:
+        pass
+
+try:
     from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
 except ImportError:  # unable to import prior to installing requirements.txt in setup.py
@@ -602,13 +609,6 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
-# If True, users can make edits to graphs that are locked
-# (generally because they have resource intances saved against them)
-# Changing this setting to True and making graph modifications may result in
-# disagreement between your Resource Models and Resource Instances potentially
-# causing your application to break.
-OVERRIDE_RESOURCE_MODEL_LOCK = False
-
 # If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
@@ -732,10 +732,17 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
-
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
+
+try:
+    from .settings_local import *
+except ImportError:
+    try:
+        from arches.settings_local import *
+    except ImportError:
+        pass
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
