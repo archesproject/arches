@@ -50,7 +50,7 @@ def deprecated(func):
             lineno=func.__code__.co_firstlineno + 1,
         )
         warnings.simplefilter("default", DeprecationWarning)  # reset filter
-        logger.warn(
+        logger.warning(
             "%s - DeprecationWarning: Call to deprecated function %s. %s:%s"
             % (datetime.datetime.now(), func.__name__, func.__code__.co_filename, func.__code__.co_firstlineno + 1)
         )

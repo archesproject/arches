@@ -45,7 +45,7 @@ to create a frontend asset bundle. This process should complete in less than 2 m
 
 Finally, visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
 
-If you run into problems, please review our the full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
+If you run into problems, please review our full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
 
 #### Release Cycle
 

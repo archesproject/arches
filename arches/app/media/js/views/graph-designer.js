@@ -83,8 +83,8 @@ define([
                 if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     isDirty = true;
                 }
-                else if (viewModel.isNodeDirty()) {
-                    shouldShowGraphPublishButtons = false;
+                if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                    isDirty = true;
                 }
                 if (ko.unwrap(viewModel.cardTree.selection)) {
                     const selection = ko.unwrap(viewModel.cardTree.selection);
