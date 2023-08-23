@@ -26,7 +26,7 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator

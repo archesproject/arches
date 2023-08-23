@@ -1,6 +1,6 @@
 import logging
 from kombu import Connection
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models.system_settings import settings
 from arches.celery import app
 import time
