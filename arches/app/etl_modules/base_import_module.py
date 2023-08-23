@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 from django.core.files.storage import default_storage
 from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
 from arches.app.utils.decorators import user_created_transaction_match
@@ -43,7 +43,7 @@ class BaseImportModule(object):
         except Exception as e:
             response["data"] = e
             logger.error(e)
-        logger.warn(response)
+        logger.warning(response)
         return response
 
     def save_to_tiles(self, loadid, finalize_import=True, multiprocessing=True):
