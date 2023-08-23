@@ -56,7 +56,7 @@
                     <span data-bind="text: $root.translations.tileExcelCap"></span>
                 </h3>
                 <h2>
-                    <span data-bind="text: $root.translations.uploadYourZipFile"></span>
+                    <span data-bind="text: $root.translations.uploadYourXlsxZipFile"></span>
                 </h2>
                 <h4>
                     <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
@@ -80,6 +80,11 @@
                     <h5>
                         <span data-bind="text: $root.translations.etlFileUploadMessage"></span>
                     </h5>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: toggleDownloadMode">
+                            <span data-bind="text: $root.translations.downloadTemplates"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

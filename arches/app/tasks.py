@@ -198,16 +198,10 @@ def on_chord_error(request, exc, traceback):
     user = User.objects.get(id=1)
     notify_completion(msg, user)
 
-
-@shared_task
-def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
-    from arches.app.etl_modules import branch_excel_importer
-
+def load_excel_data(import_module, importer_name, userid, files, summary, result, temp_dir, loadid):
     logger = logging.getLogger(__name__)
-
     try:
-        BranchExcelImporter = branch_excel_importer.BranchExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
-        BranchExcelImporter.run_load_task(files, summary, result, temp_dir, loadid)
+        import_module.run_load_task(files, summary, result, temp_dir, loadid)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -218,13 +212,29 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
         load_event.save()
         status = _("Failed")
     finally:
-        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+        msg = _("{}: {} [{}]").format(importer_name, summary["name"], status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
 
 @shared_task
-def export_branch_csv(user_id, load_id, graph_id, graph_name, resource_ids):
+def load_branch_excel(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_excel_importer
+
+    BranchExcelImporter = branch_excel_importer.BranchExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    load_excel_data(BranchExcelImporter, "Branch Excel Import", userid, files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def load_tile_excel(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import tile_excel_importer
+
+    TileExcelImporter = tile_excel_importer.TileExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    load_excel_data(TileExcelImporter, "Tile Excel Import", userid, files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def export_branch_excel(user_id, load_id, graph_id, graph_name, resource_ids):
     from arches.app.etl_modules import branch_excel_exporter
 
     logger = logging.getLogger(__name__)
