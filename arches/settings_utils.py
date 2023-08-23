@@ -103,9 +103,10 @@ def transmit_webpack_django_config(
 ):
     arches_applications_paths = {}
 
-    for arches_application in arches_applications:
-        importlib.import_module(arches_application)  # need to import module to find path
-        arches_applications_paths[arches_application] = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+    if arches_applications:
+        for arches_application in arches_applications:
+            importlib.import_module(arches_application)  # need to import module to find path
+            arches_applications_paths[arches_application] = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
 
     print(
         json.dumps(
