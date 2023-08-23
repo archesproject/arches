@@ -305,3 +305,12 @@ class BaseImportModule:
                 response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 
             return response
+        
+class FileValidationError(Exception):
+    def __init__(self, message=_("Unable to read file"), code=400):
+        self.title = _("Invalid Uploaded File")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)

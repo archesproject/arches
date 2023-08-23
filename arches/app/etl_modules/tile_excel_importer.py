@@ -10,7 +10,7 @@ from openpyxl import load_workbook
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 
 
 class TileExcelImporter(BaseImportModule):
@@ -146,7 +146,7 @@ class TileExcelImporter(BaseImportModule):
                 except (IndexError, ValidationError):
                     pass
         if graphid is None:
-            raise ValueError() 
+            raise FileValidationError()
 
     def get_graphid(self, workbook):
         for worksheet in workbook.worksheets:

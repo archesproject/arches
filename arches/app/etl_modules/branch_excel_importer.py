@@ -13,7 +13,7 @@ from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
-from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 
 
 
@@ -150,7 +150,7 @@ class BranchExcelImporter(BaseImportModule):
         try:
             workbook.get_sheet_by_name("metadata")["B1"].value
         except KeyError:
-            raise ValueError()
+            raise FileValidationError()
 
     def get_graphid(self, workbook):
         graphid = workbook.get_sheet_by_name("metadata")["B1"].value
