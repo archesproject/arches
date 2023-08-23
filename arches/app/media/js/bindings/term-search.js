@@ -118,8 +118,27 @@ define([
                     return formatedresult;
                 },
                 formatSelection: function(result, container) {
-                    var resultStr = JSON.stringify(result);
-                    result = JSON.parse(resultStr.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "[removed]"));
+                    function sanitizeString(str) {
+                        // Implement your own logic to sanitize the string
+                        // For example, you can remove <script> tags and other unwanted content
+                        return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "[removed]");
+                    };
+                    function sanitizeObject(obj) {
+                        for (const prop in obj) {
+                            if (typeof obj[prop] === 'string') {
+                            // Sanitize the string value for potential malicious content
+                            obj[prop] = sanitizeString(obj[prop]);
+                            } else if (typeof obj[prop] === 'function') {
+                            // Preserve functions
+                            obj[prop] = obj[prop];
+                            } else if (typeof obj[prop] === 'object') {
+                            // Recursively sanitize nested objects
+                            obj[prop] = sanitizeObject(obj[prop]);
+                            }
+                        }
+                        return obj;
+                    };
+                    result = sanitizeObject(result);
                     var text = ko.unwrap(result.text);
                     if (result.type === "Advanced Search Filter" && result.graphs_filtered)
                         text = result.graphs_filtered.join() + " (Advanced Search)";
