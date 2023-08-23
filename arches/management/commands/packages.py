@@ -597,8 +597,8 @@ class Command(BaseCommand):
                             resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
                         )
                 except json.decoder.JSONDecodeError as e:
-                    logger.warn("Invalid syntax in package_config.json. Please inspect and then re-run command.")
-                    logger.warn(e)
+                    logger.warning("Invalid syntax in package_config.json. Please inspect and then re-run command.")
+                    logger.warning(e)
                     sys.exit()
 
         @transaction.atomic
@@ -906,9 +906,8 @@ class Command(BaseCommand):
             raise Exception("this is an invalid package source")
 
         if setup_db:
-            management.call_command("setup_db", force=True)
-        if dev:
-            management.call_command("add_test_users")
+            management.call_command("setup_db", force=True, dev=dev)
+
         load_ontologies(package_location)
         print("loading Kibana objects")
         load_kibana_objects(package_location)

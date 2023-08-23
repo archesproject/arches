@@ -35,7 +35,7 @@ import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
-from django.utils.translation import ugettext as _, get_language
+from django.utils.translation import gettext as _, get_language
 
 logger = logging.getLogger(__name__)
 
@@ -445,7 +445,7 @@ class CsvReader(Reader):
                     save_count = save_count - 1
 
         else:
-            logger.warn(
+            logger.warning(
                 "No resource created for legacyid: {legacyid}. Make sure there is data to be imported \
                     for this resource and it is mapped properly in your mapping file."
             )
@@ -507,7 +507,7 @@ class CsvReader(Reader):
 
                 for k, v in f["descriptor_types"].items():
                     if "string_template" in v and v["string_template"] != [""]:
-                        logger.warn(
+                        logger.warning(
                             "The {0} {1} in the {2} display function.".format(
                                 ", ".join(v["string_template"]),
                                 "nodes participate" if len(v["string_template"]) > 1 else "node participates",
@@ -515,7 +515,7 @@ class CsvReader(Reader):
                             )
                         )
                     else:
-                        logger.warn("No nodes participate in the {0} display function.".format(k))
+                        logger.warning("No nodes participate in the {0} display function.".format(k))
 
             return display_nodeids
 
@@ -654,7 +654,7 @@ class CsvReader(Reader):
                                 collection_legacyoid = node.name + "_" + str(node.graph_id) + "_import"
                                 # check to see that there is not already a collection for this node
                                 if node.config["rdmCollection"] is not None:
-                                    logger.warn(
+                                    logger.warning(
                                         "A collection already exists for the {node.name} node. \
                                             Use the add option to add concepts to this collection."
                                     )
@@ -774,7 +774,7 @@ class CsvReader(Reader):
                     errors = []
                     new_row = []
                     if "ADDITIONAL" in row or "MISSING" in row:
-                        logger.warn(
+                        logger.warning(
                             "No resource created for ResourceID {0}. Line {1} has additional or missing columns.".format(
                                 row["ResourceID"], str(int(row_number.split("on line ")[1]))
                             )
@@ -812,7 +812,7 @@ class CsvReader(Reader):
                             value = datatype_instance.transform_value_for_tile(value, nodeid=nodeid)
                             errors = datatype_instance.validate(value, row_number=row_number, source=source, nodeid=nodeid)
                         except Exception as e:
-                            logger.warn(
+                            logger.warning(
                                 "The following value could not be interpreted as a {0} value: {1}".format(
                                     datatype_instance.datatype_model.classname, value
                                 )
@@ -1142,7 +1142,7 @@ class CsvReader(Reader):
         finally:
             for e in self.errors:
                 if e["type"] == "WARNING":
-                    logger.warn(e["message"])
+                    logger.warning(e["message"])
                 elif e["type"] == "ERROR":
                     logger.error(e["message"])
                 else:

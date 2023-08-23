@@ -287,7 +287,7 @@ def index_resources_by_type(
         q = Query(se=se)
         term = Term(field="graph_id", term=str(resource_type))
         q.add_query(term)
-        result_summary = {"database": len(resources), "indexed": se.count(index=RESOURCES_INDEX, body=q.dsl)}
+        result_summary = {"database": len(resources), "indexed": se.count(index=RESOURCES_INDEX, **q.dsl)}
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
         logger.info(
             "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(

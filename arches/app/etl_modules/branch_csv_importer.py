@@ -10,7 +10,7 @@ from django.core.files import File
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node

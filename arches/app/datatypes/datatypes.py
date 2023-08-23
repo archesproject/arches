@@ -48,7 +48,6 @@ from django.core.cache import cache
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, default_storage
-from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -56,7 +55,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
-from django.utils.translation import get_language, ugettext as _
+from django.utils.translation import get_language, gettext as _
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -1542,7 +1541,7 @@ class FileListDataType(BaseDataType):
             for f in tile.data[str(nodeid)]:
                 val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 document["strings"].append(val)
-        except KeyError as e:
+        except (KeyError, TypeError) as e:
             for k, pe in tile.provisionaledits.items():
                 for f in pe["value"][nodeid]:
                     val = {"string": f["name"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}

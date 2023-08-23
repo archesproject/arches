@@ -23,7 +23,7 @@ from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.models import models
 from arches.app.models.card import Card

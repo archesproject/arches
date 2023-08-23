@@ -5,7 +5,7 @@ from urllib.parse import urlsplit, parse_qs
 import uuid
 from django.db import connection
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
@@ -360,7 +360,7 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
-            data_updated = self.save_to_tiles(loadid)
+            data_updated = self.save_to_tiles(loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:
