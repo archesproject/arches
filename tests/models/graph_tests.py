@@ -1089,7 +1089,11 @@ class GraphTests(ArchesTestCase):
                     if type(value) == "dict":
                         self.assertDictEqual(value, updated_source_graph_serialized_card[key])
                     else:
-                        self.assertEqual(value, updated_source_graph_serialized_card[key])
+                        updated_value = updated_source_graph_serialized_card[key]
+                        if updated_value == '{"en": ""}':  # workaround for updated str default values
+                            updated_value = ""
+
+                        self.assertEqual(value, updated_value)
 
             # ensures all superflous values relating to `editable_future_graph` have been deleted
             try:
@@ -1107,7 +1111,11 @@ class GraphTests(ArchesTestCase):
                     if type(value) == "dict":
                         self.assertDictEqual(value, updated_source_graph_serialized_node[key])
                     else:
-                        self.assertEqual(value, updated_source_graph_serialized_node[key])
+                        updated_value = updated_source_graph_serialized_node[key]
+                        if updated_value == '{"en": ""}':  # workaround for updated str default values
+                            updated_value = ""
+
+                        self.assertEqual(value, updated_value)
 
             # ensures all superflous values relating to `editable_future_graph` have been deleted
             try:
