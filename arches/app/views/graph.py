@@ -25,8 +25,7 @@ from dateutil import tz
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
-from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView

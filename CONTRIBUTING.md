@@ -14,7 +14,7 @@ If you find a bug in the source code or a mistake in the documentation, you can 
 with a fix.
 
 #### Submitting an Issue
-Before you submit your issue search the archive, maybe your question was already answered. Please take a minute to search through the open issues in the repo, and if you find one that matches your own, feel free to comment and your thoughts.
+Before you submit your issue search the archive, maybe your question was already answered. Please take a minute to search through the open issues in the repo, and if you find one that matches your own, feel free to comment and add your thoughts.
 If your issue appears to be a bug, and hasn't been reported, open a new issue. Be sure to create your issue in the Arches repo and not a fork of Arches so that it is visible to the community.
 
 Please add the [appropriate labels](https://github.com/archesproject/arches/wiki/Issue-and-Pull-Request-Labels) to the issue (multiple labels are ok) to help us keep track of them.
