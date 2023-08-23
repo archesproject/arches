@@ -110,11 +110,11 @@ class Command(BaseCommand):
             + "'install'=Runs the setup file defined in your package root",
         )
 
-        parser.add_argument(
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
             "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
         )
-
-        parser.add_argument(
+        group.add_argument(
             "-a", "--arches-application", action="store", dest="arches_application", default="", help="Name of Arches Application",
         )
 
@@ -353,21 +353,8 @@ class Command(BaseCommand):
             arches_application_path = None
 
             if arches_application:
-                site_package_path = site.getsitepackages()[0]
-                arches_application_path = os.path.join(site_package_path, arches_application)
-
-                if not os.path.exists(arches_application_path):
-                    egg_link_path = arches_application_path.replace('_', '-')
-                    egg_link_path += '.egg-link'
-
-                    if os.path.exists(egg_link_path):
-                        original_path = Path(egg_link_path).read_text()
-                        original_path = original_path.replace('.', '')
-                        original_path = original_path.strip()
-
-                        arches_application_path = os.path.join(original_path, arches_application)
-
-                arches_application_path = os.path.join(arches_application_path, 'pkg')
+                application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+                arches_application_path = os.path.join(application_origin, 'pkg')
 
             self.load_package(
                 arches_application_path or options["source"],

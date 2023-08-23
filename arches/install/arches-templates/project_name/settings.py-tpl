@@ -148,7 +148,7 @@ MIDDLEWARE = [
     # "silk.middleware.SilkyMiddleware",
 ]
 
-STATICFILES_DIRS =  build_staticfiles_dirs(
+STATICFILES_DIRS = build_staticfiles_dirs(
     root_dir=ROOT_DIR,
     app_root=APP_ROOT,
     arches_applications=ARCHES_APPLICATIONS,

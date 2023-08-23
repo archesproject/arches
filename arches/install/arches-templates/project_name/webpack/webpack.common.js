@@ -25,34 +25,12 @@ module.exports = () => {
             
             const APP_ROOT = parsedData['APP_ROOT'];
             const ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
-            const ARCHES_APPLICATIONS_PATH = parsedData['ARCHES_APPLICATIONS_PATH'];
+            const ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
+            const SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
             const ROOT_DIR = parsedData['ROOT_DIR'];
             const STATIC_URL = parsedData['STATIC_URL']
             const PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS']
             const WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT']
-
-            // BEGIN build config to handle eggfiles
-            let eggFilePaths;
-
-            try {
-                eggFilePaths = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
-                    const archesApplicationEggFile = archesApplication.replaceAll('_', '-').concat('.egg-link'); 
-
-                    let updatedFilepath = fs.readFileSync(
-                        Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplicationEggFile), { encoding: 'utf8' }
-                    )
-                    updatedFilepath = updatedFilepath.replace(/(\r\n|\n|\r)/gm, "");  // remove newlines
-                    updatedFilepath = updatedFilepath.replace(/\./g, "");  // remove dots
-
-                    return {
-                        ...acc,
-                        [archesApplication]: updatedFilepath,
-                    }
-                }, {});
-            }
-            catch{}
-
-            // END build config to handle eggfiles
 
             // BEGIN create entry point configurations
         
@@ -60,14 +38,9 @@ module.exports = () => {
             const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'), {});
 
             const archesApplicationsEntrypointConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
-                let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'media', 'js');
-
-                if (eggFilePaths && archesApplication in eggFilePaths) {
-                    filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'media', 'js');
-                }
                 return {
                     ...acc,
-                    ...buildJavascriptFilepathLookup(filepath, {})
+                    ...buildJavascriptFilepathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'js'), {})
                 };
             }, {});
 
@@ -135,8 +108,9 @@ module.exports = () => {
                 try {
                     let filepath;
 
-                    if (eggFilePaths && archesApplication in eggFilePaths) {
-                        filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], 'package.json');
+                    if (!ARCHES_APPLICATIONS_PATHS[archesApplication].includes('site-packages')) {  
+                        // if the path doesn't include site-packages then we can assume it's linked via egg/wheel
+                        filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], '..', 'package.json');
                     }
                     else {
                         filepath = Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', archesApplication, 'package.json')
@@ -177,15 +151,9 @@ module.exports = () => {
             const projectTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'templates'), {});
 
             const archesApplicationsTemplatePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
-                let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'templates');
-
-                if (eggFilePaths && archesApplication in eggFilePaths) {
-                    filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'templates');
-                }
-
                 return {
                     ...acc,
-                    ...buildTemplateFilePathLookup(filepath, {})
+                    ...buildTemplateFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'templates'), {})
                 };
             }, {});
 
@@ -203,15 +171,9 @@ module.exports = () => {
             const projectImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, APP_ROOT, 'media', 'img'), {});
 
             const archesApplicationsImagePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
-                let filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'media', 'img');
-
-                if (eggFilePaths && archesApplication in eggFilePaths) {
-                    filepath = Path.resolve(__dirname, eggFilePaths[archesApplication], archesApplication, 'media', 'img');
-                }
-
                 return {
                     ...acc,
-                    ...buildImageFilePathLookup(STATIC_URL, filepath, {})
+                    ...buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'img'), {})
                 };
             }, {});
 
@@ -230,8 +192,8 @@ module.exports = () => {
 
             const archesApplicationsVuePaths = []
             const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
-                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATH, archesApplication, 'src');
-                archesApplicationsVuePaths.push(path)
+                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'src');
+                archesApplicationsVuePaths.push(path);
 
                 return {
                     ...acc,
@@ -248,19 +210,24 @@ module.exports = () => {
 
             // END create vue filepath lookup
             // BEGIN create universal constants
+
             const universalConstants = {
                 APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g ,'/'),
                 ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g ,'/'),
                 ARCHES_APPLICATIONS: JSON.stringify(ARCHES_APPLICATIONS),
-                ARCHES_APPLICATIONS_DIRECTORY: JSON.stringify(ARCHES_APPLICATIONS_PATH).replace(/\\/g ,'/'),
-            }
-            if (eggFilePaths) {
-                let eggFileCount = 0;
-                for (const value of Object.values(eggFilePaths)) {
-                    universalConstants[`EGG_FILE_PATH_${eggFileCount}`] = JSON.stringify(value).replace(/\\/g ,'/');
-                    eggFileCount += 1;
+                SITE_PACKAGES_DIRECTORY: JSON.stringify(SITE_PACKAGES_DIRECTORY).replace(/\\/g ,'/'),
+            };
+
+            let linkedApplicationPathCount = 0;
+            for (const archesApplication of ARCHES_APPLICATIONS) {
+                if (!ARCHES_APPLICATIONS_PATHS[archesApplication].includes('site-packages')) {
+                    universalConstants[`LINKED_APPLICATION_PATH_${linkedApplicationPathCount}`] = JSON.stringify(
+                        ARCHES_APPLICATIONS_PATHS[archesApplication]
+                    ).replace(/\\/g ,'/');
+                    linkedApplicationPathCount += 1;
                 }
             }
+
             // END create universal constants
             
             resolve({
@@ -386,16 +353,14 @@ module.exports = () => {
 
                                     let templatePath;
 
-                                    if (eggFilePaths) {  // handles egg files
-                                        for (const eggFilePath of Object.keys(eggFilePaths)) {
-                                            if (resourcePath.includes(eggFilePath)) {
-                                                templatePath = resourcePath.split(eggFilePath)[2];
-                                            }
+                                    for (const archesApplicationPath of Object.values(ARCHES_APPLICATIONS_PATHS)) {
+                                        if (resourcePath.includes(archesApplicationPath)) {
+                                            templatePath = resourcePath.split(archesApplicationPath)[1];
                                         }
                                     }
 
-                                    if (!templatePath && resourcePath.includes(ARCHES_APPLICATIONS_PATH)) {  // arches application component
-                                        const archesAppPath = resourcePath.split(ARCHES_APPLICATIONS_PATH)[1];  // first split off arches applications path
+                                    if (!templatePath && resourcePath.includes(SITE_PACKAGES_DIRECTORY)) {  // arches application component
+                                        const archesAppPath = resourcePath.split(SITE_PACKAGES_DIRECTORY)[1];  // first split off arches applications path
                                         const [_emptyValueBeforeFirstSlash, _appName, ...subPath] = archesAppPath.split('/') // then split off arches application name
                                         templatePath = '/' + subPath.join('/');
                                     }

@@ -1,3 +1,4 @@
+import importlib
 import json
 import os
 import site
@@ -29,22 +30,10 @@ def build_staticfiles_dirs(root_dir, app_root=None, arches_applications=None, ad
         directories.append(os.path.join(app_root, "media"))
 
     if arches_applications:
-        site_package_path = site.getsitepackages()[0]
-
-        for arches_app in arches_applications:
-            arches_app_path = os.path.join(site_package_path, arches_app)
-
-            if os.path.exists(arches_app_path):
-                directories.append(os.path.join(arches_app_path, "media"))  # packages should never have a build directory
-            else:
-                egg_link_path = arches_app_path.replace('_', '-')
-                egg_link_path += '.egg-link'
-
-                if os.path.exists(egg_link_path):
-                    original_path = Path(egg_link_path).read_text()
-                    original_path = original_path.replace('.', '')
-                    original_path = original_path.strip()
-                    directories.append(os.path.join(original_path, arches_app, 'media'))
+        for arches_application in arches_applications:
+            importlib.import_module(arches_application)  # need to import module to find path
+            application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+            directories.append(os.path.join(application_origin, 'media'))
 
     directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
@@ -75,22 +64,10 @@ def build_templates_config(root_dir, debug, app_root=None, arches_applications=N
         directories.append(os.path.join(app_root, "templates"))
 
     if arches_applications:
-        site_package_path = site.getsitepackages()[0]
-
-        for arches_app in arches_applications:
-            arches_app_path = os.path.join(site_package_path, arches_app)
-
-            if os.path.exists(arches_app_path):
-                directories.append(os.path.join(arches_app_path, "templates"))
-            else:
-                egg_link_path = arches_app_path.replace('_', '-')
-                egg_link_path += '.egg-link'
-
-                if os.path.exists(egg_link_path):
-                    original_path = Path(egg_link_path).read_text()
-                    original_path = original_path.replace('.', '')
-                    original_path = original_path.strip()
-                    directories.append(os.path.join(original_path, arches_app, 'templates'))
+        for arches_application in arches_applications:
+            importlib.import_module(arches_application)  # need to import module to find path
+            application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+            directories.append(os.path.join(application_origin, 'templates'))
 
     directories.append(os.path.join(root_dir, "app", "templates"))
 
@@ -124,12 +101,19 @@ def build_templates_config(root_dir, debug, app_root=None, arches_applications=N
 def transmit_webpack_django_config(
     root_dir, app_root, static_url, public_server_address, webpack_development_server_port, arches_applications=None
 ):
+    arches_applications_paths = {}
+
+    for arches_application in arches_applications:
+        importlib.import_module(arches_application)  # need to import module to find path
+        arches_applications_paths[arches_application] = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+
     print(
         json.dumps(
             {
                 "APP_ROOT": app_root,
                 "ARCHES_APPLICATIONS": list(arches_applications) if arches_applications else [],
-                "ARCHES_APPLICATIONS_PATH": site.getsitepackages()[0],
+                "ARCHES_APPLICATIONS_PATHS": arches_applications_paths,
+                "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
                 "PUBLIC_SERVER_ADDRESS": public_server_address,
                 "ROOT_DIR": root_dir,
                 "STATIC_URL": static_url,

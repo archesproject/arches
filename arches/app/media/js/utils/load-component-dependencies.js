@@ -15,19 +15,23 @@ define([], function() {
                     for (const archesApp of ARCHES_APPLICATIONS) {
                         // eslint-disable-next-line no-undef
                         try {
-                            require(`${ARCHES_APPLICATIONS_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
+                            require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
+                            break;
                         }
-                        catch(e) { // handles egg files, cannot access them programatically hence manual access
+                        catch(e) { // handles egg/wheel links, cannot access them programatically hence manual access
                             try {
-                                require(`${EGG_FILE_PATH_0}/${archesApp}/media/js/${componentPath}`);
+                                require(`${LINKED_APPLICATION_PATH_0}/media/js/${componentPath}`);
+                                break;
                             }
-                            catch {  // handles egg files, cannot access them programatically hence manual access
+                            catch {  // handles egg/wheel links, cannot access them programatically hence manual access
                                 try {
-                                    require(`${EGG_FILE_PATH_1}/${archesApp}/media/js/${componentPath}`);
+                                    require(`${LINKED_APPLICATION_PATH_1}/media/js/${componentPath}`);
+                                    break;
                                 }
-                                catch { // handles egg files, cannot access them programatically hence manual access
+                                catch { // handles egg/wheel links, cannot access them programatically hence manual access
                                     try {
-                                        require(`${EGG_FILE_PATH_2}/${archesApp}/media/js/${componentPath}`);
+                                        require(`${LINKED_APPLICATION_PATH_2}/media/js/${componentPath}`);
+                                        break;
                                     }
                                     catch {}
                                 }
