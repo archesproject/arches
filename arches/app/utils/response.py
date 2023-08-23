@@ -1,7 +1,7 @@
 from io import StringIO
 import logging
 from django.http import HttpResponse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.models.system_settings import settings
 

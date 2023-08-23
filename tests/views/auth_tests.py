@@ -352,13 +352,13 @@ def apply_middleware(request):
 
 
 def save_session(request):
-    middleware = SessionMiddleware()
+    middleware = SessionMiddleware(request)
     middleware.process_request(request)
     request.session.save()
 
 
 def set_anonymous_user(request):
-    set_anon_middleware = SetAnonymousUser()
+    set_anon_middleware = SetAnonymousUser(request)
     set_anon_middleware.process_request(request)
 
 
