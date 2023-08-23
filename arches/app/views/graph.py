@@ -24,7 +24,7 @@ import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
@@ -359,6 +359,16 @@ class GraphDataView(View):
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+
+                    if old_node_data.datatype != 'semantic' and old_node_data.datatype != data['datatype']:
+                        return JSONErrorResponse(
+                            _("Datatype Error"),
+                            _(
+                                """If you want to change the datatype of an existing node.
+                                Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
+                            ),
+                        )
+                    
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
@@ -430,14 +440,6 @@ class GraphDataView(View):
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
         except PublishedModelError as e:
             return JSONErrorResponse(e.title, e.message)
-        except RequestError as e:
-            return JSONErrorResponse(
-                _("Elasticsearch indexing error"),
-                _(
-                    """If you want to change the datatype of an existing node.
-                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
-                ),
-            )
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):

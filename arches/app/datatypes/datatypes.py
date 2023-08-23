@@ -48,7 +48,6 @@ from django.core.cache import cache
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, default_storage
-from django.utils.translation import ugettext as _
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import fromstr
@@ -56,7 +55,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
-from django.utils.translation import get_language, ugettext as _
+from django.utils.translation import get_language, gettext as _
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -161,6 +160,13 @@ class StringDataType(BaseDataType):
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
             tile.data[nodeid] = None
+        elif isinstance(tile.data[nodeid], dict):
+            for language_dict in tile.data[nodeid].values():
+                if language_dict["value"]:
+                    break
+            else:
+                # No non-empty value was found.
+                tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue is not None:
