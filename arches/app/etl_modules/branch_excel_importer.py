@@ -148,8 +148,9 @@ class BranchExcelImporter(BaseImportModule):
 
     def validate_uploaded_file(self, workbook):
         try:
-            workbook.get_sheet_by_name("metadata")["B1"].value
-        except KeyError:
+            graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+            uuid.UUID(graphid)
+        except:
             raise FileValidationError()
 
     def get_graphid(self, workbook):
