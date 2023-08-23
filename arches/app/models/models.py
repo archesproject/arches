@@ -1570,6 +1570,18 @@ class Plugin(models.Model):
         db_table = "plugins"
 
 
+class WorkflowHistory(models.Model):
+    workflowid = models.UUIDField(primary_key=True)
+    workflowstepids = JSONField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "workflow_history"
+
+
 class IIIFManifestValidationError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Image Service Validation Error")
