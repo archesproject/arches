@@ -1,0 +1,129 @@
+from django.db import migrations
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('models', '9748_branch_excel_exporter'),
+    ]
+
+    update_refresh_tile_resource_relationship_function = """
+        CREATE OR REPLACE FUNCTION __arches_refresh_tile_resource_relationships(tile_id uuid)
+        RETURNS boolean AS $$
+        DECLARE
+            resource_id uuid;
+        BEGIN
+            SELECT resourceinstanceid INTO resource_id FROM tiles WHERE tileid = tile_id;
+
+            DELETE FROM resource_x_resource WHERE tileid = tile_id;
+
+            WITH relationships AS (
+                (SELECT s.nodeid, s.relationship, s.graphid as graphid_from, r.graphid as graphid_to
+                    FROM resource_instances r,
+                        (SELECT n.nodeid,
+                            n.graphid,
+                            jsonb_array_elements(t.tiledata->n.nodeid::text) as relationship
+                        FROM tiles t
+                            LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                        WHERE n.datatype IN ('resource-instance-list', 'resource-instance')
+                            AND t.tileid = tile_id::uuid
+                            AND t.tiledata->>n.nodeid::text IS NOT null) s
+                    WHERE r.resourceinstanceid = (s.relationship ->> 'resourceId')::uuid
+                )
+            )
+            
+            INSERT INTO resource_x_resource (
+                resourcexid,
+                notes,
+                relationshiptype,
+                resourceinstanceidfrom,
+                resourceinstanceidto,
+                inverserelationshiptype,
+                tileid,
+                nodeid,
+                resourceinstancefrom_graphid,
+                resourceinstanceto_graphid,
+                created,
+                modified
+            ) SELECT
+                CASE relationship->>'resourceXresourceId'
+                    WHEN '' THEN uuid_generate_v4()
+                    ELSE (relationship->>'resourceXresourceId')::uuid
+                END,
+                '',
+                relationship->>'ontologyProperty',
+                resource_id,
+                (relationship->>'resourceId')::uuid,
+                relationship->>'inverseOntologyProperty',
+                tile_id,
+                nodeid,
+                graphid_from,
+                graphid_to,
+                now(),
+                now()
+            FROM relationships;
+
+            RETURN true;
+        END;
+        $$ language plpgsql;
+    """,
+
+    revert_refresh_tile_resource_relationship_function = """
+        create or replace function __arches_refresh_tile_resource_relationships(
+            tile_id uuid
+        ) returns boolean as $$
+        declare
+            resource_id uuid;
+        begin
+            select resourceinstanceid into resource_id from tiles where tileid = tile_id;
+
+            delete from resource_x_resource where tileid = tile_id;
+
+            with relationships as (
+                select n.nodeid,
+                    jsonb_array_elements(t.tiledata->n.nodeid::text) as relationship
+                from tiles t
+                    left join nodes n on t.nodegroupid = n.nodegroupid
+                where n.datatype in ('resource-instance-list', 'resource-instance')
+                    and t.tileid = tile_id
+                    and t.tiledata->>n.nodeid::text is not null
+            )
+            insert into resource_x_resource (
+                resourcexid,
+                notes,
+                relationshiptype,
+                resourceinstanceidfrom,
+                resourceinstanceidto,
+                inverserelationshiptype,
+                tileid,
+                nodeid,
+                created,
+                modified
+            ) select
+                CASE relationship->>'resourceXresourceId'
+                    WHEN '' THEN uuid_generate_v4()
+                    ELSE (relationship->>'resourceXresourceId')::uuid
+                END,
+                '',
+                relationship->>'ontologyProperty',
+                resource_id,
+                (relationship->>'resourceId')::uuid,
+                relationship->>'inverseOntologyProperty',
+                tile_id,
+                nodeid,
+                now(),
+                now()
+            from relationships;
+
+            return true;
+        end;
+        $$ language plpgsql;
+    """
+
+
+    operations = [
+        migrations.RunSQL(
+            update_refresh_tile_resource_relationship_function,
+            revert_refresh_tile_resource_relationship_function,
+        ),
+    ]
