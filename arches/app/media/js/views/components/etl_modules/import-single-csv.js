@@ -52,8 +52,11 @@ define([
         this.validated = params.validated || ko.observable();
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
-        this.formatTime = params.formatTime
-        this.timeDifference = params.timeDifference
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
+        this.ready = ko.computed(() => {
+            return self.selectedGraph() && self.fieldMapping().find((mapping) => mapping.node());
+        });
 
         this.createTableConfig = function(col) {
             return {
@@ -188,6 +191,7 @@ define([
         };
 
         this.write = function(){
+            if (!self.ready()) { return; }
             const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node;});
             const fieldMapping = koMapping.toJS(self.fieldMapping);
             self.formData.append('fieldnames', fieldnames);
