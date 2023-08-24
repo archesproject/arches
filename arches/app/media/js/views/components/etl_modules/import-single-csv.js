@@ -20,7 +20,6 @@ define([
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
-        this.loading(true);
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
@@ -215,8 +214,9 @@ define([
                             function(){}
                         )
                     );
-                }
-                );
+                }).always(() => {
+                    self.loading(false);
+                });
             }).fail(error => console.log(error.responseJSON.data));
         };
 
