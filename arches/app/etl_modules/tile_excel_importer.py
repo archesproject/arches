@@ -3,6 +3,8 @@ import json
 from openpyxl import load_workbook
 from openpyxl.writer.excel import save_virtual_workbook
 import os
+
+from django.core.exceptions import ValidationError
 import uuid
 from django.db import connection
 from django.http import HttpResponse
@@ -12,6 +14,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.base_import_module import BaseImportModule
 import arches.app.tasks as tasks
 from arches.management.commands.etl_template import create_tile_excel_workbook
@@ -158,22 +161,40 @@ class TileExcelImporter(BaseImportModule):
             [self.loadid],
         )
         return {"name": worksheet.title, "rows": row_count}
+    
+    def validate_uploaded_file(self, workbook):
+        graphid = None
+        for worksheet in workbook.worksheets:
+            if worksheet.cell(2, worksheet.max_column).value:
+                try:
+                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id)
+                    break
+                except (IndexError, ValidationError):
+                    pass
+        if graphid is None:
+            raise FileValidationError()
+
+    def get_graphid(self, workbook):
+        for worksheet in workbook.worksheets:
+            if worksheet.cell(2, worksheet.max_column).value:
+                try:
+                    nodegroup_id = worksheet.cell(2, worksheet.max_column).value
+                    graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[0].graph_id)
+                    break
+                except (IndexError, ValidationError):
+                    pass
+        return graphid
 
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            workbook = load_workbook(filename=default_storage.open(os.path.join("uploadedfiles", "tmp", self.loadid, file)))
-            try:
-                nodegroup_id = workbook.active.cell(2, workbook.active.max_column).value
-                graphid = str(Node.objects.filter(nodegroup_id=nodegroup_id)[:1].values_list('graph_id', flat=True)[0])
-            except KeyError:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                raise ValueError(_("A graphid is not available in the metadata worksheet"))
+            uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
+            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
+
             for worksheet in workbook.worksheets:
                 details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)
                 summary["files"][file]["worksheets"].append(details)

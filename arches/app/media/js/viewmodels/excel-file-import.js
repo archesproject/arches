@@ -15,8 +15,6 @@ define([
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.data2 = ko.observable(false);
-        this.formatTime = params.formatTime;
-        this.timeDifference = params.timeDifference;
         this.moduleId = params.etlmoduleid;
         ImporterViewModel.apply(this, arguments);
         this.selectedTemplate = ko.observable();
@@ -82,6 +80,16 @@ define([
             this.loading(false);
         };
 
+        this.showAlert = (data) => {
+            self.alert(new AlertViewModel(
+                'ep-alert-red',
+                data["data"]["title"],
+                data["data"]["message"],
+                null,
+                function(){}
+            ));
+        };
+
         this.addFile = async function(file){
             self.loading(true);
             self.fileInfo({name: file.name, size: file.size});
@@ -94,9 +102,9 @@ define([
                 self.response(data);
                 self.loadDetails(data);
             } else {
-                // eslint-disable-next-line no-console
-                console.log('error');
                 self.loading(false);
+                const data = await response.json();
+                self.showAlert(data);
             }
         };
 
@@ -124,15 +132,9 @@ define([
             }
             else {
                 const data = await response.json();
-                this.alert(new AlertViewModel(
-                    'ep-alert-red',
-                    data["data"]["title"],
-                    data["data"]["message"],
-                    null,
-                    function(){}
-                ));
+                self.showAlert(data);
             }
         };
     };
-    return ExcelFileImportViewModel
+    return ExcelFileImportViewModel;
 });

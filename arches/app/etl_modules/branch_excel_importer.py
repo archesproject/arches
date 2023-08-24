@@ -16,7 +16,7 @@ import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.management.commands.etl_template import create_workbook
 from openpyxl.writer.excel import save_virtual_workbook
-from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 
 
 
@@ -169,20 +169,26 @@ class BranchExcelImporter(BaseImportModule):
         )
         return {"name": worksheet.title, "rows": row_count}
 
+    def validate_uploaded_file(self, workbook):
+        try:
+            graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+            uuid.UUID(graphid)
+        except:
+            raise FileValidationError()
+
+    def get_graphid(self, workbook):
+        graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+        return graphid
+
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            workbook = load_workbook(filename=default_storage.open(os.path.join("uploadedfiles", "tmp", self.loadid, file)))
-            try:
-                graphid = workbook.get_sheet_by_name("metadata")["B1"].value
-            except KeyError:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), self.loadid),
-                )
-                raise ValueError(_("A graphid is not available in the metadata worksheet"))
+            uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
+            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
+
             for worksheet in workbook.worksheets:
                 if worksheet.title.lower() != "metadata":
                     details = self.process_worksheet(worksheet, cursor, node_lookup, nodegroup_lookup)

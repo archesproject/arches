@@ -5,6 +5,7 @@ import math
 import os
 import uuid
 import zipfile
+from openpyxl import load_workbook
 
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -183,6 +184,9 @@ class BaseImportModule:
         result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
 
+    def validate_uploaded_file(self, file, kwarg):
+        pass
+
     ### Actions ###
 
     def validate(self, loadid):
@@ -231,7 +235,23 @@ class BaseImportModule:
             result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
             default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
-        return {"success": result, "data": result}
+
+        has_valid_excel_file = False
+        for file in result["summary"]["files"]:
+            if file.split(".")[-1] == "xlsx":
+                try:
+                    uploaded_file_path = os.path.join(self.temp_dir, file)
+                    workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+                    self.validate_uploaded_file(workbook)
+                    has_valid_excel_file = True
+                except:
+                    pass
+        if not has_valid_excel_file:
+            title = _("Invalid Uploaded File")
+            message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
+            return {"success": False, "data": {"title": title, "message": message}}
+
+        return {"success": True, "data": result}
 
     def start(self, request):
         self.loadid = request.POST.get("load_id")
@@ -265,3 +285,12 @@ class BaseImportModule:
                 response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
 
             return response
+        
+class FileValidationError(Exception):
+    def __init__(self, message=_("Unable to read file"), code=400):
+        self.title = _("Invalid Uploaded File")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
