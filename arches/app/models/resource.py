@@ -161,6 +161,7 @@ class Resource(models.ResourceInstance):
 
         for lang in settings.LANGUAGES:
             language = self.get_descriptor_language({"language":lang[0]})
+            context = {"language":language}
             if not self.descriptor_function:
                 self.descriptor_function = models.FunctionXGraph.objects.filter(
                     graph_id=self.graph_id, function__functiontype="primarydescriptors"
