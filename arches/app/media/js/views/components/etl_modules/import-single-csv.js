@@ -20,7 +20,6 @@ define([
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
-        this.loading(true);
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
@@ -52,8 +51,11 @@ define([
         this.validated = params.validated || ko.observable();
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
-        this.formatTime = params.formatTime
-        this.timeDifference = params.timeDifference
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
+        this.ready = ko.computed(() => {
+            return self.selectedGraph() && self.fieldMapping().find((mapping) => mapping.node());
+        });
 
         this.createTableConfig = function(col) {
             return {
@@ -188,6 +190,7 @@ define([
         };
 
         this.write = function(){
+            if (!self.ready()) { return; }
             const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node;});
             const fieldMapping = koMapping.toJS(self.fieldMapping);
             self.formData.append('fieldnames', fieldnames);
@@ -211,8 +214,9 @@ define([
                             function(){}
                         )
                     );
-                }
-                );
+                }).always(() => {
+                    self.loading(false);
+                });
             }).fail(error => console.log(error.responseJSON.data));
         };
 

@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block task_details %}
+<div class="loading-mask" data-bind="visible: loading"></div>
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
 <div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; margin-top: 65px; background: white">
@@ -139,7 +140,7 @@
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="disable: !ready(), click: write" class="btn btn-success">
         <span data-bind="text: $root.translations.importData"></span>
     </button>
     <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
