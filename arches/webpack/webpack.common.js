@@ -125,7 +125,7 @@ module.exports = () => {
                         ) {
                             console.warn(
                                 '\x1b[33m%s\x1b[0m',  // yellow
-                                `"${alias}" has failed to load, it has already been defined in the project, another arches application, or the Arches software.`
+                                `"${alias}" is already loaded! It has might have been defined in the project, another arches application, or the Arches software.`
                             )
                         }
                         else {
