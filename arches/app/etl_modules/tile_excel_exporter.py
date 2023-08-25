@@ -120,18 +120,18 @@ class TileExcelExporter:
                     tile_data = json.loads(tile['tiledata'])
                     for key, value in tile_data.items():
                         alias = node_lookup_by_id[key]["alias"]
-                        if node_lookup_by_id[key]["datatype"] == "file-list":
+                        datatype = node_lookup_by_id[key]["datatype"]
+                        if datatype == "file-list":
                             file_names_to_export = []
                             for file in value:
                                 files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
                                 file_names_to_export.append(file["name"])
                             tile[alias] = ",".join(file_names_to_export)
                         else:
-                            try:
-                                value.keys() # to check if it is a dictionary
-                                tile[alias] = json.dumps(value)
-                            except AttributeError:
-                                tile[alias] = value
+                            from arches.app.datatypes.datatypes import DataTypeFactory
+                            self.datatype_factory = DataTypeFactory()
+                            datatype_instance = self.datatype_factory.get_instance(datatype)
+                            tile[alias] = datatype_instance.transform_export_values(value) if value else None
                     card_name = str(Card.objects.get(nodegroup=tile["nodegroupid"]).name)
                     tiles_to_export.setdefault(card_name, []).append(tile)
 
