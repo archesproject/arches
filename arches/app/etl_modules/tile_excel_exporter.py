@@ -77,7 +77,7 @@ class TileExcelExporter:
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
-        use_celery = False
+        use_celery = True
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -100,9 +100,6 @@ class TileExcelExporter:
                 resource_ids = [ row[0] for row in rows ]
 
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graph_id,))
-            nodegroup_lookup = dictfetchall(cursor)
-
             nodes = Node.objects.filter(graph_id=graph_id)
             node_lookup_by_id = self.get_node_lookup_by_id(nodes)
             tiles_to_export = {}
@@ -112,11 +109,6 @@ class TileExcelExporter:
                 cursor.execute("""SELECT * FROM tiles WHERE resourceinstanceid = (%s)""", [resource_id])
                 tiles = dictfetchall(cursor)
                 for tile in tiles:
-                    # root_nodegroup, nodegroup_alias = [
-                    #     (ng["root_nodegroup"], ng["alias"]) for ng in nodegroup_lookup if ng["nodegroupid"] == tile["nodegroupid"]
-                    # ][0]
-                    # node_alias = [ng["alias"] for ng in nodegroup_lookup if ng["root_nodegroup"] == root_nodegroup][0]
-                    # tile["alias"] = nodegroup_alias
                     tile_data = json.loads(tile['tiledata'])
                     for key, value in tile_data.items():
                         alias = node_lookup_by_id[key]["alias"]
@@ -169,7 +161,7 @@ class TileExcelExporter:
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
 
-        export_task = tasks.export_branch_excel.apply_async(
+        export_task = tasks.export_tile_excel.apply_async(
             (self.userid, self.loadid, graph_id, graph_name, resource_ids),
         )
 
