@@ -255,7 +255,7 @@ def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, res
         notify_completion(msg, user)
 
 @shared_task
-def load_branch_excel(userid, load_id, graph_id, graph_name, resource_ids):
+def export_branch_excel(userid, load_id, graph_id, graph_name, resource_ids):
     from arches.app.etl_modules import branch_excel_exporter
 
     BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None, loadid=load_id)
@@ -263,7 +263,7 @@ def load_branch_excel(userid, load_id, graph_id, graph_name, resource_ids):
 
 
 @shared_task
-def load_tile_excel(userid, load_id, graph_id, graph_name, resource_ids):
+def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids):
     from arches.app.etl_modules import tile_excel_exporter
 
     TileExcelExporter = tile_excel_exporter.TileExcelExporter(request=None, loadid=load_id)
