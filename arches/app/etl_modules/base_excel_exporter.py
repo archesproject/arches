@@ -1,24 +1,18 @@
 from datetime import datetime
 from io import BytesIO
-import json
-import os
 import zipfile
 from openpyxl.writer.excel import save_virtual_workbook
 from django.core.files import File as DjangoFile
 from django.db import connection
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import Node, File, TempFile
+from arches.app.models.models import File, TempFile
 from arches.app.models.system_settings import settings
-import arches.app.tasks as tasks
-from arches.app.utils.db_utils import dictfetchall
-from arches.management.commands.etl_template import create_workbook
 
 
 class BaseExcelExporter:
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.moduleid = request.POST.get("module") if request else None
         self.loadid = loadid if loadid else None
 
     def get_node_lookup_by_id(self, nodes):
@@ -90,4 +84,11 @@ class BaseExcelExporter:
             response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids)
 
         return response
+    
+    @load_data_async
+    def run_load_task_async(self, request, laod_id):
+        pass
 
+
+    def run_export_task(self, laod_id, graph_id, graph_name, resource_ids):
+        pass
