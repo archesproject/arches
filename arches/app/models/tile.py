@@ -475,13 +475,13 @@ class Tile(models.TileModel):
                     transaction_id=transaction_id,
                 )
 
-            if index:
-                self.index()
-
             for tile in self.tiles:
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
                 tile.save(*args, request=request, index=index, **kwargs)
+            
+            if index:
+                self.index()
 
     def populate_missing_nodes(self):
         first_node = next(iter(self.data.items()), None)
