@@ -197,7 +197,7 @@ def index_resources_using_singleprocessing(
                 resource.set_node_datatypes(node_datatypes)
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if recalculate_descriptors:
-                    resource.calculate_descriptors(resave=True)
+                    resource.save_descriptors()
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 document, terms = resource.get_documents_to_index(

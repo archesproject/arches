@@ -146,22 +146,22 @@ class Resource(models.ResourceInstance):
             except KeyError:
                 pass
 
-        self.calculate_descriptors(context=context)
+        self.save_descriptors(context=context) # Save descriptors to resource instance
         return self.descriptors[language][descriptor]
 
-    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None, resave=False):
+    def save_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
         """
         descriptors -- iterator with descriptors to be calculated
-        context -- Dictionary which may have:
-            language -- Language code in which the descriptor should be returned (e.g. 'en').
-                This occurs when handling concept values.
-            any key:value pairs needed to control the behavior of a custom descriptor function
+        context -- Dictionary with any key:value pairs needed to control the behavior of a custom descriptor function
 
         """
 
         for lang in settings.LANGUAGES:
             language = self.get_descriptor_language({"language":lang[0]})
-            context = {"language":language}
+            if context:
+                context["language"] = language
+            else:
+                context = {"language":language}
             if not self.descriptor_function:
                 self.descriptor_function = models.FunctionXGraph.objects.filter(
                     graph_id=self.graph_id, function__functiontype="primarydescriptors"
@@ -177,8 +177,8 @@ class Resource(models.ResourceInstance):
                         self.name[language] = self.descriptors[language][descriptor]
                 else:
                     self.descriptors[language][descriptor] = None
-        if resave:
-            super(Resource, self).save()
+        
+        super(Resource, self).save()
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -325,7 +325,7 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            self.calculate_descriptors(resave=True)
+            self.save_descriptors()
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
