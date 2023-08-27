@@ -874,6 +874,14 @@ class ResourceXResource(models.Model):
 
         super(ResourceXResource, self).save()
 
+    @staticmethod
+    def bulk_save(relations):
+        for rr in relations:
+            if not rr.created:
+                rr.created = datetime.datetime.now()
+            rr.modified = datetime.datetime.now()
+        ResourceXResource.objects.bulk_create(relations)
+
     def __init__(self, *args, **kwargs):
         super(ResourceXResource, self).__init__(*args, **kwargs)
         if not self.resourcexid:
