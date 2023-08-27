@@ -99,42 +99,51 @@ class Reader(object):
                 return ret[0].resourceinstanceid
 
         def validate_resourceinstanceid(resourceinstanceid, key):
-                # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
+            errors = []
+            # Test if resourceinstancefrom is a uuid it is for a resource or if it is not a uuid that get_resourceid_from_legacyid found a resourceid.
+            try:
+                # Test if resourceinstanceid from relations file is a UUID.
+                newresourceinstanceid = uuid.UUID(resourceinstanceid)
                 try:
-                    # Test if resourceinstanceid from relations file is a UUID.
-                    newresourceinstanceid = uuid.UUID(resourceinstanceid)
-                    try:
-                        # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
-                        Resource.objects.get(resourceinstanceid=resourceinstanceid)
-                    except:
-                        # If resourceinstanceid is not associated with a resource instance then set resourceinstanceid to None
-                        newresourceinstanceid = None
+                    # If resourceinstanceid is a UUID then test that it is assoicated with a resource instance
+                    Resource.objects.get(resourceinstanceid=resourceinstanceid)
                 except:
-                    # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
-                    newresourceinstanceid = get_resourceid_from_legacyid(resourceinstanceid)
-
-                # If resourceinstancefrom is None then either:
-                # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
-                # 2.) a uuid was passed in and it is not associated with a resource instance
+                    # If resourceinstanceid is not associated with a resource instance then set resourceinstanceid to None
+                    newresourceinstanceid = None
+                    errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "Unable to find a resource with this resourceinstanceid: {0}".format(
+                            relation[key]
+                        ),
+                    }
+                )
+            except:
+                # If resourceinstanceid is not UUID then assume it's a legacyid and pass it into get_resourceid_from_legacyid function
+                newresourceinstanceid = get_resourceid_from_legacyid(resourceinstanceid)
                 if newresourceinstanceid is None:
-                    errors = []
                     # self.errors.append({'datatype':'legacyid', 'value':relation[key], 'source':'', 'message':'either multiple resources or no resource have this legacyid\n'})
                     errors.append(
                         {
                             "type": "ERROR",
-                            "message": "Relation not created, either zero or multiple resources found with legacyid: {0}".format(
+                            "message": "Either Multiple resources with legacyid or No resource with this legacyid: {0}".format(
                                 relation[key]
                             ),
                         }
                     )
-                    if len(errors) > 0:
-                        self.errors += errors
 
-                return newresourceinstanceid
+            # If resourceinstancefrom is None then either:
+            # 1.) a legacyid was passed in and get_resourceid_from_legacyid could not find a resource or found multiple resources with the indicated legacyid or
+            # 2.) a uuid was passed in and it is not associated with a resource instance
+            if len(errors) > 0:
+                self.errors += errors
+
+            return newresourceinstanceid
 
         start = time()
         bulk_relations = []
         relation_count = 2
+        failed = 0
         preexisting_count = 0
         for i, relation in enumerate(relations):
             relation_count += 1
@@ -161,6 +170,8 @@ class Reader(object):
                 else:
                     exists = ResourceXResource.objects.filter(resourceinstanceidfrom_id=resourceinstancefrom, resourceinstanceidto_id=resourceinstanceto, relationshiptype=relationshiptype).exists()
                 if not exists:
+                    if not relid:
+                        relid = uuid.uuid4()
                     if (
                         "resourceinstancefrom_graphid" not in relation
                         or relation["resourceinstancefrom_graphid"] == ""
@@ -215,6 +226,7 @@ class Reader(object):
                     relation_count -= 1
                     preexisting_count += 1
             else:
+                failed +=1
                 self.errors.append(
                         {
                             "type": "ERROR",
@@ -230,6 +242,8 @@ class Reader(object):
             print("{0} pre-existing relations detected".format(str(preexisting_count)))
         else:
             print("no pre-existing relations")
+        if failed:
+            print(f"{failed} were incomplete and not saved.")
         elapsed = time() - start
         bulk_str = " bulk" if bulk else ""
         print(f"Time to{bulk_str} import resource relations = {datetime.timedelta(seconds=elapsed)}")
