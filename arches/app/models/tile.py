@@ -478,7 +478,7 @@ class Tile(models.TileModel):
             for tile in self.tiles:
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
-                tile.save(*args, request=request, index=index, **kwargs)
+                tile.save(*args, request=request, index=False, **kwargs)
             
             if index:
                 self.index()
