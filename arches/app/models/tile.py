@@ -528,7 +528,9 @@ class Tile(models.TileModel):
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid, index=index)
                 if index:
-                    self.index()
+                    resource = Resource.objects.get(pk=self.resourceinstance_id)
+                    resource.save_descriptors()
+                    self.index(resource=resource)
             except IntegrityError as e:
                 logger.error(e)
 
@@ -536,12 +538,17 @@ class Tile(models.TileModel):
             self.apply_provisional_edit(user, data={}, action="delete")
             super(Tile, self).save(*args, **kwargs)
 
-    def index(self):
+    def index(self, resource=None):
         """
         Indexes all the nessesary documents related to resources to support the map, search, and reports
 
         """
-        Resource.objects.get(pk=self.resourceinstance_id).index()
+
+        if not resource:
+            Resource.objects.get(pk=self.resourceinstance_id).index()
+        else:
+            resource.index()
+            
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):

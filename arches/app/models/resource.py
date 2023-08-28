@@ -325,7 +325,6 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            self.save_descriptors()
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
