@@ -481,7 +481,9 @@ class Tile(models.TileModel):
                 tile.save(*args, request=request, index=False, **kwargs)
             
             if index:
-                self.index()
+                resource = Resource.objects.get(pk=self.resourceinstance_id)
+                resource.save_descriptors()
+                self.index(resource=resource)
 
     def populate_missing_nodes(self):
         first_node = next(iter(self.data.items()), None)
