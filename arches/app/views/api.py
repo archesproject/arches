@@ -552,7 +552,7 @@ class Resources(APIBase):
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
         
-        if format = "json-ld" and slug is None and graphid is None:
+        if format == "json-ld" and slug is None and graphid is None:
             return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
 
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
@@ -632,7 +632,7 @@ class Resources(APIBase):
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
-        if format = "json-ld" and slug is None and graphid is None:
+        if format == "json-ld" and slug is None and graphid is None:
             return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
         
         try:
