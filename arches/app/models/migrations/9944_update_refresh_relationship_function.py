@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9748_branch_excel_exporter'),
+        ('models', '9892_tile_excel_exporter'),
     ]
 
     update_refresh_tile_resource_relationship_function = """
@@ -134,9 +134,6 @@ class Migration(migrations.Migration):
         AND x.resourceinstanceto_graphid is null;
     """
 
-    revert_previous_relationship = """
-    """
-
 
     operations = [
         migrations.RunSQL(
@@ -145,6 +142,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(
             update_previous_relationship,
-            revert_previous_relationship,
+            migrations.RunSQL.noop,
         ),
     ]
