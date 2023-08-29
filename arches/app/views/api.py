@@ -546,13 +546,14 @@ class Resources(APIBase):
 
     def put(self, request, resourceid, slug=None, graphid=None):
         allowed_formats = ["arches-json", "json-ld"]
-        if slug is None and graphid is None:
-            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
-        
         indent = request.GET.get("indent", None)
         format = request.GET.get("format", "json-ld")
+        
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+        
+        if format = "json-ld" and slug is None and graphid is None:
+            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
 
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
@@ -625,14 +626,15 @@ class Resources(APIBase):
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
         allowed_formats = ["arches-json", "json-ld"]
-        if slug is None and graphid is None:
-            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
-        
         indent = request.POST.get("indent", None)
         format = request.GET.get("format", "json-ld")
+        
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
+        if format = "json-ld" and slug is None and graphid is None:
+            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
+        
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 if format == "json-ld":
