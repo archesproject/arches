@@ -18,20 +18,14 @@ class Migration(migrations.Migration):
             DELETE FROM resource_x_resource WHERE tileid = tile_id;
 
             WITH relationships AS (
-                (SELECT s.nodeid, s.relationship, s.graphid as graphid_from, r.graphid as graphid_to
-                    FROM resource_instances r,
-                        (SELECT n.nodeid,
-                            n.graphid,
-                            jsonb_array_elements(t.tiledata->n.nodeid::text) as relationship
-                        FROM tiles t
-                            LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-                        WHERE n.datatype IN ('resource-instance-list', 'resource-instance')
-                            AND t.tileid = tile_id::uuid
-                            AND t.tiledata->>n.nodeid::text IS NOT null) s
-                    WHERE r.resourceinstanceid = (s.relationship ->> 'resourceId')::uuid
-                )
+                SELECT n.nodeid,
+                    jsonb_array_elements(t.tiledata->n.nodeid::text) AS relationship
+                FROM tiles t
+                    LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
+                WHERE n.datatype IN ('resource-instance-list', 'resource-instance')
+                    AND t.tileid = tile_id
+                    AND t.tiledata->>n.nodeid::text IS NOT null
             )
-            
             INSERT INTO resource_x_resource (
                 resourcexid,
                 notes,
@@ -41,8 +35,6 @@ class Migration(migrations.Migration):
                 inverserelationshiptype,
                 tileid,
                 nodeid,
-                resourceinstancefrom_graphid,
-                resourceinstanceto_graphid,
                 created,
                 modified
             ) SELECT
@@ -57,11 +49,21 @@ class Migration(migrations.Migration):
                 relationship->>'inverseOntologyProperty',
                 tile_id,
                 nodeid,
-                graphid_from,
-                graphid_to,
                 now(),
                 now()
             FROM relationships;
+
+            UPDATE resource_x_resource x
+            SET resourceinstancefrom_graphid = r.graphid
+            FROM resource_instances r
+            WHERE r.resourceinstanceid = x.resourceinstanceidfrom
+            AND x.resourceinstancefrom_graphid is null;
+
+            UPDATE resource_x_resource x
+            SET resourceinstanceto_graphid = r.graphid
+            FROM resource_instances r
+            WHERE r.resourceinstanceid = x.resourceinstanceidto
+            AND x.resourceinstanceto_graphid is null;
 
             RETURN true;
         END;
