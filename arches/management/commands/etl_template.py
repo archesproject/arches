@@ -174,4 +174,20 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             sheet.cell(column=i+6, row=1, value="provisionaledits")
             sheet.cell(column=i+7, row=1, value="nodegroup_id")
 
+        if tiledata is not None:
+            for card_name, tiles in tiledata.items():
+                sheet = wb[card_name]
+                for tile in tiles:
+                    row_number = sheet.max_row + 1
+                    sheet[f"A{row_number}"] = str(tile["tileid"])
+                    sheet[f"B{row_number}"] = str(tile["parenttileid"])
+                    sheet[f"C{row_number}"] = str(tile["resourceinstanceid"])
+                    nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("alias")
+                    for i, node in enumerate(nodes):
+                        if tile[node['alias']] is not None:
+                            sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
+                    sheet.cell(column=i+5, row=row_number, value=tile["sortorder"])
+                    sheet.cell(column=i+6, row=row_number, value=tile["provisionaledits"])
+                    sheet.cell(column=i+7, row=row_number, value=str(tile["nodegroupid"]))
+
     return wb
