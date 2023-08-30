@@ -5,7 +5,7 @@ from django.db import connection
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator

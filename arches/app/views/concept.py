@@ -23,7 +23,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -443,7 +443,7 @@ def search(request):
     searchString = request.GET["q"]
     removechildren = request.GET.get("removechildren", None)
     query = Query(se, start=0, limit=100)
-    phrase = Match(field="value", query=searchString.lower(), type="phrase_prefix")
+    phrase = Match(field="value.folded", query=searchString.lower(), type="phrase_prefix")
     query.add_query(phrase)
     results = query.search(index=CONCEPTS_INDEX)
 

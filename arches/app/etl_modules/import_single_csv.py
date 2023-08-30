@@ -8,7 +8,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.db.models.functions import Lower
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings

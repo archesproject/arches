@@ -9,11 +9,10 @@ from openpyxl import load_workbook
 
 from django.core.files import File
 from django.core.files.storage import default_storage
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
 
-from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.models.models import Node
 from arches.app.utils.decorators import user_created_transaction_match
@@ -67,7 +66,7 @@ class BaseImportModule:
         except Exception as e:
             response["data"] = e
             logger.error(e)
-        logger.warn(response)
+        logger.warning(response)
         return response
 
     def delete_from_default_storage(self, directory):

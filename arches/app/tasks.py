@@ -9,7 +9,7 @@ from django.core import management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
 from tempfile import NamedTemporaryFile
@@ -176,7 +176,7 @@ def update_user_task_record(arg_dict={}):
 @shared_task
 def log_error(request, exc, traceback, msg=None):
     logger = logging.getLogger(__name__)
-    logger.warn(exc)
+    logger.warning(exc)
     try:
         task_obj = models.UserXTask.objects.get(taskid=request.id)
         task_obj.status = "ERROR"
@@ -192,8 +192,8 @@ def log_error(request, exc, traceback, msg=None):
 @shared_task
 def on_chord_error(request, exc, traceback):
     logger = logging.getLogger(__name__)
-    logger.warn(exc)
-    logger.warn(traceback)
+    logger.warning(exc)
+    logger.warning(traceback)
     msg = f"Package Load erred on import_business_data. Exception: {exc}. See logs for details."
     user = User.objects.get(id=1)
     notify_completion(msg, user)
@@ -331,7 +331,7 @@ def create_user_task_record(taskid, taskname, userid):
         new_task_record = models.UserXTask.objects.create(user=user, taskid=taskid, datestart=datetime.now(), name=taskname)
     except Exception as e:
         logger = logging.getLogger(__name__)
-        logger.warn(e)
+        logger.warning(e)
 
 
 def notify_completion(msg, user, notiftype_name=None, context=None):
