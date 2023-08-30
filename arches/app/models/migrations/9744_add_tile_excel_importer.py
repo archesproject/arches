@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9746_related_resource_post_save_bug'),
+        ('models', '9748_alter_graphmodel_functions_alter_icon_id'),
     ]
 
     forward_sql =  """
