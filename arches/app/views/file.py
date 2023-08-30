@@ -1,6 +1,6 @@
 import logging
 import uuid
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import View
 from django.shortcuts import redirect
 from arches.app.models.models import File, TempFile
