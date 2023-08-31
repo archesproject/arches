@@ -63,5 +63,8 @@
     <!-- ko if: displayValue -->
     <a data-bind="attr: { href: '#' + value() }, text: displayValue"></a>
     <!-- /ko -->
+    <!-- ko ifnot: displayValue -->
+    <span data-bind="text: $root.translations.none"></span>
+    <!-- /ko -->
 </dd>
 {% endblock report %}
