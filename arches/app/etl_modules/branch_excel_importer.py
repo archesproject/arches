@@ -5,7 +5,7 @@ import uuid
 
 from django.http import HttpResponse
 from openpyxl import load_workbook
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.files.storage import default_storage
 from django.db import connection
 

@@ -3,7 +3,7 @@ import functools
 import logging
 
 from django.db import connection
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 import arches.app.utils.task_management as task_management
 

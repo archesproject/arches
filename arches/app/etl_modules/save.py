@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.db import connection
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
