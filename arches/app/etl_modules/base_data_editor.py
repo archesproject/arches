@@ -10,6 +10,9 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Aggregation, Bool, FiltersAgg, NestedAgg, Query, Wildcard
+from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
 from arches.app.views.search import search_results
 
@@ -158,17 +161,39 @@ class BulkStringEditor(BaseBulkEditor):
 
         request.GET["advanced-search"] = json.dumps(advanced_search_object)
 
+        advanced_search_query = search_results(request, returnDsl=True)._dsl["query"]
 
-        response = search_results(request)
-        results = json.loads(response.content)['results']
+        case_insensitive = True if case_insensitive == "true" else False
+
+        node_value_query = Wildcard(
+            field="tiles.data.%s.%s.value.keyword" % (node_id, language_code),
+            query=f"*{old_text}*",
+            case_insensitive=case_insensitive,
+        )
+
+        search_bool_query = Bool()
+        search_bool_query.must(node_value_query)
+
+        search_filter_agg = FiltersAgg(name="string_search")
+        search_filter_agg.add_filter(search_bool_query)
+
+        nested_agg = NestedAgg(path="tiles", name="tile_agg")
+        nested_agg.add_aggregation(search_filter_agg)
+
+        se = SearchEngineFactory().create()
+        query = Query(se)
+        
+        query.add_aggregation(nested_agg)
+        query.add_query(advanced_search_query)
+
+        results = query.search(index=RESOURCES_INDEX)
         values = []
         for hit in results['hits']['hits']:
             for tile in hit['_source']['tiles']:
                 if node_id in tile['data']:
                     values.append(tile['data'][node_id][language_code]['value'])
-
         number_of_resources = results['hits']['total']['value']
-        number_of_tiles = 0
+        number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
 
         return values, number_of_tiles, number_of_resources
 
@@ -191,7 +216,7 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
-        if case_insensitive == "true" and operation == "replace":
+        if case_insensitive and operation == "replace":
             operation = "replace_i"
         if also_trim == "true":
             operation = operation + "_trim"
