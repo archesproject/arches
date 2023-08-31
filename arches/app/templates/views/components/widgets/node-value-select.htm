@@ -60,6 +60,8 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd>
+    <!-- ko if: displayValue -->
     <a data-bind="attr: { href: '#' + value() }, text: displayValue"></a>
+    <!-- /ko -->
 </dd>
 {% endblock report %}
