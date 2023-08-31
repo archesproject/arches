@@ -23,6 +23,12 @@ module.exports = () => {
                         overlay: {
                             errors: true,
                             warnings: false,
+                            runtimeErrors: (error) => {
+                                if (error.message === "ResizeObserver loop limit exceeded") {
+                                  return false;
+                                }
+                                return true;
+                            },
                         },
                     },
                     hot: true,

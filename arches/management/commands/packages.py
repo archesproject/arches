@@ -2,7 +2,6 @@ import json
 import pyprind
 import csv
 import shutil
-import subprocess
 import glob
 import uuid
 import sys
@@ -10,7 +9,6 @@ import urllib.request, urllib.parse, urllib.error
 import os
 import imp
 import logging
-import requests
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -25,7 +23,6 @@ from arches.app.utils.data_management.resources.formats.csvfile import (
     MissingConfigException,
     TileCsvReader,
 )
-from arches.app.utils.data_management.resources.formats.format import MissingGraphException
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
@@ -33,9 +30,7 @@ from arches.app.models import models
 from arches.app.models.fields.i18n import I18n_String
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
-import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.task_management as task_management
-from django.forms.models import model_to_dict
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
 from django.utils.module_loading import import_string
@@ -108,8 +103,12 @@ class Command(BaseCommand):
             + "'install'=Runs the setup file defined in your package root",
         )
 
-        parser.add_argument(
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
             "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
+        )
+        group.add_argument(
+            "-a", "--arches-application", action="store", dest="arches_application", default="", help="Name of Arches Application",
         )
 
         parser.add_argument(
@@ -343,16 +342,22 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
-            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
+            arches_application = options['arches_application']
+            arches_application_path = None
+
+            if arches_application:
+                application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+                arches_application_path = os.path.join(application_origin, 'pkg')
+
             self.load_package(
-                options["source"],
+                arches_application_path or options["source"],
                 options["setup_db"],
                 options["overwrite"],
                 options["bulk_load"],
                 options["stage"],
                 options["yes"],
                 options["dev"],
-                defer_indexing,
+                False if str(options["defer_indexing"])[0].lower() == "f" else True,
             )
 
         if options["operation"] in ["create", "create_package"]:
