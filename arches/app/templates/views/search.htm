@@ -16,16 +16,16 @@
 
                 <!-- Inline Filters (for QA and Resource Type) -->
                 <div class="search-inline-filters">
-                    <div class="resource-filter" data-bind="component: {
-                        name: 'resource-type-filter',
-                        params: sharedStateObject
-                    }"></div>
                     <!--ko if: sharedStateObject.userIsReviewer-->
                         <div class="qa-filter" data-bind="component: {
                             name: 'provisional-filter',
                             params: sharedStateObject
                         }"></div>
                     <!--/ko-->
+                    <div class="resource-filter" data-bind="component: {
+                        name: 'resource-type-filter',
+                        params: sharedStateObject
+                    }"></div>
                 </div>
             </div>
             <div class="search-tools-container">

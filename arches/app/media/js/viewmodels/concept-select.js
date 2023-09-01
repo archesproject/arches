@@ -105,8 +105,10 @@ define([
                         }
                     });
                     return {
-                        results: data.results,
-                        more: data.more
+                        "results": data.results,
+                        "pagination": {
+                            "more": data.more
+                        }
                     };
                 }
             },

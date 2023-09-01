@@ -1,11 +1,9 @@
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    &.term-flag{
-        background-color: #42a5f5;
-    }
 
     &.filter-flag {
         background-color: #30ad24;
     }
+    
     & button.search-tag {
         border: none;
         background: transparent;
@@ -18,13 +16,4 @@
         }
     }
 
-}
-
-.select2-selection__choice__remove {
-    background-color: #fff;
-    border-radius: 3px;
-    line-height: 12px;
-    font-size: 18px;
-    margin-top: 6px;
-    padding: 1px;
 }

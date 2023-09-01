@@ -11,14 +11,13 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Term Filter';
-
              
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter.terms = ko.observableArray();
             this.filter.tags = ko.observableArray();
 
-            this.language = ko.observable();
+            this.language = ko.observable("*");
             this.languages = ko.observableArray();
             const languages = arches.languages.slice();
             languages.unshift({"code": "*", "name": "All"});
@@ -65,7 +64,7 @@ define([
             var queryObj = this.query();
             if (terms.length > 0){
                 queryObj[componentName] = ko.toJSON(terms);
-                queryObj['language'] = this.language()?.code;
+                queryObj['language'] = this.language();
             } else {
                 delete queryObj[componentName];
             }

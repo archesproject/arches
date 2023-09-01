@@ -11,10 +11,14 @@
     ></select>
     <select data-bind="
         options: languages, 
+        optionsValue: 'code',
         optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
-        value: language, 
-        chosen: {width:'100%'},
-        attr: {'aria-label': $root.translations.language}"
+        select2Query: {
+            select2Config:{
+                value: language,
+                allowClear: false
+        }},
+        attr: {'data-label': $root.translations.language}"
     ></select></form>
 </div>
 <!-- End Term Filter -->

@@ -1,4 +1,4 @@
-define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
+define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _, selectWoo) {
     ko.bindingHandlers.select2 = {
         init: function(el, valueAccessor, allBindingsAccessor, viewmodel, bindingContext) {
             var allBindings = allBindingsAccessor().select2;
@@ -9,7 +9,7 @@ define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
                 $(el).select2('destroy');
             });
 
-            select2Config.formatResult = function(item) {
+            select2Config.templateResult = function(item) {
                 return ko.unwrap(item.text);
             };
 
@@ -83,7 +83,7 @@ define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
                 return result;
             };
 
-            select2Config.formatSelection = function(item) {
+            select2Config.templateSelection = function(item) {
                 var path = [];
                 var result = ko.unwrap(item.text);
                 if (select2Config.showParents === true) {
@@ -97,8 +97,8 @@ define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
 
 
             select2Config.value = value();
-            $(el).select2(select2Config);
-            $(el).select2("val", value());
+            $(el).selectWoo(select2Config);
+            $(el).selectWoo("val", value());
             $(el).on("change", function(val) {
                 if (val.val === "") {
                     val.val = null;
@@ -107,7 +107,7 @@ define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
             });
 
             if (ko.unwrap(select2Config.disabled)) {
-                $(el).select2("disable");
+                $(el).selectWoo("disable");
             }
 
             $(el).on("select2-opening", function() {
@@ -117,7 +117,7 @@ define(['jquery', 'knockout', 'underscore', 'select-woo'], function($, ko, _) {
             });
             value.subscribe(function(newVal) {
                 select2Config.value = newVal;
-                $(el).select2("val", newVal);
+                $(el).selectWoo("val", newVal);
             }, this);
         }
     };

@@ -482,9 +482,9 @@ define([
                         hit.id = hit._id;
                     });
                     return {
-                        results: data.results.hits.hits,
-                        pagination: {
-                            more: data['paging-filter'].paginator.has_next
+                        "results": data.results.hits.hits,
+                        "pagination": {
+                            "more": data['paging-filter'].paginator.has_next
                         }
                     };
                 }

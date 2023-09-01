@@ -15,6 +15,7 @@ define([
                 allowClear: true,
             });
             var value = select2Config.value;
+            value.extend({ rateLimit: 250 });
             // select2Config.value = value();
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
@@ -26,10 +27,10 @@ define([
 
             var placeholder = select2Config.placeholder;
             if (ko.isObservable(placeholder)) {
-                // placeholder.subscribe(function(newItems) {
-                //     select2Config.placeholder = newItems;
-                //     $(el).data('renderPlaceholder')();
-                // }, this);
+                placeholder.subscribe(function(newItems) {
+                    select2Config.placeholder = newItems;
+                    $(el).selectWoo(select2Config);
+                }, this);
                 select2Config.placeholder = select2Config.placeholder();
                 // if (select2Config.allowClear) {
                 //     select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
@@ -46,7 +47,22 @@ define([
             }
 
             $(document).ready(function() {
+                select2Config.data = ko.unwrap(select2Config.data);
                 $(el).selectWoo(select2Config);
+               
+                if (value) {
+                    // initialize the dropdown with the value
+                    $(el).val(value());
+                    $(el).trigger('change.select2'); 
+    
+                    // update the dropdown if something else changes the value
+                    value.subscribe(function(newVal) {
+                        console.log(newVal);
+                        // select2Config.value = newVal;
+                        $(el).val(newVal);
+                        $(el).trigger('change.select2');
+                    }, this);
+                }
             });
 
             // this initializes the placeholder for the select element
@@ -64,21 +80,6 @@ define([
             // });
             // $(el).data('renderPlaceholder')();
             
-            if (value) {
-                // initialize the dropdown with the value
-                //$(el).val(value());
-
-                //select2Config.init(value);
-
-                
-                // update the dropdown if something else changes the value
-                value.subscribe(function(newVal) {
-                    console.log(newVal);
-                    // select2Config.value = newVal;
-                    // $(el).val(newVal).trigger('change.select2');
-                }, this);
-            }
-            
             $(el).on("change", function(e) {
                 let val = $(el).val();
                 if (val === "") {
@@ -92,10 +93,6 @@ define([
                     $(el).parent().trigger('click');
                 }
             });
-
-            // $(el).on('select2:selecting', function() {
-            //     $(el).trigger('selection:update');
-            // });
             
             if (typeof select2Config.onSelect === 'function') {
                 $(el).on("select2:selecting", function(e) {

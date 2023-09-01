@@ -11,13 +11,11 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12 resource-instance-wrapper">
-            <input style="width:30%; display:inline-block;"
-                data-bind="
-                value: value,
-                select2Query: {
+            <select style="width:30%; display:inline-block;"
+                data-bind=" select2Query: {
                     select2Config: select2Config
                 }
-            ">
+            "></select>
 
         </div>
     </div>

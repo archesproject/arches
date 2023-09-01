@@ -9287,9 +9287,8 @@ a.search-query-link-captions:focus {
 }
 
 .search-inline-filters {
-    /*display: flex;
-        flex-direction: row;
-        justify-content: right;*/
+    display: flex;
+    justify-content: right;
     margin-top: 10px;
     margin-left: -5px;
     margin-bottom: 5px;

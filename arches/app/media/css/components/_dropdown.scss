@@ -1,0 +1,23 @@
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #42a5f5;
+
+    border: none;
+    //background: transparent;
+    color: white;
+    vertical-align: top;
+    height: 26px;
+
+    & .fa-minus {
+        margin: 0px 2px 0px 7px;
+    }
+
+}
+
+.select2-selection__choice__remove {
+    background-color: #fff;
+    border-radius: 3px;
+    line-height: 12px;
+    font-size: 18px;
+    margin-top: 6px;
+    padding: 1px;
+}

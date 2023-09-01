@@ -51,13 +51,8 @@ define([
                         };
                     },
                     processResults: function(data, params) {
-                        var value = $(el).parent().find('.select2-input').val();
-
-                        // this result is being hidden by a style in arches.css
-                        // .select2-results li:first-child{
-                        //     display:none;
-                        // }
                         window.setTimeout(function() {
+                            // handles tabbing into the tags themselves to allow for removal
                             $('.select2-results').on('keydown', (e) => {
                                 if (e.keyCode == 9) {
                                     e.preventDefault();
@@ -66,30 +61,13 @@ define([
                                 }
                             });
                         }, 2000);
-                        // var results = [];
-                        // searchbox.groups = [];
                         _.each(data, function(value, searchType) {
-                            // if (value.length > 0) {
-                            //     searchbox.groups.unshift(searchType);
-                            // }
                             _.each(value, function(val) {
                                 val.inverted = ko.observable(false);
                                 val.id = val.type + val.value + val.context_label;
-                                // results.push(val);
                             }, this);
                         }, this);
-                        //res = _.groupBy(results, 'type');
                         var res = [];
-                        // res.push({
-                        //     inverted: ko.observable(false),
-                        //     type: 'group',
-                        //     context: '',
-                        //     context_label: '',
-                        //     id: '',
-                        //     text: searchbox.groups,
-                        //     value: '',
-                        //     disabled: true
-                        // });
                         res.push({
                             inverted: ko.observable(false),
                             type: 'string',
@@ -105,28 +83,15 @@ define([
                         if(data.concepts.length > 0){
                             res.push({"text": "Concepts", "children": data.concepts});
                         }
-                        // _.each(_.groupBy(results, 'type'), function(value, group){
-                        //     res = res.concat(value);
-                        // });
                         return {
                             results: res
                         };
                     }
                 },
-                // id: function(item) {
-                //     return item.type + item.value + item.context_label;
-                // },
                 templateResult: function(result, container) {
                     if (result.loading || result.children) {
                         return result.text;
                     }
-                    // if (searchbox?.groups?.length > 0) {
-                    //     if (searchbox.groups[0] === 'concepts'){
-                    //         $('.term').hide();
-                    //     } else {
-                    //         $('.concept').hide();
-                    //     }
-                    // }
                     var markup = [];
                     var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                     if (result.type === 'group') {
@@ -142,17 +107,6 @@ define([
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
                     var formatedresult = '<span class="' + result.type + '"><span class="' + indent + '">' + markup.join("") + '</span>' + context + '</span>';
                     container.className = container.className + ' ' + result.type;
-                    // if (searchbox.groups.length > 0) {
-                    //     if(result.type === 'concept' || result.type === 'terms'){
-                    //         $(container).hide();
-                    //     }
-                    //     if (searchbox.groups[0] === 'concepts' && result.type === 'concept'){
-                    //         $(container).show();
-                    //     }
-                    //     if (searchbox.groups[0] === 'terms' && result.type === 'term'){
-                    //         $(container).show();
-                    //     }
-                    // }
                     $(container).click(function(event){
                         var btn = event.target.closest('button');
                         if(!!btn && btn.id === 'termsgroup') {
@@ -208,23 +162,8 @@ define([
                 escapeMarkup: function(m) {
                     return m;
                 }
-            }).on('change', function(e, el) {
-                // if (e.added) {
-                //     terms.push(e.added);
-                // }
-                // if (e.removed) {
-                //     terms.remove(function(item) {
-                //         return item.id === e.removed.id && item.context_label === e.removed.context_label;
-                //     });
-                //     tags.remove(function(item) {
-                //         return item.id === e.removed.id && item.context_label === e.removed.context_label;
-                //     });
-                // }
             }).on('select2:select', function(e) {
-                console.log(e);
-                //if(!(e.params.data.manual)){
                 terms.push(e.params.data);
-                //}
             }).on('select2:unselect', function(e) {
                 if(e.params.data.element.data){
                     e.params.data = {
@@ -232,7 +171,6 @@ define([
                         ...e.params.data.element.data
                     };
                 }
-                console.log(e);
                 terms.remove(function(item) {
                     return item.id === e.params.data.id && item.context_label === e.params.data.context_label;
                 });
@@ -242,8 +180,6 @@ define([
             }).on('choice-selected', function(e, params) {
                 let el = params.el;
                 let selectedTerm = params.result;
-                // var selectedTerm = $(el).data('select2-data');
-                // var terms = searchbox.selectWoo('data');
 
                 if (selectedTerm.id !== "Advanced Search") {
                     if(!selectedTerm.inverted()){
@@ -253,36 +189,9 @@ define([
                     }
                     selectedTerm.inverted(!selectedTerm.inverted());
                 }
-
-                //terms(terms);
-
-            }).on('select2:open', function(e, el) {
-                // if (searchbox?.groups?.length > 0) {
-                //     if (searchbox.groups[0] === 'concepts'){
-                //         $('.term').hide();
-                //     } else {
-                //         $('.concept').hide();
-                //     }
-                // }
-
             });
 
             searchbox.tags = [];
-            // searchbox('data', ko.unwrap(terms).concat(ko.unwrap(tags))).trigger('change');
-            // let initalSelectedItems = ko.unwrap(terms).concat(ko.unwrap(tags));
-            // initalSelectedItems.forEach(item => {
-            //     var option = new Option(item.text, item.id, true, true);
-            //     $(el).append(option);
-            // }); 
-
-            // searchbox.trigger('change');
-
-            // searchbox.trigger({
-            //     type: 'select2:select',
-            //     params: {
-            //         data: ko.unwrap(terms).concat(ko.unwrap(tags))
-            //     }
-            // });
         }
     };
 
