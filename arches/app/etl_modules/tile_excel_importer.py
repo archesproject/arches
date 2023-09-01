@@ -96,8 +96,11 @@ class TileExcelImporter(BaseImportModule):
         row_count = 0
 
         nodegroupid_column = int(worksheet.max_column)
-        nodegroup_alias = nodegroup_lookup[worksheet.cell(row=2,column=nodegroupid_column).value]['alias']
-        data_node_lookup[nodegroup_alias] = [val.value for val in worksheet[1][3:-3]]
+        maybe_nodegroup = worksheet.cell(row=2,column=nodegroupid_column).value
+        if maybe_nodegroup:
+            nodegroup_alias = nodegroup_lookup[maybe_nodegroup]['alias']
+            data_node_lookup[nodegroup_alias] = [val.value for val in worksheet[1][3:-3]]
+        # else: empty worksheet (no tiles)
 
         for row in worksheet.iter_rows(min_row=2):
             cell_values = [cell.value for cell in row]
