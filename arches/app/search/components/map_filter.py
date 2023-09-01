@@ -1,7 +1,7 @@
 import logging
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms, GeoShape

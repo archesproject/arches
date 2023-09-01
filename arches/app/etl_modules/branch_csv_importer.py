@@ -10,7 +10,7 @@ from django.core.files import File
 from django.http import HttpResponse
 from openpyxl import load_workbook
 from django.db import connection
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
@@ -268,6 +268,11 @@ class BranchCsvImporter(BaseImportModule):
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
                         default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
+        elif content.name.split(".")[-1] == "xlsx":
+            self.cumulative_excel_files_size += content.size
+            result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
+            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+            default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
         return {"success": result, "data": result}
 
     def start(self, request):
