@@ -32,9 +32,9 @@ define([
                     $(el).selectWoo(select2Config);
                 }, this);
                 select2Config.placeholder = select2Config.placeholder();
-                // if (select2Config.allowClear) {
-                //     select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
-                // }
+                if (select2Config.allowClear) {
+                    select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
+                }
             }
 
             var disabled = select2Config.disabled;

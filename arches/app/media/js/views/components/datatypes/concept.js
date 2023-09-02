@@ -13,10 +13,12 @@ define([
         this.search = params.search;
         if (this.search) {
             var filter = params.filterValue();
-            params.config = ko.observable({options:[]});
+            params.config = ko.observable({
+                options:[],
+                placeholder: arches.translations.selectAnOption
+            });
              
             this.op = ko.observable(filter.op || '');
-            this.placeholder = ko.observable('Select a concept');
             this.multiple = ko.observable(false);
             this.searchValue = ko.observable(filter.val || '');
             this.node = params.node;
