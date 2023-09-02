@@ -10,7 +10,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
-from arches.app.search.elasticsearch_dsl_builder import Aggregation, Bool, FiltersAgg, NestedAgg, Query, Wildcard
+from arches.app.search.elasticsearch_dsl_builder import Bool, Exists, FiltersAgg, Nested, NestedAgg, Query, Wildcard
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
@@ -147,32 +147,30 @@ class BulkStringEditor(BaseBulkEditor):
             for k, v in params.items():
                 request.GET.__setitem__(k, v[0])
 
-        if old_text:
-            op = "i~" if case_insensitive else "~"
-            advanced_search_object = [{
-                "op":"and",
-                node_id:{"op":op,"lang":language_code,"val": f'"{old_text}"'}
-            }]
-        else:
-            advanced_search_object = [{
-                "op":"and",
-                node_id:{"op":"not_null","lang":language_code}
-            }]
-
-        request.GET["advanced-search"] = json.dumps(advanced_search_object)
-
-        advanced_search_query = search_results(request, returnDsl=True)._dsl["query"]
-
+        search_url_query = search_results(request, returnDsl=True).dsl["query"]
         case_insensitive = True if case_insensitive == "true" else False
 
-        node_value_query = Wildcard(
-            field="tiles.data.%s.%s.value.keyword" % (node_id, language_code),
-            query=f"*{old_text}*",
-            case_insensitive=case_insensitive,
-        )
+        if old_text:
+            node_value_query = Wildcard(
+                field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                query=f"*{old_text}*",
+                case_insensitive=case_insensitive,
+            )
+            string_search_nested = Nested(path="tiles", query=node_value_query)
 
-        search_bool_query = Bool()
-        search_bool_query.must(node_value_query)
+            search_bool_query = Bool()
+            search_bool_query.must(string_search_nested)
+        else:
+            data_exists_query = Exists(field=f"tiles.data.{str(node_id)}.{language_code}.value")
+            tiles_w_node_exists_nested = Nested(path="tiles", query=data_exists_query)
+            non_blank_string_query = Wildcard(field=f"tiles.data.{node_id}.{language_code}.value", query="?*")
+            on_blank_string_nested = Nested(path="tiles", query=non_blank_string_query)
+
+            search_bool_query = Bool()
+            search_bool_query.must(tiles_w_node_exists_nested)
+            search_bool_query.must(on_blank_string_nested)
+
+        search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
         search_filter_agg = FiltersAgg(name="string_search")
         search_filter_agg.add_filter(search_bool_query)
@@ -181,10 +179,10 @@ class BulkStringEditor(BaseBulkEditor):
         nested_agg.add_aggregation(search_filter_agg)
 
         se = SearchEngineFactory().create()
-        query = Query(se)
+        query = Query(se, limit=5)
         
+        query.add_query(search_url_query)
         query.add_aggregation(nested_agg)
-        query.add_query(advanced_search_query)
 
         results = query.search(index=RESOURCES_INDEX)
         values = []
