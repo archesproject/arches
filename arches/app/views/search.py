@@ -1,14 +1,17 @@
 """
 ARCHES - a program developed to inventory and manage immovable cultural heritage.
 Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
 published by the Free Software Foundation, either version 3 of the
 License, or (at your option) any later version.
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
+
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -178,24 +181,11 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
-                    context_label = ""
-                    if len(result["nodegroupid"]["buckets"]) > 0:
-                        for nodegroup in result["nodegroupid"]["buckets"]:
-                            nodegroup_id = nodegroup["key"]
-                            node = models.Node.objects.get(nodeid=nodegroup_id)
-                            graph = node.graph
-                        if str(graph.graphid) not in {
-                            "a271c302-1037-11ec-b65f-31043b30bbcd",
-                            "bb6de9d8-98a2-11eb-b28f-5f1901ec6b3b",
-                            "ccbd1537-ac5e-11e6-84a5-026d961c88e6",
-                        }:
-                            continue
-                        context_label = "{0} - {1}".format(graph.name, node.name)
                     ret[index].append(
                         {
                             "type": "term",
                             "context": "",
-                            "context_label": context_label,
+                            "context_label": get_resource_model_label(result),
                             "id": i,
                             "text": result["key"],
                             "value": result["key"],
@@ -333,22 +323,26 @@ def search_results(request, returnDsl=False):
     dsl.include("points")
     dsl.include("permissions.users_without_read_perm")
     dsl.include("permissions.users_without_edit_perm")
-    dsl.include("permissions.users_without_read_perm")
+    dsl.include("permissions.users_without_delete_perm")
+    dsl.include("permissions.users_with_no_access")
+    dsl.include("geometries")
     dsl.include("displayname")
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
     if load_tiles:
         dsl.include("tiles")
-    if resourceinstanceid is None:
-        results = dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
+    if for_export or pages:
+        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
         scroll_id = results["_scroll_id"]
-        scroll_size = results["hits"]["total"]["value"]
-
-        while scroll_size > 0:
-            page = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
-            scroll_size = len(page["hits"]["hits"])
-            results["hits"]["hits"] += page["hits"]["hits"]
+        if not pages:
+            if total <= settings.SEARCH_EXPORT_LIMIT:
+                pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
+            if total > settings.SEARCH_EXPORT_LIMIT:
+                pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+        for page in range(int(pages)):
+            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
     else:
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
@@ -364,11 +358,7 @@ def search_results(request, returnDsl=False):
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                try:
-                    search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
-                except KeyError as e:
-                    print(f"could not apply search_filter: {filter_type}")
-                    print(f"'{e}' not present in results")
+                search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
 
         ret["results"] = results
 
