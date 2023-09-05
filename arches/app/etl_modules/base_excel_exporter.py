@@ -86,9 +86,9 @@ class BaseExcelExporter:
         return response
     
     @load_data_async
-    def run_load_task_async(self, request, laod_id):
+    def run_load_task_async(self, request, load_id):
         pass
 
 
-    def run_export_task(self, laod_id, graph_id, graph_name, resource_ids):
+    def run_export_task(self, load_id, graph_id, graph_name, resource_ids):
         pass
