@@ -54,6 +54,8 @@ define([
                 select2Config.disabled.subscribe(function(val){
                     if (val === false) {
                         $(el).select2("enable");
+                    } else {
+                        $(el).select2("disable");
                     }
                 });
             }
