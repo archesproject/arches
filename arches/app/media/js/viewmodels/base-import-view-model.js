@@ -16,6 +16,8 @@ define(['jquery', 'knockout', 'uuid', 'arches', 'js-cookie'], function($, ko, uu
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + uuid.generate();
         });
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
         this.response = ko.observable();
         this.validationError = ko.observable();
 
