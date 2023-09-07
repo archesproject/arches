@@ -18,7 +18,7 @@ define([
                 placeholder: arches.translations.selectAnOption
             });
              
-            this.op = ko.observable(filter.op || '');
+            this.op = ko.observable(filter.op || 'eq');
             this.multiple = ko.observable(false);
             this.searchValue = ko.observable(filter.val || '');
             this.node = params.node;
