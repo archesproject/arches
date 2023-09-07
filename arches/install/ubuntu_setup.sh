@@ -40,9 +40,14 @@ function install_postgres {
 }
 
 function install_yarn {
-  wget --quiet -O - https://deb.nodesource.com/setup_16.x | sudo -E bash -
   sudo apt-get update
-  sudo apt-get install -y nodejs
+  sudo apt-get install -y ca-certificates curl gnupg
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+  echo NODE_MAJOR=18 >> ~/.profile
+  source ~/.profile
+  sudo apt-get update
+  sudo apt-get install nodejs -y
   sudo apt install curl
   curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
   echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
