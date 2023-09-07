@@ -12,7 +12,8 @@ define([
             select2Config = _.defaults(select2Config, {
                 clickBubble: true,
                 multiple: false,
-                allowClear: true,
+                allowClear: false,
+                minimumResultsForSearch: 8
             });
             var value = select2Config.value;
             value.extend({ rateLimit: 250 });
