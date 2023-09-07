@@ -491,13 +491,15 @@ define([
             },
             templateResult: function(item) {
                 let res = '';
-                if (item._source) {
-                    const iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
-                    res = `<span style="cursor:pointer"><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
-                } else {
-                    const graph = self.graphLookup[item._id];
-                    if (self.allowInstanceCreation && graph.publication_id) {
-                        return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                if(!item.loading){
+                    if (item._source) {
+                        const iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
+                        res = `<span style="cursor:pointer"><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
+                    } else {
+                        const graph = self.graphLookup[item._id];
+                        if (self.allowInstanceCreation && graph.publication_id) {
+                            res = '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                        }
                     }
                 }
                 return $(res);
