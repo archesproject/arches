@@ -211,17 +211,17 @@
     <select 
         class="resources" 
         data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: $root.translations.references, value: '' },
-                { text: $root.translations.doesNotReference, value: '!' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            attr: {'aria-label': $root.translations.searchCriteria}
+            select2Query: {
+                select2Config:{
+                    data: [
+                        { text: $root.translations.references, id: '' },
+                        { text: $root.translations.doesNotReference, id: '!' },
+                        { text: $root.translations.hasNoValue, id: 'null' },
+                        { text: $root.translations.hasAnyValue, id: 'not_null' },
+                    ],
+                    value: op
+            }},
+            attr: {'data-label': $root.translations.searchCriteria}
         "
     ></select>
 </div>
