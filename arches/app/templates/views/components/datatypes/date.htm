@@ -6,26 +6,21 @@
         tabindex="0" 
         style="display: none;" 
         data-bind="
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: '=', value: 'eq' },
-                { text: '&gt;', value: 'gt' },
-                { text: '&lt;', value: 'lt' },
-                { text: '&ge;', value: 'gte' },
-                { text: '&le;', value: 'lte' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            select2Query: {
-                select2Config:{
-                    value: op,
-                    allowClear: false,
-                    minimumResultsForSearch: -1
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: '=', id: 'eq' },
+                    { text: '&gt;', id: 'gt' },
+                    { text: '&lt;', id: 'lt' },
+                    { text: '&ge;', id: 'gte' },
+                    { text: '&le;', id: 'lte' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op
             }},
-            attr: {'data-label': $root.translations.searchCriteria},
-        "
-    ></select>
+        attr: {'data-label': $root.translations.searchCriteria},
+    "></select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
@@ -49,14 +44,10 @@
     <select
         data-bind="
             attr: {'data-label': $root.translations.dateFormat},
-            options:dateFormatOptions, 
-            optionsText:'name', 
-            optionsValue:'id',
             select2Query: {
                 select2Config:{
+                    data: options,
                     value: dateFormat,
-                    allowClear: false,
-                    minimumResultsForSearch: -1,
                     placeholder: $root.translations.dateFormat
             }}
         "
