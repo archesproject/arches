@@ -1,9 +1,8 @@
 {% load i18n %}
 
 <!-- Term Filter -->
-<div><form autocomplete="off">
-    <select class="select2 resource_search_widget arches-select2"  
-        style="width:100%;"
+<div class="term-search-filter"><form autocomplete="off">
+    <select style="width:100%;"
         data-bind="
             attr: {'data-label': $root.translations.findAResource},
             termSearch: {terms: filter.terms, language: language, tags: filter.tags, placeholder: $root.translations.findAResource}
