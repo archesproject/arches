@@ -53,10 +53,7 @@ define([
             self.renderContext = 'search';
         }
 
-        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
-        if (self.renderContext === 'search') {
-            this.allowInstanceCreation = params.allowInstanceCreation === true ? true : false;
-        }
+        this.allowInstanceCreation = typeof params.allowInstanceCreation === 'undefined' ? true : !!params.allowInstanceCreation;
         if (!!params.configForm) {
             this.allowInstanceCreation = false;
         }
@@ -342,8 +339,7 @@ define([
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
-                if (!(self.renderContext === 'search') || self.allowInstanceCreation) {
-                    if (item._source) {
+                if (item._source) {
                         if (self.renderContext === 'search'){
                             self.value(item._id);
                         } else {
@@ -401,7 +397,7 @@ define([
                             });
                         }
                     }
-                }
+                
             },
             ajax: {
                 url: function() {
