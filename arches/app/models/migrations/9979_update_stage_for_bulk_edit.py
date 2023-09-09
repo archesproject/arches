@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     ]
 
     update_staging_function = """
-        DROP FUNCTION IF EXISTS __arches_stage_data_for_bulk_edit(uuid, uuid, uuid, uuid, uuid[], text, text, boolean);
+        DROP FUNCTION IF EXISTS __arches_stage_string_data_for_bulk_edit(uuid, uuid, uuid, uuid, uuid[], text, text, boolean);
         CREATE OR REPLACE FUNCTION __arches_stage_string_data_for_bulk_edit(
             load_id uuid,
             graph_id uuid,
@@ -82,7 +82,7 @@ class Migration(migrations.Migration):
     """
 
     revert_staging_function = """
-        DROP FUNCTION IF EXISTS __arches_stage_data_for_bulk_edit(uuid, uuid, uuid, uuid, uuid[], text, text, text, boolean);
+        DROP FUNCTION IF EXISTS __arches_stage_string_data_for_bulk_edit(uuid, uuid, uuid, uuid, uuid[], text, text, text, boolean);
         CREATE OR REPLACE FUNCTION __arches_stage_string_data_for_bulk_edit(
             load_id uuid,
             graph_id uuid,
