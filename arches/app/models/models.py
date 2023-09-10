@@ -27,7 +27,7 @@ from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
@@ -338,6 +338,8 @@ class File(models.Model):
 class TempFile(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to="archestemp")
+    created = models.DateTimeField(auto_now_add=True)
+    source = models.TextField()
 
     def __init__(self, *args, **kwargs):
         super(TempFile, self).__init__(*args, **kwargs)
@@ -1100,8 +1102,15 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
 
+    def is_fully_provisional(self):
+        return bool(self.provisionaledits and not any(self.data.values()))
+
     def save(self, *args, **kwargs):
-        if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
+        if self.sortorder is None or self.is_fully_provisional():
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+                if not str(node.pk) in self.data:
+                    self.data[str(node.pk)] = None
+
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
@@ -1512,7 +1521,7 @@ def send_email_on_save(sender, instance, **kwargs):
                 instance.save()
         except Exception as e:
             logger = logging.getLogger(__name__)
-            logger.warn("Email Server not correctly set up. See settings to configure.")
+            logger.warning("Email Server not correctly set up. See settings to configure.")
 
     return False
 
@@ -1703,6 +1712,7 @@ class LoadStaging(models.Model):
     nodegroup_depth = models.IntegerField(default=1)
     source_description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
+    operation = models.TextField(default='insert')
 
     class Meta:
         managed = True

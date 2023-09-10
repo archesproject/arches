@@ -30,7 +30,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.resource import EditLog
@@ -210,9 +210,8 @@ class Tile(models.TileModel):
         been approved by a user in the resource reviewer group
 
         """
-
         result = False
-        if self.provisionaledits is not None and len(self.data) == 0:
+        if self.provisionaledits is not None and not any(self.data.values()):
             result = True
 
         return result
@@ -566,7 +565,7 @@ class Tile(models.TileModel):
 
     def is_blank(self):
         if self.data != {}:
-            if len([item for item in list(self.data.values()) if item is not None]) > 0:
+            if any(self.data.values()):
                 return False
 
         child_tiles_are_blank = True

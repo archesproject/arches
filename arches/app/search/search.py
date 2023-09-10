@@ -41,6 +41,8 @@ class SearchEngine(object):
         self.es = Elasticsearch(serializer=serializer, **kwargs)
         self.logger = logging.getLogger(__name__)
         warnings.filterwarnings("ignore", category=ElasticsearchWarning)
+        if "cloud_id" in settings.ELASTICSEARCH_CONNECTION_OPTIONS:
+            serializer.utf_encode = True
 
     def _add_prefix(self, *args, **kwargs):
         if args:
@@ -70,12 +72,12 @@ class SearchEngine(object):
         """
 
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.pop("body", None)
-        if body is not None:
+        query = kwargs.pop("query", None)
+        if query is not None:
             try:
                 data = []
                 refresh = kwargs.pop("refresh", False)
-                for hit in helpers.scan(self.es, query=body, **kwargs):
+                for hit in helpers.scan(self.es, query=query, **kwargs):
                     hit["_op_type"] = "delete"
                     data.append(hit)
 
@@ -95,14 +97,14 @@ class SearchEngine(object):
                         pass
                 except:
                     self.logger.warning(
-                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), body, detail)
+                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), query, detail)
                     )
                     raise detail
         else:
             try:
-                return self.es.delete(ignore=[404], **kwargs)
+                return self.es.options(ignore_status=404).delete(**kwargs)
             except Exception as detail:
-                self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), body, detail))
+                self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), kwargs, detail))
                 raise detail
 
     def delete_index(self, **kwargs):
@@ -113,7 +115,7 @@ class SearchEngine(object):
 
         kwargs = self._add_prefix(**kwargs)
         print("deleting index : %s" % kwargs.get("index"))
-        return self.es.indices.delete(ignore=[400, 404], **kwargs)
+        return self.es.options(ignore_status=[400, 404]).indices.delete(**kwargs)
 
     def search(self, **kwargs):
         """
@@ -149,7 +151,6 @@ class SearchEngine(object):
             ret = self.es.search(**kwargs).body
         except RequestError as detail:
             self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
-
         return ret
 
     def create_mapping(self, index, fieldname="", fieldtype="string", fieldindex=None, body=None):
@@ -159,12 +160,12 @@ class SearchEngine(object):
         """
 
         index = self._add_prefix(index)
-        self.es.indices.create(index=index, ignore=400)
-        self.es.indices.put_mapping(index=index, body=body)
+        self.es.options(ignore_status=400).indices.create(index=index)
+        self.es.indices.put_mapping(index=index, **body)
 
     def create_index(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        self.es.indices.create(ignore=400, **kwargs)
+        self.es.options(ignore_status=400).indices.create(**kwargs)
         print("creating index : %s" % kwargs.get("index", ""))
 
     def index_data(self, index=None, body=None, idfield=None, id=None, **kwargs):
@@ -190,7 +191,7 @@ class SearchEngine(object):
                     id = getattr(document, idfield)
 
             try:
-                self.es.index(index=index, body=document, id=id)
+                self.es.index(index=index, document=document, id=id)
             except Exception as detail:
                 self.logger.warning(
                     "%s: WARNING: failed to index document: %s \nException detail: %s\n" % (datetime.now(), document, detail)
@@ -208,13 +209,17 @@ class SearchEngine(object):
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
-        body = kwargs.pop("body", None)
+        query = kwargs.pop("query", None)
 
-        # need to only pass in the query key as other keys (eg: _source) are not allowed
-        if body:
-            query = body.pop("query", None)
-            if query:
-                kwargs["body"] = {"query": query}
+        # need to only pass in the query and index keys
+        # as other keys (eg: _source) are not allowed
+        if query:
+            index = None
+            if 'index' in kwargs:
+                index = kwargs["index"]
+            kwargs = {"query": query}
+            if index:
+                kwargs["index"] = index
 
         count = self.es.count(**kwargs)
         if count is not None:
