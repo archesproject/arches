@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9477_fix_for_spatial_view_dbf_function_edtf_displaying_null"),
+        ("models", "10006_fix_escape_chars_breaking_bulk_edit"),
     ]
 
     update_staging_function = """
