@@ -26,7 +26,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
