@@ -31,6 +31,7 @@
     <select 
         class="resources" 
         data-bind="
+            attr: {'data-label': $root.translations.searchCriteria},
             select2Query: {
                 select2Config:{
                     data: [
@@ -41,7 +42,6 @@
                     ],
                     value: op
             }},
-            attr: {'data-label': $root.translations.searchCriteria},
         "
     ></select>
 </div>
@@ -49,10 +49,11 @@
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <select style="display:inline-block;"
         data-bind="
-        select2Query: {
-            value: searchValue,
-            select2Config: select2Config
-        }
+            attr: {'data-label': $root.translations.value},
+            select2Query: {
+                value: searchValue,
+                select2Config: select2Config
+            }
         ">
     </select>
 </div>

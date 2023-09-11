@@ -44,6 +44,7 @@ define([
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
         this.renderContext = params.renderContext;
+        this.label = params.label;
         this.relationship = ko.observable();
         /* 
             shoehorn logic to piggyback off of search context functionality. 
@@ -340,64 +341,63 @@ define([
             onSelect: function(item) {
                 self.selectedItem(item);
                 if (item._source) {
-                        if (self.renderContext === 'search'){
-                            self.value(item._id);
-                        } else {
-                            var ret = self.makeObject(item._id, item._source);
-                            self.setValue(ret);
-                            window.setTimeout(function() {
-                                if(self.displayOntologyTable){
-                                    self.resourceToAdd("");
-                                }
-                            }, 250);    
-                        }
+                    if (self.renderContext === 'search'){
+                        self.value(item._id);
                     } else {
-                        // This section is used when creating a new resource Instance
-                        if(!self.preview){
-                            var params = {
-                                graphid: item._id,
-                                complete: ko.observable(false),
-                                resourceid: ko.observable(),
-                                tileid: ko.observable()
-                            };
-                            self.newResourceInstance(params);
-                            var clearNewInstance = function() {
-                                self.newResourceInstance(null);
-                                window.setTimeout(function() {
-                                    self.resourceToAdd("");
-                                }, 250);
-                            };
-                            let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
-                            resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
-                            params.complete.subscribe(function() {
-                                if (params.resourceid()) {
-                                    if (self.renderContext === 'search'){
-                                        self.value(params.resourceid());
-                                        clearNewInstance();
-                                    } else {
-                                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                            .then(function(response){
-                                                if(response.ok) {
-                                                    return response.json();
-                                                }
-                                                throw("error");
-                                            })
-                                            .then(function(json) {
-                                                var item = json.results.hits.hits[0];
-                                                var ret = self.makeObject(params.resourceid(), item._source);
-                                                self.setValue(ret);
-                                            })
-                                            .finally(function(){
-                                                clearNewInstance();
-                                            });
-                                    }
-                                } else {
-                                    clearNewInstance();
-                                }
-                            });
-                        }
+                        var ret = self.makeObject(item._id, item._source);
+                        self.setValue(ret);
+                        window.setTimeout(function() {
+                            if(self.displayOntologyTable){
+                                self.resourceToAdd("");
+                            }
+                        }, 250);    
                     }
-                
+                } else {
+                    // This section is used when creating a new resource Instance
+                    if(!self.preview){
+                        var params = {
+                            graphid: item._id,
+                            complete: ko.observable(false),
+                            resourceid: ko.observable(),
+                            tileid: ko.observable()
+                        };
+                        self.newResourceInstance(params);
+                        var clearNewInstance = function() {
+                            self.newResourceInstance(null);
+                            window.setTimeout(function() {
+                                self.resourceToAdd("");
+                            }, 250);
+                        };
+                        let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
+                        resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
+                        params.complete.subscribe(function() {
+                            if (params.resourceid()) {
+                                if (self.renderContext === 'search'){
+                                    self.value(params.resourceid());
+                                    clearNewInstance();
+                                } else {
+                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                        .then(function(response){
+                                            if(response.ok) {
+                                                return response.json();
+                                            }
+                                            throw("error");
+                                        })
+                                        .then(function(json) {
+                                            var item = json.results.hits.hits[0];
+                                            var ret = self.makeObject(params.resourceid(), item._source);
+                                            self.setValue(ret);
+                                        })
+                                        .finally(function(){
+                                            clearNewInstance();
+                                        });
+                                }
+                            } else {
+                                clearNewInstance();
+                            }
+                        });
+                    }
+                }
             },
             ajax: {
                 url: function() {
