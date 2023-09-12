@@ -8,7 +8,7 @@
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
-        <div class="col-xs-12 resource-instance-wrapper, class: nodeCssClasses">
+        <div class="col-xs-12 resource-instance-wrapper" data-bind="class: nodeCssClasses">
             <input style="display:inline-block;"
                 data-bind="
                     value: value,
