@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper, class: widgetCssClasses()">
+<div class="row widget-wrapper, class: nodeCssClasses">
     <div class="form-group">
         <span class="control-label widget-input-label" for="" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -167,16 +167,16 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 
 <!-- ko if: uploadedFiles().length === 0 -->
-<dd data-bind="class: widgetCssClasses()">
+<dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dd data-bind="class: widgetCssClasses()">
+<dd data-bind="class: nodeCssClasses">
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
@@ -185,7 +185,7 @@
 <!-- /ko -->
 
 <!-- ko if: reportImages().length > 0 -->
-<dd data-bind="class: widgetCssClasses()">
+<dd data-bind="class: nodeCssClasses">
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
@@ -200,5 +200,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue(), class: widgetCssClasses()"></span>
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue(), class: nodeCssClasses"></span>
 {% endblock display_value %}

@@ -5,7 +5,7 @@
 {% block form %}
 <!--ko let: {self: $data} -->
 <!-- ko ifnot: self.displayOntologyTable -->
-<div class="row" style="margin: 0px;" data-bind="class: widgetCssClasses()">
+<div class="row" style="margin: 0px;" data-bind="class: nodeCssClasses">
     <div class="col-xs-12 resource-instance-wrapper">
         <input style="width:30%; display:inline-block;"
             data-bind="
@@ -17,7 +17,7 @@
 </div>
 <!-- /ko -->
 <!-- ko if: self.displayOntologyTable -->
-<div class="row widget-wrapper" data-bind="visible: !newResourceInstance(), class: widgetCssClasses()">
+<div class="row widget-wrapper" data-bind="visible: !newResourceInstance(), class: nodeCssClasses">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
@@ -402,16 +402,16 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko foreach: value -->
 <dd>
     <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+ko.unwrap(resourceId) }
-                  , class: $parent.widgetCssClasses()" target="_blank"></a>
+                  , class: $parent.nodeCssClasses" target="_blank"></a>
 </dd>
 <!-- /ko -->
 <!-- ko if: (!!value() && value().length === 0) || value() === null -->
 <dd>
-    <span data-bind="text: $root.translations.none, class: widgetCssClasses()"></span>
+    <span data-bind="text: $root.translations.none, class: nodeCssClasses"></span>
 </dd>
 <!-- /ko -->
 {% endblock report %}

@@ -3,7 +3,7 @@
 
 
 {% block form %}
-<div class="row widget-wrapper, class: widgetCssClasses()">
+<div class="row widget-wrapper, class: nodeCssClasses">
     <div class="form-group">
         <label class="control-label widget-input-label" data-bind="text:label">
         </label>
@@ -58,8 +58,8 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
-<dd data-bind="class: widgetCssClasses()">
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
+<dd data-bind="class: nodeCssClasses">
     <a data-bind="attr: { href: '#' + value() }, text: displayValue"></a>
 </dd>
 {% endblock report %}

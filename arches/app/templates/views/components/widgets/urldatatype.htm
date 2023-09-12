@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper, class: widgetCssClasses()">
+<div class="row widget-wrapper, class: nodeCssClasses">
     <div class="form-group">
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
@@ -65,8 +65,8 @@
 
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
-<dd data-bind="class: widgetCssClasses()">
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
+<dd data-bind="class: nodeCssClasses">
     <div style='margin-bottom:2px'>
         <a data-bind="attr: {href: url}, style: { color: link_color }">
             <span data-bind="text: urlPreviewText()"></span>
@@ -76,7 +76,7 @@
 {% endblock report %}
 
 {% block display_value %}
-<a data-bind="attr: {href: url}, style: { color: link_color }, class: widgetCssClasses()">
+<a data-bind="attr: {href: url}, style: { color: link_color }, class: nodeCssClasses">
     <span data-bind="text: urlPreviewText()"></span>
 </a>
 {% endblock display_value %}

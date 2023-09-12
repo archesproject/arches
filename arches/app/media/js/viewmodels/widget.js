@@ -62,11 +62,11 @@ define([
             this.config = ko.observable(this.config);
         }
 
-        this.widgetCssClasses = function() {
+        this.nodeCssClasses = ko.pureComputed(function() {
             return [self.node?.alias(),
                 self.widget?.widgetLookup[ko.unwrap(self.widget?.widget_id)].name
                 ].join(" ").trim();
-        }
+        });
 
         this.disposables = [];
 

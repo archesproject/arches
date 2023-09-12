@@ -3,7 +3,7 @@
 {% load template_tags %}
 
 {% block form %}
-<div class="row widget-wrapper, class: widgetCssClasses()">
+<div class="row widget-wrapper, class: nodeCssClasses">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <!-- ko if: node -->
@@ -17,14 +17,14 @@
 {% endblock form %}
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko if: summaryDetails.length === 0 -->
-<dd data-bind="class: widgetCssClasses()">
+<dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 <!-- ko ifnot: summaryDetails.length === 0  -->
-<dd data-bind="foreach: summaryDetails, class: widgetCssClasses()">
+<dd data-bind="foreach: summaryDetails, class: nodeCssClasses">
     <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
 </dd>
 <!-- /ko -->
@@ -107,6 +107,6 @@
 {% endblock config_form %}
 
 {% block display_value %}
-<span data-bind="text: displayValue(), class: widgetCssClasses()"></span>
-<span data-bind="text: $root.translations.features, class: widgetCssClasses()"></span>
+<span data-bind="text: displayValue(), class: nodeCssClasses"></span>
+<span data-bind="text: $root.translations.features, class: nodeCssClasses"></span>
 {% endblock display_value %}

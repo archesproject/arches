@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper, class: widgetCssClasses()">
+<div class="row widget-wrapper, class: nodeCssClasses">
     <div class="form-group">
         <span class="control-labx mesel widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -24,13 +24,13 @@
 {% endblock form %}
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko if: value() !== null -->
-<dd data-bind="date: value(), dateFormat: dateFormat || $root.translations.noDateEntered, class: widgetCssClasses()"></dd>
+<dd data-bind="date: value(), dateFormat: dateFormat || $root.translations.noDateEntered, class: nodeCssClasses"></dd>
 <!-- /ko -->
 <!-- ko if: value() === null -->
 <dd>
-    <span data-bind="text: $root.translations.none, class: widgetCssClasses()"></span>
+    <span data-bind="text: $root.translations.none, class: nodeCssClasses"></span>
 </dd>
 <!-- /ko -->
 {% endblock report %}

@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}, class: widgetCssClasses()">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}, class: nodeCssClasses">
     <div class="form-group" style="position: relative;">
         <div style="max-width: 600px; position: relative">
             <div class="widget-inline-tools-collapser" tabindex="0" role="button"
@@ -187,16 +187,16 @@
 <!-- ko if: !configForm  && state === 'display_value' -->
 {% block display_value %}
 <span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || $root.translations.none
-                 , class: widgetCssClasses()"></span>
+                 , class: nodeCssClasses"></span>
 {% endblock display_value %}
 <!-- /ko -->
 
 <!-- ko if: !configForm  && state === 'report' -->
 {% block report %}
 <!-- ko if: !ko.unwrap(hideEmptyNodes) || (ko.unwrap(hideEmptyNodes) === true && !!ko.unwrap(currentText) ) -->
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : $root.translations.none
-               , class: widgetCssClasses()"></dd>
+               , class: nodeCssClasses"></dd>
 <!-- /ko -->
 {% endblock report %}
 <!-- /ko -->

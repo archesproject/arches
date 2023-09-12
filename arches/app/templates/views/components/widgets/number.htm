@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper, class: widgetCssClasses()">
+<div class="row widget-wrapper, class: nodeCssClasses">
     <div class="form-group">
         <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -30,8 +30,8 @@
 {% endblock form %}
 
 {% block report %}
-<dt data-bind="text: label, class: widgetCssClasses()"></dt>
-<dd data-bind="class: widgetCssClasses()">
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
+<dd data-bind="class: nodeCssClasses">
     <div class='number-widget-report'>
     <!-- ko if: displayValue -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
