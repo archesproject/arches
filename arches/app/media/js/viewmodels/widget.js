@@ -62,6 +62,12 @@ define([
             this.config = ko.observable(this.config);
         }
 
+        this.widgetCssClasses = function() {
+            return [self.node?.alias(),
+                self.widget?.widgetLookup[ko.unwrap(self.widget?.widget_id)].name
+                ].join(" ").trim();
+        }
+
         this.disposables = [];
 
         var subscribeConfigObservable = function(obs, key) {

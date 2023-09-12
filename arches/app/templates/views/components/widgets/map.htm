@@ -3,7 +3,7 @@
 {% load template_tags %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper, class: widgetCssClasses()">
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <!-- ko if: node -->
@@ -17,14 +17,14 @@
 {% endblock form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
+<dt data-bind="text: label, class: widgetCssClasses()"></dt>
 <!-- ko if: summaryDetails.length === 0 -->
-<dd>
+<dd data-bind="class: widgetCssClasses()">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 <!-- ko ifnot: summaryDetails.length === 0  -->
-<dd data-bind="foreach: summaryDetails">
+<dd data-bind="foreach: summaryDetails, class: widgetCssClasses()">
     <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
 </dd>
 <!-- /ko -->
@@ -61,13 +61,13 @@
     <span data-bind="text: $root.translations.mapCenterLongitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        id="" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        id=""
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.longitudeXCoordinate},
-            value: centerX, 
+            value: centerX,
             valueUpdate: 'keyup'
         "
     >
@@ -76,13 +76,13 @@
     <span data-bind="text: $root.translations.mapCenterLatitude"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        id="" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        id=""
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.latitudeYCoordinate},
-            value: centerY, 
+            value: centerY,
             valueUpdate: 'keyup'
         "
     >
@@ -91,15 +91,15 @@
     <span data-bind="text: $root.translations.defaultZoom"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        min=1 
-        max=20 
-        id="" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        min=1
+        max=20
+        id=""
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.zoomLevel},
-            value: zoom, 
+            value: zoom,
             valueUpdate: 'keyup'
         "
     >
@@ -107,6 +107,6 @@
 {% endblock config_form %}
 
 {% block display_value %}
-<span data-bind="text: displayValue()"></span>
-<span data-bind="text: $root.translations.features"></span>
+<span data-bind="text: displayValue(), class: widgetCssClasses()"></span>
+<span data-bind="text: $root.translations.features, class: widgetCssClasses()"></span>
 {% endblock display_value %}
