@@ -171,6 +171,21 @@
         <!-- /ko -->
         <!-- /ko -->
     </div>
+    <h4>
+        <span data-bind="text: $root.translations.numberOfResourcesImported"></span>
+    </h4>
+    <div>
+        <!-- ko foreach: load_details.number_of_import -->
+        <span class="etl-loading-metadata-key" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+        <!-- ko foreach: $data.counts -->
+        <div style="padding-left: 20px;">
+            <span class="etl-loading-metadata-key" data-bind="text: $data.tile + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
     <!-- /ko -->
     <!-- /ko -->
 </div>
