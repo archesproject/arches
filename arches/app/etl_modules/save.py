@@ -18,13 +18,13 @@ def save_to_tiles(loadid, finalize_import=True, multiprocessing=True):
             saved = cursor.fetchone()[0]
             if saved:
                 cursor.execute(
-                    """SELECT g.name graph, COUNT(*)
-                        FROM edit_log e, resource_instances r, graphs g
-                        WHERE e.transactionid = %s
-                        AND e.edittype = 'create'
-                        AND r.resourceinstanceid = e.resourceinstanceid::uuid
+                    """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
+                        FROM load_staging l, resource_instances r, graphs g
+                        WHERE l.loadid = %s
+                        AND r.resourceinstanceid = l.resourceid
                         AND g.graphid = r.graphid
-                        GROUP BY g.name""", [loadid]
+                        GROUP BY g.name
+                    """, [loadid]
                 )
                 resources = cursor.fetchall()
                 number_of_resources = {}
@@ -32,13 +32,13 @@ def save_to_tiles(loadid, finalize_import=True, multiprocessing=True):
                     graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
                     number_of_resources.update({ graph: { "total": resource[1] } })
                 cursor.execute(
-                    """SELECT g.name graph, n.name tile, count(*)
-                        FROM edit_log e, nodes n, graphs g
-                        WHERE e.transactionid = %s
-                        AND n.nodeid::text = e.nodegroupid
-                        AND edittype = 'tile create'
+                    """SELECT g.name graph, n.name, COUNT(*)
+                        FROM load_staging l, nodes n, graphs g
+                        WHERE l.loadid = %s
+                        AND n.nodeid = l.nodegroupid
                         AND n.graphid = g.graphid
-                        GROUP BY n.name, g.name""", [loadid]
+                        GROUP BY n.name, g.name;
+                    """, [loadid]
                 )
                 tiles = cursor.fetchall()
                 for tile in tiles:
