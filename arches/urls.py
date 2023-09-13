@@ -22,8 +22,9 @@ from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.admin import ReIndexResources, FileView, ClearUserPermissionCache
+from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
+from arches.app.views.file import FileView, TempFileView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -232,6 +233,8 @@ urlpatterns = [
     re_path(r"^report-templates/(?P<template>[a-zA-Z_-]*)", main.report_templates, name="report-templates"),
     re_path(r"^function-templates/(?P<template>[a-zA-Z_-]*)", main.function_templates, name="function-templates"),
     re_path(r"^help-templates$", main.help_templates, name="help_templates"),
+    re_path(r"^temp_file/(?P<file_id>[^\/]+)", TempFileView.as_view(), name="temp_file"),
+    re_path(r"^temp_file$", TempFileView.as_view(), name="temp_file"),
     re_path(r"^tile$", TileData.as_view(action="update_tile"), name="tile"),
     re_path(r"^tiles/reorder_tiles$", TileData.as_view(action="reorder_tiles"), name="reorder_tiles"),
     re_path(r"^tiles/tile_history$", TileData.as_view(action="tile_history"), name="tile_history"),

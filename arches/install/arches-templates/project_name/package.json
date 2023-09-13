@@ -11,5 +11,7 @@
     },
     "dependencies": {
         "arches": "archesproject/arches#{{ arches_version }}"
+    },
+    "nodeModulesPaths": {
     }
 }

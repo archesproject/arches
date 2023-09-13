@@ -274,10 +274,10 @@ class TileCsvWriter(Writer):
         self.node_datatypes = {}
         self.datatype_factory = DataTypeFactory()
 
-        nodes = Node.objects.all().values("nodeid", "name")
+        nodes = Node.objects.all().values("nodeid", "alias")
         self.node_name_lookup = {}
         for node in nodes:
-            self.node_name_lookup[str(node["nodeid"])] = node["name"]
+            self.node_name_lookup[str(node["nodeid"])] = node["alias"]
 
     def group_tiles(self, tiles, key):
         new_tiles = {}
