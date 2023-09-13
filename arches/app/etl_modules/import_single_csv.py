@@ -69,7 +69,7 @@ class ImportSingleCsv(BaseImportModule):
         """
 
         content = request.FILES.get("file")
-        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(temp_dir)
         except (FileNotFoundError):
@@ -147,7 +147,7 @@ class ImportSingleCsv(BaseImportModule):
                 )
             return {"success": False, "data": error_message}
 
-        temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         csv_size = default_storage.size(csv_file_path)  # file size in byte
         use_celery_threshold = 500  # 500 bytes
@@ -215,7 +215,7 @@ class ImportSingleCsv(BaseImportModule):
         return {"success": True, "data": message}
 
     def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
-        temp_dir = os.path.join("uploadedfiles", "tmp", loadid)
+        temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         with default_storage.open(csv_file_path, mode="r") as csvfile:
             reader = csv.reader(csvfile)  # if there is a duplicate field, DictReader will not work
