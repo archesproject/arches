@@ -34,8 +34,8 @@ class Migration(migrations.Migration):
                 IF text_replacing IS NOT NULL THEN
                     text_replacing_like = FORMAT('%%%s%%', text_replacing);
                 END IF;
-                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, passes_validation)
-                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', true
+                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', 'update', true
                     FROM tiles t, nodes n
                     WHERE t.nodegroupid = n.nodegroupid
                     AND CASE
@@ -107,8 +107,8 @@ class Migration(migrations.Migration):
                 IF text_replacing IS NOT NULL THEN
                     text_replacing_like = FORMAT('%%%s%%', text_replacing);
                 END IF;
-                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, passes_validation)
-                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', true
+                INSERT INTO load_staging (tileid, value, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
+                    SELECT DISTINCT t.tileid, t.tiledata, t.nodegroupid, t.parenttileid, t.resourceinstanceid, load_id, 0, 'bulk_edit', 'update', true
                     FROM tiles t, nodes n
                     WHERE t.nodegroupid = n.nodegroupid
                     AND CASE
