@@ -396,8 +396,13 @@ class StringNonLocalizedDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        val = {"string": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
-        document["strings"].append(val)
+        if nodevalue is not None:
+            val = {
+                "string": nodevalue, 
+                "language": "nonlocalized",
+                "nodegroup_id": tile.nodegroup_id, 
+                "provisional": provisional}
+            document["strings"].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
         if value is not None:
@@ -405,9 +410,10 @@ class StringNonLocalizedDataType(BaseDataType):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
+
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(nodevalue)
+                terms.append(SearchTerm(value=nodevalue, lang="nonlocalized"))
         return terms
 
     def append_search_filters(self, value, node, query, request):
