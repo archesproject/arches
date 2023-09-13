@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9748_alter_graphmodel_functions_alter_icon_id"),
+        ("models", "10006_fix_escape_chars_breaking_bulk_edit"),
     ]
 
     operations = [
