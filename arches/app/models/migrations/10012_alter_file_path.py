@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9944_update_refresh_relationship_function'),
+        ('models', '10006_fix_escape_chars_breaking_bulk_edit'),
     ]
 
     operations = [
