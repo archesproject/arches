@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10006_fix_escape_chars_breaking_bulk_edit'),
+        ('models', '9979_update_stage_for_bulk_edit'),
     ]
 
     operations = [
