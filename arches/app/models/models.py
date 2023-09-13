@@ -347,6 +347,8 @@ class File(models.Model):
 class TempFile(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to="archestemp")
+    created = models.DateTimeField(auto_now_add=True)
+    source = models.TextField()
 
     def __init__(self, *args, **kwargs):
         super(TempFile, self).__init__(*args, **kwargs)
@@ -1749,6 +1751,7 @@ class LoadStaging(models.Model):
     nodegroup_depth = models.IntegerField(default=1)
     source_description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
+    operation = models.TextField(default='insert')
 
     class Meta:
         managed = True

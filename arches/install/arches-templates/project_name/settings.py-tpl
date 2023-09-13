@@ -21,11 +21,6 @@ APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 MIN_ARCHES_VERSION = arches.__version__
 MAX_ARCHES_VERSION = arches.__version__
 
-STATICFILES_DIRS =  (
-    os.path.join(APP_ROOT, 'media', 'build'),
-    os.path.join(APP_ROOT, 'media'),
-) + STATICFILES_DIRS
-
 WEBPACK_LOADER = {
     "DEFAULT": {
         "STATS_FILE": os.path.join(APP_ROOT, 'webpack/webpack-stats.json'),
@@ -133,7 +128,7 @@ INSTALLED_APPS = (
     "{{ project_name }}",
 )
 
-INSTALLED_PACKAGES = ()
+ARCHES_APPLICATIONS = ()
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -152,17 +147,17 @@ MIDDLEWARE = [
     # "silk.middleware.SilkyMiddleware",
 ]
 
-STATICFILES_DIRS =  build_staticfiles_dirs(
+STATICFILES_DIRS = build_staticfiles_dirs(
     root_dir=ROOT_DIR,
     app_root=APP_ROOT,
-    installed_packages=INSTALLED_PACKAGES,
+    arches_applications=ARCHES_APPLICATIONS,
 )
 
 TEMPLATES = build_templates_config(
     root_dir=ROOT_DIR,
     debug=DEBUG,
     app_root=APP_ROOT,
-    installed_packages=INSTALLED_PACKAGES,
+    arches_applications=ARCHES_APPLICATIONS,
 )
 
 ALLOWED_HOSTS = []
@@ -375,7 +370,7 @@ if __name__ == "__main__":
     transmit_webpack_django_config(
         root_dir=ROOT_DIR,
         app_root=APP_ROOT,
-        installed_packages=INSTALLED_PACKAGES,
+        arches_applications=ARCHES_APPLICATIONS,
         public_server_address=PUBLIC_SERVER_ADDRESS,
         static_url=STATIC_URL,
         webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
