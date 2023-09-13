@@ -7,16 +7,17 @@ from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
+from arches.app.etl_modules.decorators import load_data_async
+from arches.app.etl_modules.save import save_to_tiles
 from arches.app.views.search import search_results
 
 logger = logging.getLogger(__name__)
 
 
-class BaseBulkEditor(BaseImportModule):
+class BaseBulkEditor:
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -303,7 +304,7 @@ class BulkStringEditor(BaseBulkEditor):
             event_created = self.create_load_event(cursor, load_details)
             if event_created["success"]:
                 if use_celery_bulk_edit:
-                    response = self.load_data_async(request)
+                    response = self.run_load_task_async(request, self.loadid)
                 else:
                     response = self.run_load_task(self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
             else:
@@ -312,6 +313,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         return response
 
+    @load_data_async
     def run_load_task_async(self, request):
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
@@ -360,7 +362,8 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
-            data_updated = self.save_to_tiles(loadid, finalize_import=False)
+            self.loadid = loadid  # currently redundant, but be certain
+            data_updated = save_to_tiles(loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:
