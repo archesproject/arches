@@ -118,10 +118,10 @@ class ArchesProjectCommand(TemplateCommand):
 
     def handle(self, options):
         project_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(project_name, "project")
 
         # Check that the project_name cannot be imported.
         try:
-            self.validate_name(project_name, "project")
             import_module(project_name)
         except ImportError:
             pass
@@ -176,14 +176,14 @@ class ArchesAppCommand(TemplateCommand):
 
     def handle(self, options):
         app_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(app_name, "app")
 
         # Check that the app_name cannot be imported.
         try:
-            self.validate_name(app_name, "app")
             import_module(app_name)
         except ImportError:
             pass
-        except:
+        except Exception as e:
             raise CommandError(
                 "%r conflicts with the name of an existing "
                 "Python module and cannot be used as an "
@@ -207,6 +207,7 @@ class ArchesAppCommand(TemplateCommand):
             file = open(os.path.join(path_to_project, relative_file_path),'w')
             file.write(updated_file_data)
             file.close()
+
 
 
 def command_startapp(args):

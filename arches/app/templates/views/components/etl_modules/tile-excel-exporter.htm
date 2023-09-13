@@ -1,0 +1,100 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+<div class="etl-module-component-container">
+    <div class="etl-module-body">
+        <h2>
+            <span data-bind="text: $root.translations.exportTileExcel"></span>
+        </h2>
+        <section class="etl-module-component">
+            <!-- <div class="etl-module-component-block">
+                <h3>
+                    <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+                </h3>
+                <textarea id="search-url-input"
+                    style="min-height: 100px; width: 80%;"
+                    class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
+                ></textarea>
+            </div> -->
+            <div class="etl-module-component-block">
+                <h3>
+                    <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
+                </h3>
+                <select id="resource-model-select" data-bind="
+                    value: selectedGraph,
+                    options: graphs,
+                    optionsText: 'name',
+                    optionsValue: 'graphid',
+                    optionsCaption: $root.translations.select,
+                    valueAllowUnset: true,
+                    chosen: {width: '500px'}"
+                ></select>
+            </div>
+        </section>
+    </div>
+    <div class="tabbed-workflow-footer, etl-module-footer">
+        <button class="btn btn-success" style="margin-right: 8px;" data-bind="click: exportResources, css: {disabled: !selectedGraph()}">
+            <span data-bind="text: $root.translations.start"></span>
+        </button>
+    </div>
+</div>
+<!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.exportTileExcelSummary"></span>
+    </h4>
+    <!-- ko if: ko.unwrap(loadDetails) -->
+    <div class="branch-csv-etl-load-summmary">
+        <div class="summary-header">
+            <span data-bind="text: $root.translations.downloadExportedZipFile"></span>
+        </div>
+        <div class="summary-contents">
+            <div class="etl-loading-metadata-value">
+                <a class="file-listing-link" download data-bind="text: loadDetails.zipfile.name, attr: { href: '/temp_file/'+loadDetails.zipfile.fileid }"></a>
+            </div>
+        </div>
+
+        <!-- ko if: loadDetails.skipped_files.length > 0 -->
+        <div class="summary-header">
+            <span data-bind="text: $root.translations.downloadAdditionalFiles"></span>
+        </div>
+        <div class="summary-contents">
+            <!-- ko foreach: { data: loadDetails.skipped_files, as: 'file' } -->
+            <div class="etl-loading-metadata-value">
+                <a class="file-listing-link" data-bind="text: file.name, attr: { download: file.name, href: file.url }"></a>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <div class="summary-header">
+            <span data-bind="text: $root.translations.exportDetails"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModel + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.graph"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesExported + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_resources"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRelatedFiles + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_files + loadDetails.skipped_files.length"></span>
+        </div>
+        <div class="summary-contents">
+            <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRelatedFilesInZip + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_files"></span>
+        </div>
+    </div>
+    <!--/ko-->
+</div>
+{% endblock etl_status %}
+
+{% block etl_error_report %}
+{% endblock etl_error_report %}
