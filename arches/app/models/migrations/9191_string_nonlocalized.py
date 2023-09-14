@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            """
+            sql = """
             INSERT INTO d_data_types(
                 datatype, 
                 iconclass, 
@@ -51,14 +51,12 @@ class Migration(migrations.Migration):
                     "defaultValue": ""
                 }'
             );
+            """,
+            reverse_sql = """
+            DELETE FROM d_data_types
+                WHERE datatype = 'string-nonlocalized';
+            DELETE from widgets
+                WHERE widgetid = '46ef064b-2611-4708-9f52-60136bd8a65b';
             """
-            # """
-            # DELETE FROM d_data_types
-            #     WHERE datatype = 'string-nonlocalized';
-            # DELETE from widgets
-            #     WHERE widgetid = '46ef064b-2611-4708-9f52-60136bd8a65b';
-            # DELETE from widgets
-            #     WHERE widgetid = 'a952163c-0bae-4ac8-949b-12dd2379fe6d';
-            # """
             ),
         ]
