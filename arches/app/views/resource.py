@@ -791,7 +791,7 @@ class RelatedResourcesView(BaseManagerView):
         else:
             lang = request.GET.get("lang", settings.LANGUAGE_CODE)
             resourceinstance_graphid = request.GET.get("resourceinstance_graphid")
-            paginate = strtobool(request.GET.get("paginate", "true"))  # default to true
+            paginate = json.loads(request.GET.get("paginate", "true"))  # default to true
             resource = Resource.objects.get(pk=resourceid)
 
             if paginate:
@@ -806,8 +806,10 @@ class RelatedResourcesView(BaseManagerView):
                     resourceinstance_graphid=resourceinstance_graphid,
                     graphs=self.graphs,
                 )
-
-                ret = self.paginate_related_resources(related_resources=related_resources, page=page, request=request)
+                if request.GET.get("page", "") == "":
+                    ret = related_resources
+                else:
+                    ret = self.paginate_related_resources(related_resources=related_resources, page=page, request=request)
             else:
                 ret = resource.get_related_resources(
                     lang=lang, user=request.user, resourceinstance_graphid=resourceinstance_graphid, graphs=self.graphs

@@ -1257,7 +1257,7 @@ class ResourceReport(APIBase):
             )
 
             get_params = request.GET.copy()
-            get_params.update({"paginate": "false"})
+            # get_params.update({"paginate": "false"}) # Unclear why this was set as default like this
             request.GET = get_params
 
             related_resources_response = RelatedResourcesView().get(request, resourceid)
