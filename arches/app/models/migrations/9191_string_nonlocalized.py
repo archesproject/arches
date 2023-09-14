@@ -51,19 +51,6 @@ class Migration(migrations.Migration):
                     "defaultValue": ""
                 }'
             );
-            INSERT INTO widgets(
-                widgetid,
-                name,
-                component,
-                datatype,
-                defaultconfig
-            ) VALUES (
-                'a952163c-0bae-4ac8-949b-12dd2379fe6d',
-                'rich-text-nonlocalized-widget',
-                'views/components/widgets/rich-text-nonlocalized',
-                'string-nonlocalized',
-                '{}'
-            );
             """
             # """
             # DELETE FROM d_data_types

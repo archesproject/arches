@@ -1,9 +1,9 @@
 define([
     'knockout',
-    'arches',
     'templates/views/components/datatypes/string-nonlocalized.htm',
-], function (ko, arches, stringNonLocalizedDatatypeTemplate) {
-    var name = 'string-nonlocalized-datatype-config';
+], function (ko, stringNonLocalizedDatatypeTemplate) {
+    const name = 'string-nonlocalized-datatype-config';
+
     const viewModel = function (params) {
         var self = this;
         this.search = params.search;
@@ -29,5 +29,5 @@ define([
         template: stringNonLocalizedDatatypeTemplate
     });
 
-    return name
+    return name;
 });
