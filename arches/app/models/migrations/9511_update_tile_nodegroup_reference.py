@@ -10,13 +10,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
+        migrations.AlterField(
             model_name="tilemodel",
             name="nodegroup",
-        ),
-        migrations.AddField(
-            model_name="tilemodel",
-            name="nodegroup_id",
             field=models.UUIDField(db_column="nodegroupid", null=True),
         ),
+        migrations.RenameField(
+            model_name="tilemodel",
+            old_name="nodegroup",
+            new_name="nodegroup_id",
+        )
     ]
