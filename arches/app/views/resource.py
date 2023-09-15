@@ -342,6 +342,8 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
+        context["nav"]["report_view"] = True
+
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
             context["nav"]["help"] = {"title": _("Managing System Settings"), "templates": ["system-settings-help"]}

@@ -391,6 +391,15 @@
                         </a>
                         {% endif %}
 
+                        {% if nav.report_view %}
+                        <a href="{% url 'resource_report' resourceid %}" class="ep-tools ep-tools-right"
+                            data-bind="click:function () { navigate('{% url 'resource_report' resourceid %}') }">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "View Report" %}">
+                                <i class="ion-document-text"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
                         {% if nav.help %}
                         <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right"
                             data-bind="click: function(){ {{ nav.help.templates }}.forEach(template => getHelp(template)); helpOpen(true) }">
