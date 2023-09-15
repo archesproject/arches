@@ -157,7 +157,7 @@
     <h4>
         <span data-bind="text: $root.translations.importSingleCsv"></span>
     </h4>
-    <!-- ko if: load_details -->
+    <!-- ko if: loadDetails -->
     <!-- ko ifnot: loading() -->
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fileName + ':'"></span>
@@ -165,11 +165,11 @@
     </div>
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetResource + ':'"></span>
-        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(loadDetails.graph)"></span>
     </div>
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetFields + ':'"></span>
-        <!-- ko foreach: load_details.mapping -->
+        <!-- ko foreach: loadDetails.mapping -->
         <!-- ko if:  $data.node -->
         <span class="etl-loading-metadata-value" data-bind="text: $data.node"></span><span>;</span>
         <!-- /ko -->
