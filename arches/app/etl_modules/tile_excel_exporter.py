@@ -20,7 +20,9 @@ class TileExcelExporter(BaseExcelExporter):
         self.loadid = loadid if loadid else None
 
 
-    def run_export_task(self, load_id, graph_id, graph_name, resource_ids):
+    def run_export_task(self, load_id, graph_id, graph_name, resource_ids, *args, **kwargs):
+        concept_export_value_type = 'id' if kwargs.get('export_concepts_as') == 'uuids' else None
+
         if resource_ids is None:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT resourceinstanceid FROM resource_instances WHERE graphid = (%s)""", [graph_id])
@@ -51,7 +53,10 @@ class TileExcelExporter(BaseExcelExporter):
                             from arches.app.datatypes.datatypes import DataTypeFactory
                             self.datatype_factory = DataTypeFactory()
                             datatype_instance = self.datatype_factory.get_instance(datatype)
-                            tile[alias] = datatype_instance.transform_export_values(value) if value else None
+                            tile[alias] = datatype_instance.transform_export_values(
+                                value, 
+                                concept_export_value_type=concept_export_value_type
+                            ) if value else None
                     card_name = str(Card.objects.get(nodegroup=tile["nodegroupid"]).name)
                     tiles_to_export.setdefault(card_name, []).append(tile)
 
@@ -88,9 +93,10 @@ class TileExcelExporter(BaseExcelExporter):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
+        export_concepts_as = request.POST.get("export_concepts_as")
 
         export_task = tasks.export_tile_excel.apply_async(
-            (self.userid, self.loadid, graph_id, graph_name, resource_ids),
+            (self.userid, self.loadid, graph_id, graph_name, resource_ids, export_concepts_as),
         )
 
         with connection.cursor() as cursor:

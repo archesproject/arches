@@ -234,13 +234,13 @@ def load_tile_excel(userid, files, summary, result, temp_dir, loadid):
 
 
 @shared_task
-def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, resource_ids):
+def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, resource_ids, export_concepts_as=None):
 
     logger = logging.getLogger(__name__)
 
     status = _("Failed")
     try:
-        import_module.run_export_task(load_id, graph_id, graph_name, resource_ids)
+        import_module.run_export_task(load_id, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -263,11 +263,11 @@ def export_branch_excel(userid, load_id, graph_id, graph_name, resource_ids):
 
 
 @shared_task
-def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids):
+def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as):
     from arches.app.etl_modules import tile_excel_exporter
 
     TileExcelExporter = tile_excel_exporter.TileExcelExporter(request=None, loadid=load_id)
-    export_excel_data(TileExcelExporter, userid, load_id, graph_id, graph_name, resource_ids)
+    export_excel_data(TileExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as)
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):

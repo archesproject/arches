@@ -9,6 +9,7 @@ define([
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
+    'views/components/simple-switch',
 ], function(_, $, Cookies, ko, uuid, arches, JsonErrorAlertViewModel) {
     const ExcelFileExportViewModel = function(params) {
         const self = this;
@@ -22,6 +23,7 @@ define([
         this.searchUrl = ko.observable();
         this.formatTime = params.formatTime;
         this.timeDifference = params.timeDifference;
+        this.exportConceptsAs = ko.observable('uuids');
 
         this.graphs = arches.resources.map(resource => ({name: resource.name, graphid: resource.graphid}));
         this.selectedGraph = ko.observable();
@@ -43,6 +45,7 @@ define([
         this.exportResources = async function() {
             self.formData.append('graph_id', self.selectedGraph());
             self.formData.append('graph_name', self.getGraphName(self.selectedGraph()));
+            self.formData.append('export_concepts_as', self.exportConceptsAs());
             const response = await self.submit('export');
             params.activeTab("import");
 

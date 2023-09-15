@@ -31,6 +31,14 @@
                     valueAllowUnset: true,
                     chosen: {width: '500px'}"
                 ></select>
+
+                <div style="display: flex; padding-top: 20px; font-size: 15px;">
+                    <label for="export-concepts-as-uuids" data-bind="text: $root.translations.exportConceptsAs"></label>
+                    <div id="export-concepts-as-uuids" style="padding-left: 10px;">
+                        <div><input style="margin-right: 4px; cursor: pointer;" type="radio" value="uuids" data-bind="checked: $data.exportConceptsAs" />{% trans 'UUIDs' %}</div>
+                        <div><input style="margin-right: 4px; cursor: pointer;" type="radio" value="labels" data-bind="checked: $data.exportConceptsAs" />{% trans 'Labels' %}</div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>

@@ -45,7 +45,7 @@ class BranchExcelExporter(BaseExcelExporter):
         self.loadid = loadid if loadid else None
 
 
-    def run_export_task(self, load_id, graph_id, graph_name, resource_ids):
+    def run_export_task(self, load_id, graph_id, graph_name, resource_ids, *args, **kwargs):
         if resource_ids is None:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT resourceinstanceid FROM resource_instances WHERE graphid = (%s)""", [graph_id])
