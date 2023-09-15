@@ -49,6 +49,27 @@
         <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
     </div>
 </div>
+
+<!-- ko if: loadDetails.number_of_import -->
+<div style="padding: 5px 0">
+    <h4>
+        <span data-bind="text: $root.translations.numberOfResourcesImported"></span>
+    </h4>
+    <div>
+        <!-- ko foreach: loadDetails.number_of_import -->
+        <span class="etl-loading-metadata-key" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+        <!-- ko foreach: $data.tiles -->
+        <div style="padding-left: 20px;">
+            <span class="etl-loading-metadata-key" data-bind="text: $data.tile + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+</div>
+<!-- /ko -->
+
 {% endblock loading_status %}
 
 {% block etl_error_report %}
