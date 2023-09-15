@@ -14,8 +14,7 @@ define([
 ], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
-
-        this.load_details = params.load_details;
+        this.loadDetails = params.load_details || ko.observable();
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
