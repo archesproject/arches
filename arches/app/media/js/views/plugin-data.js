@@ -3,10 +3,14 @@ define([], function() {
         return string.replace(/,\s*}*$/, "}");
     }
 
-    const pluginDataHTML = document.querySelector('#pluginData');
-    const pluginData = pluginDataHTML.getAttribute('pluginData');
-
-    const parsedPluginData = JSON.parse(removeTrailingCommaFromObject(pluginData));
-
-    return parsedPluginData;
+    try {        
+        const pluginDataHTML = document.querySelector('#pluginData');
+        const pluginData = pluginDataHTML.getAttribute('pluginData');
+    
+        const parsedPluginData = JSON.parse(removeTrailingCommaFromObject(pluginData));
+    
+        return parsedPluginData;
+    } catch (error) {
+        console.error(error);
+    }
 });
