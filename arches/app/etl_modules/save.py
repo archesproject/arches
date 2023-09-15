@@ -1,7 +1,9 @@
 from datetime import datetime
+import json
 from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import gettext as _
 from django.db import connection
+from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
 
@@ -14,6 +16,41 @@ def save_to_tiles(loadid, finalize_import=True, multiprocessing=True):
             cursor.execute("""CALL __arches_prepare_bulk_load();""")
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
             saved = cursor.fetchone()[0]
+            if saved:
+                cursor.execute(
+                    """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
+                        FROM load_staging l, resource_instances r, graphs g
+                        WHERE l.loadid = %s
+                        AND r.resourceinstanceid = l.resourceid
+                        AND g.graphid = r.graphid
+                        GROUP BY g.name
+                    """, [loadid]
+                )
+                resources = cursor.fetchall()
+                number_of_resources = {}
+                for resource in resources:
+                    graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
+                    number_of_resources.update({ graph: { "total": resource[1] } })
+                cursor.execute(
+                    """SELECT g.name graph, n.name, COUNT(*)
+                        FROM load_staging l, nodes n, graphs g
+                        WHERE l.loadid = %s
+                        AND n.nodeid = l.nodegroupid
+                        AND n.graphid = g.graphid
+                        GROUP BY n.name, g.name;
+                    """, [loadid]
+                )
+                tiles = cursor.fetchall()
+                for tile in tiles:
+                    graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
+                    number_of_resources[graph].setdefault('tiles', []).append({'tile': tile[1], 'count': tile[2] })
+
+                number_of_import = json.dumps({ "number_of_import": [{ "name": k, "total": v["total"], "tiles": v["tiles"] } for k, v in number_of_resources.items()]})
+                cursor.execute(
+                    """UPDATE load_event SET load_details = load_details || %s::JSONB WHERE loadid = %s""",
+                    (number_of_import, loadid),
+                )
+
         except (IntegrityError, ProgrammingError) as e:
             logger.error(e)
             cursor.execute(
