@@ -160,6 +160,10 @@ class BulkStringEditor(BaseBulkEditor):
 
             search_bool_query = Bool()
             search_bool_query.must(string_search_nested)
+
+            search_bool_agg = Bool()
+            search_bool_agg.must(node_value_query)
+
         else:
             data_exists_query = Exists(field=f"tiles.data.{str(node_id)}.{language_code}.value")
             tiles_w_node_exists_nested = Nested(path="tiles", query=data_exists_query)
@@ -170,10 +174,14 @@ class BulkStringEditor(BaseBulkEditor):
             search_bool_query.must(tiles_w_node_exists_nested)
             search_bool_query.must(on_blank_string_nested)
 
+            search_bool_agg = Bool()
+            search_bool_agg.must(data_exists_query)
+            search_bool_agg.must(non_blank_string_query)
+
         search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
         search_filter_agg = FiltersAgg(name="string_search")
-        search_filter_agg.add_filter(search_bool_query)
+        search_filter_agg.add_filter(search_bool_agg)
 
         nested_agg = NestedAgg(path="tiles", name="tile_agg")
         nested_agg.add_aggregation(search_filter_agg)
