@@ -503,7 +503,9 @@ define([
             templateSelection: function(item) {
                 let ret = '';
                 if (item._source) {
-                    ret = `<span><i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
+                    var graph = self.graphLookup[item._source.graph_id];
+                    var iconClass = graph?.iconclass || '';
+                    ret = `<span><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
                 } else {
                     ret = item.name;
                 }
@@ -534,18 +536,22 @@ define([
                         if (resourceInstance) { lookups.push(resourceInstance); }
                     });
                     Promise.all(lookups).then(function(arr){
+                        var ret = [];
                         if (arr.length) {
-                            var ret = arr.map(function(item) {
+                            ret = arr.map(function(item) {
                                 return {"_source":{"displayname": item["_source"].displayname, "iconclass": self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'}, "_id":item["_id"]};
                             });
                             if(self.multiple === false) {
                                 ret = ret[0];
                             }
-                            callback(ret);
                         }
+                        callback(ret);
                     });
                 } else if (self.graphIds().includes(self.value())){
                     self.value(null);
+                    callback([]);
+                } else {
+                    callback([]);
                 }
             }
         };
