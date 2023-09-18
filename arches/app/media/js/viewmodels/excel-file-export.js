@@ -33,6 +33,7 @@ define([
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
         this.alert = params.alert;
+        this.filename = ko.observable();
 
         this.getGraphName = (selectedGraphId) => {
             if (self.graphs) {
@@ -69,6 +70,11 @@ define([
             self.formData.append('action', action);
             self.formData.append('load_id', self.loadId);
             self.formData.append('module', self.moduleId);
+
+            if (self.filename()) {
+                self.formData.append('filename', self.filename());
+            }
+            
             return fetch(arches.urls.etl_manager, {
                 method: 'POST',
                 body: self.formData,
