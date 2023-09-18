@@ -23,7 +23,7 @@ import uuid
 import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
-from django.db.models import Q
+from django.db.models import F, Func, Q
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
@@ -372,6 +372,11 @@ class GraphDataView(View):
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
+                        if not self.validate_images_only_config(old_node_data, data):
+                            return JSONErrorResponse(
+                                _("Datatype Error"),
+                                _("This node cannot be restricted to images only as it holds non-images already."),
+                            )
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
@@ -481,6 +486,20 @@ class GraphDataView(View):
                 return JSONErrorResponse(e.title, e.message)
 
         return HttpResponseNotFound()
+
+    @staticmethod
+    def validate_images_only_config(old_node_data, new_node_data):
+        if old_node_data.config.get("imagesOnly", None) is False and new_node_data["config"]["imagesOnly"]:
+            nodegroup_id = new_node_data["nodegroup_id"]
+            for file_type in models.TileModel.objects.filter(
+                nodegroup_id=nodegroup_id
+            ).annotate(
+                file_data=Func(F(f"data__{nodegroup_id}"),
+                function="JSONB_ARRAY_ELEMENTS")
+            ).values_list(F("file_data__type"), flat=True).distinct():
+                if not file_type.startswith("image/"):
+                    return False
+        return True
 
 
 class GraphPublicationView(View):
