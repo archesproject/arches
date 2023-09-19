@@ -182,9 +182,9 @@ define([
                     .catch(function(error) {
                         reject(error);
                     })
-                    .finally(function() {
-                        self.saving(false);
-                    });
+                    .finally(
+                        self.saving(false)
+                    );
             });
         };
 
