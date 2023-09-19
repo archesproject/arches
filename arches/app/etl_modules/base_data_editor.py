@@ -157,6 +157,13 @@ class BulkStringEditor(BaseBulkEditor):
                 case_insensitive=case_insensitive,
             )
             string_search_nested = Nested(path="tiles", query=node_value_query)
+            inner_hits_query = {
+                "inner_hits": {
+                    "_source": False,
+                    "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
+                }
+            }
+            string_search_nested.dsl["nested"].update(inner_hits_query)
 
             search_bool_query = Bool()
             search_bool_query.must(string_search_nested)
@@ -195,13 +202,18 @@ class BulkStringEditor(BaseBulkEditor):
         results = query.search(index=RESOURCES_INDEX)
         values = []
         for hit in results['hits']['hits']:
-            for tile in hit['_source']['tiles']:
-                if node_id in tile['data']:
-                    values.append(tile['data'][node_id][language_code]['value'])
+            if "inner_hits" in hit:
+                for tile in hit['inner_hits']['tiles']['hits']['hits']:
+                    values.append(tile['fields'][f"tiles.data.{node_id}.{language_code}.value.keyword"][0])
+            else:
+                for tile in hit['_source']['tiles']:
+                    if node_id in tile['data']:
+                        values.append(tile['data'][node_id][language_code]['value'])
+
         number_of_resources = results['hits']['total']['value']
         number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
 
-        return values, number_of_tiles, number_of_resources
+        return values[:5], number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
