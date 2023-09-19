@@ -1259,7 +1259,7 @@ class BulkDisambiguatedResourceInstance(APIBase):
                 compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm
             )
 
-        return JSONResponse(disambiguated_resource_instances)
+        return JSONResponse(disambiguated_resource_instances, sort_keys=False)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
