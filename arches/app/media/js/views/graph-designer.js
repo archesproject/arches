@@ -285,14 +285,11 @@ define([
             document.addEventListener("keydown", e => {
                 if (e.ctrlKey && e.key === "s") {
                     e.preventDefault();
-                    if (viewModel.isNodeDirty()) {
-                        viewModel.saveSelectedNode()
-                    }
-                    if (viewModel.graphSettingsViewModel.dirty()) {
-                        viewModel.saveSelectedNode()
+                    if (viewModel.isNodeDirty() || viewModel.graphSettingsViewModel.dirty()) {
+                        viewModel.saveSelectedNode();
                     }
                 }
-            })
+            });
 
             viewModel.saveNode = function(node) {
                 if (node) {

@@ -187,9 +187,10 @@ define([
                 if (e.ctrlKey && e.key === "s") {
                     e.preventDefault();
                     if (this.dirty()) {
-                        this.save()
+                        this.save();
                     }
-                }})
+                }}
+            );
 
         },
 

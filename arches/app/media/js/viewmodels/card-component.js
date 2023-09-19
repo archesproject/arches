@@ -152,13 +152,12 @@ define([
         document.addEventListener("keydown", e => {
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
-                if (self?.tile && 
-                    self?.tile?.dirty() == true && 
+                if (self?.tile?.dirty() == true && 
                     self?.tile?.parent?.isWritable === true) {
-                        self.saveTile()
-                };
-            };
-        })
+                        self.saveTile();
+                }
+            }
+        });
 
         this.saveTile = function(callback) {
             self.loading(true);
