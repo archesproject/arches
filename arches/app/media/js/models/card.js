@@ -183,14 +183,20 @@ define([
                 dispose(self);
             };
 
-            document.addEventListener("keydown", e => {
+            // ctrl+S to save any edited/dirty card edits 
+            var keyListener = function (e) {
                 if (e.ctrlKey && e.key === "s") {
                     e.preventDefault();
-                    if (this.dirty()) {
-                        this.save();
+                    if (self.dirty()) {
+                        self.save();
                     }
-                }}
-            );
+                }
+            };
+            document?.addEventListener("keydown", keyListener)
+            // dispose of eventlistener
+            this.dispose = function () {
+                document?.removeEventListener("keydown", keyListener);
+            };
 
         },
 

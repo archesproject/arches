@@ -282,14 +282,20 @@ define([
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
             viewModel.updatedCardinalityData = ko.observable();
 
-            document.addEventListener("keydown", e => {
+            // ctrl+S to save any edited/dirty nodes 
+            var keyListener = function(e) {
                 if (e.ctrlKey && e.key === "s") {
                     e.preventDefault();
                     if (viewModel.isNodeDirty() || viewModel.graphSettingsViewModel.dirty()) {
                         viewModel.saveSelectedNode();
                     }
                 }
-            });
+            };
+            document.addEventListener("keydown", keyListener)
+            // dispose of eventlistener
+            this.dispose = function(){
+                document.removeEventListener("keydown", keyListener);
+            };
 
             viewModel.saveNode = function(node) {
                 if (node) {

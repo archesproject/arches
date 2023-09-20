@@ -148,8 +148,8 @@ define([
             params.dirty(true);
         };
 
-        // ctrl+S saves any edited/dirty tiles in resource view 
-        document.addEventListener("keydown", e => {
+        // ctrl+S to save any edited/dirty tiles in resource view 
+        var keyListener = function(e) {
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
                 if (self?.tile?.dirty() == true && 
@@ -157,7 +157,12 @@ define([
                         self.saveTile();
                 }
             }
-        });
+        };
+        document.addEventListener("keydown", keyListener)
+        // dispose of eventlistener
+        this.dispose = function(){
+            document.removeEventListener("keydown", keyListener);
+        };
 
         this.saveTile = function(callback) {
             self.loading(true);
