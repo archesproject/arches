@@ -112,11 +112,15 @@ class ManifestManagerView(View):
         def add_canvases(manifest, canvases):
             manifest.manifest["sequences"][0]["canvases"] += canvases
 
+        def check_canvas_in_use(canvas_id):
+            canvas_ids_in_use = [annotation.canvas for annotation in models.VwAnnotation.objects.all()]
+            return canvas_id in canvas_ids_in_use
+
         def delete_canvases(manifest, canvases_to_remove):
             canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
             canvases_in_use = []
             for canvas_id in canvas_ids_remove:
-                if self.check_canvas_in_use(canvas_id):
+                if check_canvas_in_use(canvas_id):
                     canvases_in_use.append(canvas_id)
             canvases = manifest.manifest["sequences"][0]["canvases"]
             if len(canvases_in_use) > 0:
