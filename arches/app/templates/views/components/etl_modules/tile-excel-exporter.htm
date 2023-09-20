@@ -39,6 +39,19 @@
                         <div><input style="margin-right: 4px; cursor: pointer;" type="radio" value="labels" data-bind="checked: $data.exportConceptsAs" />{% trans 'Labels' %}</div>
                     </div>
                 </div>
+                
+                <div style="padding-top: 16px;">
+                    <h3>
+                        <label for="export-file-name" data-bind="text: $root.translations.chooseNameForFile"></label>
+                    </h3>
+                    <input 
+                        type="text" 
+                        id="export-file-name"
+                        size="69" 
+                        style="border: 1px solid #ddd; padding: 4px; border-radius: 2px;" 
+                        data-bind="textInput: $data.filename"
+                    />
+                </div>
             </div>
         </section>
     </div>

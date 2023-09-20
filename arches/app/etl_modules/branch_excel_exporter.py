@@ -42,6 +42,7 @@ class BranchExcelExporter(BaseExcelExporter):
         self.request = request if request else None
         self.userid = request.user.id if request else None
         self.moduleid = request.POST.get("module") if request else None
+        self.filename = request.POST.get("filename") if request else None
         self.loadid = loadid if loadid else None
 
 
@@ -97,7 +98,9 @@ class BranchExcelExporter(BaseExcelExporter):
 
         wb = create_workbook(graph_id, tiles_to_export)
 
-        zip_file, download_files, skipped_files = self.get_files_in_zip_file(files_to_download, graph_name, wb)
+        user_generated_filename = self.filename or kwargs.get('filename')
+        zip_file, download_files, skipped_files = self.get_files_in_zip_file(files_to_download, graph_name, wb, user_generated_filename=user_generated_filename)
+        
         zip_file_name = os.path.basename(zip_file.path.name)
         zip_file_url = settings.MEDIA_URL + zip_file.path.name
 
@@ -127,9 +130,10 @@ class BranchExcelExporter(BaseExcelExporter):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
+        filename = request.POST.get("filename")
 
         export_task = tasks.export_branch_excel.apply_async(
-            (self.userid, self.loadid, graph_id, graph_name, resource_ids),
+            (self.userid, self.loadid, graph_id, graph_name, resource_ids, filename),
         )
 
         with connection.cursor() as cursor:
