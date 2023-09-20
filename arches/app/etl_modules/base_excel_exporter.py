@@ -73,6 +73,7 @@ class BaseExcelExporter:
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
+        export_concepts_as = request.POST.get("export_concepts_as")
         use_celery = True
 
         with connection.cursor() as cursor:
@@ -84,7 +85,7 @@ class BaseExcelExporter:
         if use_celery:
             response = self.run_load_task_async(request, self.loadid)
         else:
-            response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids)
+            response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as)
 
         return response
     
