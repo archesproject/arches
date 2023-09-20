@@ -614,12 +614,7 @@ class Tile(models.TileModel):
         tile.resourceinstance_id = resourceid
         tile.parenttile = parenttile
         tile.data = {}
-        tile.load_serialized_graph()
-        try:
-            nodes = [(node for node in tile.serialized_graph["nodes"] if node["nodegroupid"] == nodegroup_id)]
-            nodes = [SimpleNamespace(**next(node, None)) for node in nodes]
-        except:
-            nodes = models.Node.objects.filter(nodegroup=nodegroup_id)
+        nodes = models.Node.objects.filter(nodegroup=nodegroup_id)
 
         for node in nodes:
             if node.datatype != "semantic":
