@@ -614,11 +614,10 @@ class Tile(models.TileModel):
         tile.resourceinstance_id = resourceid
         tile.parenttile = parenttile
         tile.data = {}
-        nodes = models.Node.objects.filter(nodegroup=nodegroup_id)
+        nodes = models.Node.objects.filter(nodegroup=nodegroup_id).exclude(datatype="semantic")
 
         for node in nodes:
-            if node.datatype != "semantic":
-                tile.data[str(node.nodeid)] = None
+            tile.data[str(node.nodeid)] = None
 
         return tile
 
