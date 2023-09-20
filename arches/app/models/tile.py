@@ -570,7 +570,7 @@ class Tile(models.TileModel):
                     
             nodes = [(node for node in self.serialized_graph["nodes"] if node["nodegroup_id"] == self.nodegroup_id)]
             nodes = [SimpleNamespace(**next(node, None)) for node in nodes]
-        except:
+        except TypeError: # handle if serialized_graph is None
             nodegroup = models.NodeGroup.objects.get(pk=self.nodegroup_id)
             nodes = nodegroup.node_set.all()
 
