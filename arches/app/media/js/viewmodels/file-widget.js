@@ -161,7 +161,7 @@ define([
             var arr = [], lowerName = "", filter = self.filter().toLowerCase();
             if(filter) {
                 self.filesJSON().forEach(function(f, i) {
-                    lowerName = f.name.toLowerCase();
+                    lowerName = ko.unwrap(f.name).toLowerCase();
                     if(lowerName.includes(filter)) { arr.push(self.filesJSON()[i]); }
                 });
             }
@@ -179,7 +179,7 @@ define([
             var uploadedFiles = self.uploadedFiles();
             if (file.file_id) {
                 file = _.find(uploadedFiles, function(uploadedFile) {
-                    return file.file_id ===  ko.unwrap(uploadedFile.file_id);
+                    return ko.unwrap(file.file_id) === ko.unwrap(uploadedFile.file_id);
                 });
                 self.uploadedFiles.remove(file);
             } else {
