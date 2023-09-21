@@ -96,7 +96,7 @@ define([
         this.filesJSON = ko.computed(function() {
             var filesForUpload = self.filesForUpload();
             var uploadedFiles = self.uploadedFiles();
-            return ko.toJS(uploadedFiles.concat(
+            return uploadedFiles.concat(
                 _.map(filesForUpload, function(file, i) {
                     return {
                         name: file.name,
@@ -117,7 +117,7 @@ define([
                         error: file.error
                     };
                 })
-            ));
+            );
         }).extend({throttle: 100});
 
         this.filesJSON.subscribe(function(value) {
