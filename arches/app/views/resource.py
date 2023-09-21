@@ -536,12 +536,16 @@ class ResourceEditLogView(BaseManagerView):
                     pass
 
     def get(self, request, resourceid=None, view_template="views/resource/edit-log.htm"):
+        transaction_id = request.GET.get("transactionid", None)
         if resourceid is None:
-            recent_edits = (
-                models.EditLog.objects.all()
-                .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .order_by("-timestamp")[:100]
-            )
+            if transaction_id:
+                recent_edits = models.EditLog.objects.filter(transactionid=transaction_id).order_by("-timestamp")
+            else:
+                recent_edits = (
+                    models.EditLog.objects.all()
+                    .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    .order_by("-timestamp")[:100]
+                )
             edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
             resources = Resource.objects.filter(resourceinstanceid__in=edited_ids).select_related("graph")
             edit_type_lookup = {

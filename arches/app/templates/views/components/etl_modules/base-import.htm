@@ -56,6 +56,9 @@
         <span data-bind="text: $root.translations.numberOfResourcesImported"></span>
     </h4>
     <div>
+        <div class="etl-status-link">
+            <a target="_blank" data-bind="text: $root.translations.listOfImportedResources, attr: { href: editHistoryUrl }"></a>
+        </div>
         <!-- ko foreach: loadDetails.number_of_import -->
         <span class="etl-loading-metadata-key" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
@@ -104,7 +107,7 @@
                 <td data-bind="text: $data.nodeAlias"></td>
                 <td data-bind="text: $data.datatype"></td>
                 <td data-bind="text: $data.count"></td>
-                <td class='etl-error-report-link'
+                <td class='etl-status-link'
                     data-bind="
                         if: $data.type === 'node',
                         click: function(){
@@ -146,7 +149,7 @@
             <!-- /ko -->    
             <!-- /ko -->
             <tr>
-                <td colspan="6" class='etl-error-report-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
+                <td colspan="6" class='etl-status-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
             </tr>
         </tbody>
         <!-- /ko -->
