@@ -101,7 +101,7 @@ define([
                     return {
                         name: file.name,
                         title: '',
-                        caption: '',
+                        altText: '',
                         description: '',
                         accepted: file.accepted,
                         height: file.height,

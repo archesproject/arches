@@ -118,34 +118,31 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <div style="padding: 0px 4px;">
-                                <label for="title">Title</label>
+                                <label data-bind="text: $root.translations.title"></label>
                                 <input
                                     type="text"
-                                    id="title"
                                     class="form-control"
-                                    data-bind="value: $data.title"
+                                    data-bind="value: $data.title, attr: {'aria-label': $root.translations.title}"
                                 />
                             </div>
                             <div style="padding: 0px 4px;">
-                                <label for="caption">Caption</label>
+                                <label data-bind="text: $root.translations.alternativeText"></label>
                                 <input
                                     type="text"
-                                    id="caption"
                                     class="form-control"
-                                    data-bind="value: $data.caption"
+                                    data-bind="value: $data.altText, attr: {'aria-label': $root.translations.alternativeText}"
                                 />
                             </div>
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-6">
                             <div style="padding-right: 4px;">
-                                <label for="description">Description</label>
+                                <label data-bind="text: $root.translations.description"></label>
                                 <textarea
-                                    id="description"
                                     class="form-control"
                                     rows="4"
-                                    data-bind="value: $data.description"
+                                    data-bind="value: $data.description, attr: {'aria-label': $root.translations.description}"
                                     style="resize: vertical;"
                                 >
                                 </textarea>
