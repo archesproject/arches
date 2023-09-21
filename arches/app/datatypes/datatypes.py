@@ -1481,12 +1481,9 @@ class FileListDataType(BaseDataType):
         if request:
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
-        def add_invalid_file_type_error(errors):
+        if len(file_type_errors) > 0:
             title = _("Invalid File Type")
             errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
-
-        if len(file_type_errors) > 0:
-            add_invalid_file_type_error(errors)
 
         if node:
             self.node_lookup[str(node.pk)] = node
@@ -1518,7 +1515,8 @@ class FileListDataType(BaseDataType):
                 for file in files:
                     width, height = get_image_dimensions(file.file)
                     if not width or not height:
-                        add_invalid_file_type_error(errors)
+                        title = _("Invalid File Type")
+                        errors.append({"type": "ERROR", "message": _("This node allows only images."), "title": title})
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
