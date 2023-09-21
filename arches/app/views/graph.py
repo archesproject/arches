@@ -494,8 +494,10 @@ class GraphDataView(View):
             for file_type in models.TileModel.objects.filter(
                 nodegroup_id=nodegroup_id
             ).annotate(
-                file_data=Func(F(f"data__{nodegroup_id}"),
-                function="JSONB_ARRAY_ELEMENTS")
+                file_data=Func(
+                    F(f"data__{nodegroup_id}"),
+                    function="JSONB_ARRAY_ELEMENTS",
+                )
             ).values_list(F("file_data__type"), flat=True).distinct():
                 if not file_type.startswith("image/"):
                     return False
