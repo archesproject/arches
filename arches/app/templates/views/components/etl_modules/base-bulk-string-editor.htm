@@ -210,9 +210,6 @@
             <tr>
                 <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
                 <td>
-                    <div class="etl-loading-metadata-value">
-                        <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.listOfEditedTiles, attr: { href: editHistoryUrl }"></a>
-                    </div>
                     <!-- ko foreach: load_details.number_of_import -->
                     <span class="etl-loading-metadata-value" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
                     <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
@@ -223,6 +220,14 @@
                     </div>
                     <!-- /ko -->
                     <!-- /ko -->
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfEditedTiles"></span></td>
+                <td>
+                    <div class="etl-loading-metadata-value">
+                        <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.clickHere, attr: { href: editHistoryUrl }"></a>
+                    </div>
                 </td>      
             </tr>
         </tbody>
