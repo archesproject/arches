@@ -33,6 +33,9 @@ define([
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
         this.loading(true);
         this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
