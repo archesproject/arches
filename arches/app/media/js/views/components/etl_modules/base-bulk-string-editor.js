@@ -28,7 +28,7 @@ define([
         };
 
         this.load_details = params.load_details;
-        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${params.selectedLoadEvent().loadid}`;
+        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
