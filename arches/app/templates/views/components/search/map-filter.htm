@@ -99,9 +99,9 @@
                 lineNumbers: true
             }"></div>
             <!-- ko if: geoJSONErrors().length !== 0 -->
-            <div class="geojson-error-list">
-                <span data-bind="text: $root.translations.geojsonErrors"></span>
-                <ul>
+            <div class="geojson-error-list" data-bind="let: {uid: Math.random().toString()}">
+                <span data-bind="text: $root.translations.geojsonErrors, attr: {id: uid}"></span>
+                <ul data-bind="attr: {'aria-labeledby': uid}" aria-live="polite">
                     <!-- ko foreach: geoJSONErrors() -->
                     <li data-bind="text: message"></li>
                     <!-- /ko-->
@@ -111,7 +111,7 @@
         </div>
         <!-- /ko-->
         <div class="map-card-zoom-tool">
-            <button data-bind="click: function(){
+            <button id="edit-geojson-btn" data-bind="click: function(){
                 editGeoJSON(filter.feature_collection);}">
                 <i class="fa fa-pencil map-card-feature-edit"></i>
                 <span data-bind="text: $root.translations.editGeoJson"></span>
@@ -131,14 +131,27 @@
 
     <!-- ko if: geoJSONString() !== undefined -->
     <div class="install-buttons">
-        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: function () {
-            geoJSONString(undefined);
-        }">
+        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times"
+            data-bind="onEnterkeyClick, onSpaceClick,
+                click: function () {
+                    geoJSONString(undefined);
+                    $root.shiftFocus('#edit-geojson-btn');
+                }, 
+                attr: {'aria-label': $root.translations.cancelGeoJson},
+            "
+        >
             <span data-bind="text: $root.translations.cancel"></span>
         </button>
-        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
-            disabled: geoJSONErrors().length !== 0
-        }, click: updateGeoJSON">
+        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" 
+            data-bind="onEnterkeyClick, onSpaceClick,
+                css: {disabled: geoJSONErrors().length !== 0}, 
+                click: function () {
+                    updateGeoJSON();
+                    $root.shiftFocus('#edit-geojson-btn');
+                },
+                attr: {'aria-label': $root.translations.acceptGeoJson},
+            "
+        >
             <span data-bind="text: $root.translations.acceptGeoJson"></span>
         </button>
     </div>

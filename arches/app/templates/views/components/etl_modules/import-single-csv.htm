@@ -2,6 +2,7 @@
 {% load i18n %}
 
 {% block task_details %}
+<div class="loading-mask" data-bind="visible: loading"></div>
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
 <div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; margin-top: 65px; background: white">
@@ -10,7 +11,7 @@
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
         <h2>
-            <span data-bind="text: $root.translations.UploadCsvZipFile"></span>
+            <span data-bind="text: $root.translations.uploadCsvZipFile"></span>
         </h2>
         <h4>
             <span data-bind="text: $root.translations.dropzoneFileUploadCaption"></span>
@@ -130,16 +131,16 @@
         </table>
         </div>
         <!-- ko if: csvExample().length >= 5-->
-        <div data-bind="text: $root.translations.showingFirst + ' ' + csvExample().length + $root.translations.rows"></div>
+        <div data-bind="text: $root.translations.showingFirst + ' ' + csvExample().length + ' ' + $root.translations.rows"></div>
         <!-- /ko -->
         <!-- ko ifnot: csvExample().length >= 5 -->
-        <div data-bind="text: $root.translations.showingAll + ' ' + csvExample().length + $root.translations.rows"></div>
+        <div data-bind="text: $root.translations.showingAll + ' ' + csvExample().length + ' ' + $root.translations.rows"></div>
         <!-- /ko -->
     </div>
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: write" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="disable: !ready(), click: write" class="btn btn-success">
         <span data-bind="text: $root.translations.importData"></span>
     </button>
     <button data-bind="click: function () { fileAdded(null); }" class="btn btn-danger">
@@ -156,15 +157,15 @@
     <h4>
         <span data-bind="text: $root.translations.importSingleCsv"></span>
     </h4>
-    <!-- ko if: load_details -->
+    <!-- ko if: loadDetails -->
     <!-- ko ifnot: loading() -->
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetResource + ':'"></span>
-        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(loadDetails.graph)"></span>
     </div>
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetFields + ':'"></span>
-        <!-- ko foreach: load_details.mapping -->
+        <!-- ko foreach: loadDetails.mapping -->
         <!-- ko if:  $data.node -->
         <span class="etl-loading-metadata-value" data-bind="text: $data.node"></span><span>;</span>
         <!-- /ko -->

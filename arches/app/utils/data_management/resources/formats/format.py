@@ -16,7 +16,7 @@ from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
 from django.db import connection, transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class MissingGraphException(Exception):
