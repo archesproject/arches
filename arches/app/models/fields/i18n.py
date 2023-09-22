@@ -5,10 +5,13 @@ from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.db.models.sql.compiler import SQLInsertCompiler
+from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
 
 
-class I18n_String(object):
+class I18n_String(NothingNode):
+    """Subclassing NothingNode works around https://code.djangoproject.com/ticket/34745."""
+
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
@@ -24,6 +27,18 @@ class I18n_String(object):
         if isinstance(value, str) and value != "null":
             try:
                 ret = json.loads(value)
+
+                # the following is a fix for issue #9623 - using double quotation marks in i18n input
+                # re https://github.com/archesproject/arches/issues/9623
+                # the reason we have to do this next check is that we assumed that if the 
+                # json.loads method doesn't fail we have a python dict.  That's usually 
+                # true unless you have a simple string wrapped in quotes 
+                # eg: '"hello world"' rather than simply 'hello world'
+                # the quoted string loads without error but is not a dict
+                # hence the need for this check
+                if not isinstance(ret, dict):
+                    ret = {}
+                    raise Exception("value is not a json object")
             except:
                 ret[lang] = value
                 self.value_is_primitive = True
@@ -200,8 +215,13 @@ class I18n_TextField(JSONField):
 
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
 
+    def get_db_prep_save(self, value, connection):
+        """Override to avoid the optimization from Django 4.2 that
+        immediately returns `value` if it is None."""
+        return self.get_db_prep_value(value, connection)
 
-class I18n_JSON(object):
+
+class I18n_JSON(NothingNode):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
@@ -385,3 +405,8 @@ class I18n_JSONField(JSONField):
         """
 
         return I18n_JSON(value, attname=self.attname)
+
+    def get_db_prep_save(self, value, connection):
+        """Override to avoid the optimization from Django 4.2 that
+        immediately returns `value` if it is None."""
+        return self.get_db_prep_value(value, connection)

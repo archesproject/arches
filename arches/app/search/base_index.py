@@ -1,6 +1,6 @@
 import pyprind
 from datetime import datetime
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -32,7 +32,7 @@ class BaseIndex(object):
         """
 
         if self.index_metadata is not None:
-            self.se.create_index(index=self.index_name, body=self.index_metadata)
+            self.se.create_index(index=self.index_name, **self.index_metadata)
         else:
             raise SearchIndexError("No index metadata defined.")
 
@@ -84,7 +84,7 @@ class BaseIndex(object):
         start = datetime.now()
         q = Query(se=self.se)
         self.se.refresh(index=self.index_name)
-        count_before = self.se.count(index=self.index_name, body=q.dsl)
+        count_before = self.se.count(index=self.index_name, **q.dsl)
         result_summary = {"database": len(resources), "indexed": 0}
         if quiet is False:
             bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
@@ -98,7 +98,7 @@ class BaseIndex(object):
                     indexer.add(index=self.index_name, id=doc_id, data=document)
 
         self.se.refresh(index=self.index_name)
-        result_summary["indexed"] = self.se.count(index=self.index_name, body=q.dsl) - count_before
+        result_summary["indexed"] = self.se.count(index=self.index_name, **q.dsl) - count_before
         status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
         print(f"Custom Index - {settings.ELASTICSEARCH_PREFIX}_{self.index_name}")
         print(

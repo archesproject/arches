@@ -27,7 +27,7 @@ from arches.app.search.search_term import SearchTerm
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -41,7 +41,7 @@ default_url_widget = None
 try:
     default_url_widget = Widget.objects.get(name=default_widget_name)
 except Widget.DoesNotExist as e:
-    logger.warn("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
+    logger.warning("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
 
 details = {
     "datatype": "url",
@@ -100,9 +100,12 @@ class URLDataType(BaseDataType):
             try:
                 return ast.literal_eval(value)
             except:
-                # this will probably fail validation, but that is ok. We need the error to report the value.
-                return value
+                if isinstance(value, dict):
+                    return value
+                else:
+                    return {"url": value, "url_label": ""}
         except BaseException:
+            # this will probably fail validation, but that is ok. We need the error to report the value.
             if isinstance(value, dict):
                 return value
             else:
