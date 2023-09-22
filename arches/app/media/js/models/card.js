@@ -178,11 +178,6 @@ define([
             this.disposables.push(this.dirty);
             this.disposables.push(this.isContainer);
 
-            this.dispose = function() {
-                //console.log('disposing CardModel');
-                dispose(self);
-            };
-
             // ctrl+S to save any edited/dirty card edits 
             var keyListener = function (e) {
                 if (e.ctrlKey && e.key === "s") {
@@ -194,7 +189,8 @@ define([
             };
             document?.addEventListener("keydown", keyListener)
             // dispose of eventlistener
-            this.dispose = function () {
+            this.dispose = function() {
+                dispose(self);
                 document?.removeEventListener("keydown", keyListener);
             };
 
