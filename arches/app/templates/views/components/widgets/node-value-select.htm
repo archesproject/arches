@@ -5,8 +5,8 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" data-bind="text:label">
-        </label>
+        <span class="control-label widget-input-label" data-bind="text:label"></span>
+
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
@@ -16,7 +16,8 @@
                 value: value,
                 select2Query: {
                     select2Config: select2Config
-                }
+                },
+                attr: {'aria-label': label}
             ">
 
         </div>
@@ -35,7 +36,7 @@
         <input 
             class="form-control input-md widget-input"
             data-bind="
-                attr: {placeholder: $root.translations.placeholder},
+                attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
                 value: placeholder, 
                 valueUpdate: 'keyup'
             "
@@ -46,11 +47,18 @@
             <span data-bind="text: $root.translations.dropdownFormat"></span>
         </div>
         <div class="toggle-container">
-            <span class="switch switch-small" data-bind="css: {'on': displayOnlySelectedNode()}, click: toggleDisplayOnlySelected"><small></small></span>
+            <span class="switch switch-small" tabindex="0" role="switch" aria-describedby="description1 description2"
+                data-bind="css: {'on': displayOnlySelectedNode()}, 
+                    onEnterkeyClick, onSpaceClick, click: toggleDisplayOnlySelected,
+                    attr: {
+                        'aria-label': $root.translations.dropdownFormat, 
+                        'aria-checked': displayOnlySelectedNode(),
+                    }
+            "><small></small></span>
                     <div style="display:flex; flex-direction:row;">
-                    <div class="arches-toggle-sm" data-bind="text:$root.translations.showOnlySelectedNodeInDropdown"></div>
+                        <div id="description1" class="arches-toggle-sm" data-bind="text: $root.translations.showOnlySelectedNodeInDropdown"></div>
                     </div>
-            <span class="arches-toggle-subtitle" data-bind="text:$root.translations.limitDropdownToWidgetNodes"></span>
+            <span id="description2" class="arches-toggle-subtitle" data-bind="text: $root.translations.limitDropdownToWidgetNodes"></span>
         </div>
         </div>
     </div>
