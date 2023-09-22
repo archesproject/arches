@@ -151,25 +151,13 @@ class BulkStringEditor(BaseBulkEditor):
         case_insensitive = True if case_insensitive == "true" else False
 
         if old_text:
-            node_value_query = Wildcard(
+            search_query = Wildcard(
                 field=f"tiles.data.{node_id}.{language_code}.value.keyword",
                 query=f"*{old_text}*",
                 case_insensitive=case_insensitive,
             )
-            string_search_nested = Nested(path="tiles", query=node_value_query)
-            inner_hits_query = {
-                "inner_hits": {
-                    "_source": False,
-                    "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
-                }
-            }
-            string_search_nested.dsl["nested"].update(inner_hits_query)
-
-            search_bool_query = Bool()
-            search_bool_query.must(string_search_nested)
-
             search_bool_agg = Bool()
-            search_bool_agg.must(node_value_query)
+            search_bool_agg.must(search_query)
 
         else:
             if operation.startswith("upper"):
@@ -187,22 +175,22 @@ class BulkStringEditor(BaseBulkEditor):
                     }
                 }
             }
-            case_search_bool = Bool()
-            case_search_bool.must(case_search_query)
-
-            string_search_nested = Nested(path="tiles", query=case_search_bool)
-            inner_hits_query = {
-                "inner_hits": {
-                    "_source": False,
-                    "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
-                }
-            }
-            string_search_nested.dsl["nested"].update(inner_hits_query)
-
-            search_bool_query = Bool()
-            search_bool_query.must(string_search_nested)
+            search_query = Bool()
+            search_query.must(case_search_query)
             search_bool_agg = Bool()
             search_bool_agg.must(case_search_query)
+
+        string_search_nested = Nested(path="tiles", query=search_query)
+        inner_hits_query = {
+            "inner_hits": {
+                "_source": False,
+                "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
+            }
+        }
+        string_search_nested.dsl["nested"].update(inner_hits_query)
+
+        search_bool_query = Bool()
+        search_bool_query.must(string_search_nested)
 
         search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
@@ -213,7 +201,7 @@ class BulkStringEditor(BaseBulkEditor):
         nested_agg.add_aggregation(search_filter_agg)
 
         se = SearchEngineFactory().create()
-        query = Query(se, limit=50)
+        query = Query(se, limit=5)
 
         query.add_query(search_url_query)
         query.add_aggregation(nested_agg)
@@ -232,7 +220,7 @@ class BulkStringEditor(BaseBulkEditor):
         number_of_resources = results['hits']['total']['value']
         number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
 
-        return values, number_of_tiles, number_of_resources
+        return values[:5], number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
