@@ -171,7 +171,7 @@ class BulkStringEditor(BaseBulkEditor):
             case_search_query = {
                 "regexp": {
                     f"tiles.data.{str(node_id)}.{language_code}.value.keyword": {
-                    "value": regexp
+                        "value": regexp
                     }
                 }
             }
