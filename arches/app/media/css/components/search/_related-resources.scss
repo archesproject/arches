@@ -1,0 +1,7 @@
+.related-resources-graph-workbench {
+	.workbench-card-sidepanel {
+		@include break-at(mobile-max) {
+			width: calc(100% - 75px);
+		}
+	}
+}
