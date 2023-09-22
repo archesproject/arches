@@ -19,7 +19,7 @@ def setup(apps):
     }
     resource_instance_tiles = tiles.objects.filter(
         Q(nodegroup_id__node__datatype="resource-instance") | Q(nodegroup_id__node__datatype="resource-instance-list")
-    ).distinct()
+    ).distinct().iterator(chunk_size=1000)
     root_ontology_classes = {
         str(node["graph_id"]): node["ontologyclass"] for node in nodes.objects.filter(istopnode=True).values("graph_id", "ontologyclass")
     }

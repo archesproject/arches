@@ -222,17 +222,17 @@
 <div>
     <ul class="nav nav-tabs flex pad-no">
         <li data-bind="if: shouldShowCreateService">
-            <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
+            <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); selectService(false)}, css: { active: createService }">
                 <div class='tab-label'>
                     <span data-bind="text: $root.translations.createNewService"></span>
                 </div>
             </div>
         </li>
-        <li data-bind="if: shouldShowEditService">
+        <li data-bind="if: shouldShowSelectService">
             <div class='manifest-manager-nav-tab' data-bind=
-                "click: function(){createService(false); editService(true)}, css: { active: editService }">
+                "click: function(){createService(false); selectService(true)}, css: { active: selectService }">
                 <div class='tab-label'>
-                    <span data-bind="text: $root.translations.editService"></span>
+                    <span data-bind="text: $root.translations.selectService"></span>
                 </div>
             </div>
         </li>
@@ -281,14 +281,14 @@
 </div>
 <!-- /ko -->
 
-<!--ko if: editService -->
+<!--ko if: selectService -->
 <div class="file-select loader-select" style="height: 100%;">
     <div style="display:flex; flex-direction: column; align-items: center;">
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-picture-o r-select-icon"></i></span>
         </div> 
         <h2>
-            <span data-bind="text: $root.translations.editExistingImageService"></span>
+            <span data-bind="text: $root.translations.selectExistingImageService"></span>
         </h2>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column; width: 300px">
@@ -328,7 +328,7 @@
         class="iiif-gallery-sequence-label" 
         style="padding:0 5px" 
         data-bind="
-            if: shouldShowEditService,
+            if: shouldShowSelectService,
             click: toggleManifestEditor,
         "
     >
@@ -346,7 +346,7 @@
             </div>
         </div>
     </div>
-    <div>
+    <div class="iiif-list-filter">
         <span data-bind="text: $root.translations.filter"></span>
         <div class="list-filter" data-bind="">
             <input type="text" class="form-control" style="width: 100%;" data-bind="attr:{placeholder: $root.translations.filterImages + '...'}, textInput: filter">

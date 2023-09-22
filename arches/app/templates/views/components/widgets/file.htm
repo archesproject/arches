@@ -87,8 +87,7 @@
                 </div>
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
-            <!-- ko if: !filter() -->
-                <!-- ko foreach: pagedList(filesJSON()) -->
+                <!-- ko foreach: pagedList(filter() ? filteredList() : filesJSON()) -->
                 <div class="file-upload-card">
                     <div class="media-body">
                         <div class="media-block">
@@ -120,41 +119,6 @@
                     </div>
                 </div>
                 <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko if: filter() -->
-                <!-- ko foreach: pagedList(filteredList()) -->
-                <div class="file-upload-card">
-                    <div class="media-body">
-                        <div class="media-block">
-                            <div class="media-left">
-                                <span><i class="fa fa-file fa-lg"></i></span>
-                            </div>
-                            <div class="media-body file-upload-card-detail">
-                                <div class="media-left">
-                                    <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
-                                    <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
-                                    <!-- /ko -->
-                                    <span class="text-sm">
-                                        <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
-                                            <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
-                                        </a>
-                                    </span>
-                                </div>
-                                <div class="file-upload-card-detail-right">
-                                    <div class="media-right" data-bind="click: $parent.removeFile">
-                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
-                                    </div>
-                                    <div>
-                                        <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /ko -->
-            <!-- /ko -->
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
                 <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt" aria-label="{% trans 'Number of Files Shown' %}">

@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language
+from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
 
@@ -41,3 +42,35 @@ class StringDataTypeTests(ArchesTestCase):
         self.assertEqual(type(tile_value), dict)
         self.assertTrue("fa" in tile_value.keys())
         new_language.delete()
+
+    def test_tile_clean(self):
+        string = DataTypeFactory().get_instance("string")
+        nodeid = "72048cb3-adbc-11e6-9ccf-14109fd34195"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        json_all_empty_strings = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"en": {"value": "", "direction": "ltr"}}},
+        }
+        tile1 = Tile(json_all_empty_strings)
+        string.clean(tile1, nodeid)
+
+        self.assertIsNone(tile1.data[nodeid])
+
+        json_some_empty_strings = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {
+                "en": {"value": "", "direction": "ltr"},
+                "de": {"value": "danke", "direction": "ltr"},
+            }},
+        }
+        tile2 = Tile(json_some_empty_strings)
+        string.clean(tile2, nodeid)
+
+        self.assertIsNotNone(tile2.data[nodeid])

@@ -148,16 +148,21 @@ define([
             params.dirty(true);
         };
 
-        // ctrl+S saves any edited/dirty tiles in resource view 
-        document.addEventListener("keydown", e => {
+        // ctrl+S to save any edited/dirty tiles in resource view 
+        var keyListener = function(e) {
             if (e.ctrlKey && e.key === "s") {
                 e.preventDefault();
-                if (self.tile && self.tile.dirty() == true) {
-                    self.saveTile();
-                };
-
+                if (self?.tile?.dirty() == true && 
+                    self?.tile?.parent?.isWritable === true) {
+                        self.saveTile();
+                }
             }
-        })
+        };
+        document.addEventListener("keydown", keyListener)
+        // dispose of eventlistener
+        this.dispose = function(){
+            document.removeEventListener("keydown", keyListener);
+        };
 
         this.saveTile = function(callback) {
             self.loading(true);
@@ -169,7 +174,6 @@ define([
             else if (ko.unwrap(params.form?.resourceId)){
                 self.tile.resourceinstance_id = ko.unwrap(params.form.resourceId);
             }
-
             self.tile.save(function(response) {
                 self.loading(false);
                 if(params?.form?.error){
