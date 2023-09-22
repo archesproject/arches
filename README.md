@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.4.0 release notes](https://github.com/archesproject/arches/blob/dev/7.4.x/releases/7.4.0.md)
+[Version 7.4.1 release notes](https://github.com/archesproject/arches/blob/dev/7.4.x/releases/7.4.1.md)
 
 #### Quick Install
 
@@ -45,7 +45,7 @@ to create a frontend asset bundle. This process should complete in less than 2 m
 
 Finally, visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
 
-If you run into problems, please review our the full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
+If you run into problems, please review our full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
 
 #### Release Cycle
 

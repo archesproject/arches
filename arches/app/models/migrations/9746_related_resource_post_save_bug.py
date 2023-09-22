@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9648_add_empty_key_value_pairs_to_tiles'),
+        ('models', '9670_improve_bulk_load_performance'),
     ]
 
     forward_sql = """
