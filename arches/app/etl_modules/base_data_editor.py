@@ -177,7 +177,7 @@ class BulkStringEditor(BaseBulkEditor):
             elif operation.startswith("lower"):
                 regexp = "(.*[A-Z].*)"
             elif operation.startswith("capitalize"):
-                regexp = "(.*)" #TODO 
+                regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)"
             elif operation.startswith("trim"):
                 regexp = "[ \t].*|.*[ \t]"
             case_search_query = {
@@ -213,8 +213,8 @@ class BulkStringEditor(BaseBulkEditor):
         nested_agg.add_aggregation(search_filter_agg)
 
         se = SearchEngineFactory().create()
-        query = Query(se, limit=5)
-        
+        query = Query(se, limit=50)
+
         query.add_query(search_url_query)
         query.add_aggregation(nested_agg)
 
