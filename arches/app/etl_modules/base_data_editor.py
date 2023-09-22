@@ -165,7 +165,7 @@ class BulkStringEditor(BaseBulkEditor):
             elif operation.startswith("lower"):
                 regexp = "(.*[A-Z].*)"
             elif operation.startswith("capitalize"):
-                regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)"
+                regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)|((.+[ ]+)[a-z].*)|((.+[ ]+)[A-Z][a-zA-Z]*[A-Z].*)"
             elif operation.startswith("trim"):
                 regexp = "[ \t].*|.*[ \t]"
             case_search_query = {
