@@ -769,6 +769,7 @@
         first-five-shown='{% trans "First 5 errors are shown" as firstFiveShown %} "{{ firstFiveShown|escapejs }}"'
         validation-errors='{% trans "Validation Errors" as validationErrors %} "{{ validationErrors|escapejs }}"'
         no-error-found='{% trans "No Error Found" as noErrorFound %} "{{ noErrorFound|escapejs }}"'
+        click-here='{% trans "click here" as clickHere %} "{{ clickHere|escapejs }}"'
         loading-data='{% trans "Loading data" as loadingData %} "{{ loadingData|escapejs }}"'
         loading-status='{% trans "Loading status" as loadingStatus %} "{{ loadingStatus|escapejs }}"'
         loading-started='{% trans "Loading started" as loadingStarted %} "{{ loadingStarted|escapejs }}"'
@@ -776,6 +777,13 @@
         load-duration='{% trans "Load duration" as loadDuration %} "{{ loadDuration|escapejs }}"'
         indexing-ended='{% trans "Indexing ended" as indexingEnded %} "{{ indexingEnded|escapejs }}"'
         indexing-duration='{% trans "Indexing duration" as indexingDuration %} "{{ indexingDuration|escapejs }}"'
+        updating-progress='{% trans "Updating Progress" as updatingProgress %} "{{ updatingProgress|escapejs }}"'
+        updating-status='{% trans "Updating status" as updatingStatus %} "{{ updatingStatus|escapejs }}"'
+        updating-started='{% trans "Updating started" as updatingStarted %} "{{ updatingStarted|escapejs }}"'
+        updating-ended='{% trans "Updating ended" as updatingEnded %} "{{ updatingEnded|escapejs }}"'
+        updating-duration='{% trans "Updating duration" as updatingDuration %} "{{ updatingDuration|escapejs }}"'
+        list-of-imported-resources='{% trans "List of Imported Resources" as listOfImportedResources %} "{{ listOfImportedResources|escapejs }}"'
+        list-of-edited-resources='{% trans "List of Edited Resources" as listOfEditedResources %} "{{ listOfEditedResources|escapejs }}"'
         manage='{% trans "Manage" as manage %} "{{ manage|escapejs }}"'
         unable-to-display-selected-file='{% trans "Unable to display the selected file" as unableToDisplaySelectedFile %} "{{ unableToDisplaySelectedFile|escapejs }}"'
         file-display-error-message1='{% trans "This file can't be displayed." as fileDisplayErrorMessage1 %} "{{ fileDisplayErrorMessage1|escapejs }}"'
@@ -868,6 +876,7 @@
         reorder_tiles="{% url 'reorder_tiles' %}"
         reorder_nodes="{% url 'reorder_nodes' %}"
         delete_provisional_tile="{% url 'delete_provisional_tile' %}"
+        edit_history="{% url 'edit_history' %}"
         tile_history="{% url 'tile_history' %}"
         download_files="{% url 'download_files' %}"
         apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
