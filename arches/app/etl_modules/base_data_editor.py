@@ -209,13 +209,8 @@ class BulkStringEditor(BaseBulkEditor):
         results = query.search(index=RESOURCES_INDEX)
         values = []
         for hit in results['hits']['hits']:
-            if "inner_hits" in hit:
-                for tile in hit['inner_hits']['tiles']['hits']['hits']:
-                    values.append(tile['fields'][f"tiles.data.{node_id}.{language_code}.value.keyword"][0])
-            else:
-                for tile in hit['_source']['tiles']:
-                    if node_id in tile['data']:
-                        values.append(tile['data'][node_id][language_code]['value'])
+            for tile in hit['inner_hits']['tiles']['hits']['hits']:
+                values.append(tile['fields'][f"tiles.data.{node_id}.{language_code}.value.keyword"][0])
 
         number_of_resources = results['hits']['total']['value']
         number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
