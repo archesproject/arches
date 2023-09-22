@@ -132,7 +132,7 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_preview_data(self, graph_id, node_id, search_url, language_code, old_text, case_insensitive):
+    def get_preview_data(self, node_id, search_url, language_code, operation, old_text, case_insensitive):
         request = HttpRequest()
         request.user = self.request.user
         request.method = "GET"
@@ -172,18 +172,37 @@ class BulkStringEditor(BaseBulkEditor):
             search_bool_agg.must(node_value_query)
 
         else:
-            data_exists_query = Exists(field=f"tiles.data.{str(node_id)}.{language_code}.value")
-            tiles_w_node_exists_nested = Nested(path="tiles", query=data_exists_query)
-            non_blank_string_query = Wildcard(field=f"tiles.data.{node_id}.{language_code}.value", query="?*")
-            on_blank_string_nested = Nested(path="tiles", query=non_blank_string_query)
+            if operation.startswith("upper"):
+                regexp = "(.*[a-z].*)"
+            elif operation.startswith("lower"):
+                regexp = "(.*[A-Z].*)"
+            elif operation.startswith("capitalize"):
+                regexp = "(.*)" #TODO 
+            elif operation.startswith("trim"):
+                regexp = "[ \t].*|.*[ \t]"
+            case_search_query = {
+                "regexp": {
+                    f"tiles.data.{str(node_id)}.{language_code}.value.keyword": {
+                    "value": regexp
+                    }
+                }
+            }
+            case_search_bool = Bool()
+            case_search_bool.must(case_search_query)
+
+            string_search_nested = Nested(path="tiles", query=case_search_bool)
+            inner_hits_query = {
+                "inner_hits": {
+                    "_source": False,
+                    "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
+                }
+            }
+            string_search_nested.dsl["nested"].update(inner_hits_query)
 
             search_bool_query = Bool()
-            search_bool_query.must(tiles_w_node_exists_nested)
-            search_bool_query.must(on_blank_string_nested)
-
+            search_bool_query.must(string_search_nested)
             search_bool_agg = Bool()
-            search_bool_agg.must(data_exists_query)
-            search_bool_agg.must(non_blank_string_query)
+            search_bool_agg.must(case_search_query)
 
         search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
@@ -213,7 +232,7 @@ class BulkStringEditor(BaseBulkEditor):
         number_of_resources = results['hits']['total']['value']
         number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
 
-        return values[:5], number_of_tiles, number_of_resources
+        return values, number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -240,7 +259,7 @@ class BulkStringEditor(BaseBulkEditor):
             operation = operation + "_trim"
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, search_url, language_code, old_text, case_insensitive
+            node_id, search_url, language_code, operation, old_text, case_insensitive
         )
         return_list = []
         with connection.cursor() as cursor:
@@ -303,7 +322,7 @@ class BulkStringEditor(BaseBulkEditor):
         }
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+            node_id, resourceids, language_code, operation, old_text, case_insensitive
         )
 
         load_details = {
