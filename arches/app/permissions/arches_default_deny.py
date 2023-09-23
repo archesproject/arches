@@ -1,4 +1,4 @@
-from arches.app.utils.permissions.arches_standard import ArchesStandardPermissionFramework
+from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework
 
 class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
     def check_resource_instance_permissions(self, user, resourceid, permission):
