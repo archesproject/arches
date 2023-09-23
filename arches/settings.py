@@ -594,6 +594,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+PERMISSION_FRAMEWORK_LOCATIONS = [
+    "arches.app.permissions",
+]
 DATATYPE_LOCATIONS = [
     "arches.app.datatypes",
 ]
@@ -761,7 +764,7 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
-PERMISSION_FRAMEWORK = "arches_standard"
+PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
 
 ##########################################

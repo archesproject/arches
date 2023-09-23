@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABCMeta
-import inspect
 
 from arches.app.models.models import *
 from arches.app.models.system_settings import settings
@@ -289,11 +288,14 @@ _PERMISSION_FRAMEWORK = None
 def _get_permission_framework():
     global _PERMISSION_FRAMEWORK
     if not _PERMISSION_FRAMEWORK:
-        if settings.PERMISSION_FRAMEWORK == "arches_default_deny":
-            from arches.app.utils.permissions.arches_standard import ArchesDefaultDenyPermissionFramework
-            _PERMISSION_FRAMEWORK = ArchesDefaultDenyPermissionFramework()
+        if settings.PERMISSION_FRAMEWORK:
+            if "." not in settings.PERMISSION_FRAMEWORK:
+                raise RuntimeError("Permissions frameworks must be a dot-separated module and a class")
+            modulename, classname = settings.PERMISSION_FRAMEWORK.split(".", -1)
+            PermissionFramework = get_class_from_modulename(modulename, classname, settings.PERMISSION_FRAMEWORK_LOCATIONS)
+            _PERMISSION_FRAMEWORK = PermissionFramework()
         else:
-            from arches.app.utils.permissions.arches_standard import ArchesStandardPermissionFramework
+            from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework
             _PERMISSION_FRAMEWORK = ArchesStandardPermissionFramework()
     return _PERMISSION_FRAMEWORK
 
@@ -334,10 +336,10 @@ def user_can_write_map_layers(user):
     return _get_permission_framework().user_can_write_map_layers(user)
 
 def get_users_with_perms(obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
-    return _get_permission_framework().get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superuesrs, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+    return _get_permission_framework().get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
 
-def get_groups_with_perms(obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
-    return _get_permission_framework().get_groups_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+def get_groups_with_perms(obj, attach_perms=False):
+    return _get_permission_framework().get_groups_with_perms(obj, attach_perms=attach_perms)
 
 def get_user_perms(user, obj):
     return _get_permission_framework().get_user_perms(user, obj)

@@ -35,7 +35,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
     def assign_perm(self, perm, user_or_group, obj=None):
         try:
-            return assign_perm(perm, user_or_group, obj=None)
+            return assign_perm(perm, user_or_group, obj=obj)
         except NotUserNorGroup:
             raise ArchesNotUserNorGroup()
 
@@ -43,7 +43,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         return PermissionBackend()
 
     def remove_perm(self, perm, user_or_group=None, obj=None):
-        return remove_perm(perm, user_or_group=None, obj=None)
+        return remove_perm(perm, user_or_group=user_or_group, obj=obj)
 
     def get_perms(self, user_or_group, obj):
         return get_perms(user_or_group, obj)
@@ -232,10 +232,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         return result
 
     def get_users_with_perms(self, obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
-        return get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superuesrs, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+        return get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
 
-    def get_groups_with_perms(self, obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
-        return get_groups_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)
+    def get_groups_with_perms(self, obj, attach_perms=False):
+        return get_groups_with_perms(obj, attach_perms=attach_perms)
 
     def get_restricted_users(self, resource):
         """
