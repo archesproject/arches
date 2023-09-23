@@ -8,7 +8,7 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node
+from arches.app.models.models import GraphModel, Node, ETLModule
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.etl_modules.decorators import load_data_async
@@ -114,12 +114,13 @@ class BaseBulkEditor:
 
         return result
 
-    def stage_data(self, cursor, graph_id, node_id, resourceids, operation, text_replacing, language_code, case_insensitive):
+    def stage_data(self, cursor, module_id, graph_id, node_id, resourceids, operation, text_replacing, language_code, case_insensitive):
         result = {"success": False}
+        update_limit = ETLModule.objects.get(pk=module_id).config["updateLimit"]
         try:
             cursor.execute(
-                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, text_replacing, language_code, case_insensitive),
+                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, text_replacing, language_code, case_insensitive, update_limit),
             )
             result["success"] = True
         except Exception as e:
@@ -371,7 +372,7 @@ class BulkStringEditor(BaseBulkEditor):
             operation = operation + "_trim"
 
         edit_task = tasks.edit_bulk_string_data.apply_async(
-            (self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
+            (self.loadid, self.moduleid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -379,7 +380,7 @@ class BulkStringEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
+    def run_load_task(self, loadid, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
         case_insensitive = False
@@ -387,7 +388,7 @@ class BulkStringEditor(BaseBulkEditor):
             case_insensitive = True
 
         with connection.cursor() as cursor:
-            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids, operation, old_text, language_code, case_insensitive)
+            data_staged = self.stage_data(cursor, module_id, graph_id, node_id, resourceids, operation, old_text, language_code, case_insensitive)
 
             if data_staged["success"]:
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, old_text, new_text)

@@ -293,14 +293,14 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
 
 
 @shared_task
-def edit_bulk_string_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+def edit_bulk_string_data(load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
     from arches.app.etl_modules import base_data_editor
 
     logger = logging.getLogger(__name__)
 
     try:
         BulkStringEditor = base_data_editor.BulkStringEditor(loadid=load_id)
-        BulkStringEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+        BulkStringEditor.run_load_task(load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
