@@ -28,10 +28,14 @@ define([
         };
 
         this.load_details = params.load_details;
+        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
         this.loading(true);
         this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
@@ -199,9 +203,9 @@ define([
             }
 
             self.addAllFormData();
-            self.loading(true);
+            params.activeTab("import");
             self.submit('write').then(data => {
-                params.activeTab("import");
+                //console.log(data.result);
             }).fail( function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(

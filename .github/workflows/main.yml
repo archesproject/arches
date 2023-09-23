@@ -47,6 +47,14 @@ jobs:
         run: |
           yarn && yarn build_test
 
+      - name: Check for missing migrations
+        run: |
+          python manage.py makemigrations --check
+
       - name: Run Arches unit tests
         run: |
-          python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+          coverage run manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+
+      - name: Report coverage
+        run: |
+          coverage report

@@ -6,8 +6,8 @@ import shutil
 import uuid
 from revproxy.views import ProxyView
 from django.core.files.storage import default_storage
-from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.http.response import Http404
+from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models
@@ -208,15 +208,12 @@ class ManifestManagerView(View):
             canvases = []
             for f in files:
                 if os.path.splitext(f.name)[1].lower() in acceptable_types:
-                    try:
-                        image_json, image_id, file_url = create_image(f)
-                    except:
-                        return
+                    image_json, image_id, file_url = create_image(f)
 
                     canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                     canvases.append(canvas)
                 else:
-                    logger.warn("filetype unacceptable: " + f.name)
+                    logger.warning("filetype unacceptable: " + f.name)
 
             pres_dict = create_manifest(name=name, canvases=canvases)
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
@@ -250,18 +247,15 @@ class ManifestManagerView(View):
                 canvases = []
                 for f in files:
                     if os.path.splitext(f.name)[1].lower() in acceptable_types:
-                        try:
-                            image_json, image_id, file_url = create_image(f)
-                        except:
-                            return
+                        image_json, image_id, file_url = create_image(f)
                         canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                         canvases.append(canvas)
                     else:
-                        logger.warn("filetype unacceptable: " + f.name)
+                        logger.warning("filetype unacceptable: " + f.name)
                 add_canvases(manifest, canvases)
             except:
                 logger.warning("You have to select a manifest to add images")
-                return None
+                raise
 
         change_manifest_metadata(manifest)
 
@@ -273,8 +267,8 @@ class ManifestManagerView(View):
             resp = requests.get(url)
             return resp.json()
         except:
-            logger.warn("Manifest not created. Check if Cantaloupe running")
-            return None
+            logger.warning("Manifest not created. Check if Cantaloupe running")
+            raise
 
     def on_import(self, tile):
         raise NotImplementedError

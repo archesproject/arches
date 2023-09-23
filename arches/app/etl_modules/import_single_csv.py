@@ -1,7 +1,6 @@
 import csv
 from datetime import datetime
 import json
-import logging
 import os
 import uuid
 import zipfile
@@ -9,7 +8,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.db.models.functions import Lower
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
@@ -17,8 +16,8 @@ import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule
-
-logger = logging.getLogger(__name__)
+from arches.app.etl_modules.decorators import load_data_async
+from arches.app.etl_modules.save import save_to_tiles
 
 
 class ImportSingleCsv(BaseImportModule):
@@ -154,7 +153,7 @@ class ImportSingleCsv(BaseImportModule):
         use_celery_threshold = 500  # 500 bytes
 
         if csv_size > use_celery_threshold:
-            response = self.load_data_async(request)
+            response = self.run_load_task_async(request, self.loadid)
         else:
             response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
@@ -171,7 +170,8 @@ class ImportSingleCsv(BaseImportModule):
                     """UPDATE load_event SET status = %s WHERE loadid = %s""",
                     ("validated", loadid),
                 )
-            response = self.save_to_tiles(loadid, multiprocessing=False)
+            self.loadid = loadid  # currently redundant, but be certain
+            response = save_to_tiles(loadid, multiprocessing=False)
             return response
         else:
             with connection.cursor() as cursor:
@@ -181,6 +181,7 @@ class ImportSingleCsv(BaseImportModule):
                 )
             return {"success": False, "data": "failed"}
 
+    @load_data_async
     def run_load_task_async(self, request):
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
@@ -203,7 +204,8 @@ class ImportSingleCsv(BaseImportModule):
     def start(self, request):
         graphid = request.POST.get("graphid")
         csv_mapping = request.POST.get("fieldMapping")
-        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
+        csv_file_name = request.POST.get("csvFileName")
+        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid, "file_name": csv_file_name}
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
@@ -335,8 +337,9 @@ class ImportSingleCsv(BaseImportModule):
                                 loadid,
                                 nodegroup_depth,
                                 source_description,
+                                operation,
                                 passes_validation
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                             (
                                 nodegroup,
                                 legacyid,
@@ -346,6 +349,7 @@ class ImportSingleCsv(BaseImportModule):
                                 loadid,
                                 node_depth,
                                 csv_file_name,
+                                'insert',
                                 passes_validation,
                             ),
                         )

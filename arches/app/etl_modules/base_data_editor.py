@@ -5,21 +5,26 @@ from urllib.parse import urlsplit, parse_qs
 import uuid
 from django.db import connection
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, Exists, FiltersAgg, Nested, NestedAgg, Query, Wildcard
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
+from arches.app.etl_modules.decorators import load_data_async
+from arches.app.etl_modules.save import save_to_tiles
+from arches.app.utils.decorators import user_created_transaction_match
+import arches.app.utils.task_management as task_management
+from arches.app.utils.transaction import reverse_edit_log_entries
 from arches.app.views.search import search_results
 
 logger = logging.getLogger(__name__)
 
 
-class BaseBulkEditor(BaseImportModule):
+class BaseBulkEditor:
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
@@ -27,6 +32,36 @@ class BaseBulkEditor(BaseImportModule):
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
+
+    def reverse_load(self, loadid):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                ("reversing", loadid),
+            )
+            resources_changed_count = reverse_edit_log_entries(loadid)
+            cursor.execute(
+                """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
+                ("unloaded", resources_changed_count, loadid),
+            )
+
+    @method_decorator(user_created_transaction_match, name="dispatch")
+    def reverse(self, request, **kwargs):
+        success = False
+        response = {"success": success, "data": ""}
+        loadid = self.loadid if self.loadid else request.POST.get("loadid")
+        try:
+            if task_management.check_if_celery_available():
+                logger.info(_("Delegating load reversal to Celery task"))
+                tasks.reverse_etl_load.apply_async([loadid])
+            else:
+                self.reverse_load(loadid)
+            response["success"] = True
+        except Exception as e:
+            response["data"] = e
+            logger.error(e)
+        logger.warning(response)
+        return response
 
     def get_graphs(self, request):
         graph_name_i18n = "name__" + settings.LANGUAGE_CODE
@@ -82,12 +117,12 @@ class BaseBulkEditor(BaseImportModule):
 
         return result
 
-    def stage_data(self, cursor, graph_id, node_id, resourceids, text_replacing, language_code, case_insensitive):
+    def stage_data(self, cursor, graph_id, node_id, resourceids, operation, text_replacing, language_code, case_insensitive):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), text_replacing, language_code, case_insensitive),
+                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, text_replacing, language_code, case_insensitive),
             )
             result["success"] = True
         except Exception as e:
@@ -323,7 +358,7 @@ class BulkStringEditor(BaseBulkEditor):
             event_created = self.create_load_event(cursor, load_details)
             if event_created["success"]:
                 if use_celery_bulk_edit:
-                    response = self.load_data_async(request)
+                    response = self.run_load_task_async(request, self.loadid)
                 else:
                     response = self.run_load_task(self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
             else:
@@ -332,6 +367,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         return response
 
+    @load_data_async
     def run_load_task_async(self, request):
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
@@ -371,7 +407,7 @@ class BulkStringEditor(BaseBulkEditor):
             case_insensitive = True
 
         with connection.cursor() as cursor:
-            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids, old_text, language_code, case_insensitive)
+            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids, operation, old_text, language_code, case_insensitive)
 
             if data_staged["success"]:
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, old_text, new_text)
@@ -380,7 +416,8 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
-            data_updated = self.save_to_tiles(loadid)
+            self.loadid = loadid  # currently redundant, but be certain
+            data_updated = save_to_tiles(loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:

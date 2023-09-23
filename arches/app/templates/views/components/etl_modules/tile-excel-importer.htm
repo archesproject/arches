@@ -10,6 +10,9 @@
                 <div class="manifest-manager-main-menu-circle loader-button">
                     <span><i style="color: #000" class="fa fa-file-text-o r-select-icon"></i></span>
                 </div> 
+                <h3>
+                    <span data-bind="text: $root.translations.tileExcelCap"></span>
+                </h3>
                 <h2>
                     <span data-bind="text: $root.translations.downloadTemplates"></span>
                 </h2>
@@ -49,6 +52,9 @@
                 <div class="manifest-manager-main-menu-circle loader-button">
                     <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
                 </div> 
+                <h3>
+                    <span data-bind="text: $root.translations.tileExcelCap"></span>
+                </h3>
                 <h2>
                     <span data-bind="text: $root.translations.uploadYourXlsxZipFile"></span>
                 </h2>
@@ -88,7 +94,7 @@
         <div class="branch-xl-metadata-container">
             <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
                 <h3 class="branch-xl-title" style="">
-                    <span data-bind="text: $root.translations.format + ': ' + $root.translations.branchExcel"></span>
+                    <span data-bind="text: $root.translations.format + ': ' + $root.translations.tileExcelCap"></span>
                 </h3>
                 <div class="etl-module-component" style="margin-top: 0px;">
                     <h4 class="branch-xl-title">
@@ -138,7 +144,7 @@
 {% block etl_status %}
 <div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
     <h4 class="summary-title">
-        <span data-bind="text: $root.translations.importBranchExcelSummary"></span>
+        <span data-bind="text: $root.translations.importTileExcelSummary"></span>
     </h4>
     <!-- ko if: ko.unwrap(loadDetails) -->
     <div class="branch-csv-etl-load-summmary">

@@ -3,7 +3,7 @@ from django.urls import reverse
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 import logging
 
 logger = logging.getLogger(__name__)
@@ -193,7 +193,7 @@ class BaseDataType(object):
         except:
             data = tile["data"]
             provisionaledits = tile["provisionaledits"]
-        if data is not None and len(list(data.keys())) > 0:
+        if data is not None and any(data.values()):
             return data
         elif provisionaledits is not None and len(list(provisionaledits.keys())) > 0:
             if len(list(provisionaledits.keys())) > 1:
