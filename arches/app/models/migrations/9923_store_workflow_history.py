@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('models', '9748_alter_graphmodel_functions_alter_icon_id'),
+        ('models', '10006_fix_escape_chars_breaking_bulk_edit'),
     ]
 
     operations = [
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='WorkflowHistory',
             fields=[
                 ('workflowid', models.UUIDField(primary_key=True, serialize=False)),
-                ('workflowstepids', models.JSONField(blank=True, null=True)),
+                ('workflowdata', models.JSONField(blank=True, null=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('completed', models.BooleanField(default=False)),
                 ('user', models.ForeignKey(db_column='userid', null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),

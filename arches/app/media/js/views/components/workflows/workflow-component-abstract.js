@@ -9,8 +9,9 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
+    'js-cookie',
     'templates/views/components/workflows/workflow-component-abstract.htm',
-], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, workflowComponentAbstractTemplate) {
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, Cookies, workflowComponentAbstractTemplate) {
     const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     function NonTileBasedComponent() {
@@ -659,6 +660,7 @@ define([
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
             self.setToLocalStorage('value', savedData);
+            self.setToWorklowHistory('value', savedData);
         });
 
         this.multiTileUpdated = ko.observable();
@@ -681,7 +683,7 @@ define([
             return hasUnsavedData;
         });
 
-        this.initialize = function() {
+        this.initialize = async function() {
             /* cached ID logic */ 
             if (params.workflowComponentAbstractId) {
                 self.id(params.workflowComponentAbstractId);
@@ -690,13 +692,18 @@ define([
                 self.id(uuid.generate());
             }
 
-            if (self.getFromLocalStorage('value')) {
-                self.savedData( self.getFromLocalStorage('value') );
+            // if (self.getFromLocalStorage('value')) {
+            //     self.savedData( self.getFromLocalStorage('value') );
+            //     self.complete(true);
+            // }
+
+            if (self.getItemFromWorkflowHistoryData('value')) {
+                self.savedData( await self.getItemFromWorkflowHistoryData('value') );
                 self.complete(true);
             }
         };
 
-        this.loadComponent = function() {
+        this.loadComponent = async function() {
             self.loading(true);
     
             /* 
@@ -728,7 +735,8 @@ define([
             }
 
             if (self.componentData.componentType === 'card') {
-                let previouslySavedValue = self.getFromLocalStorage('value');
+                // let previouslySavedValue = self.getFromLocalStorage('value');
+                let previouslySavedValue = await self.getItemFromWorkflowHistoryData('value');
                 let previouslySavedResourceInstanceId;
 
                 if (previouslySavedValue) {
@@ -769,12 +777,67 @@ define([
             );
         };
 
+        this.setToWorklowHistory = async function(key, value) {
+            const workflowid = self.workflowId;
+            const workflowHistory = await self.getWorkflowHistoryData();
+            
+            if (workflowHistory['workflowdata']) {
+                var workflowData = workflowHistory['workflowdata'];
+            }
+            else {
+                var workflowData = {};
+            }
+
+            if (!workflowData[ko.unwrap(self.id())]) {
+                workflowData[ko.unwrap(self.id())] = {};
+            };
+
+            workflowData[ko.unwrap(self.id())][key] = value;
+
+            // console.log(workflowData);
+            workflowHistory['workflowid'] = workflowid;
+            workflowHistory['completed'] = false;
+            workflowHistory['workflowdata'] = workflowData;
+
+
+            fetch(arches.urls.workflow_history + workflowid, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken')
+                },
+                body: JSON.stringify(workflowHistory),
+            });
+
+        };
+
         this.getFromLocalStorage = function(key) {
             var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
 
             if (allComponentsLocalStorageData[self.id()] && typeof allComponentsLocalStorageData[self.id()][key] !== "undefined") {
                 return JSON.parse(allComponentsLocalStorageData[self.id()][key]);
             }
+        };
+        
+        this.getItemFromWorkflowHistoryData = async function(key) {
+            const workflowHistory = await this.getWorkflowHistoryData();
+            const workflowData = await workflowHistory
+            if (workflowData[key] && workflowData[key] !== "undefined") {
+                return workflowData['workflowdata'][key];
+            }
+        };
+
+        this.getWorkflowHistoryData = async function(key) {
+            const workflowid = self.workflowId;
+            const response = await fetch(arches.urls.workflow_history + workflowid, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken')
+                },
+            });
+            const data = await response.json(); 
+            return data;
         };
 
         this.getCardResourceIdOrGraphId = function() {
