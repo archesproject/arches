@@ -248,6 +248,11 @@ define([
         },
         toggleGrid: function(){
             this.showGrid(!this.showGrid());
+        },
+
+        copyNodeId: function(node, e) {
+            var nodeId = node.nodeid
+            navigator.clipboard.writeText(nodeId);
         }
     });
     return GraphTree;
