@@ -36,6 +36,7 @@ define([
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
         this.formatTime = params.formatTime;
         this.timeDifference = params.timeDifference;
+        this.config = params.config;
         this.loading(true);
         this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
