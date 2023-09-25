@@ -10,6 +10,9 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node
 from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Bool, Exists, FiltersAgg, Nested, NestedAgg, Query, Wildcard
+from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
@@ -164,73 +167,90 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_preview_data(self, graph_id, node_id, resourceids, language_code, old_text, case_insensitive):
-        node_id_query = " AND nodeid = %(node_id)s" if node_id else ""
-        graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
-        resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
-        like_operator = "ilike" if case_insensitive == "true" else "like"
-        old_text_like = "%" + old_text + "%" if old_text else ""
-        text_query = (
-            " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
-        )
+    def get_preview_data(self, node_id, search_url, language_code, operation, old_text, case_insensitive):
+        request = HttpRequest()
+        request.user = self.request.user
+        request.method = "GET"
+        request.GET["paging-filter"] = 1
+        request.GET["tiles"] = True
+
         if language_code is None:
             language_code = "en"
 
-        request_parmas_dict = {
-            "node_id": node_id,
-            "language_code": language_code,
-            "graph_id": graph_id,
-            "resourceids": resourceids,
-            "old_text": old_text_like,
+        if search_url:
+            params = parse_qs(urlsplit(search_url).query)
+            for k, v in params.items():
+                request.GET.__setitem__(k, v[0])
+
+        search_url_query = search_results(request, returnDsl=True).dsl["query"]
+        case_insensitive = True if case_insensitive == "true" else False
+
+        if old_text:
+            search_query = Wildcard(
+                field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                query=f"*{old_text}*",
+                case_insensitive=case_insensitive,
+            )
+            search_bool_agg = Bool()
+            search_bool_agg.must(search_query)
+
+        else:
+            if operation.startswith("upper"):
+                regexp = "(.*[a-z].*)"
+            elif operation.startswith("lower"):
+                regexp = "(.*[A-Z].*)"
+            elif operation.startswith("capitalize"):
+                regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)|((.+[ ]+)[a-z].*)|((.+[ ]+)[A-Z][a-zA-Z]*[A-Z].*)"
+            elif operation.startswith("trim"):
+                regexp = "[ \t].*|.*[ \t]"
+            case_search_query = {
+                "regexp": {
+                    f"tiles.data.{str(node_id)}.{language_code}.value.keyword": {
+                        "value": regexp
+                    }
+                }
+            }
+            search_query = Bool()
+            search_query.must(case_search_query)
+            search_bool_agg = Bool()
+            search_bool_agg.must(case_search_query)
+
+        string_search_nested = Nested(path="tiles", query=search_query)
+        inner_hits_query = {
+            "inner_hits": {
+                "_source": False,
+                "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
+            }
         }
+        string_search_nested.dsl["nested"].update(inner_hits_query)
 
-        sql_query = (
-            """
-            SELECT t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-            + " LIMIT 5;"
-        )
+        search_bool_query = Bool()
+        search_bool_query.must(string_search_nested)
 
-        tile_count_query = (
-            """
-            SELECT count(t.tileid) FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-        )
+        search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
-        resource_count_query = (
-            """
-            SELECT count(DISTINCT t.resourceinstanceid) FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-        )
+        search_filter_agg = FiltersAgg(name="string_search")
+        search_filter_agg.add_filter(search_bool_agg)
 
-        with connection.cursor() as cursor:
-            cursor.execute(sql_query, request_parmas_dict)
-            row = [value[0] for value in cursor.fetchall()]
+        nested_agg = NestedAgg(path="tiles", name="tile_agg")
+        nested_agg.add_aggregation(search_filter_agg)
 
-            cursor.execute(tile_count_query, request_parmas_dict)
-            count = cursor.fetchall()
-            (number_of_tiles,) = count[0]
+        se = SearchEngineFactory().create()
+        query = Query(se, limit=5)
 
-            cursor.execute(resource_count_query, request_parmas_dict)
-            count = cursor.fetchall()
-            (number_of_resources,) = count[0]
+        query.add_query(search_url_query)
+        query.add_aggregation(nested_agg)
 
-        return row, number_of_tiles, number_of_resources
+        results = query.search(index=RESOURCES_INDEX)
+        values = []
+        for hit in results['hits']['hits']:
+            for tile in hit['inner_hits']['tiles']['hits']['hits']:
+                values.append(tile['fields'][f"tiles.data.{node_id}.{language_code}.value.keyword"][0])
+
+        number_of_resources = results['hits']['total']['value']
+        number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
+
+        return values[:5], number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -251,13 +271,13 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
-        if case_insensitive == "true" and operation == "replace":
+        if case_insensitive and operation == "replace":
             operation = "replace_i"
         if also_trim == "true":
             operation = operation + "_trim"
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+            node_id, search_url, language_code, operation, old_text, case_insensitive
         )
         return_list = []
         with connection.cursor() as cursor:
@@ -320,7 +340,7 @@ class BulkStringEditor(BaseBulkEditor):
         }
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+            node_id, resourceids, language_code, operation, old_text, case_insensitive
         )
 
         load_details = {
