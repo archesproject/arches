@@ -159,6 +159,9 @@ a, button {
     }
 }
 
+// Focus indicator
+div.chosen-container-active:not(.chosen-with-drop) a.chosen-single,
+ul.chosen-results li.highlighted,
 a[href]:focus-visible,
 area[href]:focus-visible,
 input:focus-visible,
