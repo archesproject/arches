@@ -91,15 +91,16 @@ def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
                 user_email = getattr(user, "email", "")
                 user_firstname = getattr(user, "first_name", "")
                 user_lastname = getattr(user, "last_name", "")
+                user_username = getattr(user, "username", "")
                 cursor.execute(
                     """
                         UPDATE edit_log e
-                        SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email) = (r.name ->> %s, %s, %s, %s, %s)
+                        SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email, user_username) = (r.name ->> %s, %s, %s, %s, %s, %s)
                         FROM resource_instances r
                         WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
                         AND transactionid = %s
                     """,
-                    (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, loadid),
+                    (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, user_username, loadid),
                 )
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
