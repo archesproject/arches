@@ -93,6 +93,14 @@ define([
             return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
         };
 
+        const createStrObject = str => {
+            return {[arches.activeLanguage]: {
+                "value": str,
+                "direction": arches.languages.find(lang => lang.code == arches.activeLanguage).default_direction,
+            }};
+        };
+        this.activeLanguage = arches.activeLanguage;
+
         this.filesJSON = ko.computed(function() {
             var filesForUpload = self.filesForUpload();
             var uploadedFiles = self.uploadedFiles();
@@ -100,10 +108,10 @@ define([
                 _.map(filesForUpload, function(file, i) {
                     return {
                         name: file.name,
-                        altText: '',
-                        title: '',
-                        attribution: '',
-                        description: '',
+                        altText: createStrObject(''),
+                        title: createStrObject(''),
+                        attribution: createStrObject(''),
+                        description: createStrObject(''),
                         accepted: file.accepted,
                         height: file.height,
                         lastModified: file.lastModified,
@@ -155,7 +163,16 @@ define([
         };
 
         if (Array.isArray(self.value())) {
-            this.uploadedFiles(self.value());
+            // Hydrate the metadata fields in place with the active language keys if missing
+            const vals = self.value();
+            vals.forEach(val => {
+                Object.values(val).filter(innerVal => typeof innerVal === 'object').forEach(i18nObj => {
+                    if (i18nObj[arches.activeLanguage] === undefined) {
+                        i18nObj[arches.activeLanguage] = createStrObject('')[arches.activeLanguage];
+                    }
+                });
+            });
+            this.uploadedFiles(vals);
         }
         this.filter = ko.observable("");
         this.filteredList = ko.computed(function() {
