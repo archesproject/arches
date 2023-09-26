@@ -130,11 +130,16 @@
                             />
                         </div>
                     </div>
-                    <div class="row file-metadata"
+                    <div class="row"
                         data-toggle="collapse"
                         style="cursor: pointer"
-                        data-bind="text: $root.translations.additionalMetadata, attr: {'data-target': '.file-metadata-additional-' + $parent.uniqueId + $index()}"
+                        data-bind="attr: {'data-target': '.file-metadata-additional-' + $parent.uniqueId + $index()},
+                            click: $parent.updateClosedDropdowns($index())"
                     >
+                        <div class="file-metadata">
+                            <i class="fa" aria-hidden="true" data-bind="class: $parent.closedDropdowns().includes($index()) ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                            <span data-bind="text: $root.translations.additionalMetadata"></span>
+                        </div>
                     </div>
                     <div class="row collapse" data-bind="class: 'file-metadata-additional-' + $parent.uniqueId + $index()">
                         <div class="file-metadata col-sm-6">

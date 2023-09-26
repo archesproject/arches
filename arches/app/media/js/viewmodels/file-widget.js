@@ -208,6 +208,15 @@ define([
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + self.unique_id;
         });
+        this.closedDropdowns = ko.observableArray([]);  // indexes of files with closed metadata dropdowns
+        this.updateClosedDropdowns = (index) => {
+            // dz will emit a click, so this function runs once before the user clicks
+            if (self.closedDropdowns().includes(index)) {
+                self.closedDropdowns.remove(index);
+            } else {
+                self.closedDropdowns.push(index);
+            }
+        };
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
