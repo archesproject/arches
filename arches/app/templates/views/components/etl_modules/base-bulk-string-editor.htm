@@ -138,6 +138,12 @@
     </section>
     <!-- ko if: showPreview-->
     <section  class="etl-preview">
+        <!-- ko if: numberOfTiles() === 0 -->
+        <h3 style="margin-top: 0px;">
+            <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
+        </h3>
+        <!-- /ko -->
+        <!-- ko if: numberOfTiles() > 0 -->
         <h3 style="margin-top: 0px;">
             <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
         </h3>
@@ -166,11 +172,12 @@
                 <!-- /ko -->
             </tbody>
         </table>
+        <!-- /ko -->
     </section>
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !ready()}" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !allowEditOperation()}" class="btn btn-success">
         <span data-bind="text: $root.translations.start"></span>
     </button>
 </div>

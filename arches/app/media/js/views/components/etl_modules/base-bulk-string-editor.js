@@ -59,8 +59,8 @@ define([
         this.searchUrl = ko.observable();
         this.caseInsensitive = ko.observable();
         this.trim = ko.observable();
-        this.numberOfResources = ko.observable();
-        this.numberOfTiles = ko.observable();
+        this.numberOfResources = ko.observable(0);
+        this.numberOfTiles = ko.observable(0);
         this.selectedCaseOperation = ko.observable();
 
         this.caseOperations = [
@@ -93,6 +93,10 @@ define([
                 ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
             return ready;
         });
+
+        this.allowEditOperation = ko.computed(() => {
+            return self.ready() && self.numberOfTiles() > 0;
+        })
 
         this.addAllFormData = () => {
             if (self.operation() == 'case'){
@@ -187,7 +191,7 @@ define([
         };
 
         this.write = function() {
-            if (!self.ready()) {
+            if (!self.allowEditOperation()) {
                 return;
             }
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
