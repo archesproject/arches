@@ -199,7 +199,7 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
         else:  # if no explicit permissions, object is considered accessible by all with group permissions
             permitted_nodegroups.add(nodegroup)
 
-    return permitted_nodegroups
+    return list(permitted_nodegroups)
 
 
 def get_editable_resource_types(user):
