@@ -1,8 +1,9 @@
 from datetime import datetime
 import json
 from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import gettext as _
+from django.contrib.auth.models import User
 from django.db import connection
+from django.utils.translation import gettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
@@ -10,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(loadid, finalize_import=True, multiprocessing=True):
+def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
     with connection.cursor() as cursor:
         try:
             cursor.execute("""CALL __arches_prepare_bulk_load();""")
@@ -86,6 +87,20 @@ def save_to_tiles(loadid, finalize_import=True, multiprocessing=True):
             )
             try:
                 index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+                user = User.objects.get(id=userid)
+                user_email = getattr(user, "email", "")
+                user_firstname = getattr(user, "first_name", "")
+                user_lastname = getattr(user, "last_name", "")
+                cursor.execute(
+                    """
+                        UPDATE edit_log e
+                        SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email) = (r.name ->> %s, %s, %s, %s, %s)
+                        FROM resource_instances r
+                        WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
+                        AND transactionid = %s
+                    """,
+                    (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, loadid),
+                )
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
                     ("indexed", datetime.now(), True, True, loadid),
