@@ -156,7 +156,7 @@ class BaseImportModule:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
 
-    def run_load_task(self, files, summary, result, temp_dir, loadid):
+    def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
         with connection.cursor() as cursor:
             for file in files.keys():
                 self.stage_excel_file(file, summary, cursor)
@@ -173,7 +173,7 @@ class BaseImportModule:
             result["validation"] = self.validate(loadid)
             if len(result["validation"]["data"]) == 0:
                 self.loadid = loadid  # currently redundant, but be certain
-                save_to_tiles(loadid, multiprocessing=False)
+                save_to_tiles(userid, loadid, multiprocessing=False)
             else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
@@ -277,11 +277,11 @@ class BaseImportModule:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
+            use_celery_file_size_threshold_in_MB = 100000
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 response = self.run_load_task_async(request, self.loadid)
             else:
-                response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
+                response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid)
 
             return response
         

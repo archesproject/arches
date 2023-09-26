@@ -155,11 +155,11 @@ class ImportSingleCsv(BaseImportModule):
         if csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
         else:
-            response = self.run_load_task(self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
+            response = self.run_load_task(self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         return response
 
-    def run_load_task(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
+    def run_load_task(self, userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
 
         self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
@@ -171,7 +171,7 @@ class ImportSingleCsv(BaseImportModule):
                     ("validated", loadid),
                 )
             self.loadid = loadid  # currently redundant, but be certain
-            response = save_to_tiles(loadid, multiprocessing=False)
+            response = save_to_tiles(userid, loadid, multiprocessing=False)
             return response
         else:
             with connection.cursor() as cursor:

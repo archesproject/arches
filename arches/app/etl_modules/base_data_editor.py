@@ -361,7 +361,7 @@ class BulkStringEditor(BaseBulkEditor):
                 if use_celery_bulk_edit:
                     response = self.run_load_task_async(request, self.loadid)
                 else:
-                    response = self.run_load_task(self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+                    response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
@@ -392,7 +392,7 @@ class BulkStringEditor(BaseBulkEditor):
             operation = operation + "_trim"
 
         edit_task = tasks.edit_bulk_string_data.apply_async(
-            (self.loadid, self.moduleid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
+            (self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -400,7 +400,7 @@ class BulkStringEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, loadid, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
+    def run_load_task(self, userid, loadid, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
         case_insensitive = False
@@ -418,7 +418,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         if data_updated["success"]:
             self.loadid = loadid  # currently redundant, but be certain
-            data_updated = save_to_tiles(loadid, finalize_import=False)
+            data_updated = save_to_tiles(userid, loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:
