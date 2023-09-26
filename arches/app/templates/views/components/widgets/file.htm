@@ -120,11 +120,14 @@
                     <div class="row">
                         <div class="file-metadata">
                             <label data-bind="text: $root.translations.alternativeText"></label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    data-bind="value: $data.altText, attr: {'aria-label': $root.translations.alternativeText}"
-                                />
+                            <a href="#" data-toggle="tooltip" data-bind="attr: {title: $root.translations.altTextHelp}">
+                                <i class="fa fa-question-circle" aria-hidden="true" style="padding-left: 3px;"></i>
+                            </a>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="value: $data.altText, attr: {'aria-label': $root.translations.alternativeText}"
+                            />
                         </div>
                     </div>
                     <div class="row file-metadata"
