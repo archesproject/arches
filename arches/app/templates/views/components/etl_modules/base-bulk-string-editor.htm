@@ -126,11 +126,6 @@
                 </span>
             </div>
         </div>
-        <div>
-            <p class="pad-btm" data-bind="ifnot: showPreview">
-                <span data-bind="text: $root.translations.bulkEditLimitInfo(config.updateLimit.toLocaleString())"></span>
-            </p>
-        </div>
         <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
             <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
@@ -148,7 +143,7 @@
             <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
         </h3>
         <h3 style="margin-top: 0px;color:red;" data-bind="if: numberOfTiles() > config.updateLimit">
-            <span data-bind="text: $root.translations.bulkEditLimitWarning(config.updateLimit.toLocaleString())"></span>
+            <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.bulkEditLimitWarning(config.updateLimit.toLocaleString())"></span>
         </h3>
         <table class="table table-striped csv-mapping-table">
             <thead>
@@ -161,7 +156,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody data-bind="value: console.log(previewValue())">
+            <tbody>
                 <!-- ko foreach: { data: previewValue(), as: "row" } -->
                 <!-- ko if: row[0] -->
                 <tr>
