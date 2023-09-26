@@ -118,35 +118,46 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <div style="padding: 0px 4px;">
-                                <label data-bind="text: $root.translations.title"></label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    data-bind="value: $data.title, attr: {'aria-label': $root.translations.title}"
-                                />
-                            </div>
-                            <div style="padding: 0px 4px;">
-                                <label data-bind="text: $root.translations.alternativeText"></label>
+                        <div class="file-metadata">
+                            <label data-bind="text: $root.translations.alternativeText"></label>
                                 <input
                                     type="text"
                                     class="form-control"
                                     data-bind="value: $data.altText, attr: {'aria-label': $root.translations.alternativeText}"
                                 />
-                            </div>
                         </div>
-                        <div class="col-sm-6">
-                            <div style="padding-right: 4px;">
-                                <label data-bind="text: $root.translations.description"></label>
-                                <textarea
-                                    class="form-control"
-                                    rows="4"
-                                    data-bind="value: $data.description, attr: {'aria-label': $root.translations.description}"
-                                    style="resize: vertical;"
-                                >
-                                </textarea>
-                            </div>
+                    </div>
+                    <div class="row file-metadata"
+                        data-toggle="collapse"
+                        style="cursor: pointer"
+                        data-bind="text: $root.translations.additionalMetadata, attr: {'data-target': '.file-metadata-additional-' + $parent.uniqueId + $index()}"
+                    >
+                    </div>
+                    <div class="row collapse" data-bind="class: 'file-metadata-additional-' + $parent.uniqueId + $index()">
+                        <div class="file-metadata col-sm-6">
+                            <label data-bind="text: $root.translations.title"></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="value: $data.title, attr: {'aria-label': $root.translations.title}"
+                            />
+                        </div>
+                        <div class="file-metadata col-sm-6">
+                            <label data-bind="text: $root.translations.attribution"></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="value: $data.attribution, attr: {'aria-label': $root.translations.attribution}"
+                            />
+                        </div>
+                        <div class="file-metadata">
+                            <label data-bind="text: $root.translations.description"></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="value: $data.description, attr: {'aria-label': $root.translations.description}"
+                                style="resize: vertical;"
+                            />
                         </div>
                     </div>
                 </div>

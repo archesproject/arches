@@ -29,7 +29,7 @@
 .dz-previews .file-upload-card {
     border-bottom: 1px solid #D3E5F4;
     border-radius: 2px;
-    padding: 7px 8px 5px 15px;
+    padding: 7px 8px 10px 15px;
     background: #fff;
     color: #666;
     height: 100%;
@@ -99,4 +99,11 @@
 .file-select h2,
 .file-select-h2 {
     font-weight: 400;
+}
+
+.file-metadata {
+    padding-top: 8px;
+    padding-left: 4px;
+    padding-right: 4px;
+    max-width: unset;
 }
