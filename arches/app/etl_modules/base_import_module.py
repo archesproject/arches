@@ -277,7 +277,7 @@ class BaseImportModule:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 100000
+            use_celery_file_size_threshold_in_MB = 0.1
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 response = self.run_load_task_async(request, self.loadid)
             else:
