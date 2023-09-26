@@ -54,6 +54,11 @@
 <div style="padding: 5px 0">
     <h4>
         <span data-bind="text: $root.translations.importedData"></span>
+        <span>
+            <a class="etl-status-link" target="_blank"
+                data-bind="text: '('+$root.translations.viewInEditLog+')', attr: { href: editHistoryUrl }">
+            </a>
+        </span>
     </h4>
     <div>
         <!-- ko foreach: loadDetails.number_of_import -->
