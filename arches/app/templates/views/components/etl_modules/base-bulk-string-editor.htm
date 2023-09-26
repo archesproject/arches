@@ -219,13 +219,9 @@
                 <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
                 <td>
                     <!-- ko foreach: load_details.number_of_import -->
-                    <span class="etl-loading-metadata-value" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
-                    <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesUpdated($data.total)"></div>
                     <!-- ko foreach: $data.tiles -->
-                    <div style="padding-left: 20px;">
-                        <span class="etl-loading-metadata-value" data-bind="text: $data.tile + ':'"></span>
-                        <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
-                    </div>
+                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfTilesUpdated($data.count)"></div>
                     <!-- /ko -->
                     <!-- /ko -->
                 </td>      

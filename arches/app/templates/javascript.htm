@@ -766,6 +766,8 @@
         preview-count-stats='(limit, possible, resCount) => {return {% trans "Showing first ${limit} of ${possible} values in ${resCount} resources" as previewCountStats %} `{{ previewCountStats|escapejs }}` }'
         bulk-edit-limit-info='(limit) => {return {% trans "If the number of edits exceeds the limit of ${limit} values, you may need to perform bulk-edit multiple times" as bulkEditLimitInfo %} `{{ bulkEditLimitInfo|escapejs }}`}'
         bulk-edit-limit-warning='(limit) => {return {% trans "The number of possible edits exceeds the limit of ${limit} values, only the first ${limit} will be updated" as bulkEditLimitWarning %} `{{ bulkEditLimitWarning|escapejs }}`}'
+        count-of-resources-updated='(count) => {return {% trans "Resources updated: ${count}" as countOfResourcesUpdated %} `{{ countOfResourcesUpdated|escapejs }}` }'
+        count-of-tiles-updated='(count) => {return {% trans "Tiles updated: ${count}" as countOfTilesUpdated %} `{{ countOfTilesUpdated|escapejs }}` }'
         show='{% trans "show" as show %} "{{ show|escapejs }}"'
         hide='{% trans "hide" as hide %} "{{ hide|escapejs }}"'
         first-five-shown='{% trans "First 5 errors are shown" as firstFiveShown %} "{{ firstFiveShown|escapejs }}"'
