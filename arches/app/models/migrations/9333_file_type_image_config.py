@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9979_update_stage_for_bulk_edit'),
+        ('models', '10041_limit_number_of_bulk_edit'),
     ]
 
     operations = [
