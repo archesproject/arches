@@ -206,7 +206,7 @@ class SearchResultsExporter(object):
                         missing_field_names.append(header["name"])
                         header.pop("name")
                 if len(missing_field_names) > 0:
-                    message = _("Shapefile are fieldnames required for the following nodes: {0}".format(", ".join(missing_field_names)))
+                    message = _("Graphid: {0} Shapefile fieldnames required for the following nodes: {1}".format(graph_id, ", ".join(missing_field_names)))
                     logger.error(message)
                     raise (Exception(message))
 
