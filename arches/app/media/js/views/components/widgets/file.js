@@ -5,8 +5,9 @@ define([
     'dropzone',
     'uuid',
     'viewmodels/file-widget',
-    'bindings/dropzone'
-], function($, ko, _, Dropzone, uuid, FileWidgetViewModel) {
+    'templates/views/components/widgets/file.htm',
+    'bindings/dropzone',
+], function($, ko, _, Dropzone, uuid, FileWidgetViewModel, fileWidgetTemplate) {
     /**
      * registers a file-widget component for use in forms
      * @function external:"ko.components".file-widget
@@ -17,14 +18,14 @@ define([
      * @param {string} params.config().maxFilesize - maximum allowed file size in MB
      */
 
-    return ko.components.register('file-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['acceptedFiles', 'maxFilesize'];
-            FileWidgetViewModel.apply(this, [params]);
-        },
-        template: {
-            require: 'text!widget-templates/file'
-        }
-    });
+    const viewModel = function(params) {
+        params.configKeys = ['acceptedFiles', 'maxFilesize'];
+         
+        FileWidgetViewModel.apply(this, [params]);
+    };
 
+    return ko.components.register('file-widget', {
+        viewModel: viewModel,
+        template: fileWidgetTemplate,
+    });
 });

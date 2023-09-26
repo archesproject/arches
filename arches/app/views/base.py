@@ -16,11 +16,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+from arches import __version__
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.compatibility import is_compatible_with_arches, CompatibilityError
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import (
@@ -28,10 +30,15 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_editable_resource_types,
     get_resource_types_by_perm,
+    user_can_read_map_layers,
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
 class BaseManagerView(TemplateView):
+
+    if is_compatible_with_arches() is False:
+        message = _("This project is incompatible with Arches {0}.").format(__version__)
+        raise CompatibilityError(message)
 
     template_name = ""
 
@@ -52,7 +59,6 @@ class BaseManagerView(TemplateView):
             exclude=[
                 "functions",
                 "ontology",
-                "isactive",
                 "isresource",
                 "version",
                 "deploymentdate",
@@ -95,9 +101,11 @@ class MapBaseManagerView(BaseManagerView):
         context = super(MapBaseManagerView, self).get_context_data(**kwargs)
         datatype_factory = DataTypeFactory()
         geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
-        geom_nodes = models.Node.objects.filter(graph__isresource=True, graph__isactive=True, datatype__in=geom_datatypes).exclude(
-            graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-        )
+        geom_nodes = models.Node.objects.filter(
+            graph__isresource=True,
+            graph__publication__isnull=False,
+            datatype__in=geom_datatypes,
+        ).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:
@@ -113,5 +121,12 @@ class MapBaseManagerView(BaseManagerView):
         context["geom_nodes"] = geom_nodes
         context["resource_map_layers"] = resource_layers
         context["resource_map_sources"] = resource_sources
+
+        all_map_sources = models.MapSource.objects.all()
+
+        map_layers = user_can_read_map_layers(self.request.user)
+
+        context["map_layers"] = map_layers
+        context["map_sources"] = all_map_sources
 
         return context

@@ -27,7 +27,7 @@
                     },
                     {
                         "data": {
-                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71": "Res Inst "
+                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71":  {"en": {"value": "Res Inst "}}
                         },
                         "nodegroup_id": "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71",
                         "parenttile_id": null,
@@ -47,7 +47,7 @@
                 "tiles": [
                     {
                         "data": {
-                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71": "res inst list"
+                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71":  {"en": {"value": "res inst list"}}
                         },
                         "nodegroup_id": "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71",
                         "parenttile_id": null,
@@ -89,7 +89,7 @@
                 "tiles": [
                     {
                         "data": {
-                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71": "Test Data"
+                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71":  {"en": {"value": "Test Data"}}
                         },
                         "nodegroup_id": "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71",
                         "parenttile_id": null,
@@ -169,7 +169,7 @@
                 "tiles": [
                     {
                         "data": {
-                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71": "res inst plus concept"
+                            "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71":  {"en": {"value": "res inst plus concept"}}
                         },
                         "nodegroup_id": "fa3b2ec6-fa6c-11e9-b369-3af9d3b32b71",
                         "parenttile_id": null,

@@ -10,7 +10,7 @@
                 "tiles": [
                     {
                         "data": {
-                            "48f40508-bf97-11e9-bd39-0242ac160002": "This is the external node"
+                            "48f40508-bf97-11e9-bd39-0242ac160002": {"en": {"value": "This is the external node", "direction": "ltr"}}
                         },
                         "nodegroup_id": "36f3ec9c-bf97-11e9-b4dc-0242ac160002",
                         "parenttile_id": null,

@@ -3,8 +3,8 @@
 
 
 {% block editor_tree %}
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.tiles().length > 0 && card.expanded()), 'jstree-closed' : (card.tiles().length > 0 && !card.expanded()), 'jstree-leaf': card.tiles().length === 0, 'hide-background': !self.showGrid()}, scrollTo: card.scrollTo, container: '.resource-editor-tree'">
+    <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, event: {
         mousedown: function(d, e) {
             e.stopPropagation();
@@ -19,7 +19,7 @@
         <!-- /ko -->
         <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
         <!-- ko if: card.canAdd() -->
-        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="{% trans "Add New" %}"></i>
+        <i class="fa fa-plus-circle add-new-tile" role="presentation" data-bind="css:{'jstree-clicked': card.selected}" data-toggle="tooltip" data-original-title="$root.translations.addNew"></i>
         <!-- /ko -->
     </a>
     <ul class="jstree-children" aria-expanded="true">
@@ -27,8 +27,8 @@
         <!-- ko let: $parent.getDataForDisplay(nodeId) --> 
         <!-- ko if: widget.visible -->
         <!-- the let statement above returns an object of the form {widget: null, tile: null: tileData: null, card: null} -->
-            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && expanded), 'jstree-closed' : (card.cards.length > 0 && !expanded()), 'jstree-leaf': card.cards.length === 0}">
-                <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){expanded(!expanded())}"></i>
+            <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': (card.cards.length > 0 && expanded), 'jstree-closed' : (card.cards.length > 0 && !expanded()), 'jstree-leaf': card.cards.length === 0, 'hide-background': !self.showGrid()}">
+                <i class="jstree-icon" role="presentation" data-bind="click: function(){expanded(!expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { $parent.selectGroupCard()}, css:{'jstree-clicked': card.selected, 'child-selected': card.selected(), 'filtered-leaf': card.highlight()}">
                     <i class="fa fa-file" role="presentation" data-bind="css:{'has-provisional-edits': tile.hasprovisionaledits()}"></i>
                     <strong style="margin-right: 10px;">
@@ -83,14 +83,14 @@
 
 
 {% block designer_tree %}
-<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
-    <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}"></i>
+<li role="treeitem card-treeitem" class="jstree-node" data-bind="css: {'jstree-open': ((card.cards().length > 0 || card.widgets().length > 0) && card.expanded()), 'jstree-closed' : ((card.cards().length > 0 || card.widgets().length > 0) && !card.expanded()), 'jstree-leaf': card.cards().length === 0 && card.widgets().length === 0, 'hide-background': !self.showGrid()}, scrollTo: card.scrollTo, container: '.designer-card-tree'">
+    <i class="jstree-icon" role="presentation" data-bind="click: function(){card.expanded(!card.expanded())}, css: {'jstree-ocl': self.showGrid}"></i>
     <a class="jstree-anchor" href="#" tabindex="-1" data-bind="css:{'filtered': card.highlight(), 'jstree-clicked': card.selected, 'child-selected': card.isChildSelected(), 'func-node': card.isFuncNode()}, click: function () { card.selected(true) },">
         <i class="fa fa-file-o" role="presentation"></i>
-        <span style="padding-right: 5px;" data-bind="text: card.model.name"></span>
+        <span style="padding-right: 5px;" data-bind="text: self.card.model.name"></span>
     </a>
 
-    <!-- ko if: card.cards().length > 0 || card.widgets().length > 0 -->
+    <!-- ko if: self.card.cards().length > 0 || self.card.widgets().length > 0 -->
     <ul data-bind="sortable: {
                 data: sortedWidgetIds,
                 as: 'nodeId',
@@ -100,9 +100,10 @@
         <div>
             <!-- ko let: {widget:$parent.widgetInstanceDataLookup[nodeId]} -->
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
-                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0
+                    'jstree-last': $index() === (card.widgets().length - 1) && card.cards().length === 0,
+                    'hide-background': !self.showGrid()
                 }">
-                <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': self.showGrid}"></i>
                 <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(d, e) {widget.selected(true); e.stopPropagation(); }, css:{'jstree-clicked': widget.selected, 'hover': widget.hovered}, event: { mouseover: function(){ widget.hovered(true) }, mouseout: function(){ widget.hovered(null) } }">
                     <i data-bind="css: widget.datatype.iconclass" role="presentation"></i>
                     <strong style="margin-right: 10px;" >
@@ -124,20 +125,22 @@
 
     <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
     <div class="edit-message-container">
-        <span>{% trans 'Showing edits by' %}</span>
+        <span data-bind="text: $root.translations.showingEditsBy"></span>
         <span class="edit-message-container-user" data-bind="text: provisionalTileViewModel.selectedProvisionalEdit().username() + '.'"></span>
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
-        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">{% trans 'Return to approved edits' %}</a>
+        <a class="reset-authoritative" href='' data-bind="click: function(){provisionalTileViewModel.resetAuthoritative();}">
+            <span data-bind="text: $root.translations.returnToApprovedEdits"></span>
+        </a>
         <!-- /ko-->
         <!-- ko if: provisionalTileViewModel.selectedProvisionalEdit().isfullyprovisional -->
-        <span>{% trans ' This is a new contribution by a provisional editor.' %}</span>
+            <span data-bind="text: $root.translations.newProvisionalContribution"></span>
         <!-- /ko-->
     </div>
     <!-- /ko-->
 
     <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 && !provisionalTileViewModel.selectedProvisionalEdit()-->
     <div class="edit-message-container approved">
-        <div>{% trans 'Currently showing the most recent approved edits' %}</div>
+        <span data-bind="text: $root.translations.showingMostRecentApprovedEdits"></span>
     </div>
     <!-- /ko-->
 
@@ -148,8 +151,16 @@
         <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
         <div class='new-provisional-edits-list'>
             <div class='new-provisional-edits-header'>
-                <div class='new-provisional-edits-title'>{% trans 'Provisional Edits' %}</div>
-                <div class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" style="padding: 3px;" data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}">{% trans 'Delete all edits' %}</div>
+                <div class='new-provisional-edits-title'>
+                    <span data-bind="text: $root.translations.provisionalEdits"></span>
+                </div>
+                <div 
+                    class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" 
+                    style="padding: 3px;" 
+                    data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}"
+                >
+                    <span data-bind="text: $root.translations.deleteAllEdits"></span>
+                </div>
             </div>
             <!-- ko foreach: { data: provisionalTileViewModel.provisionaledits(), as: 'pe' } -->
             <div class='new-provisional-edit-entry' data-bind="css: {'selected': pe === $parent.provisionalTileViewModel.selectedProvisionalEdit()}, click: function(){$parent.provisionalTileViewModel.selectProvisionalEdit(pe)}">
@@ -172,15 +183,20 @@
 
         <div class="card">
             {% block form_header %}
-            <h4 data-bind="text: card.model.name"></h4>
-            <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
-            <h4 data-bind="text: card.isFuncNode()"></h4>
-            <!-- /ko -->
-            <!-- ko if: card.model.helpenabled -->
-            <span>
-                <a class="pull-right card-help help editable-help" data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> {% trans "Help" %} <i class="fa fa-question-circle"></i></a>
-            </span>
-            <!-- /ko -->
+            <div style="display: flex;">
+                <h4 class="card-title" data-bind="text: card.model.name"></h4>
+                <!-- ko if: card.isFuncNode && card.isFuncNode()  -->
+                <h4 data-bind="text: card.isFuncNode()"></h4>
+                <!-- /ko -->
+                <!-- ko if: card.model.helpenabled -->
+                <span>
+                    <a data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> 
+                        <span data-bind="text: $root.translations.help"></span>
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </span>
+                <!-- /ko -->
+            </div>
             <h5 data-bind="text: card.model.instructions"></h5>
             {% endblock form_header %}
             <!-- ko if: card.widgets().length > 0 && !saving() -->
@@ -193,12 +209,12 @@
                         <div data-bind='component: {
                             name: self.form.widgetLookup[widget.widget_id()].name,
                             params: {
-                                formData: $component.getTile(widget.card.id).formData,
-                                tile: $component.getTile(widget.card.id),
+                                formData: self.getTile(widget.card.id).formData,
+                                tile: self.getTile(widget.card.id),
                                 form: self.form,
                                 config: widget.configJSON,
                                 label: widget.label(),
-                                value: $component.getTile(widget.card.id).data[widget.node_id()],
+                                value: self.getTile(widget.card.id).data[widget.node_id()],
                                 node: self.form.nodeLookup[widget.node_id()],
                                 expanded: self.expanded,
                                 graph: self.form.graph,
@@ -265,18 +281,26 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: previouslySaved() && self.deleteTiles -->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">{% trans 'Delete this record' %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-trash" data-bind="click: deleteTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }">
+                        <span data-bind="text: $root.translations.deleteThisRecord"></span>
+                    </button>
                 <!-- /ko -->
                 <!-- ko if: dirty() -->
                     <!-- ko if: provisionalTileViewModel && !provisionalTileViewModel.tileIsFullyProvisional() && card.isWritable -->
-                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: resetTiles">{% trans 'Cancel edit' %}</button>
+                        <button class="btn btn-shim btn-danger btn-labeled btn-lg fa fa-times" data-bind="click: resetTiles">
+                            <span data-bind="text: $root.translations.cancelEdit"></span>
+                        </button>
                     <!-- /ko -->
                     <!-- ko if: previouslySaved -->
-                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Save edit' %}</button>
+                        <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
+                            <span data-bind="text: $root.translations.saveEdit"></span>
+                        </button>
                     <!-- /ko -->
                 <!-- /ko -->
                 <!-- ko if: !previouslySaved()-->
-                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">{% trans 'Add'  %}</button>
+                    <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: saveTiles, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
+                        <span data-bind="text: $root.translations.add"></span>
+                    </button>
                 <!-- /ko -->
             </div>
             {% endblock form_buttons %}
@@ -318,7 +342,9 @@
                     {% block report_widgets %}
                         <div class="rp-report-tile" data-bind="attr: { id: tile.tileid }">
                             <!-- ko if: ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false -->
-                            <div class="report-card-provisional-flag">{% trans 'These data are provisional and pending review' %}</div>
+                            <div class="report-card-provisional-flag">
+                                <span data-bind="text: $root.translations.pendingProvisionalData"></span>
+                            </div>
                             <!-- /ko-->
                             <dl class="dl-horizontal" data-bind="css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false}">
                                 <!-- ko if: widget.visible -->
@@ -362,10 +388,11 @@
         <!-- ko if: !hasTiles && !self.preview -->
         <div class="row rp-report-tile rp-no-data">
             <!-- ko ifnot: card.model.get('cardid') -->
-            {% trans "Sorry, you don't have access to this information" %}
+                <span data-bind="text: $root.translations.noAccessInformation"></span>
             <!-- /ko -->
             <!-- ko if: card.model.get('cardid') -->
-            <span>{% trans "No data added yet for " %}</span><span data-bind="text: card.model.get('name')"></span>
+            <span data-bind="text: $root.translations.noDataAddedYet"></span>
+            <span data-bind="text: card.model.get('name')"></span>
             <!-- /ko -->
         </div>
         <!-- /ko -->
@@ -375,6 +402,17 @@
 
 {% block config %}
 <div>
-    <select class="resources" multiple data-placeholder="{% trans "Choose a sibling card..." %}" data-bind="selectedOptions: groupedCardIds, options: siblingCards, optionsText: 'name', optionsValue: 'id', chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}"></select>
+    <select 
+        class="resources" 
+        multiple 
+        data-bind="
+            placeholder: $root.translations.chooseASiblingCard + '...',
+            selectedOptions: groupedCardIds, 
+            options: siblingCards, 
+            optionsText: 'name', 
+            optionsValue: 'id', 
+            chosen: {multiple: true, disable_search_threshold: 10, width: '100%'}
+        "
+    ></select>
 </div>
 {% endblock config %}

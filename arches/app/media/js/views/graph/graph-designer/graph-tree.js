@@ -2,9 +2,9 @@ define([
     'jquery',
     'knockout',
     'underscore',
+    'arches',
     'views/tree-view',
-    'arches'
-], function($, ko, _, TreeView, arches) {
+], function($, ko, _, arches, TreeView) {
     var loading = ko.observable(false);
 
     var GraphTree = TreeView.extend({
@@ -73,6 +73,8 @@ define([
             this.toggleIds = function() {
                 self.showIds(!self.showIds());
             };
+            this.showGrid = ko.observable(false);
+            this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -243,6 +245,9 @@ define([
                     item.expanded(false);
                 }
             }, this);
+        },
+        toggleGrid: function(){
+            this.showGrid(!this.showGrid());
         }
     });
     return GraphTree;

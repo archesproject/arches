@@ -5,7 +5,6 @@ define([
     'knockout-mapping',
     'underscore'
 ], function(arches, AbstractModel, ko, koMapping, _) {
-
     var FunctionModel = AbstractModel.extend({
         /**
         * A backbone model to manage function data
@@ -45,7 +44,7 @@ define([
                     description: self.description(),
                     functiontype: self.functiontype(),
                     component: self.component(),
-                }))
+                }));
             });
 
             self.dirty = ko.computed(function() {

@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], function ($, Backbone, arches, ConceptModel, ValueModel) {
+define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], function($, Backbone, arches, ConceptModel, ValueModel) {
     return Backbone.View.extend({
 
         initialize: function(options){
@@ -9,14 +9,14 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
             // test to see if select2 has already been applied to the dom
             if (! this.$el.find('.select2').attr('id')){
                 this.schemedropdown = this.$el.find('.select2').select2()
-                .on("select2-selecting", function(e, el) {
-                    $.ajax({
-                        url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', e.val),
-                        success: function(response) {
-                            self.modal.find('.modal-body [name="additional-info"]').html(response);
-                        }
-                    });     
-                });              
+                    .on("select2-selecting", function(e, el) {
+                        $.ajax({
+                            url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', e.val),
+                            success: function(response) {
+                                self.modal.find('.modal-body [name="additional-info"]').html(response);
+                            }
+                        });     
+                    });              
             }
 
             this.modal.validate({

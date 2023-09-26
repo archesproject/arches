@@ -10,7 +10,6 @@ define(['knockout', 'arches'], function(ko, arches) {
     * @param  {function} cancel (optional) - a function to call on cancel
     * @param  {function} ok (optional) - a function to call on confirmation
     */
-
     var getPropertyOrDefaultMessage = function(property, defaultMessage) {
         if (typeof property === 'undefined') {
             return defaultMessage;
@@ -29,8 +28,8 @@ define(['knockout', 'arches'], function(ko, arches) {
 
     var parseResponseJson = function(responseJSON) {
         responseJSON = initializeResponseJSON(responseJSON);
-        responseJSON.title = getPropertyOrDefaultMessage(responseJSON.title, arches.requestFailed.title);
-        responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, arches.requestFailed.text);
+        responseJSON.title = getPropertyOrDefaultMessage(responseJSON.title, arches.translations.requestFailed.title);
+        responseJSON.message = getPropertyOrDefaultMessage(responseJSON.message, arches.translations.requestFailed.text);
 
         return responseJSON;
     };

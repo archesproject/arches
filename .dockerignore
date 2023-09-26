@@ -18,3 +18,4 @@ arches/settings_local.pyc
 elasticsearch-5.2.1
 virtualenv
 arches/app/media/packages
+arches/app/media/node_modules

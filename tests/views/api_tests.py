@@ -24,6 +24,7 @@ Replace this with more appropriate tests for your application.
 """
 
 import os
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
@@ -52,40 +53,50 @@ class APITests(ArchesTestCase):
     def setUpClass(cls):
         geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         cls.loadOntology()
+        LanguageSynchronizer.synchronize_settings_with_db()
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
+            cls.unique_graph.publish(user=None)
             cls.unique_graph.save()
 
         with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.ambiguous_graph = Graph(json["graph"][0])
+            cls.ambiguous_graph.publish(user=None)
             cls.ambiguous_graph.save()
 
         with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "rU") as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
+            cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
 
         # Load the test package to provide resources graph.
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+        LanguageSynchronizer.synchronize_settings_with_db()
+
+    def get_tile_by_id(self, tileid, tiles):
+        for tile in tiles:
+            if tile["tileid"] == tileid:
+                return tile
+        return None
 
     def test_api_base_view(self):
         """
         Test that our custom header parameters get pushed on to the GET QueryDict
 
         """
-
         factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
         view = APIBase.as_view()
 
-        request = factory.get(reverse("mobileprojects", kwargs={}), {"ver": "2.0"})
+        request = factory.get(reverse("api_node_value", kwargs={}), {"ver": "2.0"})
         request.user = None
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.0")
 
-        request = factory.get(reverse("mobileprojects"), kwargs={})
+        request = factory.get(reverse("api_node_value"), kwargs={})
         request.user = None
         response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
@@ -109,8 +120,10 @@ class APITests(ArchesTestCase):
                 {
                     "data": {
                         "46f4da0c-95bd-11e8-8f87-acde48001122": None,
-                        "4f553551-95bd-11e8-8b48-acde48001122": "Knights of Camelot",
-                        "65f87f4c-95bd-11e8-b7a6-acde48001122": "We're knights of the Round Table, we dance whene'er we're able.",
+                        "4f553551-95bd-11e8-8b48-acde48001122": {"en": {"value": "Knights of Camelot", "direction": "ltr"}},
+                        "65f87f4c-95bd-11e8-b7a6-acde48001122": {
+                            "en": {"value": "We're knights of the Round Table, we dance whene'er we're able.", "direction": "ltr"}
+                        },
                     },
                     "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
                     "parenttile_id": None,
@@ -263,8 +276,9 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm.status_code, 200)  # Success, we got one.
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm["tiles"])
         self.assertEqual(
-            data_get_confirm["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We're knights of the Round Table, we dance whene'er we're able.",
         )  # Success, we got the right one.
         # ==================================================================================================
@@ -272,9 +286,9 @@ class APITests(ArchesTestCase):
         # ==Arrange=========================================================================================
 
         # modify test_resource_simple
-        test_resource_simple["tiles"][0]["data"][
-            "65f87f4c-95bd-11e8-b7a6-acde48001122"
-        ] = "We do routines and chorus scenes with footwork impec-cable.."
+        test_resource_simple["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"] = {
+            "en": {"value": "We do routines and chorus scenes with footwork impec-cable..", "direction": "ltr"}
+        }
         test_resource_simple["legacyid"] = "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
         payload_modified = JSONSerializer().serialize(test_resource_simple)
 
@@ -311,10 +325,9 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
         data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
-
-        tile = next(x for x in data_put_get_confirm["tiles"] if x["tileid"] == "39cd6433-370c-471d-85a7-64de182fce6b")
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_put_get_confirm["tiles"])
         self.assertEqual(
-            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )  # Success, we got the right one.
         # ==================================================================================================
@@ -358,10 +371,9 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
         data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
-
-        tile = next(x for x in data_put_get_confirm["tiles"] if x["tileid"] == "39cd6433-370c-471d-85a7-64de182fce6b")
+        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm_mod["tiles"])
         self.assertEqual(
-            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"],
+            tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
         )
         # ==================================================================================================

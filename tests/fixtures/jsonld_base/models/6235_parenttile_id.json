@@ -288,9 +288,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "0bc001c2-c163-11ea-8354-3af9d3b32b71",
+            "publication": {
+                "graph_id": "0bc001c2-c163-11ea-8354-3af9d3b32b71",
+                "notes": "Initial migration.",
+                "publicationid": "30e0e6da-71af-40e6-990b-7860c68ef154",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Test model 6235",
@@ -528,7 +534,6 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
                 "sortorder": 0
             },
-            "slug": "test",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

@@ -1,11 +1,10 @@
 define([
     'knockout',
     'jquery',
-    'viewmodels/widget',
     'arches',
-], function(ko, $, WidgetViewModel, arches) {
+    'viewmodels/widget',
+], function(ko, $, arches, WidgetViewModel) {
     var NAME_LOOKUP = {};
-
     var ConceptSelectViewModel = function(params) {
         var self = this;
 

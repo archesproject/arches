@@ -1,0 +1,16 @@
+.modal-header {
+    display: flex;
+}
+
+.modal-header .close{
+    position: unset;
+}
+
+.modal-title {
+    flex-grow: 1;
+    text-align: start;
+}
+
+.modal-footer {
+    text-align: end;
+}

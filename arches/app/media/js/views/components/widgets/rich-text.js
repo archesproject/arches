@@ -1,4 +1,14 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], function (ko, _, WidgetViewModel) {
+define([
+    'jquery',
+    'knockout',
+    'knockout-mapping',
+    'underscore',
+    'viewmodels/widget',
+    'arches',
+    'templates/views/components/widgets/rich-text.htm',
+    'bindings/ckeditor',
+    'bindings/chosen'
+], function($, ko, koMapping, _, WidgetViewModel, arches, richTextWidgetTemplate) {
     /**
     * registers a rich-text-widget component for use in forms
     * @function external:"ko.components".rich-text-widget
@@ -6,12 +16,104 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'bindings/ckeditor'], fun
     * @param {string} params.value - the value being managed
     * @param {function} params.config - observable containing config object
     */
+
+    const viewModel = function(params) {
+        params.configKeys = ['placeholder', 'displayfullvalue'];
+        const self = this;
+        self.card = params.card;
+
+        WidgetViewModel.apply(self, [params]);
+        const initialCurrent = {};
+        self.showi18nOptions = ko.observable(false);
+        initialCurrent[arches.activeLanguage] = {value: '', direction: 'ltr'};
+        const currentLanguage = {"code": arches.activeLanguage};
+        let currentValue = koMapping.toJS(self.value) || initialCurrent;
+        self.currentLanguage = ko.observable(currentLanguage);
+
+        if(self.form){
+            self.form.on('tile-reset', (x) => {
+                if (ko.unwrap(self.value)) {
+                    currentValue = koMapping.toJS(self.value);
+                    self.currentText(currentValue[self.currentLanguage().code]?.value);
+                    self.currentDirection(currentValue[self.currentLanguage().code]?.direction);
+                }
+            });
+        }
+
+        const languages = arches.languages;
+        self.languages =  ko.observableArray(languages);
+        self.currentLanguage(languages.find(element => element.code == arches.activeLanguage));
+
+        if(!currentValue?.[currentLanguage.code]){
+            self.currentText = ko.observable('');
+            self.currentDirection = ko.observable('ltr');
+            currentValue[currentLanguage.code] = {value: '', direction: 'ltr'};
+        } else {
+            self.currentText = ko.observable(currentValue?.[currentLanguage.code]?.value);
+            self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
+        }
+
+        self.strippedValue = ko.pureComputed(() => {
+            return $(`<span>${self.currentText()}</span>`).text();
+        });
+
+        self.strippedValue();
+
+        self.defaultText = ko.observable();
+        self.defaultText.subscribe(newValue => {
+            const config = self.config();
+            config.placeholder = newValue;
+            self.config(config);
+        });
+
+        const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
+        valueLeaf?.subscribe(newValue => {
+            const currentLanguage = self.currentLanguage();
+            if(!currentLanguage) { return; }
+
+            if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
+                self.currentText(newValue?.[currentLanguage.code]?.value || newValue);
+            }
+        });
+
+        self.currentText.subscribe(newValue => {
+            const currentLanguage = self.currentLanguage();
+            if(!currentLanguage) { return; }
+
+            currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
+            if (ko.isObservable(self.value)) {
+                self.value(currentValue);
+            } else {
+                self.value[currentLanguage.code].value(newValue);
+            }
+        });
+        self.currentDirection.subscribe(newValue => {
+            const currentLanguage = self.currentLanguage();
+            if(!currentLanguage) { return; }
+
+            currentValue[currentLanguage.code].direction = newValue;
+
+            if (ko.isObservable(self.value)) {
+                self.value(currentValue);
+            } else {
+                self.value[currentLanguage.code].direction(newValue);
+            }
+        });
+
+        self.currentLanguage.subscribe(() => {
+            if(!self.currentLanguage()){ return; }
+
+            const currentLanguage = self.currentLanguage();
+
+            self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
+            self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
+        });
+
+        this.displayfullvalue(params.displayfullvalue);
+    };
+
     return ko.components.register('rich-text-widget', {
-        viewModel: function(params) {
-            params.configKeys = ['displayfullvalue'];
-            WidgetViewModel.apply(this, [params]);
-            this.displayfullvalue(params.displayfullvalue);
-        },
-        template: { require: 'text!widget-templates/rich-text' }
+        viewModel: viewModel,
+        template: richTextWidgetTemplate,
     });
 });

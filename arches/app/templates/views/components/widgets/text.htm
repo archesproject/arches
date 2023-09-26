@@ -1,15 +1,72 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
-    <div class="form-group">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
-        <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
-        <!-- /ko -->
-        <div class="col-xs-12">
-            <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable}" class="form-control input-lg widget-input">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}">
+    <div class="form-group" style="position: relative;">
+        <div style="max-width: 600px; position: relative">
+            <div class="widget-inline-tools-collapser" tabindex="0" role="button"
+                data-bind="onEnterkeyClick, onSpaceClick, 
+                    click: function() { showi18nOptions(!showi18nOptions()); },
+                    attr: {
+                        'aria-expanded': showi18nOptions().toString(), 
+                        'aria-label': label() + ' ' + $root.translations.languageSettings,
+                        'aria-controls': uid
+                    },
+                "
+            >
+                <span class="control-label widget-input-label" data-bind="text:label"></span>
+                <span>
+                    <i class="fa" data-bind="{
+                        css: {
+                            'fa-caret-down' : !showi18nOptions(),
+                            'fa-caret-up' : showi18nOptions(),
+                        }
+                    }"></i>
+                    <span data-bind="text: $root.translations.languages"></span>
+                </span>
+            </div>
+            <div data-bind="if: showi18nOptions, attr: {id: uid}">
+                <div class="i18n-style-tools-panel">
+                    <div style="display: flex; flex-direction: column; max-width:600px">
+                        <span class="control-label widget-input-label" data-bind="text: $root.translations.language"></span>
+                        <select 
+                            style="flex:1" 
+                            name="language" 
+                            data-bind="
+                                options: languages, 
+                                optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
+                                value: currentLanguage, 
+                                chosen: {width:'100%'},
+                                attr: {'aria-label': $root.translations.language}
+                            "
+                        ></select>
+                        <span class="control-label widget-input-label" data-bind="text: $root.translations.direction"></span>
+                        <select
+                            style="flex:1"
+                            name="language"
+                            data-bind="
+                                value: currentDirection,
+                                chosen: {'width':'100%'},
+                                optionsText: 'text',
+                                optionsValue: 'value',
+                                options: [
+                                    { text: $root.translations.leftToRight, value: 'ltr' },
+                                    { text: $root.translations.rightToLeft, value: 'rtl' },
+                                ],
+                                attr: {'aria-label': $root.translations.direction}
+                            "
+                        ></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
+                <input type="text" style="flex:1" class="form-control input-lg widget-input"
+                    data-bind="textInput: currentText, 
+                        attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, 'aria-label': label, dir: currentDirection}
+                ">
+            </div>
         </div>
     </div>
 </div>
@@ -17,30 +74,127 @@
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Placeholder" %}
+    <span class="control-label widget-input-label" data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="textInput: placeholder">
+    <input
+        id="input-placeholder"
+        class="form-control input-md widget-input"
+        data-bind="
+            attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
+            textInput: placeholder
+        "
+    >
 </div>
 <div class="control-label">
-    {% trans "Max Length" %}
+    <span data-bind="text: $root.translations.maxLength"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Max Length" %}" id="" class="form-control input-md widget-input" data-bind="textInput: maxLength">
+    <input
+        id="input-max-length"
+        class="form-control input-md widget-input"
+        data-bind="
+            attr: {placeholder: $root.translations.maxLength, 'aria-label': $root.translations.maxLength},
+            textInput: maxLength
+        "
+    >
 </div>
-
-<div class="control-label">
-    {% trans "Default Value" %}
-</div>
-<div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
+<div class="form-group" style="position: relative;" data-bind="let: {uid: Math.random().toString()}">
+    <div style="max-width: 600px; position: relative">
+    <div class="widget-inline-tools-collapser" tabindex="0" role="button"
+        data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function() { showi18nOptions(!showi18nOptions()); },
+            attr: {
+                'aria-expanded': showi18nOptions().toString(), 
+                'aria-label': $root.translations.defaultValue + ' ' + $root.translations.languageSettings,
+                'aria-controls': uid,
+            },
+        "
+    >
+        <span class="control-label widget-input-label" data-bind="text: $root.translations.defaultValue"></span>
+        <span>
+            <i class="fa" data-bind="{
+                css: {
+                    'fa-caret-down' : !showi18nOptions(),
+                    'fa-caret-up' : showi18nOptions(),
+                }
+            }"></i>
+            <span data-bind="text: $root.translations.languages"></span>
+        </span>
+    </div>
+    <div class="form-horizontal" data-bind="if: showi18nOptions, attr: {id: uid}">
+        <div class="i18n-style-tools-panel">
+            <div style="display: flex; flex-direction: column; max-width:600px">
+                <span class="widget-input-label" data-bind="text: $root.translations.language"></span>
+                <select 
+                    style="flex:1" 
+                    name="language" 
+                    data-bind="
+                        options: languages, 
+                        optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
+                        value: currentDefaultLanguage, 
+                        chosen: {width:'100%'},
+                        attr: {'aria-label': $root.translations.language}
+                    "
+                ></select>
+                <span class="widget-input-label" data-bind="text: $root.translations.direction"></span>
+                <select
+                    style="flex:1"
+                    name="language"
+                    data-bind="
+                        value: currentDefaultDirection,
+                        chosen: {'width':'100%'},
+                        optionsText: 'text',
+                        optionsValue: 'value',
+                        options: [
+                            { text: $root.translations.leftToRight, value: 'ltr' },
+                            { text: $root.translations.rightToLeft, value: 'rtl' },
+                        ],
+                        attr: {'aria-label': $root.translations.direction}
+                    "
+                ></select>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
+        <input type="text" style="flex:1" id="input-default-value" class="form-control input-lg widget-input" 
+            data-bind="textInput: currentDefaultText, 
+                attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection, 'aria-label': $root.translations.defaultValue}
+        ">
+    </div>
+    </div>
 </div>
 <div class="node-config-item">
     <div class="control-label">
-        {% trans "Disabled" %}
+        <span class="widget-input-label" data-bind="text: $root.translations.disabled"></span>
     </div>
     <div class="pad-no">
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: '{% trans "Disable Editing" %}', subtitle: '{% trans "Prevent users from editing value" %}'}}}"></div>
+        <div
+            data-bind="
+                component: {
+                    name: 'views/components/simple-switch',
+                    params: {
+                        value: uneditable,
+                        config:{label: $root.translations.disableEditing, subtitle: $root.translations.preventUsersFromEditingValue}
+                    }
+                }
+            "
+        ></div>
     </div>
 </div>
 {% endblock config_form %}
+
+<!-- ko if: !configForm  && state === 'display_value' -->
+{% block display_value %}
+<span data-bind="text: displayValue && displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : '' || $root.translations.none"></span>
+{% endblock display_value %}
+<!-- /ko -->
+
+<!-- ko if: !configForm  && state === 'report' -->
+{% block report %}
+<!-- ko if: !ko.unwrap(hideEmptyNodes) || (ko.unwrap(hideEmptyNodes) === true && !!ko.unwrap(currentText) ) -->
+<dt data-bind="text: label"></dt>
+<dd data-bind="text: displayValue() && currentLanguage() && displayValue()[currentLanguage().code] && displayValue()[currentLanguage().code]['value'] ? displayValue()[currentLanguage().code]['value'] : $root.translations.none"></dd>
+<!-- /ko -->
+{% endblock report %}
+<!-- /ko -->

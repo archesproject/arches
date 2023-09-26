@@ -10,31 +10,35 @@
           <!-- /ko -->
       </div></div>
       <div class="col-xs-12">
-        <div style="pad-hor">
-        <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, click: function(e){setValue(true)}" class="form-radio form-normal form-text">
-            <input type="radio" name="stat-w-label" data-bind="checked: value() === true"><span data-bind="text:node.config.trueLabel"></span>
-        </label>
-        <label data-bind="css: { 'active': value() === false, 'disabled': disabled }, click: function(e){setValue(false)}" class="form-radio form-normal form-text">
-            <input type="radio" name="stat-w-label" data-bind="checked: value() === false"><span data-bind="text:node.config.falseLabel"></span>
-        </label>
-     </div>
-   </div>
+        <div class="pad-hor" role="radiogroup" data-bind="attr:{'aria-label': label}">
+            <label data-bind="css: { 'active': value() === true, 'disabled': disabled }, onEnterkeyClick, onSpacekeyClick, click: function(e){setValue(true)}, attr: {'aria-checked': value() === true}" 
+                class="form-radio form-normal form-text" tabindex="0" role="radio">
+                <input type="radio" name="stat-w-label" data-bind="checked: value() === true"><span data-bind="text:node.config.trueLabel"></span>
+            </label>
+            <label data-bind="css: { 'active': value() === false, 'disabled': disabled }, onEnterkeyClick, onSpacekeyClick, click: function(e){setValue(false)}, attr: {'aria-checked': value() === false}" 
+                class="form-radio form-normal form-text" tabindex="0" role="radio">
+                <input type="radio" name="stat-w-label" data-bind="checked: value() === false"><span data-bind="text:node.config.falseLabel"></span>
+            </label>
+        </div>
+      </div>
   </div>
 </div>
 {% endblock form %}
 
 {% block config_form %}
 <div class="control-label">
-    {% trans "Default Value" %}
+    <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="col-xs-12" style="display:flex; flex-direction: column; height: 50px">
-  <div style="pad-hor">
-      <label data-bind="css: { 'active': defaultValue() === true }, click: function(e){setDefaultValue(true)}" class="form-radio form-normal form-text">
-          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === true"><span data-bind="text: node.config.trueLabel"></span>
-      </label>
-      <label data-bind="css: { 'active': defaultValue() === false }, click: function(e){setDefaultValue(false)}" class="form-radio form-normal form-text">
-          <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === false"><span data-bind="text: node.config.falseLabel"></span>
-      </label>
-  </div>
+    <div class="pad-hor" role="radiogroup" data-bind="attr:{'aria-label': $root.translations.defaultValue}">
+        <label data-bind="css: { 'active': defaultValue() === true }, onEnterkeyClick, onSpacekeyClick, click: function(e){setDefaultValue(true)}, attr: {'aria-checked': defaultValue() === true}" 
+            class="form-radio form-normal form-text" tabindex="0" role="radio">
+            <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === true"><span data-bind="text: node.config.trueLabel"></span>
+        </label>
+        <label data-bind="css: { 'active': defaultValue() === false }, onEnterkeyClick, onSpacekeyClick, click: function(e){setDefaultValue(false)}, attr: {'aria-checked': defaultValue() === false}" 
+            class="form-radio form-normal form-text" tabindex="0" role="radio">
+            <input type="radio" name="stat-w-label" data-bind="checked: defaultValue() === false"><span data-bind="text: node.config.falseLabel"></span>
+        </label>
+    </div>
 </div>
 {% endblock config_form %}

@@ -1,21 +1,21 @@
 define([
-    'arches',
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'viewmodels/widget',
     'viewmodels/map-editor',
+    'templates/views/components/widgets/map.htm',
     'bindings/chosen',
     'bindings/codemirror',
     'select2',
     'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
-    'bindings/chosen',
     'bindings/color-picker',
-    'geocoder-templates'
-], function(arches, _, ko, koMapping, WidgetViewModel, MapEditorViewModel) {
+], function(_, ko, koMapping, arches, WidgetViewModel, MapEditorViewModel, mapWidgetTemplate) {
     var viewModel = function(params) {
+         
         this.context = params.type;
 
         this.summaryDetails = [];
@@ -100,11 +100,11 @@ define([
 
         MapEditorViewModel.apply(this, [params]);
     };
+
     ko.components.register('map-widget', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/widgets/map.htm'
-        }
+        template: mapWidgetTemplate,
     });
+
     return viewModel;
 });

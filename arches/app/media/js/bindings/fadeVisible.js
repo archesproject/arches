@@ -1,9 +1,9 @@
 // Here's a custom Knockout binding that makes elements shown/hidden via jQuery's fadeIn()/fadeOut() methods
 // Could be stored in a separate utility library
 define([
-  'jquery',
-  'knockout',
-], function ($, ko) {
+    'jquery',
+    'knockout',
+], function($, ko) {
     ko.bindingHandlers.fadeVisible = {
         init: function(element, valueAccessor,allBindingsAccessor, viewModel, bindingContent) {
             // Initially set the element to be instantly visible/hidden depending on the value
@@ -13,12 +13,12 @@ define([
         update: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContent) {
             // Whenever the value subsequently changes, slowly fade the element in or out
             var delay = allBindingsAccessor.get('delay');
-            var fade = allBindingsAccessor.get('fade')
+            var fade = allBindingsAccessor.get('fade');
             var value = valueAccessor();
             if (ko.unwrap(value) === false) {
-              $(element).fadeOut(fade);
+                $(element).fadeOut(fade);
             } else {
-              $(element).delay(delay).fadeIn(fade)
+                $(element).delay(delay).fadeIn(fade);
             }
         }
     };

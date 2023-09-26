@@ -15,16 +15,19 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import ast
 import re
 import json
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Widget
 from arches.app.search.elasticsearch_dsl_builder import Match, Exists, Term
+from arches.app.search.search_term import SearchTerm
 
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from django.utils.translation import ugettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -75,19 +78,10 @@ class URLDataType(BaseDataType):
                     if url_test is None:
                         raise FailRegexURLMatch
             except FailRegexURLMatch:
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
-                            self.datatype_model.datatype,
-                            value,
-                            source,
-                            row_number,
-                            "this is not a valid HTTP/HTTPS URL",
-                            "This data was not imported.",
-                        ),
-                    }
-                )
+                message = _("This is not a valid HTTP/HTTPS URL")
+                title = _("Invalid HTTP/HTTPS URL")
+                error_message = self.create_error_message(value, source, row_number, message, title)
+                errors.append(error_message)
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -99,19 +93,25 @@ class URLDataType(BaseDataType):
         a json string like '{"url": "", "url_label": ""}'
         """
 
-        ret = {"url": "", "url_label": ""}
-
         try:
-            ret = json.loads(value)
+            return json.loads(value)
+        except ValueError:
+            # do this if json (invalid) is formatted with single quotes, re #6390
+            try:
+                return ast.literal_eval(value)
+            except:
+                if isinstance(value, dict):
+                    return value
+                else:
+                    return {"url": value, "url_label": ""}
         except BaseException:
+            # this will probably fail validation, but that is ok. We need the error to report the value.
             if isinstance(value, dict):
-                ret = value
+                return value
             else:
-                ret["url"] = value
+                return {"url": value, "url_label": ""}
 
-        return ret
-
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
             display_value = data.get(str(node.nodeid))
@@ -147,23 +147,21 @@ class URLDataType(BaseDataType):
         if nodevalue.get("url") is not None:
             if nodevalue.get("url_label") is not None:
                 if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue["url_label"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append(nodevalue["url_label"])
+                    terms.append(SearchTerm(value=nodevalue["url_label"]))
             # terms.append(nodevalue['url'])       FIXME: URLs searchable?
         return terms
 
     def append_search_filters(self, value, node, query, request):
         # Match the label in the same manner as a String datatype
-
         try:
             if value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
                 if "~" in value["op"]:
                     match_query = Match(
                         field="tiles.data.%s.url" % (str(node.pk)),
                         query=value["val"],
-                        type=match_type,
+                        type="phrase_prefix",
                     )
-                if "=" in value["op"]:
+                if "eq" in value["op"]:
                     match_query = Term(field="tiles.data.%s.url.keyword" % (str(node.pk)), term=value["val"])
                 if "!" in value["op"]:
                     query.must_not(match_query)

@@ -1,6 +1,8 @@
+import re
+import uuid
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Nested, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Match, Nested, SimpleQueryString, QueryString, Terms, Term
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -21,14 +23,33 @@ class TermFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
+        language = self.request.GET.get("language", "*")
         for term in JSONDeserializer().deserialize(querysting_params):
             if term["type"] == "term" or term["type"] == "string":
                 string_filter = Bool()
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
                 elif term["type"] == "string":
-                    string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
-                    string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
+                    try:
+                        uuid.UUID(str(term["value"]))
+                        string_filter.must(Ids(ids=term["value"]))
+                    except:
+                        if language != "*":
+                            string_filter.must(Match(field="strings.language", query=language, type="phrase_prefix"))
+                        exact_term = re.search('"(?P<search_string>.*)"', term["value"])
+                        if exact_term:
+                            search_string = exact_term.group("search_string")
+                            string_filter.should(Term(field="strings.string.raw", term=search_string))
+                        elif "?" in term["value"] or "*" in term["value"]:
+                            reserved_chars = '+ - = && || > < ! ( ) { } [ ] ^ " ~ : /'.split(" ")
+                            for rc in reserved_chars:
+                                term["value"] = term["value"].replace(rc, f"\\{rc}")
+                            string_filter.must(QueryString(field="strings.string.folded", default_operator="AND", query=term["value"]))
+                        elif "|" in term["value"] or "+" in term["value"]:
+                            string_filter.must(SimpleQueryString(field="strings.string", operator="and", query=term["value"]))
+                        else:
+                            string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
+                            string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
 
                 if include_provisional is False:
                     string_filter.must_not(Match(field="strings.provisional", query="true", type="phrase"))

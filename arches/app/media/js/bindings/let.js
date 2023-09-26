@@ -1,6 +1,6 @@
 define([
     'knockout',
-], function (ko) {
+], function(ko) {
     /**
     * A knockout.js binding to alias a given context 
     * Should be available in knockout 3.5 

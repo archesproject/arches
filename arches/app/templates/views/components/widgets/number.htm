@@ -1,10 +1,11 @@
 {% extends "views/components/widgets/base.htm" %}
+{% load template_tags %}
 {% load i18n %}
 
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
+        <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
@@ -14,10 +15,10 @@
             <span class="input-group-addon" data-bind="text: prefix"></span>
             <!-- /ko -->
             <!-- ko if: format -->
-            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <input type="text" data-bind="formattedNumber: value, format: format, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable, 'aria-label': label}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko ifnot: format -->
-            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
+            <input type="number" data-bind="value: value, attr: {placeholder: placeholder, max: max, min: min, step: step, disabled: disable, 'aria-label': label}, style: {width: width}, valueUpdate: 'keyup'" class="form-control input-lg widget-input">
             <!-- /ko -->
             <!-- ko if: suffix -->
             <span class="input-group-addon" data-bind="text: suffix"></span>
@@ -35,7 +36,7 @@
     <!-- ko if: displayValue -->
     <span data-bind="text: prefix(), css: {'number-prefix': prefix()}"></span>
         <!-- ko if: format -->
-        <span data-bind="formattedNumber: displayValue(), format: format || '{% trans "None" %}'"></span>
+        <span data-bind="formattedNumber: displayValue(), format: format || $root.translations.none"></span>
         <!-- /ko -->
         <!-- ko ifnot: format -->
         <span data-bind="text: displayValue()"></span>
@@ -43,73 +44,171 @@
     <span data-bind="text: suffix(), css: {'number-suffix': suffix()}"></span>
     <!-- /ko -->
     <!-- ko ifnot: displayValue -->
-    <span data-bind="text: '{% trans "None" %}'"></span>
+    <span data-bind="text: $root.translations.none"></span>
     <!-- /ko -->
     </div>
 </dd>
 {% endblock report %}
 
 {% block config_form %}
-<div class="control-label">
-    {% trans "Placeholder" %}
-</div>
+<label for="input-placeholder" class="control-label">
+    <span data-bind="text: $root.translations.placeholder"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="value: placeholder, valueUpdate: 'keyup'">
+    <input 
+        type="" 
+        id="input-placeholder"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.placeholder},
+            value: placeholder, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Min" %}
-</div>
+<label for="input-min" class="control-label">
+    <span data-bind="text: $root.translations.min"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Min" %}" id="" class="form-control input-md widget-input" data-bind="value: min, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        id="input-min"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.min},
+            value: min, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Max" %}
-</div>
+<label for="input-max" class="control-label">
+    <span data-bind="text: $root.translations.max"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Max" %}" id="" class="form-control input-md widget-input" data-bind="value: max, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        id="input-max"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.max},
+            value: max, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Increment" %}
-</div>
+<label for="input-step" class="control-label">
+    <span data-bind="text: $root.translations.increment"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container" >
-    <input type="number" placeholder="{% trans "Increment size" %}" id="" class="form-control input-md widget-input" data-bind="value: step, valueUpdate: 'keyup', disable: format">
+    <input 
+        type="number" 
+        id="input-step"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.incrementSize},
+            value: step, 
+            valueUpdate: 'keyup', 
+            disable: format
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Decimal Places" %}
-</div>
+<label for="input-precision" class="control-label">
+    <span data-bind="text: $root.translations.decimalPlaces"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Number of decimal places" %}" id="" class="form-control input-md widget-input" data-bind="value: precision, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        id="input-precision"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.numberOfDecimalPlaces},
+            value: precision, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Prefix" %}
-</div>
+<label for="input-prefix" class="control-label">
+    <span data-bind="text: $root.translations.prefix"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Field prefix" %}" id="" class="form-control input-md widget-input" data-bind="value: prefix, valueUpdate: 'keyup'">
+    <input 
+        type="" 
+        id="input-prefix"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.fieldPrefix},
+            value: prefix, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Suffix" %}
-</div>
+<label for="input-suffix" class="control-label">
+    <span data-bind="text: $root.translations.suffix"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="" placeholder="{% trans "Field suffix" %}" id="" class="form-control input-md widget-input" data-bind="value: suffix, valueUpdate: 'keyup'">
+    <input 
+        type="" 
+        id="input-suffix"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.fieldSuffix},
+            value: suffix, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-    {% trans "Default Value" %}
-</div>
+<label for="input-defaultValue" class="control-label">
+    <span data-bind="text: $root.translations.defaultValue"></span>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input type="number" placeholder="{% trans "Default Value" %}" id="" class="form-control input-md widget-input" data-bind="value: defaultValue, valueUpdate: 'keyup'">
+    <input 
+        type="number" 
+        id="input-defaultValue"
+        class="form-control input-md widget-input" 
+        data-bind="
+            attr: {placeholder: $root.translations.defaultValue},
+            value: defaultValue, 
+            valueUpdate: 'keyup'
+        "
+    >
 </div>
-<div class="control-label">
-  {% trans "Format" %} <a href="http://numeraljs.com/#format" target="_blank">{% trans "(view valid formats)" %}</a>
-</div>
+<label for="input-format" class="control-label">
+    <span data-bind="text: $root.translations.format"></span> 
+    <a href="http://numeraljs.com/#format" target="_blank">
+        <span data-bind="text: '(' + $root.translations.viewValidFormats + ')'"></span>
+    </a>
+</label>
 <div class="col-xs-12 pad-no crud-widget-container">
-  <input type="" placeholder="{% trans "Format" %}" id="" class="form-control input-md widget-input" data-bind="value: format, valueUpdate: 'keyup'">
+  <input 
+    type="" 
+    id="input-format"
+    class="form-control input-md widget-input" 
+    data-bind="
+        attr: {placeholder: $root.translations.format},
+        value: format, 
+        valueUpdate: 'keyup'
+    "
+>
 </div>
 <div class="node-config-item">
     <div class="control-label">
-        {% trans "Disabled" %}
+        <span data-bind="text: $root.translations.disabled"></span>
     </div>
     <div class="pad-no">
-        <div data-bind="component: { name: 'views/components/simple-switch', params: {value: uneditable, config:{label: '{% trans "Disable Editing" %}', subtitle: '{% trans "Prevent users from editing value" %}'}}}"></div>
+        <div 
+            data-bind="
+                component: { 
+                    name: 'views/components/simple-switch', 
+                    params: {
+                        value: uneditable, 
+                        config:{
+                            label: $root.translations.disableEditing, 
+                            subtitle: $root.translations.preventUsersFromEditingValue
+                        }
+                    }
+                }
+            "
+        ></div>
     </div>
 </div>
 {% endblock config_form %}

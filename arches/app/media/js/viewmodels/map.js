@@ -4,11 +4,12 @@ define([
     'arches',
     'knockout',
     'knockout-mapping',
-    'utils/map-popup-provider'
+    'utils/map-popup-provider',
+    'templates/views/components/map-popup.htm'
 ], function($, _, arches, ko, koMapping, mapPopupProvider) {
     const viewModel = function(params) {
-
         var self = this;
+         
 
         var geojsonSourceFactory = function() {
             return {
@@ -42,8 +43,8 @@ define([
             if (ko.unwrap(params.x) && ko.unwrap(params.y)) {
                 var center = map.getCenter();
 
-                lng = parseFloat(params.x());
-                lat = parseFloat(params.y());
+                const lng = parseFloat(params.x());
+                const lat = parseFloat(params.y());
 
                 if (lng) { center.lng = lng; }
                 if (lat) { center.lat = lat; }
@@ -100,7 +101,7 @@ define([
 
         this.zoom = ko.observable(ko.unwrap(params.zoom) || arches.mapDefaultZoom);
         this.zoom.subscribe(function(level) {
-            if (level && self.map()) { self.map().setZoom(level) };
+            if (level && self.map()) { self.map().setZoom(level); }
 
             if (ko.isObservable(params.zoom) && params.zoom() !== level) {
                 params.zoom(level);
@@ -110,10 +111,10 @@ define([
         this.overlayConfigs = ko.observableArray(ko.unwrap(params.overlayConfigs));
         this.overlayConfigs.subscribe(function(overlayConfigs) {
             if (ko.isObservable(params.overlayConfigs)) {
-                params.overlayConfigs(overlayConfigs)
+                params.overlayConfigs(overlayConfigs);
             }
-        })
-
+        });
+        
         this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
@@ -148,15 +149,15 @@ define([
 
                 layer.updateParent = function(parent) {
                     if (self.overlayConfigs.indexOf(layer.maplayerid) === -1) {
-                        self.overlayConfigs.push(layer.maplayerid)
-                        layer.opacity(100)
+                        self.overlayConfigs.push(layer.maplayerid);
+                        layer.opacity(100);
                     } else {
                         self.overlayConfigs.remove(layer.maplayerid);
-                        layer.opacity(0)
+                        layer.opacity(0);
                     }
 
                     if (parent !== self) {
-                        parent.overlayConfigs(self.overlayConfigs())
+                        parent.overlayConfigs(self.overlayConfigs());
 
                         if (params.inWidget) {
                             try {
@@ -436,7 +437,10 @@ define([
                 .setHTML(popupTemplate)
                 .addTo(map);
             ko.applyBindingsToDescendants(
-                mapPopupProvider.processData(self.getPopupData(features)),
+                {
+                    ...mapPopupProvider.processData(self.getPopupData(features)),
+                    translations: arches.translations,
+                },
                 self.popup._content
             );
             features.forEach(feature=>{

@@ -6,7 +6,7 @@ define([
     'bindings/chosen',
     'views/components/simple-switch',
     'views/components/notification',
-], function($, arches, ListView) {
+], function($, arches,  ListView) {
     var NotificationsList = ListView.extend({
         /**
         * A backbone view to manage a list of notification records

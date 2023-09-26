@@ -2,7 +2,7 @@ define([
     'jquery',
     'knockout',
     'jquery-ui'
-], function ($, ko) {
+], function($, ko) {
     var _dragged;
     ko.bindingHandlers.drag = {
         init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -22,7 +22,7 @@ define([
                 };
                 dragElement.draggable(dragOptions).disableSelection();
             } else {
-                console.log(valueAccessor())
+                console.log(valueAccessor());
             }
         }
     };

@@ -19,7 +19,8 @@ define([
                 dragAndDrop: true,
                 dataUrl: options.url,
                 data: [],
-                autoOpen: false
+                autoOpen: false,
+                rtl: $("body").attr("dir") == "rtl"
             });
 
             this.render();
@@ -31,6 +32,7 @@ define([
             }
             var self = this,
                 node = self.$el.tree('getNodeById', this.model.get('id'));
+            
             if (node) {
                 // collapse the node while it's loading
                 if (!node.load_on_demand) {

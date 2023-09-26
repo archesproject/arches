@@ -5,7 +5,7 @@
 <div class="resource-instance-card-component-container">
     <div class="resource-instance-card-component-toc">
         <div class="create-instance-menu-header">
-            {% trans "Data Themes" %}
+            <span data-bind="text: $root.translations.dataThemes"></span>
         </div>
         <!-- ko if: topCards().length -->
         <!-- ko foreach: {data:topCards(), as: 'card'} -->
@@ -24,11 +24,13 @@
     <div class="resource-instance-card-component-content">
         <div class="create-instance-header">
             <div class="new-instance-model-name">
-                <span>{% trans "New" %}</span>
+                <span data-bind="text: $root.translations.new"></span>
                 <span data-bind="text: graphName"></span>
             </div>
             <div class="close-new-step">
-                <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary" data-bind="click: function(){close()}, clickBubble: false">{% trans "Return" %}</button>
+                <button class="btn btn-labeled btn-lg fa fa-arrow-right btn-primary" data-bind="click: function(){close()}, clickBubble: false">
+                    <span data-bind="text: $root.translations.return"></span>
+                </button>
             </div>
         </div>
         <div>

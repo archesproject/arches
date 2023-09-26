@@ -1,13 +1,13 @@
 define([
     'jquery',
-    'arches',
     'knockout',
     'underscore',
+    'arches',
     'dropzone',
     'uuid',
     'viewmodels/widget',
     'bindings/dropzone'
-], function($, arches, ko, _, Dropzone, uuid, WidgetViewModel) {
+], function($, ko, _, arches, Dropzone, uuid, WidgetViewModel) {
     /**
      * A viewmodel used for domain widgets
      *
@@ -29,7 +29,7 @@ define([
 
 
         if (this.form) {
-            this.form.on('after-update', function(req, tile) {
+            $(this.form).on('after-update', function(req, tile) {
                 var hasdata = _.filter(tile.data, function(val, key) {
                     val = ko.unwrap(val);
                     if (val) {
@@ -139,7 +139,15 @@ define([
         });
 
         this.getFileUrl = function(url){
-            return (arches.urls.url_subpath + ko.unwrap(url)).replace('//', '/');
+            url = ko.unwrap(url);
+            var httpRegex = /^https?:\/\//;
+            // test whether the url is external (starts with http(s), if it is just return it)
+            if (httpRegex.test(url)){
+                return url;
+            }else{
+                return (arches.urls.url_subpath + url).replace('//', '/');
+            }
+
         };
 
         if (Array.isArray(self.value())) {

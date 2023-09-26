@@ -10,7 +10,7 @@ define([
             var picking = false;
             var updateValues = function(val) {
                 if (!picking) {
-                    $(cp).colorpicker('setValue', val)
+                    $(cp).colorpicker('setValue', val);
                 }
             };
 

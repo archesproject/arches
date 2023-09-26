@@ -1,19 +1,18 @@
-const {map} = require("jquery");
-
 define([
-    'arches',
     'jquery',
     'knockout',
     'knockout-mapping',
     'leaflet',
+    'arches',
     'views/components/workbench',
-    'text!templates/views/components/iiif-popup.htm',
+    'templates/views/components/iiif-popup.htm',
+    'templates/views/components/iiif-viewer.htm',
     'leaflet-iiif',
     'leaflet-fullscreen',
     'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
-], function(arches, $, ko, koMapping, L, WorkbenchViewmodel, iiifPopup) {
+], function($, ko, koMapping, L, arches, WorkbenchViewmodel, iiifPopup, iiifViewerTemplate) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -23,6 +22,7 @@ define([
             return val;
         };
 
+         
         this.map = ko.observable();
         this.manifest = ko.observable(params.manifest);
         this.editManifest = ko.observable(!params.manifest);
@@ -56,7 +56,7 @@ define([
         this.showModeSelector = ko.observable(true);
         this.primaryLayerLoaded = true;
         this.secondaryLayerLoaded = true;
-        let primaryPanelFilters
+        let primaryPanelFilters;
         let secondaryPanelFilters;
         const layers = [];
         const secondaryLayers = [];
@@ -107,9 +107,9 @@ define([
 
                 if(secondaryCanvasLayer && map.hasLayer(secondaryCanvasLayer)){
                     try {
-                        map.removeLayer(secondaryCanvasLayer)
+                        map.removeLayer(secondaryCanvasLayer);
                     } catch(e){
-                        ; // ignore/smother if remove layer fails
+                        // ignore/smother if remove layer fails
                     }
                 }
 
@@ -246,7 +246,8 @@ define([
                                     'description': ko.observable(''),
                                     'graphName': feature.properties.graphName,
                                     'resourceinstanceid': feature.properties.resourceId,
-                                    'reportURL': arches.urls.resource_report
+                                    'reportURL': arches.urls.resource_report,
+                                    'translations': arches.translations
                                 };
                                 window.fetch(arches.urls.resource_descriptors + popupData.resourceinstanceid)
                                     .then(function(response) {
@@ -358,7 +359,7 @@ define([
             closeOnSelect: true,
             allowClear: true,
             data: () => {
-                results = this.canvases();
+                const results = this.canvases();
                 return { results };
             },
             id: function(item) {
@@ -380,10 +381,10 @@ define([
                 return self.canvases() === '' || !self.canvases();
             }, this),
             initSelection: function(element, callback) {
-                const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val())
+                const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val());
                 callback(canvasObj);
             }
-        }
+        };
 
         this.rightSideSelectConfig = {
             ...splitSelectConfig,
@@ -466,7 +467,7 @@ define([
             }
             self.floatingLocation(location);
             if(self.floatingLocation() == "left") {
-                self.selectPrimaryPanel(true)
+                self.selectPrimaryPanel(true);
             } else {
                 self.selectPrimaryPanel(false);
             }
@@ -501,20 +502,20 @@ define([
             const greyscale = self.greyscale();
 
             return { brightness, contrast, saturation, greyscale };
-        })
+        });
 
         this.canvasFilter.subscribe((value) => {
             console.log(value);
-        })
+        });
         var updateCanvasLayerFilter = function() {
             var filter = self.canvasFilter();
             var map = self.map();
             let layer;
             if (map) {
                 if(self.selectPrimaryPanel()){
-                    layer = map.getPane('tilePane').querySelector('.iiif-layer-primary')
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-primary');
                 } else {
-                    layer = map.getPane('tilePane').querySelector('.iiif-layer-secondary')
+                    layer = map.getPane('tilePane').querySelector('.iiif-layer-secondary');
                 }
                 if(layer && layer !== null){
                     layer.style.filter = filter;
@@ -537,7 +538,7 @@ define([
             var ne = map.options.crs.pointToLatLng(L.point(imageSize.x, 0), initialZoom);
             var bounds = L.latLngBounds(sw, ne);
             map.fitBounds(bounds);
-        }
+        };
 
         const loadComparison = () => {
             const map = self.map();
@@ -575,12 +576,12 @@ define([
                     try {
                         map.removeLayer(canvasLayer);
                     } catch(e){
-                        ; // ignore/smother if remove layer fails
+                        // ignore/smother if remove layer fails
                     }
                     canvasLayer = undefined;
                 }
                 if (canvas) {
-                    const layerInfoUrl = canvas + '/info.json'
+                    const layerInfoUrl = canvas + '/info.json';
                     canvasLayer = getLayer(layerInfoUrl, layers);
     
                     if(!canvasLayer){
@@ -612,7 +613,7 @@ define([
             if(match.length > 0){
                 return match[0];
             }
-        }
+        };
 
         const updateSecondaryCanvasLayer = () => {
             const map = self.map();
@@ -628,12 +629,12 @@ define([
                     try {
                         map.removeLayer(secondaryCanvasLayer);
                     } catch(e){
-                        ; // ignore/smother if remove layer fails
+                        // ignore/smother if remove layer fails
                     }
                     secondaryCanvasLayer = undefined;
                 }
 
-                const layerInfoUrl = secondaryCanvas + '/info.json'
+                const layerInfoUrl = secondaryCanvas + '/info.json';
                 secondaryCanvasLayer = getLayer(layerInfoUrl, secondaryLayers);
 
                 if(!secondaryCanvasLayer){
@@ -671,7 +672,7 @@ define([
             if(service){
                 self.secondaryCanvas(service);
             }
-        }
+        };
 
         this.selectCanvas = function(canvas) {
             
@@ -680,11 +681,11 @@ define([
             if (service && self.selectPrimaryPanel()) {
                 self.canvas(service);
                 self.canvasObject(canvas);
-                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true))
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
             } else {
                 self.secondaryCanvas(service);
                 self.secondaryCanvasObject(canvas);
-                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true))
+                self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
             }
         };
 
@@ -750,9 +751,7 @@ define([
     };
     ko.components.register('iiif-viewer', {
         viewModel: IIIFViewerViewmodel,
-        template: {
-            require: 'text!templates/views/components/iiif-viewer.htm'
-        }
+        template: iiifViewerTemplate,
     });
     return IIIFViewerViewmodel;
 });

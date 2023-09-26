@@ -2,6 +2,15 @@
 
 <!-- Term Filter -->
 <div><form autocomplete="off">
-    <input class="select2 resource_search_widget arches-select2" name="" style="width:100%;" placeholder="{% trans "Find a resource..." %}" data-bind="termSearch: {terms: filter.terms, tags: filter.tags}"></form>
+    <input 
+        class="select2 resource_search_widget arches-select2" 
+        name="" 
+        style="width:100%;"
+        data-bind="
+            attr: {placeholder: $root.translations.findAResource},
+            termSearch: {terms: filter.terms, language: language, tags: filter.tags}
+        "
+    >
+    <select data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: language, chosen:{width:'100%'}"></select></form>
 </div>
 <!-- End Term Filter -->

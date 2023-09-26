@@ -1,4 +1,9 @@
-define(['knockout', 'viewmodels/widget'], function (ko, WidgetViewModel) {
+define([
+    'knockout',
+    'viewmodels/widget', 
+    'templates/views/components/simple-switch.htm',
+    'bindings/key-events-click',
+], function(ko, WidgetViewModel, simpleSwitchTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -28,13 +33,11 @@ define(['knockout', 'viewmodels/widget'], function (ko, WidgetViewModel) {
                 }else{
                     self.value(self.on);
                 }
-            }
+            };
             this.getvalue = this.config().getvalue || ko.computed(function(){
                 return this.value() === this.on;
             }, this);
         },
-        template: {
-            require: 'text!templates/views/components/simple-switch.htm'
-        }
+        template: simpleSwitchTemplate,
     });
 });

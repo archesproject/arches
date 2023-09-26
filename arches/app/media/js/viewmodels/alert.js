@@ -1,4 +1,4 @@
-define(['knockout'], function (ko) {
+define(['knockout'], function(ko) {
     /**
     * A viewmodel used for generic alert messages
     *
@@ -14,7 +14,7 @@ define(['knockout'], function (ko) {
     var AlertViewModel = function(type, title, text, cancel, ok) {
         var self = this;
         this.active = ko.observable(true);
-        this.close = function () {
+        this.close = function() {
             self.active(false);
         };
 
@@ -27,13 +27,13 @@ define(['knockout'], function (ko) {
             this.ok = function() {
                 self.close();
                 ok();
-            }
+            };
         }
         if (typeof cancel === 'function') {
             this.cancel = function() {
                 self.close();
                 cancel();
-            }
+            };
         }
     };
     return AlertViewModel;

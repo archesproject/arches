@@ -1,22 +1,21 @@
 define([
-    'arches',
     'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'uuid',
     'viewmodels/alert',
     'viewmodels/workflow-step',
     'bindings/gallery',
     'bindings/scrollTo'
-], function(arches, $, _, ko, koMapping, uuid, AlertViewModel, WorkflowStep) {
-    WORKFLOW_LABEL = 'workflow';
-    WORKFLOW_ID_LABEL = 'workflow-id';
-    STEPS_LABEL = 'workflow-steps';
-    STEP_ID_LABEL = 'workflow-step-id';
-    STEP_IDS_LABEL = 'workflow-step-ids';
-    WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
-
+], function($, _, ko, koMapping, arches, uuid, AlertViewModel, WorkflowStep) {
+    const WORKFLOW_LABEL = 'workflow';
+    const WORKFLOW_ID_LABEL = 'workflow-id';
+    const STEPS_LABEL = 'workflow-steps';
+    const STEP_ID_LABEL = 'workflow-step-id';
+    const STEP_IDS_LABEL = 'workflow-step-ids';
+    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     var Workflow = function(config) {
         var self = this;
@@ -29,6 +28,7 @@ define([
         this.pan = ko.observable();
         this.alert = config.alert || ko.observable(null);
         this.quitUrl = config.quitUrl || arches.urls.search_home;
+        this.plugin = config.plugin;
         this.isWorkflowFinished = ko.observable(false);
         
         this.stepConfig;  /* overwritten in workflow.js file */
@@ -53,7 +53,7 @@ define([
 
         this.steps.subscribe(() => {
             this.furthestValidStepIndex.valueHasMutated();
-        })
+        });
         
         this.initialize = function() {
             self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
@@ -122,11 +122,11 @@ define([
 
             if (!workflowMetaDataLocalStorageData[workflowName]) {
                 workflowMetaDataLocalStorageData[workflowName] = {};
-            };
+            }
 
             if (!workflowMetaDataLocalStorageData[workflowName][stepName]) {
                 workflowMetaDataLocalStorageData[workflowName][stepName] = {};
-            };
+            }
             
             workflowMetaDataLocalStorageData[workflowName][stepName][key] = value;
 
@@ -295,7 +295,7 @@ define([
             self.stepConfig.forEach(function(stepConfigData) {
                 steps.push(
                     self.createStep(stepConfigData)
-                )
+                );
             });
 
             var idx = 0;
@@ -315,7 +315,7 @@ define([
                         if (stepData) {
                             childStep = self.createStep(stepData);
                         }
-                        currentStep.locked(true)
+                        currentStep.locked(true);
                     }
                     else if (defaultStepChoice) {
                         childStep = self.createStep(defaultStepChoice);

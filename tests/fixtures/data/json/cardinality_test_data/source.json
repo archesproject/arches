@@ -10,7 +10,7 @@
             "nodegroup_id": "316d7911-c6f2-11e6-9c87-685b3597724b",
             "tileid": "01f8ad21-08ee-4754-aa6f-ed627211c6b2",
             "data": {
-              "316d7911-c6f2-11e6-9c87-685b3597724b": "single 1 test text"
+              "316d7911-c6f2-11e6-9c87-685b3597724b": {"en": {"value": "single 1 test text", "direction": "ltr"}} 
             },
             "sortorder": 0
           },
@@ -20,7 +20,7 @@
             "nodegroup_id": "316d6a30-c6f2-11e6-892a-685b3597724b",
             "tileid": "4d52c3ef-d9ea-4cd1-978c-e015c4cec4fa",
             "data": {
-              "316d6a30-c6f2-11e6-892a-685b3597724b": "1 single n test"
+              "316d6a30-c6f2-11e6-892a-685b3597724b": {"en": {"value": "1 single n test", "direction": "ltr"}} 
             },
             "sortorder": 0
           },
@@ -30,7 +30,7 @@
             "nodegroup_id": "316d6a30-c6f2-11e6-892a-685b3597724b",
             "tileid": "6a22da9f-9ee9-4351-a69c-5112404a23d4",
             "data": {
-              "316d6a30-c6f2-11e6-892a-685b3597724b": "2 single n test"
+              "316d6a30-c6f2-11e6-892a-685b3597724b": {"en": {"value": "2 single n test", "direction": "ltr"}} 
             },
             "sortorder": 1
           },
@@ -40,7 +40,7 @@
             "nodegroup_id": "316d6a30-c6f2-11e6-892a-685b3597724b",
             "tileid": "d61e1803-f4ff-4d83-b9b6-a33ced42e63d",
             "data": {
-              "316d6a30-c6f2-11e6-892a-685b3597724b": "3 single n test"
+              "316d6a30-c6f2-11e6-892a-685b3597724b": {"en": {"value": "3 single n test", "direction": "ltr"}} 
             },
             "sortorder": 2
           },
@@ -58,7 +58,7 @@
             "nodegroup_id": "316d743a-c6f2-11e6-a8f0-685b3597724b",
             "tileid": "f78b84a6-e520-4077-9168-ce2baa9bb88b",
             "data": {
-              "316d743a-c6f2-11e6-a8f0-685b3597724b": "1-1 test text"
+              "316d743a-c6f2-11e6-a8f0-685b3597724b": {"en": {"value": "1-1 test text", "direction": "ltr"}}
             },
             "sortorder": 0
           },
@@ -76,7 +76,7 @@
             "nodegroup_id": "316d6207-c6f2-11e6-b09d-685b3597724b",
             "tileid": "90be3bff-cff3-477b-9f2d-0f13f567a14e",
             "data": {
-              "316d6207-c6f2-11e6-b09d-685b3597724b": "1 n-1 test"
+              "316d6207-c6f2-11e6-b09d-685b3597724b": {"en": {"value": "1 n-1 test", "direction": "ltr"}}
             },
             "sortorder": 0
           },
@@ -102,7 +102,7 @@
             "nodegroup_id": "316d6207-c6f2-11e6-b09d-685b3597724b",
             "tileid": "a405d9af-84cb-4b75-bd7d-5a7c7f0d4558",
             "data": {
-              "316d6207-c6f2-11e6-b09d-685b3597724b": "2 n-1 test"
+              "316d6207-c6f2-11e6-b09d-685b3597724b": {"en": {"value": "2 n-1 test", "direction": "ltr"}}
             },
             "sortorder": 1
           },
@@ -112,7 +112,7 @@
             "nodegroup_id": "316d6207-c6f2-11e6-b09d-685b3597724b",
             "tileid": "c91c1766-9cf9-4226-ab16-e21c7d221d86",
             "data": {
-              "316d6207-c6f2-11e6-b09d-685b3597724b": "3 n-1 test"
+              "316d6207-c6f2-11e6-b09d-685b3597724b": {"en": {"value": "3 n-1 test", "direction": "ltr"}}
             },
             "sortorder": 2
           },
@@ -130,7 +130,7 @@
             "nodegroup_id": "316d7cfd-c6f2-11e6-8728-685b3597724b",
             "tileid": "bf6ca379-7cd1-4149-aac2-6fee0e71c344",
             "data": {
-              "316d7cfd-c6f2-11e6-8728-685b3597724b": "1 1-n test"
+              "316d7cfd-c6f2-11e6-8728-685b3597724b": {"en": {"value": "1 1-n test", "direction": "ltr"}}
             },
             "sortorder": 0
           },
@@ -140,7 +140,7 @@
             "nodegroup_id": "316d7cfd-c6f2-11e6-8728-685b3597724b",
             "tileid": "4b36198b-445c-47ba-b549-3a73d4c5d71a",
             "data": {
-              "316d7cfd-c6f2-11e6-8728-685b3597724b": "2 1-n test"
+              "316d7cfd-c6f2-11e6-8728-685b3597724b": {"en": {"value": "2 1-n test", "direction": "ltr"}}
             },
             "sortorder": 1
           },
@@ -150,7 +150,7 @@
             "nodegroup_id": "316d7cfd-c6f2-11e6-8728-685b3597724b",
             "tileid": "f4275b5e-79d1-4fe3-9624-efd42357a80f",
             "data": {
-              "316d7cfd-c6f2-11e6-8728-685b3597724b": "3 1-n test"
+              "316d7cfd-c6f2-11e6-8728-685b3597724b": {"en": {"value": "3 1-n test", "direction": "ltr"}}
             },
             "sortorder": 2
           },
@@ -160,7 +160,7 @@
             "nodegroup_id": "316d7cfd-c6f2-11e6-8728-685b3597724b",
             "tileid": "1ca61b91-9fbc-439d-927f-1b4b78191962",
             "data": {
-              "316d7cfd-c6f2-11e6-8728-685b3597724b": "4 1-n test"
+              "316d7cfd-c6f2-11e6-8728-685b3597724b": {"en": {"value": "4 1-n test", "direction": "ltr"}}
             },
             "sortorder": 3
           },
@@ -178,7 +178,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "c63c8176-9082-431e-92b2-1d075d3ce597",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "1 1 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "1 1 n-n test", "direction": "ltr"}}
             },
             "sortorder": 0
           },
@@ -188,7 +188,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "7ce440d3-83e7-4f22-bbdc-0201fd58bafd",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "2 1 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "2 1 n-n test", "direction": "ltr"}}
             },
             "sortorder": 1
           },
@@ -198,7 +198,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "4507e4e7-c30d-4159-af06-428386900992",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "3 1 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "3 1 n-n test", "direction": "ltr"}}
             },
             "sortorder": 2
           },
@@ -216,7 +216,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "7efe4086-df77-49d8-b349-dd036784e96e",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "2 1 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "2 1 n-n test", "direction": "ltr"}}
             },
             "sortorder": 3
           },
@@ -226,7 +226,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "b07fdad2-e198-4ec1-afea-0556b1dc676b",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "2 2 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "2 2 n-n test", "direction": "ltr"}}
             },
             "sortorder": 4
           },
@@ -236,7 +236,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "e7ee2c75-aab2-42cf-b994-e4efa742f5d3",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "3 2 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "3 2 n-n test", "direction": "ltr"}}
             },
             "sortorder": 5
           },
@@ -254,7 +254,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "cb581101-c854-4c4f-880a-0aa4de94fda9",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "3 1 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "3 1 n-n test", "direction": "ltr"}}
             },
             "sortorder": 6
           },
@@ -264,7 +264,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "cf1164fe-e51a-45ef-a39c-4816592ea186",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "3 2 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "3 2 n-n test", "direction": "ltr"}}
             },
             "sortorder": 7
           },
@@ -274,7 +274,7 @@
             "nodegroup_id": "316d574a-c6f2-11e6-8ac4-685b3597724b",
             "tileid": "257fa2f7-f997-4aa6-b842-4439cb92fff4",
             "data": {
-              "316d574a-c6f2-11e6-8ac4-685b3597724b": "3 3 n-n test"
+              "316d574a-c6f2-11e6-8ac4-685b3597724b": {"en": {"value": "3 3 n-n test", "direction": "ltr"}}
             },
             "sortorder": 8
           }
@@ -651,6 +651,13 @@
       "maplinewidth": 1,
       "mappointsize": 3,
       "graphid": "316d5523-c6f2-11e6-8705-685b3597724b",
+        "publication": {
+            "graph_id": "316d5523-c6f2-11e6-8705-685b3597724b",
+            "notes": "Initial migration.",
+            "publicationid": "1ba8f154-d8e9-4a80-8382-a4676d4f263b",
+            "published_time": "2022-03-22T13:29:06.593",
+            "user_id": null
+        },
       "name": "Source",
       "cards_x_nodes_x_widgets": [],
       "cards": [
@@ -807,7 +814,6 @@
         "config": null,
         "name": "Target"
       },
-      "isactive": true,
       "deploymentdate": null
     }
   ],

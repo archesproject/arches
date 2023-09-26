@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['knockout', 'templates/views/components/cards/file-renderers/imagereader.htm'], function(ko, imageReaderTemplate) {
     return ko.components.register('imagereader', {
         viewModel: function(params) {
             this.params = params;
@@ -11,6 +11,6 @@ define(['knockout'], function(ko) {
             }
             this.fileType = 'image/jpeg';
         },
-        template: { require: 'text!templates/views/components/cards/file-renderers/imagereader.htm' }
+        template: imageReaderTemplate,
     });
 });

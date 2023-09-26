@@ -5,7 +5,8 @@ define([
     'knockout-mapping',
     'moment',
     'arches',
-    'views/components/simple-switch'
+    'utils/set-csrf-token',
+    'views/components/simple-switch',
 ], function($, _, ko, koMapping, moment, arches) {
     /**
     * A viewmodel for managing provisional edits
@@ -24,6 +25,18 @@ define([
         self.declineUnacceptedEdits = ko.observable(true);
         self.selectedProvisionalEdit = ko.observable();
 
+        // function csrfSafeMethod(method) {
+        //     // these HTTP methods do not require CSRF protection
+        //     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        // }
+        // $.ajaxSetup({
+        //     beforeSend: function(xhr, settings) {
+        //         console.log("DSIDS()DS()")
+        //         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        //             xhr.setRequestHeader("X-CSRFToken", Cookies.get('csrftoken'));
+        //         }
+        //     }
+        // });
         self.getUserNames = function(edits, users){
             $.ajax({
                 url: arches.urls.get_user_names,

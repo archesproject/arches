@@ -1,9 +1,10 @@
 define([
     'jquery',
-    'arches',
     'knockout',
     'moment',
-], function($, arches, ko, moment) {
+    'arches',
+    'templates/views/components/notification.htm'
+], function($, ko, moment, arches, notificationTemplate) {
 
     /** 
      * A generic component for displaying notifications
@@ -13,6 +14,7 @@ define([
     function NotificationViewModel(params) {
         var self = this;
 
+         
         this.info = ko.observable();
 
         this.displaytime = moment(params.created).format('dddd, DD MMMM YYYY | hh:mm A');
@@ -20,6 +22,7 @@ define([
         this.loadedResources = params.loaded_resources;
         this.link = params.link;
         this.message = params.message;
+        this.files = params.files;
 
         this.dismiss = function(parent) {
             $.ajax({
@@ -53,9 +56,7 @@ define([
 
     ko.components.register('notification', {
         viewModel: NotificationViewModel,
-        template: {
-            require: 'text!templates/views/components/notification.htm'
-        }
+        template: notificationTemplate,
     });
 
     return NotificationViewModel;

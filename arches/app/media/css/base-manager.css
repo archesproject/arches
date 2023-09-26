@@ -1,0 +1,38 @@
+.header {
+  grid-area: header;
+}
+.content-panel {
+  grid-area: content-body;
+}
+.sidenav {
+  grid-area: sidenav;
+  background-color: #2d3c4b;
+  z-index: 15;
+}
+
+.base-manager-grid {
+    display: grid;
+    grid-template-columns: 50px auto;
+    grid-template-rows: 50px auto;
+    grid-template-areas: 
+        "sidenav header"
+        "sidenav content-body";
+    height: 100vh;
+    width: 100vw;
+}
+
+@media print {
+    .base-manager-grid {
+        display: block;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    .header, 
+    .header *, 
+    .sidenav,
+    .sidenav *{
+        display: none !important;
+    }
+
+}

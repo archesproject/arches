@@ -16,7 +16,7 @@ from guardian.exceptions import WrongAppError
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
-from arches.app.models.models import ResourceInstance
+from arches.app.models.models import ResourceInstance, MapLayer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 
@@ -204,6 +204,75 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     return permitted_nodegroups
 
 
+def get_map_layers_by_perm(user, perms, any_perm=True):
+    """
+    returns a list of node groups that a user has the given permission on
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_map_layer" or list of strings
+    any_perm -- True to check ANY perm in "perms" or False to check ALL perms
+
+    """
+
+    if not isinstance(perms, list):
+            perms = [perms]
+
+    formatted_perms = []
+    # in some cases, `perms` can have a `model.` prefix
+    for perm in perms:
+        if len(perm.split(".")) > 1:
+            formatted_perms.append(perm.split(".")[1])
+        else:
+            formatted_perms.append(perm)
+
+    if user.is_superuser is True:
+        return MapLayer.objects.all()
+    else:
+        permitted_map_layers = list()
+
+        user_permissions = ObjectPermissionChecker(user)
+
+        for map_layer in MapLayer.objects.all():
+            if map_layer.addtomap is True and map_layer.isoverlay is False:
+                permitted_map_layers.append(map_layer)
+            else:  # if no explicit permissions, object is considered accessible by all with group permissions
+                explicit_map_layer_perms = user_permissions.get_perms(map_layer)
+                if len(explicit_map_layer_perms):
+                    if any_perm:
+                        if len(set(formatted_perms) & set(explicit_map_layer_perms)):
+                            permitted_map_layers.append(map_layer)
+                    else:
+                        if set(formatted_perms) == set(explicit_map_layer_perms):
+                            permitted_map_layers.append(map_layer)
+                elif map_layer.ispublic:
+                    permitted_map_layers.append(map_layer)
+
+        return permitted_map_layers
+
+def user_can_read_map_layers(user):
+
+    map_layers_with_read_permission = get_map_layers_by_perm(user, ['models.read_maplayer'])
+    map_layers_allowed = []
+
+    for map_layer in map_layers_with_read_permission:
+        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+            map_layers_allowed.append(map_layer)
+
+    return map_layers_allowed
+
+
+def user_can_write_map_layers(user):
+    map_layers_with_write_permission = get_map_layers_by_perm(user, ['models.write_maplayer'])
+    map_layers_allowed = []
+
+    for map_layer in map_layers_with_write_permission:
+        if ('no_access_to_maplayer' not in get_user_perms(user, map_layer)) or (map_layer.addtomap is False and map_layer.isoverlay is False):
+            map_layers_allowed.append(map_layer)
+
+    return map_layers_allowed
+
+
 def get_editable_resource_types(user):
     """
     returns a list of graphs of which a user can edit resource instances
@@ -227,8 +296,10 @@ def get_createable_resource_types(user):
     user -- the user to check
 
     """
-
-    return get_resource_types_by_perm(user, "models.write_nodegroup")
+    if user_is_resource_editor(user):
+        return get_resource_types_by_perm(user, "models.write_nodegroup")
+    else:
+        return []
 
 
 def get_resource_types_by_perm(user, perms):
@@ -244,7 +315,7 @@ def get_resource_types_by_perm(user, perms):
 
     graphs = set()
     nodegroups = get_nodegroups_by_perm(user, perms)
-    for node in Node.objects.filter(nodegroup__in=nodegroups).select_related("graph"):
+    for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
         if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             graphs.add(node.graph)
     return list(graphs)
@@ -289,7 +360,7 @@ def user_has_resource_model_permissions(user, perms, resource):
 
     nodegroups = get_nodegroups_by_perm(user, perms)
     nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
-    return nodes.count() > 0
+    return nodes.exists()
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
@@ -334,7 +405,8 @@ def check_resource_instance_permissions(user, resourceid, permission):
                 return result
 
     except ObjectDoesNotExist:
-        return None
+        result["permitted"] = True # if the object does not exist, no harm in returning true - this prevents strange 403s.
+        return result
 
     return result
 
@@ -439,11 +511,22 @@ def user_is_resource_reviewer(user):
     return user.groups.filter(name="Resource Reviewer").exists()
 
 
+def user_is_resource_exporter(user):
+    """
+    Single test for whether a user is in the Resource Exporter group
+    """
+
+    return user.groups.filter(name="Resource Exporter").exists()
+
+
 def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
             return True
-        if EditLog.objects.filter(transactionid=transactionid, userid=user.id).count() > 0:
+        if EditLog.objects.filter(transactionid=transactionid).exists():
+            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).exists():
+                return True
+        else:
             return True
     return False
 
@@ -494,8 +577,11 @@ class CachedUserPermissionChecker:
             user_permissions = set()
 
             for group in user.groups.all():
-                for permission in group.permissions.all():
-                    user_permissions.add(permission.codename)
+                for group_permission in group.permissions.all():
+                    user_permissions.add(group_permission.codename)
+
+            for user_permission in user.user_permissions.all():
+                user_permissions.add(user_permission.codename)
 
             current_user_cached_permissions["user_permissions"] = user_permissions
             user_permission_cache.set(str(user.pk), current_user_cached_permissions)

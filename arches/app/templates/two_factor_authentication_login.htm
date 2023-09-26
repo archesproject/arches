@@ -1,0 +1,93 @@
+{% extends "base.htm" %}
+{% load static %}
+{% load i18n %}
+
+{% block loading_mask %}
+{% endblock loading_mask %}
+
+{% block body %}
+<div id="container" class="cls-container arches-login">
+
+	<!-- BACKGROUND IMAGE -->
+	<!--===================================================
+	<div id="bg-overlay" class="bg-img img-login"></div>
+	-->
+
+	<div class="cls-content arches-signin">
+        <div class="cls-content-sm panel login-panel" style="">
+			<div class="panel-body" style="padding: 40px; padding-bottom: 20px;">
+				<h3 class="login-panel-header arches-signin">{% trans "Two-Factor Authentication" %}</h3>
+                
+                <hr style="border-color: #eee;">
+
+                {% if user_has_enabled_two_factor_authentication %}
+                    <p>{% trans 'Please enter the code from your external authentication application below.' %} </p>
+
+                    <form name="two-factor-authentication-form" action="{% url 'two-factor-authentication-login' %}" method="post" style="margin-top: 24px;">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="username" value="{{ username }}" />
+                        <input type="hidden" name="password" value="{{ password }}" />
+                        <input type="hidden" name="next" value="{{ next }}" />
+                        <input type="hidden" name="user-has-enabled-two-factor-authentication" value="{{ user_has_enabled_two_factor_authentication }}" />
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="ion-lock-combination"></i></div>
+                                <input
+                                    id='two-factor-authentication'
+                                    name='two-factor-authentication'
+                                    class="form-control input-lg"
+                                    type="text"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                    placeholder="2-step verification code"
+                                    autocomplete="one-time-code"
+                                    onkeyup="(function(input){   // IIFE
+                                        if (input.value.length == 6) {
+                                            document.forms['two-factor-authentication-form'].submit();
+                                        }
+                                    })(this)"
+                                />
+                            </div>
+                        </div>
+
+                        {% if auth_failed %}
+                            <p 
+                                class="login-panel-header arches-signin" 
+                                style="
+                                    color: red;
+                                    font-size: 14px;
+                                "
+                            >
+                                {% trans "Authentication failed. Please try again." %}
+                            </p>
+                        {% endif %}
+                    </form>
+
+                    <hr style="border-color: #eee;">
+                    
+                    <div class="row account-management" style="border-top: 0;">
+                        <a href="{% url 'two-factor-authentication-reset' %}" class="btn btn-link">{% trans "Need to reset two-factor authentication?" %}</a>
+                    </div>
+
+                    <hr style="border-color: #eee;">
+                {% else %}
+                    <div class="row account-management" style="border-top: 0;">
+                        <form action="{% url 'two-factor-authentication-reset' %}" method="post" style="display: flex; flex-direction: column;">
+                            {% csrf_token %}
+                            <input type="hidden" name="email" value="{{ email }}" />
+
+                            <p>{% trans 'The administrator has required that all users enable two-factor authentication.' %}</p>
+                            <button class="btn btn-link account-link" style="color: #579ddb;">{% trans "Enable two-factor authentication via email" %}</button>
+                        </form>
+                    </div>
+                    
+                    <hr style="border-color: #eee;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}

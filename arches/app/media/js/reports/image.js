@@ -2,15 +2,18 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'viewmodels/report',
     'arches',
+    'viewmodels/report',
+    'templates/views/report-templates/image.htm',
     'knockstrap',
     'bindings/chosen'
-], function(_, ko, koMapping, ReportViewModel, arches) {
+], function(_, ko, koMapping, arches, ReportViewModel, imageReportTemplate) {
     return ko.components.register('image-report', {
         viewModel: function(params) {
             var self = this;
             params.configKeys = ['nodes'];
+             
+            
             ReportViewModel.apply(this, [params]);
 
             self.imgs = ko.computed(function() {
@@ -61,8 +64,6 @@ define([
                 })
             );
         },
-        template: {
-            require: 'text!report-templates/image'
-        }
+        template: imageReportTemplate,
     });
 });

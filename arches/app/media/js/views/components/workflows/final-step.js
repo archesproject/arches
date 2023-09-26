@@ -1,8 +1,10 @@
 define([
-    'arches',
     'knockout',
-], function(arches, ko) {
+    'arches',
+    'templates/views/components/workflows/final-step.htm',
+], function(ko, arches, finalStepTemplate) {
     function viewModel(params) {
+         
         this.urls = arches.urls;
         this.loading = ko.observable(true);
         this.resourceid = params.resourceid;
@@ -22,9 +24,7 @@ define([
 
     ko.components.register('final-step', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/workflows/final-step.htm'
-        }
+        template: finalStepTemplate,
     });
     return viewModel;
 });

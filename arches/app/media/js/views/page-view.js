@@ -5,14 +5,15 @@ define([
     'knockout',
     'moment',
     'arches',
+    'view-data',
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
-    'view-data',
     'bindings/scrollTo',
     'bootstrap',
-    'bindings/slide'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData) {
+    'bindings/slide',
+    'jquery-ui',
+], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -67,28 +68,34 @@ define([
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
                         self.viewModel.navDestination(url);
-                        self.viewModel.alert(new AlertViewModel('ep-alert-blue', arches.confirmNav.title, arches.confirmNav.text, function() {
-                            self.viewModel.showConfirmNav(false);
-                        }, function() {
-                            self.viewModel.navigate(self.viewModel.navDestination(), true);
-                        }));
+                        self.viewModel.alert(new AlertViewModel(
+                            'ep-alert-blue', 
+                            arches.translations.confirmNav.title, 
+                            arches.translations.confirmNav.text, 
+                            function() {
+                                self.viewModel.showConfirmNav(false);
+                            }, function() {
+                                self.viewModel.navigate(self.viewModel.navDestination(), true);
+                            }
+                        ));
                         return;
                     }
                     self.viewModel.alert(null);
                     self.viewModel.loading(true);
                     window.location.assign(url);
                 },
-                getHelp: function() {
+                getHelp: function(template) {
                     self.viewModel.helploading(true);
-                    var el = $('.ep-help-content');
+                    var el = document.createElement('div');
+                    $('.ep-help-content').append(el);
                     $.ajax({
                         type: "GET",
                         url: arches.urls.help_template,
-                        data: {'template': self.viewModel.helpTemplate()}
+                        data: {'template': template}
                     }).done(function(data) {
-                        el.html(data);
+                        $(el).html(data);
                         self.viewModel.helploading(false);
-                        $('.ep-help-topic-toggle').click(function() {
+                        $(el).find('.ep-help-topic-toggle').click(function() {
                             var sectionEl = $(this).closest('div');
                             var iconEl = $(this).find('i');
                             if (iconEl.hasClass("fa-chevron-right")) {
@@ -101,10 +108,14 @@ define([
                             var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
                             contentEl.slideToggle();
                         });
-                        $('.reloadable-img').click(function(){
+                        $(el).find('.reloadable-img').click(function(){
                             $(this).attr('src', $(this).attr('src'));
                         });
                     });
+                },
+                closeHelp: function() {
+                    var el = $('.ep-help-content');
+                    el.empty();
                 },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();
@@ -116,6 +127,8 @@ define([
             self.viewModel.notifsList.items.subscribe(function(list) {
                 self.viewModel.unreadNotifs((list.length > 0));
             });
+
+            self.viewModel.translations = arches.translations;
 
             window.addEventListener('beforeunload', function() {
                 self.viewModel.loading(true);

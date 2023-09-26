@@ -110,9 +110,9 @@ class TimeFilter(BaseSearchFilter):
     def view_data(self):
         ret = {}
         date_datatypes = ["date", "edtf"]
-        date_nodes = models.Node.objects.filter(datatype__in=date_datatypes, graph__isresource=True, graph__isactive=True).prefetch_related(
-            "nodegroup"
-        )
+        date_nodes = models.Node.objects.filter(
+            datatype__in=date_datatypes, graph__isresource=True, graph__publication__isnull=False
+        ).prefetch_related("nodegroup")
         node_graph_dict = {
             str(node.nodeid): str(node.graph_id) for node in date_nodes if self.request.user.has_perm("read_nodegroup", node.nodegroup)
         }
@@ -125,7 +125,7 @@ class TimeFilter(BaseSearchFilter):
         for cnw in date_cardxnodesxwidgets:
             node_obj = {}
             node_obj["nodeid"] = str(cnw.node_id)
-            node_obj["label"] = card_name_dict[str(cnw.card_id)] + " - " + cnw.label
+            node_obj["label"] = f"{card_name_dict[str(cnw.card_id)]} - {cnw.label}"
             node_obj["graph_id"] = node_graph_dict[node_obj["nodeid"]]
             node_obj_list.append(node_obj)
 

@@ -375,9 +375,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "9b596906-1540-11ea-b353-acde48001122",
+            "publication": {
+                "graph_id": "9b596906-1540-11ea-b353-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "8e84f6df-4304-440a-a35f-bd0f4f08b741",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "Nesting Testing",

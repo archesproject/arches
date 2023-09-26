@@ -899,9 +899,15 @@
             "forms_x_cards": [],
             "functions_x_graphs": [],
             "graphid": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+            "publication": {
+                "graph_id": "8e672ab0-c6e2-11e6-9725-685b3597724b",
+                "notes": "Initial migration.",
+                "publicationid": "446e5a7f-6cb7-49c8-bc07-50dcc5302207",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": true,
-            "isactive": true,
             "isresource": true,
             "name": "Target",
             "nodegroups": [
@@ -1282,7 +1288,7 @@
                         "advancedStyling": false,
                         "clusterDistance": 20,
                         "clusterMaxZoom": 5,
-                        "clusterMinPoints": 3, 
+                        "clusterMinPoints": 3,
                         "fillColor": "rgba(130, 130, 130, 0.5)",
                         "haloRadius": 4,
                         "haloWeight": 4,

@@ -1,23 +1,27 @@
 define([
     'knockout',
     'underscore',
+    'arches',
     'viewmodels/alert',
     'bindings/scrollTo'
-], function(ko, _, AlertViewModel) {
+], function(ko, _, arches, AlertViewModel) {
     return function(params) {
         var self = this;
 
-        if (!params.card && params.form.card) {
-            params.card = params.form.card();
+        if (!params.card && ko.unwrap(params.form.card)) {
+            params.card = ko.unwrap(params.form.card);
         }
 
-        this.inResourceEditor = location.pathname.includes(params.pageVm.urls.resource_editor);
+         
+        this.inResourceEditor = location.pathname.includes(arches.urls.resource_editor);
         this.configKeys = params.configKeys || [];
         this.showIds = params.showIds || false;
         this.state = params.state || 'form';
         this.preview = params.preview;
         this.loading = params.loading || ko.observable(false);
         this.card = params.card;
+        this.showGrid = params?.form?.showGrid;
+        this.toggleGrid = params?.form?.toggleGrid;
         this.card.hideEmptyNodes = params.hideEmptyNodes;
         this.card.showIds = this.showIds;
         this.tile = params.tile;
@@ -143,7 +147,7 @@ define([
             tile.selected(true);
             self.tile = tile;
             params.dirty(true);
-        }
+        };
 
         this.saveTile = function(callback) {
             self.loading(true);
@@ -233,7 +237,7 @@ define([
             });
         };
         
-        this.createParentAndChild = async (parenttile, childcard) => {
+        this.createParentAndChild = async(parenttile, childcard) => {
             try{
                 const newSave = await self.card.saveParentTile(parenttile);
                 if(newSave){

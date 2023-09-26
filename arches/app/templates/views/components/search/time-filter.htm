@@ -1,12 +1,13 @@
 {% load i18n %}
 <div class="search-container time-search-container">
 
-    <div class="filter-title">{% trans "Date Interval" %}
-        <div class="pull-right">
-            <div class="btn-group">
-                <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> <i class="fa fa-close"></i> {% trans "Clear" %}
-                </button>
-            </div>
+    <div class="filter-title">
+        <span data-bind="text: $root.translations.dateInterval"></span>
+        <div class="btn-group">
+            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> 
+                <i class="fa fa-close"></i>
+                <span data-bind="text: $root.translations.clear"></span>
+            </button>
         </div>
     </div>
     <hr class="title-underline">
@@ -14,11 +15,21 @@
 
         <!-- Date Type -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "Type" %}</h3>
-            <select id="" class="resources" data-placeholder="Date type" tabindex="-1" data-bind="value: filter.dateNodeId, chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} ">
-                <option value="">{% trans "Search all dates" %}</option>
+            <h3 class="search-label">
+                <span data-bind="text: $root.translations.type"></span>
+            </h3>
+            <select 
+                id="" class="resources" 
+                tabindex="-1" 
+                data-bind="
+                    placeholder: $root.translations.dateType,
+                    value: filter.dateNodeId, 
+                    chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} 
+                "
+            >
+                <option value="" data-bind="text: $root.translations.searchAllDates"></option>
                 <!-- ko foreach: { data: graph_models, as: 'graph' } -->
-                    <optgroup data-bind="if: (graph.isresource && graph.isactive), attr: { label: graph.name }">
+                    <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
                         <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
                             <!-- ko if: graph.graphid === node.graph_id -->
                                 <option data-bind="attr: { value: node.nodeid }, text: node.label"></option>
@@ -31,17 +42,31 @@
 
         <!-- Date Selector -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "Within" %}</h3>
-            <select id="" class="resources" placeholder="Select" tabindex="-1" data-bind="value: dateRangeType, chosen:{ width: '100%' }">
-                <option value="custom">{% trans "Custom date range" %}</option>
-                <option value="today">{% trans "Today" %}</option>
-                <option value="last-7">{% trans "Last 7 days" %}</option>
-                <option value="last-30">{% trans "Last 30 days" %}</option>
-                <option value="this-week">{% trans "This week" %}</option>
-                <option value="this-month">{% trans "This month" %}</option>
-                <option value="this-quarter">{% trans "This quarter" %}</option>
-                <option value="this-year">{% trans "This year" %}</option>
-            </select>
+            <h3 class="search-label">
+                <span data-bind="text: $root.translations.within"></span>
+            </h3>
+            <select 
+                id="" 
+                class="resources" 
+                tabindex="-1" 
+                data-bind="
+                    attr: {placeholder: $root.translations.select},
+                    value: dateRangeType, 
+                    chosen:{ width: '100%' },
+                    optionsText: 'text',
+                    optionsValue: 'value',
+                    options: [
+                        { text: $root.translations.customDateRange, value: 'custom' },
+                        { text: $root.translations.today, value: 'today' },
+                        { text: $root.translations.lastSevenDays, value: 'last-7' },
+                        { text: $root.translations.lastThirtyDays, value: 'last-30' },
+                        { text: $root.translations.thisWeek, value: 'this-week' },
+                        { text: $root.translations.thisMonth, value: 'this-month' },
+                        { text: $root.translations.thisQuarter, value: 'this-quarter' },
+                        { text: $root.translations.thisYear, value: 'this-year' },
+                    ],
+                "
+            ></select>
         </div>
 
     </div>
@@ -49,7 +74,9 @@
     <div id="calendar">
         <!-- From Date -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "From" %}</h3>
+            <h3 class="search-label">
+                <span data-bind="text: $root.translations.from"></span>
+            </h3>
             <div id="search-from-c" class="hide-datepicker-time-option">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
             </div>
@@ -57,16 +84,24 @@
 
         <!-- To Date -->
         <div class="calendar picker">
-            <h3 class="search-label">{% trans "To" %}</h3>
+            <h3 class="search-label">
+                <span data-bind="text: $root.translations.to"></span>
+            </h3>
             <div id="search-from-b" class="hide-datepicker-time-option">
                 <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
             </div>
         </div>
     </div>
 
-    <h3 class="time-wheel-title">{% trans "Time Wheel" %}</h3>
-    <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
-    <hr class="title-underline"><div class="sequence" data-bind="visible: loading">{% trans 'Loading time wheel...' %}</div>
+    <h3 class="time-wheel-title">
+        <span data-bind="text: $root.translations.timeWheel"></span>
+    </h3>
+    <div class="time-wheel-instructions">
+        <span data-bind="text: '(' + $root.translations.timeWheelText + ')'"></span>
+    </div>
+    <hr class="title-underline"><div class="sequence" data-bind="visible: loading">
+        <span data-bind="text: $root.translations.loadingTimeWheel + '...'"></span>
+    </div>
     <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}, css:{'time-wheel-loading-mask': loading}">
         <div class="sequence" data-bind="text: breadCrumb"></div>
         <div class="chart svg-container"></div>

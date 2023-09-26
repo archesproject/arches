@@ -32,11 +32,12 @@ class BaseDataType(object):
 
         return []
 
-    def create_error_message(self, value, source, row_number, message):
+    def create_error_message(self, value, source, row_number, message, title=None):
         source_info = "{0} {1}".format(source, row_number) if row_number else ""
         error_message = {
             "type": "ERROR",
             "message": _("{0} error, {1} {2} - {3}. Unable to save.").format(self.datatype_name, value, source_info, message),
+            "title": title,
         }
         return error_message
 
@@ -80,12 +81,6 @@ class BaseDataType(object):
     def get_bounds(self, tile, node):
         """
         Gets the bounds of a geometry if the datatype is spatial
-        """
-        return None
-
-    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
-        """
-        Transforms data from a mobile device to an Arches friendly format
         """
         return None
 
@@ -209,7 +204,7 @@ class BaseDataType(object):
             logger.exception(_("Tile has no authoritative or provisional data"))
 
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         """
         Returns a list of concept values for a given node
         """
@@ -223,7 +218,7 @@ class BaseDataType(object):
 
     def get_search_terms(self, nodevalue, nodeid=None):
         """
-        Returns a nodevalue if it qualifies as a search term
+        Returns an array of arches.app.search_term.SearchTerm objects
         """
         return []
 
@@ -238,25 +233,28 @@ class BaseDataType(object):
         """
         Appends the search query dsl to search for fields that have not been populated
         """
-        base_query = Bool()
-        base_query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
-        null_query = Bool()
-        data_exists_query = Exists(field="tiles.data.%s" % (str(node.pk)))
-        nested_query = Nested(path="tiles", query=data_exists_query)
-        null_query.must(nested_query)
-        if value["op"] == "null":
+        query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}")
+        tiles_w_node_exists = Nested(path="tiles", query=data_exists_query)
+        if value["op"] == "not_null":
+            query.must(tiles_w_node_exists)
+        elif value["op"] == "null":
             # search for tiles that don't exist
-            exists_query = Bool()
-            exists_query.must_not(null_query)
-            base_query.should(exists_query)
+            null_query = Bool()
+            null_query.must_not(tiles_w_node_exists)
+            query.should(null_query)
 
             # search for tiles that do exist, but that have null or [] as values
+            exists_query = Bool()
+            exists_query.must(tiles_w_node_exists)
+            exists_query.must(Terms(field="graph_id", terms=[str(node.graph_id)]))
             func_query = Dsl()
             func_query.dsl = {
                 "function_score": {
                     "min_score": 1,
-                    "query": {"match_all": {}},
+                    "query": exists_query.dsl,
                     "functions": [
                         {
                             "script_score": {
@@ -264,9 +262,9 @@ class BaseDataType(object):
                                     "source": """
                                     int null_docs = 0;
                                     for(tile in params._source.tiles){
-                                        if(tile.data.containsKey(params.node_id)){
+                                        if(tile.nodegroup_id == params.nodegroup_id ){
                                             def val = tile.data.get(params.node_id);
-                                            if (val == null || (val instanceof List && val.length==0)) {
+                                            if (val == null || val == "" || (val instanceof List && val.length==0)) {
                                                 null_docs++;
                                                 break;
                                             }
@@ -275,7 +273,7 @@ class BaseDataType(object):
                                     return null_docs;
                                 """,
                                     "lang": "painless",
-                                    "params": {"node_id": "%s" % (str(node.pk))},
+                                    "params": {"node_id": f"{str(node.pk)}", "nodegroup_id": f"{str(node.nodegroup_id)}"},
                                 }
                             }
                         }
@@ -285,10 +283,7 @@ class BaseDataType(object):
                     "boost_mode": "replace",
                 }
             }
-            base_query.should(func_query)
-        elif value["op"] == "not_null":
-            base_query.must(null_query)
-        query.must(base_query)
+            query.should(func_query)
 
     def pre_tile_save(self, tile, nodeid):
         """
@@ -296,6 +291,12 @@ class BaseDataType(object):
 
         """
         pass
+
+    def get_default_language_value_from_localized_node(self, tile, nodeid):
+        """
+        If value is internationalized, return only the first value in the i18n object
+        """
+        return tile.data[str(nodeid)]
 
     def post_tile_save(self, tile, nodeid, request):
         """
@@ -310,6 +311,12 @@ class BaseDataType(object):
 
         """
         pass
+
+    def is_multilingual_rdf(self, rdf):
+        """
+        Determines if the rdf snippet contains multiple languages that can be processed by a given datatype
+        """
+        return False
 
     def is_a_literal_in_rdf(self):
         """
@@ -436,3 +443,22 @@ class BaseDataType(object):
         ret = {"@display_value": self.get_display_value(tile, node)}
         ret.update(kwargs)
         return ret
+
+    def has_multicolumn_data(self):
+        """
+        Used primarily for csv exports - true if data
+        for a node can span multiple columns
+        """
+        return False
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        return node["file_field_name"]
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        """
+        Adds properties to a tile necessary for some clients, but not essential to the tile
+        """
+        pass

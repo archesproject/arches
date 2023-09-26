@@ -6,6 +6,7 @@ today! Here are the guidelines we'd like you to follow:
 - [Contributing Code](#contribute-code)
     - [Commit Message Guidelines](#commit)
 - [Contributing Documentation](#documentation)
+- [CSS Styleguide](contributing/css-styleguide.md)
 
 ### <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by

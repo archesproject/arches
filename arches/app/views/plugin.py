@@ -43,20 +43,20 @@ class PluginView(MapBaseManagerView):
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
         )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()
         datatypes = models.DDataType.objects.all()
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         geocoding_providers = models.Geocoder.objects.all()
         templates = models.ReportTemplate.objects.all()
+        plugins = models.Plugin.objects.all()
 
         context = self.get_context_data(
             plugin=plugin,
             plugin_json=JSONSerializer().serialize(plugin),
+            plugins_json=JSONSerializer().serialize(plugins),
             main_script="views/plugin",
             resource_graphs=resource_graphs,
             widgets=widgets,
@@ -64,9 +64,7 @@ class PluginView(MapBaseManagerView):
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
             datatypes_json=JSONSerializer().serialize(datatypes, exclude=["iconclass", "modulename", "classname"]),
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
             templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
@@ -76,5 +74,15 @@ class PluginView(MapBaseManagerView):
         context["nav"]["menu"] = False
         context["nav"]["icon"] = plugin.icon
         context["nav"]["title"] = plugin.name
+
+        if plugin.componentname == "etl-manager":
+            template_paths = []
+            for etl_module in models.ETLModule.objects.order_by("helpsortorder"):
+                if etl_module.helptemplate:
+                    template_paths.append(etl_module.helptemplate)
+            if len(template_paths) > 0:
+                context["nav"]["help"] = {"title": _("Plugin Help"), "templates": template_paths}
+        elif plugin.helptemplate:
+            context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.helptemplate]}
 
         return render(request, "views/plugin.htm", context)

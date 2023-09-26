@@ -1,7 +1,7 @@
 define([
-  'jquery',
-  'knockout',
-], function ($, ko) {
+    'jquery',
+    'knockout',
+], function($, ko) {
     ko.bindingHandlers.fadeVisible = {
         init: function(element, valueAccessor) {
             // Initially set the element to be instantly visible/hidden depending on the value
@@ -12,9 +12,9 @@ define([
             // Whenever the value subsequently changes, slowly fade the element in or out
             var value = valueAccessor();
             if (ko.unwrap(value) === false) {
-              $(element).fadeOut();
+                $(element).fadeOut();
             } else {
-              $(element).delay(200).fadeIn(400)
+                $(element).delay(200).fadeIn(400);
             }
             // ko.unwrap(value) ? $(element).fadeOut() : $(element).fadeIn();
         }

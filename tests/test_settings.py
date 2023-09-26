@@ -17,15 +17,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from arches.settings import *
+import arches
 import os
 import inspect
 
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+    pass
 
 PACKAGE_NAME = "arches"
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, "..", "arches"))
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
+
+MIN_ARCHES_VERSION = arches.__version__
+MAX_ARCHES_VERSION = arches.__version__
 
 # LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
 # data migration tests, which could add over a minute to the test process. It's
@@ -89,14 +97,28 @@ REMOTE_BROWSERS = [
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
+ENABLE_TWO_FACTOR_AUTHENTICATION = False
+FORCE_TWO_FACTOR_AUTHENTICATION = False
+
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
 
 INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
 
-DATATYPE_LOCATIONS.append('tests.fixtures.datatypes')
+DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
+ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+LANGUAGES = [
+    ("de", _("German")),
+    ("en", _("English")),
+    ("en-gb", _("British English")),
+    ("es", _("Spanish")),
+    ("ar", _("Arabic")),
+]
 
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
-    pass
+    try:
+        from .settings_docker import *
+    except ImportError:
+        pass

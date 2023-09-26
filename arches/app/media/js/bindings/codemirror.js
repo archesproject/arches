@@ -1,6 +1,7 @@
 define([
+    'jquery',
     'knockout'
-], function(ko) {
+], function($, ko) {
     const initialize = function(element, valueAccessor, CodeMirror) {
         var options = ko.toJS(valueAccessor());
         options.value = options.value || '';

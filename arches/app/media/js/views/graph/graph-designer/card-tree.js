@@ -2,16 +2,14 @@ define([
     'jquery',
     'underscore',
     'knockout',
+    'arches',
+    'views/graph-designer-data',
     'viewmodels/card',
     'models/card-widget',
-    'arches',
     'uuid',
-    'graph-designer-data',
     'bindings/sortable',
     'bindings/scrollTo',
-    'widgets',
-    'card-components'
-], function($, _, ko, CardViewModel, CardWidgetModel, arches, uuid, data) {
+], function($, _, ko, arches, data, CardViewModel, CardWidgetModel, uuid) {
     var CardTreeViewModel = function(params) {
         var self = this;
         var filter = ko.observable('');
@@ -133,6 +131,7 @@ define([
             },
             loading: loading,
             showIds: ko.observable(false),
+            showGrid: ko.observable(false),
             cachedFlatTree: cachedFlatTree,
             widgetLookup: createLookup(data.widgets, 'widgetid'),
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
@@ -152,6 +151,9 @@ define([
             },
             collapseAll: function() {
                 toggleAll(false);
+            },
+            toggleGrid: function() {
+                self.showGrid(!this.showGrid());
             },
             selectAllCards: function() {
                 selectAll(true);
@@ -391,6 +393,15 @@ define([
                 return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
             });
             return !nodegroup || !ko.unwrap(nodegroup.parentnodegroup_id);
+        }).sort((firstEl, secondEl) => {
+            if(firstEl.sortorder < secondEl.sortorder) {
+                return -1;
+            }
+            if(firstEl.sortorder === secondEl.sortorder) {
+                return 0;
+            }
+            return 1;
+
         });
         this.topCards(tc.map(function(card) {
             var constraints =  data.constraints.filter(function(ct){return ct.card_id === card.cardid;});

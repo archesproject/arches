@@ -1,0 +1,60 @@
+.edit-history {
+    display: flex; 
+    flex-direction: column;
+    padding: 0 30px;
+
+    .resource-grid-title {
+        padding: 0;
+    }
+
+    .recent-additions-container {
+        padding: 0;
+    }
+
+    .dataTables_wrapper {
+
+        .row:first-child {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            margin: 0;
+
+            div {
+                width: auto;
+            }
+
+            input.form-control.input-sm {
+                margin-left: 0;
+            }
+
+            div:first-child {
+                display: flex;
+                flex: 1
+            }
+        }
+
+        .row:last-child{
+            margin: 10px 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+
+            div {
+                width: auto;
+            }
+
+            div:first-child {
+                display: flex;
+                flex: 1
+            }
+            .dataTables_info {
+                padding-top: 0;
+                margin-top: 0;
+            }
+        }
+    } 
+}

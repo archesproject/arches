@@ -1,0 +1,60 @@
+{% load i18n %}
+
+<!-- Icon search component-->
+<div class="icon-selector">
+    <!-- Icon Filter -->
+    <div style="padding: 10px;">
+        <div class="flex" style="gap: 5px;">
+            <div>
+                <span data-bind="text: label"></span>
+                <button class="btn btn-default btn-icon icon-lg" tabindex="-1" data-bind="css: selectedIcon(), click: function() {}, attr: {'aria-label': selectedIcon()}"
+                    style="height: 35px; width: 35px;"></button>
+            </div>
+    
+            <div>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    style="width: 366px; height: 36px;" 
+                    data-bind="
+                        attr: {placeholder: $root.translations.findAnIcon, 'aria-label': label},
+                        textInput:iconFilter
+                    "
+                >
+            </div>
+    
+            <!-- ko if: iconFilter() !== '' -->
+            <span class="clear-search" tabindex="0" 
+                data-bind="onEnterkeyClick, onSpaceClick, click: function () { iconFilter(''); },
+                    attr: {'aria-label': $root.translations.clearFilter}
+                ">
+                <i class="fa fa-times-circle"></i>
+            </span>
+            <!-- /ko -->
+        </div>
+    </div>
+    
+    <!-- Skip icon content -->
+    <div><a href="#skip-over-icons-target" id="skip-over-icons-link" class="skip-content-link" tabindex="0">{% trans "Skip icon listbox" %}</a></div>
+
+    <!-- Icon List -->
+    <div class="icon-list" style="height: 300px;overflow-y: scroll;padding: 15px;border: 1px solid #e9e9e9;" role="listbox">
+        <div>
+    
+            <!-- ko foreach: iconList -->
+            <div class="col-xs-6 col-md-3 col-sm-4 demo-icon-font"
+                data-bind="css: {'selected': (cssclass === $parent.selectedIcon())}, 
+                    onEnterkeyClick, onSpaceClick, click: function() { $parent.selectedIcon(cssclass) },
+                    attr: {'aria-label': name, role: 'option', tabindex: '0', 'aria-selected': cssclass === $parent.selectedIcon()},
+                ">
+                <i data-bind="css: cssclass"></i> <span data-bind="text: name"></span>
+            </div>
+            <!-- /ko -->
+    
+        </div>
+    </div>
+
+    <!-- Skip back to icon content -->
+    <div><a href="#skip-over-icons-link" id="skip-over-icons-target" class="skip-content-link" tabindex="0">{% trans "Skip back to icon listbox" %}</a></div>
+    
+</div>

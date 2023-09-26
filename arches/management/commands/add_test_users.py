@@ -50,7 +50,6 @@ class Command(BaseCommand):
                     "Application Administrator",
                     "Crowdsource Editor",
                     "Guest",
-                    "Mobile Project Administrator",
                     "RDM Administrator",
                     "Resource Reviewer",
                     "System Administrator",

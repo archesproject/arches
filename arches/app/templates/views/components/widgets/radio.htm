@@ -4,21 +4,26 @@
 {% block form %}
 <div class="row widget-wrapper">
     <div class="form-group">
-        <label class="control-label widget-input-label" data-bind="text:label">
-        </label>
+        <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <div class="pad-hor columns option-input" data-bind="foreach: flatOptions">
-                <label class="form-radio form-normal form-text"
+            <div class="pad-hor columns option-input" data-bind="foreach: flatOptions, attr:{'aria-label': label}" role="radiogroup">
+                <label class="form-radio form-normal form-text" role="radio"
                     data-bind="css: {
                         'active': $parent.isOptionSelected($data),
                         'disabled': $parent.disabled
                     },
+                    onEnterkeyClick,
+                    onSpaceClick,
                     click: function () {
                         $parent.setOptionSelection($data, true);
-                    }">
+                    },
+                    attr: {
+                        'aria-checked': $parent.isOptionSelected($data)
+                    }"
+                    tabindex="0">
                     <input type="radio" data-bind="checked: $parent.value,
                         attr: {
                             value: id,
@@ -35,17 +40,23 @@
 {% block config_form %}
 <div>
     <div class="control-label">
-        {% trans "Default Value" %}
+        <span data-bind="text: $root.translations.defaultValue"></span>
     </div>
     <div class="col-xs-12">
-        <div class="pad-hor columns radio-panel option-input-config" data-bind="foreach: flatOptions">
-            <label class="form-radio form-normal form-text"
+        <div class="pad-hor columns radio-panel option-input-config" data-bind="foreach: flatOptions, attr:{'aria-label': $root.translations.defaultValue}" role="radiogroup">
+            <label class="form-radio form-normal form-text" role="radio"
                 data-bind="css: {
                     'active': $parent.isOptionSelected($data)
                 },
+                onEnterkeyClick,
+                onSpaceClick,
                 click: function () {
                     $parent.setOptionSelection($data, true);
-                }">
+                },
+                attr: {
+                    'aria-checked': $parent.isOptionSelected($data)
+                }"
+                tabindex="0">
                 <input type="radio" data-bind="checked: $parent.defaultValue,
                     attr: {
                         value: id,

@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
@@ -7,7 +8,7 @@ define([
     'geojson-extent',
     'views/components/iiif-viewer',
     'leaflet-draw'
-], function(_, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
+], function($, _, ko, koMapping, L, uuid, geojsonExtent, IIIFViewerViewmodel) {
     var viewModel = function(params) {
         var self = this;
 

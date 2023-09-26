@@ -29,6 +29,7 @@ from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.i18n import rank_label
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
 from django.db import IntegrityError
@@ -329,7 +330,7 @@ class Concept(object):
             for relation in conceptrelations:
                 relation.delete()
 
-            if models.Relation.objects.filter(relations_filter).count() == 0:
+            if not models.Relation.objects.filter(relations_filter).exists():
                 # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
                 concept = models.Concept.objects.get(pk=self.id)
                 concept.nodetype_id = "ConceptScheme"
@@ -795,32 +796,21 @@ class Concept(object):
         return [atof(c) for c in re.split(r"[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)", str(text))]
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
-        score = 0
         ranked_labels = []
         if self.values == []:
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=["label"])
         else:
             concept = self
 
-        for value in concept.values:
-            ranked_label = {"weight": 1, "value": value}
-            if value.type == "prefLabel":
-                ranked_label["weight"] = ranked_label["weight"] * 10
-            elif value.type == "altLabel":
-                ranked_label["weight"] = ranked_label["weight"] * 4
-
-            if value.language == lang:
-                ranked_label["weight"] = ranked_label["weight"] * 10
-            elif value.language.split("-")[0] == lang.split("-")[0]:
-                ranked_label["weight"] = ranked_label["weight"] * 5
-
-            ranked_labels.append(ranked_label)
-
-        ranked_labels = sorted(ranked_labels, key=lambda label: label["weight"], reverse=True)
+        ranked_labels = sorted(
+            concept.values,
+            key=lambda label: rank_label(kind=label.type, source_lang=label.language, target_lang=lang),
+            reverse=True,
+        )
         if len(ranked_labels) == 0:
-            ranked_labels.append({"weight": 1, "value": ConceptValue()})
+            return ConceptValue()
 
-        return ranked_labels[0]["value"]
+        return ranked_labels[0]
 
     def flatten(self, ret=None):
         """
@@ -1189,24 +1179,24 @@ class Concept(object):
         cursor.execute(
             """
             WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, c.languageid, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
                     FROM relations d
                     JOIN values c ON(c.conceptid = d.conceptidto)
                     JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
                     WHERE d.conceptidfrom = %s
-                    and c2.valuetype = 'prefLabel'
-                    and c.valuetype in ('prefLabel', 'sortorder', 'collector')
+                    and c2.valuetype IN ('prefLabel', 'altLabel')
+                    and c.valuetype IN ('prefLabel', 'altLabel', 'sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                     UNION
-                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
+                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, v.languageid, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
                     FROM relations  d
                     JOIN children b ON(b.conceptidto = d.conceptidfrom)
                     JOIN values v ON(v.conceptid = d.conceptidto)
                     JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
-                    WHERE  v2.valuetype = 'prefLabel'
-                    and v.valuetype in ('prefLabel','sortorder', 'collector')
+                    WHERE  v2.valuetype IN ('prefLabel', 'altLabel')
+                    and v.valuetype IN ('prefLabel', 'altLabel', 'sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
+                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, languageid, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
             """,
             [conceptid],
         )
@@ -1219,6 +1209,7 @@ class Concept(object):
             "valueid",
             "valueto",
             "valueidto",
+            "languageid",
             "depth",
             "idpath",
             "conceptpath",
@@ -1243,7 +1234,7 @@ class Concept(object):
                     new_val = Val(rec["conceptidto"])
                     if rec["vtype"] == "sortorder":
                         new_val.sortorder = rec["valueto"]
-                    elif rec["vtype"] == "prefLabel":
+                    elif rec["vtype"] in ("prefLabel", "altLabel"):
                         new_val.text = rec["valueto"]
                         new_val.id = rec["valueidto"]
                     elif rec["vtype"] == "collector":
@@ -1255,7 +1246,7 @@ class Concept(object):
                             if conceptid == path[-1]:
                                 if rec["vtype"] == "sortorder":
                                     child.sortorder = rec["valueto"]
-                                elif rec["vtype"] == "prefLabel":
+                                elif rec["vtype"] in ("prefLabel", "altLabel"):
                                     child.text = rec["valueto"]
                                     child.id = rec["valueidto"]
                                 elif rec["vtype"] == "collector":
@@ -1264,8 +1255,13 @@ class Concept(object):
                             _findNarrower(child, path, rec)
                 val.children.sort(key=lambda x: (x.sortorder, x.text))
 
-        for row in rows:
-            rec = dict(list(zip(column_names, row)))
+        def best_language_last(rec):
+            """_findNarrower updates via recursive search, so sort the best language last."""
+            label_rank = rank_label(kind=rec["vtype"], source_lang=rec["languageid"])
+            return (rec["depth"], rec["conceptpath"], label_rank)
+
+        records = [dict(list(zip(column_names, row))) for row in rows]
+        for rec in sorted(records, key=best_language_last):
             path = rec["conceptpath"][1:-1].split(",")
             _findNarrower(result, path, rec)
 
@@ -1401,7 +1397,6 @@ class ConceptValue(object):
 
 
 def get_preflabel_from_conceptid(conceptid, lang):
-    ret = None
     default = {
         "category": "",
         "conceptid": "",
@@ -1416,17 +1411,19 @@ def get_preflabel_from_conceptid(conceptid, lang):
     bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
     query.add_query(bool_query)
     preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
-    for preflabel in preflabels:
-        default = preflabel["_source"]
-        if preflabel["_source"]["language"] is not None and lang is not None:
-            # get the label in the preferred language, otherwise get the label in the default language
-            if preflabel["_source"]["language"] == lang:
-                return preflabel["_source"]
-            if preflabel["_source"]["language"].split("-")[0] == lang.split("-")[0]:
-                ret = preflabel["_source"]
-            if preflabel["_source"]["language"] == settings.LANGUAGE_CODE and ret is None:
-                ret = preflabel["_source"]
-    return default if ret is None else ret
+
+    ranked = sorted(
+        preflabels,
+        key=lambda prefLabel: rank_label(kind=prefLabel["_source"]["type"],
+                                         source_lang=prefLabel["_source"]["language"],
+                                         target_lang=lang,
+                                         ),
+        reverse=True,
+    )
+
+    if not ranked:
+        return default
+    return ranked[0]["_source"]
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):

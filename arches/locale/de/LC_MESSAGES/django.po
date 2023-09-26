@@ -1,0 +1,7309 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-30 19:07-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: app/datatypes/base.py:39
+#, python-brace-format
+msgid "{0} error, {1} {2} - {3}. Unable to save."
+msgstr ""
+
+#: app/datatypes/base.py:199
+msgid "Multiple provisional edits. Returning first edit"
+msgstr ""
+
+#: app/datatypes/base.py:203
+msgid "Tile has no authoritative or provisional data"
+msgstr ""
+
+#: app/datatypes/concept_types.py:140
+msgid ""
+"The widget used to save this data appears to be incorrect for this datatype. "
+"Contact system admin to resolve"
+msgstr ""
+
+#: app/datatypes/concept_types.py:148
+msgid "This is an invalid concept prefLabel, or an incomplete UUID"
+msgstr ""
+
+#: app/datatypes/concept_types.py:156
+msgid "This UUID is not an available concept value"
+msgstr ""
+
+#: app/datatypes/datatypes.py:104
+msgid "This is not a string"
+msgstr ""
+
+#: app/datatypes/datatypes.py:328
+msgid "Not a properly formatted number"
+msgstr ""
+
+#: app/datatypes/datatypes.py:419
+msgid "Not of type boolean"
+msgstr ""
+
+#: app/datatypes/datatypes.py:500
+msgid ""
+"Incorrect format. Confirm format is in settings.DATE_FORMATS or set the "
+"format in settings.DATE_IMPORT_EXPORT_FORMAT."
+msgstr ""
+
+#: app/datatypes/datatypes.py:564
+#, python-brace-format
+msgid "{value} is an invalid date format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:665
+msgid ""
+"Incorrect Extended Date Time Format. See http://www.loc.gov/standards/"
+"datetime/ for supported formats"
+msgstr ""
+
+#: app/datatypes/datatypes.py:718
+msgid ""
+"Only dates that specify an exact year, month, and day can be used with the "
+"\"=\" operator"
+msgstr ""
+
+#: app/datatypes/datatypes.py:727
+msgid ""
+"Only dates that specify an exact year, "
+"month,                                     and day can be used with the \">"
+"\", \"<\", \">=\", and \"<=\" operators"
+msgstr ""
+
+#: app/datatypes/datatypes.py:739
+msgid "Invalid date specified."
+msgstr ""
+
+#: app/datatypes/datatypes.py:806
+msgid "Unable to serialize some geometry features"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1398
+msgid "File type not permitted"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1424
+#, python-brace-format
+msgid "This node has a limit of {0} files. Please reduce files."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1432
+#, python-brace-format
+msgid ""
+"This node has a file-size limit of {0}. Please reduce file size or contact "
+"your sysadmin."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1440
+#, python-brace-format
+msgid "The file \"{0}\" does not exist in \"{1}\""
+msgstr ""
+
+#: app/datatypes/datatypes.py:1444
+#, python-brace-format
+msgid "datatype: {0}, value: {1} - {2} ."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1503 app/datatypes/datatypes.py:1590
+msgid "File does not exist"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1622
+msgid "The file url is invalid"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1624
+msgid "A file is not available for this tile"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1626
+msgid "This file's fileid is not a valid UUID"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1757
+#, python-brace-format
+msgid "No domain option found for option id {0}, in node conifg: {1}"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1806
+msgid ""
+"Invalid domain id. Please check the node this value is mapped to for a list "
+"of valid domain ids."
+msgstr ""
+
+#: app/datatypes/datatypes.py:2122
+#, python-brace-format
+msgid "The related resource with id '{0}' is not in the system."
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:33
+msgid "Delegating load reversal to Celery task"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:218
+msgid "Legacy id(s) already exist. Legacy ids must be unique"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:243
+#: app/etl_modules/import_single_csv.py:208
+msgid "Failed to complete load"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:244
+#: app/etl_modules/import_single_csv.py:209
+msgid "Unable to insert record into staging table"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:279
+msgid "Invalid excel file/zip specified"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:280
+msgid "Upload a valid excel file"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:307
+msgid "Unable to initialize load"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:322
+#: app/etl_modules/import_single_csv.py:161
+msgid "Delegating load to Celery task"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:326
+#: app/etl_modules/import_single_csv.py:165
+msgid "delegated_to_celery"
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:329
+#: app/etl_modules/import_single_csv.py:168
+msgid ""
+"Cannot start process. Unable to run process as a background task at this "
+"time."
+msgstr ""
+
+#: app/etl_modules/branch_csv_importer.py:335
+#: app/etl_modules/import_single_csv.py:174
+#: app/templates/views/rdm/modals/import-concept-form.htm:40
+msgid "Error"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:104
+msgid "No csv file found"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:105
+msgid "Upload a valid csv file"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:143
+msgid "No valid node is selected"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:145
+msgid "Only one column should be selected for id"
+msgstr ""
+
+#: app/functions/primary_descriptors.py:67
+#, python-brace-format
+msgid "Invalid nodegroupid, {0}, participating in descriptor function."
+msgstr ""
+
+#: app/functions/primary_descriptors.py:69 app/views/resource.py:745
+#: app/views/search.py:387
+msgid "Undefined"
+msgstr ""
+
+#: app/models/concept.py:153
+msgid "Only include values for include or exclude, but not both"
+msgstr ""
+
+#: app/models/concept.py:844
+#, python-format
+msgid "Invalid subconcept definition: %s"
+msgstr ""
+
+#: app/models/concept.py:852
+#, python-format
+msgid "Invalid related concept definition: %s"
+msgstr ""
+
+#: app/models/concept.py:863
+#, python-format
+msgid "Invalid value definition: %s"
+msgstr ""
+
+#: app/models/concept.py:1267
+msgid "Need to include values when creating a collection"
+msgstr ""
+
+#: app/models/concept.py:1375
+msgid ""
+"Index of label failed.  Index type (scheme id) could not be derived from the "
+"label."
+msgstr ""
+
+#: app/models/fields/i18n.py:166
+msgid "A I18n_TextField object"
+msgstr ""
+
+#: app/models/fields/i18n.py:357
+msgid "A I18n_JSONField object"
+msgstr ""
+
+#: app/models/graph.py:77
+msgid "New Node"
+msgstr ""
+
+#: app/models/graph.py:267
+msgid "Top Node"
+msgstr ""
+
+#: app/models/graph.py:491
+#, python-brace-format
+msgid ""
+"Duplicate node alias: \"{0}\". All aliases must be unique in a resource "
+"model."
+msgstr ""
+
+#: app/models/graph.py:495
+#, python-brace-format
+msgid "Fail to save node \"{0}\"."
+msgstr ""
+
+#: app/models/graph.py:554
+#, python-brace-format
+msgid ""
+"Your resource model: {0}, already has instances saved. You cannot delete a "
+"Resource Model with instances."
+msgstr ""
+
+#: app/models/graph.py:703
+#, python-brace-format
+msgid ""
+"Your resource model: {0}, already has instances saved. You cannot modify a "
+"Resource Model with instances."
+msgstr ""
+
+#: app/models/graph.py:735
+msgid "Ontology rules don't allow this node to be appended"
+msgstr ""
+
+#: app/models/graph.py:1002
+#, python-brace-format
+msgid ""
+"Your resource model: {self.name}, already has instances "
+"saved.                             You cannot delete nodes from a Resource "
+"Model with instances."
+msgstr ""
+
+#: app/models/graph.py:1037
+msgid "The graph you wish to append needs to define an ontology"
+msgstr ""
+
+#: app/models/graph.py:1050
+msgid "Ontology rules don't allow this graph to be appended"
+msgstr ""
+
+#: app/models/graph.py:1522
+#, python-brace-format
+msgid ""
+"Your resource model: {self.name}, already has instances "
+"saved.                                 You cannot modify a Resource Model "
+"with instances."
+msgstr ""
+
+#: app/models/graph.py:1541
+#, python-brace-format
+msgid "Duplicate node name: \"{0}\". All node names in a card must be unique."
+msgstr ""
+
+#: app/models/graph.py:1550
+#, python-brace-format
+msgid "Duplicate node name: \"{0}\". All sibling node names must be unique."
+msgstr ""
+
+#: app/models/graph.py:1586
+msgid ""
+"The top node of your resource graph: {self.root.name} needs to be a "
+"collector.                             Hint: check that nodegroup_id of your "
+"resource node(s) are not null."
+msgstr ""
+
+#: app/models/graph.py:1592
+msgid "The top node of your resource graph must have a datatype of 'semantic'."
+msgstr ""
+
+#: app/models/graph.py:1597
+msgid ""
+"If your graph contains more than one node and is not a resource the root "
+"must be a collector."
+msgstr ""
+
+#: app/models/graph.py:1602
+msgid "Field name must not be blank."
+msgstr ""
+
+#: app/models/graph.py:1604
+msgid "Field name must contain only alpha-numeric characters or underscores."
+msgstr ""
+
+#: app/models/graph.py:1606
+msgid "Field name cannot begin with an underscore or number"
+msgstr ""
+
+#: app/models/graph.py:1612
+#, python-brace-format
+msgid "Field name must be unique to the graph; '{fieldname}' already exists."
+msgstr ""
+
+#: app/models/graph.py:1634
+#, python-brace-format
+msgid "A valid {0} ontology class must be selected"
+msgstr ""
+
+#: app/models/graph.py:1637
+#, python-brace-format
+msgid "'{0}' is not a valid {1} ontology class"
+msgstr ""
+
+#: app/models/graph.py:1645
+msgid ""
+"You must specify an ontology property. Your graph isn't semantically "
+"valid.                                 Entity domain '{edge.domainnode."
+"ontologyclass}' and                                 Entity range '{edge."
+"rangenode.ontologyclass}' can not be related via Property '{edge."
+"ontologyproperty}'."
+msgstr ""
+
+#: app/models/graph.py:1664
+msgid ""
+"Your graph isn't semantically valid. Entity domain '{edge.domainnode."
+"ontologyclass}' and                                 Entity range '{edge."
+"rangenode.ontologyclass}' cannot                                 be related "
+"via Property '{edge.ontologyproperty}'."
+msgstr ""
+
+#: app/models/graph.py:1672
+#, python-brace-format
+msgid ""
+"'{0}' is not found in the {1} ontology or is not a valid ontology property "
+"for Entity domain '{2}'."
+msgstr ""
+
+#: app/models/graph.py:1681
+msgid ""
+"You have assigned ontology classes to your graph nodes but not assigned an "
+"ontology to your graph."
+msgstr ""
+
+#: app/models/graph.py:1702
+msgid "The json-ld context you supplied wasn't formatted correctly."
+msgstr ""
+
+#: app/models/graph.py:1707
+#, python-brace-format
+msgid "Another resource model already uses the slug '{self.slug}'"
+msgstr ""
+
+#: app/models/graph.py:1753
+msgid "Graph Validation Error"
+msgstr ""
+
+#: app/models/models.py:435
+msgid "Only resource models may be edited - branches are not editable"
+msgstr ""
+
+#: app/models/models.py:437
+msgid ""
+"This Model is currently unpublished and not available for instance creation."
+msgstr ""
+
+#: app/models/resource.py:785
+msgid "Published Model Error"
+msgstr ""
+
+#: app/models/resource.py:795
+msgid "Unpublished Model Error"
+msgstr ""
+
+#: app/models/tile.py:276
+msgid ""
+"This card violates a unique constraint.                                 The "
+"following value is already saved: "
+msgstr ""
+
+#: app/models/tile.py:297
+#, python-brace-format
+msgid ""
+"Error checking for missing node. Nodeid: {nodeid} with value: {value}, not "
+"in nodes.                     You may have a node in your business data that "
+"no longer exists in any graphs."
+msgstr ""
+
+#: app/models/tile.py:302
+msgid "This card requires values for the following: "
+msgstr ""
+
+#: app/models/tile.py:325
+#, python-brace-format
+msgid "{0}"
+msgstr ""
+
+#: app/models/tile.py:645 app/models/tile.py:656 app/models/tile.py:673
+msgid "No associated functions or other TypeError raised by a function"
+msgstr ""
+
+#: app/models/tile.py:711
+msgid "Tile Validation Error"
+msgstr ""
+
+#: app/models/tile.py:722
+msgid "Tile Cardinaltiy Error"
+msgstr ""
+
+#: app/search/base_index.py:182
+msgid "Search Index Error:"
+msgstr ""
+
+#: app/search/base_index.py:192
+msgid "Search Index Not Defined Error:"
+msgstr ""
+
+#: app/search/base_index.py:193
+#, python-format
+msgid ""
+"The index \"%s\" is not defined in settings.ELASTICSEARCH_CUSTOM_INDEXES"
+msgstr ""
+
+#: app/search/components/map_filter.py:75
+msgid "Feature geometry is not defined"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:289
+msgid ""
+"You need at least one of the following operators in a Range expression: gte, "
+"gt, lte, or lt"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:291
+msgid "You can only use one of either: gte or gt"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:293
+msgid "You can only use one of either: lte or lt"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:377
+msgid "You need to specify either a \"field\" or a \"script\""
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:379
+msgid "You need to specify a name for your aggregation"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:381
+msgid "You need to specify an aggregation type"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:570
+msgid "You need to specify a path for your nested aggregation"
+msgstr ""
+
+#: app/search/search_export.py:212
+#, python-brace-format
+msgid "Shapefile are fieldnames required for the following nodes: {0}"
+msgstr ""
+
+#: app/tasks.py:31
+msgid "files_deleted"
+msgstr ""
+
+#: app/tasks.py:84
+msgid ""
+"Your search {} is ready for download. You have 24 hours to access this file, "
+"after which we'll automatically remove it."
+msgstr ""
+
+#: app/tasks.py:88
+msgid ""
+"Hello,\n"
+"Your request to download a set of search results is now ready."
+msgstr ""
+
+#: app/tasks.py:90
+msgid "Download Now"
+msgstr ""
+
+#: app/tasks.py:91 app/tasks.py:148
+msgid "Thank you"
+msgstr ""
+
+#: app/tasks.py:140
+msgid "Resources have completed loading."
+msgstr ""
+
+#: app/tasks.py:144
+msgid ""
+"Hello,\n"
+"Your package has successfully loaded into your Arches project."
+msgstr ""
+
+#: app/tasks.py:147
+msgid "Log me in"
+msgstr ""
+
+#: app/tasks.py:213 app/tasks.py:235
+msgid "Completed"
+msgstr ""
+
+#: app/tasks.py:213 app/tasks.py:220 app/tasks.py:235 app/tasks.py:242
+msgid "Failed"
+msgstr ""
+
+#: app/tasks.py:214
+msgid "Branch Excel Import: {} [{}]"
+msgstr ""
+
+#: app/tasks.py:236
+msgid "Single CSV Import: {} [{}]"
+msgstr ""
+
+#: app/templates/base-manager.htm:42 app/templates/change_password.htm:46
+#: app/templates/javascript.htm:404
+#: app/templates/views/rdm/modals/import-concept-form.htm:52
+#: app/templates/views/rdm/modals/import-scheme-form.htm:53
+#: app/templates/views/rdm/modals/manage-parent-form.htm:57
+#: app/templates/views/rdm/modals/related-concept-form.htm:67
+#: app/templates/views/rdm/modals/related-member-form.htm:66
+#: app/templates/views/rdm/modals/value-form.htm:63
+#: app/templates/views/rdm/modals/value-form.htm:142
+#: app/templates/views/rdm/modals/value-form.htm:220
+#: app/templates/views/user-profile-manager.htm:156
+msgid "Cancel"
+msgstr ""
+
+#: app/templates/base-manager.htm:45
+msgid "OK"
+msgstr ""
+
+#: app/templates/base-manager.htm:72 app/templates/rdm.htm:64
+msgid "Tools"
+msgstr ""
+
+#: app/templates/base-manager.htm:80
+msgid "Manage System Settings"
+msgstr ""
+
+#: app/templates/base-manager.htm:86
+#: app/templates/help/system-settings-help.htm:11 app/views/api.py:799
+#: app/views/resource.py:239
+msgid "System Settings"
+msgstr ""
+
+#: app/templates/base-manager.htm:90
+msgid "System Settings Graph"
+msgstr ""
+
+#: app/templates/base-manager.htm:101 app/templates/base-manager.htm:363
+#: app/templates/javascript.htm:386 app/templates/views/search.htm:23
+#: app/views/search.py:105
+msgid "Search"
+msgstr ""
+
+#: app/templates/base-manager.htm:116
+msgid "Add New Resource"
+msgstr ""
+
+#: app/templates/base-manager.htm:149 app/views/graph.py:151
+msgid "Arches Designer"
+msgstr ""
+
+#: app/templates/base-manager.htm:155 app/templates/index.htm:399
+#: app/templates/views/graph.htm:64
+msgid "Resource Models"
+msgstr ""
+
+#: app/templates/base-manager.htm:159 app/templates/views/graph.htm:65
+msgid "Branches"
+msgstr ""
+
+#: app/templates/base-manager.htm:171
+#: app/templates/views/map-layer-manager.htm:26 app/views/map.py:96
+#: app/views/map.py:98
+msgid "Map Layer Manager"
+msgstr ""
+
+#: app/templates/base-manager.htm:177
+#: app/templates/help/map-manager-help.htm:11
+#: app/templates/views/map-layer-manager.htm:88
+msgid "Resource Layers"
+msgstr ""
+
+#: app/templates/base-manager.htm:182
+#: app/templates/help/map-manager-help.htm:31 app/templates/javascript.htm:439
+#: app/templates/views/map-layer-manager.htm:89
+msgid "Basemaps"
+msgstr ""
+
+#: app/templates/base-manager.htm:187
+#: app/templates/help/map-manager-help.htm:46 app/templates/javascript.htm:440
+#: app/templates/javascript.htm:482
+#: app/templates/views/map-layer-manager.htm:90
+msgid "Overlays"
+msgstr ""
+
+#: app/templates/base-manager.htm:201 app/templates/views/edit-history.htm:5
+#: app/views/resource.py:572
+msgid "Recent Edits"
+msgstr ""
+
+#: app/templates/base-manager.htm:214 app/views/user.py:107
+#: app/views/user.py:142
+msgid "Profile Manager"
+msgstr ""
+
+#: app/templates/base-manager.htm:223
+msgid "Modules"
+msgstr ""
+
+#: app/templates/base-manager.htm:232 app/templates/rdm.htm:9
+#: app/views/concept.py:67
+msgid "Reference Data Manager"
+msgstr ""
+
+#: app/templates/base-manager.htm:274
+msgid "DEBUG"
+msgstr ""
+
+#: app/templates/base-manager.htm:289 app/templates/index.htm:87
+#: app/templates/javascript.htm:735 app/templates/views/graph.htm:109
+#: app/templates/views/rdm/concept-report.htm:26
+#: app/templates/views/rdm/concept-report.htm:50
+msgid "Manage"
+msgstr ""
+
+#: app/templates/base-manager.htm:323
+msgid "Profile"
+msgstr ""
+
+#: app/templates/base-manager.htm:323 app/templates/base-manager.htm:326
+msgid "Login"
+msgstr ""
+
+#: app/templates/base-manager.htm:328
+msgid "Welcome"
+msgstr ""
+
+#: app/templates/base-manager.htm:349 app/templates/base-manager.htm:422
+msgid "Notifications"
+msgstr ""
+
+#: app/templates/base-manager.htm:374
+msgid "My Recent Edits"
+msgstr ""
+
+#: app/templates/base-manager.htm:383
+msgid "Edit Resource"
+msgstr ""
+
+#: app/templates/base-manager.htm:391
+msgid "Print"
+msgstr ""
+
+#: app/templates/base-manager.htm:400 app/templates/javascript.htm:340
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:54
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:110
+msgid "Help"
+msgstr ""
+
+#: app/templates/base-manager.htm:411
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base-manager.htm:426 app/templates/base-manager.htm:448
+#: app/templates/login.htm:73 app/templates/rdm.htm:78
+#: app/templates/views/rdm/concept-report.htm:42
+#: app/templates/views/rdm/concept-report.htm:59
+#: app/templates/views/rdm/modals/add-child-form.htm:49
+#: app/templates/views/rdm/modals/add-collection-form.htm:31
+#: app/templates/views/rdm/modals/add-scheme-form.htm:37
+#: app/templates/views/rdm/modals/delete-collection-form.htm:43
+#: app/templates/views/rdm/modals/delete-scheme-form.htm:43
+#: app/templates/views/rdm/modals/export-scheme-form.htm:26
+msgid "Close"
+msgstr ""
+
+#: app/templates/base-manager.htm:444
+msgid "My Edit History"
+msgstr ""
+
+#: app/templates/base-manager.htm:471
+msgid "Close Help"
+msgstr ""
+
+#: app/templates/base-manager.htm:482
+msgid "for more documentation, visit"
+msgstr ""
+
+#: app/templates/change_password.htm:23
+msgid "Change your password"
+msgstr ""
+
+#: app/templates/change_password.htm:47
+msgid "Change Password"
+msgstr ""
+
+#: app/templates/change_password.htm:50 app/templates/signup.htm:133
+msgid "Your password must:"
+msgstr ""
+
+#: app/templates/errors/404.htm:11 app/templates/errors/500.htm:11
+#: app/templates/javascript.htm:206
+msgid "Arches"
+msgstr ""
+
+#: app/templates/errors/404.htm:19 app/templates/errors/500.htm:19
+msgid "Oops!"
+msgstr ""
+
+#: app/templates/errors/404.htm:20
+msgid "Page Not Found!"
+msgstr ""
+
+#: app/templates/errors/404.htm:22
+msgid ""
+"Sorry, but the page you are looking for has not been found on our server."
+msgstr ""
+
+#: app/templates/errors/404.htm:26 app/templates/errors/500.htm:26
+msgid "Back to Homepage"
+msgstr ""
+
+#: app/templates/errors/500.htm:20
+msgid "Internal Server Error!"
+msgstr ""
+
+#: app/templates/errors/500.htm:22
+msgid "Something went wrong and we couldn't process your request."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:6
+msgid "Cards Tab"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:10
+#: app/templates/help/function-help.htm:7
+#: app/templates/help/graph-tab-help.htm:10
+#: app/templates/help/permissions-tab-help.htm:10
+msgid "Overview"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:14
+msgid ""
+"In this tab you will configure the user-facing aspects of your graph. There "
+"are multiple levels to doing so, which are reflected in the levels of the "
+"graph tree. <strong>Report Configuration</strong> where you choose the "
+"template for the resource report, <strong>Card Configuration</strong> where "
+"you'll specify card-related settings, and the <strong>Widget Manager</"
+"strong> where you will choose and configure the data entry widget for each "
+"node in the graph."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:19
+#: app/templates/views/graph-designer.htm:307
+msgid "Report Configuration"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:23
+msgid ""
+"Each Resource Model must be configured with a report template. Reports show "
+"data for all nodes in a resource instance for which the user has Read "
+"permissions."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:24
+msgid "No Header Template"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:25
+msgid "Lists all node data, no special header at the top of the page."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:26
+msgid "Image Header Template"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:27
+msgid ""
+"Use this template for Resource Models that will be be primarily used to "
+"record images."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:30 app/templates/javascript.htm:535
+msgid "Included Image Nodes"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:31
+msgid ""
+"Choose one or more nodes that hold images in this Resource Model. These "
+"images will be presented as a slideshow in the report header."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:34
+msgid "Map Header Template"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:35
+msgid ""
+"Use this template for Resource Models that will be be primarily used to "
+"record resources that have a geo-location. There are number of settings you "
+"should fill out to control the appearance of the map in the header."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:38
+msgid "Map Controls"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:39
+msgid "Choose whether or not the user has access to the Map Tools."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:42
+msgid "Position"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:43
+msgid ""
+"You can set the position by panning the map. On report load, the map will "
+"automatically pan and zoom to the resource geo-location if there is one "
+"(also see <strong>Default Value</strong> below). Pitch values are 0-60 "
+"(higher = more oblique), <strong>Bearing</strong> values can be positive or "
+"negative (270 faces west; -180 faces south). Use <code>ctrl + click</code> "
+"then pan the map to change Pitch and Bearing."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:46
+msgid "Zoom"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:47
+msgid ""
+"Zoom levels go from 0 (zoomed out) to 20 (zoomed in). On report load, the "
+"map will automatically pan and zoom to the resource geo-location if there is "
+"one."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:50
+msgid "Geocoder"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:51
+msgid ""
+"Configure which geocoding service the address search bar will use, and "
+"whether or not to show the bar at all."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:54
+msgid "Resource Properties"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:55
+msgid "Configure some styling options for how the resource appears on the map."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:58
+#: app/templates/help/cards-tab-help.htm:127 app/templates/javascript.htm:236
+#: app/templates/javascript.htm:313
+msgid "Default Value"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:59
+msgid ""
+"Choose whether the map should zoom to the resource geo-location if available "
+"or the geo-location of the user."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:67
+#: app/templates/views/graph/graph-designer/card-configuration.htm:7
+msgid "Card Configuration"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:71
+msgid ""
+"The settings for Cards are mostly related yo how you want a user to see the "
+"card, but some have a more direct bearing on data structure as well. The "
+"preview shows what the card will look like to users."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:74
+#: app/templates/views/graph/graph-designer/card-configuration.htm:18
+msgid "Card Type"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:75
+msgid ""
+"Choose the Card Component to use. Only the Default Card is available "
+"initially, but custom Card Components are a way for developers to enhance "
+"the user experience."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:78
+#: app/templates/views/graph/graph-designer/card-configuration.htm:28
+msgid "Card Title"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:79
+msgid "Users will see this title when performing data entry."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:82
+#: app/templates/help/graph-tab-help.htm:32 app/templates/javascript.htm:228
+#: app/templates/views/graph/graph-designer/card-configuration.htm:37
+#: app/templates/views/graph/graph-designer/graph-settings.htm:44
+#: app/templates/views/graph/graph-designer/graph-settings.htm:48
+msgid "Subtitle"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:83
+msgid "Users will see this subtitle when performing data entry."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:86
+msgid "CSS Classes"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:87
+msgid ""
+"You can add your own CSS classes to this Card to customize its look and "
+"feel. Define these classes in your project's \"package.css\" file."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:90
+msgid "Make Card Visible"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:91
+msgid ""
+"Show this Card by default. Developers could hide a card initially, and show "
+"it based other variables."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:94
+msgid "Allow Multiple Values"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:95
+msgid ""
+"While certain node data types allow the storage of multiple values in a "
+"single node, \"concept-list\" for example, this setting is how you control "
+"cardinality at a higher level. When determining whether or not to use this "
+"setting, we recommend testing out the resource editor interface directly."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:98
+msgid "Enable Card-level Help"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:99
+msgid ""
+"To aid data entry users when using this Card, you may want to add some extra "
+"guidance. Enable setting to do so, and design the content of this guidance "
+"with the Card-Level Help menu."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:106
+msgid "Widget Management"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:110
+msgid ""
+"Widgets are data entry helpers for each node that collects information; it's "
+"often easier to pick a date from a calendar than to type it in, for example. "
+"Generally, the data type of the node will determine which Widget template is "
+"used. However, in some cases you will have a choice: For example, in the "
+"case of a <code>concept</code> node, you can choose a dropdown menu or a set "
+"of radio buttons. Similarly, for a <code>string</code> node you can choose a "
+"basic text box or a rich text editor."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:111
+msgid ""
+"Depending on the Widget, there are more settings you can configure, most of "
+"which are optional and all come with acceptable defaults."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:112
+msgid "Common Settings"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:115
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:18
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:21
+msgid "Widget Label"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:116
+msgid ""
+"This will be used in the user interface. The default label comes from the "
+"node name."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:119
+#: app/templates/views/graph-designer.htm:312
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:27
+msgid "Template"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:120
+msgid ""
+"The list of available Widgets is determined by the node's data type, though "
+"developers can <a href=\"https://arches.readthedocs.io/en/stable/functions-"
+"widgets-datatypes/#widgets\" target=\"_blank\">create new Widgets</a>."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:123 app/templates/javascript.htm:199
+msgid "Placeholder"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:124
+msgid "Shown in the input area before the user has entered anything."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:128
+msgid "If desired, you can define a default value."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:131
+msgid "Other Settings by Widget"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:134
+msgid "map-widget"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:135
+msgid ""
+"The map widget allows for a good deal of customization, from the default "
+"center and zoom level to default layers."
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:138
+msgid "datepicker-widget"
+msgstr ""
+
+#: app/templates/help/cards-tab-help.htm:139
+msgid ""
+"This widget is used for the normal date data type, not the extended date/"
+"time format data type. You can set minumum or maximum dates, change how "
+"specific the calendar is when user first opens it, or set the display of the "
+"date. However, note that real YYYY-MM-DD dates are stored in the database "
+"whether no matter what display format you have chosed for this widget. So if "
+"you have set YYYY for the <strong>Date Format</strong> and a user enters "
+"\"2005\", then \"2005-01-01\" will be saved in the database."
+msgstr ""
+
+#: app/templates/help/function-help.htm:11
+msgid ""
+"\n"
+"            <p>Functions are discrete operations that can be associated with "
+"a Resource Model and are run on specific nodes or cards whenever a user "
+"clicks creates or modify's a Resource. Here in the Function Manager you will "
+"associate Functions with this Resource Model and configure them "
+"appropriately.</p>\n"
+"            <p>To add a Function to this Resource Model, click on it in "
+"Function Library, and notice that it is added to the list of Selected "
+"Functions. To delete a Function, use the <i class=\"ion-ios-trash add-tooltip"
+"\" style=\"color:lightcoral;\"></i> symbol in the upper right corner.\n"
+"              "
+msgstr ""
+
+#: app/templates/help/function-help.htm:16
+msgid "adding a function - click to view"
+msgstr ""
+
+#: app/templates/help/function-help.htm:16
+#: app/templates/help/graph-tab-help.htm:112
+#: app/templates/help/permissions-tab-help.htm:47
+#: app/templates/help/rdm-help.htm:33 app/templates/help/rdm-help.htm:47
+#: app/templates/help/rdm-help.htm:61 app/templates/help/rdm-help.htm:75
+#: app/templates/help/rdm-help.htm:89
+#: app/templates/help/resource-editor-help.htm:18
+#: app/templates/help/resource-editor-help.htm:31
+#: app/templates/help/resource-editor-help.htm:53
+#: app/templates/help/search-help.htm:8 app/templates/help/search-help.htm:30
+#: app/templates/help/search-help.htm:39 app/templates/help/search-help.htm:49
+#: app/templates/help/search-help.htm:65 app/templates/help/search-help.htm:88
+msgid "open in new tab"
+msgstr ""
+
+#: app/templates/help/function-help.htm:19
+#, python-format
+msgid ""
+"\n"
+"            <p>Arches comes with three default functions (see below). "
+"However, functions are envisioned as the hook through which developers can "
+"easily customize Arches capabilities, because new Functions can be added to "
+"your individual Arches installation. Learn more <a href=\"https://github.com/"
+"archesproject/arches/wiki/Creating-New-Functions%%2C-DataTypes%%2C-and-"
+"Widgets\" target=\"_blank\">here</a>.</p>\n"
+"            "
+msgstr ""
+
+#: app/templates/help/function-help.htm:26
+msgid "Define Resource Descriptors"
+msgstr ""
+
+#: app/templates/help/function-help.htm:31
+msgid ""
+"This function will generate one or more descriptors for Resources that are "
+"created with this Resource Model. These descriptors are used throughout the "
+"database interface, but are not saved as part of the resource. This gives "
+"you control over the way Resources are identified and described in search "
+"results and elsewhere."
+msgstr ""
+
+#: app/templates/help/function-help.htm:32
+msgid ""
+"Once added to the Resource Model, use the appropriate tab to configure a "
+"descriptor template. Choose a card, and variables corresponding to each node "
+"in that card will be added to the template, demarcated with <code>&lt; &gt;</"
+"code>. You can rearrange these variables and add text to customize the "
+"descriptor. When you have set the descriptors, click <strong>Re-Index</"
+"strong> to update any existing resources in your database."
+msgstr ""
+
+#: app/templates/help/function-help.htm:33
+msgid ""
+"If there are multiple instances of a given card in a Resource, the first one "
+"added will be used to create these descriptors. To manually change this, "
+"edit the Resource in question and drag the desired tile to the top of the "
+"list."
+msgstr ""
+
+#: app/templates/help/function-help.htm:34
+msgid ""
+"Any user with read access permission to a resource will be seeing these "
+"resource descriptors wherever it shows up in search results or on the map. "
+"<strong>If a card is intended to be hidden from any group of users, it "
+"should not be used in this function.</strong>"
+msgstr ""
+
+#: app/templates/help/function-help.htm:36
+msgid ""
+"\n"
+"            <h5>Example</h5>\n"
+"            <p>Consider a Resource where the <strong>Name</strong> node "
+"value is <em>Folsom School</em> and <strong>Name Type</strong> node value is "
+"<em>Primary</em>.</p>\n"
+"            <p>Selecting the <strong>Name</strong> card will populate the "
+"template with <code>&lt;Name Type&gt;, &lt;Name&gt;</code>. The resulting "
+"descriptor would read <em>Primary, Folsom School</em>. Changing the template "
+"to <code>Building Name: &lt;Name&gt;</code> would yield <em>Building Name: "
+"Folsom School</em>.</p>\n"
+"            "
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:6
+msgid "Graph Tab"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:14
+msgid ""
+"In this tab you will design the graph&mdash;the core of a Resource Model or "
+"Branch. In fact, sometimes Resource Models and Branches are generically "
+"referred to as \"graphs\"."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:15
+msgid ""
+"For the first step in building a graph, you should fill out the <strong>top-"
+"level settings</strong>. Some of these may be changed later while others "
+"can't, so make sure to do a lot of testing while developing a graph. With "
+"the top-level settings in place, it's time to <strong>construct the graph</"
+"strong> by adding nodes (or full Branches) to the graph tree. Along the way, "
+"you'll need to set the <strong>node-level settings</strong> for each node "
+"you create."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:16
+msgid ""
+"Once you've finished creating this Resource Model or Branch make sure to set "
+"its status to \"active\"."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:21
+msgid "Top-Level Settings"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:25
+#: app/templates/views/rdm/concept-report.htm:269
+#: app/templates/views/rdm/entitytype-report.htm:160
+msgid "Identifiers"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:28 app/templates/javascript.htm:339
+#: app/templates/views/graph/graph-designer/graph-settings.htm:31
+#: app/templates/views/graph/graph-designer/graph-settings.htm:36
+msgid "Name"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:29
+msgid ""
+"Used to identify this Resource Model throughout the app interface. Default "
+"is New Resource Model."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:33
+msgid "Optional subtitle, displayed on the Arches Designer home page."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:36
+#: app/templates/views/graph/graph-designer/graph-settings.htm:56
+msgid "Ontology"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:37
+msgid ""
+"Decide whether an ontology will be enforced in this graph. To learn more "
+"about what this means, read <a href=\"https://arches.readthedocs.io/en/"
+"stable/ontologies-in-arches\" target=\"_blank\">Ontologies in Arches</a>. By "
+"default, you are allowed to choose between using the CIDOC CRM v6.2, or "
+"using no ontology. Once a node or branch has been added to this graph the "
+"<strong>Ontology</strong> setting <em>cannot be modified</em>."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:40
+#: app/templates/views/graph/graph-designer/graph-settings.htm:68
+msgid "Root Class"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:41
+msgid ""
+"This setting is only necessary if an \"Ontology\" has been chosen. Define "
+"the ontology class of the root node for this graph."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:44
+#: app/templates/views/graph/graph-designer/graph-settings.htm:80
+msgid "Configuration"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:47
+msgid "Status"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:48
+msgid ""
+"Set to \"inactive\" to disallow use of this graph during development. "
+"Inactive Resource Models cannot be used to create new resources, and "
+"inactive Branches can not be added to a Resource Model."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:52
+msgid "Resource models that may be related"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:53
+msgid ""
+"Choose which Resource Models can be related to this one with resource-to-"
+"resource relationships."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:58
+#: app/templates/views/graph/graph-designer/graph-settings.htm:89
+msgid "Root Node Data Type"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:59
+msgid "Choose what data type to use for the root node of this Branch."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:63 app/templates/javascript.htm:636
+#: app/templates/javascript.htm:644
+#: app/templates/views/graph/graph-designer/graph-settings.htm:158
+#: app/templates/views/graph/graph-designer/node-form.htm:123
+msgid "Description"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:66
+#: app/templates/views/graph/graph-designer/graph-settings.htm:165
+msgid "Author"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:67
+msgid ""
+"You can optionally add an <strong>Author</strong> to this graph. Only "
+"administrators will see this information."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:70
+#: app/templates/views/graph/graph-designer/graph-settings.htm:177
+msgid "Abstract"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:71
+msgid "You can optionally add an <strong>Abstract</strong> to this graph."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:71
+msgid ""
+"Users will see this abstract when they are presented with a choice of what "
+"Resource Model to use to create a new resource."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:71
+msgid ""
+"This abstract will be shown in the Branch Library which is used during graph "
+"construction."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:75
+#: app/templates/views/graph/graph-designer/graph-settings.htm:189
+msgid "JSON-LD Context"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:76
+msgid ""
+"Add a <a href=\"https://www.w3.org/TR/json-ld/\">JSON-LD Context</a> for "
+"this Resource Model. This allows you to namespace common URI endpoints that "
+"are used within a JSON-LD output of the resource. You can enter a plain URL "
+"(<code>\"http://www.cidoc-crm.org/cidoc-crm/\"</code>), or JSON that defines "
+"multiple keys (<code>{\"crm\":\"http://www.cidoc-crm.org/cidoc-crm/\",\"rdf"
+"\":\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"}</code>)."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:80
+#: app/templates/views/graph/graph-designer/graph-settings.htm:212
+msgid "Appearance"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:84 app/templates/javascript.htm:599
+#: app/templates/views/graph/graph-designer/graph-settings.htm:221
+msgid "Color"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:85
+msgid ""
+"Choose a color for this Resource Model to be used in the related resources "
+"force directed graph."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:89
+msgid "Icon"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:90
+msgid ""
+"Choose an icon to identify this graph throughout the app interface. You can "
+"browse the icons to select one, or type in the search bar to filter them. "
+"Arches uses the <a href=\"http://fontawesome.io/\" target=\"_blank\">Font "
+"Awesome</a> icon library; custom icons are not supported."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:98
+msgid "Construct the Graph"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:102
+msgid ""
+"Use the graph tree on the left side of the page to construct the graph. "
+"Every new graph starts with a <strong>Top Node</strong>, which will take the "
+"name of the new Resource Model or Branch. From this node, you can either "
+"<strong>Add Child Node</strong> to add a single node, or <strong>Add Branch</"
+"strong> to add an entire existing Branch."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:103
+msgid ""
+"At any point during construction you can switch from <strong>Design</strong> "
+"mode to <strong>Preview</strong> to see the full shape of your graph."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:104
+msgid ""
+"If you have created a branch structure in a Resource Model that you would "
+"like to use in a different Resource Model, you can export it from the graph "
+"tree."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:110
+#: app/templates/help/permissions-tab-help.htm:45
+msgid "add a node and branch to new graph - click to view"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:122
+msgid "Node-Level Settings"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:126
+#: app/templates/views/graph/graph-designer/node-form.htm:28
+msgid "Node Identifiers"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:129
+#: app/templates/views/graph/graph-designer/node-form.htm:40
+msgid "Node Name"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:130
+msgid ""
+"Set the name for this node. This will be used by default in the user "
+"interface, but a different name for display can be configured at the widget "
+"level."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:133
+#: app/templates/views/graph/graph-designer/node-form.htm:85
+msgid "Ontology Class"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:134
+msgid "only present if this graph uses an ontology"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:134
+msgid ""
+"This setting assigns an ontological class to this node. To learn more, read "
+"<a href=\"https://arches.readthedocs.io/en/stable/managing-resources/"
+"#ontologies-in-arches\" target=\"_blank\">Ontologies in Arches</a>"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:137
+msgid "Relationship to..."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:138
+msgid ""
+"Define what relationship this node has with its parent node (the one "
+"directly above it in the graph tree). A verbalization of your choice is "
+"shown in the <strong>Semantics</strong> section below this setting."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:141
+msgid "Node Data Type and Settings"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:142
+msgid ""
+"Depending on which data type you choose, you may have many more settings to "
+"fill out. Those listed below will be present for every node no matter the "
+"data type."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:145
+#: app/templates/views/graph/graph-designer/node-form.htm:144
+msgid "Data type"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:146
+msgid ""
+"Choose the data type for this node. Please see the <strong>Default Data "
+"Types</strong> section below. Once data is collected for this node, this "
+"setting cannot be changed."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:149
+#: app/templates/views/graph/graph-designer/node-form.htm:183
+msgid "Expose to Advanced Search"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:150
+msgid ""
+"If true users will be able to add this node to an Advanced Search query."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:153
+#: app/templates/views/graph/graph-designer/node-form.htm:203
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:63
+msgid "Required"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:154
+msgid ""
+"If true a value must be entered for this node in order to save it. Once data "
+"is collected for this node, this setting cannot be changed."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:157
+msgid "Place node(s) in a separate card"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:158
+msgid "only present if this node is not already the top node for a card"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:158
+msgid ""
+"If true this node will be set in a different card from its parent. This "
+"affects data entry, and you are encouraged to test both states of this "
+"setting while building you graph. Once data is collected for this node, this "
+"setting cannot be changed."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:165
+msgid "Default Data Types"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:169
+msgid ""
+"The data type of a node determines what kind of data that node will store. "
+"Once chosen, some data types will require further configuration."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:170
+msgid ""
+"Developers can <a href=\"https://arches.readthedocs.io/en/stable/functions-"
+"widgets-datatypes/#datatypes\" target=\"_blank\">create new datatypes</a>."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:173
+msgid "boolean"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:174
+msgid "Use this to store a \"yes\"/\"no\" or \"true\"/\"false\" value."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:177
+msgid "concept"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:178
+msgid ""
+"Stores one of a series of concepts from the Reference Data Manager. Users "
+"will choose a concept in a dropdown list or set of radio buttons. You'll "
+"further be prompted to choose a <strong>Concept Collection</strong>&mdash;"
+"this controls which concepts the user is able to choose from."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:181
+msgid "concept-list"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:182
+msgid "Stores multiple concepts in a single node."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:185
+msgid "date"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:186
+msgid "Stores a CE calendar date. See etdf for BCE and fuzzy date handling."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:189
+msgid "edtf"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:190
+msgid ""
+"Stores an <a href='https://www.loc.gov/standards/datetime/' "
+"target='_blank'>Extended Date/Time Format</a> value. Use this data type for "
+"BCE dates or dates with uncertainty. This datatype requires extra "
+"configuration to inform the database search methods how to interpret EDTF "
+"values. Data entry users can enter edtf dates using formats listed in the <a "
+"href='https://www.loc.gov/standards/datetime/pre-submission.html' "
+"target='_blank'>EDTF draft specification</a>."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:193
+msgid "file-list"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:194
+msgid "Stores one or mores files. Use this to upload images, documents, etc."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:197
+msgid "iiif-drawing"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:198
+msgid ""
+"Used to store an <a href='http://iiif.io/' target='_blank'>IIIF compliant</"
+"a> image."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:201
+msgid "geojson-feature-collection"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:202
+msgid ""
+"Stores geographic coordinates, and is used to show a resource on the map."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:205
+msgid "domain-value"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:206
+msgid ""
+"Similar to \"concept\", choose this to present the user with a dropdown list "
+"or set of radio buttons. Unlike \"concept\" this dropdown menu will not come "
+"from your system-wide controlled vocubulary, but from a list of values that "
+"you must define here."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:209
+msgid "domain-value-list"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:210
+msgid "Stores multiple domain-values in a single node."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:213
+msgid "csv-chart-json"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:214
+msgid "Stores a csv chart formatted as JSON."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:217
+msgid "node-value"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:218
+msgid ""
+"Stores a reference to a different node in this graph. This would allow you "
+"to store duplicate data in more than one branch."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:221
+msgid "number"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:222
+msgid "Stores a number."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:225
+msgid "resource-instance"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:226
+msgid ""
+"Embeds a separate resource instance into this node. For example, you could "
+"add a node called \"Assessed By\" to a condition assessment branch, and use "
+"this data type. This would allow you to associate an individual stored in "
+"your database as an Actor resource with a specific condition assessment. "
+"Note that this construction is different from making a \"resource-to-"
+"resource relationship\". "
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:229
+msgid "resource-instance-list"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:230
+msgid "Stores a list of resource instances in a single node."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:233
+msgid "semantic"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:234
+msgid ""
+"<em>A semantic node does not store data.</em> Semantic nodes are used where "
+"necessary to make symbolic connections between other nodes, generally in "
+"order to follow ontological rules. The top node of every graph is a semantic "
+"node."
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:237
+msgid "string"
+msgstr ""
+
+#: app/templates/help/graph-tab-help.htm:238
+msgid ""
+"Stores a string of text. This could be something simple like a name, or more "
+"something elaborate like a descriptive paragraph with formatting and "
+"hyperlinks."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:6
+msgid ""
+"\n"
+"        <p>Three categories of Map Layers will appear on your map: "
+"<strong>Resource Layers</strong> (the contents of your database), "
+"<strong>Basemaps</strong> (static background layers), and <strong>Overlays</"
+"strong> (custom data layers from outside your database). To configure a "
+"layer, first select its category in the top bar, and then choose it from the "
+"list at left.</p>\n"
+"      "
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:13
+msgid ""
+"Resource Layers display the resource layers in your database. One Resource "
+"Layer is created for each node with a geospatial datatype (for example, "
+"<code>geojson-feature-collection</code>). You are able to customize the "
+"appearance and visibility of each Resource Layer in the following ways."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:14
+#: app/templates/help/map-manager-help.htm:34
+#: app/templates/help/map-manager-help.htm:49 app/templates/javascript.htm:588
+#: app/templates/views/map-layer-manager.htm:186
+msgid "Service Styling"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:15
+msgid ""
+"Define the way features will look on the map. The example map has "
+"demonstration features that give you a preview of the changes you make. You "
+"can choose to use <strong>Advanced Editing</strong> to create a more nuanced "
+"style. Note that changes made in Advanced Editing will not be reflected if "
+"you switch back to basic editing. For styling reference, checkout the <a "
+"href='https://www.mapbox.com/mapbox-gl-js/style-spec/' "
+"target='_blank'>MapBox Style Specification</a>."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:16
+#: app/templates/help/map-manager-help.htm:36
+#: app/templates/help/map-manager-help.htm:51 app/templates/javascript.htm:395
+#: app/templates/views/graph/graph-designer/card-configuration.htm:70
+#: app/templates/views/map-layer-manager.htm:183
+msgid "Settings"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:17
+msgid ""
+"You can change the name of this overlay if desired; by default it will use "
+"the name of its Resource Model. You make also set the layer to be added to "
+"the search map by default, or choose a custom icon for it."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:18 app/templates/javascript.htm:590
+msgid "Clustering"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:19
+msgid ""
+"Arches uses 'clustering' to better display resources at low zoom levels "
+"(zoomed out). You are able to control the clustering settings for each layer "
+"individually."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:21
+msgid ""
+"<strong>Cluster Distance</strong> - distance (in pixels) within which "
+"resources will be clustered"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:22
+msgid ""
+"<strong>Cluster Max Zoom</strong> - zoom level after which clustering will "
+"<em>stop</em> being used"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:23
+msgid ""
+"<strong>Cluster Min Points</strong> - minimum number of points needed to "
+"create a cluster"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:25 app/templates/javascript.htm:207
+#: app/templates/javascript.htm:589 app/templates/views/graph-designer.htm:212
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:10
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:57
+msgid "Permissions"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:26
+msgid ""
+"This tab shows the permissions for the nodegroup whose geometry is displayed "
+"in this Resource Layer. Permissions are defined in the Graph Designer."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:33
+msgid ""
+"A Basemap will always be present in your map. Arches comes with a few "
+"default basemaps, but advanced users are able to add more. Once added, there "
+"are few ways to configure each basemap."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:35
+msgid ""
+"Define a style for this basemap. Note that depending on the type of layer, "
+"there are different styling options. For styling reference, checkout the <a "
+"href='https://www.mapbox.com/mapbox-gl-js/style-spec/#layers' "
+"target='_blank'>MapBox Style Specification</a>."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:38
+msgid "<strong>Layer name</strong> - enter a name to identify this basemap"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:39
+msgid ""
+"<strong>Default search map</strong> - choose this layer to be the default "
+"basemap"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:40
+#: app/templates/help/map-manager-help.htm:55
+msgid "<strong>Layer icon</strong> - associate an icon with this layer"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:48
+msgid ""
+"Overlays allow you to incorporate map layers from external sources. Note "
+"that Search Results and Search Markets are treated as overlays, and can be "
+"customize separately. New overlays can be added with a little behind-the-"
+"scenes work. Once added, there are few ways to configure each overlay."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:50
+msgid ""
+"Define a style for this overlay. Note that depending on the type of layer, "
+"there are different styling options. For styling reference, checkout the <a "
+"href='https://www.mapbox.com/mapbox-gl-js/style-spec/#layers' "
+"target='_blank'>MapBox Style Specification</a>."
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:53
+msgid "<strong>Layer name</strong> - enter a name to identify this overlay"
+msgstr ""
+
+#: app/templates/help/map-manager-help.htm:54
+msgid ""
+"<strong>Default search map</strong> - choose whether this overlay should be "
+"shown in the search map by default. Note that in the search map itself you "
+"can change the order of the layers."
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:6
+msgid "Permissions Tab"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:14
+msgid ""
+"Arches allows you to define user and user group permissions on a per-"
+"nodegroup basis. For example, you may want to hide the coordinates of a "
+"Resource from the public, or allow a certain group of users to only update "
+"the condition assessment section of a Resource Model. Rules like these are "
+"all enforced using permissions."
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:15
+msgid "Permissions Levels"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:18
+#: app/templates/javascript.htm:648 app/templates/javascript.htm:756
+#: app/templates/views/components/plugins/workflow.htm:34
+#: app/templates/views/graph/function-manager.htm:121
+#: app/templates/views/rdm/modals/delete-collection-form.htm:44
+#: app/templates/views/rdm/modals/delete-scheme-form.htm:44
+msgid "Delete"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:19
+msgid ""
+"Allows users to delete instances of this nodegroup. Note, this is not the "
+"same as being allowed to delete an entire resource, permissions for which "
+"are not handled here."
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:22
+msgid "No Access"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:23
+msgid ""
+"Disallows users from seeing or editing instances of this nodegroup. Use this "
+"permission level to hide sensitive data from non-authenticated users (the "
+"public)."
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:26
+msgid "Read"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:27
+msgid ""
+"Allows users to see this nodegroup's card. If disallowed, the card/nodegroup "
+"will be hidden from the map and resource reports."
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:30
+msgid "Create/Update"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:31
+msgid ""
+"Allows users to create or edit instances of this nodegroup. This provides "
+"the ability to let users edit some information about a resource, while be "
+"restricted from editing other information."
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:34
+msgid "Non-Authenticated Users"
+msgstr ""
+
+#: app/templates/help/permissions-tab-help.htm:35
+msgid ""
+"You may notice that by default Arches comes with a \"Guest\" group, as well "
+"as user named \"anonymous\" who is a member of that group. <strong>Any non-"
+"authenticated user is treated as the \"anonymous\" user.</strong> This means "
+"that all permissions applied to the Guest group will be given to anyone who "
+"views the website without logging in."
+msgstr ""
+
+#: app/templates/help/profile-manager-help.htm:7
+msgid ""
+"The profile manager allows you to update your account information, such as "
+"your password, at any time."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:6
+msgid ""
+"The Reference Data Management (RDM) enables the creation and maintenance of "
+"controlled vocabularies that are used throughout your database. In Arches, "
+"controlled vocabularies consist of Concepts, and these Concepts are managed "
+"in Thesauri and Collections. In the RDM you can create new Thesauri, create "
+"new Concepts, import Concepts from external an endpoint (like the Getty "
+"AAT), and -- the ultimate goal -- create Collections, which will be used in "
+"your database as data input dropdown lists."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:8 app/templates/javascript.htm:574
+#: app/templates/views/rdm/concept-report.htm:356
+msgid "Concepts"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:10
+msgid ""
+"A Concept is a qualitative property that can be attached to a resource, "
+"something like \"Stone\" (which may describe a building material) or \"House"
+"\" (which may describe a past use for a structure). The advantage of storing "
+"these properties as Concepts is that a Concept may have attributes of its "
+"own. In the case of \"House\", we could add an alternate label, \"Dwelling\" "
+"to that Concept. Then, if a user searches for \"dwelling\", any resource "
+"with the \"House\" Concept attached to it will be found."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:11
+msgid ""
+"Concepts can also be nested, to allow more complex and meaningful "
+"relationships between them. For example, \"House\" may appear next to "
+"\"School\" within a parent Concept called \"Building Use\"."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:15 app/templates/rdm.htm:57
+msgid "Thesauri"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:17
+msgid ""
+"A Thesaurus is an entire set of Concepts which can be imported and exported "
+"as a whole. You can create as many new Thesauri as you need, or just add new "
+"Concepts to the default \"Arches\" Thesaurus. The organization of your "
+"Thesauri has no impact on the way Concepts will be exposed to the public or "
+"used throughout the app."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:21 app/templates/rdm.htm:60
+#: app/templates/views/rdm/concept-report.htm:344
+msgid "Collections"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:23
+msgid ""
+"Collections, or Concept Collections as they are sometimes called, are custom "
+"aggregations of Concepts that will be used in your app as dropdown lists "
+"during the data entry process. Collections allow you to reorganize your "
+"Concepts for the specific purpose of data entry, so your dropdown lists do "
+"not have to look anything like your Thesaurus. You can create as many "
+"Collections as you want, or add new Concepts to existing Collections."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:27
+msgid "Example - Create a New Thesaurus"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:29
+msgid ""
+"In the video below, a new Thesaurus is created. Once you have made a "
+"Thesaurus, you can begin creating a hierarchy of Concepts within it. "
+"Remember, the final step will be to make a new Collection and add Concepts "
+"to it (from <em>any</em> of your Thesauri)."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:31 app/templates/help/rdm-help.htm:45
+#: app/templates/help/rdm-help.htm:59 app/templates/help/rdm-help.htm:73
+#: app/templates/help/rdm-help.htm:87
+msgid "click to view demonstration"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:41
+msgid "Example - Create a Top Concept"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:43
+msgid ""
+"The first level of organization within a Thesaurus is a set of Top Concepts. "
+"A Top Concept may be something like \"Architectural Styles\" and its "
+"children Concepts will be the actual styles themselves. Below, a new, empty "
+"Top Concept is added to an empty Thesaurus."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:55
+msgid "Example - Create New Concepts"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:57
+msgid ""
+"To create a new Concept, begin by selecting the Top Concept under which it "
+"should be placed. This will bring the details about the Top Concept into the "
+"main panel. Use the Manage dropdown to \"Add Child\", type in a label, and "
+"select the correct language for the label."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:69
+msgid "Example - Add an Alternate Label to a Concept"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:71
+msgid ""
+"To improve the searchability of your Concepts, you can add as many alternate "
+"labels to each one as you want Below, the label \"Dwelling\" is added to the "
+"Concept \"House\". The result is that anyone using \"Dwelling\" as a search "
+"term will be shown Resources that have the \"House\" Concept."
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:83
+msgid "Example - Create a Collection"
+msgstr ""
+
+#: app/templates/help/rdm-help.htm:85
+msgid ""
+"Creating a Collection is very similar to creating a Thesaurus. However, you "
+"will be adding existing Concepts to a Collection (potentially from more than "
+"one Thesaurus) instead of creating new ones. Below, a new Collection is "
+"created. To go further, select the Collection, and use the \"Add dropdown "
+"entry\" link to add existing Concepts to this Collection. When configuring "
+"the Graph for a Branch or Resource Model, you will now be able to add this "
+"Concept Collection to a node."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:7
+msgid "Creating Resource Data"
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:11
+msgid ""
+"The Resource Editor is used to create new or edit existing Resources. What "
+"you see on the left-hand side of the page is this Resource's \"card tree\", "
+"which shows all of the data entry cards that you can edit. Think of "
+"\"creating data\" as \"adding cards\"."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:12
+msgid ""
+"To begin, select a card, enter data, and click <strong>Add</strong>. Some "
+"cards may allow multiple instances, in which case you will be able to add as "
+"many of the same type as you want."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:13
+msgid ""
+"Note that in the demonstration below, the \"Define Resource Descriptors\" "
+"function has already been configured to set the Name card value as the "
+"resource display name."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:16
+msgid "basic card data enty - click to view"
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:24
+msgid ""
+"Once you have saved data for a resource, you can see a full summary by "
+"selecting the top card. This is the resource report."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:25
+msgid ""
+"In some cases, cards will be nested within other cards, as in the example of "
+"adding a geo-location below."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:29
+msgid "nested card data enty - click to view"
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:42
+msgid "Creating Resources Relations"
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:47
+msgid ""
+"In the Resource Editor you can also access the <strong>Related Resources "
+"Editor</strong> . To create a relationship between this resource and another "
+"in your database, open the editor, find the resource, and click <strong>Add</"
+"strong>."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:48
+msgid ""
+"Your Resource Model will need to be configured to allow relations with the "
+"target Resource Model. If relations are not allowed, resources in the "
+"dropdown menu will not be selectable."
+msgstr ""
+
+#: app/templates/help/resource-editor-help.htm:51
+msgid "create resource relation - click to view"
+msgstr ""
+
+#: app/templates/help/resource-editor-landing-help.htm:7
+msgid ""
+"Choose a Resource Model to begin creating a new Resource in your database."
+msgstr ""
+
+#: app/templates/help/search-help.htm:6
+msgid "Introduction to Search"
+msgstr ""
+
+#: app/templates/help/search-help.htm:11
+msgid ""
+"<strong>Search Bar</strong> The quickest way to search the database is to "
+"begin typing in the search bar. You'll be presented with database "
+"terminology which you can use to create one or more simple filters. The "
+"search bar also acts as an aggregator of <em>all</em> currently enabled "
+"filters."
+msgstr ""
+
+#: app/templates/help/search-help.htm:12
+msgid ""
+"<strong>Search Tools</strong> There are a number tools you can use to "
+"explore the database, which are described in detail below."
+msgstr ""
+
+#: app/templates/help/search-help.htm:13
+msgid ""
+"<strong>Search Results</strong> Whenever you change any search filters, the "
+"updated search results will be listed here. You can link to a resource's "
+"report, zoom to it on the map, or view its related resources."
+msgstr ""
+
+#: app/templates/help/search-help.htm:14
+msgid ""
+"<strong>Search Panel</strong> The contents of this panel will change "
+"depending on what search tool you are using. Typically, the map will be "
+"activated by default."
+msgstr ""
+
+#: app/templates/help/search-help.htm:19 app/templates/index.htm:148
+msgid "Search Tools"
+msgstr ""
+
+#: app/templates/help/search-help.htm:22 app/templates/javascript.htm:399
+msgid "Map"
+msgstr ""
+
+#: app/templates/help/search-help.htm:24
+msgid ""
+"Search results can be represented on the map in two ways: <strong>markers</"
+"strong> show the first set of resources in the search results, and "
+"<strong>cells</strong> are used to give a general spatial representation of "
+"<em>all</em> resources in the search results."
+msgstr ""
+
+#: app/templates/help/search-help.htm:25
+msgid ""
+"In addition to displaying search results, the map can show resource layers "
+"(showing all resources), or custom overlays, if any have been added. You "
+"control the visibility of all layers and basemaps with the tool panel on the "
+"right."
+msgstr ""
+
+#: app/templates/help/search-help.htm:26
+msgid ""
+"Finally, you can add a spatial filter to your query by using the map drawing "
+"tools to draw a shape and apply a buffer distance if desired."
+msgstr ""
+
+#: app/templates/help/search-help.htm:28
+msgid "change basemap - click to view"
+msgstr ""
+
+#: app/templates/help/search-help.htm:37
+msgid "toggle search results layer - click to view"
+msgstr ""
+
+#: app/templates/help/search-help.htm:47
+msgid "search with spatial query - click to view"
+msgstr ""
+
+#: app/templates/help/search-help.htm:58
+msgid "Time"
+msgstr ""
+
+#: app/templates/help/search-help.htm:60
+msgid ""
+"You can apply a temporal criterion to your query by using the Time Filter. "
+"You have the option of creating the filter by hand, or you can use the time "
+"wheel. The time wheel is a graphic representation of all the resources in "
+"the database, organized chronologically."
+msgstr ""
+
+#: app/templates/help/search-help.htm:63
+msgid "apply time filter with time wheel - click to view"
+msgstr ""
+
+#: app/templates/help/search-help.htm:74
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:93
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:135
+msgid "Saved"
+msgstr ""
+
+#: app/templates/help/search-help.htm:76
+msgid ""
+"Saved searches allow you to view pre-made queries. Saved searches are "
+"created by database administrators, so the number of saved searches shown "
+"here will vary from one database to the next."
+msgstr ""
+
+#: app/templates/help/search-help.htm:80 app/templates/javascript.htm:594
+msgid "Advanced"
+msgstr ""
+
+#: app/templates/help/search-help.htm:82
+msgid ""
+"You can use the advanced search to make more complex queries based on data "
+"attributes, or \"facets\". While the basic search filter allows you to "
+"combine multiple filters, advanced search is the only way to combine filters "
+"with an <strong>or</strong> operator, and also gives you access to more "
+"comparison operators."
+msgstr ""
+
+#: app/templates/help/search-help.htm:83
+msgid ""
+"In the example below, a search is made within a single resource type for any "
+"name <strong>like</strong> \"church\" <strong>or</strong> any name "
+"<strong>like</strong> \"gate\"."
+msgstr ""
+
+#: app/templates/help/search-help.htm:86
+msgid "search for multiple words in names - click to view"
+msgstr ""
+
+#: app/templates/help/search-help.htm:97
+msgid "Related"
+msgstr ""
+
+#: app/templates/help/search-help.htm:99
+msgid ""
+"For each resource listed in the search results you can view its related "
+"resources with the \"Related Resources\" link under the description. By "
+"viewing Related Resources, you get a new view of the database: not how "
+"resources are related geographically nor chronologically, but qualitatively."
+msgstr ""
+
+#: app/templates/help/search-help.htm:100
+msgid ""
+"There two methods for viewing Related Resources: in a table where each "
+"related resource is a row, or in a graph where resources are shown as nodes "
+"in a graph, with relationships connecting them."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:6
+msgid ""
+"\n"
+"        <p>A number of global settings can be defined or altered here.</p>\n"
+"      "
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:13
+msgid "Default Application Settings"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:15
+msgid ""
+"\n"
+"                <strong>Application Name</strong> - Name of your Arches app, "
+"to be displayed in the browser title bar and elsewhere.<br>\n"
+"                <strong>Default Data Import/Export User</strong> - Name to "
+"associate with data that is imported into the system.<br>\n"
+"              "
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:20
+msgid "Web Analytics"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:22
+msgid ""
+"\n"
+"                <strong>Google Analytics Key</strong> - If you have made a "
+"Google Analytics Key to track your app's traffic, enter it here.<br>\n"
+"              "
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:26
+msgid "Thesaurus Service Providers"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:28
+msgid ""
+"\n"
+"                <strong>Thesaurus SPARQL Endpoint</strong> - Advanced users "
+"may create more SPARQL endpoints and register them here. These endpoints "
+"will be available in the RDM and allow you to import thesaurus entries from "
+"external sources.<br>\n"
+"              "
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:35
+msgid "Map Settings"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:37
+msgid "Mapbox API"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:38
+msgid ""
+"Arches uses the Mapbox mapping library for map display and data creation. "
+"Arches also supports Mapbox basemaps and other services."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:40
+msgid ""
+"<strong>Mapbox API Key (Optional)</strong> - By default, Arches uses some "
+"basemap web services from Mapbox. You will need to <a href='https://www."
+"mapbox.com/help/create-api-access-token/' target=\"_blank\">create a free "
+"API key</a> (or \"access token\") for these services to be activated. "
+"Alternatively, you could remove all of the default basemaps and add your "
+"own, non-Mapbox layers."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:41
+msgid "<strong>Mapbox Sprites</strong> - Path to Mapbox sprites (use default)."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:42
+msgid "<strong>Mapbox Glyphs</strong> - Path to Mapbox glyphs (use default)."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:44
+msgid "Project Extent"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:45
+msgid ""
+"Draw a polygon representing your project's extent. These bounds will serve "
+"as the default for the search result grid bounds, and map bounds in search, "
+"cards, and reports."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:46
+msgid "Map Zoom"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:47
+msgid ""
+"You can define the zoom behavior of your map. Zoom level 0 shows the whole "
+"world (and is the absolute minimum zoom level) and zoom level 20 is the "
+"maximum level that most map services support."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:49
+msgid ""
+"<strong>Default Zoom</strong> - Set the zoom level that the map will be "
+"shown at by default."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:50
+msgid ""
+"<strong>Min Zoom</strong> - Minimum zoom level defines how far the user can "
+"zoom out when viewing the map."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:51
+msgid ""
+"<strong>Max Zoom</strong> - Maximum zoom level defines how far the user can "
+"zoom in when viewing the map."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:53
+msgid "Search Results Grid"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:54
+msgid ""
+"Arches aggregates search results and displays them as hexagons. You will "
+"need to set default parameters for the hexagon size and precision."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:56
+msgid ""
+"<strong>Hexagon Size (in km)</strong> - Set the actual size of the hex bins "
+"that will be shown on the map."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:57
+msgid ""
+"<strong>Hexagon Grid Precision</strong> - Set the precision with which the "
+"contents of the hex bins will be calculated."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:59
+msgid ""
+"<strong>Warning:</strong> A large project area combined with a small hexagon "
+"size and/or high precision will take a very long time to load, and can crash "
+"your browser. We suggest changing these settings in small increments to find "
+"the best combination for your project."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:63
+msgid "Basic Search Settings"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:65
+msgid "Set the default search results behavior."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:66
+msgid ""
+"\n"
+"            <p>\n"
+"                <strong>Number of search results per page</strong> - Set the "
+"number of search results shown per page. Note this also defines the number "
+"of search result markers that are shown on the map.<br>\n"
+"                <strong>Number of search hints per dropdown</strong> - Set "
+"the number of search hints that will appear under the search bar as you type "
+"in search terms.<br>\n"
+"                <strong>Max number of search results to export</strong> - "
+"Set the maximum number of resources to be exported from the search results. "
+"This value should generally be evenly divible by the SEARCH_RESULT_LIMIT "
+"setting in Arches (10,000 by default).\n"
+"            </p>\n"
+"            "
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:76
+msgid "Temporal Search Settings"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:78
+msgid ""
+"Arches creates a Time Wheel based on the resources in your database, to "
+"allow for quick temporal visualization and queries. A few aspects of this "
+"temporal search are defined here."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:80
+msgid ""
+"<strong>Color Ramp</strong> - <em>not currently implemented</em> The color "
+"ramp for the time wheel. For further reference, check out the <a "
+"href='https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales."
+"md' target=\"_blank\">d3 API reference</a>."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:81
+msgid ""
+"<strong>Time wheel configuration</strong> - <em>not currently implemented</"
+"em>"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:86
+msgid "Saved Searches"
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:88
+msgid ""
+"Arches allows you save a search and present it as convenience for your "
+"users. Saved Searches appear as search options in the main Search page. "
+"Creating a Saved Search is a three-step process."
+msgstr ""
+
+#: app/templates/help/system-settings-help.htm:90
+msgid ""
+"\n"
+"                <strong>1. Specify Search Criteria</strong> - Go to the "
+"Search page and enter all the criteria you would like to use to configure "
+"your Saved Search. You may notice that with the addition of each new search "
+"filter (either by using the term filter, map filtering tools, or temporal "
+"filters) the URL for the page will change.<br>\n"
+"                <strong>2. Copy the URL</strong> - In your browser address "
+"bar, copy the <em>entire</em> URL. This will be a long string that defines "
+"each of the search filters created in step 1.<br>\n"
+"                <strong>3. Create the Saved Search</strong> - Finally, head "
+"back to this page and fill out the settings that you see at left. You can "
+"also upload an image that will be shown along with your Search Search.\n"
+"            "
+msgstr ""
+
+#: app/templates/index.htm:72
+#, python-format
+msgid "Arches | %(version)s"
+msgstr ""
+
+#: app/templates/index.htm:80
+msgid "Arches Features"
+msgstr ""
+
+#: app/templates/index.htm:83
+msgid "Search Arches"
+msgstr ""
+
+#: app/templates/index.htm:92
+msgid "Sign in"
+msgstr ""
+
+#: app/templates/index.htm:97
+msgid "Welcome, "
+msgstr ""
+
+#: app/templates/index.htm:101
+msgid "Log off"
+msgstr ""
+
+#: app/templates/index.htm:133
+msgid "Home"
+msgstr ""
+
+#: app/templates/index.htm:138 app/templates/index.htm:215
+msgid "Fast"
+msgstr ""
+
+#: app/templates/index.htm:143 app/templates/index.htm:269
+msgid "Workflows"
+msgstr ""
+
+#: app/templates/index.htm:183
+#, python-format
+msgid "Arches %(version)s"
+msgstr ""
+
+#: app/templates/index.htm:184
+msgid "A web and mobile platform for"
+msgstr ""
+
+#: app/templates/index.htm:185
+msgid "managing your most important resource information"
+msgstr ""
+
+#: app/templates/index.htm:193
+msgid ""
+"Glarus thrust, Tectonic Area Sardona, Switzerland | Jonas Wagner https://www."
+"flickr.com/photos/80225884@N06/ | Attribution 2.0 Generic (CC BY 2.0)"
+msgstr ""
+
+#: app/templates/index.htm:216
+msgid "Deploy Applications Rapidly"
+msgstr ""
+
+#: app/templates/index.htm:218
+msgid ""
+"Design custom information management applications in hours.  Build your "
+"databases with Arches Designer, then configure your interface all without "
+"having to write any code."
+msgstr ""
+
+#: app/templates/index.htm:235
+msgid "Interface Manager"
+msgstr ""
+
+#: app/templates/index.htm:237
+msgid ""
+"Arches automatically creates data entry forms based on your data models.  "
+"Use Arches' Card Manager to configure the look and feel of your data entry "
+"UI."
+msgstr ""
+
+#: app/templates/index.htm:246
+msgid "Data Security"
+msgstr ""
+
+#: app/templates/index.htm:248
+msgid ""
+"Use Arches' Permissions Manager to set up data access rules for all your "
+"user groups and individual accounts.  You can define read/write/delete and "
+"no-access permissions."
+msgstr ""
+
+#: app/templates/index.htm:270
+msgid "Orchestrate your data entry"
+msgstr ""
+
+#: app/templates/index.htm:272
+msgid ""
+"Design step-wise data management interfaces that simplify complex editing "
+"tasks.  Ensure that everyone enters data completely and consistently"
+msgstr ""
+
+#: app/templates/index.htm:295
+msgid "Arches Search Tools"
+msgstr ""
+
+#: app/templates/index.htm:296
+msgid "Find what you're looking for"
+msgstr ""
+
+#: app/templates/index.htm:298
+msgid ""
+"Arches comes with powerful built-in search tools.  Quickly filter large "
+"databases with term, geospatial, and time-based search components"
+msgstr ""
+
+#: app/templates/index.htm:311
+msgid "Search Options"
+msgstr ""
+
+#: app/templates/index.htm:313
+msgid ""
+"Arches gives you many ways to find precisely the information you need, even "
+"if your Arches application contains 10's of millions of records.  In "
+"addition to term, thesaurus, geospatial, and temporal filters, Arches "
+"provides you with advanced filtering options that support boolean logic, "
+"inverses, and many other filtering options."
+msgstr ""
+
+#: app/templates/index.htm:317
+msgid ""
+"Arches' search capabilities also provide for sophisticated data "
+"visualizations, including interactive displays of the connections between "
+"your data objects using a Force Directed Graph."
+msgstr ""
+
+#: app/templates/index.htm:321
+msgid ""
+"If you're a software developer, you can build on Arches modular search "
+"services and create your own filters, reports, and visualizations to best "
+"show off your particular dataset."
+msgstr ""
+
+#: app/templates/index.htm:343
+msgid "Sample Institution Name"
+msgstr ""
+
+#: app/templates/index.htm:346
+msgid "Sample Address"
+msgstr ""
+
+#: app/templates/index.htm:347
+msgid "Getty Conservation Institute"
+msgstr ""
+
+#: app/templates/index.htm:348
+msgid "1200 Getty Center Drive"
+msgstr ""
+
+#: app/templates/index.htm:349
+msgid "Los Angeles, CA  90049"
+msgstr ""
+
+#: app/templates/index.htm:355
+msgid "Guides and Documentation"
+msgstr ""
+
+#: app/templates/index.htm:363
+msgid "What is Arches"
+msgstr ""
+
+#: app/templates/index.htm:366
+msgid "Implementation Considerations"
+msgstr ""
+
+#: app/templates/index.htm:369
+msgid "Information For Developers"
+msgstr ""
+
+#: app/templates/index.htm:379
+msgid "FAQ"
+msgstr ""
+
+#: app/templates/index.htm:382
+msgid "Standards and Interoperability"
+msgstr ""
+
+#: app/templates/index.htm:385
+msgid "Installation Guide"
+msgstr ""
+
+#: app/templates/index.htm:393
+msgid "Arches Project Background"
+msgstr ""
+
+#: app/templates/index.htm:396
+msgid "Arches Webinars/Presentations"
+msgstr ""
+
+#: app/templates/index.htm:415
+msgid "Terms & Conditions"
+msgstr ""
+
+#: app/templates/index.htm:416
+msgid "Privacy Policy"
+msgstr ""
+
+#: app/templates/index.htm:419
+msgid "Powered by Arches"
+msgstr ""
+
+#: app/templates/javascript.htm:114
+msgid "Delete All Resources Associated with this Graph?"
+msgstr ""
+
+#: app/templates/javascript.htm:115
+msgid ""
+"Deleting All Resources removes all associated data with this graph "
+"entirely.  Are you sure you would like to proceed?"
+msgstr ""
+
+#: app/templates/javascript.htm:118
+msgid "Delete Branch/Resource Model?"
+msgstr ""
+
+#: app/templates/javascript.htm:119
+msgid ""
+"Deleting this branch/resource model will remove it (and all associated data) "
+"entirely.  Are you sure you would like to proceed?"
+msgstr ""
+
+#: app/templates/javascript.htm:159
+msgid "Please contact your system administrator for more details."
+msgstr ""
+
+#: app/templates/javascript.htm:160
+msgid "Hide Null Values"
+msgstr ""
+
+#: app/templates/javascript.htm:161 app/templates/javascript.htm:509
+msgid "Load More"
+msgstr ""
+
+#: app/templates/javascript.htm:162
+msgid "Load All"
+msgstr ""
+
+#: app/templates/javascript.htm:163
+msgid "Display Name"
+msgstr ""
+
+#: app/templates/javascript.htm:164
+msgid "Display Description"
+msgstr ""
+
+#: app/templates/javascript.htm:165
+msgid "Map Popup"
+msgstr ""
+
+#: app/templates/javascript.htm:166
+msgid "Map Popup Template"
+msgstr ""
+
+#: app/templates/javascript.htm:167
+msgid "ID:"
+msgstr ""
+
+#: app/templates/javascript.htm:168
+msgid "Add Buffer"
+msgstr ""
+
+#: app/templates/javascript.htm:169
+msgid "Buffer Intersecting Feature"
+msgstr ""
+
+#: app/templates/javascript.htm:170
+msgid "Add buffer to features"
+msgstr ""
+
+#: app/templates/javascript.htm:171
+msgid "Add Buffer Feature"
+msgstr ""
+
+#: app/templates/javascript.htm:172
+msgid "Select a feature to perform intersection"
+msgstr ""
+
+#: app/templates/javascript.htm:173
+msgid "Intersect"
+msgstr ""
+
+#: app/templates/javascript.htm:174
+msgid "Re-index"
+msgstr ""
+
+#: app/templates/javascript.htm:175
+msgid "Re-indexing"
+msgstr ""
+
+#: app/templates/javascript.htm:176
+msgid "Re-index Resources Now"
+msgstr ""
+
+#: app/templates/javascript.htm:177
+msgid ""
+"If you've made any changes to this function and there are resources already "
+"in the system, then you will need to reindex the resources to reflect your "
+"changes.  This process can take some time (potentially several minuetes or "
+"more).  Please be patient."
+msgstr ""
+
+#: app/templates/javascript.htm:178
+msgid "Use bracketed node names like this: <node name>"
+msgstr ""
+
+#: app/templates/javascript.htm:179
+msgid "Primary Name Template"
+msgstr ""
+
+#: app/templates/javascript.htm:180
+msgid "Primary Description Template"
+msgstr ""
+
+#: app/templates/javascript.htm:181
+msgid ""
+"Select a card from which to choose nodes to power your primary name "
+"identifier."
+msgstr ""
+
+#: app/templates/javascript.htm:182
+msgid ""
+"Select a card from which to choose nodes to power your primary description "
+"identifier."
+msgstr ""
+
+#: app/templates/javascript.htm:183
+msgid "Add as new"
+msgstr ""
+
+#: app/templates/javascript.htm:184
+msgid "Add Feature"
+msgstr ""
+
+#: app/templates/javascript.htm:185
+msgid "Distance:"
+msgstr ""
+
+#: app/templates/javascript.htm:186
+msgid "Units:"
+msgstr ""
+
+#: app/templates/javascript.htm:187
+msgid "meters:"
+msgstr ""
+
+#: app/templates/javascript.htm:188
+msgid "feet:"
+msgstr ""
+
+#: app/templates/javascript.htm:189
+msgid "Download"
+msgstr ""
+
+#: app/templates/javascript.htm:190
+msgid "Download File"
+msgstr ""
+
+#: app/templates/javascript.htm:191
+msgid "Triggering Nodegroups"
+msgstr ""
+
+#: app/templates/javascript.htm:192 app/templates/javascript.htm:540
+msgid "Select a Nodegroup"
+msgstr ""
+
+#: app/templates/javascript.htm:193
+msgid "No Relationships Added"
+msgstr ""
+
+#: app/templates/javascript.htm:194
+msgid "Relate Resource"
+msgstr ""
+
+#: app/templates/javascript.htm:195
+msgid "Cannot Be Related"
+msgstr ""
+
+#: app/templates/javascript.htm:196 app/templates/views/resource/editor.htm:92
+msgid "Related Resources"
+msgstr ""
+
+#: app/templates/javascript.htm:197
+msgid ""
+"Arches keeps track of how resources are related. Click the 'related "
+"resources' link on a search result from the list on the left to see its "
+"relatives displayed in an interactive graph"
+msgstr ""
+
+#: app/templates/javascript.htm:198
+msgid "Report Date:"
+msgstr ""
+
+#: app/templates/javascript.htm:200
+msgid "X Coordinate Placeholder"
+msgstr ""
+
+#: app/templates/javascript.htm:201
+msgid "Y Coordinate Placeholder"
+msgstr ""
+
+#: app/templates/javascript.htm:202
+msgid "Display as Greyscale"
+msgstr ""
+
+#: app/templates/javascript.htm:203
+msgid "Annotation Overlays"
+msgstr ""
+
+#: app/templates/javascript.htm:204
+msgid "Reset to defaults"
+msgstr ""
+
+#: app/templates/javascript.htm:205
+msgid "Data Themes"
+msgstr ""
+
+#: app/templates/javascript.htm:208
+msgid "Allow Normal Access"
+msgstr ""
+
+#: app/templates/javascript.htm:209
+msgid "Person/Group"
+msgstr ""
+
+#: app/templates/javascript.htm:210
+msgid "Set Permissions for this instance"
+msgstr ""
+
+#: app/templates/javascript.htm:211
+msgid ""
+"By default only you have access to this record. You can set permissions for "
+"specific people or groups by selecting to whom you will grant access"
+msgstr ""
+
+#: app/templates/javascript.htm:212
+msgid ""
+"Define access privileges for this instance. You may limit access to "
+"yourself, or select which user accounts and groups have permission to this "
+"resource."
+msgstr ""
+
+#: app/templates/javascript.htm:213
+msgid "Configure Access to this Instance"
+msgstr ""
+
+#: app/templates/javascript.htm:214
+msgid "Resource Instance Permissions"
+msgstr ""
+
+#: app/templates/javascript.htm:215
+msgid "Unsorted"
+msgstr ""
+
+#: app/templates/javascript.htm:216
+msgid "Ascending"
+msgstr ""
+
+#: app/templates/javascript.htm:217
+msgid "Descending"
+msgstr ""
+
+#: app/templates/javascript.htm:218
+msgid "Fuzzy Year Padding"
+msgstr ""
+
+#: app/templates/javascript.htm:219
+msgid "Fuzzy Month Padding"
+msgstr ""
+
+#: app/templates/javascript.htm:220
+msgid "Fuzzy Day Padding"
+msgstr ""
+
+#: app/templates/javascript.htm:221
+msgid "Fuzzy Season Padding (weeks)"
+msgstr ""
+
+#: app/templates/javascript.htm:222
+msgid "Multiplier if Date is Uncertain (?)"
+msgstr ""
+
+#: app/templates/javascript.htm:223
+msgid "Multiplier if Date is Approximate (~)"
+msgstr ""
+
+#: app/templates/javascript.htm:224
+msgid "Multiplier if Both (? and ~)"
+msgstr ""
+
+#: app/templates/javascript.htm:225
+msgid "Maximum Number of Files"
+msgstr ""
+
+#: app/templates/javascript.htm:226
+msgid "Related Node"
+msgstr ""
+
+#: app/templates/javascript.htm:227
+msgid "Relationship to Node"
+msgstr ""
+
+#: app/templates/javascript.htm:229
+msgid "Continue"
+msgstr ""
+
+#: app/templates/javascript.htm:230
+#: app/templates/views/components/datatypes/number.htm:27
+msgid "Value"
+msgstr ""
+
+#: app/templates/javascript.htm:231
+msgid "Disabled"
+msgstr ""
+
+#: app/templates/javascript.htm:232 app/templates/javascript.htm:269
+msgid "Disable Editing"
+msgstr ""
+
+#: app/templates/javascript.htm:233 app/templates/javascript.htm:270
+msgid "Prevent users from editing value"
+msgstr ""
+
+#: app/templates/javascript.htm:234
+msgid "Domain options"
+msgstr ""
+
+#: app/templates/javascript.htm:235
+msgid "Add new option"
+msgstr ""
+
+#: app/templates/javascript.htm:237
+msgid "Add GNU"
+msgstr ""
+
+#: app/templates/javascript.htm:238 app/templates/javascript.htm:543
+msgid "Showing edits by"
+msgstr ""
+
+#: app/templates/javascript.htm:239 app/templates/javascript.htm:541
+msgid "Return to approved edits"
+msgstr ""
+
+#: app/templates/javascript.htm:240 app/templates/javascript.htm:545
+msgid "This is a new contribution by a provisional editor."
+msgstr ""
+
+#: app/templates/javascript.htm:241 app/templates/javascript.htm:544
+msgid "Currently showing the most recent approved edits"
+msgstr ""
+
+#: app/templates/javascript.htm:242
+#: app/templates/views/resource/editor/provisional-tile-manager.htm:8
+msgid "Provisional Edits"
+msgstr ""
+
+#: app/templates/javascript.htm:243
+msgid "QA Type"
+msgstr ""
+
+#: app/templates/javascript.htm:244
+msgid "All Resources"
+msgstr ""
+
+#: app/templates/javascript.htm:245
+msgid "All Edits"
+msgstr ""
+
+#: app/templates/javascript.htm:246
+msgid "Delete all edits"
+msgstr ""
+
+#: app/templates/javascript.htm:247
+msgid "Delete this record"
+msgstr ""
+
+#: app/templates/javascript.htm:248
+msgid "Cancel edit"
+msgstr ""
+
+#: app/templates/javascript.htm:249
+msgid "Save edit"
+msgstr ""
+
+#: app/templates/javascript.htm:250
+msgid "Sorry, you do not have access to this information"
+msgstr ""
+
+#: app/templates/javascript.htm:251
+msgid "No data added yet for"
+msgstr ""
+
+#: app/templates/javascript.htm:252
+msgid "These data are provisional and pending review"
+msgstr ""
+
+#: app/templates/javascript.htm:253
+msgid "Label 'True'"
+msgstr ""
+
+#: app/templates/javascript.htm:254
+msgid "Label 'False'"
+msgstr ""
+
+#: app/templates/javascript.htm:255
+msgid "Select an Option"
+msgstr ""
+
+#: app/templates/javascript.htm:256
+msgid "Concept Collection"
+msgstr ""
+
+#: app/templates/javascript.htm:257
+msgid "Select a concept collection"
+msgstr ""
+
+#: app/templates/javascript.htm:258
+msgid "Select a Node"
+msgstr ""
+
+#: app/templates/javascript.htm:259
+msgid "Select a Property"
+msgstr ""
+
+#: app/templates/javascript.htm:260
+msgid "No Date Entered"
+msgstr ""
+
+#: app/templates/javascript.htm:261
+msgid "Use date of data entry"
+msgstr ""
+
+#: app/templates/javascript.htm:262
+msgid "Check this to use the date of data entry as the default value."
+msgstr ""
+
+#: app/templates/javascript.htm:263
+msgid "Date"
+msgstr ""
+
+#: app/templates/javascript.htm:264
+msgid "rich text"
+msgstr ""
+
+#: app/templates/javascript.htm:265
+msgid "Direction"
+msgstr ""
+
+#: app/templates/javascript.htm:266
+msgid "Left-to-Right"
+msgstr ""
+
+#: app/templates/javascript.htm:267
+msgid "Right-to-Left"
+msgstr ""
+
+#: app/templates/javascript.htm:268
+msgid "Max Length"
+msgstr ""
+
+#: app/templates/javascript.htm:271
+#: app/templates/views/rdm/modals/add-child-form.htm:25
+#: app/templates/views/rdm/modals/add-collection-form.htm:19
+#: app/templates/views/rdm/modals/add-scheme-form.htm:25
+#: app/templates/views/rdm/modals/value-form.htm:45
+#: app/templates/views/rdm/modals/value-form.htm:46
+#: app/templates/views/rdm/modals/value-form.htm:124
+#: app/templates/views/rdm/modals/value-form.htm:202
+#: app/templates/views/rdm/modals/value-form.htm:203
+msgid "Language"
+msgstr ""
+
+#: app/templates/javascript.htm:272
+msgid "Languages"
+msgstr ""
+
+#: app/templates/javascript.htm:273
+#: app/templates/views/rdm/modals/value-form.htm:34
+#: app/templates/views/rdm/modals/value-form.htm:113
+#: app/templates/views/rdm/modals/value-form.htm:191
+msgid "Type"
+msgstr ""
+
+#: app/templates/javascript.htm:274
+msgid "not a valid EDTF format"
+msgstr ""
+
+#: app/templates/javascript.htm:275
+msgid "Year-month approximate"
+msgstr ""
+
+#: app/templates/javascript.htm:276
+msgid "Entire date (year-month-day) uncertain and approximate"
+msgstr ""
+
+#: app/templates/javascript.htm:277
+msgid "Year uncertain (possibly the year 1984, but not definitely)"
+msgstr ""
+
+#: app/templates/javascript.htm:278
+msgid ""
+"Spring, 2001. The values 21, 22, 23, 24 may be used used to signify ' "
+"Spring', 'Summer', 'Autumn', 'Winter', respectively, in place of a month "
+"value (01 through 12) for a year-and-month format string"
+msgstr ""
+
+#: app/templates/javascript.htm:279
+msgid ""
+"The year -100000.  'Y' may be used at the beginning of the date string to "
+"signify that the date is a year, when (and only when) the year exceeds four "
+"digits, i.e. for years later than 9999 or earlier than -9999."
+msgstr ""
+
+#: app/templates/javascript.htm:280
+msgid ""
+"A time interval with calendar year precision, beginning sometime in 1964 and "
+"ending sometime in 2008"
+msgstr ""
+
+#: app/templates/javascript.htm:281
+msgid ""
+"A time interval with calendar month precision, beginning sometime in June "
+"2004 and ending sometime in August of 2006"
+msgstr ""
+
+#: app/templates/javascript.htm:282
+msgid ""
+"A time interval beginning sometime on February 1, 2004 and ending sometime "
+"in 2005. The start endpoint has calendar day precision and the end endpoint "
+"has calendar year precision"
+msgstr ""
+
+#: app/templates/javascript.htm:283
+msgid "[year][“-”][month][“-”][day]"
+msgstr ""
+
+#: app/templates/javascript.htm:284
+msgid "Refers to the calendar date 2021 April 12th with day precision"
+msgstr ""
+
+#: app/templates/javascript.htm:285
+msgid "[year][“-”][month]"
+msgstr ""
+
+#: app/templates/javascript.htm:286
+msgid "Refers to the calendar month April 2021 with month precision"
+msgstr ""
+
+#: app/templates/javascript.htm:287
+msgid " [year]"
+msgstr ""
+
+#: app/templates/javascript.htm:288
+msgid "Refers to the year 2021 with year precision"
+msgstr ""
+
+#: app/templates/javascript.htm:289
+msgid "Some common encodings:"
+msgstr ""
+
+#: app/templates/javascript.htm:290
+msgid "EDTF Date Specfication (Library of Congress)"
+msgstr ""
+
+#: app/templates/javascript.htm:291
+msgid ""
+"The EDTF datatype allows you to describe dates (even uncertain dates).  You "
+"can find a summary of the standard here:"
+msgstr ""
+
+#: app/templates/javascript.htm:292
+msgid "Extended Date/Time Formats (EDTF)"
+msgstr ""
+
+#: app/templates/javascript.htm:293
+msgid "EDTF Formats"
+msgstr ""
+
+#: app/templates/javascript.htm:294
+msgid "Loading Time Wheel"
+msgstr ""
+
+#: app/templates/javascript.htm:295
+msgid "Time Wheel"
+msgstr ""
+
+#: app/templates/javascript.htm:296
+msgid ""
+"Click on a block to set a filter, double-click to zoom in, double-click "
+"center to zoom out"
+msgstr ""
+
+#: app/templates/javascript.htm:297
+msgid "Last 7 Days"
+msgstr ""
+
+#: app/templates/javascript.htm:298
+msgid "Last 30 Days"
+msgstr ""
+
+#: app/templates/javascript.htm:299
+#: app/templates/views/provisional-history-list.htm:19
+msgid "This week"
+msgstr ""
+
+#: app/templates/javascript.htm:300
+#: app/templates/views/provisional-history-list.htm:20
+msgid "This month"
+msgstr ""
+
+#: app/templates/javascript.htm:301
+#: app/templates/views/provisional-history-list.htm:21
+msgid "This quarter"
+msgstr ""
+
+#: app/templates/javascript.htm:302
+#: app/templates/views/provisional-history-list.htm:22
+msgid "This year"
+msgstr ""
+
+#: app/templates/javascript.htm:303
+#: app/templates/views/provisional-history-list.htm:16
+msgid "Today"
+msgstr ""
+
+#: app/templates/javascript.htm:304
+#: app/templates/views/provisional-history-list.htm:15
+msgid "Custom date range"
+msgstr ""
+
+#: app/templates/javascript.htm:305
+msgid "Search all dates"
+msgstr ""
+
+#: app/templates/javascript.htm:306
+msgid "Date Type"
+msgstr ""
+
+#: app/templates/javascript.htm:307
+msgid "Date Interval"
+msgstr ""
+
+#: app/templates/javascript.htm:308
+msgid "Minimum Date"
+msgstr ""
+
+#: app/templates/javascript.htm:309
+msgid "Maximum Date"
+msgstr ""
+
+#: app/templates/javascript.htm:310
+msgid "Date Format"
+msgstr ""
+
+#: app/templates/javascript.htm:311
+msgid "Has no value"
+msgstr ""
+
+#: app/templates/javascript.htm:312
+msgid "Has any value"
+msgstr ""
+
+#: app/templates/javascript.htm:314
+msgid "Format"
+msgstr ""
+
+#: app/templates/javascript.htm:315
+msgid "view valid formats"
+msgstr ""
+
+#: app/templates/javascript.htm:316
+msgid "Max"
+msgstr ""
+
+#: app/templates/javascript.htm:317
+msgid "Min"
+msgstr ""
+
+#: app/templates/javascript.htm:318
+msgid "Increment"
+msgstr ""
+
+#: app/templates/javascript.htm:319
+msgid "Increment Size"
+msgstr ""
+
+#: app/templates/javascript.htm:320
+msgid "Decimal Places"
+msgstr ""
+
+#: app/templates/javascript.htm:321
+msgid "Number of decimal places"
+msgstr ""
+
+#: app/templates/javascript.htm:322
+msgid "Prefix"
+msgstr ""
+
+#: app/templates/javascript.htm:323
+msgid "Field Prefix"
+msgstr ""
+
+#: app/templates/javascript.htm:324
+msgid "suffix"
+msgstr ""
+
+#: app/templates/javascript.htm:325
+msgid "Field Suffix"
+msgstr ""
+
+#: app/templates/javascript.htm:326
+msgid "From"
+msgstr ""
+
+#: app/templates/javascript.htm:327
+msgid "To"
+msgstr ""
+
+#: app/templates/javascript.htm:328
+msgid "Select"
+msgstr ""
+
+#: app/templates/javascript.htm:329
+msgid "Within"
+msgstr ""
+
+#: app/templates/javascript.htm:330
+msgid "overlaps"
+msgstr ""
+
+#: app/templates/javascript.htm:331
+msgid "equals"
+msgstr ""
+
+#: app/templates/javascript.htm:332
+msgid "is not"
+msgstr ""
+
+#: app/templates/javascript.htm:333
+msgid "not"
+msgstr ""
+
+#: app/templates/javascript.htm:334
+msgid "like"
+msgstr ""
+
+#: app/templates/javascript.htm:335
+msgid "not like"
+msgstr ""
+
+#: app/templates/javascript.htm:336
+msgid "and"
+msgstr ""
+
+#: app/templates/javascript.htm:337
+msgid "or"
+msgstr ""
+
+#: app/templates/javascript.htm:338
+msgid "of"
+msgstr ""
+
+#: app/templates/javascript.htm:341
+#: app/templates/views/user-profile-manager.htm:111
+msgid "None"
+msgstr ""
+
+#: app/templates/javascript.htm:342 app/templates/views/graph.htm:71
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:83
+msgid "Add"
+msgstr ""
+
+#: app/templates/javascript.htm:343
+msgid "Remove"
+msgstr ""
+
+#: app/templates/javascript.htm:344 app/templates/views/graph.htm:41
+#: app/templates/views/graph/function-manager.htm:81
+#: app/templates/views/resource.htm:41
+msgid "Find"
+msgstr ""
+
+#: app/templates/javascript.htm:345
+msgid "Filter"
+msgstr ""
+
+#: app/templates/javascript.htm:346 app/templates/views/list.htm:20
+msgid "Clear"
+msgstr ""
+
+#: app/templates/javascript.htm:347
+msgid "Clear Filter"
+msgstr ""
+
+#: app/templates/javascript.htm:348
+msgid "Buffer"
+msgstr ""
+
+#: app/templates/javascript.htm:349
+msgid "Distance"
+msgstr ""
+
+#: app/templates/javascript.htm:350
+#: app/templates/views/resource/editor.htm:235
+msgid "New"
+msgstr ""
+
+#: app/templates/javascript.htm:351
+#: app/templates/views/resource/editor.htm:262
+msgid "Add New"
+msgstr ""
+
+#: app/templates/javascript.htm:352
+msgid "Return"
+msgstr ""
+
+#: app/templates/javascript.htm:353
+msgid "csv"
+msgstr ""
+
+#: app/templates/javascript.htm:354
+msgid "html"
+msgstr ""
+
+#: app/templates/javascript.htm:355
+msgid "shapefile"
+msgstr ""
+
+#: app/templates/javascript.htm:356
+msgid "geojson url"
+msgstr ""
+
+#: app/templates/javascript.htm:357
+msgid "tile excel"
+msgstr ""
+
+#: app/templates/javascript.htm:358
+msgid "Copy to clipboard"
+msgstr ""
+
+#: app/templates/javascript.htm:359
+msgid "Info"
+msgstr ""
+
+#: app/templates/javascript.htm:360
+msgid "Arches Export"
+msgstr ""
+
+#: app/templates/javascript.htm:361
+msgid "Include the report link in the export?"
+msgstr ""
+
+#: app/templates/javascript.htm:362
+msgid "1. Format"
+msgstr ""
+
+#: app/templates/javascript.htm:363
+msgid ""
+"Select the format you'd like for your export data. (tile excel and geojson "
+"formats require a resource type filter)"
+msgstr ""
+
+#: app/templates/javascript.htm:364
+msgid "2. Coordinate Precision"
+msgstr ""
+
+#: app/templates/javascript.htm:365
+msgid ""
+"Tell us how many decimal places of precision you'd like for geo-data results"
+msgstr ""
+
+#: app/templates/javascript.htm:366
+msgid "3. Report Link"
+msgstr ""
+
+#: app/templates/javascript.htm:367
+msgid "Only applicable to CSV and shapefile exports"
+msgstr ""
+
+#: app/templates/javascript.htm:368
+msgid "4. Name this export"
+msgstr ""
+
+#: app/templates/javascript.htm:369
+msgid "5. Email Address"
+msgstr ""
+
+#: app/templates/javascript.htm:370
+msgid ""
+"This download may take some time.  Tell us where to email a download link to "
+"your results"
+msgstr ""
+
+#: app/templates/javascript.htm:371
+msgid "Export Search Results"
+msgstr ""
+
+#: app/templates/javascript.htm:372
+msgid "Advanced Search"
+msgstr ""
+
+#: app/templates/javascript.htm:373
+msgid ""
+"With Advanced Search you can build more sophisticated search queries. Select "
+"the search facets you wish to query from the list on the right. Then enter "
+"your criteria to customize your search filters"
+msgstr ""
+
+#: app/templates/javascript.htm:374
+msgid "Map Search"
+msgstr ""
+
+#: app/templates/javascript.htm:375
+msgid "Accept GeoJSON"
+msgstr ""
+
+#: app/templates/javascript.htm:376
+msgid "GeoJSON has the following errors that must be resolved:"
+msgstr ""
+
+#: app/templates/javascript.htm:377
+msgid "Edit GeoJSON"
+msgstr ""
+
+#: app/templates/javascript.htm:378
+msgid "Edit Coordinates"
+msgstr ""
+
+#: app/templates/javascript.htm:379
+msgid "Show Feature"
+msgstr ""
+
+#: app/templates/javascript.htm:380
+msgid "Coordinate Reference:"
+msgstr ""
+
+#: app/templates/javascript.htm:381
+msgid "Zoom to all"
+msgstr ""
+
+#: app/templates/javascript.htm:382
+msgid "Zoom to all features"
+msgstr ""
+
+#: app/templates/javascript.htm:383
+msgid "No Email saved for User"
+msgstr ""
+
+#: app/templates/javascript.htm:384
+msgid "Drag GeoJSON or KML files here to add"
+msgstr ""
+
+#: app/templates/javascript.htm:385
+msgid "The following errors occurred:"
+msgstr ""
+
+#: app/templates/javascript.htm:387
+msgid "Enter Search String here"
+msgstr ""
+
+#: app/templates/javascript.htm:388
+msgid "View search string"
+msgstr ""
+
+#: app/templates/javascript.htm:389
+msgid "Search String - use to filter resources displayed"
+msgstr ""
+
+#: app/templates/javascript.htm:390
+msgid "Saved Search"
+msgstr ""
+
+#: app/templates/javascript.htm:391
+msgid "The Arches site administrator hasn't saved any searches yet."
+msgstr ""
+
+#: app/templates/javascript.htm:392
+msgid "searching"
+msgstr ""
+
+#: app/templates/javascript.htm:393
+msgid "Search Facets"
+msgstr ""
+
+#: app/templates/javascript.htm:394
+msgid "Analyze"
+msgstr ""
+
+#: app/templates/javascript.htm:396 app/templates/javascript.htm:521
+msgid "Legend"
+msgstr ""
+
+#: app/templates/javascript.htm:397
+msgid "close"
+msgstr ""
+
+#: app/templates/javascript.htm:398
+#: app/templates/views/resource/edit-log.htm:93
+#: app/templates/views/resource/edit-log.htm:96
+#: app/templates/views/user-profile-manager.htm:91
+msgid "Edit"
+msgstr ""
+
+#: app/templates/javascript.htm:400
+msgid "Details"
+msgstr ""
+
+#: app/templates/javascript.htm:401
+msgid "Report"
+msgstr ""
+
+#: app/templates/javascript.htm:402
+#: app/templates/views/graph/graph-base.htm:48
+#: app/templates/views/rdm/modals/add-image-form.htm:21
+msgid "Done"
+msgstr ""
+
+#: app/templates/javascript.htm:403
+msgid "Apply"
+msgstr ""
+
+#: app/templates/javascript.htm:405
+msgid "Panels"
+msgstr ""
+
+#: app/templates/javascript.htm:406
+msgid "Single Panel"
+msgstr ""
+
+#: app/templates/javascript.htm:407
+msgid "Double Panel"
+msgstr ""
+
+#: app/templates/javascript.htm:408
+msgid "Panel 1"
+msgstr ""
+
+#: app/templates/javascript.htm:409
+msgid "Panel 2"
+msgstr ""
+
+#: app/templates/javascript.htm:410
+msgid "Panel Layout"
+msgstr ""
+
+#: app/templates/javascript.htm:411
+msgid "Selected Panel Layout"
+msgstr ""
+
+#: app/templates/javascript.htm:412
+msgid "Annotation(s)"
+msgstr ""
+
+#: app/templates/javascript.htm:413
+msgid "Brightness"
+msgstr ""
+
+#: app/templates/javascript.htm:414
+msgid "Contrast"
+msgstr ""
+
+#: app/templates/javascript.htm:415
+msgid "Saturation"
+msgstr ""
+
+#: app/templates/javascript.htm:416
+msgid "Greyscale"
+msgstr ""
+
+#: app/templates/javascript.htm:417 app/templates/javascript.htm:420
+msgid "Default Color"
+msgstr ""
+
+#: app/templates/javascript.htm:418
+msgid "Selected Feature Color"
+msgstr ""
+
+#: app/templates/javascript.htm:419
+msgid "Hovered Feature Color"
+msgstr ""
+
+#: app/templates/javascript.htm:421
+msgid "Layer Color Palette"
+msgstr ""
+
+#: app/templates/javascript.htm:422
+msgid "Fill Opacity"
+msgstr ""
+
+#: app/templates/javascript.htm:423
+msgid "Fill Color"
+msgstr ""
+
+#: app/templates/javascript.htm:424
+msgid "Overview Zoom"
+msgstr ""
+
+#: app/templates/javascript.htm:425
+msgid "Min Zoom"
+msgstr ""
+
+#: app/templates/javascript.htm:426
+msgid "Point Radius"
+msgstr ""
+
+#: app/templates/javascript.htm:427
+msgid "Line Opacity"
+msgstr ""
+
+#: app/templates/javascript.htm:428
+msgid "Line Width"
+msgstr ""
+
+#: app/templates/javascript.htm:429
+msgid "Line Color"
+msgstr ""
+
+#: app/templates/javascript.htm:430
+msgid "Stroke Color"
+msgstr ""
+
+#: app/templates/javascript.htm:431
+msgid "Stroke Width"
+msgstr ""
+
+#: app/templates/javascript.htm:432
+msgid "Point Stroke Width"
+msgstr ""
+
+#: app/templates/javascript.htm:433
+msgid "Point Stroke Opacity"
+msgstr ""
+
+#: app/templates/javascript.htm:434
+msgid "Show Style Tools"
+msgstr ""
+
+#: app/templates/javascript.htm:435
+msgid "Hide Style Tools"
+msgstr ""
+
+#: app/templates/javascript.htm:436
+msgid "dismiss"
+msgstr ""
+
+#: app/templates/javascript.htm:437
+msgid "Preview"
+msgstr ""
+
+#: app/templates/javascript.htm:438
+#: app/templates/views/map-layer-manager.htm:72
+msgid "Basemap"
+msgstr ""
+
+#: app/templates/javascript.htm:441
+msgid "Participating Layers"
+msgstr ""
+
+#: app/templates/javascript.htm:442
+msgid "Add a new feature"
+msgstr ""
+
+#: app/templates/javascript.htm:443
+msgid "files uploaded"
+msgstr ""
+
+#: app/templates/javascript.htm:444
+msgid "Max File Size (mb)"
+msgstr ""
+
+#: app/templates/javascript.htm:445
+msgid "example: .jpg, .png, .txt"
+msgstr ""
+
+#: app/templates/javascript.htm:446
+msgid ""
+"Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats "
+"will be ignored"
+msgstr ""
+
+#: app/templates/javascript.htm:447
+msgid "Accepted formats: .jpg, .png, .tiff"
+msgstr ""
+
+#: app/templates/javascript.htm:448
+msgid "Accepted File Types"
+msgstr ""
+
+#: app/templates/javascript.htm:449
+msgid "Show all files"
+msgstr ""
+
+#: app/templates/javascript.htm:450
+msgid "Show first 5 files"
+msgstr ""
+
+#: app/templates/javascript.htm:451
+msgid "Show first 10 files"
+msgstr ""
+
+#: app/templates/javascript.htm:452
+msgid "Show first 25 files"
+msgstr ""
+
+#: app/templates/javascript.htm:453
+msgid "error"
+msgstr ""
+
+#: app/templates/javascript.htm:454
+msgid "Unsaved"
+msgstr ""
+
+#: app/templates/javascript.htm:455
+msgid "delete all files"
+msgstr ""
+
+#: app/templates/javascript.htm:456
+msgid "add more files"
+msgstr ""
+
+#: app/templates/javascript.htm:457
+msgid "file(s) uploaded"
+msgstr ""
+
+#: app/templates/javascript.htm:458
+msgid "find a file"
+msgstr ""
+
+#: app/templates/javascript.htm:459
+msgid "Uploaded Files"
+msgstr ""
+
+#: app/templates/javascript.htm:460
+msgid "Allowed document formats:"
+msgstr ""
+
+#: app/templates/javascript.htm:461
+msgid ""
+"You may upload as many documents as you wish, but the maximum size of any "
+"single file is"
+msgstr ""
+
+#: app/templates/javascript.htm:462
+msgid ""
+"You may upload as many photos as you wish, but the maximum size of any "
+"single file is 8MB."
+msgstr ""
+
+#: app/templates/javascript.htm:463
+msgid "Adding documents to this record is optional."
+msgstr ""
+
+#: app/templates/javascript.htm:464
+msgid "Adding photos to this record is optional."
+msgstr ""
+
+#: app/templates/javascript.htm:465
+msgid "Select Files"
+msgstr ""
+
+#: app/templates/javascript.htm:466
+msgid "Select Photographs"
+msgstr ""
+
+#: app/templates/javascript.htm:467
+msgid "Drag & Drop your files onto this panel"
+msgstr ""
+
+#: app/templates/javascript.htm:468
+msgid "Drag & Drop your photos onto this panel"
+msgstr ""
+
+#: app/templates/javascript.htm:469
+msgid "Upload Photographs"
+msgstr ""
+
+#: app/templates/javascript.htm:470
+msgid "Upload Documents"
+msgstr ""
+
+#: app/templates/javascript.htm:471
+msgid "Show Gallery"
+msgstr ""
+
+#: app/templates/javascript.htm:472
+msgid "Hide Gallery"
+msgstr ""
+
+#: app/templates/javascript.htm:473
+msgid "Select default value"
+msgstr ""
+
+#: app/templates/javascript.htm:474
+msgid "Select a filter"
+msgstr ""
+
+#: app/templates/javascript.htm:475
+msgid "Default Manifest URL"
+msgstr ""
+
+#: app/templates/javascript.htm:476
+msgid "Enter Manifest URL"
+msgstr ""
+
+#: app/templates/javascript.htm:477
+msgid "Select a manifest"
+msgstr ""
+
+#: app/templates/javascript.htm:478 app/templates/javascript.htm:669
+msgid "No manifest selected"
+msgstr ""
+
+#: app/templates/javascript.htm:479
+msgid "Load manifest"
+msgstr ""
+
+#: app/templates/javascript.htm:480
+msgid "Loading manifest"
+msgstr ""
+
+#: app/templates/javascript.htm:481
+msgid "Error loading manifest"
+msgstr ""
+
+#: app/templates/javascript.htm:483
+msgid "Filter images"
+msgstr ""
+
+#: app/templates/javascript.htm:484
+msgid "Draw a"
+msgstr ""
+
+#: app/templates/javascript.htm:485
+msgid "View Gallery"
+msgstr ""
+
+#: app/templates/javascript.htm:486
+msgid "Image"
+msgstr ""
+
+#: app/templates/javascript.htm:487
+msgid "Image List"
+msgstr ""
+
+#: app/templates/javascript.htm:488
+msgid "Image Tools"
+msgstr ""
+
+#: app/templates/javascript.htm:489 app/templates/javascript.htm:667
+msgid "Switch Image Service"
+msgstr ""
+
+#: app/templates/javascript.htm:490
+msgid "Resource Instance Name"
+msgstr ""
+
+#: app/templates/javascript.htm:491 app/templates/javascript.htm:620
+msgid "Related Resource Summary"
+msgstr ""
+
+#: app/templates/javascript.htm:492 app/templates/views/graph-designer.htm:34
+msgid "Resource Model"
+msgstr ""
+
+#: app/templates/javascript.htm:493 app/templates/views/edit-history.htm:18
+msgid "Resource Type"
+msgstr ""
+
+#: app/templates/javascript.htm:494
+msgid "Resource Details"
+msgstr ""
+
+#: app/templates/javascript.htm:495
+msgid ""
+"Click the 'Details' link on a search result from the list on the left to "
+"view more information about a resource."
+msgstr ""
+
+#: app/templates/javascript.htm:496
+msgid "Resource Information"
+msgstr ""
+
+#: app/templates/javascript.htm:497
+msgid "Has Relationship"
+msgstr ""
+
+#: app/templates/javascript.htm:498
+msgid "Resource's relationship to"
+msgstr ""
+
+#: app/templates/javascript.htm:499
+msgid "Related to"
+msgstr ""
+
+#: app/templates/javascript.htm:500
+msgid "'s relationship to Resource"
+msgstr ""
+
+#: app/templates/javascript.htm:501
+msgid "Relationships"
+msgstr ""
+
+#: app/templates/javascript.htm:502
+msgid "relationships shown"
+msgstr ""
+
+#: app/templates/javascript.htm:503
+msgid "Search Network"
+msgstr ""
+
+#: app/templates/javascript.htm:504
+msgid "Analyze Network"
+msgstr ""
+
+#: app/templates/javascript.htm:505
+msgid "Click a node/edge for info"
+msgstr ""
+
+#: app/templates/javascript.htm:506
+msgid "Click a node to show more relationships"
+msgstr ""
+
+#: app/templates/javascript.htm:507
+msgid "Click a node refocus"
+msgstr ""
+
+#: app/templates/javascript.htm:508
+msgid "Click a node/edge to remove"
+msgstr ""
+
+#: app/templates/javascript.htm:510
+msgid "Workflow Complete"
+msgstr ""
+
+#: app/templates/javascript.htm:511
+msgid "with"
+msgstr ""
+
+#: app/templates/javascript.htm:512
+msgid "Link Text (Optional)"
+msgstr ""
+
+#: app/templates/javascript.htm:513
+msgid "URL for link"
+msgstr ""
+
+#: app/templates/javascript.htm:514
+msgid "URL Link Color"
+msgstr ""
+
+#: app/templates/javascript.htm:515
+msgid "URL Placeholder"
+msgstr ""
+
+#: app/templates/javascript.htm:516
+msgid "URL Label Placeholder"
+msgstr ""
+
+#: app/templates/javascript.htm:517
+msgid "Default relationship to"
+msgstr ""
+
+#: app/templates/javascript.htm:518
+msgid "Default inverse relationship to"
+msgstr ""
+
+#: app/templates/javascript.htm:519
+msgid "References"
+msgstr ""
+
+#: app/templates/javascript.htm:520
+msgid "Does not reference"
+msgstr ""
+
+#: app/templates/javascript.htm:522
+msgid ""
+"Check to limit the dropdown to only this widget's node rather than all nodes "
+"in the tile."
+msgstr ""
+
+#: app/templates/javascript.htm:523
+msgid "Show only the value of the selected node in the dropdown options"
+msgstr ""
+
+#: app/templates/javascript.htm:524
+msgid "Dropdown Format"
+msgstr ""
+
+#: app/templates/javascript.htm:525
+msgid "Provisional"
+msgstr ""
+
+#: app/templates/javascript.htm:526
+msgid "Card Name"
+msgstr ""
+
+#: app/templates/javascript.htm:527
+msgid "Add Tab"
+msgstr ""
+
+#: app/templates/javascript.htm:528
+msgid "Tab Name"
+msgstr ""
+
+#: app/templates/javascript.htm:529
+msgid "Find a resource..."
+msgstr ""
+
+#: app/templates/javascript.htm:530
+msgid "Find an icon"
+msgstr ""
+
+#: app/templates/javascript.htm:531
+msgid "Select Tab icon"
+msgstr ""
+
+#: app/templates/javascript.htm:532
+msgid "Select cards in this tab"
+msgstr ""
+
+#: app/templates/javascript.htm:533
+msgid "Enter manifest URL"
+msgstr ""
+
+#: app/templates/javascript.htm:534
+msgid "Default Image Service URL"
+msgstr ""
+
+#: app/templates/javascript.htm:536
+msgid "Select image nodes to include"
+msgstr ""
+
+#: app/templates/javascript.htm:537
+msgid "Select an Ontology Property"
+msgstr ""
+
+#: app/templates/javascript.htm:538
+msgid "Select a resource"
+msgstr ""
+
+#: app/templates/javascript.htm:539
+msgid "Select a resource model"
+msgstr ""
+
+#: app/templates/javascript.htm:542
+msgid "Choose a sibling card"
+msgstr ""
+
+#: app/templates/javascript.htm:546
+msgid "This resource has provisional edits that are pending review"
+msgstr ""
+
+#: app/templates/javascript.htm:547
+msgid ""
+"This resource has provisional edits (not displayed in this report) that are "
+"pending review"
+msgstr ""
+
+#: app/templates/javascript.htm:548
+msgid "Find an address"
+msgstr ""
+
+#: app/templates/javascript.htm:549
+msgid "Select drawings text (optional)"
+msgstr ""
+
+#: app/templates/javascript.htm:550
+msgid "Select drawings map source (optional)"
+msgstr ""
+
+#: app/templates/javascript.htm:551
+msgid "Select drawings map source layer (optional)"
+msgstr ""
+
+#: app/templates/javascript.htm:552
+msgid "Map Center Longitude"
+msgstr ""
+
+#: app/templates/javascript.htm:553
+msgid "Map Center Latitude"
+msgstr ""
+
+#: app/templates/javascript.htm:554
+msgid "Longitude (x coordinate)"
+msgstr ""
+
+#: app/templates/javascript.htm:555
+msgid "Latitude (y coordinate)"
+msgstr ""
+
+#: app/templates/javascript.htm:556
+msgid "Available Geometry Types"
+msgstr ""
+
+#: app/templates/javascript.htm:557
+msgid "Zoom Level"
+msgstr ""
+
+#: app/templates/javascript.htm:558
+msgid "Default Zoom"
+msgstr ""
+
+#: app/templates/javascript.htm:559
+msgid "Update Features"
+msgstr ""
+
+#: app/templates/javascript.htm:560
+msgid "feature(s)"
+msgstr ""
+
+#: app/templates/javascript.htm:561
+msgid "Point"
+msgstr ""
+
+#: app/templates/javascript.htm:562
+msgid "Line"
+msgstr ""
+
+#: app/templates/javascript.htm:563
+msgid "Polygon"
+msgstr ""
+
+#: app/templates/javascript.htm:564
+msgid "Add point"
+msgstr ""
+
+#: app/templates/javascript.htm:565
+msgid "Add line"
+msgstr ""
+
+#: app/templates/javascript.htm:566
+msgid "Add polygon"
+msgstr ""
+
+#: app/templates/javascript.htm:567
+msgid "Select drawing"
+msgstr ""
+
+#: app/templates/javascript.htm:568
+msgid "Related instance map sources"
+msgstr ""
+
+#: app/templates/javascript.htm:569
+msgid "Related instance map source layers (optional)"
+msgstr ""
+
+#: app/templates/javascript.htm:570
+msgid "Intersection layer configuration"
+msgstr ""
+
+#: app/templates/javascript.htm:571
+#, python-brace-format
+msgid "Create a new ${graphName}"
+msgstr ""
+
+#: app/templates/javascript.htm:572
+msgid "Add new Relationship"
+msgstr ""
+
+#: app/templates/javascript.htm:573
+msgid "Network response was not ok"
+msgstr ""
+
+#: app/templates/javascript.htm:575
+msgid "Term Matches"
+msgstr ""
+
+#: app/templates/javascript.htm:576
+#, python-brace-format
+msgid "${total} date values"
+msgstr ""
+
+#: app/templates/javascript.htm:577
+msgid "Select Widgets"
+msgstr ""
+
+#: app/templates/javascript.htm:578
+msgid "(This card data will define the resource description.)"
+msgstr ""
+
+#: app/templates/javascript.htm:579
+msgid "(This card data will define the resource name.)"
+msgstr ""
+
+#: app/templates/javascript.htm:580
+msgid "Settings Conflict: Remove this card from grouped card?"
+msgstr ""
+
+#: app/templates/javascript.htm:581
+#, python-brace-format
+msgid ""
+"The cardinality of this card cannot be changed until you remove it from "
+"being grouped with the ${cardName} card.  Do you want to remove this card "
+"from being grouped with the ${cardName} card"
+msgstr ""
+
+#: app/templates/javascript.htm:582
+msgid "!! Referenced model does not exist -- Delete and select a new model !!"
+msgstr ""
+
+#: app/templates/javascript.htm:583
+#: app/templates/views/map-layer-manager.htm:132
+msgid "Layer Preview"
+msgstr ""
+
+#: app/templates/javascript.htm:584
+msgid "Layer Icon"
+msgstr ""
+
+#: app/templates/javascript.htm:585 app/templates/views/graph-designer.htm:127
+#: app/templates/views/graph-designer.htm:136
+#: app/templates/views/graph/function-manager.htm:29
+#: app/templates/views/map-layer-manager.htm:123
+msgid "Save Edits"
+msgstr ""
+
+#: app/templates/javascript.htm:586 app/templates/views/graph-designer.htm:125
+#: app/templates/views/graph-designer.htm:134
+#: app/templates/views/graph/function-manager.htm:28
+#: app/templates/views/map-layer-manager.htm:124
+msgid "Discard Edits"
+msgstr ""
+
+#: app/templates/javascript.htm:587
+msgid "Activated"
+msgstr ""
+
+#: app/templates/javascript.htm:591
+msgid "Layer Name"
+msgstr ""
+
+#: app/templates/javascript.htm:592
+msgid "Add to search map by default:"
+msgstr ""
+
+#: app/templates/javascript.htm:593
+msgid "Legend content"
+msgstr ""
+
+#: app/templates/javascript.htm:595
+msgid ""
+"Layer has no data - data on map is for preview purposes.  This layer will "
+"not show up in map overlays until data is added."
+msgstr ""
+
+#: app/templates/javascript.htm:596
+msgid "Point Style"
+msgstr ""
+
+#: app/templates/javascript.htm:597
+msgid "Line Style"
+msgstr ""
+
+#: app/templates/javascript.htm:598
+msgid "Polygon Style"
+msgstr ""
+
+#: app/templates/javascript.htm:600
+msgid "Halo color"
+msgstr ""
+
+#: app/templates/javascript.htm:601
+msgid "Fill color"
+msgstr ""
+
+#: app/templates/javascript.htm:602
+msgid "Radius"
+msgstr ""
+
+#: app/templates/javascript.htm:603
+msgid "Halo radius"
+msgstr ""
+
+#: app/templates/javascript.htm:604
+msgid "Weight"
+msgstr ""
+
+#: app/templates/javascript.htm:605
+msgid "Halo weight"
+msgstr ""
+
+#: app/templates/javascript.htm:606
+msgid "Outline color"
+msgstr ""
+
+#: app/templates/javascript.htm:607
+msgid "Outline weight"
+msgstr ""
+
+#: app/templates/javascript.htm:608
+msgid "Cluster Distance"
+msgstr ""
+
+#: app/templates/javascript.htm:609
+msgid "Cluster Max Zoom"
+msgstr ""
+
+#: app/templates/javascript.htm:610
+msgid "Cluster Min Points"
+msgstr ""
+
+#: app/templates/javascript.htm:611
+msgid "Vector Simplification"
+msgstr ""
+
+#: app/templates/javascript.htm:612
+msgid "Changes to cluster settings will only be reflected after saving."
+msgstr ""
+
+#: app/templates/javascript.htm:613
+msgid ""
+"Preview map data do not use clustering algorithm.  Add data for this "
+"resource model to see real clustered data."
+msgstr ""
+
+#: app/templates/javascript.htm:614
+msgid ""
+"The following users and groups can view this layer. If you wish to change "
+"who can access this layer, please update the permissions on the layer node."
+msgstr ""
+
+#: app/templates/javascript.htm:615
+msgid "Users"
+msgstr ""
+
+#: app/templates/javascript.htm:616
+msgid "Groups"
+msgstr ""
+
+#: app/templates/javascript.htm:617
+msgid "Related Resources Editor"
+msgstr ""
+
+#: app/templates/javascript.htm:618
+msgid "Add Related Resources"
+msgstr ""
+
+#: app/templates/javascript.htm:619
+msgid ""
+"Arches allows you to define relationships between resources so you can "
+"better understand the context and interplay between physical objects, "
+"events, activities, people and documents. Relating resources lets you build "
+"a network of relationships for your data objects."
+msgstr ""
+
+#: app/templates/javascript.htm:621
+msgid "Table"
+msgstr ""
+
+#: app/templates/javascript.htm:622
+msgid "Visualization"
+msgstr ""
+
+#: app/templates/javascript.htm:623
+msgid "Show Me How"
+msgstr ""
+
+#: app/templates/javascript.htm:624
+msgid "Select resources and relate it to this one"
+msgstr ""
+
+#: app/templates/javascript.htm:625
+msgid "e.g.: .txt"
+msgstr ""
+
+#: app/templates/javascript.htm:626
+msgid "resource relations"
+msgstr ""
+
+#: app/templates/javascript.htm:627
+msgid "'Select an Ontology Property'"
+msgstr ""
+
+#: app/templates/javascript.htm:628
+msgid "This is a Node to Resource Instance relationship"
+msgstr ""
+
+#: app/templates/javascript.htm:629
+msgid "'s relationship to "
+msgstr ""
+
+#: app/templates/javascript.htm:630
+#: app/templates/views/graph/graph-designer/node-form.htm:71
+msgid "Relationship to"
+msgstr ""
+
+#: app/templates/javascript.htm:631
+msgid "Inverse Relationship to"
+msgstr ""
+
+#: app/templates/javascript.htm:632
+msgid "This is a Resource Instance to Resource Instance relationship"
+msgstr ""
+
+#: app/templates/javascript.htm:633
+msgid "Relationship"
+msgstr ""
+
+#: app/templates/javascript.htm:634
+msgid "From Date"
+msgstr ""
+
+#: app/templates/javascript.htm:635
+msgid "To Date"
+msgstr ""
+
+#: app/templates/javascript.htm:637
+msgid "Delete this entry"
+msgstr ""
+
+#: app/templates/javascript.htm:638 app/templates/javascript.htm:757
+#: app/templates/views/components/plugins/workflow.htm:180
+#: app/templates/views/components/plugins/workflow.htm:183
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:126
+#: app/templates/views/rdm/modals/manage-parent-form.htm:58
+#: app/templates/views/rdm/modals/related-concept-form.htm:68
+#: app/templates/views/rdm/modals/related-member-form.htm:67
+#: app/templates/views/rdm/modals/value-form.htm:64
+#: app/templates/views/rdm/modals/value-form.htm:143
+#: app/templates/views/rdm/modals/value-form.htm:221
+#: app/templates/views/user-profile-manager.htm:155
+msgid "Save"
+msgstr ""
+
+#: app/templates/javascript.htm:639
+msgid "This resource is not related to any other resources"
+msgstr ""
+
+#: app/templates/javascript.htm:640
+msgid "Service"
+msgstr ""
+
+#: app/templates/javascript.htm:641
+msgid "Canvas"
+msgstr ""
+
+#: app/templates/javascript.htm:642
+msgid "Manage Image Service"
+msgstr ""
+
+#: app/templates/javascript.htm:643
+msgid "Title"
+msgstr ""
+
+#: app/templates/javascript.htm:645
+msgid "Attribution"
+msgstr ""
+
+#: app/templates/javascript.htm:646
+msgid "Attribution Logo"
+msgstr ""
+
+#: app/templates/javascript.htm:647
+msgid "Metadata"
+msgstr ""
+
+#: app/templates/javascript.htm:649
+msgid "Manage Image Canvases"
+msgstr ""
+
+#: app/templates/javascript.htm:650
+#: app/templates/views/rdm/concept-report.htm:229
+msgid "Images"
+msgstr ""
+
+#: app/templates/javascript.htm:651
+msgid "Select image to delete from the image service"
+msgstr ""
+
+#: app/templates/javascript.htm:652 app/templates/javascript.htm:750
+msgid "Select All"
+msgstr ""
+
+#: app/templates/javascript.htm:653 app/templates/javascript.htm:751
+msgid "Clear All"
+msgstr ""
+
+#: app/templates/javascript.htm:654 app/templates/javascript.htm:752
+msgid "Delete Selected"
+msgstr ""
+
+#: app/templates/javascript.htm:655
+msgid "Drag or "
+msgstr ""
+
+#: app/templates/javascript.htm:656
+msgid "click here "
+msgstr ""
+
+#: app/templates/javascript.htm:657
+msgid "to upload photos"
+msgstr ""
+
+#: app/templates/javascript.htm:658
+msgid "Selected Image Name"
+msgstr ""
+
+#: app/templates/javascript.htm:659
+msgid "Create New Service"
+msgstr ""
+
+#: app/templates/javascript.htm:660
+msgid "Edit a service"
+msgstr ""
+
+#: app/templates/javascript.htm:661
+msgid "Drag & Drop Your Images Here"
+msgstr ""
+
+#: app/templates/javascript.htm:662
+msgid "Import digital images and create a new image service"
+msgstr ""
+
+#: app/templates/javascript.htm:663
+msgid "Select Images"
+msgstr ""
+
+#: app/templates/javascript.htm:664
+msgid ""
+"Create a new service by uploading one or more images. Images will be "
+"uploaded and processes so that you can view, annotate, and share them with "
+"others"
+msgstr ""
+
+#: app/templates/javascript.htm:665
+msgid "Edit an existing Image Service"
+msgstr ""
+
+#: app/templates/javascript.htm:666
+msgid ""
+"Update the information and images related to an existing Image Service. Or "
+"copy and paste in the URL of a IIIF Manifest to add a service from an "
+"external service"
+msgstr ""
+
+#: app/templates/javascript.htm:668
+msgid "Create Image Service"
+msgstr ""
+
+#: app/templates/javascript.htm:670
+msgid "Service Title"
+msgstr ""
+
+#: app/templates/javascript.htm:671
+msgid "Service Description"
+msgstr ""
+
+#: app/templates/javascript.htm:672
+msgid "Metadata Label"
+msgstr ""
+
+#: app/templates/javascript.htm:673
+msgid "Metadata Value"
+msgstr ""
+
+#: app/templates/javascript.htm:674
+msgid "Image Caption"
+msgstr ""
+
+#: app/templates/javascript.htm:675
+msgid "Upload .csv or .zip File"
+msgstr ""
+
+#: app/templates/javascript.htm:676
+msgid "Drag & Drop your file onto this area to upload"
+msgstr ""
+
+#: app/templates/javascript.htm:677
+msgid "Select File"
+msgstr ""
+
+#: app/templates/javascript.htm:678 app/templates/javascript.htm:693
+msgid "Cancel File Import"
+msgstr ""
+
+#: app/templates/javascript.htm:679
+msgid ""
+"Use this workflow to upload a file with data that you want to use to create "
+"new data instances of a model."
+msgstr ""
+
+#: app/templates/javascript.htm:680
+msgid "Import Format: Single .csv file"
+msgstr ""
+
+#: app/templates/javascript.htm:681
+msgid "File Summary"
+msgstr ""
+
+#: app/templates/javascript.htm:682
+msgid "File name"
+msgstr ""
+
+#: app/templates/javascript.htm:683
+msgid "File size"
+msgstr ""
+
+#: app/templates/javascript.htm:684
+msgid "Number of rows"
+msgstr ""
+
+#: app/templates/javascript.htm:685
+msgid "Target Model"
+msgstr ""
+
+#: app/templates/javascript.htm:686
+msgid "Import Details"
+msgstr ""
+
+#: app/templates/javascript.htm:687
+msgid "Column names in the first row"
+msgstr ""
+
+#: app/templates/javascript.htm:688 app/templates/javascript.htm:762
+msgid "Use as an id"
+msgstr ""
+
+#: app/templates/javascript.htm:689
+msgid "Showing First"
+msgstr ""
+
+#: app/templates/javascript.htm:690
+msgid "Showing All"
+msgstr ""
+
+#: app/templates/javascript.htm:691
+msgid "Rows"
+msgstr ""
+
+#: app/templates/javascript.htm:692
+msgid "Import data"
+msgstr ""
+
+#: app/templates/javascript.htm:694
+msgid "Import Single CSV"
+msgstr ""
+
+#: app/templates/javascript.htm:695
+msgid "Target Resource"
+msgstr ""
+
+#: app/templates/javascript.htm:696
+msgid "Target Fields"
+msgstr ""
+
+#: app/templates/javascript.htm:697
+msgid "Download Templates"
+msgstr ""
+
+#: app/templates/javascript.htm:698
+msgid "Select Template"
+msgstr ""
+
+#: app/templates/javascript.htm:699
+msgid "Upload .zip File"
+msgstr ""
+
+#: app/templates/javascript.htm:700
+msgid "Upload Your .zip File"
+msgstr ""
+
+#: app/templates/javascript.htm:701
+msgid "Branch Excel"
+msgstr ""
+
+#: app/templates/javascript.htm:702
+msgid "File Upload Summary"
+msgstr ""
+
+#: app/templates/javascript.htm:703
+msgid "File"
+msgstr ""
+
+#: app/templates/javascript.htm:704
+msgid "Size"
+msgstr ""
+
+#: app/templates/javascript.htm:705
+#: app/templates/two_factor_authentication_reset.htm:42
+msgid "Submit"
+msgstr ""
+
+#: app/templates/javascript.htm:706
+msgid "File contents"
+msgstr ""
+
+#: app/templates/javascript.htm:707
+msgid "Import Branch Excel Summary"
+msgstr ""
+
+#: app/templates/javascript.htm:708
+msgid "Excel File"
+msgstr ""
+
+#: app/templates/javascript.htm:709
+msgid "Worksheets"
+msgstr ""
+
+#: app/templates/javascript.htm:710
+msgid "Tiles"
+msgstr ""
+
+#: app/templates/javascript.htm:711
+#: app/templates/views/rdm/modals/import-concept-form.htm:53
+msgid "Import"
+msgstr ""
+
+#: app/templates/javascript.htm:712
+#: app/templates/views/rdm/modals/export-scheme-form.htm:27
+msgid "Export"
+msgstr ""
+
+#: app/templates/javascript.htm:713
+msgid "Filter Tasks"
+msgstr ""
+
+#: app/templates/javascript.htm:714
+msgid "Filter Modules"
+msgstr ""
+
+#: app/templates/javascript.htm:715
+msgid "Start"
+msgstr ""
+
+#: app/templates/javascript.htm:716
+msgid "Warning"
+msgstr ""
+
+#: app/templates/javascript.htm:717
+msgid "Are you sure you want to delete this load?"
+msgstr ""
+
+#: app/templates/javascript.htm:718
+msgid "undo import"
+msgstr ""
+
+#: app/templates/javascript.htm:719
+msgid "remove from history"
+msgstr ""
+
+#: app/templates/javascript.htm:720
+msgid "indexing"
+msgstr ""
+
+#: app/templates/javascript.htm:721
+msgid "completed"
+msgstr ""
+
+#: app/templates/javascript.htm:722
+msgid "failed"
+msgstr ""
+
+#: app/templates/javascript.htm:723
+msgid "running"
+msgstr ""
+
+#: app/templates/javascript.htm:724
+msgid "unloading"
+msgstr ""
+
+#: app/templates/javascript.htm:725
+msgid "unloaded"
+msgstr ""
+
+#: app/templates/javascript.htm:726
+msgid "Validation Errors"
+msgstr ""
+
+#: app/templates/javascript.htm:727
+msgid "No Error Found"
+msgstr ""
+
+#: app/templates/javascript.htm:728
+msgid "Loading data"
+msgstr ""
+
+#: app/templates/javascript.htm:729
+msgid "Loading status"
+msgstr ""
+
+#: app/templates/javascript.htm:730
+msgid "Loading started"
+msgstr ""
+
+#: app/templates/javascript.htm:731
+msgid "Loading ended"
+msgstr ""
+
+#: app/templates/javascript.htm:732
+msgid "Load duration"
+msgstr ""
+
+#: app/templates/javascript.htm:733
+msgid "Indexing ended"
+msgstr ""
+
+#: app/templates/javascript.htm:734
+msgid "Indexing duration"
+msgstr ""
+
+#: app/templates/javascript.htm:736
+msgid "Unable to display the selected file"
+msgstr ""
+
+#: app/templates/javascript.htm:737
+msgid "This file can't be displayed."
+msgstr ""
+
+#: app/templates/javascript.htm:738
+msgid "It may be a proprietary format or there isn't a loader available yet"
+msgstr ""
+
+#: app/templates/javascript.htm:739
+msgid "to present it in this webpage."
+msgstr ""
+
+#: app/templates/javascript.htm:740
+msgid "Unable to parse your file with the "
+msgstr ""
+
+#: app/templates/javascript.htm:741
+msgid "loader"
+msgstr ""
+
+#: app/templates/javascript.htm:742
+msgid "Select File Loader"
+msgstr ""
+
+#: app/templates/javascript.htm:743
+msgid ""
+"Select the loader best suited for processing and visualizing the selected "
+"file"
+msgstr ""
+
+#: app/templates/javascript.htm:744
+msgid "Upload Files"
+msgstr ""
+
+#: app/templates/javascript.htm:745
+msgid ""
+"You may upload as many files as you wish; check with the site admin on the "
+"maximum file size."
+msgstr ""
+
+#: app/templates/javascript.htm:746
+msgid "optional"
+msgstr ""
+
+#: app/templates/javascript.htm:747
+msgid "Adding files to this record is"
+msgstr ""
+
+#: app/templates/javascript.htm:748
+msgid ""
+"Images formatted as .jpg, .png files may be uploaded. Other formats may "
+"require a loader to view."
+msgstr ""
+
+#: app/templates/javascript.htm:749
+msgid "File Filter"
+msgstr ""
+
+#: app/templates/javascript.htm:753
+msgid "Download Selected"
+msgstr ""
+
+#: app/templates/javascript.htm:754
+msgid "Loader"
+msgstr ""
+
+#: app/templates/javascript.htm:755
+msgid "File Renderer"
+msgstr ""
+
+#: app/templates/javascript.htm:758
+msgid "files selected"
+msgstr ""
+
+#: app/templates/javascript.htm:759
+msgid "add files"
+msgstr ""
+
+#: app/templates/javascript.htm:760
+msgid "Apply to Selected Files"
+msgstr ""
+
+#: app/templates/javascript.htm:761
+msgid "Apply the same loader to all selected files in the dataset"
+msgstr ""
+
+#: app/templates/login.htm:38 app/templates/login.htm:68
+msgid "Sign In"
+msgstr ""
+
+#: app/templates/login.htm:40
+msgid ""
+"Sign in to Arches to access your data modeling, editing, and discovery tools."
+msgstr ""
+
+#: app/templates/login.htm:46
+msgid "Your account has been created. Please sign in."
+msgstr ""
+
+#: app/templates/login.htm:74
+msgid "Login failed"
+msgstr ""
+
+#: app/templates/login.htm:75
+msgid "Invalid username and/or password."
+msgstr ""
+
+#: app/templates/login.htm:80 app/templates/signup.htm:159
+msgid "Forgot password ?"
+msgstr ""
+
+#: app/templates/login.htm:81
+msgid "Forgot password?"
+msgstr ""
+
+#: app/templates/login.htm:84 app/templates/signup.htm:160
+msgid "Create a new account"
+msgstr ""
+
+#: app/templates/login.htm:90 app/templates/signup.htm:153
+msgid "Learn more about <a href='http://www.archesproject.org'>Arches</a>"
+msgstr ""
+
+#: app/templates/navbar/function-manage-menu.htm:11
+msgid "Select a graph..."
+msgstr ""
+
+#: app/templates/navbar/function-manage-menu.htm:18
+msgid "Graphs/Semantics"
+msgstr ""
+
+#: app/templates/navbar/function-manage-menu.htm:19
+msgid "Define graph"
+msgstr ""
+
+#: app/templates/navbar/function-manage-menu.htm:28
+#: app/templates/navbar/graph-designer-menu.htm:102
+msgid "Return to Arches Designer"
+msgstr ""
+
+#: app/templates/navbar/function-manage-menu.htm:29
+#: app/templates/navbar/graph-designer-menu.htm:103
+msgid "Create Arches Resource Models and Branches"
+msgstr ""
+
+#: app/templates/navbar/function-manage-menu.htm:37
+#: app/templates/navbar/graph-designer-menu.htm:111
+msgid "footer"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:15
+msgid "New Model"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:16
+msgid "Create new Resource Model"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:24
+#: app/templates/views/graph.htm:75 app/views/graph.py:346
+msgid "New Branch"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:25
+msgid "Create new Branch"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:36
+msgid "Import Model"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:37
+msgid "Import Model by uploading a json file"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:63
+msgid "Functions"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:64
+msgid "Configure functions attached to this Resource Model"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:72
+msgid "Export Mapping File"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:74
+msgid "Use a mapping file with import/export of business data"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:83
+msgid "Delete Associated Instances"
+msgstr ""
+
+#: app/templates/navbar/graph-designer-menu.htm:84
+msgid "Delete All Associated Instances with this Model"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:17
+msgid "Copy Resource"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:18
+msgid "Make a copy and start editing"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:28
+msgid "Delete Resource"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:29
+msgid "Permanently delete this resource"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:39
+msgid "Review Edit History"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:40
+msgid "View changes to this resource record"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:49
+msgid "Jump to Report"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:50
+msgid "View the full resource report"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:58
+msgid "Print Report"
+msgstr ""
+
+#: app/templates/navbar/resource-manage-menu.htm:59
+msgid "Print the full resource report"
+msgstr ""
+
+#: app/templates/rdm.htm:66 app/templates/views/rdm/concept-report.htm:28
+#: app/templates/views/rdm/concept-report.htm:52
+msgid "Toggle Dropdown"
+msgstr ""
+
+#: app/templates/rdm.htm:69
+msgid "Add Thesauri"
+msgstr ""
+
+#: app/templates/rdm.htm:70
+msgid "Import Thesauri"
+msgstr ""
+
+#: app/templates/rdm.htm:71
+msgid "Export Thesauri"
+msgstr ""
+
+#: app/templates/rdm.htm:72
+msgid "Delete Thesauri"
+msgstr ""
+
+#: app/templates/rdm.htm:74
+#: app/templates/views/rdm/modals/add-collection-form.htm:7
+msgid "Add Collection"
+msgstr ""
+
+#: app/templates/rdm.htm:75
+#: app/templates/views/rdm/modals/delete-collection-form.htm:7
+msgid "Delete Collection"
+msgstr ""
+
+#: app/templates/rdm.htm:76
+msgid "Export All Collections"
+msgstr ""
+
+#: app/templates/rdm.htm:120 app/templates/views/rdm/concept-report.htm:3
+#: app/templates/views/rdm/entitytype-report.htm:3
+msgid "Loading..."
+msgstr ""
+
+#: app/templates/signup.htm:31
+msgid "Create Account"
+msgstr ""
+
+#: app/templates/signup.htm:33
+msgid "Register to access data modeling, editing, and discovery tools."
+msgstr ""
+
+#: app/templates/signup.htm:40
+msgid "Please correct the error below."
+msgstr ""
+
+#: app/templates/signup.htm:40
+msgid "Please correct the errors below."
+msgstr ""
+
+#: app/templates/signup.htm:127
+msgid "Signup"
+msgstr ""
+
+#: app/templates/two_factor_authentication_login.htm:19
+#: app/templates/views/user-profile-manager.htm:127
+#: app/templates/views/user-profile-manager.htm:238
+msgid "Two-Factor Authentication"
+msgstr ""
+
+#: app/templates/two_factor_authentication_login.htm:24
+msgid ""
+"Please enter the code from your external authentication application below."
+msgstr ""
+
+#: app/templates/two_factor_authentication_login.htm:63
+msgid "Authentication failed. Please try again."
+msgstr ""
+
+#: app/templates/two_factor_authentication_login.htm:71
+msgid "Need to reset two-factor authentication?"
+msgstr ""
+
+#: app/templates/two_factor_authentication_login.htm:81
+msgid ""
+"The administrator has required that all users enable two-factor "
+"authentication."
+msgstr ""
+
+#: app/templates/two_factor_authentication_login.htm:82
+msgid "Enable two-factor authentication via email"
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:19
+msgid "Update Two-Factor Authentication"
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:24
+msgid "Please enter an email address below."
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:25
+msgid ""
+"If it is registered in our system it will receive instructions to update two-"
+"factor authentication."
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:53
+msgid "Success!"
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:57
+msgid "Email address:"
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:65
+msgid ""
+"If this email address is registered, an email has been sent to it containing "
+"instructions to enable two-factor authentication."
+msgstr ""
+
+#: app/templates/two_factor_authentication_reset.htm:72
+#: app/templates/two_factor_authentication_settings.htm:161
+msgid "Click here to return to login page"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:22
+msgid "Two-Factor Authentication Settings"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:33
+msgid "This page will expire in 5 minutes."
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:46
+msgid "Two-Factor Authentication:"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:49
+msgid "ENABLED"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:51
+msgid "DISABLED"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:71
+msgid "Generate a new shared secret key"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:73
+msgid "Enable two-factor authentication"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:80
+msgid "Scan the QR code below with your external authentication application."
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:91
+msgid "Click here to generate data for manual entry."
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:97
+msgid "Enter the data below into your external authentication application."
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:105
+msgid "Issuer Name:"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:111
+msgid "Account Name:"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:117
+msgid "Secret Key:"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:123
+msgid "Algorithm Type:"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:126
+msgid "Time based"
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:138
+msgid "Click here to generate QR code."
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:152
+msgid ""
+"To disable two-factor authentication, please contact your administrator."
+msgstr ""
+
+#: app/templates/two_factor_authentication_settings.htm:156
+msgid "Disable two-factor authentication"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:10
+msgid "Insert Workflow Name"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:21
+msgid "Save and Complete Workflow"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:24
+msgid "Complete"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:146
+msgid "Previous Step"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:149
+msgid "Previous"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:166
+msgid "Undo"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:196
+msgid "Save and Continue"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:199
+#: app/templates/views/components/plugins/workflow.htm:220
+#: app/templates/views/components/plugins/workflow.htm:242
+msgid "Next"
+msgstr ""
+
+#: app/templates/views/components/plugins/workflow.htm:217
+#: app/templates/views/components/plugins/workflow.htm:239
+msgid "Next Step"
+msgstr ""
+
+#: app/templates/views/concept-graph.htm:14
+msgid "Concept"
+msgstr ""
+
+#: app/templates/views/concept-graph.htm:19
+msgid "Delete this concept"
+msgstr ""
+
+#: app/templates/views/concept-graph.htm:19
+msgid "Delete this concept and all of it's sub concepts."
+msgstr ""
+
+#: app/templates/views/concept-graph.htm:20
+#: app/templates/views/rdm/concept-report.htm:138
+#: app/templates/views/rdm/concept-report.htm:147
+#: app/templates/views/rdm/concept-report.htm:187
+msgid "Jump to this concept"
+msgstr ""
+
+#: app/templates/views/concept-graph.htm:20
+msgid "More Child Concept"
+msgstr ""
+
+#: app/templates/views/concept-search.htm:2
+#: app/templates/views/rdm/modals/import-concept-form.htm:21
+msgid "Search for a concept..."
+msgstr ""
+
+#: app/templates/views/edit-history.htm:11
+msgid "Recently Added Resources"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:16
+msgid "Resource Id"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:17
+msgid "Resource Name"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:19
+msgid "Edited"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:20
+msgid "Edit Type"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:21
+msgid "Editor"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:30
+msgid " (Resource Deleted)"
+msgstr ""
+
+#: app/templates/views/edit-history.htm:45
+#: app/templates/views/edit-history.htm:47
+msgid "View Report"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:26
+msgid "Graph Designer"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:34
+msgid "Branch"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:55
+msgid "Resource:"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:63
+msgid ""
+"Warning! This will save the graph in its current state and make the Resource "
+"accessible to permissioned users."
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:76
+msgid "Notes:"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:93
+msgid "Publish"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:112 app/templates/views/graph.htm:51
+msgid "Find a Resource Model/Branch..."
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:145
+#: app/templates/views/graph-designer.htm:157
+msgid "Discard Card Edits"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:147
+#: app/templates/views/graph-designer.htm:159
+msgid "Save Card Edits"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:167
+msgid "Unpublish Graph"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:173
+msgid "Publish Graph"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:185
+msgid "Quit Designer"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:201
+msgid "Graph"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:206
+msgid "Cards"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:253
+msgid "Add a branch to your model from the library"
+msgstr ""
+
+#: app/templates/views/graph-designer.htm:280
+msgid "Card Designer"
+msgstr ""
+
+#: app/templates/views/graph.htm:25
+msgid "Graphs"
+msgstr ""
+
+#: app/templates/views/graph.htm:74 app/views/graph.py:346
+msgid "New Resource Model"
+msgstr ""
+
+#: app/templates/views/graph.htm:80
+msgid "Import Branch/Resource Model"
+msgstr ""
+
+#: app/templates/views/graph.htm:112
+msgid "Manage Graph"
+msgstr ""
+
+#: app/templates/views/graph.htm:116
+msgid "Manage Functions"
+msgstr ""
+
+#: app/templates/views/graph.htm:119
+msgid "Create Mapping File"
+msgstr ""
+
+#: app/templates/views/graph.htm:122
+msgid "Delete Instances"
+msgstr ""
+
+#: app/templates/views/graph.htm:126
+msgid "Export Model"
+msgstr ""
+
+#: app/templates/views/graph.htm:128
+msgid "Clone Model"
+msgstr ""
+
+#: app/templates/views/graph.htm:130
+msgid "Delete Model"
+msgstr ""
+
+#: app/templates/views/graph/card-configuration/card-components-tree.htm:58
+msgid "Widget"
+msgstr ""
+
+#: app/templates/views/graph/card-configuration/card-form-preview.htm:125
+msgid "Discard"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:23
+msgid "Function Manager"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:41
+msgid "Selected Functions"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:47
+msgid "You haven't added any functions yet."
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:49
+msgid ""
+"Select functions from the library to add new capabilities to your resource."
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:56
+msgid "Close Function Library"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:57
+msgid "Show Function Library"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:88
+msgid "Library filter goes here"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:96
+msgid "Function Library"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:119
+#: app/templates/views/graph/function-manager/function-list.htm:21
+msgid "Function Name"
+msgstr ""
+
+#: app/templates/views/graph/function-manager.htm:137
+msgid "This Function doesn't require any configuration."
+msgstr ""
+
+#: app/templates/views/graph/function-manager/function-list.htm:26
+msgid "Function Description"
+msgstr ""
+
+#: app/templates/views/graph/function-manager/function-list.htm:37
+msgid "Select Function"
+msgstr ""
+
+#: app/templates/views/graph/graph-base.htm:24
+msgid "Graph Manager"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/branch-list.htm:17
+msgid "Because of ontology rules, there are no branches that can be appended."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:31
+msgid "Card name"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:40
+#: app/templates/views/graph/graph-designer/card-configuration.htm:49
+msgid " "
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:46
+msgid "CSS Classes (Optional)"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:95
+msgid "Help Panel Title"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:98
+msgid "Help title"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:105
+msgid "Content"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-configuration.htm:118
+msgid "Unique Values"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree-permissions.htm:9
+#: app/templates/views/graph/graph-designer/card-tree.htm:9
+#: app/templates/views/resource/editor.htm:46
+msgid "Find a card..."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree-permissions.htm:15
+#: app/templates/views/graph/graph-designer/card-tree.htm:15
+#: app/templates/views/graph/graph-designer/graph-tree.htm:18
+#: app/templates/views/resource/editor.htm:52
+msgid " Expand"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree-permissions.htm:16
+#: app/templates/views/graph/graph-designer/card-tree.htm:16
+#: app/templates/views/graph/graph-designer/graph-tree.htm:19
+#: app/templates/views/resource/editor.htm:53
+msgid " Collapse"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree-permissions.htm:17
+#: app/templates/views/graph/graph-designer/card-tree.htm:17
+#: app/templates/views/graph/graph-designer/graph-tree.htm:20
+#: app/templates/views/resource/editor.htm:54
+msgid " Grid"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree-permissions.htm:18
+msgid " Select All"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree-permissions.htm:19
+msgid " Clear All"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree.htm:19
+#: app/templates/views/graph/graph-designer/graph-tree.htm:22
+msgid " Show IDs"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree.htm:22
+#: app/templates/views/graph/graph-designer/graph-tree.htm:25
+msgid " Hide IDs"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/card-tree.htm:40
+msgid "(edit report)"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:121
+msgid "Make card"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:124
+#: app/templates/views/graph/graph-designer/node-form.htm:252
+msgid ""
+"Data from nodes not collected in other cards will be collected in the root "
+"card's form section"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:134
+msgid "Resource models that may be related:"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:169
+msgid "Author name"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:181
+msgid "Abstract/description"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:193
+msgid ""
+"URI to a JSON-LD Context Object or a Raw Context Object or Array of Context "
+"Objects"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:200
+msgid "URI Slug for API Access"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:204
+msgid "Slug"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-settings.htm:225
+msgid " Map Feature Color "
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-tree.htm:12
+msgid "Find a node, datatype, card..."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-tree.htm:49
+msgid "Node is exportable in search"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-tree.htm:57
+msgid "Add Child Node"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-tree.htm:58
+msgid "Add Branch"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-tree.htm:61
+msgid "Export Branch"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/graph-tree.htm:64
+msgid "Delete Node"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/identity-list.htm:5
+msgid "Groups/Accounts"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:45
+msgid "Enter node name here..."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:45
+msgid "node name"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:54
+msgid "Node Name Alias"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:59
+msgid "Unique alias generated from this node\\"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:60
+msgid "Use a custom node alias"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:71
+msgid "parent"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:100
+msgid "Semantics"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:129
+msgid "description"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:137
+msgid "Node Data Type and Configuration"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:169
+msgid "Node Settings"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:186
+msgid "Activate to use this node in Advanced Search."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:206
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:66
+msgid ""
+"Activate to require that data be collected for this node when a card value "
+"is edited"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:224
+msgid "Export via Search Results"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:227
+msgid "Provide a field name for shapefiles. "
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:227
+msgid "Limited to 10 characters to meet shapefile requirements."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:230
+msgid "shapefile fieldname"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/node-form.htm:255
+msgid ""
+"Data from this node and downstream nodes will be collected in a single form "
+"section"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:21
+msgid "To set permissions: "
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:23
+msgid "<strong> 1. Select one or more cards </strong>from the card tree."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:26
+msgid ""
+"<strong> 2. Select a Group or User Account </strong>from the dropdown below."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:29
+msgid ""
+"<strong> 3. Apply Permissions </strong>to set your changes.  You'll see your "
+"selections reflected by the icons in the card tree."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:36
+msgid "Set permissions for:"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:43
+msgid "Select a Group/Account..."
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:77
+msgid "Revert Permissions"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:79
+msgid "Apply Permissions"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:88
+msgid "Selected Cards"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/permission-settings-form.htm:91
+msgid "No cards selected"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:7
+msgid "Widget Manager"
+msgstr ""
+
+#: app/templates/views/graph/graph-designer/widget-configuration.htm:36
+msgid "Visibility"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:72
+msgid "Overlay"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:97
+msgid "No overlays available"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:120
+msgid "Delete Layer"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:136
+msgid "Activated:"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:197
+msgid "Layer Name:"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:218
+msgid "Only show on search map:"
+msgstr ""
+
+#: app/templates/views/map-layer-manager.htm:249
+msgid "Legend content:"
+msgstr ""
+
+#: app/templates/views/notifications-list.htm:10
+msgid "Dismiss All"
+msgstr ""
+
+#: app/templates/views/notifications-list.htm:26
+msgid ""
+"You're up-to-date and do not have any notifications. When you trigger a "
+"notification (for example, when you request a large download) it will "
+"display here."
+msgstr ""
+
+#: app/templates/views/provisional-history-list.htm:17
+msgid "Last 7 days"
+msgstr ""
+
+#: app/templates/views/provisional-history-list.htm:18
+msgid "Last 30 days"
+msgstr ""
+
+#: app/templates/views/provisional-history-list.htm:49
+msgid ""
+"You have not yet edited any data within the specified time period. Once you "
+"edit a resource, your edit history will display here."
+msgstr ""
+
+#: app/templates/views/provisional-history-list.htm:71
+msgid "Card: "
+msgstr ""
+
+#: app/templates/views/provisional-history-list.htm:76
+msgid "Edited: "
+msgstr ""
+
+#: app/templates/views/provisional-history-list.htm:82
+msgid "pending review"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:32
+msgid "Add Top Concept"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:33
+msgid "Import Top Concept from SPARQL"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:36
+#: app/templates/views/rdm/concept-report.htm:55
+msgid "Add Child"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:37
+msgid "Import Child from SPARQL"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:39
+#: app/templates/views/rdm/concept-report.htm:57
+msgid "Manage Parents"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:40
+msgid "Make Collection"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:56
+msgid "Import Child from AAT"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:70
+#: app/templates/views/rdm/entitytype-report.htm:78
+msgid "Labels"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:72
+#: app/templates/views/rdm/entitytype-report.htm:81
+msgid "Add label"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:78
+#: app/templates/views/rdm/entitytype-report.htm:87
+msgid "Delete this label?"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:81
+msgid "preferred"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:81
+msgid "alternate"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:81
+msgid "hidden"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:94
+#: app/templates/views/rdm/entitytype-report.htm:103
+msgid "Notes"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:96
+#: app/templates/views/rdm/entitytype-report.htm:106
+msgid "Add note"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:102
+#: app/templates/views/rdm/entitytype-report.htm:112
+msgid "Delete this note?"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:123
+msgid "Broader/Narrower Concepts"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:146
+msgid "Delete this concept?"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:146
+msgid ""
+"By deleting this concept, you will also be deleting the following concepts "
+"as well.  This operation cannot be undone."
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:178
+msgid "Related Concepts"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:180
+msgid "Add related concept"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:186
+msgid "Remove the relationship to this concept?"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:203
+#: app/templates/views/rdm/entitytype-report.htm:132
+msgid "Values"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:205
+#: app/templates/views/rdm/entitytype-report.htm:135
+msgid "Add value"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:211
+#: app/templates/views/rdm/entitytype-report.htm:141
+msgid "Delete this value?"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:212
+#: app/templates/views/rdm/entitytype-report.htm:142
+msgid "Edit this value"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:231
+msgid "Add images"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:246
+msgid "Delete Image"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:274
+#: app/templates/views/rdm/entitytype-report.htm:165
+msgid "Arches ID:"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:294
+#: app/templates/views/rdm/entitytype-report.htm:179
+msgid "Are you ready to delete this item?"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:304
+#: app/templates/views/rdm/entitytype-report.htm:189
+msgid "No"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:305
+#: app/templates/views/rdm/entitytype-report.htm:190
+msgid "Yes"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:339
+msgid "Arches Reference Data Manager"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:348
+msgid "Schemes"
+msgstr ""
+
+#: app/templates/views/rdm/concept-report.htm:352
+msgid "Entity Types"
+msgstr ""
+
+#: app/templates/views/rdm/entitytype-report.htm:29
+msgid "Member Hierarchy"
+msgstr ""
+
+#: app/templates/views/rdm/entitytype-report.htm:32
+msgid "Add dropdown entry"
+msgstr ""
+
+#: app/templates/views/rdm/entitytype-report.htm:46
+#: app/templates/views/rdm/entitytype-report.htm:55
+msgid "Expand this entry"
+msgstr ""
+
+#: app/templates/views/rdm/entitytype-report.htm:54
+msgid "Remove this entry from the dropdown"
+msgstr ""
+
+#: app/templates/views/rdm/entitytype-report.htm:89
+msgid "Edit this label"
+msgstr ""
+
+#: app/templates/views/rdm/entitytype-report.htm:113
+msgid "Edit this note"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-child-form.htm:7
+msgid "Add Concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-child-form.htm:13
+msgid "Label"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-child-form.htm:19
+msgid "Note"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-child-form.htm:36
+msgid "Relation from Parent"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-child-form.htm:50
+#: app/templates/views/rdm/modals/add-collection-form.htm:32
+#: app/templates/views/rdm/modals/add-scheme-form.htm:38
+msgid "Save changes"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-collection-form.htm:13
+#: app/templates/views/rdm/modals/add-scheme-form.htm:13
+msgid "ConceptScheme Name"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-image-form.htm:9
+msgid "Import Images"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-image-form.htm:9
+msgid "(Click on panel or drag and drop files onto panel to upload)"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-scheme-form.htm:7
+msgid "Add Concept Scheme"
+msgstr ""
+
+#: app/templates/views/rdm/modals/add-scheme-form.htm:19
+msgid "Scope Note"
+msgstr ""
+
+#: app/templates/views/rdm/modals/delete-collection-form.htm:13
+msgid "Select collection to delete"
+msgstr ""
+
+#: app/templates/views/rdm/modals/delete-collection-form.htm:33
+msgid ""
+"You won't be able to undo this operation!&nbsp;  Are you sure you want to "
+"permanently delete this entire collection from Arches?"
+msgstr ""
+
+#: app/templates/views/rdm/modals/delete-scheme-form.htm:7
+msgid "Delete Scheme"
+msgstr ""
+
+#: app/templates/views/rdm/modals/delete-scheme-form.htm:13
+msgid "Select scheme to delete"
+msgstr ""
+
+#: app/templates/views/rdm/modals/delete-scheme-form.htm:33
+msgid ""
+"You won't be able to undo this operation!&nbsp;  Are you sure you want to "
+"permanently delete this entire scheme from Arches?"
+msgstr ""
+
+#: app/templates/views/rdm/modals/export-scheme-form.htm:7
+msgid "Export Scheme"
+msgstr ""
+
+#: app/templates/views/rdm/modals/export-scheme-form.htm:13
+msgid "Select scheme to export"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-concept-form.htm:9
+msgid "Import Concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-concept-form.htm:24
+msgid "Organization"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-concept-form.htm:33
+msgid "Concept Indentifiers"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:9
+msgid "Import New Concept Scheme"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:20
+msgid "SKOS File"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:30
+msgid "When concept ids match"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:32
+msgid "overwrite system concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:33
+msgid "use system concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:41
+msgid "When inserting new concepts"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:43
+msgid "keep within scheme"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:44
+msgid "stage in candidates"
+msgstr ""
+
+#: app/templates/views/rdm/modals/import-scheme-form.htm:54
+msgid "Upload File"
+msgstr ""
+
+#: app/templates/views/rdm/modals/manage-parent-form.htm:9
+msgid "New Parent Concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/manage-parent-form.htm:24
+msgid "Relation to Parent"
+msgstr ""
+
+#: app/templates/views/rdm/modals/manage-parent-form.htm:31
+msgid "Current Parents"
+msgstr ""
+
+#: app/templates/views/rdm/modals/manage-parent-form.htm:37
+msgid "Remove the relationship to this parent concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/manage-parent-form.htm:37
+msgid "Remove the relationship to this parent concept."
+msgstr ""
+
+#: app/templates/views/rdm/modals/manage-parent-form.htm:53
+msgid "Deleting reference to parent:"
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-concept-form.htm:9
+msgid "Manage Related Concepts"
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-concept-form.htm:27
+#: app/templates/views/rdm/modals/related-member-form.htm:27
+msgid "Select a concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-concept-form.htm:34
+#: app/templates/views/rdm/modals/related-member-form.htm:34
+msgid "Relation type"
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-concept-form.htm:35
+#: app/templates/views/rdm/modals/related-member-form.htm:35
+msgid "Relation to Concept"
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-concept-form.htm:52
+msgid "Use the search tool to select the concept that you want to relate."
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-member-form.htm:9
+msgid "Select Concept Values for Dropdowns"
+msgstr ""
+
+#: app/templates/views/rdm/modals/related-member-form.htm:51
+msgid "Selecting a concept will select that concept and all it's children."
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:9
+msgid "Edit Concept Label"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:9
+msgid "Add Concept Label"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:9
+msgid "Manage Concept Label"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:24
+msgid "Label Information"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:35
+msgid "Label type"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:70
+msgid "Only one preferred label may exist for each language."
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:83
+msgid "Add Concept Note"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:83
+msgid "Manage Concept Note"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:98
+msgid "Note Editor"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:151
+msgid "Only one note of each type may exist for each language."
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:164
+msgid "Add Concept Value"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:164
+msgid "Manage Concept Values"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:179
+msgid "Define a value"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:192
+msgid "Value type"
+msgstr ""
+
+#: app/templates/views/rdm/modals/value-form.htm:230
+msgid "Only one sort order value can be assigned to a concept."
+msgstr ""
+
+#: app/templates/views/resource.htm:25
+#: app/templates/views/resource/resource-base.htm:24 app/views/resource.py:90
+msgid "Resource Manager"
+msgstr ""
+
+#: app/templates/views/resource.htm:53
+msgid "Resources"
+msgstr ""
+
+#: app/templates/views/resource.htm:93
+msgid "Create Resource"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:7
+msgid "Resource History"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:30
+msgid "Now"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:34
+msgid "Most recent"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:35
+msgid "Oldest"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:36
+msgid "By editor"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:37
+msgid "By edit type"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:50
+msgid "Resource Record Created"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:52
+msgid "Record created by Arches with unique identifer"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:57
+#: app/templates/views/resource/edit-log.htm:60
+msgid "Created"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:66
+#: app/templates/views/resource/edit-log.htm:169
+msgid "Tile Data"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:78
+#: app/templates/views/resource/edit-log.htm:114
+msgid "Provisional Tile Data"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:102
+msgid "New Tile Data"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:132
+msgid "Previous Tile Data"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:146
+msgid "Previous Provisional Tile Data"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:162
+#: app/templates/views/resource/edit-log.htm:165
+msgid "Deleted"
+msgstr ""
+
+#: app/templates/views/resource/edit-log.htm:184
+msgid "edited by"
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:25
+msgid "Resource Editor"
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:102
+msgid "Manage Permissions"
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:166
+msgid "Welcome to Arches' Resource Editor"
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:169
+msgid ""
+"You are about to create a new resource record.  Select any data card from "
+"the list on the left and start entering information."
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:170
+msgid "Don't worry if you decide not to enter any data just yet."
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:171
+msgid ""
+"Arches will create your new resource record once you've saved a data entry "
+"card."
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:177
+msgid "No cards are available for this model."
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:243
+msgid "Add new"
+msgstr ""
+
+#: app/templates/views/resource/editor.htm:270
+msgid "You do not have permission to edit this card."
+msgstr ""
+
+#: app/templates/views/resource/editor/provisional-tile-manager.htm:15
+msgid "User: "
+msgstr ""
+
+#: app/templates/views/resource/editor/provisional-tile-manager.htm:18
+msgid "Created: "
+msgstr ""
+
+#: app/templates/views/resource/editor/provisional-tile-manager.htm:37
+msgid "Accept"
+msgstr ""
+
+#: app/templates/views/resource/editor/provisional-tile-manager.htm:40
+msgid "Decline"
+msgstr ""
+
+#: app/templates/views/resource/report.htm:24
+msgid "Resource Report"
+msgstr ""
+
+#: app/templates/views/search.htm:60
+msgid "Clear Filters"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:25
+msgid "Account Settings"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:48
+msgid "User name:"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:64
+msgid "Account"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:74
+msgid "User name"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:81
+msgid "Change password"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:100
+msgid "Contact email"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:113
+msgid "Phone"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:141
+msgid "Arches user name"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:149
+msgid "This is the unique email or name that you use to log on to Arches."
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:165
+#: app/templates/views/user-profile-manager.htm:166
+msgid "First name"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:176
+msgid ""
+"Arches uses your name and phone number to make it easier for other users to "
+"find and work with you."
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:186
+#: app/templates/views/user-profile-manager.htm:187
+msgid "Last name"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:202
+msgid "Phone Number (optional)"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:215
+msgid "Contact Email"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:226
+msgid ""
+"Arches uses your e-maill to alert you to projects and tasks assigned to you."
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:256
+msgid "Click here to update Two-Factor Authentication settings via email"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:346
+msgid "Notification Settings"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:354
+msgid "Trigger"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:355
+msgid "Email Notification"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:356
+msgid "Web Notification"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:365
+#: app/templates/views/user-profile-manager.htm:370
+msgid "Enable"
+msgstr ""
+
+#: app/templates/views/user-profile-manager.htm:375
+msgid "Exporting Search Results"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/csvfile.py:825
+#, python-brace-format
+msgid "No datatype detected for {0}"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/csvfile.py:1132
+#, python-brace-format
+msgid "Total resources saved: {save_count}"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:47
+#, python-brace-format
+msgid "{0} of {1} resources saved"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:57
+#, python-brace-format
+msgid "{0} of {1} relations saved"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:182
+msgid "No import errors"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:186
+msgid ""
+"***** Errors occured during import. Some data may not have been imported. "
+"For more information, check resource import error log: "
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:217
+#, python-brace-format
+msgid " {0}: {1}\n"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:269
+msgid ""
+"Must supply either a graph id or a list of resource instance ids to export"
+msgstr ""
+
+#: app/utils/data_management/sparql_providers/aat_provider.py:34
+msgid "Getty AAT"
+msgstr ""
+
+#: app/utils/data_management/sparql_providers/aat_provider.py:90
+#, python-format
+msgid ""
+"<strong>Error in SPARQL query:</strong><br>Test this query directly by "
+"pasting the query below into the Getty's                         own SPARQL "
+"endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://"
+"vocab.getty.edu/sparql</a>                         <i><pre>%s</pre></i>Query "
+"returned 0 results, please check the query for "
+"errors.                          You may need to add the appropriate "
+"languages into the database for this query to work<br><br>"
+msgstr ""
+
+#: app/utils/forms.py:64
+msgid ""
+"This email address has already been registered with the "
+"system.                             If you forgot your password, click the "
+"'exit' link below and go to the login page to reset your password."
+msgstr ""
+
+#: app/utils/forms.py:109
+msgid "Email"
+msgstr ""
+
+#: app/utils/forms.py:113
+msgid "New password"
+msgstr ""
+
+#: app/utils/forms.py:115
+msgid "Re-enter new password"
+msgstr ""
+
+#: app/utils/password_validation.py:12
+#, python-brace-format
+msgid "Be longer than {0} characters"
+msgstr ""
+
+#: app/utils/password_validation.py:20
+msgid "Have at least 1 letter"
+msgstr ""
+
+#: app/utils/password_validation.py:37
+msgid "Your password must contain at least one special character"
+msgstr ""
+
+#: app/utils/password_validation.py:43
+msgid "Have at least 1 special character"
+msgstr ""
+
+#: app/utils/password_validation.py:56
+msgid "Your password must contain at least one number"
+msgstr ""
+
+#: app/utils/password_validation.py:60
+msgid "Have at least 1 number"
+msgstr ""
+
+#: app/utils/password_validation.py:74
+msgid "Your password must contain both upper and lower case letters"
+msgstr ""
+
+#: app/utils/password_validation.py:78
+msgid "Have least 1 upper and lower case character"
+msgstr ""
+
+#: app/utils/response.py:56
+msgid "Could not return JSON Response"
+msgstr ""
+
+#: app/utils/task_management.py:28
+msgid "Celery worker connection failed. Reattempting"
+msgstr ""
+
+#: app/utils/task_management.py:30
+msgid ""
+"Failed to connect to celery due to a BrokenPipeError/ConnectionResetError"
+msgstr ""
+
+#: app/utils/task_management.py:33
+msgid "A celery broker is running, but a celery worker is not available"
+msgstr ""
+
+#: app/utils/task_management.py:37
+msgid "Unable to connect to a celery broker"
+msgstr ""
+
+#: app/views/api.py:79
+msgid "Failed to dispatch Kibana proxy"
+msgstr ""
+
+#: app/views/api.py:81
+msgid "KibanaProxy failed"
+msgstr ""
+
+#: app/views/api.py:105
+msgid "Failed to create API request"
+msgstr ""
+
+#: app/views/api.py:121 app/views/api.py:797 app/views/resource.py:236
+#: app/views/resource.py:603
+msgid "Unnamed Resource"
+msgstr ""
+
+#: app/views/api.py:483
+#, python-brace-format
+msgid "The specified resource '{0}' does not exist. JSON-LD export failed."
+msgstr ""
+
+#: app/views/api.py:793 app/views/resource.py:232
+msgid "New Resource"
+msgstr ""
+
+#: app/views/api.py:1275
+msgid "Tile not found."
+msgstr ""
+
+#: app/views/api.py:1307
+msgid "No nodegroup matching query parameters found."
+msgstr ""
+
+#: app/views/api.py:1356
+msgid "No nodes matching query parameters found."
+msgstr ""
+
+#: app/views/api.py:1364
+#, python-format
+msgid "No graph found for graphid %s"
+msgstr ""
+
+#: app/views/api.py:1424
+msgid "User does not have permission to edit this node."
+msgstr ""
+
+#: app/views/auth.py:132 app/views/auth.py:155 app/views/auth.py:212
+msgid "User signup has been disabled. Please contact your administrator."
+msgstr ""
+
+#: app/views/auth.py:169
+msgid "Signup for Arches"
+msgstr ""
+
+#: app/views/auth.py:172
+msgid ""
+"Thanks for your interest in Arches. Click on link below                     "
+"to confirm your email address! Use your email address to login."
+msgstr ""
+
+#: app/views/auth.py:176
+msgid ""
+"This link expires in 24 hours.  If you can't get to it before "
+"then,                     don't worry, you can always try again with the "
+"same email address."
+msgstr ""
+
+#: app/views/auth.py:185
+msgid "Welcome to Arches!"
+msgstr ""
+
+#: app/views/auth.py:190
+#, python-format
+msgid ""
+"An email has been sent to <br><strong>%s</strong><br> with a link to "
+"activate your account"
+msgstr ""
+
+#: app/views/auth.py:232
+msgid "The signup link has expired, please try signing up again.  Thanks!"
+msgstr ""
+
+#: app/views/auth.py:255
+msgid "Invalid password"
+msgstr ""
+
+#: app/views/auth.py:257
+msgid "New password and confirmation must match"
+msgstr ""
+
+#: app/views/auth.py:268
+msgid "Password successfully updated"
+msgstr ""
+
+#: app/views/auth.py:308 app/views/auth.py:326
+msgid "Make sure to set your OAUTH_CLIENT_ID in settings.py"
+msgstr ""
+
+#: app/views/auth.py:372
+msgid "Update Two-Factor Authentication Settings"
+msgstr ""
+
+#: app/views/auth.py:374
+msgid "Click on link below to update your two-factor authentication settings."
+msgstr ""
+
+#: app/views/auth.py:376
+msgid ""
+"This link expires in 15 minutes. If you did not request this "
+"change,                         contact your Administrator immediately."
+msgstr ""
+
+#: app/views/auth.py:385
+msgid "Arches Two-Factor Authentication"
+msgstr ""
+
+#: app/views/auth.py:390
+msgid ""
+"There has been error sending an email to this address. Please contact your "
+"system administrator."
+msgstr ""
+
+#: app/views/concept.py:68
+msgid "Using the RDM"
+msgstr ""
+
+#: app/views/concept.py:238
+msgid "Unable to Load SKOS File"
+msgstr ""
+
+#: app/views/concept.py:238
+msgid "There was an issue saving the contents of the file to Arches. "
+msgstr ""
+
+#: app/views/concept.py:274
+msgid "Unable to Delete"
+msgstr ""
+
+#: app/views/concept.py:274
+msgid ""
+"This concept or one of it's subconcepts is already in use by an existing "
+"resource."
+msgstr ""
+
+#: app/views/concept.py:327
+msgid "Success"
+msgstr ""
+
+#: app/views/concept.py:327
+msgid "Collection successfully created from the selected concept"
+msgstr ""
+
+#: app/views/concept.py:329
+msgid "Unable to Make Collection"
+msgstr ""
+
+#: app/views/concept.py:329
+msgid "Unable to make a collection from the selected concept."
+msgstr ""
+
+#: app/views/graph.py:154
+msgid "Using the Arches Designer"
+msgstr ""
+
+#: app/views/graph.py:171
+#, python-brace-format
+msgid ""
+"No namespaces appear to be associated with {ontology.ontologyid} in the "
+"ontologies table. This is not a problem as long as all necessary namespaces "
+"are included in the ONTOLOGY_NAMESPACES setting."
+msgstr ""
+
+#: app/views/graph.py:215
+msgid "Branch Library"
+msgstr ""
+
+#: app/views/graph.py:215
+msgid "Find a graph branch"
+msgstr ""
+
+#: app/views/graph.py:261
+msgid "Designing a Resource Model"
+msgstr ""
+
+#: app/views/graph.py:263
+msgid "Designing a Branch"
+msgstr ""
+
+#: app/views/graph.py:425
+msgid "Elasticsearch indexing error"
+msgstr ""
+
+#: app/views/graph.py:427
+msgid ""
+"If you want to change the datatype of an existing node.\n"
+"                    Delete and then re-create the node, or export the branch "
+"then edit the datatype and re-import the branch."
+msgstr ""
+
+#: app/views/graph.py:546
+msgid "Managing Functions"
+msgstr ""
+
+#: app/views/manifest_manager.py:300
+msgid "IIIF server proxy not configured"
+msgstr ""
+
+#: app/views/manifest_manager.py:306
+msgid "Manifest Validation Error"
+msgstr ""
+
+#: app/views/map.py:134
+msgid "Tileserver proxy not configured"
+msgstr ""
+
+#: app/views/resource.py:92
+msgid "Creating Resources"
+msgstr ""
+
+#: app/views/resource.py:350
+msgid "Managing System Settings"
+msgstr ""
+
+#: app/views/resource.py:352
+msgid "Using the Resource Editor"
+msgstr ""
+
+#: app/views/resource.py:357
+msgid "Unable to Delete Resource"
+msgstr ""
+
+#: app/views/resource.py:358
+msgid ""
+"User does not have permissions to delete this instance because the instance "
+"or its data is restricted"
+msgstr ""
+
+#: app/views/resource.py:367
+msgid "Unable to delete. Please verify the model is not currently published."
+msgstr ""
+
+#: app/views/resource.py:547 app/views/resource.py:553
+msgid "Resource Created"
+msgstr ""
+
+#: app/views/resource.py:548
+msgid "Resource Deleted"
+msgstr ""
+
+#: app/views/resource.py:549
+msgid "Tile Deleted"
+msgstr ""
+
+#: app/views/resource.py:550
+msgid "Tile Created"
+msgstr ""
+
+#: app/views/resource.py:551
+msgid "Tile Updated"
+msgstr ""
+
+#: app/views/resource.py:552
+msgid "Edit Deleted"
+msgstr ""
+
+#: app/views/resource.py:771
+msgid "Failed to fetch resource instance descriptors"
+msgstr ""
+
+#: app/views/resource.py:788
+msgid "No active report template is available for this resource."
+msgstr ""
+
+#: app/views/resource.py:903
+msgid "Unable to delete. Relationship does not exist"
+msgstr ""
+
+#: app/views/resource.py:966 app/views/resource.py:980 app/views/tile.py:151
+msgid "Unable to save. Please verify the model is not currently published."
+msgstr ""
+
+#: app/views/search.py:109
+msgid "Searching the Database"
+msgstr ""
+
+#: app/views/search.py:228
+#, python-brace-format
+msgid ""
+"Your search exceeds the {download_limit} instance download "
+"limit.                  Anonymous users cannot run an export exceeding this "
+"limit.                  Please sign in with your {app_name} account or "
+"refine your search"
+msgstr ""
+
+#: app/views/search.py:244
+#, python-brace-format
+msgid ""
+"{total} instances have been submitted for export.                     Click "
+"the Bell icon to check for a link to download your data"
+msgstr ""
+
+#: app/views/search.py:249
+#, python-brace-format
+msgid ""
+"Your search exceeds the {download_limit} instance download limit. Please "
+"refine your search"
+msgstr ""
+
+#: app/views/search.py:270
+msgid ""
+"Either no instances were identified for export or no resources have "
+"exportable geometry nodes                Please confirm that the models of "
+"instances you would like to export have geometry nodes and "
+"that                those nodes are set as exportable"
+msgstr ""
+
+#: app/views/search.py:401
+msgid "There was an error retrieving the search results"
+msgstr ""
+
+#: app/views/search.py:500
+msgid "Downloading"
+msgstr ""
+
+#: app/views/search.py:502
+msgid "The requested file is no longer available"
+msgstr ""
+
+#: app/views/tile.py:72
+msgid "Saving tile failed"
+msgstr ""
+
+#: app/views/tile.py:124
+msgid "Unable to save. Please verify the model is currently unpublished."
+msgstr ""
+
+#: app/views/tile.py:133 app/views/tile.py:235
+msgid "This tile is no longer available"
+msgstr ""
+
+#: app/views/tile.py:133
+msgid "It was likely deleted by another user"
+msgstr ""
+
+#: app/views/tile.py:148
+msgid "Unable to save. Please verify your input is valid"
+msgstr ""
+
+#: app/views/tile.py:154
+msgid "Unable to save."
+msgstr ""
+
+#: app/views/tile.py:181 app/views/tile.py:184 app/views/tile.py:259
+#: app/views/tile.py:261 app/views/tile.py:265 app/views/tile.py:286
+msgid "Request Failed"
+msgstr ""
+
+#: app/views/tile.py:181
+msgid "Unable to Save. Verify model status is active"
+msgstr ""
+
+#: app/views/tile.py:184 app/views/tile.py:259
+msgid "Permission Denied"
+msgstr ""
+
+#: app/views/tile.py:235
+msgid "It was likely already deleted by another user"
+msgstr ""
+
+#: app/views/tile.py:261
+msgid "Unable to delete. Verify model status is active"
+msgstr ""
+
+#: app/views/tile.py:265
+msgid "You do not have permissions to delete a tile with authoritative data."
+msgstr ""
+
+#: app/views/user.py:47
+msgid "Not yet logged in"
+msgstr ""
+
+#: app/views/user.py:110 app/views/user.py:145
+msgid "Profile Editing"
+msgstr ""
+
+#: app/views/user.py:167
+msgid "Your "
+msgstr ""
+
+#: management/commands/load_ontology.py:84
+msgid ""
+"You must supply an ontology_config.json within your ontology source "
+"directory."
+msgstr ""
+
+#: management/commands/load_ontology.py:85
+#, python-brace-format
+msgid "'{config_file}' was not found."
+msgstr ""
+
+#: management/commands/load_ontology.py:89
+msgid "You must supply a version number using the -vn/--version argument."
+msgstr ""

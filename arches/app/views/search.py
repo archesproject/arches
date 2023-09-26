@@ -27,7 +27,8 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
+from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
@@ -42,7 +43,8 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
-from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer
+from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer, user_is_resource_exporter
+from arches.app.utils.decorators import group_required
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
 from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWriter
@@ -57,25 +59,24 @@ logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
-        map_layers = models.MapLayer.objects.all()
         map_markers = models.MapMarker.objects.all()
-        map_sources = models.MapSource.objects.all()
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
-        search_components = models.SearchComponent.objects.all()
+        if user_is_resource_exporter(request.user):
+            search_components = models.SearchComponent.objects.all()
+        else:
+            search_components = models.SearchComponent.objects.all().exclude(componentname='search-export')
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
         card_components = models.CardComponent.objects.all()
 
         context = self.get_context_data(
-            map_layers=map_layers,
             map_markers=map_markers,
-            map_sources=map_sources,
             geocoding_providers=geocoding_providers,
             search_components=search_components,
             widgets=widgets,
@@ -107,7 +108,7 @@ class SearchView(MapBaseManagerView):
         context["nav"]["search"] = False
         context["nav"]["help"] = {
             "title": _("Searching the Database"),
-            "template": "search-help",
+            "templates": ["search-help"],
         }
         context["celery_running"] = task_management.check_if_celery_available()
         context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
@@ -136,6 +137,10 @@ def search_terms(request):
     for index in ["terms", "concepts"]:
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
+
+        if lang != "*":
+            boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
+
         boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(
@@ -167,7 +172,10 @@ def search_terms(request):
                 if len(result["top_concept"]["buckets"]) > 0:
                     for top_concept in result["top_concept"]["buckets"]:
                         top_concept_id = top_concept["key"]
-                        top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
+                        top_concept_label = get_preflabel_from_conceptid(
+                            top_concept["key"],
+                            lang=lang if lang != "*" else None
+                        )["value"]
                         for concept in top_concept["conceptid"]["buckets"]:
                             ret[index].append(
                                 {
@@ -207,6 +215,7 @@ def get_resource_model_label(result):
         return ""
 
 
+@group_required("Resource Exporter")
 def export_results(request):
 
     total = int(request.GET.get("total", 0))
@@ -359,6 +368,28 @@ def search_results(request, returnDsl=False):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
+
+        def get_localized_descriptor(resource, descriptor_type, language_codes):
+            descriptor = resource["_source"][descriptor_type]
+            result = descriptor[0] if len(descriptor) > 0 else None
+            for language_code in language_codes:
+                for entry in descriptor:
+                    if entry["language"] == language_code and entry["value"] != "":
+                        return entry
+            return result
+
+        descriptor_types = ("displaydescription", "displayname")
+        active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
+
+        for resource in results["hits"]["hits"]:
+            for descriptor_type in descriptor_types:
+                descriptor = get_localized_descriptor(resource, descriptor_type, active_and_default_language_codes)
+                if descriptor:
+                    resource["_source"][descriptor_type] = descriptor["value"]
+                    if descriptor_type == "displayname":
+                        resource["_source"]["displayname_language"] = descriptor["language"]
+                else:
+                    resource["_source"][descriptor_type] = _("Undefined")
 
         ret["results"] = results
 

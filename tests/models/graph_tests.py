@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os, json, uuid
+from django.contrib.auth.models import User
 from django.core import management
 from tests import test_settings
 from tests.base_test import ArchesTestCase
@@ -49,7 +50,6 @@ class GraphTests(ArchesTestCase):
             "description": "Represents a single node in a graph",
             "graphid": cls.SINGLE_NODE_GRAPHID,
             "iconclass": "fa fa-circle",
-            "isactive": True,
             "isresource": False,
             "name": "Node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -82,7 +82,6 @@ class GraphTests(ArchesTestCase):
             "description": "Represents a node and node type pairing",
             "graphid": cls.NODE_NODETYPE_GRAPHID,
             "iconclass": "fa fa-angle-double-down",
-            "isactive": True,
             "isresource": False,
             "name": "Node/Node Type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
@@ -158,10 +157,6 @@ class GraphTests(ArchesTestCase):
         }
         models.Edge.objects.create(**edges_dict).save()
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.deleteGraph("2f7f8e40-adbc-11e6-ac7f-14109fd34195")
-
     def setUp(self):
         graph = Graph.new()
         graph.name = "TEST GRAPH"
@@ -170,7 +165,6 @@ class GraphTests(ArchesTestCase):
         graph.description = "ARCHES TEST GRAPH"
         graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
         graph.version = "v1.0.0"
-        graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
         graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
@@ -220,7 +214,6 @@ class GraphTests(ArchesTestCase):
             "description": "ARCHES TEST GRAPH",
             "version": "v1.0.0",
             "isresource": True,
-            "isactive": False,
             "iconclass": "fa fa-building",
             "nodegroups": [],
             "nodes": [
@@ -285,7 +278,6 @@ class GraphTests(ArchesTestCase):
         self.assertEqual(graph_obj["description"], graph.description)
         self.assertEqual(graph_obj["version"], graph.version)
         self.assertEqual(graph_obj["isresource"], graph.isresource)
-        self.assertEqual(graph_obj["isactive"], graph.isactive)
         self.assertEqual(graph_obj["iconclass"], graph.iconclass)
 
     def test_nodes_are_byref(self):
@@ -1062,7 +1054,6 @@ class GraphTests(ArchesTestCase):
         graph.description = "ARCHES TEST GRAPH"
         graph.ontology = models.Ontology.objects.get(pk="e6e8db47-2ccf-11e6-927e-b8f6b115d7dd")
         graph.version = "v1.0.0"
-        graph.isactive = False
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
 
@@ -1077,3 +1068,25 @@ class GraphTests(ArchesTestCase):
 
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
+
+    def test_appending_to_published_graph(self):
+        graph = Graph.objects.get(node=self.rootNode)
+        admin = User.objects.get(username="admin")
+        graph.publish(user=admin)
+        self.addCleanup(graph.unpublish)
+
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.append_node()
+        self.assertEqual(cm.exception.code, 1012)
+        with self.assertRaises(GraphValidationError) as cm:
+            graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)
+        self.assertEqual(cm.exception.code, 1012)
+
+    def test_appending_published_branch_to_unpublished_graph(self):
+        graph = Graph.objects.get(node=self.rootNode)
+        admin = User.objects.get(username="admin")
+        branch = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
+        branch.publish(user=admin)
+        self.addCleanup(branch.unpublish)
+
+        graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)

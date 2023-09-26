@@ -11,7 +11,7 @@ define(['arches'], function(arches) {
             if (resourceLookup[resourceid] && usecache) {
                 return Promise.resolve(resourceLookup[resourceid]);
             } else {
-                return window.fetch(arches.urls.search_results + "?id=" + resourceid)
+                return window.fetch(`${arches.urls.search_results}?id=${resourceid}&tiles=true`)
                     .then(function(response) {
                         if (response.ok) {
                             return response.json();
@@ -23,6 +23,28 @@ define(['arches'], function(arches) {
                     });
             }
         },
+
+        /**
+         * lookupResourceInstanceDataByQuery - gets resource instance(s) from Elasticsearch using custom query
+         *
+         * @param  {query} a premade ES query
+         * @return {array}
+         */
+        lookupResourceInstanceDataByQuery: function(query) {
+            searchParams = new URLSearchParams({
+                'advanced-search': JSON.stringify([query]),
+                tiles: true
+            });
+            return window.fetch(`${arches.urls.search_results}?${searchParams}`)
+                .then(function(response) {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function(json) {
+                    return json["results"]["hits"]["hits"];
+                });
+            },
 
         /**
          * getNodeValues - gets resource instance data from Elastic Search

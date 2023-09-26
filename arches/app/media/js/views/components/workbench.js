@@ -1,13 +1,14 @@
 define([
     'jquery',
     'underscore',
-    'arches',
     'knockout',
-    'bindings/sortable'
-], function($, _, arches, ko) {
+    'templates/views/components/workbench.htm',
+    'bindings/sortable',
+], function($, _, ko, workbenchTemplate) {
     var viewModel = function(params) {
         var self = this;
 
+         
         this.activeTab = ko.observable(params.activeTab);
         this.showTabs = ko.observable(true);
         this.hideSidePanel = function() {
@@ -39,9 +40,7 @@ define([
 
     ko.components.register('workbench', {
         viewModel: viewModel,
-        template: {
-            require: 'text!templates/views/components/workbench.htm'
-        }
+        template: workbenchTemplate,
     });
     return viewModel;
 });

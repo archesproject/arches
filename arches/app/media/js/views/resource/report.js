@@ -2,10 +2,9 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'arches',
     'views/base-manager',
     'views/components/resource-report-abstract'
-], function($, _, ko, arches, BaseManagerView) {
+], function($, _, ko, BaseManagerView) {
     var View = BaseManagerView.extend({
         initialize: function(options){
             BaseManagerView.prototype.initialize.call(this, options);

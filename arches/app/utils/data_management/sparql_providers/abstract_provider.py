@@ -25,7 +25,7 @@ class Abstract_Provider(SPARQLWrapper):
     def __init__(self, endpoint, **kwargs):
         super(Abstract_Provider, self).__init__(endpoint, **kwargs)
         self.name = "abstract_provider"
-        self.allowed_languages = models.DLanguage.objects.values_list("pk", flat=True)
+        self.allowed_languages = models.Language.objects.values_list("code", flat=True)
 
     def get_concepts(self, uris):
         """

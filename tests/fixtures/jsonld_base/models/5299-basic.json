@@ -79,9 +79,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "0cadd978-071a-11ea-8d9a-acde48001122",
+            "publication": {
+                "graph_id": "0cadd978-071a-11ea-8d9a-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "02036694-061c-462a-b6ca-b63e26b0a027",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "5299 New Datatypes",

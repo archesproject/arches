@@ -1,0 +1,83 @@
+
+// style overrides for jqtree default styling
+
+ul.jqtree-tree 
+{
+    div.jqtree_common {
+        display: block;
+        color: #333;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        font-weight: 700;
+        background: linear-gradient(top, #fafafa0, #eee100);
+        border-radius: 3px;
+        box-sizing: border-box;
+        margin: 5px 0;
+        padding: 5px 10px;
+    }
+
+    li.jqtree-selected>.jqtree-element,
+    li.jqtree-selected>.jqtree-element:hover {
+        background-color: #ddd;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+    
+    div.jqtree_common:hover {
+        color: #2ea8e5;
+        background: #fff;
+    }
+
+    li.jqtree-folder {
+        display: block;
+        font-size: 13px;
+        line-height: 20px;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .jqtree-title {
+        color: #1C4257;
+        vertical-align: middle;
+        margin-left: 0;
+    }
+
+    .jqtree-loading>div a {
+        content: url(../img/select2-spinner.gif);
+    }
+    
+    li.jqtree-ghost {
+        margin: 0;
+    }
+
+    li.jqtree-ghost span.jqtree-line {
+        background-color: #fff;
+        opacity: 0.6;
+        border: dashed 1px #00f;
+        height: 35px;
+    }
+
+    .jqtree-toggler{
+        margin: 0 5px;
+    }
+
+    ul.jqtree_common {
+        list-style: none outside;
+        margin-left: 12px;
+        margin-right: 0;
+        margin-bottom: 2px;
+    }
+
+    .jqtree-title.jqtree_common, .jqtree-title.jqtree_common.jqtree-title-folder  {
+        font-size: 13px;
+        &:hover{
+            color: #123;
+        }
+    }
+    
+    li.jqtree-selected>.jqtree-element,
+    li.jqtree-selected>.jqtree-element:hover {
+        background: none;
+        background-color: #49596A;
+        text-shadow: none;
+    }
+}

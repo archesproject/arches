@@ -24,9 +24,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock graph_header_title %}
 
 {% block graph_header_buttons %}
-<span data-bind="if: dirty">
-    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel">{% trans "Discard Edits" %}</button>
-    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save">{% trans "Save Edits" %}</button>
+<span style="display: flex" data-bind="if: dirty">
+    <button class="btn btn-sm btn-danger btn-labeled fa fa-trash" data-bind="click: cancel"><span>{% trans "Discard Edits" %}</span></button>
+    <button class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: save"><span>{% trans "Save Edits" %}</span></button>
 </span>
 {{ block.super }}
 {% endblock graph_header_buttons %}
@@ -35,7 +35,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <div class="flex">
 
     <!--Form Listing -->
-    <div class="left-column-crud-container form-list">
+    <div class="side-column-crud-container form-list">
         <!-- Title Block -->
         <div class="title-block-title">
             <h4 class="title-block-title"> {% trans "Selected Functions" %}</h4>
@@ -50,7 +50,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
 
-        <div id="function-list" class="report-image-grid" style="margin-top: 5px; display: none;" data-bind="visible: appliedFunctionList.items().length > 0">
+        <div id="applied-function-list" class="report-image-grid" style="display: none;" data-bind="visible: appliedFunctionList.items().length > 0">
             <!-- Toolbar -->
             <div class="href-toolbar">
                 <a class="href-button" href="#" data-bind="visible: !selectedFunction(), click: toggleFunctionLibrary">{% trans "Close Function Library" %}</a>
@@ -118,7 +118,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="panel-heading">
                         <h3 class="panel-title card-main-title" data-bind="text: $data.get('function').name">{% trans "Function Name" %}</h3>
                         <a href="#" class="library-tools-icon" style="padding-right: 0px;" data-bind="click: $root.delete">
-                            <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Delete" %}'></i>
+                            <i class="ion-ios-trash add-tooltip record-delete" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Delete" %}"></i>
                         </a>
                     </div>
 
@@ -153,18 +153,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block pre_require_js %}
 {{block.super}}
-<script>
-    {% autoescape off %}
-    define('graph-functions-data', [], function () {
-        return {
-            functions: {{functions}},
-            applied_functions: {{applied_functions}},
-            // datatypes: {{ datatypes_json }},
-            // widgets: {{ widgets_json }},
-            // resourceid: '{{resourceid}}',
-            // graph: {{graph_json}},
-        };
-    });
-    {% endautoescape %}
-</script>
+<div 
+    id="graphFunctionsData"
+    style="display: none;"
+    graphFunctionsData='{
+        "functions": {{functions}},
+        "applied_functions": {{applied_functions}},
+    }'
+></div>
 {% endblock pre_require_js %}

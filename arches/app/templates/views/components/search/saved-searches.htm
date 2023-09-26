@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load webpack_static from webpack_loader %}
 
 <div class="search-container saved-search-container relative" style="overflow-y: scroll;">
 
@@ -7,15 +8,18 @@
         <div id="rr-splash" class="rr-splash">
             <!-- Image -->
             <div class="img-lg img-circle rr-splash-img-container">
-                <img class="rr-splash-img" src="{% static 'img/approval.png' %}" alt="Saved Search">
+                <img class="rr-splash-img" src="{% webpack_static 'img/approval.png' %}" alt="Saved Search">
             </div>
 
             <!-- Splash Title -->
-            <div class="rr-splash-title">{% trans "Saved Search" %}</div>
+            <div class="rr-splash-title">
+                <span data-bind="text: $root.translations.savedSearch"></span>
+            </div>
 
             <!-- Splash Instructions -->
-            <div class="rr-splash-description">{% trans "The Arches site administrator" %}</div>
-            <div class="rr-splash-description">{% trans "hasn't saved any searches yet." %}</div>
+            <div class="rr-splash-description">
+                <span data-bind="text: $root.translations.noSavedSearches"></span>
+            </div>
         </div>
     </div>
 

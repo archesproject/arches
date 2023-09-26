@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'knockout'
-], function($, ko) {
+    'knockout',
+    'arches'
+], function($, ko, arches) {
     ko.bindingHandlers.resizableSidepanel = {
         init: function(element, valueAccessor, allBindings, viewModel) {
             var $el = $(element);
@@ -12,7 +13,7 @@ define([
             for (var i = 0; i < 3; i++) {
                 handle.append(
                     $(document.createElement('i')).addClass('fa fa-circle')
-                )
+                );
             }
 
             $el.after(
@@ -20,7 +21,11 @@ define([
                     .addClass('sidepanel-draggable')
                     .append(handle)
                     .on('dragstart', function(e) {
-                        start = $el.width() - e.pageX;
+                        if(arches.activeLanguageDir == "rtl"){
+                            start = $el.width() + e.pageX;
+                        } else {
+                            start = $el.width() - e.pageX;
+                        }
                         // Fix for Firefox where dragging was not working:
                         e.originalEvent.dataTransfer.setData('Text', this.id);
                     })
@@ -28,16 +33,26 @@ define([
                         start = null;
                     })
             );
-            $el.css('flex', '0 0 ' + $el.width() + 'px');
+
+            if(arches.activeLanguageDir == "rtl"){
+                $el.css('flex', $el.width() + 'px 0 0');
+            } else {
+
+                $el.css('flex', '0 0 ' + $el.width() + 'px');
+            }
             $el.css('width', 'auto');
 
             document.addEventListener('dragover', function(e){
                 if (start !== null) {
-                    $el.css('flex', '0 0 ' + (start + e.pageX) + 'px');
+                    if(arches.activeLanguageDir == "rtl"){
+                        $el.css('flex', (start - e.pageX) + 'px 0 0');
+                    } else {
+                        $el.css('flex',  '0 0 ' + (start + e.pageX) + 'px');
+                    }
                 }
             }, false);
         }
-    }
+    };
 
     return ko.bindingHandlers.resizableSidepanel;
 });

@@ -3,14 +3,15 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/card',
     'models/card-widget',
-    'arches',
     'require',
     'uuid',
     'utils/dispose',
-    'viewmodels/tile'
-], function($, _, ko, koMapping, CardModel, CardWidgetModel, arches, require, uuid, dispose) {
+    'viewmodels/tile',
+    'utils/set-csrf-token'
+], function($, _, ko, koMapping, arches,  CardModel, CardWidgetModel, require, uuid, dispose) {
     /**
     * A viewmodel used for generic cards
     *
@@ -53,7 +54,11 @@ define([
         $.get(
             arches.urls.resource_descriptors + resourceId(),
             function(descriptors) {
-                displayname(descriptors.displayname);
+                if(typeof descriptors.displayname == "string"){
+                    displayname(descriptors.displayname);
+                } else {
+                    displayname(descriptors.displayname.find(displayname => displayname.language == arches.activeLanguage)?.value);
+                }
             }
         );
     };
@@ -77,9 +82,16 @@ define([
         var emptyConstraint = [{
             uniquetoallinstances: false,
             nodes:[],
-            cardid: self.cardid,
-            constraintid:  uuid.generate()
+            cardid: params.card.cardid,
+            constraintid: uuid.generate()
         }];
+
+        let cardConstraints;
+        if (params.card.constraints?.length) {
+            cardConstraints = params.card.constraints;
+        } else {
+            cardConstraints = emptyConstraint;
+        }
 
         var appliedFunctions = params.appliedFunctions;
         var primaryDescriptorFunction = params.primaryDescriptorFunction;
@@ -97,7 +109,7 @@ define([
                 widgets: params.cardwidgets,
                 nodes: params.graphModel.get('nodes'),
                 nodegroup: nodegroup,
-                constraints: params.constraints
+                constraints: cardConstraints
             }),
             datatypelookup: params.graphModel.get('datatypelookup'),
         });
@@ -216,34 +228,39 @@ define([
                     });
                 })
             ),
-            cards: ko.observableArray(_.filter(params.cards, function(card) {
-                var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
-                    return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
-                });
-                return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
-            }).map(function(card) {
-                return new CardViewModel({
-                    card: _.clone(card),
-                    graphModel: params.graphModel,
-                    tile: null,
-                    resourceId: params.resourceId,
-                    displayname: params.displayname,
-                    handlers: params.handlers,
-                    cards: params.cards,
-                    tiles: params.tiles,
-                    selection: selection,
-                    multiselect: multiselect,
-                    scrollTo: scrollTo,
-                    loading: loading,
-                    filter: filter,
-                    provisionalTileViewModel: params.provisionalTileViewModel,
-                    cardwidgets: params.cardwidgets,
-                    perms: perms,
-                    permsLiteral: permsLiteral,
-                    parentCard: self,
-                    topCards: params.topCards
-                });
-            })),
+            cards: ko.observableArray(
+                _.filter(params.cards, function(card) {
+                    var nodegroup = _.find(ko.unwrap(nodegroups), function(group) {
+                        return ko.unwrap(group.nodegroupid) === ko.unwrap(card.nodegroup_id);
+                    });
+
+                    if (nodegroup) {
+                        return ko.unwrap(nodegroup.parentnodegroup_id) === ko.unwrap(params.card.nodegroup_id);
+                    }
+                }).map(function(card) {
+                    return new CardViewModel({
+                        card: _.clone(card),
+                        graphModel: params.graphModel,
+                        tile: null,
+                        resourceId: params.resourceId,
+                        displayname: params.displayname,
+                        handlers: params.handlers,
+                        cards: params.cards,
+                        tiles: params.tiles,
+                        selection: selection,
+                        multiselect: multiselect,
+                        scrollTo: scrollTo,
+                        loading: loading,
+                        filter: filter,
+                        provisionalTileViewModel: params.provisionalTileViewModel,
+                        cardwidgets: params.cardwidgets,
+                        perms: perms,
+                        permsLiteral: permsLiteral,
+                        parentCard: self,
+                        topCards: params.topCards
+                    });
+                })
+            ),
             hasprovisionaledits: ko.computed(function() {
                 return _.filter(params.tiles, function(tile) {
                     return (params.tile ? (tile.parenttile_id === params.tile.tileid) : true)
@@ -406,7 +423,7 @@ define([
             if (selected) this.expanded(true);
         }, this);
         this.expanded.subscribe(function(expanded) {
-            if (expanded && this.parent) this.parent.expanded(true);
+            if (expanded && this.parent?.expanded) this.parent.expanded(true);
         }, this);
 
         this.isChildSelected = ko.computed(function() {

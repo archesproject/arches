@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Title Block -->
     <div class="ep-form-toolbar">
-        <div>
+        <div style="display: flex; flex: 1;">
             <h4 class="ep-form-toolbar-title">
             {% block graph_header_title %}
             {% endblock graph_header_title %}
@@ -45,7 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <!-- Tools -->
         <div class="ep-form-toolbar-tools">
             {% block graph_header_buttons %}
-            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }">{% trans "Done" %}</a>
+            <a class="btn btn-sm btn-mint btn-labeled fa fa-mail-reply back-to-designer" href="{% url 'graph' '' %}" data-bind="click:function () { navigate('{% url 'graph' '' %}') }"><span>{% trans "Done" %}</span></a>
             {% endblock graph_header_buttons %}
         </div>
     </div>
@@ -67,18 +67,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </div>
 {% endblock main_content %}
 
-{% block tabs %}{% endblock tabs %}
-
 {% block pre_require_js %}
     {{block.super}}
-    <script>
-        {% autoescape off %}
-        define('graph-base-data', [], function () {
-            return {
-                graphid: '{{graphid}}',
-                graph: {{graph_json}}
-            };
-        });
-        {% endautoescape %}
-    </script>
+
+    <!-- consumed by media/js/function-templates.js -->
+    <div 
+        id="graphBaseData"
+        style="display: none;"
+        graphBaseData='{
+            "graphid": "{{graphid}}",
+            "graph": {{graph_json}}
+        }'
+    ></div>
 {% endblock pre_require_js %}

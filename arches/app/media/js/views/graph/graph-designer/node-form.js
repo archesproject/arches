@@ -6,7 +6,7 @@ define([
     'arches',
     'views/components/simple-switch',
     'bindings/chosen'
-], function($, _, Backbone, ko, arches) {
+], function($, _, Backbone, ko) {
     var NodeFormView = Backbone.View.extend({
         /**
         * A backbone view representing a node form
@@ -27,7 +27,6 @@ define([
             this.datatypes = _.keys(this.graphModel.get('datatypelookup'));
             this.node = options.node;
             this.isExportable = ko.observable(null);
-
             this.graph = options.graph;
             this.loading = options.loading || ko.observable(false);
             this.hasOntology = ko.computed(function(){
@@ -37,9 +36,36 @@ define([
                 var node = self.node();
                 return self.graphModel.get('isresource') && node && node.istopnode;
             });
+            this.nodegroup = ko.computed(function() {
+                const node = ko.unwrap(self.node);
+                let nodegroup;
+
+                if (node) {
+                    nodegroup = self.graph.nodegroups().find(function(nodegroup) { 
+                        return nodegroup.nodegroupid() === node.nodeGroupId();
+                    });
+                }
+
+                return nodegroup;
+            });
             this.restrictedNodegroups = options.restrictedNodegroups;
             this.appliedFunctions = options.appliedFunctions;
             this.primaryDescriptorFunction = options.primaryDescriptorFunction;
+
+            options.updatedCardinalityData.subscribe(function(updatedCardinalityData) {
+                const data = updatedCardinalityData[0];
+                const graphSettingsViewModel = updatedCardinalityData[1];
+
+                self.loading(true);
+                self.graph['nodegroups'](ko.mapping.fromJS(data['nodegroups'])());
+                graphSettingsViewModel.save();
+            });
+
+            this.updateCardinality = function() {
+                if (self.nodegroup() && self.node().nodeid === self.node().nodeGroupId()) {
+                    self.nodegroup().cardinality(self.nodegroup().cardinality() === '1' ? 'n' : '1');
+                }
+            };
 
             this.isFuncNode = function() {
                 var node = self.node();

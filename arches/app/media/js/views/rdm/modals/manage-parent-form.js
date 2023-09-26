@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function ($, Backbone, arches, ConceptSearch, ConceptModel) {
+define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'], function($, Backbone, arches, ConceptSearch, ConceptModel) {
     return Backbone.View.extend({
 
         events: {
@@ -24,7 +24,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
             this.deletedrelationships = [];
         },
         
-		save: function(){
+        save: function(){
             var self = this;
             if (this.conceptsearch.searchbox.val() !== ''){
                 var parentConcept = new ConceptModel({
@@ -40,14 +40,14 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
                     id: this
                 });
                 concepts.push(parentConcept);
-            })
-            self.model.set('deleted', concepts)
+            });
+            self.model.set('deleted', concepts);
 
-            this.modal.on('hidden.bs.modal', function (e) {
+            this.modal.on('hidden.bs.modal', function(e) {
                 self.model.save(function() {
                     self.cleanup();
                 }, this);
-            })
+            });
             this.modal.modal('hide');
         },
 
@@ -65,7 +65,7 @@ define(['jquery', 'backbone', 'arches', 'views/concept-search', 'models/concept'
             var self = this;
             $.each(this.deletedrelationships, function(){
                 self.$el.find('[data-id="'+ this +'"]').toggle(300);
-            })
+            });
             this.model.set('deleted', []);
             this.model.set('added', []);
 

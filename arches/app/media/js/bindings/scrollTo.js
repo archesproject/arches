@@ -1,9 +1,9 @@
 define([
     'jquery',
     'knockout'
-], function ($, ko) {
+], function($, ko) {
     ko.bindingHandlers.scrollTo = {
-        update: function (element, valueAccessor, allBindings) {
+        update: function(element, valueAccessor, allBindings) {
             var _value = valueAccessor();
             
             if (ko.unwrap(_value)) {

@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['knockout', 'templates/views/components/cards/file-renderers/pdfreader.htm'], function(ko, pdfReaderTemplate) {
     return ko.components.register('pdfreader', {
         viewModel: function(params) {
             this.params = params;
@@ -11,6 +11,6 @@ define(['knockout'], function(ko) {
             }
             this.fileType = 'application/pdf';
         },
-        template: { require: 'text!templates/views/components/cards/file-renderers/pdfreader.htm' }
+        template: pdfReaderTemplate,
     });
 });

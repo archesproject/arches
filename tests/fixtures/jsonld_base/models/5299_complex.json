@@ -87,9 +87,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "f348bbda-0721-11ea-b628-acde48001122",
+            "publication": {
+                "graph_id": "f348bbda-0721-11ea-b628-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "390da4b9-2c09-4e45-8af1-bfeb821e6a9a",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "5299_complex",

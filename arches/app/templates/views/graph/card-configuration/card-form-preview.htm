@@ -80,7 +80,7 @@
 
                                         <!-- ko if: !card.get('disabled') -->
                                         <div id="card-save-tile-btn" class="install-buttons" data-bind="visible: card.get('cardinality')() === 'n'" style="display: none;">
-                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" disabled>{% trans "Add" %}</button>
+                                            <button id="" class="btn btn-shim btn-mint btn-labeled btn-lg fa fa-plus" disabled><span>{% trans "Add" %}</span></button>
                                         </div>
                                         <!-- /ko -->
                                     </div>
@@ -122,8 +122,8 @@
                 <div class="ep-form-toolbar" style="background: transparent; border-bottom: none; padding-bottom: 20px;">
                     <div class="ep-form-toolbar-tools mar-no flex">
                         <span>
-                            <button disabled class="btn btn-danger btn-lg btn-labeled fa fa-trash">{% trans "Discard" %}</button>
-                            <button disabled class="btn btn-primary btn-lg btn-labeled fa fa-check">{% trans "Save" %}</button>
+                            <button disabled class="btn btn-danger btn-lg btn-labeled fa fa-trash"><span>{% trans "Discard" %}</span></button>
+                            <button disabled class="btn btn-primary btn-lg btn-labeled fa fa-check"><span>{% trans "Save" %}</span></button>
                         </span>
                     </div>
                 </div>

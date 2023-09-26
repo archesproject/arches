@@ -2,11 +2,10 @@ require([
     'jquery',
     'underscore',
     'knockout',
-    'uuid',
     'arches',
     'views/base-manager',
     'bindings/chosen'
-], function($, _, ko, uuid, arches, BaseManagerView) {
+], function($, _, ko, arches, BaseManagerView) {
     /**
     * a BaseManagerView representing the resource listing and recent edits pages
     */

@@ -1,9 +1,9 @@
 define([
-    'arches',
     'jquery',
     'underscore',
     'knockout',
     'knockout-mapping',
+    'arches',
     'uuid',
     'geojson-extent',
     'geojsonhint',
@@ -11,8 +11,11 @@ define([
     'proj4',
     'views/components/map',
     'views/components/cards/select-feature-layers',
-], function(arches, $, _, ko, koMapping, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory) {
+    'views/components/datatypes/geojson-feature-collection',
+], function($, _, ko, koMapping, arches, uuid, geojsonExtent, geojsonhint, toGeoJSON, proj4, MapComponentViewModel, selectFeatureLayersFactory) {
     var viewModel = function(params) {
+         
+
         var self = this;
         var padding = 40;
         var drawFeatures;
@@ -58,7 +61,7 @@ define([
 
         var sources = [];
         for (var sourceName in arches.mapSources) {
-            if (arches.mapSources.hasOwnProperty(sourceName)) {
+            if (Object.prototype.hasOwnProperty.call(arches.mapSources, sourceName)) {
                 sources.push(sourceName);
             }
         }

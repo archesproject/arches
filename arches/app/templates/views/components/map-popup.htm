@@ -4,7 +4,7 @@
 <!-- ko if: loading() -->
 <div class="hover-feature-body hover-feature-loading">
     <i class="fa fa-spin fa-spinner"></i>
-    {% trans "Loading..." %}
+    <span data-bind="text: $root.translations.loading + '...'"></span>
 </div>
 <!--/ko-->
 
@@ -28,11 +28,11 @@
         <!-- ko if: resourceinstanceid -->
         <div class="hover-feature-metadata-block">
             <div class="hover-feature-metadata">
-                {% trans "Resource Model:" %}
+                <span data-bind="text: $root.translations.resourceModel"></span>
                 <span data-bind="text: graph_name"></span>
             </div>
             <div class="hover-feature-metadata">
-                {% trans "ID:" %}
+                <span data-bind="text: $root.translations.idString"></span>
                 <span data-bind="text: resourceinstanceid"></span>
             </div>
         </div>
@@ -47,7 +47,7 @@
             window.open(reportURL + ko.unwrap(resourceinstanceid));
         }" href="javascript:void(0)">
             <i class="ion-document-text"></i>
-            {% trans "Report" %}
+            <span data-bind="text: $root.translations.report"></span>
         </a>
         <!--/ko-->
         <!-- ko if: showEditButton -->
@@ -55,14 +55,14 @@
             window.open(editURL + ko.unwrap(resourceinstanceid));
         }" href="javascript:void(0)">
             <i class="ion-ios-refresh-empty"></i>
-            {% trans "Edit" %}
+            <span data-bind="text: $root.translations.edit"></span>
         </a>
         <!--/ko-->
         </div>
         <!-- ko if: $parent.popupFeatures.length > 1 -->
         <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">
             <div class="hover-feature-instance-counter" data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
-            {% trans "of" %}
+            <span data-bind="text: $root.translations.of"></span>
             <div style="padding-left: 3px;" data-bind="text: $parent.popupFeatures.length"></div>
         </div>
         <!--/ko-->

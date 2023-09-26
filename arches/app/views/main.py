@@ -16,12 +16,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import re
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 from arches import __version__
 from arches.app.models.system_settings import settings
-from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponseNotFound, HttpResponse, HttpResponseRedirect
+from django.utils import translation
 
 
 def index(request):
@@ -34,6 +36,7 @@ def index(request):
             "app_title": settings.APP_TITLE,
             "copyright_text": settings.COPYRIGHT_TEXT,
             "copyright_year": settings.COPYRIGHT_YEAR,
+            "app_version": settings.APP_VERSION,
             "version": __version__,
             "show_language_swtich": settings.SHOW_LANGUAGE_SWITCH,
         },
@@ -57,6 +60,9 @@ def function_templates(request, template):
 
 
 def templates(request, template):
+    if not template:
+        template = request.GET.get("template")
+
     try:
         return render(request, template)
     except Exception as e:

@@ -16,7 +16,7 @@ define([
                 event.stopPropagation();
             });
         }
-    }
+    };
 
     return ko.bindingHandlers.leaflet;
 });

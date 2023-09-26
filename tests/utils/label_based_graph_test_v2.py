@@ -8,6 +8,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph, LabelBasedNode, NODE_ID_KEY, TILE_ID_KEY
 
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+
+
 # these tests can be run from the command line via
 # python manage.py test tests/utils/label_based_graph_test_v2.py --pattern="*.py" --settings="tests.test_settings"
 
@@ -136,13 +139,8 @@ class LabelBasedGraphTests(TestCase):
         self.assertEqual(mock_tile, node_ids_to_tiles_reference.get(self.node_1.node_id)[0])
         self.assertEqual(nodegroup_cardinality_reference, {mock_tile.nodegroup_id: mock_cardinality})
 
-    @mock.patch.object(LabelBasedGraph, "_build_graph", side_effect=None)
-    def test_from_tile(self, mock__build_graph):
-        with mock.patch("arches.app.utils.label_based_graph.models.Node", return_value=None):
-            LabelBasedGraph.from_tile(tile=mock.Mock(nodegroup_id=1), node_ids_to_tiles_reference=mock.Mock())
-            mock__build_graph.assert_called_once()
 
-
+@mock.patch("arches.app.utils.label_based_graph.models.PublishedGraph")
 @mock.patch("arches.app.utils.label_based_graph.models.NodeGroup")
 @mock.patch("arches.app.utils.label_based_graph.models.Node")
 class LabelBasedGraph_FromResourceTests(TestCase):
@@ -163,7 +161,9 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         cls.grouping_node = models.Node(datatype="semantic", name="Test Node Grouping", nodegroup=cls.nodegroup)
         cls.string_node = models.Node(datatype="string", name="Test Node", nodegroup=cls.nodegroup)
         cls.grouping_tile = models.TileModel(data={}, nodegroup_id=str(cls.grouping_node.pk))
-        cls.string_tile = models.TileModel(data={str(cls.string_node.pk): "value_1"}, nodegroup_id=str(cls.string_node.pk))
+        cls.string_tile = models.TileModel(
+            data={str(cls.string_node.pk): {"en": {"value": "value_1", "direction": "ltr"}}}, nodegroup_id=str(cls.string_node.pk)
+        )
         cls.hidden_card = models.CardModel(nodegroup=cls.nodegroup, visible=False)
 
         cls.grouping_node.nodegroupid = cls.grouping_node.nodeid
@@ -173,7 +173,11 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         # and complex to get `displayname`
         cls.test_resource = mock.Mock(tiles=[])
 
-    def test_smoke(self, mock_Node, mock_NodeGroup):
+    def test_smoke(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
@@ -189,14 +193,18 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup):
+    def test_handles_node_with_single_value(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         mock_Node.objects.get.return_value = self.string_node
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
 
         self.test_resource.tiles.append(self.string_tile)
-
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
 
         self.assertEqual(
@@ -206,7 +214,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                     self.string_node.name: {
                         NODE_ID_KEY: str(self.string_node.pk),
                         TILE_ID_KEY: str(self.string_tile.pk),
-                        self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                        self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                        **self.string_tile.data[str(self.string_node.pk)],
                     },
                 },
                 self.DISPLAY_DESCRIPTION_KEY: mock.ANY,
@@ -218,13 +227,19 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_node_with_multiple_values(self, mock_Node, mock_NodeGroup):
+    def test_handles_node_with_multiple_values(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         mock_Node.objects.get.return_value = self.string_node
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.string_tile.nodegroup_id, "cardinality": "1"}
         ]
-
-        duplicate_node_tile = models.TileModel(data={str(self.string_node.pk): "value_2"}, nodegroup_id=str(self.string_node.pk))
+        duplicate_node_tile = models.TileModel(
+            data={str(self.string_node.pk): {"en": {"value": "value_2", "direction": "ltr"}}}, nodegroup_id=str(self.string_node.pk)
+        )
 
         self.test_resource.tiles.append(self.string_tile)
         self.test_resource.tiles.append(duplicate_node_tile)
@@ -239,12 +254,14 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.string_tile.pk),
-                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **self.string_tile.data[str(self.string_node.pk)],
                         },
                         {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(duplicate_node_tile.pk),
-                            self.VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: duplicate_node_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **duplicate_node_tile.data[str(self.string_node.pk)],
                         },
                     ],
                 },
@@ -257,7 +274,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_semantic_node_with_child(self, mock_Node, mock_NodeGroup):
+    def test_semantic_node_with_child(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         mock_Node.objects.get.return_value = self.grouping_node
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"}
@@ -265,7 +287,7 @@ class LabelBasedGraph_FromResourceTests(TestCase):
 
         self.grouping_node.get_direct_child_nodes = mock.Mock(return_value=[self.string_node])
 
-        self.grouping_tile.data = {str(self.string_node.pk): "value_2"}
+        self.grouping_tile.data = {str(self.string_node.pk): {"en": {"value": "value_2", "direction": "ltr"}}}
         self.test_resource.tiles.append(self.grouping_tile)
 
         label_based_graph = LabelBasedGraph.from_resource(resource=self.test_resource, compact=False, hide_empty_nodes=False)
@@ -280,7 +302,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.string_node.name: {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.grouping_tile.pk),
-                            self.VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: self.grouping_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **self.grouping_tile.data[str(self.string_node.pk)],
                         },
                     },
                 },
@@ -293,7 +316,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_node_grouped_in_separate_card(self, mock_Node, mock_NodeGroup):
+    def test_handles_node_grouped_in_separate_card(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
@@ -319,7 +347,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                         self.string_node.name: {
                             NODE_ID_KEY: str(self.string_node.pk),
                             TILE_ID_KEY: str(self.string_tile.pk),
-                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                            self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                            **self.string_tile.data[str(self.string_node.pk)],
                         },
                     },
                 },
@@ -332,7 +361,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
+    def test_handles_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
@@ -359,7 +393,8 @@ class LabelBasedGraph_FromResourceTests(TestCase):
                             {
                                 NODE_ID_KEY: str(self.string_node.pk),
                                 TILE_ID_KEY: str(self.string_tile.pk),
-                                self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)],
+                                self.VALUE_KEY: self.string_tile.data[str(self.string_node.pk)]["en"]["value"],
+                                **self.string_tile.data[str(self.string_node.pk)],
                             }
                         ],
                     },
@@ -373,7 +408,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
             },
         )
 
-    def test_handles_empty_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup):
+    def test_handles_empty_node_grouped_in_separate_card_with_cardinality_n(self, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         mock_Node.objects.get.side_effect = [self.grouping_node, self.string_node]
         mock_NodeGroup.objects.filter.return_value.values.return_value = [
             {"nodegroupid": self.grouping_tile.nodegroup_id, "cardinality": "1"},
@@ -402,7 +442,12 @@ class LabelBasedGraph_FromResourceTests(TestCase):
         )
 
     @mock.patch("arches.app.utils.label_based_graph.models.CardModel")
-    def test_handle_hidden_nodes(self, mock_CardModel, mock_Node, mock_NodeGroup):
+    def test_handle_hidden_nodes(self, mock_CardModel, mock_Node, mock_NodeGroup, mock_PublishedGraph):
+        mock_PublishedGraph.objects.get.return_value.serialized_graph = {
+            "nodes": JSONDeserializer().deserialize(JSONSerializer().serialize([self.string_node, self.grouping_node])),
+            "edges": [{"domainnode_id": str(self.grouping_node.pk), "rangenode_id": str(self.string_node.pk)}],
+        }
+
         filter_mock = mock.MagicMock()
 
         def filter_side_effect(nodegroup_id=None):

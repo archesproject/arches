@@ -33,6 +33,7 @@ from django.test.client import Client
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm
@@ -55,6 +56,7 @@ class SearchTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
+        LanguageSynchronizer.synchronize_settings_with_db()
         models.ResourceInstance.objects.all().delete()
         with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "rU") as f:
             archesfile = JSONDeserializer().deserialize(f)
@@ -119,7 +121,10 @@ class SearchTests(ArchesTestCase):
         cls.date_resource.tiles.append(tile)
         tile = Tile(data={cls.search_model_destruction_date_nodeid: "1948-01-01"}, nodegroup_id=cls.search_model_destruction_date_nodeid)
         cls.date_resource.tiles.append(tile)
-        tile = Tile(data={cls.search_model_name_nodeid: "testing 123"}, nodegroup_id=cls.search_model_name_nodeid)
+        tile = Tile(
+            data={cls.search_model_name_nodeid: {"en": {"value": "testing 123", "direction": "ltr"}}},
+            nodegroup_id=cls.search_model_name_nodeid,
+        )
         cls.date_resource.tiles.append(tile)
         cls.date_resource.save()
 
@@ -133,7 +138,10 @@ class SearchTests(ArchesTestCase):
 
         # add resource instance with with no dates or periods defined
         cls.name_resource = Resource(graph_id=cls.search_model_graphid)
-        tile = Tile(data={cls.search_model_name_nodeid: "some test name"}, nodegroup_id=cls.search_model_name_nodeid)
+        tile = Tile(
+            data={cls.search_model_name_nodeid: {"en": {"value": "some test name", "direction": "ltr"}}},
+            nodegroup_id=cls.search_model_name_nodeid,
+        )
         cls.name_resource.tiles.append(tile)
         geom = {
             "type": "FeatureCollection",
@@ -149,6 +157,7 @@ class SearchTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.user.delete()
+        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
 
     def test_temporal_only_search_1(self):

@@ -4,20 +4,23 @@ define([
     'js-cookie',
     'arches',
     'viewmodels/alert',
-], function($, ko, Cookies, arches, AlertViewModel) {
+    'templates/views/components/plugins/etl-manager.htm',
+    'utils/load-component-dependencies'
+], function($, ko, Cookies, arches, AlertViewModel, ETLManagerTemplate, loadComponentDependencies) {
     return ko.components.register('etl-manager', {
         viewModel: function(params) {
             const self = this;
+             
             this.loading = params.loading;
             this.alert = params.alert;
             this.loading(true);
             this.selectedModule = ko.observable();
             this.activeTab = ko.observable();
-            this.isImport = ko.observable(true);
+            this.activeModules = ko.observable('import');
             this.loadEvents = ko.observable();
             this.selectedLoadEvent = ko.observable();
             this.validated = ko.observable();
-            this.validationError = ko.observableArray();
+            this.validationErrors = ko.observableArray();
             this.paginator = ko.observable();
 
             this.selectedLoadEvent.subscribe(function(val){
@@ -65,6 +68,7 @@ define([
                             return response.json();
                         }
                     }).then(function(data){
+                        data.events.map((event)=> { event.loading = ko.observable(false); });
                         self.loadEvents(data.events);
                         self.paginator(data.paginator);
                         const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
@@ -105,6 +109,7 @@ define([
                 this.alert(new AlertViewModel('ep-alert-red', undoAlertTitle, undoAlertMessage, function() {
                     return;
                 }, function() {
+                    event.loading(true);
                     const formData = new FormData();
                     const url = arches.urls.etl_manager;
                     event.status = 'reversing';
@@ -121,9 +126,10 @@ define([
                     }).then(function(response) {
                         return response.json();
                     }).then(function() {
-                        //pass
+                        self.fetchLoadEvent();
+                        event.loading(false);
                     });
-                    }
+                }
                 ));
             };
 
@@ -146,6 +152,17 @@ define([
                 });
             };
 
+            this.stopEtl = function(loadid) {
+                const url = arches.urls.etl_manager + "?action=stop&loadid="+loadid;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    console.log(data);
+                });
+            };
+
             this.fetchValidation = function(loadid){
                 const url = arches.urls.etl_manager + "?action=validate&loadid="+loadid;
                 window.fetch(url).then(function(response){
@@ -154,7 +171,34 @@ define([
                     }
                 }).then(function(data){
                     self.validated(true);
-                    self.validationError(data.data);
+                    const errors = data.data;
+                    errors.map(error => {
+                        error.showDetails = ko.observable(false);
+                        error.details = ko.observable();
+                        error.nodeAlias = self.selectedLoadEvent()?.load_details?.mapping?.find( (x) => x.field.trim() == error.source.trim())?.node;
+                    });
+                    self.validationErrors(errors);
+                });
+            };
+
+            this.getErrorReport = function(loadid){
+                const url = arches.urls.etl_manager + "?action=errorReport&loadid="+loadid;
+                window.open(url);
+            };
+
+            this.getNodeError = function(loadid, error){
+                const url = `${arches.urls.etl_manager}?action=nodeError&nodeid=${error.nodeid}&error=${error.error}&loadid=${loadid}`;
+                window.fetch(url).then(function(response){
+                    if(response.ok){
+                        return response.json();
+                    }
+                }).then(function(data){
+                    const sampleErrors = data?.data.slice(0,5);
+                    self.validationErrors().map(error => {
+                        if (error.nodeid === data.data[0].nodeid) {
+                            error.details(sampleErrors);
+                        }
+                    });
                 });
             };
 
@@ -185,7 +229,7 @@ define([
                     }
                 }).then(function(data){
                     self.etlModules = data.map(function(etl){
-                        require([etl.component]);
+                        loadComponentDependencies([`${etl.component}`]);
                         return etl;
                     });
                     self.loading(false);
@@ -193,8 +237,8 @@ define([
                 this.activeTab("start");
             };
             this.init();
-            setInterval(this.fetchLoadEvent, 5000)
+            setInterval(this.fetchLoadEvent, 5000);
         },
-        template: { require: 'text!templates/views/components/plugins/etl-manager.htm' }
+        template: ETLManagerTemplate,
     });
 });

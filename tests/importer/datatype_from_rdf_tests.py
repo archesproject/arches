@@ -76,8 +76,8 @@ class RDFImportUnitTests(ArchesTestCase):
         # expected fragment, based on conversations about the from_rdf method
         jf = [{"@value": "test string"}]
         resp = dt.from_rdf(jf)
-        self.assertTrue(isinstance(resp, str))
-        self.assertTrue(resp == "test string")
+        self.assertTrue(isinstance(resp, dict))
+        self.assertTrue(resp["en"]["value"] == "test string")
 
     def test_jsonld_number(self):
         dt = self.DT.get_instance("number")

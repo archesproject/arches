@@ -2,18 +2,22 @@ define([
     'jquery',
     'knockout',
     'underscore',
+    'arches',
     'turf',
     'geohash',
     'views/base-manager',
     'models/node',
     'viewmodels/alert',
     'views/components/widgets/map/bin-feature-collection',
-    'map-layer-manager-data',
-    'arches',
+    'views/map-layer-manager-data',
     'bindings/mapbox-gl',
     'bindings/codemirror',
-    'datatype-config-components'
-], function($, ko, _, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data, arches) {
+    'codemirror/mode/javascript/javascript',
+    'datatype-config-components',
+    'views/components/icon-selector',
+    'views/components/datatypes/geojson-feature-collection',
+    'views/components/widgets/number',
+], function($, ko, _, arches, turf, geohash, BaseManagerView, NodeModel, AlertViewModel, binFeatureCollection, data) {
     var vm = {
         map: null,
         geomNodes: [],
@@ -44,6 +48,8 @@ define([
         layer.centerX = ko.observable(layer.centerx);
         layer.centerY = ko.observable(layer.centery);
         layer.zoom = ko.observable(layer.zoom);
+        layer.sortOrder = ko.observable(layer.sortorder);
+        layer.isPublic = ko.observable(layer.ispublic);
         layer.toJSON = ko.computed(function() {
             var layers;
             try {
@@ -65,7 +71,9 @@ define([
                 "is_resource_layer": false,
                 "centerx": layer.centerX(),
                 "centery": layer.centerY(),
-                "zoom": layer.zoom()
+                "zoom": layer.zoom(),
+                "sortorder": layer.sortOrder(),
+                "ispublic": layer.isPublic()
             });
         });
         layer.dirty = ko.computed(function() {
@@ -112,35 +120,42 @@ define([
             layer.centerX(_layer.centerx);
             layer.centerY(_layer.centery);
             layer.zoom(_layer.zoom);
+            layer.sortOrder(_layer.sortorder);
+            layer.isPublic(_layer.ispublic);
             layer.legend(_layer.legend);
             layer.searchonly(_layer.searchonly);
         };
         layer.delete = function() {
-            pageView.viewModel.alert(new AlertViewModel('ep-alert-red', arches.confirmMaplayerDelete.title, arches.confirmMaplayerDelete.text, function() {
-                return;
-            }, function(){
-                vm.loading(true);
-                $.ajax({
-                    type: "DELETE",
-                    url: window.location.pathname + '/' + layer.maplayerid,
-                    success: function(response) {
-                        mapLayers.remove(layer);
-                        arches.mapLayers = _.without(arches.mapLayers, _.findWhere(arches.mapLayers, {
-                            maplayerid: layer.maplayerid
-                        }));
-                        var selection = null;
-                        var layerList = ko.unwrap(vm.selectedList());
-                        if (layerList && layerList.length > 0) {
-                            selection = layerList[0];
+            pageView.viewModel.alert(new AlertViewModel(
+                'ep-alert-red',
+                arches.translations.confirmMaplayerDelete.title,
+                arches.translations.confirmMaplayerDelete.text,
+                function() {
+                    return;
+                }, function(){
+                    vm.loading(true);
+                    $.ajax({
+                        type: "DELETE",
+                        url: window.location.pathname + '/' + layer.maplayerid,
+                        success: function(response) {
+                            mapLayers.remove(layer);
+                            arches.mapLayers = _.without(arches.mapLayers, _.findWhere(arches.mapLayers, {
+                                maplayerid: layer.maplayerid
+                            }));
+                            var selection = null;
+                            var layerList = ko.unwrap(vm.selectedList());
+                            if (layerList && layerList.length > 0) {
+                                selection = layerList[0];
+                            }
+                            vm.selection(selection);
+                            pageView.viewModel.loading(false);
+                        },
+                        error: function(response) {
+                            pageView.viewModel.loading(false);
                         }
-                        vm.selection(selection);
-                        pageView.viewModel.loading(false);
-                    },
-                    error: function(response) {
-                        pageView.viewModel.loading(false);
-                    }
-                });
-            }));
+                    });
+                }
+            ));
         };
     });
 
@@ -226,7 +241,6 @@ define([
                 source: node,
                 datatypelookup: datatypelookup,
                 icons: data.icons,
-                graph: undefined,
                 layer: _.find(data.resource_map_layers, function(layer) {
                     return layer.nodeid === node.nodeid;
                 }),
@@ -372,7 +386,7 @@ define([
 
         searchAggregations.subscribe(updateSearchResultsLayer);
         if (ko.isObservable(bins)) {
-        	bins.subscribe(updateSearchResultsLayer);
+            bins.subscribe(updateSearchResultsLayer);
         }
         updateSearchResultsLayer();
     };

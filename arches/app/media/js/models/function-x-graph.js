@@ -4,9 +4,7 @@ define([
     'models/abstract',
     'knockout',
     'knockout-mapping',
-    'underscore'
-], function (_, arches, AbstractModel, ko, koMapping, _) {
-
+], function(_, arches, AbstractModel, ko, koMapping) {
     var FunctionXGraphModel = AbstractModel.extend({
         /**
         * A backbone model to manage function data
@@ -42,7 +40,7 @@ define([
             
             this.dirty = ko.computed(function(){
                 return JSON.stringify(_.extend(JSON.parse(this._json()),this.toJSON())) !== this._json();
-            }, this)
+            }, this);
 
         },
 
@@ -54,9 +52,9 @@ define([
         * @param {object} data.config - the properties requiring user configuration 
         */
         parse: function(data) {
-            koMapping.fromJS(data.config, this.config)
+            koMapping.fromJS(data.config, this.config);
 
-            this.set('id', data.id)
+            this.set('id', data.id);
             this._json(JSON.stringify(this.toJSON()));
         },
 
@@ -64,7 +62,7 @@ define([
         * discard unsaved model changes and resets the model data
         * @memberof FunctionXGraphModel.prototype
         */
-        reset: function () {
+        reset: function() {
             this.parse(JSON.parse(this._json()));
         },
 
@@ -73,7 +71,7 @@ define([
         * @memberof FunctionXGraphModel.prototype
         * @return {object} a JSON object containing model data
         */
-        toJSON: function () {
+        toJSON: function() {
             var ret = {};
             var trackedProperties = ['_id', 'id', 'function_id', 'graph_id', 'config'];
             for(var key in this){

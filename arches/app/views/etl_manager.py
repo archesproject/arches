@@ -1,20 +1,31 @@
+from celery import app, Celery
+from datetime import datetime
 import logging
 from django.db import connection
 from django.core.paginator import Paginator
 from django.forms.models import model_to_dict
+from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 from django.views.generic import View
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
+from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+import arches.app.utils.task_management as task_management
 
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(group_required("Resource Editor"), name="dispatch")
 class ETLManagerView(View):
     """
     to get the ETL modules from db
     """
+
+    def dictfetchall(self, cursor):
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     def validate(self, loadid):
         """
@@ -23,19 +34,96 @@ class ETLManagerView(View):
         """
 
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT * FROM __arches_load_staging_report_errors(%s)""", [loadid])
-            rows = cursor.fetchall()
+            cursor.execute(
+                """
+                (SELECT n.name as source, e.error as error, n.datatype as datatype, count(n.name), e.type, e.nodeid
+                FROM load_errors e
+                JOIN nodes n ON e.nodeid = n.nodeid
+                WHERE loadid = %s AND e.type = 'node'
+                GROUP BY n.name, e.error, n.datatype, e.type, e.nodeid)
+                UNION
+                (SELECT n.name as source, e.error as error, e.datatype as datatype, count(n.name), e.type, e.nodegroupid
+                FROM load_errors e
+                JOIN nodes n ON e.nodegroupid = n.nodeid
+                WHERE loadid = %s AND e.type = 'tile'
+                GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid);
+            """,
+                [loadid, loadid],
+            )
+            rows = self.dictfetchall(cursor)
+        return {"success": True, "data": rows}
+
+    def error_report(self, loadid):
+        """
+        Creates records in the load_staging table (validated before poulating the load_staging table with error message)
+        Collects error messages if any and returns table of error messages
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                -- SELECT n.name as node, e.error, e.message, e.value, e.source
+                SELECT n.name as node, e.*
+                FROM load_errors e
+                JOIN nodes n ON n.nodeid = e.nodeid
+                WHERE loadid = %s
+                """,
+                [loadid],
+            )
+            rows = self.dictfetchall(cursor)
+        return {"success": True, "data": rows}
+
+    def node_error(self, loadid, nodeid, error):
+        """
+        Creates records in the load_staging table (validated before poulating the load_staging table with error message)
+        Collects error messages if any and returns table of error messages
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT n.name as node, e.error, e.message, e.value, e.source, e.nodeid, e.nodegroupid
+                FROM load_errors e
+                JOIN nodes n ON n.nodeid = e.nodeid
+                WHERE loadid = %s AND e.nodeid = %s AND e.error = %s
+                """,
+                [loadid, nodeid, error],
+            )
+            rows = self.dictfetchall(cursor)
         return {"success": True, "data": rows}
 
     def clean_load_event(self, loadid):
         with connection.cursor() as cursor:
+            cursor.execute("""DELETE FROM load_errors WHERE loadid = %s""", [loadid])
             cursor.execute("""DELETE FROM load_staging WHERE loadid = %s""", [loadid])
             cursor.execute("""DELETE FROM load_event WHERE loadid = %s""", [loadid])
         return {"success": True, "data": ""}
 
+    def stop_loading(self, loadid):
+        if task_management.check_if_celery_available():
+            logger.info(_("Cancel Request sent to Celery"))
+            load_event = LoadEvent.objects.get(loadid=loadid)
+            taskid = load_event.taskid
+            celery_app = Celery()
+            remote_control = app.control.Control(app=celery_app)
+            remote_control.revoke(task_id=taskid, terminate=True)
+            # app.control.Control.revoke(task_id=taskid, terminate=True)
+            result = _("Cancel Request sent to Celery")
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("cancelled", datetime.now(), loadid),
+                )
+            return {"success": True, "data": result}
+        else:
+            err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
+            return {"success": False, "data": {"title": _("Error"), "message": err}}
+
     def get(self, request):
         action = request.GET.get("action", None)
         loadid = request.GET.get("loadid", None)
+        nodeid = request.GET.get("nodeid", None)
+        error = request.GET.get("error", None)
         page = int(request.GET.get("page", 1))
         if action == "modules" or action is None:
             response = []
@@ -74,6 +162,12 @@ class ETLManagerView(View):
             response = self.validate(loadid)
         elif action == "cleanEvent" and loadid:
             response = self.clean_load_event(loadid)
+        elif action == "stop" and loadid:
+            response = self.stop_loading(loadid)
+        elif action == "nodeError" and loadid:
+            response = self.node_error(loadid, nodeid, error)
+        elif action == "errorReport" and loadid:
+            return JSONResponse(self.error_report(loadid)["data"], indent=2)
         return JSONResponse(response)
 
     def post(self, request):

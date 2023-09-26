@@ -19,12 +19,12 @@ add_etl_manager = """
         sortorder)
     values (
         '7720e9fa-876c-4127-a77a-b099cd2a5d45',
-        'ETL Manager',
+        'Bulk Data Manager',
         'fa fa-database',
         'views/components/plugins/etl-manager',
         'etl-manager',
         '{"show": false}',
-        'etl-manager',
+        'bulk-data-manager',
         2);
     """
 remove_etl_manager = """

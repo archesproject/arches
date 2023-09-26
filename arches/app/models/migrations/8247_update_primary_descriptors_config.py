@@ -3,7 +3,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("models", "7874_node_alias"), ]
+    dependencies = [
+        ("models", "7874_node_alias"),
+    ]
     operations = [
         migrations.RunSQL(
             sql="""
@@ -33,6 +35,6 @@ class Migration(migrations.Migration):
                                          '"description": {"nodegroup_id": "", "string_template": ""}}')::jsonb
                     where functionid = '60000000-0000-0000-0000-000000000001';
 
-            """
+            """,
         )
     ]

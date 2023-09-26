@@ -26,10 +26,6 @@ MODE = get_env_variable("DJANGO_MODE")
 
 DEBUG = ast.literal_eval(get_env_variable("DJANGO_DEBUG"))
 
-COUCHDB_URL = "http://{}:{}@{}:{}".format(
-    get_env_variable("COUCHDB_USER"), get_env_variable("COUCHDB_PASS"), get_env_variable("COUCHDB_HOST"), get_env_variable("COUCHDB_PORT")
-)  # defaults to localhost:5984
-
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",

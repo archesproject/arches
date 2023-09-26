@@ -35,19 +35,19 @@
   box-shadow: 0 0 5px #ccc;
   margin-left: auto !important;
   margin-right: auto !important;
-  background: url(../img/patterns/15.png) repeat;
+  /* background: url(../img/patterns/15.png) repeat; */
 }
 
 /*Parallax Backgrounds
 ------------------------------------*/
 .parallax-bg {
-    background: url(../img/blur/img1.jpg) 50% 0 repeat fixed;       
+    /* background: url(../img/blur/img1.jpg) 50% 0 repeat fixed;        */
 }
 
 /*Parallax Counter Block*/
 .parallax-counter {
     padding: 60px 0;
-    background: url(../img/bg/9.jpg) 50% 0 no-repeat fixed; 
+    /* background: url(../img/bg/9.jpg) 50% 0 no-repeat fixed;  */
 }
 
 .parallax-counter h4 {
@@ -64,7 +64,7 @@
 
 /*Parallax Team*/
 .parallax-team {
-    background: url(../img/team/faces.jpg) 50% 0 repeat fixed;  
+    /* background: url(../img/team/faces.jpg) 50% 0 repeat fixed;   */
 }
 
 .parallax-team,
@@ -1553,7 +1553,7 @@ ul.blog-tags a:hover i {
 
 .slider-promo-info-bg {
     padding: 25px 20px 20px;
-    background: url(../img/bg-black.png) repeat;
+    /* background: url(../img/bg-black.png) repeat; */
 }
 
 .slider-promo-info span.big-size { 
@@ -2222,7 +2222,7 @@ ul.labels-demo li {
 .breadcrumbs-v2 {
     text-align: center;
     position: relative;
-    background: url(../img/bg/11.jpg) no-repeat center;
+    /* background: url(../img/bg/11.jpg) no-repeat center; */
 }
 
 .breadcrumbs-v2-in {
@@ -2315,7 +2315,7 @@ ul.labels-demo li {
 /*General Positioning Classes
 ------------------------------------*/
 .margin-0 {
-    .margin: 0px;
+    margin: 0px;
 }
 
 .margin-10 {
@@ -2505,10 +2505,6 @@ ul.labels-demo li {
     padding-left: 5px;
 }
 
-.padding-left-10 {
-    padding-left: 10px;
-}
-
 .padding-left-20 {
     padding-left: 20px;
 }
@@ -2619,7 +2615,7 @@ ul.labels-demo li {
     text-align: center;
     position: relative;
     margin-bottom: 20px;
-    background: url(../img/bg/Coast.jpg);
+    /* background: url(../img/bg/Coast.jpg); */
     background-size: 101%;
     background-position: 50% -80px;
     background-repeat: no-repeat;       
@@ -3407,6 +3403,7 @@ a.disabled {
     margin-bottom: 5px;
     font-weight: 300;
     color: #555;
+    display: flex;
 }
 
 .arches-modal-form-group {
@@ -3752,7 +3749,7 @@ a.read-more:hover {
 ------------------------------------*/
 /*Main Parallax Sldier*/
 .da-slide h2 i {
-    background:url(../../plugins/parallax-slider/img/bg-heading-dark-blue.png) repeat;
+    /* background:url(../../plugins/parallax-slider/img/bg-heading-dark-blue.png) repeat; */
 }
 
 /*Sequence Parallax Sldier*/
@@ -3834,10 +3831,10 @@ a.read-more:hover {
 }
 
 .bx-wrapper .bx-prev {
-    background-image: url(../../plugins/bxslider/images/controls-dark-blue.png);
+    /* background-image: url(../../plugins/bxslider/images/controls-dark-blue.png); */
 }
 .bx-wrapper .bx-next {
-    background-image: url(../../plugins/bxslider/images/controls-dark-blue.png);
+    /* background-image: url(../../plugins/bxslider/images/controls-dark-blue.png); */
 }
 
 /*Typography

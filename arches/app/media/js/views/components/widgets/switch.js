@@ -1,4 +1,11 @@
-define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetViewModel) {
+define([
+    'arches',
+    'knockout', 
+    'underscore', 
+    'viewmodels/widget',
+    'templates/views/components/widgets/switch.htm',
+    'bindings/key-events-click',
+], function(arches, ko, _, WidgetViewModel, switchWidgetTemplate) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -19,10 +26,31 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
 
     var SwitchWidget = function(params) {
         params.configKeys = ['subtitle', 'defaultValue'];
+         
         WidgetViewModel.apply(this, [params]);
+        const originalConfig = this.config();
         this.on = this.config().on || true;
+        this.activeLanguage = arches.activeLanguage;
         this.off = this.config().off || false;
         this.null = this.config().null || null;
+        this.localizedSubtitle = ko.observable(this.subtitle()[this.activeLanguage]);
+
+        // chained observable to avoid issues with ko.mapping
+        this.localizedSubtitle.subscribe((value) => {
+            const val = this.subtitle();
+
+            if(value != ""){
+                val[this.activeLanguage] = value;
+                this.subtitle(val);
+            } else {
+                delete val[this.activeLanguage];
+                this.config(originalConfig);
+            }
+
+            params.card.get('widgets').valueHasMutated();
+        });
+
+
         this.setvalue = this.config().setvalue || function(self, evt){
             if (ko.unwrap(self.disabled) === false) {
                 if(self.value() === self.on){
@@ -34,12 +62,23 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
                 }
             }
         };
+
         this.getvalue = this.config().getvalue || ko.computed(function(){
             var result = null;
             if (this.value() === this.on) {
                 result = true;
             } else if (this.value() === false) {
                 result = false;
+            }
+            return result;
+        }, this);
+
+        this.getariavalue = ko.computed(function(){
+            var result = null;
+            if (this.getvalue() === null) {
+                result = "mixed";
+            } else {
+                result = this.getvalue();
             }
             return result;
         }, this);
@@ -64,6 +103,16 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
             return result;
         }, this);
 
+        this.getariadefault = ko.computed(function(){
+            var result = null;
+            if (this.getdefault() === null) {
+                result = "mixed";
+            } else {
+                result = this.getdefault();
+            }
+            return result;
+        }, this);
+
         var defaultValue = ko.unwrap(this.defaultValue);
         if (this.value() === null && this.defaultValue() !== null) {
             this.value(this.defaultValue());
@@ -78,6 +127,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function(ko, _, WidgetVi
 
     return ko.components.register('switch-widget', {
         viewModel: SwitchWidget,
-        template: { require: 'text!widget-templates/switch' }
+        template: switchWidgetTemplate,
     });
 });

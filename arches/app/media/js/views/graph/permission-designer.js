@@ -15,6 +15,7 @@ define([
     *
     * @param  {string} params - a configuration object
     */
+
     var PermissionDesignerViewModel = function(params) {
         var self = this;
         var permIcons = {

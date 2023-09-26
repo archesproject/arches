@@ -10,7 +10,7 @@
                 "tiles": [
                     {
                         "data": {
-                            "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a": "Test Text Here"
+                            "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a": {"en": {"value": "Test Text Here"}}
                         },
                         "nodegroup_id": "cdfc22b2-f6b5-11e9-8f09-a4d18cec433a",
                         "parenttile_id": null,

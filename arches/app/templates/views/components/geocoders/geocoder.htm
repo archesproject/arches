@@ -25,7 +25,7 @@
         <div class="geocoder-results panel">
             <div class="geocoder-result-item">
                 <i class="fa fa-spinner fa-spin"></i>
-                {% trans "searching...." %}
+                <span data-bind="text: $root.translations.searching + '...'"></span>
             </div>
         </div>
         <!--/ko-->

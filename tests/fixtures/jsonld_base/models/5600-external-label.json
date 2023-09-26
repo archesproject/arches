@@ -125,9 +125,15 @@
             ],
             "functions_x_graphs": [],
             "graphid": "9d2c2ca0-0e3d-11ea-b4f1-acde48001122",
+            "publication": {
+                "graph_id": "9d2c2ca0-0e3d-11ea-b4f1-acde48001122",
+                "notes": "Initial migration.",
+                "publicationid": "f5c41c31-671b-412f-beee-423561ad7f13",
+                "published_time": "2022-03-22T13:29:06.593",
+                "user_id": null
+            },
             "iconclass": "",
             "is_editable": false,
-            "isactive": true,
             "isresource": true,
             "jsonldcontext": null,
             "name": "5600 concept label",

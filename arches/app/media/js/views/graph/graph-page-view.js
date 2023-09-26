@@ -2,10 +2,9 @@ define([
     'knockout',
     'underscore',
     'views/base-manager',
-    'arches',
-    'graph-base-data',
-    'bindings/chosen'
-], function(ko, _, BaseManager, arches, data) {
+    'views/graph/graph-base-data',
+    'bindings/chosen',
+], function(ko, _, BaseManager, data) {
     /**
     * A backbone view representing a page in the graph manager workflow.  It
     * adds some graph manager specfic values to the view model.
@@ -25,12 +24,12 @@ define([
         *                 bound to the page
         * @return {object} an instance of GraphPageView
         */
-        constructor: function (options) {
+        constructor: function(options) {
             var self = this;
             options.viewModel.graphid = ko.observable(data.graphid);
             BaseManager.apply(this, arguments);
-            options.viewModel.graphid.subscribe(function (graphid) {
-                var re = /\b[a-f\d-]{36}\b/
+            options.viewModel.graphid.subscribe(function(graphid) {
+                var re = /\b[a-f\d-]{36}\b/;
                 var newPath = window.location.pathname.replace(re, graphid);
                 self.viewModel.navigate(newPath);
             });

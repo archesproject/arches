@@ -1,19 +1,21 @@
 define([
     'underscore',
     'jquery',
-    'arches',
     'knockout',
     'knockout-mapping',
+    'arches',
     'models/graph',
     'viewmodels/card',
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
-], function(_, $, arches, ko, koMapping, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid) {
-    WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
+    'templates/views/components/workflows/workflow-component-abstract.htm',
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, workflowComponentAbstractTemplate) {
+    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     function NonTileBasedComponent() {
         var self = this;
+         
 
         this.initialize = function() {
             self.loading(false);
@@ -39,6 +41,7 @@ define([
 
     function TileBasedComponent() {
         var self = this;
+         
 
         this.tile = ko.observable();
         this.tiles = ko.observable();
@@ -47,11 +50,12 @@ define([
         this.topCards = ko.observable();
 
         this.loadData = function(loadedData) {
+            let data;
             if (!Array.isArray(loadedData)) {
-                var data = [loadedData]
+                data = [loadedData];
             }
             else {
-                var data = loadedData;
+                data = loadedData;
             }
             
             /* a flat object of the previously saved data for all tiles */ 
@@ -280,6 +284,7 @@ define([
 
     function AbstractCardAdapter() {  // CURRENTLY IN DEVLEOPMENT, USE AT YOUR OWN RISK!
         var self = this;
+         
 
         this.cardinality = ko.observable();
 
@@ -289,9 +294,25 @@ define([
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
 
-                $.getJSON(( arches.urls.resource + `/${self.componentData.parameters['resourceid']}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}` ), function(data) {
+                const resourceInstanceDataPromise = new Promise(function(resolve, _reject) {
+                    const resourceInstanceId = self.componentData.parameters['resourceid'];
+    
+                    if (resourceInstanceId) {
+                        $.getJSON(
+                            ( arches.urls.resource + `/${resourceInstanceId}/tiles?nodeid=${self.componentData.parameters['nodegroupid']}`),
+                            function(data) {
+                                resolve(data);
+                            }
+                        );
+                    }
+                    else {
+                        resolve(null);
+                    }
+                });
+
+                resourceInstanceDataPromise.then( function(data) {
                     if (self.cardinality() === '1') {
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.componentData.parameters['tileid'] = data['tiles'][0]['tileid'];
                             self.complete(true);
                         }
@@ -299,18 +320,39 @@ define([
                     }
                     else if (self.cardinality() === 'n') {
                         MultipleTileBasedComponent.apply(self);
-                        if (data['tiles'].length) {
+                        if (data && data['tiles'].length) {
                             self.complete(true);
                         }
                         
-                        self.onSaveSuccess = function(_savedData) {  // LEGACY -- DO NOT USE
+                        self.card.subscribe(function(card) {
+                            if (!card.selected()) {
+                                card.selected(card.tiles().length);
+                            }
+                        });
+
+                        self.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
+                            if (!(savedData instanceof Array)) { savedData = [savedData]; }
+
+                            self.card().getNewTile();
+            
+                            self.savedData(savedData.map(function(savedDatum) {
+                                return {
+                                    tileData: savedDatum._tileData(),
+                                    tileId: savedDatum.tileid,
+                                    nodegroupId: savedDatum.nodegroup_id,
+                                    resourceInstanceId: savedDatum.resourceinstance_id,
+                                };
+                            }));
+
                             self.componentData.parameters.dirty(false);
+                            self.card().selected(true);
                             self.dirty(false);
                             self.saving(false);
                             self.complete(true);
                         };
                     }
                 });
+
             });
         };
 
@@ -320,6 +362,8 @@ define([
 
     function MultipleTileBasedComponent(title) {
         var self = this;
+         
+
         TileBasedComponent.apply(this);
 
         this.tileLoadedInEditor = ko.observable();
@@ -564,6 +608,7 @@ define([
 
     function WorkflowComponentAbstract(params) {
         var self = this;
+         
 
         this.workflowId = params.workflowId;
         this.componentData = params.componentData;
@@ -618,13 +663,14 @@ define([
                     hasUnsavedData = true;
                 }
             }
+
             return hasUnsavedData;
         });
 
         this.initialize = function() {
             /* cached ID logic */ 
             if (params.workflowComponentAbstractId) {
-                self.id(params.workflowComponentAbstractId)
+                self.id(params.workflowComponentAbstractId);
             }
             else {
                 self.id(uuid.generate());
@@ -667,12 +713,21 @@ define([
                 self.componentData['parameters']['renderContext'] = 'workflow';
             }
 
-
-
             if (self.componentData.componentType === 'card') {
+                const previouslySavedValue = self.getFromLocalStorage('value');
+                let previouslySavedResourceInstanceId;
+    
+                if (previouslySavedValue) {
+                    if (!(previouslySavedValue instanceof Array)) { previouslySavedValue = [previouslySavedValue]; }
+    
+                    if (previouslySavedValue[0]['resourceInstanceId']) {
+                        previouslySavedResourceInstanceId = previouslySavedValue[0]['resourceInstanceId'];
+                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId
+                    }
+                }
+
                 AbstractCardAdapter.apply(self);
             }
-
 
             else if (!self.componentData.tilesManaged || self.componentData.tilesManaged === "none") {
                 NonTileBasedComponent.apply(self);
@@ -683,7 +738,7 @@ define([
             else if (self.componentData.tilesManaged === "many") {
                 MultipleTileBasedComponent.apply(self, [params.title] );
             }
-        }
+        };
 
         this.setToLocalStorage = function(key, value) {
             var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
@@ -741,10 +796,16 @@ define([
                 }
             });
 
-            if (self.componentData.tilesManaged === "many"){
-                self.saveMultiTiles();
-            } else {
-                self.save();
+            // only saves updated tiles
+            if (ko.unwrap(self.dirty) || ko.unwrap(self.hasDirtyTiles) || ko.unwrap(self.hasUnsavedData)) {
+                if (self.componentData.tilesManaged === "many"){
+                    self.saveMultiTiles();
+                } else {
+                    self.save();
+                }
+            }
+            else {
+                self.complete(true);
             }
         };
 
@@ -760,9 +821,7 @@ define([
     }
 
     ko.components.register('workflow-component-abstract', {
-        template: {
-            require: 'text!templates/views/components/workflows/workflow-component-abstract.htm'
-        }
+        template: workflowComponentAbstractTemplate,
     });
 
     return WorkflowComponentAbstract;

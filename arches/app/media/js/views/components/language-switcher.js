@@ -1,4 +1,4 @@
-define(['knockout'], function(ko) {
+define(['knockout', 'templates/views/components/language-switcher.htm', 'js-cookie'], function(ko, languageSwitcherTemplate, Cookies) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
@@ -15,12 +15,13 @@ define(['knockout'], function(ko) {
         viewModel: function(params) {
             this.formid = Math.random();
             this.value = ko.observable(params.current_language);
+            this.csrfToken = Cookies.get('csrftoken');
             this.value.subscribe(function(val){
-                document.getElementById(this.formid).submit();
+                if (val) {
+                    document.getElementById(this.formid).submit();
+                }
             }, this);
         },
-        template: {
-            require: 'text!templates/views/components/language-switcher.htm'
-        }
+        template: languageSwitcherTemplate,
     });
 });

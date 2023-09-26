@@ -4,13 +4,16 @@ define([
     'viewmodels/base-import-view-model',
     'arches',
     'viewmodels/alert',
+    'templates/views/components/etl_modules/branch-csv-importer.htm',
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, arches, AlertViewModel) {
+], function(_, ko, ImporterViewModel, arches, AlertViewModel, branchCSVImporterTemplate) {
     return ko.components.register('branch-csv-importer', {
         viewModel: function(params) {
             const self = this;
+
+             
             this.loadDetails = params.load_details || ko.observable();
             this.state = params.state;
             this.loading = params.loading || ko.observable();
@@ -18,16 +21,20 @@ define([
 
             this.moduleId = params.etlmoduleid;
             ImporterViewModel.apply(this, arguments);
-            this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
             this.loadStatus = ko.observable('ready');
             this.downloadMode = ko.observable(false);
+            this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+            this.validationErrors = params.validationErrors || ko.observable();
+            this.validated = params.validated || ko.observable();
+            this.getErrorReport = params.getErrorReport;
+            this.getNodeError = params.getNodeError;
+            this.templates = ko.observableArray(
+                arches.resources.map(resource => ({text: resource.name, id: resource.graphid}))
+            );
 
             this.toggleDownloadMode = () => {
                 this.downloadMode(!this.downloadMode());
-                if (this.downloadMode() && !ko.unwrap(this.templates).length) {
-                    getGraphs();
-                }
             };
 
             function getCookie(name) {
@@ -44,12 +51,12 @@ define([
                 return decodeURIComponent(xsrfCookies[0].split('=')[1]);
             }
 
-            this.downloadTemplate = async () => {
-                const url = `/etl-manager`;
+            this.downloadTemplate = async() => {
+                const url = arches.urls.etl_manager;
                 const formData = new window.FormData();
                 formData.append("id", ko.unwrap(this.selectedTemplate));
                 formData.append("format", "xls");
-                formData.append("module", ko.unwrap(self.moduleId));;
+                formData.append("module", ko.unwrap(self.moduleId));
                 formData.append("action", "download");
                 
                 const response = await window.fetch(url, {
@@ -75,17 +82,6 @@ define([
                     window.document.body.removeChild(a);
                 }, 0);
                 this.loading(false);
-            };
-
-            const getGraphs = async function() {
-                const response = await fetch(arches.urls.graphs_api);
-                if (response.ok) {
-                    let graphs = await response.json();
-                    let templates = graphs.map(function(graph){
-                        return {text: graph.name, id: graph.graphid};
-                    });
-                    self.templates(templates);
-                }
             };
 
             this.addFile = async function(file){
@@ -140,6 +136,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/etl_modules/branch-csv-importer.htm' }
+        template: branchCSVImporterTemplate,
     });
 });

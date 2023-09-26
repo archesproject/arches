@@ -1,3 +1,4 @@
+import copy
 import uuid
 import json
 import decimal
@@ -13,18 +14,35 @@ import time
 from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
+
+from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
-import arches.app.utils.task_management as task_management
-from arches.app.search.elasticsearch_dsl_builder import Query, Dsl, Bool, Match, Range, Term, Terms, Nested, Exists, RangeDSLException
+from arches.app.utils.i18n import get_localized_value
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Dsl,
+    Exists,
+    Match,
+    Query,
+    Range,
+    RangeDSLException,
+    Term,
+    Terms,
+    Wildcard,
+    Prefix,
+    Nested,
+)
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
+from arches.app.search.search_term import SearchTerm
 from arches.app.search.mappings import RESOURCES_INDEX
 from django.core.cache import cache
 from django.core.files import File
@@ -38,6 +56,7 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
+from django.utils.translation import get_language, ugettext as _
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
@@ -91,39 +110,156 @@ class StringDataType(BaseDataType):
         errors = []
         try:
             if value is not None:
-                value.upper()
+                for key in value.keys():
+                    isinstance(value[key]["value"], str)
+                    isinstance(value[key]["direction"], str)
         except:
             message = _("This is not a string")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid String Format")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
         return errors
+
+    def rdf_transform(self, value):
+        default_language = models.Language.objects.get(code=get_language())
+        incoming_value = {}
+        for val in value:
+            if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
+                try:
+                    language_code = val["language"] if "language" in val else val["@language"]
+                    language = models.Language.objects.get(code=language_code)
+                    incoming_value = {
+                        **incoming_value,
+                        language.code: {
+                            "value": val["value"] if "value" in val else val["@value"],
+                            "direction": language.default_direction,
+                        },
+                    }
+                except models.Language.DoesNotExist:
+                    ValueError("Language does not exist in Language table - cannot create string.")
+            else:
+                incoming_value = {
+                    **incoming_value,
+                    default_language.code: {
+                        "value": val["value"] if "value" in val else val["@value"],
+                        "direction": default_language.default_direction,
+                    },
+                }
+
+        return incoming_value if len(incoming_value.keys()) > 0 else None
+
+    def validate_from_rdf(self, value):
+        transformed_value = None
+        if isinstance(value, list):
+            transformed_value = self.rdf_transform(value)
+        elif isinstance(value, str):
+            transformed_value = self.rdf_transform([{"value": value}])
+        incoming_value = value if transformed_value is None else transformed_value
+
+        return self.validate(incoming_value)
 
     def clean(self, tile, nodeid):
         if tile.data[nodeid] in ["", "''"]:
             tile.data[nodeid] = None
+        elif isinstance(tile.data[nodeid], dict):
+            for language_dict in tile.data[nodeid].values():
+                if language_dict["value"]:
+                    break
+            else:
+                # No non-empty value was found.
+                tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        val = {"string": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
-        document["strings"].append(val)
+        if nodevalue is not None:
+            for key in nodevalue.keys():
+                val = {
+                    "string": nodevalue[key]["value"],
+                    "language": key,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+                document["strings"].append(val)
 
     def transform_export_values(self, value, *args, **kwargs):
+        language = kwargs.pop("language", None)
         if value is not None:
-            return value
+            try:
+                if language is not None:
+                    return value[language]["value"]
+                else:
+                    return value[get_language()]["value"]
+            except KeyError:
+                # sometimes certain requested language values aren't populated.  Just pass back with implicit None.
+                pass
 
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
-        if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(nodevalue)
+
+        if nodevalue is not None and isinstance(nodevalue, dict):
+            for key in nodevalue.keys():
+                try:
+                    if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue[key]["value"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                        terms.append(SearchTerm(value=nodevalue[key]["value"], lang=key))
+                except:
+                    pass
         return terms
+
+    def append_null_search_filters(self, value, node, query, request):
+        """
+        Appends the search query dsl to search for fields that have not been populated or are empty strings
+        """
+
+        query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
+
+        data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value")
+        tiles_w_node_exists = Nested(path="tiles", query=data_exists_query)
+
+        if value["op"] == "not_null":
+            query.must(tiles_w_node_exists)
+            non_blank_string_query = Wildcard(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value", query="?*")
+            query.must(Nested(path="tiles", query=non_blank_string_query))
+
+        elif value["op"] == "null":
+            # search for tiles that don't exist
+            not_exists_query = Bool()
+            not_exists_query.must_not(tiles_w_node_exists)
+            query.should(not_exists_query)
+
+            # search for tiles that do exist, but have empty strings
+            non_blank_string_query = Term(field=f"tiles.data.{str(node.pk)}.{value['lang']}.value.keyword", query="")
+            query.should(Nested(path="tiles", query=non_blank_string_query))
 
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
             elif value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                exact_terms = re.search('"(?P<search_string>.*)"', value["val"])
+                if exact_terms:
+                    if "~" in value["op"]:
+                        match_query = Wildcard(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=f"*{exact_terms.group('search_string')}*",
+                            case_insensitive=False,
+                        )
+                    else:  # "eq" in value["op"]
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]),
+                            query=exact_terms.group("search_string"),
+                            type="phrase",
+                        )
+                elif "?" in value["val"] or "*" in value["val"]:
+                    match_query = Wildcard(field="tiles.data.%s.%s.value.keyword" % (str(node.pk), value["lang"]), query=value["val"])
+                else:
+                    if "~" in value["op"]:
+                        match_query = Bool()
+                        for word in value["val"].split(" "):
+                            match_query.must(Prefix(field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=word))
+                    else:  # "eq" in value["op"]
+                        match_query = Match(
+                            field="tiles.data.%s.%s.value" % (str(node.pk), value["lang"]), query=value["val"], type="phrase"
+                        )
+
                 if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -141,17 +277,108 @@ class StringDataType(BaseDataType):
         g = Graph()
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"])))
+            for key in edge_info["range_tile_data"].keys():
+                if edge_info["range_tile_data"][key]["value"]:
+                    g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
         return g
 
-    def from_rdf(self, json_ld_node):
-        # returns the string value only
-        # FIXME: Language?
-        value = get_value_from_jsonld(json_ld_node)
+    def transform_value_for_tile(self, value, **kwargs):
+        language = None
         try:
-            return value[0]
-        except (AttributeError, KeyError) as e:
+            regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
+            match = regex.match(value)
+            if match is not None:
+                language = match.groups()[1]
+                value = match.groups()[0]
+        except Exception as e:
             pass
+
+        try:
+            parsed_value = json.loads(value)
+        except Exception:
+            try:
+                parsed_value = ast.literal_eval(value)
+            except Exception:
+                parsed_value = value
+
+        try:
+            parsed_value.keys()
+            return parsed_value
+        except AttributeError:
+            if language is not None:
+                language_objects = list(models.Language.objects.filter(code=language))
+                if len(language_objects) > 0:
+                    return {language: {"value": value, "direction": language_objects[0].default_direction}}
+
+            return {get_language(): {"value": value, "direction": "ltr"}}
+
+    def from_rdf(self, json_ld_node):
+        transformed_value = None
+        if isinstance(json_ld_node, list):
+            transformed_value = self.rdf_transform(json_ld_node)
+        else:
+            new_value = get_value_from_jsonld(json_ld_node)
+            if new_value is not None:
+                transformed_value = self.rdf_transform([{"value": new_value[0], "language": new_value[1]}])
+        return transformed_value
+
+    def get_display_value(self, tile, node, **kwargs):
+        data = self.get_tile_data(tile)
+        requested_language = kwargs.pop("language", None)
+        current_language = requested_language or get_language()
+        if not current_language:
+            current_language = settings.LANGUAGE_CODE
+        if data:
+            raw_value = data.get(str(node.nodeid))
+            if raw_value is not None:
+                try:
+                    return raw_value[current_language]["value"]
+                except KeyError:
+                    pass
+
+    def default_es_mapping(self):
+        """
+        Default mapping if not specified is a text field
+        """
+        # languages = models.Language.objects.all()
+        # lang_mapping = {"properties": {"value": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}}}}
+        # for lang in languages:
+        #     text_mapping = {"properties": {lang.code: lang_mapping}}
+        text_mapping = {"properties": {}}
+        return text_mapping
+
+    def get_default_language_value_from_localized_node(self, tile, nodeid):
+        return tile.data[str(nodeid)][settings.LANGUAGE_CODE]["value"]
+
+    def is_multilingual_rdf(self, rdf):
+        if len(rdf) > 1 and len(set(val["language"] for val in rdf)) > 1:
+            return True
+        else:
+            return False
+
+    def has_multicolumn_data(self):
+        return True
+
+    def get_column_header(self, node, **kwargs):
+        """
+        Returns a CSV column header or headers for a given node ID of this type
+        """
+        language_codes = kwargs.pop("language_codes")
+        return ["{column} ({code})".format(column=node["file_field_name"], code=code) for code in language_codes]
+
+    def to_json(self, tile, node):
+        data = self.get_tile_data(tile)
+        if data:
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        all_language_codes = {lang.code for lang in kwargs["languages"]}
+        direction_lookup = {lang.code: lang.default_direction for lang in kwargs["languages"]}
+        if tile.data[nodeid] is None:
+            tile.data[nodeid] = {}
+        tile_language_codes = set(tile.data[nodeid].keys())
+        for code in all_language_codes - tile_language_codes:
+            tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
 
 
 class NumberDataType(BaseDataType):
@@ -166,11 +393,12 @@ class NumberDataType(BaseDataType):
         except Exception:
             dt = self.datatype_model.datatype
             message = _("Not a properly formatted number")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid Number Format")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
             display_value = data.get(str(node.nodeid))
@@ -257,12 +485,13 @@ class BooleanDataType(BaseDataType):
                 type(bool(util.strtobool(str(value)))) is True
         except Exception:
             message = _("Not of type boolean")
-            error_message = self.create_error_message(value, source, row_number, message)
+            title = _("Invalid Boolean")
+            error_message = self.create_error_message(value, source, row_number, message, title)
             errors.append(error_message)
 
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         if data:
             raw_value = data.get(str(node.nodeid))
@@ -339,7 +568,8 @@ class DateDataType(BaseDataType):
                 message = _(
                     "Incorrect format. Confirm format is in settings.DATE_FORMATS or set the format in settings.DATE_IMPORT_EXPORT_FORMAT."
                 )
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid Date Format")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
@@ -476,15 +706,15 @@ class DateDataType(BaseDataType):
         mapping = {"type": "date", "format": es_date_formats}
         return mapping
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
-            og_value = data[str(node.pk)]
+            og_value = data[str(node.nodeid)]
             valid_date_format, valid = self.get_valid_date_format(og_value)
             new_date_format = settings.DATE_FORMATS["Python"][settings.DATE_FORMATS["JavaScript"].index(node.config["dateFormat"])]
             value = datetime.strptime(og_value, valid_date_format).strftime(new_date_format)
         except TypeError:
-            value = data[str(node.pk)]
+            value = data[str(node.nodeid)]
         return value
 
 
@@ -503,16 +733,17 @@ class EDTFDataType(BaseDataType):
         if value is not None:
             if not ExtendedDateFormat(value).is_valid():
                 message = _("Incorrect Extended Date Time Format. See http://www.loc.gov/standards/datetime/ for supported formats")
-                error_message = self.create_error_message(value, source, row_number, message)
+                title = _("Invalid EDTF Format")
+                error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
         try:
-            value = data[str(node.pk)]["value"]
+            value = data[str(node.nodeid)]["value"]
         except TypeError:
-            value = data[str(node.pk)]
+            value = data[str(node.nodeid)]
         return value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -604,36 +835,48 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
                 if coordinate_count > coord_limit:
-                    message = f"Geometry has too many coordinates for Elasticsearch ({coordinate_count}), \
-                        Please limit to less then {coord_limit} coordinates of 5 digits of precision or less."
+                    message = _(
+                        "Geometry has too many coordinates for Elasticsearch ({0}), \
+                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
+                            coordinate_count, coord_limit
+                        )
+                    )
+                    title = _("Geometry Too Many Coordinates for ES")
                     errors.append(
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
                                 self.datatype_model.datatype, value, source, message, "This data was not imported."
                             ),
+                            "title": title,
                         }
                     )
 
                 if bbox.contains(geom) == False:
-                    message = "Geometry does not fall within the bounding box of the selected coordinate system. \
+                    message = _(
+                        "Geometry does not fall within the bounding box of the selected coordinate system. \
                          Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
+                    )
+                    title = _("Geometry Out Of Bounds")
                     errors.append(
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
                                 self.datatype_model.datatype, value, source, message, "This data was not imported."
                             ),
+                            "title": title,
                         }
                     )
             except Exception:
-                message = "Not a properly formatted geometry"
+                message = _("Not a properly formatted geometry")
+                title = _("Invalid Geometry Format")
                 errors.append(
                     {
                         "type": "ERROR",
                         "message": "datatype: {0} value: {1} {2} - {3}. {4}.".format(
                             self.datatype_model.datatype, value, source, message, "This data was not imported."
                         ),
+                        "title": title,
                     }
                 )
 
@@ -644,7 +887,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     validate_geom(geom, coordinate_count)
                 except Exception:
                     message = _("Unable to serialize some geometry features")
-                    error_message = self.create_error_message(value, source, row_number, message)
+                    title = _("Unable to Serialize Geometry")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
                     errors.append(error_message)
         return errors
 
@@ -756,8 +1000,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
-        if not preview and (count < 1 or not node.config["layerActivated"]):
+        tile_exists = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).exists()
+        if not preview and (not tile_exists or not node.config["layerActivated"]):
             return None
 
         source_name = "resources-%s" % node.nodeid
@@ -1239,7 +1483,8 @@ class FileListDataType(BaseDataType):
             file_type_errors = errors + self.validate_file_types(request, str(node.pk))
 
         if len(file_type_errors) > 0:
-            errors.append({"type": "ERROR", "message": _("File type not permitted")})
+            title = _("Invalid File Type")
+            errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1266,7 +1511,8 @@ class FileListDataType(BaseDataType):
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
-                errors.append({"type": "ERROR", "message": message})
+                title = _("Exceed Maximun Number of Files")
+                errors.append({"type": "ERROR", "message": message, "title": title})
 
             if max_size is not None:
                 formatted_max_size = format_bytes(max_size)
@@ -1277,16 +1523,19 @@ class FileListDataType(BaseDataType):
                                 formatted_max_size
                             )
                         )
-                        errors.append({"type": "ERROR", "message": message})
+                        title = _("Exceed File Size Limit")
+                        errors.append({"type": "ERROR", "message": message, "title": title})
             if path:
                 for file in value:
                     if not default_storage.exists(os.path.join(path, file["name"])):
                         message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], default_storage.path(path)))
-                        errors.append({"type": "ERROR", "message": message})
+                        title = _("File Not Found")
+                        errors.append({"type": "ERROR", "message": message, "title": title})
         except Exception as e:
             dt = self.datatype_model.datatype
             message = _("datatype: {0}, value: {1} - {2} .".format(dt, value, e))
-            errors.append({"type": "ERROR", "message": message})
+            title = _("Unexpected File Error")
+            errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
@@ -1304,13 +1553,13 @@ class FileListDataType(BaseDataType):
         terms = []
         for file_obj in nodevalue:
             if file_obj["name"] is not None:
-                terms.append(file_obj["name"])
+                terms.append(SearchTerm(value=file_obj["name"]))
 
         return terms
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
-        files = data[str(node.pk)]
+        files = data[str(node.nodeid)]
         file_urls = ""
         if files is not None:
             file_urls = " | ".join([file["url"] for file in files])
@@ -1320,7 +1569,7 @@ class FileListDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return self.compile_json(tile, node, file_details=data[str(node.pk)])
+            return self.compile_json(tile, node, file_details=data[str(node.nodeid)])
 
     def post_tile_save(self, tile, nodeid, request):
         if request is not None:
@@ -1346,14 +1595,19 @@ class FileListDataType(BaseDataType):
                             except models.File.DoesNotExist:
                                 logger.exception(_("File does not exist"))
 
-            files = request.FILES.getlist("file-list_" + nodeid, [])
+            files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, [])
 
             for file_data in files:
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).count() > 0:
+                if models.TileModel.objects.filter(pk=tile.tileid).exists():
+                    original_storage = file_model.path.storage
+                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
+                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
+                        file_model.path.storage = FileSystemStorage()
                     file_model.save()
+                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
@@ -1445,7 +1699,7 @@ class FileListDataType(BaseDataType):
         return json.loads(json.dumps(tile_data))
 
     def pre_tile_save(self, tile, nodeid):
-        # TODO If possible this method should probably replace 'handle request' and perhaps 'process mobile data'
+        # TODO If possible this method should probably replace 'handle request'
         if tile.data[nodeid]:
             for file in tile.data[nodeid]:
                 try:
@@ -1568,38 +1822,6 @@ class FileListDataType(BaseDataType):
         # Currently up in the air about how best to do file imports via JSON-LD
         pass
 
-    def process_mobile_data(self, tile, node, db, couch_doc, node_value):
-        """
-        Takes a tile, couch db instance, couch record, and the node value from
-        a provisional edit. Creates a django instance, saves the corresponding
-        attachement as a file, updates the provisional edit value with the
-        file location information and returns the revised provisional edit value
-        """
-
-        try:
-            for file in node_value:
-                attachment = db.get_attachment(couch_doc["_id"], file["file_id"])
-                if attachment is not None:
-                    attachment_file = attachment.read()
-                    file_data = ContentFile(attachment_file, name=file["name"])
-                    file_model, created = models.File.objects.get_or_create(fileid=file["file_id"])
-
-                    if created:
-                        file_model.path = file_data
-
-                    file_model.tile = tile
-                    file_model.save()
-                    if file["name"] == file_data.name and "url" not in list(file.keys()):
-                        file["file_id"] = str(file_model.pk)
-                        file["url"] = str(file_model.path.url)
-                        file["status"] = "uploaded"
-                        file["accepted"] = True
-                        file["size"] = file_data.size
-
-        except KeyError as e:
-            pass
-        return node_value
-
     def collects_multiple_values(self):
         return True
 
@@ -1624,45 +1846,66 @@ class BaseDomainDataType(BaseDataType):
         for option in node.config["options"]:
             if option["id"] == option_id:
                 return option["text"]
-        return ""
+        return {}
+
+    def get_localized_option_text(self, node, option_id, return_lang=False):
+        for option in node.config["options"]:
+            if option["id"] == option_id:
+                return get_localized_value(option["text"], return_lang=return_lang)
+        raise Exception(_("No domain option found for option id {0}, in node conifg: {1}".format(option_id, node.config["options"])))
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
-        for dnode in models.Node.objects.filter(config__contains={"options": [{"text": value}]}):
-            for option in dnode.config["options"]:
-                if option["text"] == value:
-                    yield option["id"], dnode.nodeid
+        # this returns the FIRST option that matches the text, but there could be
+        # more than 1 option with that value!!.  If we knew the node then we could fix this issue.
+
+        found_option = None
+        dt = self.datatype_model.datatype
+        domain_val_node_query = models.Node.objects.filter(datatype=dt)
+        try:
+            for x in domain_val_node_query:
+                for option in x.config["options"]:
+                    for option_text in option["text"].values():
+                        if value == option_text:
+                            found_option = option["id"]
+                            # once we find at least one value we can just
+                            # exit the nested loops by raising an excpetion
+                            raise Exception()
+        except:
+            pass
+
+        return found_option
 
     def is_a_literal_in_rdf(self):
         return True
 
     def lookup_domainid_by_value(self, value, nodeid):
+        language = get_language()
         if nodeid not in self.value_lookup:
             config = models.Node.objects.get(pk=nodeid).config
             options = {}
             for val in config["options"]:
-                options[val["text"]] = val["id"]
+                options[val["text"][language]] = val["id"]
             self.value_lookup[nodeid] = options
         return self.value_lookup[nodeid][value]
 
 
 class DomainDataType(BaseDomainDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
+        found_option = False
         errors = []
-        key = "id"
         if value is not None:
             try:
                 uuid.UUID(str(value))
+                found_option = len(models.Node.objects.filter(config__contains={"options": [{"id": value}]})) > 0
             except ValueError as e:
-                key = "text"
+                found_option = True if self.get_option_id_from_text(value) is not None else False
 
-            domain_val_node_query = models.Node.objects.filter(config__contains={"options": [{key: value}]})
-            if len(domain_val_node_query) != 1:
-                row_number = row_number if row_number else ""
-                if len(domain_val_node_query) == 0:
-                    message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
-                    error_message = self.create_error_message(value, source, row_number, message)
-                    errors.append(error_message)
+            if not found_option:
+                message = _("Invalid domain id. Please check the node this value is mapped to for a list of valid domain ids.")
+                title = _("Invalid Domain Id")
+                error_message = self.create_error_message(value, source, row_number, message, title)
+                errors.append(error_message)
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -1673,7 +1916,7 @@ class DomainDataType(BaseDomainDataType):
             except ValueError:
                 try:
                     value = self.lookup_domainid_by_value(value, kwargs["nodeid"])
-                except Exception:
+                except KeyError:
                     value = value
         return value
 
@@ -1681,25 +1924,30 @@ class DomainDataType(BaseDomainDataType):
         terms = []
         node = models.Node.objects.get(nodeid=nodeid)
         domain_text = self.get_option_text(node, nodevalue)
-        if domain_text is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(domain_text)
+        for lang, text in domain_text.items():
+            if settings.WORDS_PER_SEARCH_TERM is None or (len(text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                terms.append(SearchTerm(value=text, lang=lang))
         return terms
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        domain_text = None
-        for tile in document["tiles"]:
-            for k, v in tile.data.items():
-                if v == nodevalue:
-                    node = models.Node.objects.get(nodeid=k)
-                    domain_text = self.get_option_text(node, v)
+        node = models.Node.objects.get(nodeid=nodeid)
+        domain_text = self.get_option_text(node, nodevalue)
 
-        if domain_text not in document["strings"] and domain_text is not None:
-            document["strings"].append({"string": domain_text, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+        for key in domain_text.keys():
+            val = {
+                "string": domain_text[key],
+                "language": key,
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+            }
+            document["strings"].append(val)
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         data = self.get_tile_data(tile)
-        return self.get_option_text(node, data[str(node.nodeid)])
+        try:
+            return self.get_localized_option_text(node, data[str(node.nodeid)])
+        except:
+            return ""
 
     def transform_export_values(self, value, *args, **kwargs):
         ret = ""
@@ -1708,9 +1956,9 @@ class DomainDataType(BaseDomainDataType):
             or kwargs["concept_export_value_type"] == ""
             or kwargs["concept_export_value_type"] == "label"
         ):
-            ret = self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
+            ret = self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
         elif kwargs["concept_export_value_type"] == "both":
-            ret = value + "|" + self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
+            ret = value + "|" + self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), value)
         elif kwargs["concept_export_value_type"] == "id":
             ret = value
         return ret
@@ -1735,12 +1983,15 @@ class DomainDataType(BaseDomainDataType):
         # type and the number as a numeric literal (as this is how it is in the JSON)
         g = Graph()
         if edge_info["range_tile_data"] is not None:
+            option = self.get_localized_option_text(edge.rangenode, edge_info["range_tile_data"], return_lang=True)
+            lang = list(option.keys())[0]
+            text = option[lang]
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add(
                 (
                     edge_info["d_uri"],
                     URIRef(edge.ontologyproperty),
-                    Literal(self.get_option_text(edge.rangenode, edge_info["range_tile_data"])),
+                    Literal(text, lang=lang),
                 )
             )
         return g
@@ -1751,10 +2002,60 @@ class DomainDataType(BaseDomainDataType):
         # a string may be present in multiple domains for instance
         # via models.Node.objects.filter(config__options__contains=[{"text": value}])
         value = get_value_from_jsonld(json_ld_node)
-        try:
-            return [str(v_id) for v_id, n_id in self.get_option_id_from_text(value[0])][0]
-        except (AttributeError, KeyError, TypeError) as e:
-            print(e)
+        return self.get_option_id_from_text(value[0])
+
+    def i18n_as_sql(self, i18n_json_field, compiler, connection):
+        """
+        Creates a sql snippet that can be used to update the
+        config object associated with this datatype.
+        This snippet will be used in a SQL UPDATE statement.
+        """
+
+        sql = i18n_json_field.attname
+        for prop, value in i18n_json_field.raw_value.items():
+            escaped_value = json.dumps(value).replace("%", "%%")
+            if prop == "options":
+                sql = f"""
+                    __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i18n_json_field.lang}')
+                """
+            else:
+                sql = f"jsonb_set({sql}, array['{prop}'], '{escaped_value}')"
+        return sql
+
+    def i18n_serialize(self, i18n_json_field: I18n_JSONField):
+        """
+        Takes a localized list of options eg:
+        {"options": [{"text":{"en": "blue", "es": "azul"}}, {"text":{"en": "red", "es": "rojo"}}]}
+        and returns the value as a string based on the active language
+        Eg: if the active language is Spanish then the above returned
+        object would be {"options": [{"text":"azul"},{"text":"rojo"}]}
+
+        Arguments:
+        i18n_json_field -- the I18n_JSONField being serialized
+        """
+
+        ret = copy.deepcopy(i18n_json_field.raw_value)
+        for option in ret["options"]:
+            option["text"] = str(I18n_String(option["text"]))
+        return ret
+
+    def i18n_to_localized_object(self, i18n_json_field: I18n_JSONField):
+        """
+        Takes a list of optione that is assumed to hold a localized value
+        eg: {"options": [{"text":"azul"},{"text":"rojo"}]}
+        and returns the value as an object keyed to the active language
+        Eg: if the active language is Spanish then the above returned
+        object would be {"options": [{"text":{"es":"azul"}},{"text":{"es":"rojo"}}]}
+
+        Arguments:
+        i18n_json_field -- the I18n_JSONField being localized
+        """
+
+        ret = copy.deepcopy(i18n_json_field.raw_value)
+        for option in ret["options"]:
+            if not isinstance(option["text"], dict):
+                option["text"] = {i18n_json_field.lang: option["text"]}
+        return ret
 
 
 class DomainListDataType(BaseDomainDataType):
@@ -1790,33 +2091,37 @@ class DomainListDataType(BaseDomainDataType):
         node = models.Node.objects.get(nodeid=nodeid)
         for val in nodevalue:
             domain_text = self.get_option_text(node, val)
-            if domain_text is not None:
-                if settings.WORDS_PER_SEARCH_TERM is None or (len(domain_text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                    terms.append(domain_text)
+            for lang, text in domain_text.items():
+                if settings.WORDS_PER_SEARCH_TERM is None or (len(text.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                    terms.append(SearchTerm(value=text, lang=lang))
 
         return terms
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
-        for tile in document["tiles"]:
-            for k, v in tile.data.items():
-                if v == nodevalue:
-                    node = models.Node.objects.get(nodeid=k)
-                    for value in nodevalue:
-                        text_value = self.get_option_text(node, value)
-                        domain_text_values.add(text_value)
+        node = models.Node.objects.get(nodeid=nodeid)
+        for value in nodevalue:
+            domain_text = self.get_option_text(node, value)
+            # domain_text_values.add(text_value)
+            for key in domain_text.keys():
+                val = {
+                    "string": domain_text[key],
+                    "language": key,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+                document["strings"].append(val)
 
-        for value in domain_text_values:
-            if value not in document["strings"]:
-                document["strings"].append({"string": value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
-
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         new_values = []
         data = self.get_tile_data(tile)
         if data[str(node.nodeid)] is not None:
             for val in data[str(node.nodeid)]:
-                option = self.get_option_text(node, val)
-                new_values.append(option)
+                try:
+                    option = self.get_localized_option_text(node, val)
+                    new_values.append(option)
+                except:
+                    pass
         return ",".join(new_values)
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -1827,9 +2132,9 @@ class DomainListDataType(BaseDomainDataType):
                 or kwargs["concept_export_value_type"] == ""
                 or kwargs["concept_export_value_type"] == "label"
             ):
-                new_values.append(self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
+                new_values.append(self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
             elif kwargs["concept_export_value_type"] == "both":
-                new_values.append(val + "|" + self.get_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
+                new_values.append(val + "|" + self.get_localized_option_text(models.Node.objects.get(nodeid=kwargs["node"]), val))
             elif kwargs["concept_export_value_type"] == "id":
                 new_values.append(val)
         return ",".join(new_values)
@@ -1889,8 +2194,8 @@ class ResourceInstanceDataType(BaseDataType):
         if value is not None:
             resourceXresourceIds = self.get_id_list(value)
             for resourceXresourceId in resourceXresourceIds:
-                resourceid = resourceXresourceId["resourceId"]
                 try:
+                    resourceid = resourceXresourceId["resourceId"]
                     uuid.UUID(resourceid)
                     if strict:
                         try:
@@ -1919,11 +2224,19 @@ class ResourceInstanceDataType(BaseDataType):
                         except ObjectDoesNotExist:
                             message = _("The related resource with id '{0}' is not in the system.".format(resourceid))
                             errors.append({"type": "ERROR", "message": message})
-                except ValueError:
-                    message = _("The related resource with id '{0}' is not a valid uuid.".format(resourceid))
-                    error_type = "ERROR"
-                    errors.append({"type": error_type, "message": message})
+                except (ValueError, TypeError):
+                    message = _("The related resource with id '{0}' is not a valid uuid.".format(str(value)))
+                    title = _("Invalid Resource Instance Datatype")
+                    error_message = self.create_error_message(value, source, row_number, message, title)
+                    errors.append(error_message)
+
         return errors
+
+    def pre_tile_save(self, tile, nodeid):
+        relationships = tile.data[nodeid]
+        if relationships:
+            for relationship in relationships:
+                relationship["resourceXresourceId"] = str(uuid.uuid4())
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False
@@ -1938,7 +2251,7 @@ class ResourceInstanceDataType(BaseDataType):
             ret = cursor.fetchone()
         return ret
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
         resourceid = None
@@ -1996,7 +2309,7 @@ class ResourceInstanceDataType(BaseDataType):
             try:
                 return ast.literal_eval(value)
             except:
-                return None
+                return value
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
@@ -2122,15 +2435,17 @@ class NodeValueDataType(BaseDataType):
             try:
                 models.TileModel.objects.get(tileid=value)
             except ObjectDoesNotExist:
-                errors.append({"type": "ERROR", "message": f"{value} {row_number} is not a valid tile id. This data was not imported."})
+                message = _("{0} {1} is not a valid tile id. This data was not imported.".format(value, row_number))
+                title = _("Invalid Tile Id")
+                errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
-    def get_display_value(self, tile, node):
+    def get_display_value(self, tile, node, **kwargs):
         datatype_factory = DataTypeFactory()
         try:
             value_node = models.Node.objects.get(nodeid=node.config["nodeid"])
             data = self.get_tile_data(tile)
-            tileid = data[str(node.pk)]
+            tileid = data[str(node.nodeid)]
             if tileid:
                 value_tile = models.TileModel.objects.get(tileid=tileid)
                 datatype = datatype_factory.get_instance(value_node.datatype)
@@ -2173,10 +2488,6 @@ class AnnotationDataType(BaseDataType):
             if isinstance(value, list):
                 return value
 
-    def get_search_terms(self, nodevalue, nodeid=None):
-        # return [nodevalue["address"]]
-        return []
-
     def default_es_mapping(self):
         mapping = {
             "properties": {
@@ -2196,10 +2507,16 @@ class AnnotationDataType(BaseDataType):
 
 def get_value_from_jsonld(json_ld_node):
     try:
-        return (json_ld_node[0].get("@value"), json_ld_node[0].get("@language"))
+        language = json_ld_node[0].get("@language")
+        if language is None:
+            language = get_language()
+        return (json_ld_node[0].get("@value"), language)
     except KeyError as e:
         try:
-            return (json_ld_node.get("@value"), json_ld_node.get("@language"))
+            language = json_ld_node.get("@language")
+            if language is None:
+                language = get_language()
+            return (json_ld_node.get("@value"), language)
         except AttributeError as e:
             return
     except IndexError as e:
