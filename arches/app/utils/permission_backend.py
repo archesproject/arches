@@ -275,7 +275,7 @@ def user_has_resource_model_permissions(user, perms, resource):
     """
 
     nodegroups = get_nodegroups_by_perm(user, perms)
-    nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
+    nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=str(resource.graph_id)).select_related("graph")
     return nodes.count() > 0
 
 

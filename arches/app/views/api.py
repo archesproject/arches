@@ -1231,8 +1231,8 @@ class ResourceReport(APIBase):
         readable_nodegroups = list(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, ["models.read_nodegroup"], any_perm=True))
 
         resource = Resource.objects.get(pk=resourceid)
-        graph = Graph.objects.get(graphid=resource.graph_id)
-        template = models.ReportTemplate.objects.get(pk=graph.template_id)
+        graph = Graph.objects.get(graphid=str(resource.graph_id))
+        template = models.ReportTemplate.objects.get(pk=str(graph.template_id))
 
         if not template.preload_resource_data:
             return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version, user=request.user, perm=perm)})

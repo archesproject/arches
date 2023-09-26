@@ -119,7 +119,7 @@ class PermissionTests(ArchesTestCase):
         """
 
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
-        nodes = Node.objects.filter(graph_id=resource.graph_id)
+        nodes = Node.objects.filter(graph_id=str(resource.graph_id))
         for node in nodes:
             if node.nodegroup:
                 assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
