@@ -1511,6 +1511,13 @@ class FileListDataType(BaseDataType):
 
             images_only = config.get("imagesOnly", False)
             if images_only and request:
+                for metadata in value:
+                    if not metadata.get("altText", ""):
+                        errors.append({
+                            "type": "ERROR",
+                            "title": _("Missing alt text"),
+                            "message": _("The image '{0}' is missing an alternative text.").format(metadata["name"]),
+                        })
                 files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
                 for file in files:
                     width, height = get_image_dimensions(file.file)
