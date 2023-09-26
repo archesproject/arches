@@ -341,7 +341,7 @@ class BulkStringEditor(BaseBulkEditor):
         }
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            node_id, resourceids, language_code, operation, old_text, case_insensitive
+            node_id, search_url, language_code, operation, old_text, case_insensitive
         )
 
         load_details = {
