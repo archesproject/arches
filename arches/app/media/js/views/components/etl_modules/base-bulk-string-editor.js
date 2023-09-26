@@ -94,9 +94,26 @@ define([
             return ready;
         });
 
+        this.clearResults = ko.computed(() => {
+            // if any of these values change then clear the preview results
+            self.showPreview(false);
+            // we don't actually care about the results of the following
+            let clearResults = '';
+            [self.selectedGraph(),
+                self.selectedCaseOperation(),
+                self.selectedNode(),
+                self.searchUrl(),
+                self.selectedLanguage(),
+                ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'))
+            ].forEach(function(item){
+                clearResults += item?.toString();
+            });
+            return clearResults;
+        });
+
         this.allowEditOperation = ko.computed(() => {
-            return self.ready() && self.numberOfTiles() > 0;
-        })
+            return self.ready() && self.numberOfTiles() > 0 && self.showPreview();
+        });
 
         this.addAllFormData = () => {
             if (self.operation() == 'case'){
