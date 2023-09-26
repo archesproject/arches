@@ -204,7 +204,8 @@ class ImportSingleCsv(BaseImportModule):
     def start(self, request):
         graphid = request.POST.get("graphid")
         csv_mapping = request.POST.get("fieldMapping")
-        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
+        csv_file_name = request.POST.get("csvFileName")
+        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid, "file_name": csv_file_name}
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",

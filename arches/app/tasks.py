@@ -234,13 +234,12 @@ def load_tile_excel(userid, files, summary, result, temp_dir, loadid):
 
 
 @shared_task
-def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, resource_ids):
-
+def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, resource_ids, export_concepts_as=None, filename=None):
     logger = logging.getLogger(__name__)
 
     status = _("Failed")
     try:
-        import_module.run_export_task(load_id, graph_id, graph_name, resource_ids)
+        import_module.run_export_task(load_id, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as, filename=filename)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -250,24 +249,24 @@ def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, res
         load_event.status = "failed"
         load_event.save()
     finally:
-        msg = _("Branch Excel Export: {}").format(status)
+        msg = _("Excel Export: {}").format(status)
         user = User.objects.get(id=user_id)
         notify_completion(msg, user)
 
 @shared_task
-def export_branch_excel(userid, load_id, graph_id, graph_name, resource_ids):
+def export_branch_excel(userid, load_id, graph_id, graph_name, resource_ids, filename=None):
     from arches.app.etl_modules import branch_excel_exporter
 
     BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None, loadid=load_id)
-    export_excel_data(BranchExcelExporter, userid, load_id, graph_id, graph_name, resource_ids)
+    export_excel_data(BranchExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, filename)
 
 
 @shared_task
-def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids):
+def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as, filename=None):
     from arches.app.etl_modules import tile_excel_exporter
 
     TileExcelExporter = tile_excel_exporter.TileExcelExporter(request=None, loadid=load_id)
-    export_excel_data(TileExcelExporter, userid, load_id, graph_id, graph_name, resource_ids)
+    export_excel_data(TileExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as, filename)
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
@@ -294,14 +293,14 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
 
 
 @shared_task
-def edit_bulk_string_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+def edit_bulk_string_data(load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
     from arches.app.etl_modules import base_data_editor
 
     logger = logging.getLogger(__name__)
 
     try:
         BulkStringEditor = base_data_editor.BulkStringEditor(loadid=load_id)
-        BulkStringEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+        BulkStringEditor.run_load_task(load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
