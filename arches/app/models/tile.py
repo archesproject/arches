@@ -334,7 +334,8 @@ class Tile(models.TileModel):
         tile_errors = []
         for nodeid, value in self.data.items():
             try:
-                node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+                node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))            
+                node.pk = uuid.UUID(node.nodeid)
             except TypeError: # will catch if serialized_graph is None
                 node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
