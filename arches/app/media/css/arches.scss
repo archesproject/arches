@@ -2302,7 +2302,7 @@ div.final-cons-step-separator>h4 {
 }
 
 .workbench-card-sidepanel .new-provisional-edit-card-container {
-    padding-bottom: 20px;
+    padding-bottom: 40px;
 }
 
 .workbench-card-sidepanel-header-container {
@@ -12836,7 +12836,7 @@ ul.select2-choices:after {
 }
 
 .map-coordinate-editor-crs-selector {
-    position: absolute;
+    position: fixed;
     margin-top: 25px;
     background: #fff;
     padding-bottom: 8px;
@@ -12902,7 +12902,7 @@ ul.select2-choices:after {
 }
 
 .map-coordinate-editor-header {
-    position: absolute;
+    position: fixed;
     background: #fff;
     padding: 6px 0;
     font-size: 1.2em;
