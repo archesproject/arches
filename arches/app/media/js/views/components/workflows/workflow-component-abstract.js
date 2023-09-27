@@ -659,7 +659,7 @@ define([
 
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
-            self.setToLocalStorage('value', savedData);
+            // self.setToLocalStorage('value', savedData);
             self.setToWorkflowHistory('value', savedData);
         });
 
@@ -762,20 +762,20 @@ define([
             }
         };
 
-        this.setToLocalStorage = function(key, value) {
-            var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
+        // this.setToLocalStorage = function(key, value) {
+        //     var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
 
-            if (!allComponentsLocalStorageData[self.id()]) {
-                allComponentsLocalStorageData[self.id()] = {};
-            }
+        //     if (!allComponentsLocalStorageData[self.id()]) {
+        //         allComponentsLocalStorageData[self.id()] = {};
+        //     }
 
-            allComponentsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
+        //     allComponentsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
 
-            localStorage.setItem(
-                WORKFLOW_COMPONENT_ABSTRACTS_LABEL, 
-                JSON.stringify(allComponentsLocalStorageData)
-            );
-        };
+        //     localStorage.setItem(
+        //         WORKFLOW_COMPONENT_ABSTRACTS_LABEL, 
+        //         JSON.stringify(allComponentsLocalStorageData)
+        //     );
+        // };
 
         this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflowId;
