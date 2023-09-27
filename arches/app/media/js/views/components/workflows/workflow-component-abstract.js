@@ -660,7 +660,7 @@ define([
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
             self.setToLocalStorage('value', savedData);
-            self.setToWorklowHistory('value', savedData);
+            self.setToWorkflowHistory('value', savedData);
         });
 
         this.multiTileUpdated = ko.observable();
@@ -777,7 +777,7 @@ define([
             );
         };
 
-        this.setToWorklowHistory = async function(key, value) {
+        this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflowId;
             const workflowHistory = await self.getWorkflowHistoryData();
             

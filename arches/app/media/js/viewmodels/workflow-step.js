@@ -9,7 +9,6 @@ define([
     'templates/views/components/plugins/workflow-step.htm'
 ], function(ko, _, koMapping, arches, uuid, Cookies, WorkflowComponentAbstract, workflowStepTemplate) {
     const STEPS_LABEL = 'workflow-steps';
-    const STEP_ID_LABEL = 'workflow-step-id';
 
     var WorkflowStep = function(config) {
          
@@ -41,7 +40,7 @@ define([
         this.componentIdLookup = ko.observable();
         this.componentIdLookup.subscribe(function(componentIdLookup) {
             // self.setToLocalStorage('componentIdLookup', componentIdLookup);
-            self.setToWorklowHistory('componentIdLookup', componentIdLookup);
+            self.setToWorkflowHistory('componentIdLookup', componentIdLookup);
         });
 
 
@@ -84,7 +83,7 @@ define([
         this.locked = ko.observable(false);
         this.locked.subscribe(function(value){
             self.setToLocalStorage("locked", value);
-            self.setToWorklowHistory("locked", value);
+            self.setToWorkflowHistory("locked", value);
         });
 
         this.initialize = function() {
@@ -108,7 +107,6 @@ define([
             if (cachedComponentIdLookup) {
                 self.componentIdLookup(cachedComponentIdLookup);
             }
-
 
             /* step lock logic */ 
             var locked = self.getFromLocalStorage('locked');
@@ -148,7 +146,7 @@ define([
             //     workflowComponentAbstractId = self.getFromLocalStorage('componentIdLookup')[workflowComponentAbtractData.uniqueInstanceName];
             // }
 
-            const workflowHistoryData= await self.getWorkflowHistoryData('componentIdLookup')
+            const workflowHistoryData = await self.getWorkflowHistoryData('componentIdLookup')
             if (workflowHistoryData['componentIdLookup']) {
                 workflowComponentAbstractId = workflowHistoryData['componentIdLookup'][workflowComponentAbtractData.uniqueInstanceName];
             }
@@ -230,7 +228,7 @@ define([
             );
         };
 
-        this.setToWorklowHistory = async function(key, value) {
+        this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflow.id();
             const workflowHistory = await self.getWorkflowHistoryData();
             

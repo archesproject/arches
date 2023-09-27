@@ -81,7 +81,7 @@ define([
                 // }
 
                 if (self.getItemFromWorkflowHistoryData(WORKFLOW_ID_LABEL) !== self.id()) {
-                    self.setToWorklowHistory(WORKFLOW_ID_LABEL, self.id());
+                    self.setToWorkflowHistory(WORKFLOW_ID_LABEL, self.id());
                     /* remove step data created by previous workflow from localstorage */
                     localStorage.removeItem(STEPS_LABEL);  
                     localStorage.removeItem(STEP_IDS_LABEL);
@@ -359,7 +359,7 @@ define([
             }, {});
 
             // self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
-            self.setToWorklowHistory(STEP_IDS_LABEL, updatedStepNameToIdLookup);
+            self.setToWorkflowHistory(STEP_IDS_LABEL, updatedStepNameToIdLookup);
         };
 
         this.getWorkflowIdFromUrl = function() {
@@ -400,7 +400,7 @@ define([
         // };
 
 
-        this.setToWorklowHistory = async function(key, value) {
+        this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.id();
             const workflowHistory = await self.getWorkflowHistoryData();
             if (workflowHistory['workflowdata']) {
