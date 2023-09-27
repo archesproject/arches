@@ -86,7 +86,7 @@ define([
             self.setToWorkflowHistory("locked", value);
         });
 
-        this.initialize = function() {
+        this.initialize = async function() {
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
@@ -118,16 +118,15 @@ define([
             this.setupInformationBox();
 
             /* build page layout */ 
-            ko.toJS(self.layoutSections).forEach(function(layoutSection) {
+            for (const layoutSection of ko.toJS(self.layoutSections)) {
                 var uniqueInstanceNames = [];
-    
-                layoutSection.componentConfigs.forEach(function(componentConfigData) {
+
+                for (const componentConfigData of layoutSection.componentConfigs) {
                     uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
-                    self.updateWorkflowComponentAbstractLookup(componentConfigData);
-                });
-    
+                    await self.updateWorkflowComponentAbstractLookup(componentConfigData);
+                }
                 self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
-            });
+            }
 
             /* assigns componentIdLookup to self, which updates localStorage */ 
             var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
