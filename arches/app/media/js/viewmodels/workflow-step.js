@@ -128,7 +128,7 @@ define([
                 self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
             }
 
-            /* assigns componentIdLookup to self, which updates localStorage */ 
+            /* assigns componentIdLookup to self, which updates workflow history */
             var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
                 acc[key] = self.workflowComponentAbstractLookup()[key].id();
                 return acc;
@@ -271,7 +271,7 @@ define([
 
         this.getItemFromWorkflowHistoryData = async function(key) {
             const workflowData = await self.getWorkflowHistoryData();
-            return workflowData[key];
+            return workflowData['workflowdata'][key];
         };
 
         this.getWorkflowHistoryData = async function(key) {

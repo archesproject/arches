@@ -780,7 +780,7 @@ define([
         this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflowId;
             const workflowHistory = await self.getWorkflowHistoryData();
-            
+
             if (workflowHistory['workflowdata']) {
                 var workflowData = workflowHistory['workflowdata'];
             }
@@ -818,13 +818,10 @@ define([
                 return JSON.parse(allComponentsLocalStorageData[self.id()][key]);
             }
         };
-        
+
         this.getItemFromWorkflowHistoryData = async function(key) {
-            const workflowHistory = await this.getWorkflowHistoryData();
-            const workflowData = await workflowHistory
-            if (workflowData[key] && workflowData[key] !== "undefined") {
-                return workflowData['workflowdata'][key];
-            }
+            const workflowData = await this.getWorkflowHistoryData();
+            return workflowData['workflowdata'][key];
         };
 
         this.getWorkflowHistoryData = async function(key) {

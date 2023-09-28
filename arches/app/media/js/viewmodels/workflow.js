@@ -447,7 +447,7 @@ define([
 
         this.getItemFromWorkflowHistoryData = async function(key) {
             const workflowData = await self.getWorkflowHistoryData();
-            return workflowData[key];
+            return workflowData['workflowdata'][key];
         };
 
         this.getWorkflowHistoryData = async function(key) {
