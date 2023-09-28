@@ -1,0 +1,174 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+<div class="etl-module-component-container">
+<div class="etl-module-body">
+    <h2>
+        <span data-bind="text: $root.translations.bulkDataDeletion"></span>
+    </h2>
+    <p class="pad-btm">
+        {% blocktrans %}Delete The Selected Resources or Tiles{% endblocktrans %}
+    </p>
+
+    <section class="etl-module-component">
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+            </h3>
+            <textarea id="search-url-input"
+                style="min-height: 100px; width: 80%;"
+                class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
+            ></textarea>
+        </div>
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
+            </h3>
+            <select id="resource-model-select" data-bind="
+                value: selectedGraph,
+                options: graphs,
+                optionsText: 'name',
+                optionsValue: 'graphid',
+                optionsCaption: $root.translations.select + '...',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
+        
+        <!-- ko if: nodegroups() -->
+        <div class="etl-module-component-block">
+            <h3>
+                <label for="node-select" data-bind="text: $root.translations.selectANodegroup"></label>
+            </h3>
+            <select id="nodegroup-select" data-bind="
+                value: selectedNodegroup,
+                options: nodegroups,
+                optionsText: 'name',
+                optionsCaption: $root.translations.select + '...',
+                optionsValue: 'nodegroupid',
+                valueAllowUnset: true,
+                chosen: {width: '500px'}"
+            ></select>
+        </div>
+        <!-- /ko -->
+    </section>
+</div>
+<div class="tabbed-workflow-footer, etl-module-footer">
+    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !ready()}" class="btn btn-success">
+        <span data-bind="text: $root.translations.start"></span>
+    </button>
+</div>
+</div>
+<!-- /ko -->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div>
+    <h4>
+        <span data-bind="text: $root.translations.bulkDataEditDetails"></span>
+    </h4>
+    <!-- ko if: load_details -->
+    <!-- ko ifnot: loading() -->
+    <table class="table table-striped" style="border:1px solid #ddd;">
+        <tbody>
+            <tr>
+                <td style="min-width: 200px;"><span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEditied"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameEdited"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: load_details.node"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.searchUrl"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: load_details.search_url"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation"></span></td>
+                <td>
+                    <span class="etl-loading-metadata-value" data-bind="text: operationLabel[load_details.operation]"></span>
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.details"></span></td>
+                <td>
+                    <!-- ko if: ['replace', 'replace_i'].includes(load_details.operation) -->
+                    <span class="etl-loading-metadata-value" data-bind="text: load_details.details.old_text"></span>
+                    <i class="fa fa-long-arrow-right"></i>
+                    <span class="etl-loading-metadata-value" data-bind="text: load_details.details.new_text"></span>
+                    <!-- /ko -->
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
+                <td>
+                    <!-- ko foreach: load_details.number_of_import -->
+                    <span class="etl-loading-metadata-value" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
+                    <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+                    <!-- ko foreach: $data.tiles -->
+                    <div style="padding-left: 20px;">
+                        <span class="etl-loading-metadata-value" data-bind="text: $data.tile + ':'"></span>
+                        <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfEditedResources"></span></td>
+                <td>
+                    <div class="etl-loading-metadata-value">
+                        <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.clickHere, attr: { href: editHistoryUrl }"></a>
+                    </div>
+                </td>      
+            </tr>
+        </tbody>
+    </table>
+    <!-- /ko -->
+    <!-- /ko -->
+</div>
+{% endblock etl_status %}
+
+{% block loading_status %}
+<div>
+    <h4>
+        <span data-bind="text: $root.translations.updatingProgress"></span>
+    </h4>
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingStatus + ':'"></span>
+        <span class="etl-updatingloading-metadata-value" data-bind="
+            text:
+                selectedLoadEvent().status == 'indexed' ? $root.translations.completed
+                : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
+                : selectedLoadEvent().status == 'validated' ? $root.translations.running
+                : selectedLoadEvent().status == 'running' ? $root.translations.validating
+                : selectedLoadEvent().status == 'reversing' ? $root.translations.unloading
+                : selectedLoadEvent().status == 'unloaded' ? $root.translations.unloaded
+                : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
+                : $root.translations.failed
+        "></span>  
+    </div>
+    <div style="padding-top: 10px;">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingStarted + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().load_end_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingEnded + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().load_end_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingDuration + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
+    </div>
+    <div style="padding-top: 10px;" data-bind="if: selectedLoadEvent().indexed_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingEnded + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().indexed_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingDuration + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
+    </div>
+</div>
+{% endblock loading_status %}
