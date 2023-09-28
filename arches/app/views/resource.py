@@ -201,6 +201,7 @@ class ResourceEditorView(MapBaseManagerView):
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
 
+
         ontologyclass = None
         nodegroups = []
         editable_nodegroups = []
@@ -342,6 +343,9 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
+    
+        if resourceid not in (None, ""):
+            context["nav"]["report_view"] = True
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
             context["nav"]["help"] = {"title": _("Managing System Settings"), "templates": ["system-settings-help"]}
