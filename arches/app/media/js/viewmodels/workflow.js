@@ -69,14 +69,6 @@ define([
                 /* END workflow id logic */ 
 
                 /* BEGIN workflow step creation logic */ 
-                // if (self.getFromLocalStorage(WORKFLOW_ID_LABEL) !== self.id()) {
-                //     self.setToLocalStorage(WORKFLOW_ID_LABEL, self.id());
-                //     /* remove step data created by previous workflow from localstorage */
-                //     localStorage.removeItem(STEPS_LABEL);  
-                //     localStorage.removeItem(STEP_IDS_LABEL);
-                //     localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
-                // }
-
                 self.updateStepPath();
                 
                 var cachedStepId = self.getStepIdFromUrl();

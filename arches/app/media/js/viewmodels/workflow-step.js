@@ -39,7 +39,6 @@ define([
 
         this.componentIdLookup = ko.observable();
         this.componentIdLookup.subscribe(function(componentIdLookup) {
-            // self.setToLocalStorage('componentIdLookup', componentIdLookup);
             self.setToWorkflowHistory('componentIdLookup', componentIdLookup);
         });
 
@@ -83,7 +82,6 @@ define([
         this.locked = ko.observable(false);
         this.locked.subscribe(function(value){
             self.setToLocalStorage("locked", value);
-            self.setToWorkflowHistory("locked", value);
         });
 
         this.initialize = async function() {
@@ -102,7 +100,6 @@ define([
             }
 
             /* cached workflowComponentAbstract logic */ 
-            // var cachedComponentIdLookup = self.getFromLocalStorage('componentIdLookup');
             // Can't use self.getItemFromWorkflowHistoryData() because it assumes workflow data exists.
             const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
             if (workflowData && workflowData[self.name]) {
@@ -142,10 +139,6 @@ define([
         this.updateWorkflowComponentAbstractLookup = async function(workflowComponentAbtractData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
             var workflowComponentAbstractId;
-
-            // if (self.getFromLocalStorage('componentIdLookup')) {
-            //     workflowComponentAbstractId = self.getFromLocalStorage('componentIdLookup')[workflowComponentAbtractData.uniqueInstanceName];
-            // }
 
             const workflowHistoryData = await self.getWorkflowHistoryData('componentIdLookup')
             if (workflowHistoryData['componentIdLookup']) {

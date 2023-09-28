@@ -12,8 +12,6 @@ define([
     'js-cookie',
     'templates/views/components/workflows/workflow-component-abstract.htm',
 ], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, Cookies, workflowComponentAbstractTemplate) {
-    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
-
     function NonTileBasedComponent() {
         var self = this;
          
@@ -659,7 +657,6 @@ define([
 
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
-            // self.setToLocalStorage('value', savedData);
             self.setToWorkflowHistory('value', savedData);
         });
 
@@ -691,11 +688,6 @@ define([
             else {
                 self.id(uuid.generate());
             }
-
-            // if (self.getFromLocalStorage('value')) {
-            //     self.savedData( self.getFromLocalStorage('value') );
-            //     self.complete(true);
-            // }
 
             const value = await self.getItemFromWorkflowHistoryData('value');
             if (value) {
@@ -736,7 +728,6 @@ define([
             }
 
             if (self.componentData.componentType === 'card') {
-                // let previouslySavedValue = self.getFromLocalStorage('value');
                 let previouslySavedValue = await self.getItemFromWorkflowHistoryData('value');
                 let previouslySavedResourceInstanceId;
 
@@ -785,14 +776,6 @@ define([
                 body: JSON.stringify(workflowHistory),
             });
 
-        };
-
-        this.getFromLocalStorage = function(key) {
-            var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
-
-            if (allComponentsLocalStorageData[self.id()] && typeof allComponentsLocalStorageData[self.id()][key] !== "undefined") {
-                return JSON.parse(allComponentsLocalStorageData[self.id()][key]);
-            }
         };
 
         this.getItemFromWorkflowHistoryData = async function(key) {
