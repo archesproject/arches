@@ -3,11 +3,15 @@ define(['utils/load-component-dependencies'], function(loadComponentDependencies
         return string.replace(/,\s*}*$/, "}");
     }
 
-    const fileRendererDataHTML = document.querySelector('#fileRendererData');
-    const fileRendererData = fileRendererDataHTML.getAttribute('fileRenderers');
-    const fileRenderers = JSON.parse(removeTrailingCommaFromObject(fileRendererData));
-
-    loadComponentDependencies(Object.values(fileRenderers).map(value => value['component']));
-
-    return fileRenderers;
+    try {        
+        const fileRendererDataHTML = document.querySelector('#fileRendererData');
+        const fileRendererData = fileRendererDataHTML.getAttribute('fileRenderers');
+        const fileRenderers = JSON.parse(removeTrailingCommaFromObject(fileRendererData));
+    
+        loadComponentDependencies(Object.values(fileRenderers).map(value => value['component']));
+    
+        return fileRenderers;
+    } catch (error) {
+        console.error(error);
+    }
 });

@@ -198,16 +198,10 @@ def on_chord_error(request, exc, traceback):
     user = User.objects.get(id=1)
     notify_completion(msg, user)
 
-
-@shared_task
-def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
-    from arches.app.etl_modules import branch_csv_importer
-
+def load_excel_data(import_module, importer_name, userid, files, summary, result, temp_dir, loadid):
     logger = logging.getLogger(__name__)
-
     try:
-        BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
-        BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+        import_module.run_load_task(files, summary, result, temp_dir, loadid)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -218,10 +212,61 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
         load_event.save()
         status = _("Failed")
     finally:
-        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+        msg = _("{}: {} [{}]").format(importer_name, summary["name"], status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
+
+@shared_task
+def load_branch_excel(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_excel_importer
+
+    BranchExcelImporter = branch_excel_importer.BranchExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    load_excel_data(BranchExcelImporter, "Branch Excel Import", userid, files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def load_tile_excel(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import tile_excel_importer
+
+    TileExcelImporter = tile_excel_importer.TileExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    load_excel_data(TileExcelImporter, "Tile Excel Import", userid, files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, resource_ids, export_concepts_as=None, filename=None):
+    logger = logging.getLogger(__name__)
+
+    status = _("Failed")
+    try:
+        import_module.run_export_task(load_id, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as, filename=filename)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+    finally:
+        msg = _("Excel Export: {}").format(status)
+        user = User.objects.get(id=user_id)
+        notify_completion(msg, user)
+
+@shared_task
+def export_branch_excel(userid, load_id, graph_id, graph_name, resource_ids, filename=None):
+    from arches.app.etl_modules import branch_excel_exporter
+
+    BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None, loadid=load_id)
+    export_excel_data(BranchExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, filename)
+
+
+@shared_task
+def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as, filename=None):
+    from arches.app.etl_modules import tile_excel_exporter
+
+    TileExcelExporter = tile_excel_exporter.TileExcelExporter(request=None, loadid=load_id)
+    export_excel_data(TileExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as, filename)
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
