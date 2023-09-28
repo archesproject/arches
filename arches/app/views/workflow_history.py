@@ -55,7 +55,7 @@ class WorkflowHistoryView(View):
                     F("workflowdata"),
                     "||",
                     Value(data["workflowdata"], output_field=JSONField()),
-                )
+                )  # TODO: look at the way the front end manipulates this data and see if it would be clearer as 3 separate columns
                 history.save()
 
         return JSONResponse({'success': True}, status=200)

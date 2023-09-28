@@ -689,9 +689,9 @@ define([
                 self.id(uuid.generate());
             }
 
-            const value = await self.getItemFromWorkflowHistoryData('value');
-            if (value) {
-                self.savedData(value);
+            const savedValue = await self.getSavedValue();
+            if (savedValue) {
+                self.savedData(savedValue);
                 self.complete(true);
             }
         };
@@ -728,7 +728,7 @@ define([
             }
 
             if (self.componentData.componentType === 'card') {
-                let previouslySavedValue = await self.getItemFromWorkflowHistoryData('value');
+                let previouslySavedValue = await self.getSavedValue();
                 let previouslySavedResourceInstanceId;
 
                 if (previouslySavedValue) {
@@ -778,12 +778,14 @@ define([
 
         };
 
-        this.getItemFromWorkflowHistoryData = async function(key) {
+        this.getSavedValue = async function() {
             const workflowData = await this.getWorkflowHistoryData();
-            return workflowData['workflowdata'][key];
+            if (workflowData?.workflowdata[self.id()]) {
+                return workflowData.workflowdata[self.id()]['value'];
+            }
         };
 
-        this.getWorkflowHistoryData = async function(key) {
+        this.getWorkflowHistoryData = async function() {
             const workflowid = self.workflowId;
             const response = await fetch(arches.urls.workflow_history + workflowid, {
                 method: 'GET',

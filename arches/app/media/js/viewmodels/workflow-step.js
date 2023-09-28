@@ -140,9 +140,12 @@ define([
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
             var workflowComponentAbstractId;
 
-            const workflowHistoryData = await self.getWorkflowHistoryData('componentIdLookup')
-            if (workflowHistoryData['componentIdLookup']) {
-                workflowComponentAbstractId = workflowHistoryData['componentIdLookup'][workflowComponentAbtractData.uniqueInstanceName];
+            const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
+            if (workflowData && workflowData[self.name]) {
+                const componentIdLookup = workflowData[self.name]['componentIdLookup'];
+                if (componentIdLookup) {
+                    workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
+                }
             }
 
             var workflowComponentAbstract = new WorkflowComponentAbstract({
