@@ -3,6 +3,7 @@ import json
 from django.db import transaction
 from django.db.models import F, JSONField, Value
 from django.db.models.expressions import CombinedExpression
+from django.db.utils import IntegrityError
 from django.utils.translation import gettext as _
 from django.views.generic import View
 
@@ -17,7 +18,7 @@ class WorkflowHistoryView(View):
         if not user_is_resource_reviewer(request.user):
             return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
         try:
-            workflow_history = models.WorkflowHistory.objects.get(workflowid=workflowid)
+            workflow_history = models.WorkflowHistory.objects.get(workflowid=workflowid, user=request.user)
         except models.WorkflowHistory.DoesNotExist:
             workflow_history = {}
         return JSONResponse(workflow_history, status=200)
@@ -32,14 +33,19 @@ class WorkflowHistoryView(View):
         # call using different `defaults` vs. `create_defaults`
         with transaction.atomic():
             workflowid = data["workflowid"]
-            history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
-                workflowid = workflowid,
-                defaults = {
-                    "workflowdata": data["workflowdata"],
-                    "user": request.user,
-                    "completed": data["completed"],
-                },
-            )
+            try:
+                history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
+                    workflowid = workflowid,
+                    user = request.user,
+                    defaults = {
+                        "workflowdata": data["workflowdata"],
+                        "user": request.user,
+                        "completed": data["completed"],
+                    },
+                )
+            except IntegrityError:
+                # Wrong user for given workflowid.
+                return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
             if not created:
                 # Don't allow patching the user or the workflow id.
                 history.completed = data["completed"]
