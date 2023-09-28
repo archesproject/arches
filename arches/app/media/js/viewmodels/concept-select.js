@@ -174,15 +174,7 @@ define([
                         if(!self.select2Config.initComplete){
                             valueData.forEach(function(data) {
                                 var option = new Option(data.text, data.id, true, true);
-                                $(el).append(option);//.trigger('change');
-            
-                                // manually trigger the `select2:select` event
-                                // $(el).trigger({
-                                //     type: 'select2:select',
-                                //     params: {
-                                //         data: data
-                                //     }
-                                // });
+                                $(el).append(option);
                             });
                             self.select2Config.initComplete = true;
                         }
@@ -192,7 +184,6 @@ define([
                             text: NAME_LOOKUP[data],
                         };
                     }
-
 
                     callback(valueData);
                 };
