@@ -11,12 +11,8 @@ define([
     'bindings/gallery',
     'bindings/scrollTo'
 ], function($, _, ko, koMapping, arches, uuid, Cookies, AlertViewModel, WorkflowStep) {
-    const WORKFLOW_LABEL = 'workflow';
     const WORKFLOW_ID_LABEL = 'workflow-id';
-    const STEPS_LABEL = 'workflow-steps';
     const STEP_ID_LABEL = 'workflow-step-id';
-    const STEP_IDS_LABEL = 'workflow-step-ids';
-    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
 
     var Workflow = function(config) {
         var self = this;
@@ -55,9 +51,10 @@ define([
         this.steps.subscribe(() => {
             this.furthestValidStepIndex.valueHasMutated();
         });
-        
+        this.stepNameToIdLookup = {};
+
         this.initialize = function() {
-            self.getWorkflowMetaData(self.componentName).then(function(workflowJson) {
+            self.getWorkflowMetaData(self.componentName).then(async function(workflowJson) {
                 self.workflowName(workflowJson.name);
 
                 /* BEGIN workflow id logic */ 
@@ -79,14 +76,6 @@ define([
                 //     localStorage.removeItem(STEP_IDS_LABEL);
                 //     localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
                 // }
-
-                if (self.getItemFromWorkflowHistoryData(WORKFLOW_ID_LABEL) !== self.id()) {
-                    self.setToWorkflowHistory(WORKFLOW_ID_LABEL, self.id());
-                    /* remove step data created by previous workflow from localstorage */
-                    localStorage.removeItem(STEPS_LABEL);  
-                    localStorage.removeItem(STEP_IDS_LABEL);
-                    localStorage.removeItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL);
-                }
 
                 self.updateStepPath();
                 
@@ -146,15 +135,11 @@ define([
         };
 
         this.createStep = function(stepData) {
-            var stepNameToIdLookup = self.getFromLocalStorage(STEP_IDS_LABEL);
-
             var stepName = ko.unwrap(stepData.name);
-            
-            /* if stepIds exist for this workflow in localStorage, set correct value */ 
-            if (stepNameToIdLookup && stepNameToIdLookup[stepName]) {
+            if (self.stepNameToIdLookup[stepName]) {
                 stepData.id = stepNameToIdLookup[stepName];
             }
-            
+
             stepData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
             stepData.informationBoxDisplayed.subscribe(function(val){
                 self.setMetadataToLocalStorage(stepName, 'informationBoxDisplayed', val);
@@ -351,15 +336,11 @@ define([
                 return step;
             });
 
+            for (const step of updatedSteps) {
+                self.stepNameToIdLookup[step.name] = step.id;
+            }
+
             self.steps(updatedSteps);
-
-            var updatedStepNameToIdLookup = self.steps().reduce(function(acc, step) { 
-                acc[ko.unwrap(step.name)] = step.id(); 
-                return acc;
-            }, {});
-
-            // self.setToLocalStorage(STEP_IDS_LABEL, updatedStepNameToIdLookup);
-            self.setToWorkflowHistory(STEP_IDS_LABEL, updatedStepNameToIdLookup);
         };
 
         this.getWorkflowIdFromUrl = function() {
@@ -388,33 +369,14 @@ define([
             history.pushState(null, '', newRelativePathQuery);
         };
 
-        // this.setToLocalStorage = function(key, value) {
-        //     var workflowLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_LABEL)) || {};
-            
-        //     workflowLocalStorageData[key] = value;
-
-        //     localStorage.setItem(
-        //         WORKFLOW_LABEL, 
-        //         JSON.stringify(workflowLocalStorageData)
-        //     );
-        // };
-
-
         this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.id();
-            const workflowHistory = await self.getWorkflowHistoryData();
-            if (workflowHistory['workflowdata']) {
-                var workflowData = workflowHistory['workflowdata'];
-            }
-            else {
-                var workflowData = {};
-            }
-            
-            workflowData[key] = value;
-            workflowHistory['workflowid'] = workflowid;
-            workflowHistory['completed'] = false;
-            workflowHistory['workflowdata'] = workflowData;
-
+            const workflowHistory = {
+                workflowid,
+                completed: false,
+                // Django view will patch in this key, keeping existing keys
+                workflowdata: {[key]: value},
+            };
 
             fetch(arches.urls.workflow_history + workflowid, {
                 method: 'POST',
@@ -425,24 +387,6 @@ define([
                 body: JSON.stringify(workflowHistory),
             });
 
-        };
-
-        this.getFromLocalStorage = async function(key) {
-            // console.log(key);
-            // var localStorageData = JSON.parse(localStorage.getItem(WORKFLOW_LABEL));
-
-            // if (localStorageData) {
-                // return localStorageData[key];
-            // }
-            const workflowid = self.id();
-            const response = await fetch(arches.urls.workflow_history + workflowid, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": Cookies.get('csrftoken')
-                },
-            });
-            const data = await response.json();    
         };
 
         this.getItemFromWorkflowHistoryData = async function(key) {

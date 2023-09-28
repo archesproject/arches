@@ -103,8 +103,10 @@ define([
 
             /* cached workflowComponentAbstract logic */ 
             // var cachedComponentIdLookup = self.getFromLocalStorage('componentIdLookup');
-            var cachedComponentIdLookup = self.getItemFromWorkflowHistoryData('componentIdLookup');
-            if (cachedComponentIdLookup) {
+            // Can't use self.getItemFromWorkflowHistoryData() because it assumes workflow data exists.
+            const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
+            if (workflowData && workflowData[self.name]) {
+                const cachedComponentIdLookup = workflowData[self.name]['componentIdLookup'];
                 self.componentIdLookup(cachedComponentIdLookup);
             }
 
@@ -229,26 +231,16 @@ define([
 
         this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflow.id();
-            const workflowHistory = await self.getWorkflowHistoryData();
-            
-            if (workflowHistory['workflowdata']) {
-                var workflowData = workflowHistory['workflowdata'];
-            }
-            else {
-                var workflowData = {};
-            }
-
-            if (!workflowData[ko.unwrap(self.name)]) {
-                workflowData[ko.unwrap(self.name)] = {};
+            const workflowHistory = {
+                workflowid,
+                completed: false,
+                // Django view will patch in this key, keeping existing keys
+                workflowdata: {
+                    [ko.unwrap(self.name)]: {
+                        [key]: value,
+                    },
+                },
             };
-
-            workflowData[ko.unwrap(self.name)][key] = value;
-
-            // console.log(workflowData);
-            workflowHistory['workflowid'] = workflowid;
-            workflowHistory['completed'] = false;
-            workflowHistory['workflowdata'] = workflowData;
-
 
             fetch(arches.urls.workflow_history + workflowid, {
                 method: 'POST',
@@ -261,6 +253,7 @@ define([
 
         };
 
+        // For step locking
         this.getFromLocalStorage = function(key) {
             var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
 
@@ -274,7 +267,7 @@ define([
             return workflowData['workflowdata'][key];
         };
 
-        this.getWorkflowHistoryData = async function(key) {
+        this.getWorkflowHistoryData = async function() {
             const workflowid = self.workflow.id();
             const response = await fetch(arches.urls.workflow_history + workflowid, {
                 method: 'GET',

@@ -697,8 +697,9 @@ define([
             //     self.complete(true);
             // }
 
-            if (self.getItemFromWorkflowHistoryData('value')) {
-                self.savedData( await self.getItemFromWorkflowHistoryData('value') );
+            const value = await self.getItemFromWorkflowHistoryData('value');
+            if (value) {
+                self.savedData(value);
                 self.complete(true);
             }
         };
@@ -762,43 +763,18 @@ define([
             }
         };
 
-        // this.setToLocalStorage = function(key, value) {
-        //     var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
-
-        //     if (!allComponentsLocalStorageData[self.id()]) {
-        //         allComponentsLocalStorageData[self.id()] = {};
-        //     }
-
-        //     allComponentsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
-
-        //     localStorage.setItem(
-        //         WORKFLOW_COMPONENT_ABSTRACTS_LABEL, 
-        //         JSON.stringify(allComponentsLocalStorageData)
-        //     );
-        // };
-
         this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflowId;
-            const workflowHistory = await self.getWorkflowHistoryData();
-
-            if (workflowHistory['workflowdata']) {
-                var workflowData = workflowHistory['workflowdata'];
-            }
-            else {
-                var workflowData = {};
-            }
-
-            if (!workflowData[ko.unwrap(self.id())]) {
-                workflowData[ko.unwrap(self.id())] = {};
+            const workflowHistory = {
+                workflowid,
+                completed: false,
+                // Django view will patch in this key, keeping existing keys
+                workflowdata: {
+                    [ko.unwrap(self.id())]: {
+                        [key]: value,
+                    },
+                },
             };
-
-            workflowData[ko.unwrap(self.id())][key] = value;
-
-            // console.log(workflowData);
-            workflowHistory['workflowid'] = workflowid;
-            workflowHistory['completed'] = false;
-            workflowHistory['workflowdata'] = workflowData;
-
 
             fetch(arches.urls.workflow_history + workflowid, {
                 method: 'POST',

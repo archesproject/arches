@@ -1,5 +1,8 @@
 import json
 
+from django.db import transaction
+from django.db.models import F, JSONField, Value
+from django.db.models.expressions import CombinedExpression
 from django.utils.translation import gettext as _
 from django.views.generic import View
 
@@ -24,13 +27,29 @@ class WorkflowHistoryView(View):
             return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
 
         data = json.loads(request.body)
-        models.WorkflowHistory.objects.update_or_create(
-            workflowid = data["workflowid"],
-            defaults = {
-                "workflowid": data["workflowid"],
-                "workflowdata": data["workflowdata"],
-                "user": request.user,
-                "completed": data["completed"]
+
+        # TODO(Django 5.0) rewrite as a simpler update_or_create()
+        # call using different `defaults` vs. `create_defaults`
+        with transaction.atomic():
+            workflowid = data["workflowid"]
+            history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
+                workflowid = workflowid,
+                defaults = {
+                    "workflowdata": data["workflowdata"],
+                    "user": request.user,
+                    "completed": data["completed"],
                 },
             )
+            if not created:
+                # Don't allow patching the user or the workflow id.
+                history.completed = data["completed"]
+                # Preserve existing keys, so that the client no longer has to
+                # GET existing data, which is slower and race-condition prone.
+                history.workflowdata = CombinedExpression(
+                    F("workflowdata"),
+                    "||",
+                    Value(data["workflowdata"], output_field=JSONField()),
+                )
+                history.save()
+
         return JSONResponse({'success': True}, status=200)
