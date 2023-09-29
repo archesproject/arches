@@ -239,23 +239,23 @@ class Terms(Dsl):
 
 
 class TopHits(Dsl):
-    """
-    https://www.elastic.co/guide/en/elasticsearch/reference/7.16/search-aggregations-metrics-top-hits-aggregation.html
-    """
+     """
+     https://www.elastic.co/guide/en/elasticsearch/reference/7.16/search-aggregations-metrics-top-hits-aggregation.html
+     """
 
-    def __init__(self, **kwargs):
-        self.name = kwargs.pop("name", "top_hits")
-        self._source = kwargs.pop("_source", [])
-        self.size = kwargs.pop("size", 1)
+     def __init__(self, **kwargs):
+         self.name = kwargs.pop("name", "top_hits")
+         self._source = kwargs.pop("_source", [])
+         self.size = kwargs.pop("size", 1)
 
-        self.dsl = {
-            "top_hits": {
-                "_source": self._source,
-                "size": self.size
-            }
-        }
+         self.dsl = {
+             "top_hits": {
+                 "_source": self._source,
+                 "size": self.size
+             }
+         }
 
-        self.agg = {self.name: self.dsl}
+         self.agg = {self.name: self.dsl}
 
 
 class GeoShape(Dsl):
