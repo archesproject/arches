@@ -53,7 +53,7 @@
             <span style="font-weight:bold;" data-bind="text: ': ' + node.nodeid"></span>
             <!-- /ko -->
             <span class="spacer"></span>
-            <i class="jstree-node-action-icon ion-ios-copy-outline" role="presentation" data-bind="click: graphTree.copyNodeId.bind(graphTree), visible: graphTree.showIds()" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Copy UUID to Clipboard" %}"></i>
+            <i id="copy_node_id" class="jstree-node-action-icon ion-ios-copy-outline" role="presentation" data-bind="click: graphTree.copyNodeId.bind(graphTree), visible: graphTree.showIds()" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Copy UUID to Clipboard" %}"></i>
             <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
             <i class="jstree-node-action-icon fa fa-plus-circle" role="presentation" data-bind="click: graphTree.addChildNode.bind(graphTree)" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Add Child Node" %}"></i>
             <i class="jstree-node-action-icon ion-merge" role="presentation" data-bind="click: graphTree.toggleBranchList.bind(graphTree)" data-toggle="tooltip" data-placement="auto" data-container="body" data-original-title="{% trans "Add Branch" %}"></i>
