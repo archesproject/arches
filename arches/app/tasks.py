@@ -86,7 +86,7 @@ def export_search_results(self, userid, request_values, format, report_link):
         "notiftype_name": "Search Export Download Ready",
         "context": dict(
             greeting=_("Hello,\nYour request to download a set of search results is now ready."),
-            link=exportid,
+            link=str(exportid),
             button_text=_("Download Now"),
             closing=_("Thank you"),
             email=email,
