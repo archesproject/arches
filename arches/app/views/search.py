@@ -197,14 +197,17 @@ def search_terms(request):
 
 
 def get_resource_model_label(result):
+    resourceid = None
     if len(result["nodegroupid"]["buckets"]) > 0:
         for nodegroup in result["nodegroupid"]["buckets"]:
             nodegroup_id = nodegroup["key"]
             node = models.Node.objects.get(nodeid=nodegroup_id)
             graph = node.graph
-        return "{0} - {1}".format(graph.name, node.name)
+            if 'top_docs' in nodegroup and len(nodegroup['top_docs']['hits']['hits']) > 0:
+                resourceid = nodegroup['top_docs']['hits']['hits'][0]['_source']['resourceinstanceid']
+        return "{0} - {1}".format(graph.name, node.name), resourceid
     else:
-        return ""
+        return "", resourceid
 
 
 def export_results(request):
