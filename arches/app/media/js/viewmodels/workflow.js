@@ -278,14 +278,14 @@ define([
 
         this.updateStepPath = async function() {
             // Fetch step data in one query, rather than per step
-            const allStepsData = await(this.getWorkflowHistoryData())?.stepdata ?? {};
+            const history = await this.getWorkflowHistoryData();
             var steps = [];
-            self.stepConfig.forEach(function(stepConfigData) {
-                stepConfigData.allStepsData = allStepsData;
+            for (const stepConfigData of self.stepConfig) {
+                stepConfigData.allStepsData = history.stepdata ?? {};
                 steps.push(
                     self.createStep(stepConfigData)
                 );
-            });
+            }
 
             var idx = 0;
             var currentStep;
