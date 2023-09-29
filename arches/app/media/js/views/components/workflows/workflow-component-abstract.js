@@ -641,6 +641,7 @@ define([
         this.savedComponentPaths = {};
         this.value = ko.observable();
 
+        this.initialized = false;
         this.complete = ko.observable(false);
         this.error = ko.observable();
         this.dirty = ko.observable(); /* user can manually set dirty state */
@@ -657,7 +658,10 @@ define([
 
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
-            self.setToWorkflowHistory('value', savedData);
+            // Don't immediately repost the value fetched on initialization
+            if (self.initialized) {
+                self.setToWorkflowHistory('value', savedData);
+            }
         });
 
         this.multiTileUpdated = ko.observable();
@@ -694,6 +698,7 @@ define([
                 self.savedData(savedValue);
                 self.complete(true);
             }
+            this.initialized = true;
         };
 
         this.loadComponent = async function() {
