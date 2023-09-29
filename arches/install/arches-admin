@@ -1,0 +1,246 @@
+#!/usr/bin/env python
+
+import arches
+import argparse
+import codecs
+import os
+import sys
+import subprocess
+
+from importlib import import_module
+from django.core.management.templates import TemplateCommand
+from django.core.management.base import CommandError
+from django.utils.crypto import get_random_string
+from arches import __version__
+from arches.setup import get_complete_version
+
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
+here = os.path.abspath(os.path.dirname(__file__))
+COMMANDS = {}
+
+parser = argparse.ArgumentParser(
+    prog='arches',
+    description='Manage Arches-based Applications',
+    parents=[argparse.ArgumentParser(add_help=False)],
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+parser.add_argument(
+    '-v', '--verbosity', 
+    action='store', 
+    dest='verbosity', 
+    default='1',
+    type=int, 
+    choices=[0, 1, 2, 3],
+    help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output'
+)
+
+subparsers = parser.add_subparsers(title='available commands', dest='command')
+subparsers.required = True
+
+parser_startproject = subparsers.add_parser(
+    'startproject',
+    help="Create the scaffolding for a new Arches project",
+)
+parser_startproject.add_argument(
+    'name',
+    type=str,
+    help='name of your new project'
+)
+parser_startproject.add_argument(
+    '-d', '--directory',
+    help='destination directory of your new project',
+    dest='directory',
+    default=None,
+)
+parser_startproject.add_argument(
+    '-t', '--template',
+    help="The path or URL to load the template from.",
+    type=str,
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-templates')
+)
+parser_startproject.add_argument(
+    '-e', '--extension',
+    dest='extensions',
+    help='The file extension(s) to render (default: py).',
+    type=str,
+    default=['py', 'txt', 'html', 'js', 'css', 'log', 'json', 'gitignore']
+)
+parser_startproject.add_argument(
+    '-n', '--name',
+    dest='files',
+    help='name of your new arches project',
+    type=str,
+    default='',
+)
+
+parser_startapp = subparsers.add_parser(
+    'startapp',
+    help="Create the scaffolding for a new Arches application",
+)
+parser_startapp.add_argument(
+    'name',
+    type=str,
+    help='name of your new application'
+)
+parser_startapp.add_argument(
+    '-d', '--directory',
+    help='destination directory of your new project',
+)
+parser_startapp.add_argument(
+    '-t', '--template',
+    help="Provides the path to a directory with a custom app template file, or a path to an uncompressed archive, a compressed archive, or a URL containing the app template files.",
+    type=str,
+    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-app-templates')
+)
+parser_startapp.add_argument(
+    '-e', '--extension',
+    dest='extensions',
+    help='Specifies which file extensions in the app template should be rendered with the template engine. Defaults to py.',
+    type=str,
+    default='py'
+)
+parser_startapp.add_argument(
+    '-n', '--name',
+    dest='files',
+    help='Specifies which files in the app template (in addition to those matching --extension) should be rendered with the template engine.',
+    type=str,
+    default='',
+)
+
+class ArchesProjectCommand(TemplateCommand):
+    help = (
+        "Creates a Django project directory structure for the given "
+        "project or application name in the current directory or "
+        "optionally in the given directory."
+    )
+    missing_args_message = "You must provide a valid name."
+
+    def handle(self, options):
+        project_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(project_name, "project")
+
+        # Check that the project_name cannot be imported.
+        try:
+            import_module(project_name)
+        except ImportError:
+            pass
+        except:
+            raise CommandError(
+                "%r conflicts with the name of an existing "
+                "Python module and cannot be used as an "
+                "application or project name. Please try "
+                "another name." %
+                project_name
+            )
+
+        # Create a random SECRET_KEY to put it in the main settings.
+        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+        options['secret_key'] = get_random_string(50, chars)
+
+        # this is used in the package.json file generated when "arches-admin startproject" is called
+        # if this is not a final released version of arches (for developers) then arches_version will be blank
+        # and the arches dependency defined in the generated package.json file will point to "master"
+        complete_version = get_complete_version()
+        options["arches_version"] = "master"
+        if complete_version[3] == 'final':
+            options["arches_version"] = f"stable/{__version__}"
+        elif complete_version[3] in ['alpha','beta','rc']:
+            options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
+
+        super(ArchesProjectCommand, self).handle('project', project_name, target, **options)
+    
+def command_startproject(args):
+    cmd = ArchesProjectCommand()
+    options = vars(args)
+    proj_name = options['name']
+    cmd.handle(options)
+    yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
+    os.chdir(yarn_path)
+    subprocess.call("yarn install", shell=True)
+    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
+        os.mkdir(os.path.join(os.getcwd(), 'logs'))
+    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+    open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
+
+COMMANDS['startproject'] = command_startproject
+
+
+class ArchesAppCommand(TemplateCommand):
+    help = (
+        "Creates a Django application directory structure for the given "
+        "application name in the current directory or optionally in the "
+        "given directory."
+    )
+    missing_args_message = "You must provide a valid name."
+
+    def handle(self, options):
+        app_name, target = options.pop('name'), options.pop('directory')
+        self.validate_name(app_name, "app")
+
+        # Check that the app_name cannot be imported.
+        try:
+            import_module(app_name)
+        except ImportError:
+            pass
+        except Exception as e:
+            raise CommandError(
+                "%r conflicts with the name of an existing "
+                "Python module and cannot be used as an "
+                "application or project name. Please try "
+                "another name." %
+                app_name
+            )
+
+        super(ArchesAppCommand, self).handle('app', app_name, target, **options)
+
+        # need to manually replace instances of {{ app_name }}
+        path_to_project = os.path.join(target, app_name) if target else os.path.join(os.getcwd(), app_name)
+
+        for relative_file_path in ['setup.py', 'package.json']:  # relative to app root directory
+            file = open(os.path.join(path_to_project, relative_file_path),'r')
+            file_data = file.read()
+            file.close()
+
+            updated_file_data = file_data.replace('{{ app_name }}', app_name)
+
+            file = open(os.path.join(path_to_project, relative_file_path),'w')
+            file.write(updated_file_data)
+            file.close()
+
+
+
+def command_startapp(args):
+    cmd = ArchesAppCommand()
+    options = vars(args)
+    cmd.handle(options)
+
+COMMANDS['startapp'] = command_startapp
+
+
+class CommandError(Exception):
+    pass
+
+try:
+    # Python 3
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer)
+except AttributeError:
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+    sys.stderr = codecs.getwriter("utf-8")(sys.stderr)
+
+def main(argv=None):
+    if argv is not None:
+        args = parser.parse_args(argv)
+    else:
+        args = parser.parse_args()
+
+    try:
+        COMMANDS[args.command](args)
+    except CommandError as e:
+        print(str(e))
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
