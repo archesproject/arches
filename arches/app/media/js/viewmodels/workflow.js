@@ -11,7 +11,6 @@ define([
     'bindings/gallery',
     'bindings/scrollTo'
 ], function($, _, ko, koMapping, arches, uuid, Cookies, AlertViewModel, WorkflowStep) {
-    const WORKFLOW_LABEL = 'workflow';
     const WORKFLOW_ID_LABEL = 'workflow-id';
     const STEP_ID_LABEL = 'workflow-step-id';
 
@@ -69,9 +68,9 @@ define([
                 }
                 /* END workflow id logic */ 
 
-                /* BEGIN workflow step creation logic */ 
-                self.updateStepPath();
-                
+                /* BEGIN workflow step creation logic */
+                await self.updateStepPath();
+
                 var cachedStepId = self.getStepIdFromUrl();
                 var cachedActiveStep = self.steps().find(function(step) {
                     return step.id() === cachedStepId;
@@ -144,8 +143,8 @@ define([
 
         this.saveActiveStep = function() {
             self.activeStep().save()
-                .then(function(_data) {        
-                    self.next();
+                .then(async function(_data) {
+                    await self.next();
                 })
                 .catch(function(error) {
                     console.error(error);
@@ -277,9 +276,12 @@ define([
             }
         });
 
-        this.updateStepPath = function() {
+        this.updateStepPath = async function() {
+            // Fetch step data in one query, rather than per step
+            const allStepsData = await(this.getWorkflowHistoryData())?.stepdata ?? {};
             var steps = [];
             self.stepConfig.forEach(function(stepConfigData) {
+                stepConfigData.allStepsData = allStepsData;
                 steps.push(
                     self.createStep(stepConfigData)
                 );
@@ -421,11 +423,11 @@ define([
             );
         };
 
-        this.next = function(){
+        this.next = async function(){
             var activeStep = self.activeStep();
 
             if (activeStep.stepInjectionConfig) {
-                self.updateStepPath();
+                await self.updateStepPath();
             }
 
             if ((!activeStep.required() || activeStep.complete()) && activeStep._index < self.steps().length - 1) {

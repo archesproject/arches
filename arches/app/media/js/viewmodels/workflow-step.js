@@ -101,8 +101,7 @@ define([
             }
 
             /* cached workflowComponentAbstract logic */ 
-            const allStepsData = (await self.getWorkflowHistoryData()).stepdata;
-            const stepData = allStepsData?.[ko.unwrap(self.name)];
+            const stepData = config.allStepsData[ko.unwrap(self.name)];
             if (stepData) {
                 self.componentIdLookup(stepData[COMPONENT_ID_LOOKUP_LABEL]);
             }
@@ -122,7 +121,7 @@ define([
 
                 for (const componentConfigData of layoutSection.componentConfigs) {
                     uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
-                    self.updateWorkflowComponentAbstractLookup(componentConfigData, allStepsData);
+                    self.updateWorkflowComponentAbstractLookup(componentConfigData, stepData);
                 }
                 self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
             }
@@ -136,12 +135,12 @@ define([
             self.componentIdLookup(componentIdLookup);
         };
 
-        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData, allStepsData) {
+        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData, stepData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
             var workflowComponentAbstractId;
 
-            if (allStepsData?.[ko.unwrap(self.name)]) {
-                const componentIdLookup = allStepsData?.[ko.unwrap(self.name)][COMPONENT_ID_LOOKUP_LABEL];
+            if (stepData) {
+                const componentIdLookup = stepData[COMPONENT_ID_LOOKUP_LABEL];
                 if (componentIdLookup) {
                     workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
                 }
