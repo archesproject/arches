@@ -126,19 +126,20 @@ define([
             );
         };
 
-        this.createStep = function(stepData) {
-            var stepName = ko.unwrap(stepData.name);
-            if (self.stepNameToIdLookup[stepName]) {
-                stepData.id = stepNameToIdLookup[stepName];
+        this.createStep = function(stepConfigData) {
+            var stepName = ko.unwrap(stepConfigData.name);
+            if (stepConfigData.workflowHistory.stepdata) {
+                stepConfigData.id = Object.values(stepConfigData.workflowHistory.stepdata[stepName].componentIdLookup)[0];
             }
 
-            stepData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
-            stepData.informationBoxDisplayed.subscribe(function(val){
+            stepConfigData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
+            stepConfigData.informationBoxDisplayed.subscribe(function(val){
                 self.setMetadataToLocalStorage(stepName, 'informationBoxDisplayed', val);
             });
 
-            stepData.workflow = self;
-            return new WorkflowStep(stepData);
+            stepConfigData.workflow = self;
+            const step = new WorkflowStep(stepConfigData);
+            return step;
         };
 
         this.saveActiveStep = function() {
@@ -274,14 +275,14 @@ define([
             if (furthestValidStepIndex !== self.furthestValidStepIndex()) {
                 self.furthestValidStepIndex(furthestValidStepIndex);
             }
-        });
+    });
 
         this.updateStepPath = async function() {
             // Fetch step data in one query, rather than per step
             const history = await this.getWorkflowHistoryData();
             var steps = [];
             for (const stepConfigData of self.stepConfig) {
-                stepConfigData.allStepsData = history.stepdata ?? {};
+                stepConfigData.workflowHistory = history;
                 steps.push(
                     self.createStep(stepConfigData)
                 );

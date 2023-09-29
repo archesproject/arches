@@ -85,7 +85,7 @@ define([
             self.setToLocalStorage("locked", value);
         });
 
-        this.initialize = async function() {
+        this.initialize = function() {
             /* cached ID logic */ 
             var cachedId = ko.unwrap(config.id);
             if (cachedId) {
@@ -101,8 +101,8 @@ define([
             }
 
             /* cached workflowComponentAbstract logic */ 
-            const stepData = config.allStepsData[ko.unwrap(self.name)];
-            if (stepData) {
+            if (config.workflowHistory.stepData) {
+                const stepData = config.workflowHistory[ko.unwrap(self.name)];
                 self.componentIdLookup(stepData[COMPONENT_ID_LOOKUP_LABEL]);
             }
 
@@ -116,15 +116,16 @@ define([
             this.setupInformationBox();
 
             /* build page layout */ 
-            for (const layoutSection of ko.toJS(self.layoutSections)) {
+            ko.toJS(self.layoutSections).forEach(function(layoutSection) {
                 var uniqueInstanceNames = [];
 
-                for (const componentConfigData of layoutSection.componentConfigs) {
+                layoutSection.componentConfigs.forEach(function(componentConfigData) {
                     uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
-                    self.updateWorkflowComponentAbstractLookup(componentConfigData, stepData);
-                }
+                    self.updateWorkflowComponentAbstractLookup(componentConfigData);
+                });
+
                 self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
-            }
+            });
 
             /* assigns componentIdLookup to self, which updates workflow history */
             var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
@@ -135,12 +136,12 @@ define([
             self.componentIdLookup(componentIdLookup);
         };
 
-        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData, stepData) {
+        this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
-            var workflowComponentAbstractId;
+            var workflowComponentAbstractId = self.id();
 
-            if (stepData) {
-                const componentIdLookup = stepData[COMPONENT_ID_LOOKUP_LABEL];
+            if (config.workflowHistory.stepData) {
+                const componentIdLookup = config.workflowHistory.stepData[COMPONENT_ID_LOOKUP_LABEL];
                 if (componentIdLookup) {
                     workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
                 }
@@ -160,6 +161,7 @@ define([
                 alert: self.alert,
                 outerSaveOnQuit: self.outerSaveOnQuit,
                 isStepActive: self.active,
+                workflowHistory: config.workflowHistory,
             });
 
             workflowComponentAbstractLookup[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract;
@@ -223,7 +225,7 @@ define([
             );
         };
 
-        this.setToWorkflowHistory = async function(key, value) {
+        this.setToWorkflowHistory = function(key, value) {
             const workflowid = self.workflow.id();
             const workflowHistory = {
                 workflowid,
@@ -254,24 +256,6 @@ define([
             if (allStepsLocalStorageData[ko.unwrap(self.name)] && typeof allStepsLocalStorageData[ko.unwrap(self.name)][key] !== "undefined") {
                 return JSON.parse(allStepsLocalStorageData[ko.unwrap(self.name)][key]);
             }
-        };
-
-        this.getItemFromWorkflowHistoryData = async function(key) {
-            const workflowData = await self.getWorkflowHistoryData();
-            return workflowData?.stepdata?.[key];
-        };
-
-        this.getWorkflowHistoryData = async function() {
-            const workflowid = self.workflow.id();
-            const response = await fetch(arches.urls.workflow_history + workflowid, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": Cookies.get('csrftoken')
-                },
-            });
-            const data = await response.json(); 
-            return data;
         };
 
         this.toggleInformationBox = function() {

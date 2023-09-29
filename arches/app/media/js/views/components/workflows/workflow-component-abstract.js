@@ -621,10 +621,10 @@ define([
 
     function WorkflowComponentAbstract(params) {
         var self = this;
-         
 
         this.workflowId = params.workflowId;
         this.componentData = params.componentData;
+        this.workflowHistory = params.workflowHistory;
         this.alert = params.alert;
         
         this.locked = params.locked;
@@ -684,7 +684,7 @@ define([
             return hasUnsavedData;
         });
 
-        this.initialize = async function() {
+        this.initialize = function() {
             /* cached ID logic */ 
             if (params.workflowComponentAbstractId) {
                 self.id(params.workflowComponentAbstractId);
@@ -693,15 +693,16 @@ define([
                 self.id(uuid.generate());
             }
 
-            const savedValue = await self.getSavedValue();
+            const savedValue = self.getSavedValue();
             if (savedValue) {
                 self.savedData(savedValue);
+                self.value(savedValue);
                 self.complete(true);
             }
             this.initialized = true;
         };
 
-        this.loadComponent = async function() {
+        this.loadComponent = function() {
             self.loading(true);
     
             /* 
@@ -733,7 +734,7 @@ define([
             }
 
             if (self.componentData.componentType === 'card') {
-                let previouslySavedValue = await self.getSavedValue();
+                let previouslySavedValue = self.getSavedValue();
                 let previouslySavedResourceInstanceId;
 
                 if (previouslySavedValue) {
@@ -759,7 +760,7 @@ define([
             }
         };
 
-        this.setToWorkflowHistory = async function(key, value) {
+        this.setToWorkflowHistory = function(key, value) {
             const workflowid = self.workflowId;
             const workflowHistory = {
                 workflowid,
@@ -783,25 +784,11 @@ define([
 
         };
 
-        this.getSavedValue = async function() {
-            const workflowData = await this.getWorkflowHistoryData();
-            const savedValue = workflowData?.componentdata?.[self.id()];
+        this.getSavedValue = function() {
+            const savedValue = this.workflowHistory.componentdata?.[self.id()];
             if (savedValue) {
                 return savedValue['value'];
             }
-        };
-
-        this.getWorkflowHistoryData = async function() {
-            const workflowid = self.workflowId;
-            const response = await fetch(arches.urls.workflow_history + workflowid, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": Cookies.get('csrftoken')
-                },
-            });
-            const data = await response.json(); 
-            return data;
         };
 
         this.getCardResourceIdOrGraphId = function() {
