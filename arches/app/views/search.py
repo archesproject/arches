@@ -162,6 +162,11 @@ def search_terms(request):
         top_concept_agg.add_aggregation(conceptid_agg)
         base_agg.add_aggregation(max_score_agg)
         base_agg.add_aggregation(top_concept_agg)
+
+        if index == "terms":
+            top_hits_agg = TopHits(name="top_docs", _source=["resourceinstanceid"], size=1)
+            nodegroupid_agg.add_aggregation(top_hits_agg)
+
         base_agg.add_aggregation(nodegroupid_agg)
         query.add_aggregation(base_agg)
 
