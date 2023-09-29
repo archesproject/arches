@@ -186,12 +186,14 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
+                    context_label, resourceid = get_resource_model_label(result)
                     ret[index].append(
                         {
                             "type": "term",
                             "context": "",
-                            "context_label": get_resource_model_label(result),
+                            "context_label": context_label,
                             "id": i,
+                            "resourceinstanceid": resourceid,
                             "text": result["key"],
                             "value": result["key"],
                         }
