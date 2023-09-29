@@ -11,6 +11,7 @@ define([
     'bindings/gallery',
     'bindings/scrollTo'
 ], function($, _, ko, koMapping, arches, uuid, Cookies, AlertViewModel, WorkflowStep) {
+    const WORKFLOW_LABEL = 'workflow';
     const WORKFLOW_ID_LABEL = 'workflow-id';
     const STEP_ID_LABEL = 'workflow-step-id';
 
@@ -359,31 +360,6 @@ define([
 
             var newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
             history.pushState(null, '', newRelativePathQuery);
-        };
-
-        this.setToWorkflowHistory = async function(key, value) {
-            const workflowid = self.id();
-            const workflowHistory = {
-                workflowid,
-                completed: false,
-                // Django view will patch in this key, keeping existing keys
-                workflowdata: {[key]: value},
-            };
-
-            fetch(arches.urls.workflow_history + workflowid, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    "X-CSRFToken": Cookies.get('csrftoken')
-                },
-                body: JSON.stringify(workflowHistory),
-            });
-
-        };
-
-        this.getItemFromWorkflowHistoryData = async function(key) {
-            const workflowData = await self.getWorkflowHistoryData();
-            return workflowData['workflowdata'][key];
         };
 
         this.getWorkflowHistoryData = async function(key) {

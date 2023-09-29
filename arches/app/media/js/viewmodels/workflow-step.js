@@ -102,8 +102,8 @@ define([
             /* cached workflowComponentAbstract logic */ 
             // Can't use self.getItemFromWorkflowHistoryData() because it assumes workflow data exists.
             const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
-            if (workflowData && workflowData[self.name]) {
-                const cachedComponentIdLookup = workflowData[self.name]['componentIdLookup'];
+            if (workflowData?.[STEPS_LABEL]?.[self.name]) {
+                const cachedComponentIdLookup = workflowData[STEPS_LABEL][self.name]['componentIdLookup'];
                 self.componentIdLookup(cachedComponentIdLookup);
             }
 
@@ -141,8 +141,8 @@ define([
             var workflowComponentAbstractId;
 
             const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
-            if (workflowData && workflowData[self.name]) {
-                const componentIdLookup = workflowData[self.name]['componentIdLookup'];
+            if (workflowData?.[STEPS_LABEL]?.[self.name]) {
+                const componentIdLookup = workflowData[STEPS_LABEL][self.name]['componentIdLookup'];
                 if (componentIdLookup) {
                     workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
                 }
@@ -232,8 +232,10 @@ define([
                 completed: false,
                 // Django view will patch in this key, keeping existing keys
                 workflowdata: {
-                    [ko.unwrap(self.name)]: {
-                        [key]: value,
+                    [STEPS_LABEL]: {
+                        [ko.unwrap(self.name)]: {
+                            [key]: value,
+                        },
                     },
                 },
             };
@@ -260,7 +262,7 @@ define([
 
         this.getItemFromWorkflowHistoryData = async function(key) {
             const workflowData = await self.getWorkflowHistoryData();
-            return workflowData['workflowdata'][key];
+            return workflowData['workflowdata'][STEPS_LABEL][key];
         };
 
         this.getWorkflowHistoryData = async function() {
