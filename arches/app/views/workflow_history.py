@@ -28,6 +28,8 @@ class WorkflowHistoryView(View):
             return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
 
         data = json.loads(request.body)
+        stepdata = data.get("stepdata", {})
+        componentdata = data.get("componentdata", {})
 
         # TODO(Django 5.0) rewrite as a simpler update_or_create()
         # call using different `defaults` vs. `create_defaults`
@@ -38,7 +40,8 @@ class WorkflowHistoryView(View):
                     workflowid = workflowid,
                     user = request.user,
                     defaults = {
-                        "workflowdata": data["workflowdata"],
+                        "stepdata": stepdata,
+                        "componentdata": componentdata,
                         "user": request.user,
                         "completed": data["completed"],
                     },
@@ -51,11 +54,16 @@ class WorkflowHistoryView(View):
                 history.completed = data["completed"]
                 # Preserve existing keys, so that the client no longer has to
                 # GET existing data, which is slower and race-condition prone.
-                history.workflowdata = CombinedExpression(
-                    F("workflowdata"),
+                history.stepdata = CombinedExpression(
+                    F("stepdata"),
                     "||",
-                    Value(data["workflowdata"], output_field=JSONField()),
-                )  # TODO: look at the way the front end manipulates this data and see if it would be clearer as 3 separate columns
+                    Value(stepdata, output_field=JSONField()),
+                )
+                history.componentdata = CombinedExpression(
+                    F("componentdata"),
+                    "||",
+                    Value(componentdata, output_field=JSONField()),
+                )
                 history.save()
 
         return JSONResponse({'success': True}, status=200)

@@ -759,12 +759,10 @@ define([
             const workflowHistory = {
                 workflowid,
                 completed: false,
-                // Django view will patch in this key, keeping existing keys
-                workflowdata: {
-                    [WORKFLOW_COMPONENT_ABSTRACTS_LABEL]: {
-                        [ko.unwrap(self.id())]: {
-                            [key]: value,
-                        },
+                componentdata: {
+                    // Django view will patch in this key, keeping existing keys
+                    [self.id()]: {
+                        [key]: value,
                     },
                 },
             };
@@ -782,7 +780,7 @@ define([
 
         this.getSavedValue = async function() {
             const workflowData = await this.getWorkflowHistoryData();
-            const savedValue = workflowData?.workflowdata?.[WORKFLOW_COMPONENT_ABSTRACTS_LABEL]?.[self.id()];
+            const savedValue = workflowData?.componentdata?.[self.id()];
             if (savedValue) {
                 return savedValue['value'];
             }

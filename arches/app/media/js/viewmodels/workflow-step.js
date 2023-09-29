@@ -9,6 +9,7 @@ define([
     'templates/views/components/plugins/workflow-step.htm'
 ], function(ko, _, koMapping, arches, uuid, Cookies, WorkflowComponentAbstract, workflowStepTemplate) {
     const STEPS_LABEL = 'workflow-steps';
+    const COMPONENT_ID_LOOKUP_LABEL = 'componentIdLookup';
 
     var WorkflowStep = function(config) {
          
@@ -39,7 +40,7 @@ define([
 
         this.componentIdLookup = ko.observable();
         this.componentIdLookup.subscribe(function(componentIdLookup) {
-            self.setToWorkflowHistory('componentIdLookup', componentIdLookup);
+            self.setToWorkflowHistory(COMPONENT_ID_LOOKUP_LABEL, componentIdLookup);
         });
 
 
@@ -100,11 +101,9 @@ define([
             }
 
             /* cached workflowComponentAbstract logic */ 
-            // Can't use self.getItemFromWorkflowHistoryData() because it assumes workflow data exists.
-            const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
-            if (workflowData?.[STEPS_LABEL]?.[self.name]) {
-                const cachedComponentIdLookup = workflowData[STEPS_LABEL][self.name]['componentIdLookup'];
-                self.componentIdLookup(cachedComponentIdLookup);
+            const stepData = await self.getItemFromWorkflowHistoryData(ko.unwrap(self.name));
+            if (stepData) {
+                self.componentIdLookup(stepData[COMPONENT_ID_LOOKUP_LABEL]);
             }
 
             /* step lock logic */ 
@@ -140,9 +139,9 @@ define([
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
             var workflowComponentAbstractId;
 
-            const workflowData = (await self.getWorkflowHistoryData()).workflowdata;
-            if (workflowData?.[STEPS_LABEL]?.[self.name]) {
-                const componentIdLookup = workflowData[STEPS_LABEL][self.name]['componentIdLookup'];
+            const stepData = await self.getItemFromWorkflowHistoryData(ko.unwrap(self.name));
+            if (stepData) {
+                const componentIdLookup = stepData[COMPONENT_ID_LOOKUP_LABEL];
                 if (componentIdLookup) {
                     workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
                 }
@@ -230,12 +229,10 @@ define([
             const workflowHistory = {
                 workflowid,
                 completed: false,
-                // Django view will patch in this key, keeping existing keys
-                workflowdata: {
-                    [STEPS_LABEL]: {
-                        [ko.unwrap(self.name)]: {
-                            [key]: value,
-                        },
+                stepdata: {
+                    // Django view will patch in this key, keeping existing keys
+                    [ko.unwrap(self.name)]: {
+                        [key]: value,
                     },
                 },
             };
@@ -262,7 +259,7 @@ define([
 
         this.getItemFromWorkflowHistoryData = async function(key) {
             const workflowData = await self.getWorkflowHistoryData();
-            return workflowData['workflowdata'][STEPS_LABEL][key];
+            return workflowData?.stepdata?.[key];
         };
 
         this.getWorkflowHistoryData = async function() {
