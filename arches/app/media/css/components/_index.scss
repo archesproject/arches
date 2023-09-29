@@ -55,7 +55,7 @@
 }
 
 .workbench-card-sidepanel-body {
-    overflow-y: scroll;
+    overflow-y: auto;
     width: inherit;
     height: -moz-available;
     height: -webkit-fill-available;
