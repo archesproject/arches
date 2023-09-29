@@ -73,6 +73,19 @@ def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
                     refresh_successful = cursor.fetchone()[0]
                     if not refresh_successful:
                         raise Exception('Unable to refresh spatial views')
+                    cursor.execute("""
+                        UPDATE resource_x_resource x
+                        SET resourceinstancefrom_graphid = r.graphid
+                        FROM resource_instances r
+                        WHERE r.resourceinstanceid = x.resourceinstanceidfrom
+                        AND x.resourceinstancefrom_graphid is null;
+
+                        UPDATE resource_x_resource x
+                        SET resourceinstanceto_graphid = r.graphid
+                        FROM resource_instances r
+                        WHERE r.resourceinstanceid = x.resourceinstanceidto
+                        AND x.resourceinstanceto_graphid is null;
+                    """)
             except Exception as e:
                 logger.exception(e)
                 cursor.execute(
