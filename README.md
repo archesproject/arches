@@ -63,28 +63,13 @@ Our general release cycle will typically be a functional release (either major i
 
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change
 
-## 7.4 - Release date: June 15, 2023
-- Initial accessibility support for WCAG 2.2 level AA
-- Bulk Data Manager - Default data editing scripts for common string editing functions: case editing, search & replace
-- Bulk Data Manager - Import improvements
-  - better i18n support
-  - improved error handling and feedback
-- Added support for custom resource relationship types
-- Updates to JSONLD loader
-- Improved ETL/indexing performance 
-- Improved API/application performance
-- Enhancements to the relational data model
-- Improved documentation
-- Added map layer permissions
-- Improvements to spatial views
-- Improved term matching (relevance) in search 
-- Project version support
-- Improved null searches (ability to search for absence data)
-- Templating engine v0.1 release
-
 ## 7.5 - Release date: December 15, 2023 
 - Continued accessibility improvements
-- Improved package management
+- Arches application support
+- Bulk Data Manager export
+- Bulk Data Manager deletion
+- Tile Excel format added to Bulk Data Manager
+- Improved Bulk Data Manager data edting
 - Relationship transversal search
 - Search component redesign
 - Search UI redesign
