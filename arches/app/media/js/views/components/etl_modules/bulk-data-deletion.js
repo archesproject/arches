@@ -42,7 +42,6 @@ define([
         this.selectedGraph = ko.observable();
         this.nodegroups = ko.observable();
         this.selectedNodegroup = ko.observable();
-        this.selectedNodegroupName = ko.observable();
         this.formData = new window.FormData();
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
@@ -69,17 +68,22 @@ define([
             return graph?.name;
         };
 
-        this.ready = ko.computed(() => {
-            const ready = !!self.selectedGraph() &&
-                !!self.selectedNodegroup();
-            return ready;
-        });
+        this.getNodegroupName = function(nodegroupId){
+            let nodegroup;
+            if (self.nodegroupds()) {
+                nodegroup = self.nodegroups().find(function(nodegroup){
+                    return nodegroup.nodegroupid == nodegroupId;
+                });
+            }
+            return nodegroup?.name;
+        };
 
         this.addAllFormData = () => {
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.selectedNodegroup()) { self.formData.append('nodegroup_id', self.selectedNodegroup()); }
-            if (self.selectedNodegroupName()) { self.formData.append('nodegroup_name', self.selectedNodegroupName()); }
+            if (self.selectedNodegroupName()) { self.formData.append('nodegroup_name', self.getNodegroupName(self.selectedNodegroupName())); }
             if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
+            if (self.selectedGraph()) { self.formData.append('graph_name', self.getGraphName(self.selectedGraph())); }
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
         };
 
@@ -88,6 +92,7 @@ define([
             self.formData.delete('nodegroup_id');
             self.formData.delete('nodegroup_name');
             self.formData.delete('graph_id');
+            self.formData.delete('graph_name');
             self.formData.delete('resourceids');
         };
 
@@ -107,10 +112,6 @@ define([
         });
 
         this.write = function() {
-            if (!self.ready()) {
-                return;
-            }
-
             self.addAllFormData();
             params.activeTab("import");
             self.submit('write').then(data => {
