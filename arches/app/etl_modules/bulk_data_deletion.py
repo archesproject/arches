@@ -48,7 +48,7 @@ class BulkDataDeletion(BaseBulkEditor):
                 if use_celery_bulk_delete:
                     response = self.run_load_task_async(request, self.loadid)
                 else:
-                    response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, nodegroup_id, resourceids)
+                    response = self.run_load_task(self.userid, self.loadid, graph_id, nodegroup_id, resourceids)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
@@ -85,13 +85,48 @@ class BulkDataDeletion(BaseBulkEditor):
         elif graph_id:
             deleted = self.delete_resources(userid, loadid, graph_id, resourceids)
 
-        if deleted["success"]:
-            with connection.cursor() as cursor:
+        with connection.cursor() as cursor:
+            if deleted["success"]:
                 self.log_event(cursor, "completed")
-        else:
-            with connection.cursor() as cursor:
+            else:
                 self.log_event(cursor, "failed")
-            return {"success": False, "data": {"title": _("Error"), "message": deleted["message"]}}
+                return {"success": False, "data": {"title": _("Error"), "message": deleted["message"]}}
+
+            # count the numbers of deleted resource / tiles
+            cursor.execute(
+                """SELECT g.name, COUNT(DISTINCT e.resourceinstanceid)
+                    FROM edit_log e, graphs g
+                    WHERE g.graphid = e.resourceclassid::uuid
+                    AND e.transactionid = %s::uuid
+                    AND e.edittype = 'delete'
+                    GROUP BY g.name;
+                """, [loadid]
+            )
+            resources = cursor.fetchall()
+            number_of_data = {}
+            for resource in resources:
+                graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
+                number_of_data.update({ graph: { "total": resource[1] } })
+            cursor.execute(
+                """SELECT g.name, n.name, COUNT(DISTINCT e.tileinstanceid)
+                    FROM edit_log e, nodes n, graphs g
+                    WHERE n.nodeid = e.nodegroupid::uuid
+                    AND g.graphid = e.resourceclassid::uuid
+                    AND e.transactionid = %s::uuid
+                    AND e.edittype = 'tile delete'
+                    GROUP BY g.name, n.name;
+                """, [loadid]
+            )
+            tiles = cursor.fetchall()
+            for tile in tiles:
+                graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
+                number_of_data.setdefault(graph, { "total": 0 }).setdefault('tiles', []).append({'tile': tile[1], 'count': tile[2] })
+
+            number_of_delete = json.dumps({ "number_of_delete": [{ "name": k, "total": v["total"], "tiles": v["tiles"] } for k, v in number_of_data.items()]})
+            cursor.execute(
+                """UPDATE load_event SET load_details = load_details || %s::JSONB WHERE loadid = %s""",
+                (number_of_delete, loadid),
+            )
 
         try:
             index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)            
@@ -102,10 +137,11 @@ class BulkDataDeletion(BaseBulkEditor):
             
             return {"success": False, "data": {"title": _("Indexing Error"), "message": _("The database may need to be reindexed. Please contact your administrator.")}}
 
-        cursor.execute(
-            """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-            ("indexed", datetime.now(), True, True, loadid),
-        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                ("indexed", datetime.now(), True, True, loadid),
+            )
         return {"success": True, "data": "indexed"}
 
     def delete_resources(self, userid, loadid, graphid, resourceids):
