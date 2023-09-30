@@ -81,15 +81,58 @@
 <!-- /ko -->
 {% endblock task_details %}
 
+{% block etl_status %}
+<div>
+    <h4>
+        <span data-bind="text: $root.translations.bulkDataEditDetails"></span>
+    </h4>
+    <!-- ko if: loadDetails -->
+    <!-- ko ifnot: loading() -->
+    <table class="table table-striped" style="border:1px solid #ddd;">
+        <tbody>
+            <tr>
+                <td style="min-width: 200px;"><span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelDeleted"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: loadDetails.graph"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameDeleted"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: loadDetails.nodegroup"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.searchUrl"></span></td>
+                <td><span class="etl-loading-metadata-value" data-bind="text: loadDetails.search_url"></span></td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.deletedData"></span></td>
+                <td>
+                    <!-- ko foreach: loadDetails.number_of_delete -->
+                    <span class="etl-loading-metadata-key" data-bind="text: $data.name + ($data.total ? ': ' : '')"></span>
+                    <span class="etl-loading-metadata-value" data-bind="text: $data.total ? $data.total : ''"></span>
+                        <!-- ko foreach: $data.tiles -->
+                        <div style="padding-left: 20px;">
+                            <span class="etl-loading-metadata-key" data-bind="text: $data.tile + ':'"></span>
+                            <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
+                        </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </td>      
+            </tr>
+            <tr>
+                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfDeletedData"></span></td>
+                <td>
+                    <div class="etl-loading-metadata-value">
+                        <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.viewInEditLog, attr: { href: editHistoryUrl }"></a>
+                    </div>
+                </td>      
+            </tr>
+        </tbody>
+    </table>
+    <!-- /ko -->
+    <!-- /ko -->
+</div>
+{% endblock etl_status %}
+
 {% block loading_status %}
-<h4>
-    <span data-bind="text: $root.translations.importedData"></span>
-    <span>
-        <a class="etl-status-link" target="_blank"
-            data-bind="text: '('+$root.translations.viewInEditLog+')', attr: { href: editHistoryUrl }">
-        </a>
-    </span>
-</h4>
 {% endblock loading_status %}
 
 {% block etl_error_report %}

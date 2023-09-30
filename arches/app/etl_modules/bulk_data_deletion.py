@@ -19,6 +19,45 @@ logger = logging.getLogger(__name__)
 
 
 class BulkDataDeletion(BaseBulkEditor):
+    def delete_resources(self, userid, loadid, graphid, resourceids):
+        result = {"success": False}
+        user = User.objects.get(id=userid)
+        try:
+            if resourceids and graphid:
+                resources = Resource.objects.filter(graph_id=graphid).filter(pk__in=resourceids)
+            elif graphid:
+                resources = Resource.objects.filter(graph_id=graphid)
+            elif resourceids:
+                resources = Resource.objects.filter(pk__in=resourceids)
+            for resource in resources.iterator():
+                resource.delete(user=user, index=False, transaction_id=loadid)
+            result["success"] = True
+        except Exception as e:
+            logger.exception(e)
+            result["message"] = _("Unable to delete resources: {}").format(str(e))
+
+        return result
+
+    def delete_tiles(self, userid, loadid, nodegroupid, resourceids):
+        result = {"success": False}
+        user = User.objects.get(id=userid)
+
+        try:
+            if resourceids:
+                tiles = Tile.objects.filter(nodegroup_id=nodegroupid).filter(resourceinstance_id__in=resourceids)
+            else:
+                tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
+            for tile in tiles.iterator():
+                request = HttpRequest()
+                request.user = user
+                tile.delete(request=request, index=False, transaction_id=loadid)
+            result["success"] = True
+        except Exception as e:
+            logger.exception(e)
+            result["message"] = _("Unable to delete tiles: {}").format(str(e))
+
+        return result
+
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
@@ -82,7 +121,7 @@ class BulkDataDeletion(BaseBulkEditor):
 
         if nodegroup_id:
             deleted = self.delete_tiles(userid, loadid, nodegroup_id, resourceids)
-        elif graph_id:
+        elif graph_id or resourceids:
             deleted = self.delete_resources(userid, loadid, graph_id, resourceids)
 
         with connection.cursor() as cursor:
@@ -122,7 +161,11 @@ class BulkDataDeletion(BaseBulkEditor):
                 graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
                 number_of_data.setdefault(graph, { "total": 0 }).setdefault('tiles', []).append({'tile': tile[1], 'count': tile[2] })
 
-            number_of_delete = json.dumps({ "number_of_delete": [{ "name": k, "total": v["total"], "tiles": v["tiles"] } for k, v in number_of_data.items()]})
+            number_of_delete = json.dumps(
+                { "number_of_delete":
+                    [{ "name": k, "total": v["total"], "tiles": v.setdefault("tiles", {}) } for k, v in number_of_data.items()]
+                }
+            )
             cursor.execute(
                 """UPDATE load_event SET load_details = load_details || %s::JSONB WHERE loadid = %s""",
                 (number_of_delete, loadid),
@@ -143,40 +186,3 @@ class BulkDataDeletion(BaseBulkEditor):
                 ("indexed", datetime.now(), True, True, loadid),
             )
         return {"success": True, "data": "indexed"}
-
-    def delete_resources(self, userid, loadid, graphid, resourceids):
-        result = {"success": False}
-        user = User.objects.get(id=userid)
-        try:
-            if resourceids:
-                resources = Resource.objects.filter(graph_id=graphid).filter(pk__in=resourceids)
-            else:
-                resources = Resource.objects.filter(graph_id=graphid)
-            for resource in resources.iterator():
-                resource.delete(user=user, index=False, transaction_id=loadid)
-            result["success"] = True
-        except Exception as e:
-            logger.exception(e)
-            result["message"] = _("Unable to delete resources: {}").format(str(e))
-
-        return result
-
-    def delete_tiles(self, userid, loadid, nodegroupid, resourceids):
-        result = {"success": False}
-        user = User.objects.get(id=userid)
-
-        try:
-            if resourceids:
-                tiles = Tile.objects.filter(nodegroup_id=nodegroupid).filter(resourceinstance_id__in=resourceids)
-            else:
-                tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
-            for tile in tiles.iterator():
-                request = HttpRequest()
-                request.user = user
-                tile.delete(request=request, index=False, transaction_id=loadid)
-            result["success"] = True
-        except Exception as e:
-            logger.exception(e)
-            result["message"] = _("Unable to delete tiles: {}").format(str(e))
-
-        return result
