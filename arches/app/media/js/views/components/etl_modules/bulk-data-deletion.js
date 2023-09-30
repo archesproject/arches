@@ -70,7 +70,7 @@ define([
 
         this.getNodegroupName = function(nodegroupId){
             let nodegroup;
-            if (self.nodegroupds()) {
+            if (self.nodegroups()) {
                 nodegroup = self.nodegroups().find(function(nodegroup){
                     return nodegroup.nodegroupid == nodegroupId;
                 });
@@ -80,10 +80,14 @@ define([
 
         this.addAllFormData = () => {
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
-            if (self.selectedNodegroup()) { self.formData.append('nodegroup_id', self.selectedNodegroup()); }
-            if (self.selectedNodegroupName()) { self.formData.append('nodegroup_name', self.getNodegroupName(self.selectedNodegroupName())); }
-            if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
-            if (self.selectedGraph()) { self.formData.append('graph_name', self.getGraphName(self.selectedGraph())); }
+            if (self.selectedNodegroup()) {
+                self.formData.append('nodegroup_id', self.selectedNodegroup());
+                self.formData.append('nodegroup_name', self.getNodegroupName(self.selectedNodegroup()));
+            }
+            if (self.selectedGraph()) {
+                self.formData.append('graph_id', self.selectedGraph());
+                self.formData.append('graph_name', self.getGraphName(self.selectedGraph()));
+            }
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
         };
 
