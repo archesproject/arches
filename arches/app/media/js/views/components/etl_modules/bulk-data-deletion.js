@@ -36,7 +36,6 @@ define([
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
         this.formatTime = params.formatTime;
         this.timeDifference = params.timeDifference;
-        this.config = params.config;
         this.loading(true);
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
@@ -46,9 +45,6 @@ define([
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
         this.searchUrl = ko.observable();
-        this.numberOfResources = ko.observable();
-        this.numberOfTiles = ko.observable();
-        this.selectedCaseOperation = ko.observable();
 
         this.getGraphs = function(){
             self.loading(true);
