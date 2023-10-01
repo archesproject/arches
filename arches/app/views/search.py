@@ -180,7 +180,10 @@ def search_terms(request):
             query.add_aggregation(base_agg)
 
         ret[index] = []
-        results = query.search(index=index)
+        if index == "resources":
+            results = query.search(index=index, limit=10, scroll="1m")
+        else:
+            results = query.search(index=index)
         if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
                 if len(result["top_concept"]["buckets"]) > 0:
