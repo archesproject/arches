@@ -118,7 +118,15 @@ def prepare_search_index(create=False):
                     "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
                     "resourceinstanceid": {"type": "keyword"},
                     "root_ontology_class": {"type": "keyword"},
-                    "displayname": {"type": "keyword"},
+                    "displayname": {
+                        "type": "text",
+                        "analyzer": "folding",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
                     "displaydescription": {"type": "keyword"},
                     "map_popup": {"type": "keyword"},
                     "provisional_resource": {"type": "keyword"},

@@ -25,6 +25,7 @@ from elasticsearch.exceptions import RequestError
 from elasticsearch.helpers import BulkIndexError
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from pprint import pformat
 
 
 class SearchEngine(object):
@@ -188,7 +189,7 @@ class SearchEngine(object):
         try:
             helpers.bulk(self.es, data, **kwargs)
         except Exception as detail:
-            self.logger.warning("%s: WARNING: failed to bulk index documents, \nException detail: %s\n" % (datetime.now(), detail))
+            self.logger.warning("%s: WARNING: failed to bulk index documents, \nException detail: %s\n" % (datetime.now(), pformat(detail)))
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
         return {"_op_type": op_type, "_index": self._add_prefix(index), "_type": "_doc", "_id": id, "_source": data}

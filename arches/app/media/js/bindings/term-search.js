@@ -89,10 +89,21 @@ define([
                 },
                 formatResult: function(result, container, query, escapeMarkup) {
                     var markup = [];
-                    var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
+                    var indent = result.type === 'concept' || result.type === 'exactmatch' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                     if (result.type === 'group') {
                         _.each(result.text, function(searchType, i) {
-                            var label = searchType === 'concepts' ? arches.translations.termSearchConcept : arches.translations.termSearchTerm;
+                            var label;
+                            switch (searchType) {
+                                case 'concepts':
+                                    label = arches.translations.termSearchConcept;
+                                    break;
+                                case 'terms':
+                                    label = arches.translations.termSearchTerm;
+                                    break;
+                                case 'resources':
+                                    label = arches.translations.termSearchResource;
+                                    break;
+                            }
                             var active = i === 0 ? 'active' : '';
                             markup.push('<button id="' + searchType + 'group" class="btn search-type-btn term-search-btn ' + active + ' ">' + label + '</button>');
                         });
@@ -104,15 +115,27 @@ define([
                     container[0].className = container[0].className + ' ' + result.type;
                     $(container).click(function(event){
                         var btn = event.target.closest('button');
-                        if(!!btn && btn.id === 'termsgroup') {
-                            $(btn).addClass('active').siblings().removeClass('active');
-                            $('.term').show();
-                            $('.concept').hide();
-                        }
-                        if(!!btn && btn.id === 'conceptsgroup') {
-                            $(btn).addClass('active').siblings().removeClass('active');
-                            $('.concept').show();
-                            $('.term').hide();
+                        if (!!btn) {
+                            switch (btn.id) {
+                                case 'termsgroup':
+                                    $(btn).addClass('active').siblings().removeClass('active');
+                                    $('.term').show();
+                                    $('.concept').hide();
+                                    $('.exactmatch').hide();
+                                    break;
+                                case 'conceptsgroup':
+                                    $(btn).addClass('active').siblings().removeClass('active');
+                                    $('.concept').show();
+                                    $('.term').hide();
+                                    $('.exactmatch').hide();
+                                    break;
+                                case 'resourcesgroup':
+                                    $(btn).addClass('active').siblings().removeClass('active');
+                                    $('.exactmatch').show();
+                                    $('.term').hide();
+                                    $('.concept').hide();
+                                    break;
+                            }
                         }
                     });
                     return formatedresult;

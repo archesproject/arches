@@ -1,6 +1,6 @@
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Nested, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Nested, Terms, Ids
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -22,7 +22,10 @@ class TermFilter(BaseSearchFilter):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         for term in JSONDeserializer().deserialize(querysting_params):
-            if term["type"] == "term" or term["type"] == "string":
+            if term["type"] == "exactmatch":
+                ids_query = Ids(ids=[term["resourceinstanceid"]])
+                search_query.must(ids_query)
+            elif term["type"] == "term" or term["type"] == "string":
                 string_filter = Bool()
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
