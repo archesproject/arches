@@ -137,14 +137,27 @@ def search_terms(request):
     for index in ["terms", "concepts", "resources"]:
         boolquery = Bool()
 
-        if lang != "*":
+        if lang != "*" and index != "resources":
             boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
 
-        boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
-        boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
-        boolquery.should(
-            Match(field="value.folded", query=searchString.lower(), fuzziness="AUTO", prefix_length=settings.SEARCH_TERM_SENSITIVITY)
-        )
+        if index == "resources":
+            nested_query = Nested( 
+                path="displayname",
+                query=Bool().must(
+                    Match(field="displayname.value", query=searchString.lower(), fuzziness=2)
+                )
+            )
+            boolquery.must(nested_query)
+            query = Query(se, start=0, limit=10, min_score=20, size=10)
+            query.include("graph_id")
+            query.include("displayname")
+        else:
+            query = Query(se, start=0, limit=0)
+            boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
+            boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
+            boolquery.should(
+                Match(field="value.folded", query=searchString.lower(), fuzziness="AUTO", prefix_length=settings.SEARCH_TERM_SENSITIVITY)
+            )
 
         if user_is_reviewer is False and index == "terms":
             boolquery.filter(Terms(field="provisional", terms=["false"]))
