@@ -163,19 +163,21 @@ def search_terms(request):
             boolquery.filter(Terms(field="provisional", terms=["false"]))
 
         query.add_query(boolquery)
-        base_agg = Aggregation(
-            name="value_agg", type="terms", field="value.raw", size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"}
-        )
-        nodegroupid_agg = Aggregation(name="nodegroupid", type="terms", field="nodegroupid")
-        top_concept_agg = Aggregation(name="top_concept", type="terms", field="top_concept")
-        conceptid_agg = Aggregation(name="conceptid", type="terms", field="conceptid")
-        max_score_agg = MaxAgg(name="max_score", script="_score")
 
-        top_concept_agg.add_aggregation(conceptid_agg)
-        base_agg.add_aggregation(max_score_agg)
-        base_agg.add_aggregation(top_concept_agg)
-        base_agg.add_aggregation(nodegroupid_agg)
-        query.add_aggregation(base_agg)
+        if index != "resources":
+            base_agg = Aggregation(
+                name="value_agg", type="terms", field="value.raw", size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"}
+            )
+            nodegroupid_agg = Aggregation(name="nodegroupid", type="terms", field="nodegroupid")
+            top_concept_agg = Aggregation(name="top_concept", type="terms", field="top_concept")
+            conceptid_agg = Aggregation(name="conceptid", type="terms", field="conceptid")
+            max_score_agg = MaxAgg(name="max_score", script="_score")
+
+            top_concept_agg.add_aggregation(conceptid_agg)
+            base_agg.add_aggregation(max_score_agg)
+            base_agg.add_aggregation(top_concept_agg)
+            base_agg.add_aggregation(nodegroupid_agg)
+            query.add_aggregation(base_agg)
 
         ret[index] = []
         results = query.search(index=index)
