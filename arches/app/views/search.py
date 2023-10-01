@@ -134,8 +134,7 @@ def search_terms(request):
 
     i = 0
     ret = {}
-    for index in ["terms", "concepts"]:
-        query = Query(se, start=0, limit=0)
+    for index in ["terms", "concepts", "resources"]:
         boolquery = Bool()
 
         if lang != "*":
