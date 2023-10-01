@@ -185,38 +185,53 @@ def search_terms(request):
         else:
             results = query.search(index=index)
         if results is not None:
-            for result in results["aggregations"]["value_agg"]["buckets"]:
-                if len(result["top_concept"]["buckets"]) > 0:
-                    for top_concept in result["top_concept"]["buckets"]:
-                        top_concept_id = top_concept["key"]
-                        top_concept_label = get_preflabel_from_conceptid(
-                            top_concept["key"],
-                            lang=lang if lang != "*" else None
-                        )["value"]
-                        for concept in top_concept["conceptid"]["buckets"]:
-                            ret[index].append(
-                                {
-                                    "type": "concept",
-                                    "context": top_concept_id,
-                                    "context_label": top_concept_label,
-                                    "id": i,
-                                    "text": result["key"],
-                                    "value": concept["key"],
-                                }
-                            )
-                        i = i + 1
-                else:
+            if index == "resources" and results["hits"]["total"]["value"]:
+                for i, doc in enumerate(results["hits"]["hits"]):
                     ret[index].append(
                         {
-                            "type": "term",
+                            "type": "exactmatch",
                             "context": "",
-                            "context_label": get_resource_model_label(result),
+                            "context_label": f"{doc['_source']['displayname']} - Exact Match",
+                            "resourceinstanceid": doc['_id'],
+                            "graph_id": doc['_source']['graph_id'],
                             "id": i,
-                            "text": result["key"],
-                            "value": result["key"],
+                            "text": doc['_source']['displayname'],
+                            "value": doc['_id'],
                         }
                     )
-                    i = i + 1
+            elif index != "resources":
+                for result in results["aggregations"]["value_agg"]["buckets"]:
+                    if len(result["top_concept"]["buckets"]) > 0:
+                        for top_concept in result["top_concept"]["buckets"]:
+                            top_concept_id = top_concept["key"]
+                            top_concept_label = get_preflabel_from_conceptid(
+                                top_concept["key"],
+                                lang=lang if lang != "*" else None
+                            )["value"]
+                            for concept in top_concept["conceptid"]["buckets"]:
+                                ret[index].append(
+                                    {
+                                        "type": "concept",
+                                        "context": top_concept_id,
+                                        "context_label": top_concept_label,
+                                        "id": i,
+                                        "text": result["key"],
+                                        "value": concept["key"],
+                                    }
+                                )
+                            i = i + 1
+                    else:
+                        ret[index].append(
+                            {
+                                "type": "term",
+                                "context": "",
+                                "context_label": get_resource_model_label(result),
+                                "id": i,
+                                "text": result["key"],
+                                "value": result["key"],
+                            }
+                        )
+                        i = i + 1
 
     return JSONResponse(ret)
 
