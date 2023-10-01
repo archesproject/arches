@@ -122,15 +122,27 @@ define([
                     container[0].className = container[0].className + ' ' + result.type;
                     $(container).click(function(event){
                         var btn = event.target.closest('button');
-                        if(!!btn && btn.id === 'termsgroup') {
-                            $(btn).addClass('active').siblings().removeClass('active');
-                            $('.term').show();
-                            $('.concept').hide();
-                        }
-                        if(!!btn && btn.id === 'conceptsgroup') {
-                            $(btn).addClass('active').siblings().removeClass('active');
-                            $('.concept').show();
-                            $('.term').hide();
+                        if (!!btn) {
+                            switch (btn.id) {
+                                case 'termsgroup':
+                                    $(btn).addClass('active').siblings().removeClass('active');
+                                    $('.term').show();
+                                    $('.concept').hide();
+                                    $('.exactmatch').hide();
+                                    break;
+                                case 'conceptsgroup':
+                                    $(btn).addClass('active').siblings().removeClass('active');
+                                    $('.concept').show();
+                                    $('.term').hide();
+                                    $('.exactmatch').hide();
+                                    break;
+                                case 'resourcesgroup':
+                                    $(btn).addClass('active').siblings().removeClass('active');
+                                    $('.exactmatch').show();
+                                    $('.term').hide();
+                                    $('.concept').hide();
+                                    break;
+                            }
                         }
                     });
                     return formatedresult;
