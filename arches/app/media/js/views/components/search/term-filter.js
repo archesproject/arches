@@ -59,7 +59,7 @@ define([
 
         updateQuery: function() {
             var terms = _.filter(this.filter.terms(), function(term){
-                return term.type === 'string' || term.type === 'concept' || term.type === 'term';
+                return term.type === 'string' || term.type === 'concept' || term.type === 'term' || term.type === 'exactmatch';
             }, this);
             
             var queryObj = this.query();
