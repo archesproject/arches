@@ -25,7 +25,10 @@ class TermFilter(BaseSearchFilter):
         querysting_params = self.request.GET.get(details["componentname"], "")
         language = self.request.GET.get("language", "*")
         for term in JSONDeserializer().deserialize(querysting_params):
-            if term["type"] == "term" or term["type"] == "string":
+            if term["type"] == "exactmatch":
+                ids_query = Ids(ids=[term["resourceinstanceid"]])
+                search_query.must(ids_query)
+            elif term["type"] == "term" or term["type"] == "string":
                 string_filter = Bool()
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
