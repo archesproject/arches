@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10041_limit_number_of_bulk_edit"),
+        ("models", "10097_add_editlog_index"),
     ]
 
     add_bulk_data_deletion = """
