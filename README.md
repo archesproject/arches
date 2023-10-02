@@ -70,6 +70,8 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Bulk Data Manager deletion
 - Tile Excel format added to Bulk Data Manager
 - Improved Bulk Data Manager data edting
+- Workflow history tracking
+- Image configuration of file-list datatype
 - Perfomance Improvements
 - Support for component authoring in Vue Javascript framework
 
