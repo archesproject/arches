@@ -62,10 +62,21 @@ article.main-search-container {
                 flex-direction: column;
                 height: 52px;
             }
+            @include break-at(mobile) {
+                height: auto;
+                flex-direction: row;
+            }
+            @include break-at(mobile-portrait){
+                flex-direction: column;
+            }
             .search-type-btn-panel {
                 @include break-at(small-desktop-max) {
                     margin-left: 5px;
                     height: auto;
+                }
+                @include break-at(mobile-portrait) {
+                    display: flex;
+                    justify-content: center;
                 }
                 .search-type-btn {
                     @include break-at(small-desktop-max) {
@@ -75,8 +86,25 @@ article.main-search-container {
                         margin: 5px 2px;
                         min-width: 69px;
                     }
-                    .fa {
+                    @include break-at(mobile) {
+                        height: 42px;
+                        min-width: 42px;
+                        margin: 0;
+                        top: 1px;
+                    }
+                    i {
                         @include break-at(small-desktop-max) {
+                            display: none;
+                        }
+                        @include break-at(mobile) {
+                            display: block;
+                        }
+                    }
+                    span {
+                        @include break-at(mobile-max) {
+                            display: block;
+                        }
+                        @include break-at(mobile) {
                             display: none;
                         }
                     }
@@ -92,6 +120,13 @@ article.main-search-container {
                     @include break-at(mobile-max) {
                         top: -2px;
                     }
+                    @include break-at(mobile) {
+                        top: 0px;
+                    }
+                    @include break-at(mobile-portrait) {
+                        display: flex;
+                        justify-content: center;
+                    }
                     .search-type-btn-popup {
                         @include break-at(small-desktop-max) {
                             min-width: 90px;
@@ -99,22 +134,34 @@ article.main-search-container {
                             border: 1px solid #d8d8d8;
                             margin: 0 4px;
                         }
+                        @include break-at(mobile) {
+                            height: 42px;
+                            min-width: 42px;
+                            width: auto;
+                            margin: 1px;
+                        }
                         &.active {
                             @include break-at(small-desktop-max) {
                                 line-height: inherit;
                             }
                         }
-                        .fa {
+                        i {
                             @include break-at(small-desktop-max) {
                                 display: none;
+                            }
+                            @include break-at(mobile) {
+                                display: block;
                             }
                         }
                         p {
-                            @include break-at(small-desktop) {
+                            @include break-at(desktop-lg) {
                                 display: none;
                             }
-                            @include break-at(small-desktop-max) {
+                            @include break-at(mobile-max) {
                                 display: block;
+                            }
+                            @include break-at(mobile) {
+                                display: none;
                             }
                         }
                     }
