@@ -70,12 +70,13 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Bulk Data Manager deletion
 - Tile Excel format added to Bulk Data Manager
 - Improved Bulk Data Manager data edting
-- Security enhancements
+- Perfomance Improvements
 - Support for component authoring in Vue Javascript framework
 
 ## 7.6 - Release date: June 15, 2024
 - Activity stream edit logs
 - User specific saved searches
+- Security enhancements
 
 ## 8.0 - Release date: December 15, 2024
 - Migrate Arches UI Framework
