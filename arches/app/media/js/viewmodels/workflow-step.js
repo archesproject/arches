@@ -52,15 +52,12 @@ define([
         this.lockableExternalSteps = config.lockableExternalSteps || [];
 
         this.complete = ko.computed(function() {
-            var complete = true; 
-            
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (!workflowComponentAbstract.complete()) {
-                    complete = false;
-                }
-            });
-
-            return complete;
+            const components = Object.values(self.workflowComponentAbstractLookup());
+            if (!components.length) {
+                // New workflow being initialized.
+                return false;
+            }
+            return components.every(component => component.complete());
         });
 
         /* 
