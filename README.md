@@ -70,15 +70,6 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Bulk Data Manager deletion
 - Tile Excel format added to Bulk Data Manager
 - Improved Bulk Data Manager data edting
-- Relationship transversal search
-- Search component redesign
-- Search UI redesign
-- Tabular search results
-- Ability to define search views
-- Support for editing and publishing graphs (removing instance restrictions)
-- Support for viewing and restoring previous graph publications
-- Support for editing/localizing UI labels and permissions for published graphs
-- Business data migrations that correspond to graph changes
 - Security enhancements
 - Support for component authoring in Vue Javascript framework
 
@@ -88,5 +79,9 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 
 ## 8.0 - Release date: December 15, 2024
 - Migrate Arches UI Framework
+- Support for editing and publishing graphs (removing instance restrictions)
+- Support for viewing and restoring previous graph publications
+- Support for editing/localizing UI labels and permissions for published graphs
+- Business data migrations that correspond to graph changes
 - RDM Redesign
 
