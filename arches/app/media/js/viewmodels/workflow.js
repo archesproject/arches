@@ -404,12 +404,27 @@ define([
         this.finishWorkflow = function() {
             if (self.activeStep().hasUnsavedData()) {
                 self.activeStep().save().then(function() {
-                    window.location.assign(self.quitUrl);
+                    this.finishWorkflow();
                 });
+                return;
             }
-            else {
-                window.location.assign(self.quitUrl);
-            }
+
+            const workflowid = self.id();
+            const workflowHistory = {
+                workflowid,
+                completed: true,
+            };
+
+            fetch(arches.urls.workflow_history + workflowid, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken')
+                },
+                body: JSON.stringify(workflowHistory),
+            });
+
+            window.location.assign(self.quitUrl);
         };
 
         this.quitWorkflow = function(){
