@@ -192,15 +192,16 @@ def search_terms(request):
         if results is not None:
             if index == "resources" and results["hits"]["total"]["value"]:
                 for i, doc in enumerate(results["hits"]["hits"]):
+                    displayname_localized = ResourceDescriptors.get_localized_descriptor_static(doc, "displayname")
                     ret[index].append(
                         {
                             "type": "exactmatch",
                             "context": "",
-                            "context_label": f"{doc['_source']['displayname']} - Exact Match",
+                            "context_label": f"{displayname_localized} - {_('Exact Match')}",
                             "resourceinstanceid": doc['_id'],
                             "graph_id": doc['_source']['graph_id'],
                             "id": i,
-                            "text": doc['_source']['displayname'],
+                            "text": displayname_localized,
                             "value": doc['_id'],
                         }
                     )
