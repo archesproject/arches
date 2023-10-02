@@ -50,6 +50,12 @@ class WorkflowHistoryView(View):
                 # Wrong user for given workflowid.
                 return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
             if not created:
+                if history.completed:
+                    return JSONErrorResponse(
+                        _("Request Failed"),
+                        _("Workflow already completed"),
+                        status=401,
+                    )
                 # Don't allow patching the user or the workflow id.
                 history.completed = data["completed"]
                 # Preserve existing keys, so that the client no longer has to
