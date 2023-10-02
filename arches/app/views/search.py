@@ -142,11 +142,15 @@ def search_terms(request):
             boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
 
         if index == "resources":
+            bool_subquery = Bool()
+            bool_subquery.must(
+                Match(field="displayname.value", query=searchString.lower(), fuzziness=2)
+            )
+            if lang != "*":
+                bool_subquery.must(Match(field="displayname.language", query=lang, type="phrase_prefix"))
             nested_query = Nested( 
                 path="displayname",
-                query=Bool().must(
-                    Match(field="displayname.value", query=searchString.lower(), fuzziness=2)
-                )
+                query=bool_subquery
             )
             boolquery.must(nested_query)
             query = Query(se, start=0, limit=10, min_score=20, size=10)
