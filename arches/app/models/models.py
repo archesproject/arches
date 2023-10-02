@@ -282,6 +282,9 @@ class EditLog(models.Model):
     class Meta:
         managed = True
         db_table = "edit_log"
+        indexes = [
+            models.Index(fields=["transactionid"]),
+        ]
 
 
 class ExternalOauthToken(models.Model):
