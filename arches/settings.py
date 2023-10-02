@@ -330,8 +330,9 @@ OAUTH_CLIENT_ID = ""  # '9JCibwrWQ4hwuGn5fu2u1oRZSs9V6gK8Vu8hpRC4'
 AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
+    #"dauthz.backends.CasbinBackend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.utils.permission_backend.PermissionBackend",
+    #"arches.app.utils.permission_backend.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -353,6 +354,7 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
+    #"dauthz.apps.DauthzConfig"
 )
 
 ARCHES_APPLICATIONS = ()
@@ -370,6 +372,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    #"dauthz.middlewares.request_middleware.RequestMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
@@ -765,7 +768,6 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
-
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
