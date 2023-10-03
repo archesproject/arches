@@ -48,8 +48,8 @@
             </div>
 
             <div class="col-xs-12">
-                <input style="display:inline-block;"
-                    data-bind="select2: {
+                <select style="display:inline-block;"
+                    data-bind="select2Query: {
                         select2Config: {
                             clickBubble: true,
                             data: options,
@@ -59,6 +59,7 @@
                             allowClear: true
                         }
                     }, attr: {'aria-label': $root.translations.selectDefaultValue}">
+                </select>
             </div>
         </div>
     </div>
