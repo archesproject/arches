@@ -374,8 +374,20 @@ define([
                     "X-CSRFToken": Cookies.get('csrftoken')
                 },
             });
-            const data = await response.json(); 
-            return data;
+            if (response.ok) {
+                const data = await response.json(); 
+                return data;
+            } else {
+                self.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        response.statusText,
+                        response.responseText,
+                        null,
+                        function(){},
+                    )
+                );
+            }
         };
 
         this.getWorkflowMetaData = function(pluginJsonFileName) {
