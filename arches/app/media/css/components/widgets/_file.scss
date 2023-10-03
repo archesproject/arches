@@ -110,3 +110,8 @@
 .form-group .file-metadata input {
     max-width: unset;
 }
+
+.rp-report-tile dt.first, .rp-report-tile dd.first {
+    border: 1px lightgray;
+    border-top-style: solid;
+}

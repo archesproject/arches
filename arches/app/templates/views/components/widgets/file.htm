@@ -218,35 +218,60 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
 
 <!-- ko if: uploadedFiles().length === 0 -->
+<dt data-bind="text: label"></dt>
 <dd>
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dd>
+<dt class="first" data-bind="text: $parent.label"></dt>
+<dd class="first" style="border-top: 1px lightgray; border-top-style: solid;"></dt>
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
     </a>
 </dd>
+<!-- ko if: title[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.title"></dt>
+<dd data-bind="text: title[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: attribution[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.attribution"></dt>
+<dd data-bind="text: attribution[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: description[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.description"></dt>
+<dd data-bind="text: description[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
 <!-- /ko -->
 
-<!-- ko if: reportImages().length > 0 -->
-<dd>
+<!-- ko foreach: reportImages() -->
+<dt class="first" data-bind="text: $parent.label"></dt>
+<dd class="first">
     <div id="report-image-grid" class="report-image-grid">
-        <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
             <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
-                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url), alt: name}">
+                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url),
+                alt: $data.altText[$parent.activeLanguage].value ?? name}">
             </a>
         </div>
-        <!-- /ko -->
     </div>
 </dd>
+<!-- ko if: title[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.title"></dt>
+<dd data-bind="text: title[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: attribution[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.attribution"></dt>
+<dd data-bind="text: attribution[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: description[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.description"></dt>
+<dd data-bind="text: description[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
 <!-- /ko -->
 {% endblock report %}
 
