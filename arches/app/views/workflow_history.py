@@ -43,7 +43,7 @@ class WorkflowHistoryView(View):
                         "stepdata": stepdata,
                         "componentdata": componentdata,
                         "user": request.user,
-                        "completed": data["completed"],
+                        "completed": data.get("completed", False),
                     },
                 )
             except IntegrityError:
@@ -57,7 +57,7 @@ class WorkflowHistoryView(View):
                         status=401,
                     )
                 # Don't allow patching the user or the workflow id.
-                history.completed = data["completed"]
+                history.completed = data.get("completed", False)
                 # Preserve existing keys, so that the client no longer has to
                 # GET existing data, which is slower and race-condition prone.
                 history.stepdata = CombinedExpression(
