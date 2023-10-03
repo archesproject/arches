@@ -12,8 +12,14 @@ article.main-search-container {
             max-width: calc(100vw - 50px);
         }
         .search-tools-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
             @include break-at(small-desktop-max) {
                 width: 100%;
+            }
+            @include break-at(mobile-small) {
+                height: auto;
             }
             .clear-filter {
                 @include break-at(mobile-max) {
