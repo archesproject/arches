@@ -47,10 +47,26 @@ define([
                 select2Config.disabled = select2Config.disabled();
             }
 
+            // this initializes the placeholder for the single select element
+            // we shouldn't have to do this but there is some issue with selectwoo
+            // specifically rendering the placeholder for resource instance widgets in adv. search
+            var renderPlaceholder = function() {
+                var renderedEle = $(el).siblings().first().find('.select2-selection__rendered');
+                var placeholderEle = renderedEle.find('.select2-selection__placeholder');
+                if (placeholderEle[0]?.innerText === "" && !select2Config.multiple){
+                    placeholderEle.remove();
+                    var placeholderHtml = document.createElement("span");
+                    var placeholderText = document.createTextNode(select2Config.placeholder);
+                    placeholderHtml.classList.add('select2-selection__placeholder');
+                    placeholderHtml.appendChild(placeholderText);
+                    renderedEle.append(placeholderHtml);
+                }
+            };
+
             $(document).ready(function() {
                 select2Config.data = ko.unwrap(select2Config.data);
                 $(el).selectWoo(select2Config);
-               
+                
                 if (value) {
                     // initialize the dropdown with the value
                     $(el).val(value());
@@ -62,24 +78,15 @@ define([
                         // select2Config.value = newVal;
                         $(el).val(newVal);
                         $(el).trigger('change.select2');
+
+                        if(!newVal){
+                            renderPlaceholder();
+                        }
                     }, this);
                 }
+                renderPlaceholder();
             });
 
-            // this initializes the placeholder for the select element
-            // we shouldn't have to do this but there is some issue with selectwoo
-            // $(el).data('renderPlaceholder', function(){
-            //     var renderedEle = $(el).siblings().first().find('.select2-selection__rendered');
-            //     renderedEle.find('.select2-selection__placeholder').remove();
-            //     if (renderedEle[0].innerText === ""){
-            //         var placeholderHtml = document.createElement("span");
-            //         placeholderHtml.classList.add('select2-selection__placeholder');
-            //         var placeholderText = document.createTextNode(select2Config.placeholder);
-            //         placeholderHtml.appendChild(placeholderText);
-            //         renderedEle.append(placeholderHtml);
-            //     }
-            // });
-            // $(el).data('renderPlaceholder')();
             
             $(el).on("change", function(e) {
                 let val = $(el).val();
