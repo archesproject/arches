@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
-import Foo from 'Foo.vue';
+import Index from 'Index.vue';
 
-const app = createApp(Foo);
+const app = createApp(Index);
 app.provide('renderContext', 'editor');
 app.mount('#foo');
