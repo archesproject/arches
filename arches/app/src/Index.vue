@@ -1,6 +1,25 @@
-<script setup>
+<script>
+    import { shallowRef } from 'vue'
+    import SplashPage from '@/SplashPage.vue';
+    import UserDashboard from '@/UserDashboard.vue';
+
+    const user = shallowRef('permissioned');
+    // const user = shallowRef('non-permissioned');
+
+    export default{
+        components: {
+            UserDashboard,
+            SplashPage,
+        },
+        data() {
+            return {
+                user: user
+            }
+        }
+    }
 </script>
 
 <template>
-  <h2>HELLO WORLD!</h2>
+    <UserDashboard v-if="user === 'permissioned'" />
+    <SplashPage v-else />
 </template>
