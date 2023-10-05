@@ -128,7 +128,8 @@ define([
 
         this.createStep = function(stepConfigData) {
             var stepName = ko.unwrap(stepConfigData.name);
-            if (stepConfigData.workflowHistory.stepdata) {
+            if (stepConfigData.workflowHistory.stepdata?.[stepName]) {
+                // stepdata might exist without this specific stepName if injected
                 stepConfigData.id = Object.values(stepConfigData.workflowHistory.stepdata[stepName].componentIdLookup)[0];
             }
 
@@ -303,11 +304,13 @@ define([
                     if (currentStep.complete()) {
                         var stepData = currentStep['stepInjectionConfig']['injectionLogic'](currentStep);
                         if (stepData) {
+                            stepData.workflowHistory = history;
                             childStep = self.createStep(stepData);
                         }
                         currentStep.locked(true);
                     }
                     else if (defaultStepChoice) {
+                        defaultStepChoice.workflowHistory = history;
                         childStep = self.createStep(defaultStepChoice);
                     }
 
