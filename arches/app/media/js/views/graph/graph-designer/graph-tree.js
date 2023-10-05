@@ -251,16 +251,14 @@ define([
         },
 
         copyNodeId: function(node, e) {
-            const copyUUIDelement = $(copy_node_id)
-
             function restoreTitle(e) {
-                copyUUIDelement.tooltip('hide') 
-                copyUUIDelement.attr('data-original-title', 'Copy UUID to Clipboard')
-                copyUUIDelement.off('mouseleave', restoreTitle)
+                $(e.target).tooltip('hide') 
+                $(e.target).attr('data-original-title', 'Copy UUID to Clipboard')
+                $(e.target).off('mouseleave', restoreTitle)
             };
-            copyUUIDelement.attr('data-original-title', 'Copied to Clipboard!')
-            copyUUIDelement.tooltip('show')
-            copyUUIDelement.on('mouseleave', restoreTitle)
+            $(e.target).attr('data-original-title', 'Copied to Clipboard!')
+            $(e.target).tooltip('show')
+            $(e.target).on('mouseleave', restoreTitle)
 
             var nodeId = node.nodeid
             navigator.clipboard.writeText(nodeId);
