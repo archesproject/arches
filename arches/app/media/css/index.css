@@ -1,4 +1,6 @@
 @import url(../node_modules/chosen-js/chosen.css);
+@import url(../node_modules/primevue/resources/themes/saga-blue/theme.css);
+@import url(../node_modules/primevue/resources/primevue.min.css);
 
 html, body {
     overflow-x: hidden;

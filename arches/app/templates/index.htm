@@ -37,6 +37,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
+    {% block css %}
+    <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
+    {% endblock css %}
+
 </head>
 
 <body>

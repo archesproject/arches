@@ -20,6 +20,8 @@
 </script>
 
 <template>
-    <UserDashboard v-if="user === 'permissioned'" />
-    <SplashPage v-else />
+    <div style="height: 100vh;">
+        <UserDashboard v-if="user === 'permissioned'" />
+        <SplashPage v-else />
+    </div>
 </template>
