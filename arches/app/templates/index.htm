@@ -38,7 +38,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="author" content="">
 
     {% block css %}
-    <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
+    <!-- <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet"> -->
+    <link id="theme-link" href="/static/node_modules/primevue/resources/themes/mdc-light-indigo/theme.css" rel="stylesheet">
+        
+    <!-- <link id="theme-link" href="templates/themes/mdc-light-indigo/theme.css" rel="stylesheet" type="css" crossorigin="anonymous"> -->
     {% endblock css %}
 
 </head>

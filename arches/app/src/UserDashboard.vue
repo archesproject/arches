@@ -1,6 +1,7 @@
 <script setup>
 import Menubar from 'primevue/menubar';
-import { ref } from "vue";
+import { ref, watch } from 'vue'
+import ThemingButtons from '@/ThemingButtons.vue';
 
 const items = ref([
     {
@@ -128,6 +129,6 @@ const items = ref([
 </script>
 
 <template>
-    <h2>HELLO WORLD</h2>
+    <ThemingButtons />
     <Menubar :model="items" />
 </template>
