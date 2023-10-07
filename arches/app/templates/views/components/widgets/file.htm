@@ -176,7 +176,7 @@
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dd data-bind="class: nodeCssClasses">
+<dd data-bind="class: $parent.nodeCssClasses">
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
