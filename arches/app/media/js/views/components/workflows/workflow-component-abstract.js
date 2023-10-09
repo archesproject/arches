@@ -24,10 +24,11 @@ define([
             self.complete(false);
             self.saving(true);
 
-            self.savedData(self.value());
-            
-            self.complete(true);
-            self.saving(false);
+            self.setToWorkflowHistory('value', self.value()).then(() => {
+                self.savedData(self.value());
+                self.complete(true);
+                self.saving(false);
+            });
         };
 
         this.reset = function() {
@@ -641,7 +642,6 @@ define([
         this.savedComponentPaths = {};
         this.value = ko.observable();
 
-        this.initialized = false;
         this.complete = ko.observable(false);
         this.error = ko.observable();
         this.dirty = ko.observable(); /* user can manually set dirty state */
@@ -658,10 +658,7 @@ define([
 
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
-            // Don't immediately repost the value fetched on initialization
-            if (self.initialized) {
-                self.setToWorkflowHistory('value', savedData);
-            }
+            self.setToWorkflowHistory('value', savedData);
         });
 
         this.multiTileUpdated = ko.observable();
@@ -699,7 +696,6 @@ define([
                 self.value(savedValue);
                 self.complete(true);
             }
-            this.initialized = true;
         };
 
         this.loadComponent = function() {
@@ -760,7 +756,7 @@ define([
             }
         };
 
-        this.setToWorkflowHistory = function(key, value) {
+        this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflowId;
             const workflowHistory = {
                 workflowid,
@@ -773,7 +769,7 @@ define([
                 },
             };
 
-            fetch(arches.urls.workflow_history + workflowid, {
+            await fetch(arches.urls.workflow_history + workflowid, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
