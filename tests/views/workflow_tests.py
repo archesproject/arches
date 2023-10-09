@@ -27,6 +27,7 @@ class WorkflowHistoryTests(ArchesTestCase):
                     "componentIdLookup": {
                         "project-name": "84d0578f-6061-4015-a44d-c7b64cdb0551",
                     },
+                    "locked": False,
                 },
                 # etc...
             },
@@ -93,6 +94,7 @@ class WorkflowHistoryTests(ArchesTestCase):
                     "componentIdLookup": {
                         "project-statement": "ae8f2027-f2e1-447c-8763-125e65d4b666",
                     },
+                    "locked": False,
                 },
             },
             "componentdata": {
