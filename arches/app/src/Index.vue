@@ -13,13 +13,30 @@
         },
         data() {
             return {
-                user: user
+                user: user,
+                count: 1
             }
-        }
+        },
+        methods: {
+            increment() {
+                this.count += 1;
+                return this.count;
+            },
+            decrement() {
+                this.count -= 1;
+                return this.count;
+            }
+        },
     }
 </script>
 
 <template>
+    {{ $gettext("My message") }}
+    <p>
+        {{ $ngettext("%{c} result found.", "%{c} results found.", count, { c: count }) }}
+    </p>
+    <button @click="increment">Update search resutls</button>
+    <button @click="decrement">Decrease search resutls</button>
     <div style="height: 100vh;">
         <UserDashboard v-if="user === 'permissioned'" />
         <SplashPage v-else />

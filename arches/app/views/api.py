@@ -107,6 +107,12 @@ class APIBase(View):
 
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
+class UserLang(APIBase):
+    def get(self, request):
+        from django.utils.translation import get_language
+        
+        ret = {"lang": get_language()}
+        return JSONResponse(ret)
 
 class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
