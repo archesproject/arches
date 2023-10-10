@@ -188,13 +188,17 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: $root.translations.acceptedFileTypes"></span>
+    <span data-bind="text: node.config.imagesOnly
+        ? $root.translations.acceptedFileTypesImagesOnly : $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input 
         class="form-control input-md widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.exampleFileTypes, 'aria-label': $root.translations.acceptedFileTypes},
+            attr: {placeholder: node.config.imagesOnly
+                ? $root.translations.exampleImageTypes : $root.translations.exampleFileTypes,
+            'aria-label': node.config.imagesOnly
+                ? $root.translations.acceptedFileTypesImagesOnly : $root.translations.acceptedFileTypes},
             value: acceptedFiles, 
             valueUpdate: 'keyup'
         "
