@@ -133,7 +133,7 @@
                     <div class="row"
                         data-toggle="collapse"
                         style="cursor: pointer"
-                        data-bind="attr: {'data-target': '.file-metadata-additional-' + $parent.uniqueId + $index()},
+                        data-bind="attr: {'data-target': '.file-metadata-additional-' + $parent.unique_id + $index()},
                             click: $parent.updateClosedDropdowns($index())"
                     >
                         <div class="file-metadata">
@@ -141,7 +141,7 @@
                             <span data-bind="text: $root.translations.additionalMetadata"></span>
                         </div>
                     </div>
-                    <div class="row collapse" data-bind="class: 'file-metadata-additional-' + $parent.uniqueId + $index()">
+                    <div class="row collapse" data-bind="class: 'file-metadata-additional-' + $parent.unique_id + $index()">
                         <div class="file-metadata col-sm-6">
                             <label data-bind="text: $root.translations.title"></label>
                             <input

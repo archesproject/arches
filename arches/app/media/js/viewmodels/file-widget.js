@@ -101,17 +101,22 @@ define([
         };
         this.activeLanguage = arches.activeLanguage;
 
+        this.beforeChangeMetadataSnapshot = ko.observable({});
+        this.standaloneObservable = ko.observableArray();
+
         this.filesJSON = ko.computed(function() {
             var filesForUpload = self.filesForUpload();
             var uploadedFiles = self.uploadedFiles();
+            var standaloneObservable = self.standaloneObservable();  // for triggering update
+            var beforeChangeMetadataSnapshot = self.beforeChangeMetadataSnapshot();
             return uploadedFiles.concat(
                 _.map(filesForUpload, function(file, i) {
                     return {
                         name: file.name,
-                        altText: createStrObject(''),
-                        title: createStrObject(''),
-                        attribution: createStrObject(''),
-                        description: createStrObject(''),
+                        altText: beforeChangeMetadataSnapshot[i]?.altText ?? createStrObject(''),
+                        title: beforeChangeMetadataSnapshot[i]?.title ?? createStrObject(''),
+                        attribution: beforeChangeMetadataSnapshot[i]?.attribution ?? createStrObject(''),
+                        description: beforeChangeMetadataSnapshot[i]?.description ?? createStrObject(''),
                         accepted: file.accepted,
                         height: file.height,
                         lastModified: file.lastModified,
@@ -149,6 +154,40 @@ define([
                 );
             }
         });
+
+        this.equalMetadata = (a, b) => {
+            if (!a || !b) {
+                return false;
+            }
+            return (
+                a.altText[this.activeLanguage].value === b.altText[this.activeLanguage].value
+                && a.title[this.activeLanguage].value === b.title[this.activeLanguage].value
+                && a.attribution[this.activeLanguage].value === b.title[this.activeLanguage].value
+                && a.description[this.activeLanguage].value === b.title[this.activeLanguage].value
+            );
+        }
+
+        this.metadataIsEmpty = (metadata) => {
+            return !metadata.altText[this.activeLanguage].value
+                && !metadata.title[this.activeLanguage].value
+                && !metadata.attribution[this.activeLanguage].value
+                && !metadata.description[this.activeLanguage].value
+        };
+
+        this.filesJSON.subscribe(function(value) {
+            // Preserve current metadata for yet-to-be-uploaded files
+            value.filter(file => file.file_id === null).forEach((file, i) => {
+                const { altText, title, attribution, description } = file;
+                const metadata = { altText, title, attribution, description };
+                if (self.metadataIsEmpty(metadata)) {
+                    return;
+                }
+                if (!self.equalMetadata(self.beforeChangeMetadataSnapshot()[i], metadata)) {
+                    self.beforeChangeMetadataSnapshot()[i] = metadata;
+                    self.standaloneObservable.push(Math.random());
+                }
+            });
+        }, this, 'beforeChange');
 
         this.getFileUrl = function(url){
             url = ko.unwrap(url);
