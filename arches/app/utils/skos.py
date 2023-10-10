@@ -137,6 +137,12 @@ class SKOSReader(object):
                         if predicate == SKOS.hasTopConcept:
                             top_concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             self.relations.append({"source": scheme_id, "type": "hasTopConcept", "target": top_concept_id})
+                        elif predicate == SKOS.narrower:
+                            concept_id = self.generate_uuid_from_subject(baseuuid, object)
+                            raise Exception(f"The Concept Scheme defines a \"narrower\" relation to a concept instead of using \"hasTopConcept\".  First concept with incorrect relation: {object}")
+
+                if len(self.relations) == 0:
+                    raise Exception("The SKOS file doesn't appear to have any Top Concepts defined.")
 
                 concept_scheme.addvalue(
                     {

@@ -28,10 +28,15 @@ define([
         };
 
         this.load_details = params.load_details;
+        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
+        this.config = params.config;
         this.loading(true);
         this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
@@ -54,8 +59,8 @@ define([
         this.searchUrl = ko.observable();
         this.caseInsensitive = ko.observable();
         this.trim = ko.observable();
-        this.numberOfResources = ko.observable();
-        this.numberOfTiles = ko.observable();
+        this.numberOfResources = ko.observable(0);
+        this.numberOfTiles = ko.observable(0);
         this.selectedCaseOperation = ko.observable();
 
         this.caseOperations = [
@@ -87,6 +92,27 @@ define([
                 !self.previewing() &&
                 ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
             return ready;
+        });
+
+        this.clearResults = ko.computed(() => {
+            // if any of these values change then clear the preview results
+            self.showPreview(false);
+            // we don't actually care about the results of the following
+            let clearResults = '';
+            [self.selectedGraph(),
+                self.selectedCaseOperation(),
+                self.selectedNode(),
+                self.searchUrl(),
+                self.selectedLanguage(),
+                ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'))
+            ].forEach(function(item){
+                clearResults += item?.toString();
+            });
+            return clearResults;
+        });
+
+        this.allowEditOperation = ko.computed(() => {
+            return self.ready() && self.numberOfTiles() > 0 && self.showPreview();
         });
 
         this.addAllFormData = () => {
@@ -182,7 +208,7 @@ define([
         };
 
         this.write = function() {
-            if (!self.ready()) {
+            if (!self.allowEditOperation()) {
                 return;
             }
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
