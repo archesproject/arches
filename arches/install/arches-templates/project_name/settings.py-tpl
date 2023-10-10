@@ -37,6 +37,8 @@ LOCALE_PATHS.append(os.path.join(APP_ROOT, 'locale'))
 
 FILE_TYPE_CHECKING = False
 FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
+UPLOADED_FILES_DIR = "uploadedfiles"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
@@ -300,7 +302,7 @@ CELERY_BEAT_SCHEDULE = {
 # way of monitoring celery so you can detect the background task not being available.
 CELERY_CHECK_ONLY_INSPECT_BROKER = False
 
-CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, UPLOADED_FILES_DIR)
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
 ACCESSIBILITY_MODE = False
@@ -353,7 +355,7 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 try:
     from .package_settings import *
 except ImportError:
-    try: 
+    try:
         from package_settings import *
     except ImportError as e:
         pass
@@ -361,7 +363,7 @@ except ImportError:
 try:
     from .settings_local import *
 except ImportError as e:
-    try: 
+    try:
         from settings_local import *
     except ImportError as e:
         pass
