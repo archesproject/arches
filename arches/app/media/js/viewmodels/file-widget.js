@@ -264,14 +264,16 @@ define([
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + self.unique_id;
         });
-        this.closedDropdowns = ko.observableArray([]);  // indexes of files with closed metadata dropdowns
-        this.updateClosedDropdowns = (index) => {
+
+        // metadata drawer toggles. 0-indexed. true = expanded
+        this.dropdownToggles = ko.observable({});
+        this.toggleDropdown = (index) => {
             // dz will emit a click, so this function runs once before the user clicks
-            if (self.closedDropdowns().includes(index)) {
-                self.closedDropdowns.remove(index);
-            } else {
-                self.closedDropdowns.push(index);
-            }
+            const oldValue = self.dropdownToggles()[index];
+            self.dropdownToggles({
+                ...self.dropdownToggles(),
+                [index]: !oldValue,
+            });
         };
 
         this.dropzoneOptions = {
@@ -291,6 +293,9 @@ define([
 
                 this.on("addedfile", function(file) {
                     self.filesForUpload.push(file);
+                    // "true" is a misnomer: we're expecting dz to immediately emit
+                    // a click and cause this to become false.
+                    self.dropdownToggles()[Object.keys(self.dropdownToggles()).length] = true;
                 });
 
                 this.on("error", function(file, error) {

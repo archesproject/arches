@@ -134,10 +134,10 @@
                         data-toggle="collapse"
                         style="cursor: pointer"
                         data-bind="attr: {'data-target': '.file-metadata-additional-' + $parent.unique_id + $index()},
-                            click: $parent.updateClosedDropdowns($index())"
+                            click: $parent.toggleDropdown($index())"
                     >
                         <div class="file-metadata">
-                            <i class="fa" aria-hidden="true" data-bind="class: $parent.closedDropdowns().includes($index()) ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                            <i class="fa" aria-hidden="true" data-bind="class: $parent.dropdownToggles()[$index()] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
                             <span data-bind="text: $root.translations.additionalMetadata"></span>
                         </div>
                     </div>
