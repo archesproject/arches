@@ -1765,6 +1765,37 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
+    def update_published_graphs(self, user=None, notes=None):
+        """
+        Changes information in in GraphPublication models without creating
+        a new entry in graphs_x_published_graphs table
+        """
+        published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+
+        for language_tuple in settings.LANGUAGES:
+            translation.activate(language=language_tuple[0])
+
+            serialized_graph = JSONDeserializer().deserialize(
+                JSONSerializer().serialize(self, force_recalculation=True)
+            )
+
+            published_graph_query = published_graphs.filter(language=language_tuple[0])
+            if not len(published_graph_query):
+                published_graph = models.PublishedGraph.objects.create(
+                    publication=self.publication,
+                    serialized_graph=serialized_graph,
+                    language=models.Language.objects.get(code=language_tuple[0]),
+                )
+            elif len(published_graph_query) == 1:
+                published_graph = published_graph_query[0]
+                published_graph.serialized_graph = serialized_graph
+            else:
+                raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
+
+            published_graph.save()
+            
+            translation.deactivate()
+
     def publish(self, user, notes=None):
         """
         Adds a row to the GraphXPublishedGraph table
@@ -1806,6 +1837,15 @@ class Graph(models.GraphModel):
         self.publication = None
         self.save(validate=False)
 
+
+class GraphPublicationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Graph Publication Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):
