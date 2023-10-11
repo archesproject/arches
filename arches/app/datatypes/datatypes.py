@@ -761,7 +761,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
 
         source_name = "resources-%s" % node.nodeid
-        layer_name = "%s - %s" % (node.graph.name, node.name)
+        # layer_name = "%s - %s" % (node.graph.name, node.name)
+        layer_name = "All %ss" % (node.graph.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
         layer_icon = node.graph.iconclass
