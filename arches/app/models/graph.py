@@ -1765,7 +1765,7 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def update_published_graphs(self, user=None, notes=None):
+    def update_published_graphs(self):
         """
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table

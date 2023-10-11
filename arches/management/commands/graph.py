@@ -96,7 +96,7 @@ class Command(BaseCommand):
             print(graph.name)
             
             if self.update:
-                graph.update_published_graphs(user)
+                graph.update_published_graphs()
             else:
                 graph.publish(user)
 
