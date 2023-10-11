@@ -180,3 +180,46 @@ embed:focus-visible,
     box-shadow: inset 0 0 0 5px #fae619 !important;
     box-sizing: border-box;
 }
+
+
+// Landing page
+.application-name h1 {
+    font-size: 1.3rem;
+}
+
+.navbar-toggle {
+    &:hover{
+        background: #000;
+    }
+}
+
+.down-button {
+    border: 3px solid #fff;
+}
+
+.down-button-icon {
+    opacity: 1;
+}
+
+.down-button {
+	&:hover {
+		color: #13ce67;
+		border: 3px solid #13ce67;
+	}
+	&:focus {
+		color: #13ce67;
+		border: 3px solid #13ce67;
+	}
+}
+
+.wide-box .box-highlight p {
+    color: #555;
+}
+
+.splash-link-address:focus,
+.splash-link-address:hover,
+.link-spacing:focus,
+.link-spacing:hover {
+    color: #7AD02F;
+    text-decoration: underline;
+}
