@@ -29,23 +29,21 @@
                 </div>
             </div>
             <div class="search-tools-container">
-                <div class="row">
-                    <div class="col-xs-6">
-                        <!-- Result Count and ordering Block -->
-                        <div class="search-count-container">
-                            <p class="search-title" aria-live="polite" data-bind="text: $root.translations.shownTotalSearchResults(hits(), total())"></p>
-                        </div>
+                <div class="search-tools-item">
+                    <!-- Result Count and ordering Block -->
+                    <div class="search-count-container">
+                        <p class="search-title" aria-live="polite" data-bind="text: $root.translations.shownTotalSearchResults(hits(), total())"></p>
                     </div>
-                    <div class="col-xs-6">
-                        <div class="search-controls-container">
-                            <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
-                            <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
-                            <!--/ko-->
-                            <div data-bind="component: {
-                                name: 'sort-results',
-                                params: sharedStateObject
-                            }"></div>
-                        </div>
+                </div>
+                <div class="search-tools-item">
+                    <div class="search-controls-container">
+                        <!--ko if: ko.unwrap(sharedStateObject.filterApplied) -->
+                        <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {sharedStateObject.clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
+                        <!--/ko-->
+                        <div data-bind="component: {
+                            name: 'sort-results',
+                            params: sharedStateObject
+                        }"></div>
                     </div>
                 </div>
             </div>
