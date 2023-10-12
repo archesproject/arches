@@ -20,8 +20,9 @@ define([
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
 
-            this.shouldShowEditService = params.shouldShowEditService || ko.observable(true);
-            this.editService = ko.observable(false);
+            // params.shouldShowEditService is deprecated, but retained for backward compatibility for other projects that may have used it.  Use params.shouldShowSelectService instead.
+            this.shouldShowSelectService = params.shouldShowSelectService || params.shouldShowEditService || ko.observable(true);
+            this.selectService = ko.observable(false);
             
             this.shouldShowCreateService = params.shouldShowCreateService || ko.observable(true);
             this.createService = ko.observable(true);

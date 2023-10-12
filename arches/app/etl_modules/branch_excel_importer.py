@@ -12,6 +12,7 @@ from django.db import connection
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import TileModel
+from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.management.commands.etl_template import create_workbook
@@ -34,7 +35,7 @@ class BranchExcelImporter(BaseImportModule):
     @load_data_async
     def run_load_task_async(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
         if self.file_details:
@@ -64,7 +65,7 @@ class BranchExcelImporter(BaseImportModule):
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row_details[key]
                 config = node_details["config"]
-                config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
+                config["path"] = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
                 config["loadid"] = self.loadid
                 try:
                     config["nodeid"] = nodeid
@@ -124,7 +125,7 @@ class BranchExcelImporter(BaseImportModule):
 
                     operation = "insert"
                     if user_tileid:
-                        if nodegroup_cardinality == "n":                            
+                        if nodegroup_cardinality == "n":
                             operation = "update" # db will "insert" if tileid does not exist
                         elif nodegroup_cardinality == "1":
                             if TileModel.objects.filter(pk=cell_values[1]).exists():
@@ -183,7 +184,7 @@ class BranchExcelImporter(BaseImportModule):
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
+            uploaded_file_path = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid, file)
             workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
             graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
