@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9979_update_stage_for_bulk_edit"),
+        ("models", "10097_add_editlog_index"),
     ]
 
     operations = [
