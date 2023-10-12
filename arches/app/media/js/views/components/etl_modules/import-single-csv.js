@@ -46,6 +46,7 @@ define([
         });
 
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.validationErrors = params.validationErrors || ko.observable();
         this.validated = params.validated || ko.observable();
         this.getErrorReport = params.getErrorReport;
