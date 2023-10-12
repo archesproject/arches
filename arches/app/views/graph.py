@@ -282,7 +282,7 @@ class GraphDesignerView(GraphBaseView):
 
         context["nav"]["menu"] = True
 
-        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+        context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
 
         return render(request, "views/graph-designer.htm", context)
 
