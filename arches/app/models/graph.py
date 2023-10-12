@@ -32,6 +32,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils.i18n import LanguageSynchronizer
 from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
@@ -1770,31 +1771,32 @@ class Graph(models.GraphModel):
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
         """
-        published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+        with transaction.atomic():
+            LanguageSynchronizer.synchronize_settings_with_db()
+            published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 
-        for language_tuple in settings.LANGUAGES:
-            translation.activate(language=language_tuple[0])
+            for language_tuple in settings.LANGUAGES:
+                translation.activate(language=language_tuple[0])
 
-            serialized_graph = JSONDeserializer().deserialize(
-                JSONSerializer().serialize(self, force_recalculation=True)
-            )
-
-            published_graph_query = published_graphs.filter(language=language_tuple[0])
-            if not len(published_graph_query):
-                published_graph = models.PublishedGraph.objects.create(
-                    publication=self.publication,
-                    serialized_graph=serialized_graph,
-                    language=models.Language.objects.get(code=language_tuple[0]),
+                serialized_graph = JSONDeserializer().deserialize(
+                    JSONSerializer().serialize(self, force_recalculation=True)
                 )
-            elif len(published_graph_query) == 1:
-                published_graph = published_graph_query[0]
-                published_graph.serialized_graph = serialized_graph
-            else:
-                raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
 
-            published_graph.save()
-            
-            translation.deactivate()
+                published_graph_query = published_graphs.filter(language=language_tuple[0])
+                if not len(published_graph_query):
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication=self.publication,
+                        serialized_graph=serialized_graph,
+                        language=models.Language.objects.get(code=language_tuple[0]),
+                    )
+                elif len(published_graph_query) == 1:
+                    published_graph = published_graph_query[0]
+                    published_graph.serialized_graph = serialized_graph
+                else:
+                    raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
+
+                published_graph.save()
+                translation.deactivate()
 
     def publish(self, user, notes=None):
         """
@@ -1802,6 +1804,8 @@ class Graph(models.GraphModel):
         Assigns GraphXPublishedGraph id to Graph
         """
         with transaction.atomic():
+            LanguageSynchronizer.synchronize_settings_with_db()
+
             try:
                 publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,
