@@ -4422,7 +4422,7 @@ div.dropdown-menu.open {
     height: 8px;
     background: #55AA55;
     border-radius: 50%;
-    z-index: 10;
+    z-index: auto;
     position: absolute;
 }
 
@@ -4432,7 +4432,7 @@ div.dropdown-menu.open {
     background: #fff;
     border: 1px solid #6E7F93;
     border-radius: 50%;
-    z-index: 9;
+    z-index: auto;
     position: absolute;
     margin-left: -2px;
     margin-top: -2px;
