@@ -378,7 +378,7 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
-        use_celery_bulk_edit = False
+        use_celery_bulk_edit = True
 
         if use_celery_bulk_edit:
             response = self.run_load_task_async(request, self.loadid)
