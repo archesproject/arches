@@ -9,6 +9,7 @@ define([
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
+    'views/components/simple-switch',
 ], function(_, $, Cookies, ko, uuid, arches, JsonErrorAlertViewModel) {
     const ExcelFileExportViewModel = function(params) {
         const self = this;
@@ -22,6 +23,7 @@ define([
         this.searchUrl = ko.observable();
         this.formatTime = params.formatTime;
         this.timeDifference = params.timeDifference;
+        this.exportConceptsAs = ko.observable('uuids');
 
         this.graphs = arches.resources.map(resource => ({name: resource.name, graphid: resource.graphid}));
         this.selectedGraph = ko.observable();
@@ -33,6 +35,7 @@ define([
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
         this.alert = params.alert;
+        this.filename = ko.observable();
 
         this.getGraphName = (selectedGraphId) => {
             if (self.graphs) {
@@ -43,6 +46,7 @@ define([
         this.exportResources = async function() {
             self.formData.append('graph_id', self.selectedGraph());
             self.formData.append('graph_name', self.getGraphName(self.selectedGraph()));
+            self.formData.append('export_concepts_as', self.exportConceptsAs());
             const response = await self.submit('export');
             params.activeTab("import");
 
@@ -69,6 +73,11 @@ define([
             self.formData.append('action', action);
             self.formData.append('load_id', self.loadId);
             self.formData.append('module', self.moduleId);
+
+            if (self.filename()) {
+                self.formData.append('filename', self.filename());
+            }
+            
             return fetch(arches.urls.etl_manager, {
                 method: 'POST',
                 body: self.formData,

@@ -201,6 +201,7 @@ class ResourceEditorView(MapBaseManagerView):
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
 
+
         ontologyclass = None
         nodegroups = []
         editable_nodegroups = []
@@ -349,6 +350,9 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
+    
+        if resourceid not in (None, ""):
+            context["nav"]["report_view"] = True
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
             context["nav"]["help"] = {"title": _("Managing System Settings"), "templates": ["system-settings-help"]}
@@ -543,12 +547,16 @@ class ResourceEditLogView(BaseManagerView):
                     pass
 
     def get(self, request, resourceid=None, view_template="views/resource/edit-log.htm"):
+        transaction_id = request.GET.get("transactionid", None)
         if resourceid is None:
-            recent_edits = (
-                models.EditLog.objects.all()
-                .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .order_by("-timestamp")[:100]
-            )
+            if transaction_id:
+                recent_edits = models.EditLog.objects.filter(transactionid=transaction_id).order_by("-timestamp")
+            else:
+                recent_edits = (
+                    models.EditLog.objects.all()
+                    .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    .order_by("-timestamp")[:100]
+                )
             edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
             resources = Resource.objects.filter(resourceinstanceid__in=edited_ids).select_related("graph")
             edit_type_lookup = {
