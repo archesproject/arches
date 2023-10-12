@@ -145,7 +145,7 @@ class ArchesProjectCommand(TemplateCommand):
         options["arches_version"] = "master"
         if complete_version[3] == 'final':
             options["arches_version"] = f"stable/{__version__}"
-        elif complete_version[3] == 'beta':
+        elif complete_version[3] in ['alpha','beta','rc']:
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
 
         super(ArchesProjectCommand, self).handle('project', project_name, target, **options)
