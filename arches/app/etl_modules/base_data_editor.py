@@ -304,9 +304,9 @@ class BulkStringEditor(BaseBulkEditor):
         with connection.cursor() as cursor:
             for value in first_five_values:
                 if operation == "replace":
-                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s);""", [value, pattern, new_text])
+                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'g');""", [value, pattern, new_text])
                 elif operation == "replace_i":
-                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'i');""", [value, pattern, new_text])
+                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'ig');""", [value, pattern, new_text])
                 elif operation == "trim":
                     cursor.execute("""SELECT * FROM TRIM(%s);""", [value])
                 elif operation == "capitalize":

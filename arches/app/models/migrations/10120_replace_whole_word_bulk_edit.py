@@ -66,9 +66,9 @@ class Migration(migrations.Migration):
                         WHEN 'lower_trim' THEN
                             t.tiledata -> nodeid::text -> language_code ->> 'value' <> TRIM(LOWER(t.tiledata -> nodeid::text -> language_code ->> 'value'))
                         WHEN 'replace_i' THEN
-                            t.tiledata -> nodeid::text -> language_code ->> 'value' <> REGEXP_REPLACE(t.tiledata -> nodeid::text -> language_code ->> 'value', old_text, new_text, 'i')
+                            t.tiledata -> nodeid::text -> language_code ->> 'value' <> REGEXP_REPLACE(t.tiledata -> nodeid::text -> language_code ->> 'value', old_text, new_text, 'gi')
                         WHEN 'replace' THEN
-                            t.tiledata -> nodeid::text -> language_code ->> 'value' <> REGEXP_REPLACE(t.tiledata -> nodeid::text -> language_code ->> 'value', old_text, new_text)
+                            t.tiledata -> nodeid::text -> language_code ->> 'value' <> REGEXP_REPLACE(t.tiledata -> nodeid::text -> language_code ->> 'value', old_text, new_text, 'g')
                         END
                     LIMIT update_limit;
             END;
@@ -210,9 +210,9 @@ class Migration(migrations.Migration):
                                         FORMAT('{%s, "value"}', language_code)::text[],
                                         CASE operation
                                             WHEN 'replace' THEN
-                                                to_jsonb(REGEXP_REPLACE(updated_value -> language_code ->> 'value', old_text, new_text))
+                                                to_jsonb(REGEXP_REPLACE(updated_value -> language_code ->> 'value', old_text, new_text, 'g'))
                                             WHEN 'replace_i' THEN
-                                                to_jsonb(REGEXP_REPLACE(updated_value -> language_code ->> 'value', old_text, new_text, 'i'))
+                                                to_jsonb(REGEXP_REPLACE(updated_value -> language_code ->> 'value', old_text, new_text, 'gi'))
                                             WHEN 'trim' THEN
                                                 to_jsonb(TRIM(updated_value -> language_code ->> 'value'))
                                             WHEN 'capitalize' THEN
