@@ -13,6 +13,7 @@ from django.core.files.storage import default_storage
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import Node, TileModel
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.base_import_module import BaseImportModule
@@ -34,7 +35,7 @@ class TileExcelImporter(BaseImportModule):
     @load_data_async
     def run_load_task_async(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
         if self.file_details:
@@ -63,7 +64,7 @@ class TileExcelImporter(BaseImportModule):
                 datatype_instance = self.datatype_factory.get_instance(datatype)
                 source_value = row_details[key]
                 config = node_details["config"]
-                config["path"] = os.path.join("uploadedfiles", "tmp", self.loadid)
+                config["path"] = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
                 config["loadid"] = self.loadid
                 try:
                     config["nodeid"] = nodeid
@@ -96,8 +97,11 @@ class TileExcelImporter(BaseImportModule):
         row_count = 0
 
         nodegroupid_column = int(worksheet.max_column)
-        nodegroup_alias = nodegroup_lookup[worksheet.cell(row=2,column=nodegroupid_column).value]['alias']
-        data_node_lookup[nodegroup_alias] = [val.value for val in worksheet[1][3:-3]]
+        maybe_nodegroup = worksheet.cell(row=2,column=nodegroupid_column).value
+        if maybe_nodegroup:
+            nodegroup_alias = nodegroup_lookup[maybe_nodegroup]['alias']
+            data_node_lookup[nodegroup_alias] = [val.value for val in worksheet[1][3:-3]]
+        # else: empty worksheet (no tiles)
 
         for row in worksheet.iter_rows(min_row=2):
             cell_values = [cell.value for cell in row]
@@ -127,7 +131,7 @@ class TileExcelImporter(BaseImportModule):
                 nodegroup_cardinality = nodegroup_lookup[row_details["nodegroup_id"]]["cardinality"]
                 operation = 'insert'
                 if user_tileid:
-                    if nodegroup_cardinality == "n":                            
+                    if nodegroup_cardinality == "n":
                         operation = "update" # db will "insert" if tileid does not exist
                     elif nodegroup_cardinality == "1":
                         if TileModel.objects.filter(pk=tileid).exists():
@@ -161,7 +165,7 @@ class TileExcelImporter(BaseImportModule):
             [self.loadid],
         )
         return {"name": worksheet.title, "rows": row_count}
-    
+
     def validate_uploaded_file(self, workbook):
         graphid = None
         for worksheet in workbook.worksheets:
@@ -189,7 +193,7 @@ class TileExcelImporter(BaseImportModule):
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
-            uploaded_file_path = os.path.join("uploadedfiles", "tmp", self.loadid, file)
+            uploaded_file_path = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid, file)
             workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
             graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
