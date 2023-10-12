@@ -15,6 +15,7 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from collections import OrderedDict
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
@@ -1293,12 +1294,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
         user = request.user
         perm = "read_nodegroup"
 
-        return JSONResponse(
-            {
-                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm)
-                for resource in Resource.objects.filter(pk__in=resource_ids)
-            }
-        )
+        disambiguated_resource_instances = OrderedDict().fromkeys(resource_ids)
+        for resource in Resource.objects.filter(pk__in=resource_ids):
+            disambiguated_resource_instances[str(resource.pk)] = resource.to_json(
+                compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm
+            )
+
+        return JSONResponse(disambiguated_resource_instances, sort_keys=False)
 
 
 @method_decorator(csrf_exempt, name="dispatch")

@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% block form %}
-<div class="toggle-container" data-bind="let: {uid: Math.random().toString()}">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled }, 
+<div class="toggle-container" data-bind="let: {uid: Math.random().toString()}, class: nodeCssClasses">
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getvalue() === true, 'null': getvalue() === null, 'disabled': disabled },
           onEnterkeyClick, onSpaceClick, click: setvalue, attr: {'aria-checked': getariavalue(), 'aria-label': label() + ', ' + localizedSubtitle()}" tabindex="0" role="checkbox"
     ><small></small></span>
             <div style="display:flex; flex-direction:row;">
@@ -29,8 +29,8 @@
   <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="toggle-container" data-bind="let: {uid: Math.random().toString()}">
-    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null}, 
-          onEnterkeyClick, onSpaceClick, click: setdefault, attr: {'aria-checked': getariadefault, 'aria-label': label() + ', ' + localizedSubtitle()}" 
+    <span class="switch switch-small switch-widget" data-bind="css: {'on': getdefault() === true, 'null': getdefault() === null},
+          onEnterkeyClick, onSpaceClick, click: setdefault, attr: {'aria-checked': getariadefault, 'aria-label': label() + ', ' + localizedSubtitle()}"
           tabindex="0" tabindex="0" role="checkbox"
     ><small></small></span>
             <div style="display:flex; flex-direction:row;">
