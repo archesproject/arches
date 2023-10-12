@@ -763,7 +763,7 @@ class Command(BaseCommand):
                 self.import_business_data_relations(relation)
 
             uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
-            dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
+            dest_files_dir = os.path.join(settings.MEDIA_ROOT, settings.UPLOADED_FILES_DIR)
             if os.path.exists(dest_files_dir) is False:
                 os.makedirs(dest_files_dir)
             for f in uploaded_files:
