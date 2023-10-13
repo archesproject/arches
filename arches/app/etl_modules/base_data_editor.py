@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, ETLModule
 from arches.app.models.system_settings import settings
-from arches.app.search.elasticsearch_dsl_builder import Bool, FiltersAgg, Match, Nested, NestedAgg, Query, Terms, Wildcard
+from arches.app.search.elasticsearch_dsl_builder import Bool, FiltersAgg, Match, Nested, NestedAgg, Query, Terms, Wildcard, Regex
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
@@ -194,17 +194,11 @@ class BulkStringEditor(BaseBulkEditor):
                     case_insensitive=case_insensitive,
                 )
             else:
-                if case_insensitive:
-                    search_query = Match(
-                        field=f"tiles.data.{node_id}.{language_code}.value",
-                        query=old_text,
-                        type="phrase",
-                    )
-                else:
-                    search_query = Terms(
-                        field=f"tiles.data.{node_id}.{language_code}.value",
-                        terms=old_text,
-                    )
+                search_query = Regex(
+                    field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                    query=f"(.* {old_text} .*)|({old_text} .*)|(.* {old_text})|({old_text})",
+                    case_insensitive=case_insensitive,
+                )
 
             search_bool_agg = Bool()
             search_bool_agg.must(search_query)
@@ -218,13 +212,13 @@ class BulkStringEditor(BaseBulkEditor):
                 regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)|((.+[ ]+)[a-z].*)|((.+[ ]+)[A-Z][a-zA-Z]*[A-Z].*)"
             elif operation.startswith("trim"):
                 regexp = "[ \t].*|.*[ \t]"
-            case_search_query = {
-                "regexp": {
-                    f"tiles.data.{str(node_id)}.{language_code}.value.keyword": {
-                        "value": regexp
-                    }
-                }
-            }
+            
+            case_search_query = Regex(
+                field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                query=regexp,
+                case_insensitive=case_insensitive,
+            )
+
             search_query = Bool()
             search_query.must(case_search_query)
             search_bool_agg = Bool()
