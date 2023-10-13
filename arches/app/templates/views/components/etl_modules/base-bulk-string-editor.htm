@@ -133,8 +133,17 @@
     </section>
     <!-- ko if: showPreview-->
     <section  class="etl-preview">
+        <!-- ko if: numberOfTiles() === 0 -->
+        <h3 style="margin-top: 0px;">
+            <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
+        </h3>
+        <!-- /ko -->
+        <!-- ko if: numberOfTiles() > 0 -->
         <h3 style="margin-top: 0px;">
             <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
+        </h3>
+        <h3 style="margin-top: 0px;color:red;" data-bind="if: numberOfTiles() > config.updateLimit">
+            <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.bulkEditLimitWarning(config.updateLimit.toLocaleString())"></span>
         </h3>
         <table class="table table-striped csv-mapping-table">
             <thead>
@@ -147,7 +156,7 @@
                     </th>
                 </tr>
             </thead>
-            <tbody data-bind="value: console.log(previewValue())">
+            <tbody>
                 <!-- ko foreach: { data: previewValue(), as: "row" } -->
                 <!-- ko if: row[0] -->
                 <tr>
@@ -158,11 +167,12 @@
                 <!-- /ko -->
             </tbody>
         </table>
+        <!-- /ko -->
     </section>
     <!-- /ko -->
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !ready()}" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="click: write, css: {disabled: !allowEditOperation()}" class="btn btn-success">
         <span data-bind="text: $root.translations.start"></span>
     </button>
 </div>
@@ -211,13 +221,9 @@
                 <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
                 <td>
                     <!-- ko foreach: load_details.number_of_import -->
-                    <span class="etl-loading-metadata-value" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
-                    <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesUpdated($data.total)"></div>
                     <!-- ko foreach: $data.tiles -->
-                    <div style="padding-left: 20px;">
-                        <span class="etl-loading-metadata-value" data-bind="text: $data.tile + ':'"></span>
-                        <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
-                    </div>
+                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfTilesUpdated($data.count)"></div>
                     <!-- /ko -->
                     <!-- /ko -->
                 </td>      

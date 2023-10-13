@@ -17,6 +17,7 @@ import logging
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
@@ -281,6 +282,9 @@ class EditLog(models.Model):
     class Meta:
         managed = True
         db_table = "edit_log"
+        indexes = [
+            models.Index(fields=["transactionid"]),
+        ]
 
 
 class ExternalOauthToken(models.Model):
@@ -322,7 +326,7 @@ class ResourceRevisionLog(models.Model):
 
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True)
-    path = models.FileField(upload_to="uploadedfiles")
+    path = models.FileField(upload_to=import_class_from_string(settings.FILENAME_GENERATOR))
     tile = models.ForeignKey("TileModel", db_column="tileid", null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
