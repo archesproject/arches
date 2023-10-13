@@ -287,7 +287,7 @@ class Tile(models.TileModel):
                 node = models.Node.objects.get(nodeid=nodeid)
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
-                if self.data[nodeid] is None and node.isrequired is True:
+                if not self.data[nodeid] and node.isrequired is True:
                     if len(node.cardxnodexwidget_set.all()) > 0:
                         missing_nodes.append(node.cardxnodexwidget_set.all()[0].label)
                     else:
