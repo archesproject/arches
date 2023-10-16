@@ -125,6 +125,12 @@
                     <label for="case-insensitive-input" data-bind="text: $root.translations.caseInsensitive"></label>
                 </span>
             </div>
+            <div>
+                <span class="form-check">
+                    <input id="whole-word-input" type="checkbox" data-bind="checked: wholeWord">
+                    <label for="whole-word-input" data-bind="text: $root.translations.wholeWord"></label>
+                </span>
+            </div>
         </div>
         <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
