@@ -35,7 +35,7 @@
     <span data-bind="text: $root.translations.availableGeometryTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input style="display:inline-block;"
+    <select style="display:inline-block;"
         data-bind="select2Query: {
             select2Config: {
                 clickBubble: true,
@@ -56,8 +56,8 @@
                 }]
             }
         },
-        attr: {'aria-label': $root.translations.availableGeometryTypes}
-    ">
+        attr: {'aria-label': $root.translations.availableGeometryTypes}">
+    </select>
 </div>
 <div class="control-label">
     <span data-bind="text: $root.translations.mapCenterLongitude"></span>

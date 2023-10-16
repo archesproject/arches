@@ -28,7 +28,7 @@
     </div>
     <!-- /ko -->
 
-    <div id="skip-link-holder"><a id="skip-link" data-bind="text: $root.translations.skipToContent" tabindex="1" href="#skiptocontent"></a></div>
+    <div id="skip-link-holder"><a id="skip-link" data-bind="text: $root.translations.skipToContent" href="#skiptocontent"></a></div>
 
     <div id="container" class="base-manager-grid effect aside-left aside-bright navbar-fixed sidenav-sm"
         data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'sidenav-sm': !navExpanded(), 'sidenav-lg': navExpanded()}">
@@ -446,6 +446,15 @@
                                 </div>
                             </button>
                         </li>
+                        {% endif %}
+
+                        {% if nav.report_view %}
+                        <a href="{% url 'resource_report' resourceid %}" class="ep-tools ep-tools-right"
+                            data-bind="click:function () { navigate('{% url 'resource_report' resourceid %}') }" aria-label="{% trans 'View Report' %}">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "View Report" %}">
+                                <i class="ion-android-document"></i>
+                            </div>
+                        </a>
                         {% endif %}
 
                         {% if nav.help %}

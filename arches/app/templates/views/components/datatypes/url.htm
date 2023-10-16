@@ -5,27 +5,27 @@
     <select 
         class="resources" 
         data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: $root.translations.like, value: '~' },
-                { text: $root.translations.notLike, value: '!~' },
-                { text: $root.translations.equals, value: 'eq' },
-                { text: $root.translations.not, value: '!eq' },
-            ],
+            select2Query: {
+                select2Config:{
+                    data: [
+                        { text: $root.translations.like, id: '~' },
+                        { text: $root.translations.notLike, id: '!~' },
+                        { text: $root.translations.equals, id: 'eq' },
+                        { text: $root.translations.not, id: '!eq' },
+                    ],
+                    value: op
+            }}
         "
     ></select>
 </div>
 
 <div class="col-md-8 col-lg-9">
     <input 
-        type="text"  
+        type="text" 
         class="form-control input-lg" 
         style="height: 36px;"
         data-bind="
-            attr: {placeholder: $root.translations.name},
+            attr: {placeholder: $root.translations.value, 'aria-label': $root.translations.value },
             textInput: searchValue
         "
     >

@@ -8,16 +8,16 @@ define(['knockout', 'templates/views/components/datatypes/date.htm'], function(k
             this.dateFormat = params.config.dateFormat;
             this.dateFormatOptions = ko.observableArray([{
                 'id': 'YYYY-MM-DD HH:mm:ssZ',
-                'name': 'ISO 8601 Time (YYYY-MM-DD HH:mm:ssZ)'
+                'text': 'ISO 8601 Time (YYYY-MM-DD HH:mm:ssZ)'
             }, {
                 'id': 'YYYY-MM-DD',
-                'name': 'ISO 8601 (YYYY-MM-DD)'
+                'text': 'ISO 8601 (YYYY-MM-DD)'
             }, {
                 'id': 'YYYY-MM',
-                'name': 'ISO 8601 Month (YYYY-MM)'
+                'text': 'ISO 8601 Month (YYYY-MM)'
             }, {
                 'id': 'YYYY',
-                'name': 'CE Year (YYYY)'
+                'text': 'CE Year (YYYY)'
             }]);
     
             this.onDateFormatSelection = function(val, e) {
@@ -29,7 +29,7 @@ define(['knockout', 'templates/views/components/datatypes/date.htm'], function(k
             var config = params.node.config || params.datatype.defaultconfig;
             var filter = params.filterValue();
             this.dateFormat = config.dateFormat;
-            this.op = ko.observable(filter.op || '');
+            this.op = ko.observable(filter.op || 'eq');
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
                 return {

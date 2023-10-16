@@ -71,7 +71,7 @@
         // Provide a hook for binding to the select2 "data" property; this property is read-only in select2 so not subscribing.
         if (ko.isWriteableObservable(allBindings[dataBindingName])) {
             dataChangeHandler = function() {
-                if (!$(element).data('select2')) return;
+                if (!$(element).data('select-woo')) return;
                 allBindings[dataBindingName]($(element).select2('data'));
             };
             $(element).on('change', dataChangeHandler);

@@ -71,7 +71,7 @@
             'mapbox-gl-draw': {
                 deps: ['mapbox-gl']
             },
-            'select2': {
+            'select-woo': {
                 deps: ['jquery'],
             },
             'moment': {
@@ -215,6 +215,7 @@
         unsorted='{% trans "Unsorted" as unsorted %} "{{ unsorted|escapejs }}"'
         ascending='{% trans "Ascending" as ascending %} "{{ ascending|escapejs }}"'
         descending='{% trans "Descending" as descending %} "{{ descending|escapejs }}"'
+        sort-search-results='{% trans "Sort Search Results" as sortSearchResults %} "{{ sortSearchResults|escapejs }}"'
         fuzzy-year-padding='{% trans "Fuzzy Year Padding" as fuzzyYearPadding %} "{{ fuzzyYearPadding|escapejs }}"'
         fuzzy-month-padding='{% trans "Fuzzy Month Padding" as fuzzyMonthPadding %} "{{ fuzzyMonthPadding|escapejs }}"'
         fuzzy-day-padding='{% trans "Fuzzy Day Padding" as fuzzyDayPadding %} "{{ fuzzyDayPadding|escapejs }}"'
@@ -759,6 +760,7 @@
         etl-file-upload-message='{% trans "Use this workflow to upload a file with data that you want to use to create new data instances of a model." as etlFileUploadMessage %} "{{ etlFileUploadMessage|escapejs }}"'
         etl-single-csv-title='{% trans "Import Format: Single .csv file" as etlSingleCSVTitle %} "{{ etlSingleCSVTitle|escapejs }}"'
         bulk-data-edit-details='{% trans "Bulk Data Edit Details" as bulkDataEditDetails %} "{{ bulkDataEditDetails|escapejs }}"'
+        no-data-to-preview='{% trans "Nothing to update. Your data already meets your requirements." as noDataToPreview %} "{{ noDataToPreview|escapejs }}"'
         resource-model-editied='{% trans "Resource Model Edited" as resourceModelEditied %} "{{ resourceModelEditied|escapejs }}"'
         field-name-edited='{% trans "Field Name Edited" as fieldNameEdited %} "{{ fieldNameEdited|escapejs }}"'
         edit-operation='{% trans "Edit Operation" as editOperation %} "{{ editOperation|escapejs }}"'
@@ -775,8 +777,8 @@
         rows='{% trans "Rows" as rows %} "{{ rows|escapejs }}"'
         import-data='{% trans "Import data" as importData %} "{{ importData|escapejs }}"'
         import-single-csv='{% trans "Import Single CSV" as importSingleCsv %} "{{ importSingleCsv|escapejs }}"'
-        target-resource='{% trans "Target Resource" as targetResource %} "{{ targetResource|escapejs }}"'
-        target-fields='{% trans "Target Fields" as targetFields %} "{{ targetFields|escapejs }}"'
+        target-resource='{% trans "Target resource" as targetResource %} "{{ targetResource|escapejs }}"'
+        target-fields='{% trans "Target fields" as targetFields %} "{{ targetFields|escapejs }}"'
         download-templates='{% trans "Download Templates" as downloadTemplates %} "{{ downloadTemplates|escapejs }}"'
         select-template='{% trans "Select Template" as selectTemplate %} "{{ selectTemplate|escapejs }}"'
         upload-zip-file='{% trans "Upload .zip File" as uploadZipFile %} "{{ uploadZipFile|escapejs }}"'
@@ -793,7 +795,7 @@
         export-branch-excel='{% trans "Export Branch Excel" as exportBranchExcel %} "{{ exportBranchExcel|escapejs }}"'
         export-details='{% trans "Export Details" as exportDetails %} "{{ exportDetails|escapejs }}"'
         instances='{% trans "instances" as instances %} "{{ instances|escapejs }}"'
-        number-of-resources-imported='{% trans "Number of Resources Imported" as numberOfResourcesImported %} "{{ numberOfResourcesImported|escapejs }}"'
+        imported-data='{% trans "Imported Data" as importedData %} "{{ importedData|escapejs }}"'
         number-of-resources-exported='{% trans "Number of Resources Exported" as numberOfResourcesExported %} "{{ numberOfResourcesExported|escapejs }}"'
         number-of-related-files='{% trans "Number Of Related Files" as numberOfRelatedFiles %} "{{ numberOfRelatedFiles|escapejs }}"'
         number-of-related-files-in-zip='{% trans "Number Of Related Files In Zip" as numberOfRelatedFilesInZip %} "{{ numberOfRelatedFilesInZip|escapejs }}"'
@@ -832,11 +834,15 @@
         bulk-string-editor-replace='{% trans "Replace Text" as bulkStringEditorReplace %} "{{ bulkStringEditorReplace|escapejs }}"'
         select-edit-operation='{% trans "Select an Edit Operation" as SelectEditOperation %} "{{ SelectEditOperation|escapejs }}"'
         preview-count-stats='(limit, possible, resCount) => {return {% trans "Showing first ${limit} of ${possible} values in ${resCount} resources" as previewCountStats %} `{{ previewCountStats|escapejs }}` }'
+        count-of-resources-updated='(count) => {return {% trans "Resources updated: ${count}" as countOfResourcesUpdated %} `{{ countOfResourcesUpdated|escapejs }}` }'
+        count-of-tiles-updated='(count) => {return {% trans "Tiles updated: ${count}" as countOfTilesUpdated %} `{{ countOfTilesUpdated|escapejs }}` }'
+        bulk-edit-limit-warning='(limit) => {return {% trans "For safety, only ${limit} bulk edits are allowed at a time.  If you need to edit more than ${limit} entries, you will need to perform the operation multiple times." as bulkEditLimitWarning %} `{{ bulkEditLimitWarning|escapejs }}`}'
         show='{% trans "show" as show %} "{{ show|escapejs }}"'
         hide='{% trans "hide" as hide %} "{{ hide|escapejs }}"'
         first-five-shown='{% trans "First 5 errors are shown" as firstFiveShown %} "{{ firstFiveShown|escapejs }}"'
         validation-errors='{% trans "Validation Errors" as validationErrors %} "{{ validationErrors|escapejs }}"'
         no-error-found='{% trans "No Error Found" as noErrorFound %} "{{ noErrorFound|escapejs }}"'
+        click-here='{% trans "click here" as clickHere %} "{{ clickHere|escapejs }}"'
         loading-data='{% trans "Loading data" as loadingData %} "{{ loadingData|escapejs }}"'
         loading-status='{% trans "Loading status" as loadingStatus %} "{{ loadingStatus|escapejs }}"'
         loading-started='{% trans "Loading started" as loadingStarted %} "{{ loadingStarted|escapejs }}"'
@@ -844,6 +850,13 @@
         load-duration='{% trans "Load duration" as loadDuration %} "{{ loadDuration|escapejs }}"'
         indexing-ended='{% trans "Indexing ended" as indexingEnded %} "{{ indexingEnded|escapejs }}"'
         indexing-duration='{% trans "Indexing duration" as indexingDuration %} "{{ indexingDuration|escapejs }}"'
+        updating-progress='{% trans "Updating Progress" as updatingProgress %} "{{ updatingProgress|escapejs }}"'
+        updating-status='{% trans "Updating status" as updatingStatus %} "{{ updatingStatus|escapejs }}"'
+        updating-started='{% trans "Updating started" as updatingStarted %} "{{ updatingStarted|escapejs }}"'
+        updating-ended='{% trans "Updating ended" as updatingEnded %} "{{ updatingEnded|escapejs }}"'
+        updating-duration='{% trans "Updating duration" as updatingDuration %} "{{ updatingDuration|escapejs }}"'
+        view-in-edit-log='{% trans "view in edit log" as viewInEditLog %} "{{ viewInEditLog|escapejs }}"'
+        list-of-edited-resources='{% trans "List of Edited Resources" as listOfEditedResources %} "{{ listOfEditedResources|escapejs }}"'
         manage='{% trans "Manage" as manage %} "{{ manage|escapejs }}"'
         unable-to-display-selected-file='{% trans "Unable to display the selected file" as unableToDisplaySelectedFile %} "{{ unableToDisplaySelectedFile|escapejs }}"'
         file-display-error-message1='{% trans "This file can't be displayed." as fileDisplayErrorMessage1 %} "{{ fileDisplayErrorMessage1|escapejs }}"'
@@ -947,6 +960,7 @@
         reorder_tiles="{% url 'reorder_tiles' %}"
         reorder_nodes="{% url 'reorder_nodes' %}"
         delete_provisional_tile="{% url 'delete_provisional_tile' %}"
+        edit_history="{% url 'edit_history' %}"
         tile_history="{% url 'tile_history' %}"
         download_files="{% url 'download_files' %}"
         apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
