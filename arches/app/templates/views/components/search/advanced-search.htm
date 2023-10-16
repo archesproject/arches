@@ -96,15 +96,19 @@
                         type="text" 
                         class="form-control"
                         data-bind="
-                            attr:{placeholder: $root.translations.find + '...'},
+                            attr:{
+                                placeholder: $root.translations.find + '...',
+                                'aria-label': $root.translations.filterSearchFacets,
+                            },
                             value: facetFilterText, 
                             valueUpdate: 'keyup'
                         "
-                        aria-label="{% trans 'Filter search facets' %}"
                     >
                     <!-- Clear Filter -->
-                    <span tabindex="0" role="button" class="clear-node-search" aria-label="{% trans 'Clear facet filter' %}" 
-                        data-bind="onEnterkeyClick, onSpaceClick, click: function () { facetFilterText(''); }"
+                    <span tabindex="0" role="button" class="clear-node-search" data-bind="onEnterkeyClick, onSpaceClick, 
+                            click: function () { facetFilterText(''); },
+                            attr:{'aria-label': $root.translations.clearFacetFilter},
+                        "
                     ><i class="fa fa-times-circle"></i></span>
                 </div>
             </div>

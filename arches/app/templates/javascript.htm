@@ -424,6 +424,8 @@
         no-saved-searches='{% trans "The Arches site administrator hasn't saved any searches yet." as noSavedSearches %} "{{ noSavedSearches|escapejs }}"'
         searching='{% trans "searching" as searching %} "{{ searching|escapejs }}"'
         search-facets='{% trans "Search Facets" as searchFacets %} "{{ searchFacets|escapejs }}"'
+        filter-search-facets='{% trans "Filter search facets" as filterSearchFacets %} "{{ filterSearchFacets|escapejs }}"'
+        clear-facet-filter='{% trans "Clear facet filter" as clearFacetFilter %} "{{ clearFacetFilter|escapejs }}"'
         resource-type-search-facets='(resourceType) => {return {% trans "${resourceType} search facets" as resourceTypeSearchFacets %} `{{ resourceTypeSearchFacets|escapejs }}` }'
         add-card-to-search-query='(card, graph) => {return {% trans "Add ${card} for ${graph} to search query" as addCardToSearchQuery %} `{{ addCardToSearchQuery|escapejs }}` }'
         current-and-previous='(current, previous) => {return {% trans "${current} and ${previous}" as currentAndPrevious %} `{{ currentAndPrevious|escapejs }}` }'
