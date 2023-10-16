@@ -37,7 +37,7 @@ define([
                     && params?.report?.attributes?.resourceid) 
                     || !params.cache
                 ) {
-                    url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${params.report.attributes.resourceid != '' ? params.report.attributes.resourceid : window.location.pathname.split("/")[2]}`;
+                    url = arches.urls.api_bulk_disambiguated_resource_instance + `?v=beta&resource_ids=${params.report.attributes.resourceid != '' ? params.report.attributes.resourceid : window.location.pathname.split("/").reverse()[0]}`;
                     if(params.report.defaultConfig?.uncompacted_reporting) {
                         url += '&uncompacted=true';
                     }
