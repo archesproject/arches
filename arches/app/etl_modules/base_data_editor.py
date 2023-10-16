@@ -8,8 +8,11 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node
+from arches.app.models.models import GraphModel, Node, ETLModule
 from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Bool, FiltersAgg, Match, Nested, NestedAgg, Query, Terms, Wildcard, Regex
+from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
@@ -114,12 +117,13 @@ class BaseBulkEditor:
 
         return result
 
-    def stage_data(self, cursor, graph_id, node_id, resourceids, operation, text_replacing, language_code, case_insensitive):
+    def stage_data(self, cursor, module_id, graph_id, node_id, resourceids, operation, pattern, new_text, language_code, case_insensitive):
         result = {"success": False}
+        update_limit = ETLModule.objects.get(pk=module_id).config["updateLimit"]
         try:
             cursor.execute(
-                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, text_replacing, language_code, case_insensitive),
+                """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, pattern, new_text, language_code, case_insensitive, update_limit),
             )
             result["success"] = True
         except Exception as e:
@@ -151,12 +155,12 @@ class BaseBulkEditor:
 
 
 class BulkStringEditor(BaseBulkEditor):
-    def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, old_text, new_text):
+    def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, pattern, new_text):
         result = {"success": False}
         try:
             cursor.execute(
                 """SELECT * FROM __arches_edit_staged_string_data(%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, language_code, operation, old_text, new_text),
+                (self.loadid, graph_id, node_id, language_code, operation, pattern, new_text),
             )
             result["success"] = True
         except Exception as e:
@@ -164,73 +168,98 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_preview_data(self, graph_id, node_id, resourceids, language_code, old_text, case_insensitive):
-        node_id_query = " AND nodeid = %(node_id)s" if node_id else ""
-        graph_id_query = " AND graphid = %(graph_id)s" if graph_id else ""
-        resourceids_query = " AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
-        like_operator = "ilike" if case_insensitive == "true" else "like"
-        old_text_like = "%" + old_text + "%" if old_text else ""
-        text_query = (
-            " AND t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' " + like_operator + " %(old_text)s" if old_text else ""
-        )
+    def get_preview_data(self, node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word):
+        request = HttpRequest()
+        request.user = self.request.user
+        request.method = "GET"
+        request.GET["paging-filter"] = 1
+        request.GET["tiles"] = True
+
         if language_code is None:
             language_code = "en"
 
-        request_parmas_dict = {
-            "node_id": node_id,
-            "language_code": language_code,
-            "graph_id": graph_id,
-            "resourceids": resourceids,
-            "old_text": old_text_like,
+        if search_url:
+            params = parse_qs(urlsplit(search_url).query)
+            for k, v in params.items():
+                request.GET.__setitem__(k, v[0])
+
+        search_url_query = search_results(request, returnDsl=True).dsl["query"]
+        case_insensitive = True if case_insensitive == "true" else False
+
+        if old_text:
+            if whole_word != "true":
+                search_query = Wildcard(
+                    field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                    query=f"*{old_text}*",
+                    case_insensitive=case_insensitive,
+                )
+            else:
+                search_query = Regex(
+                    field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                    query=f"(.* {old_text} .*)|({old_text} .*)|(.* {old_text})|({old_text})",
+                    case_insensitive=case_insensitive,
+                )
+
+            search_bool_agg = Bool()
+            search_bool_agg.must(search_query)
+
+        else:
+            if operation.startswith("upper"):
+                regexp = "(.*[a-z].*)"
+            elif operation.startswith("lower"):
+                regexp = "(.*[A-Z].*)"
+            elif operation.startswith("capitalize"):
+                regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)|((.+[ ]+)[a-z].*)|((.+[ ]+)[A-Z][a-zA-Z]*[A-Z].*)"
+            elif operation.startswith("trim"):
+                regexp = "[ \t].*|.*[ \t]"
+            
+            case_search_query = Regex(
+                field=f"tiles.data.{node_id}.{language_code}.value.keyword",
+                query=regexp,
+                case_insensitive=case_insensitive,
+            )
+
+            search_query = Bool()
+            search_query.must(case_search_query)
+            search_bool_agg = Bool()
+            search_bool_agg.must(case_search_query)
+
+        string_search_nested = Nested(path="tiles", query=search_query)
+        inner_hits_query = {
+            "inner_hits": {
+                "_source": False,
+                "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
+            }
         }
+        string_search_nested.dsl["nested"].update(inner_hits_query)
 
-        sql_query = (
-            """
-            SELECT t.tiledata -> %(node_id)s -> %(language_code)s ->> 'value' FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-            + " LIMIT 5;"
-        )
+        search_bool_query = Bool()
+        search_bool_query.must(string_search_nested)
 
-        tile_count_query = (
-            """
-            SELECT count(t.tileid) FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-        )
+        search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
-        resource_count_query = (
-            """
-            SELECT count(DISTINCT t.resourceinstanceid) FROM tiles t, nodes n
-            WHERE t.nodegroupid = n.nodegroupid
-        """
-            + node_id_query
-            + graph_id_query
-            + resourceids_query
-            + text_query
-        )
+        search_filter_agg = FiltersAgg(name="string_search")
+        search_filter_agg.add_filter(search_bool_agg)
 
-        with connection.cursor() as cursor:
-            cursor.execute(sql_query, request_parmas_dict)
-            row = [value[0] for value in cursor.fetchall()]
+        nested_agg = NestedAgg(path="tiles", name="tile_agg")
+        nested_agg.add_aggregation(search_filter_agg)
 
-            cursor.execute(tile_count_query, request_parmas_dict)
-            count = cursor.fetchall()
-            (number_of_tiles,) = count[0]
+        se = SearchEngineFactory().create()
+        query = Query(se, limit=5)
 
-            cursor.execute(resource_count_query, request_parmas_dict)
-            count = cursor.fetchall()
-            (number_of_resources,) = count[0]
+        query.add_query(search_url_query)
+        query.add_aggregation(nested_agg)
 
-        return row, number_of_tiles, number_of_resources
+        results = query.search(index=RESOURCES_INDEX)
+        values = []
+        for hit in results['hits']['hits']:
+            for tile in hit['inner_hits']['tiles']['hits']['hits']:
+                values.append(tile['fields'][f"tiles.data.{node_id}.{language_code}.value.keyword"][0])
+
+        number_of_resources = results['hits']['total']['value']
+        number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
+
+        return values[:5], number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -240,7 +269,8 @@ class BulkStringEditor(BaseBulkEditor):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
-        case_insensitive = request.POST.get("case_insensitive", None)
+        case_insensitive = request.POST.get("case_insensitive", 'false')
+        whole_word = request.POST.get("whole_word", 'false')
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
@@ -251,21 +281,26 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
-        if case_insensitive == "true" and operation == "replace":
-            operation = "replace_i"
+        if operation == "replace":
+            if case_insensitive == "true":
+                operation = "replace_i"
+            if whole_word == "true":
+                pattern = "\\y{0}\\y".format(old_text)
+            else:
+                pattern = old_text
         if also_trim == "true":
             operation = operation + "_trim"
 
         first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
+            node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word
         )
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
                 if operation == "replace":
-                    cursor.execute("""SELECT * FROM REPLACE(%s, %s, %s);""", [value, old_text, new_text])
+                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'g');""", [value, pattern, new_text])
                 elif operation == "replace_i":
-                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'i');""", [value, old_text, new_text])
+                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'ig');""", [value, pattern, new_text])
                 elif operation == "trim":
                     cursor.execute("""SELECT * FROM TRIM(%s);""", [value])
                 elif operation == "capitalize":
@@ -298,8 +333,37 @@ class BulkStringEditor(BaseBulkEditor):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", "false")
+        whole_word = request.POST.get("whole_word", 'false')
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
+
+        if operation == "replace":
+            if case_insensitive == "true":
+                operation = "replace_i"
+            if whole_word == "true":
+                pattern = "\\y{0}\\y".format(old_text)
+            else:
+                pattern = old_text
+        if also_trim == "true":
+            operation = operation + "_trim"
+
+        load_details = {
+            "graph": graph_id,
+            "node": node_name,
+            "operation": operation,
+            "details": {
+                "old_text": old_text,
+                "new_text": new_text,
+            },
+            "search_url": search_url,
+            "language_code": language_code,
+        }
+
+        with connection.cursor() as cursor:
+            event_created = self.create_load_event(cursor, load_details)
+            if not event_created["success"]:
+                self.log_event(cursor, "failed")
+                return {"success": False, "data": event_created["message"]}
 
         if resourceids:
             resourceids = json.loads(resourceids)
@@ -308,42 +372,12 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
-        if case_insensitive == "true" and operation == "replace":
-            operation = "replace_i"
-        if also_trim == "true":
-            operation = operation + "_trim"
-
         use_celery_bulk_edit = True
-        operation_details = {
-            "old_text": old_text,
-            "new_text": new_text,
-        }
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            graph_id, node_id, resourceids, language_code, old_text, case_insensitive
-        )
-
-        load_details = {
-            "graph": graph_id,
-            "node": node_name,
-            "operation": operation,
-            "details": operation_details,
-            "search_url": search_url,
-            "language_code": language_code,
-            "number_of_resources": number_of_resources,
-            "number_of_tiles": number_of_tiles,
-        }
-
-        with connection.cursor() as cursor:
-            event_created = self.create_load_event(cursor, load_details)
-            if event_created["success"]:
-                if use_celery_bulk_edit:
-                    response = self.run_load_task_async(request, self.loadid)
-                else:
-                    response = self.run_load_task(self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
-            else:
-                self.log_event(cursor, "failed")
-                return {"success": False, "data": event_created["message"]}
+        if use_celery_bulk_edit:
+            response = self.run_load_task_async(request, self.loadid)
+        else:
+            response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, pattern, new_text, resourceids)
 
         return response
 
@@ -356,7 +390,8 @@ class BulkStringEditor(BaseBulkEditor):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
-        case_insensitive = request.POST.get("case_insensitive", None)
+        case_insensitive = request.POST.get("case_insensitive", 'false')
+        whole_word = request.POST.get("whole_word", 'false')
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
@@ -365,13 +400,18 @@ class BulkStringEditor(BaseBulkEditor):
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
 
-        if case_insensitive == "true" and operation == "replace":
-            operation = "replace_i"
+        if operation == "replace":
+            if case_insensitive == "true":
+                operation = "replace_i"
+            if whole_word == "true":
+                pattern = "\\y{0}\\y".format(old_text)
+            else:
+                pattern = old_text
         if also_trim == "true":
             operation = operation + "_trim"
 
         edit_task = tasks.edit_bulk_string_data.apply_async(
-            (self.loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, self.userid),
+            (self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, pattern, new_text, resourceids),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -379,7 +419,7 @@ class BulkStringEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, loadid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
+    def run_load_task(self, userid, loadid, module_id, graph_id, node_id, operation, language_code, pattern, new_text, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
         case_insensitive = False
@@ -387,17 +427,17 @@ class BulkStringEditor(BaseBulkEditor):
             case_insensitive = True
 
         with connection.cursor() as cursor:
-            data_staged = self.stage_data(cursor, graph_id, node_id, resourceids, operation, old_text, language_code, case_insensitive)
+            data_staged = self.stage_data(cursor, module_id, graph_id, node_id, resourceids, operation, pattern, new_text, language_code, case_insensitive)
 
             if data_staged["success"]:
-                data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, old_text, new_text)
+                data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, pattern, new_text)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
         if data_updated["success"]:
             self.loadid = loadid  # currently redundant, but be certain
-            data_updated = save_to_tiles(loadid, finalize_import=False)
+            data_updated = save_to_tiles(userid, loadid, finalize_import=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:

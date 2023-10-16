@@ -1600,12 +1600,7 @@ class FileListDataType(BaseDataType):
                 file_model.path = file_data
                 file_model.tile = tile
                 if models.TileModel.objects.filter(pk=tile.tileid).exists():
-                    original_storage = file_model.path.storage
-                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
-                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
-                        file_model.path.storage = FileSystemStorage()
                     file_model.save()
-                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
@@ -1613,6 +1608,7 @@ class FileListDataType(BaseDataType):
                         if file_json["name"] == file_data.name and file_json["url"] is None:
                             file_json["file_id"] = str(file_model.pk)
                             file_json["url"] = settings.MEDIA_URL + str(file_model.fileid)
+                            file_json["path"] = file_model.path.name
                             file_json["status"] = "uploaded"
                             resave_tile = True
                         updated_file_records.append(file_json)
@@ -1651,8 +1647,8 @@ class FileListDataType(BaseDataType):
         Accepts a comma delimited string of file paths as 'value' to create a file datatype value
         with corresponding file record in the files table for each path. Only the basename of each path is used, so
         the accuracy of the full path is not important. However the name of each file must match the name of a file in
-        the directory from which Arches will request files. By default, this is the 'uploadedfiles' directory
-        in a project.
+        the directory from which Arches will request files. By default, this is the directory in a project as defined
+        in settings.UPLOADED_FILES_DIR.
 
         """
 
@@ -1671,7 +1667,7 @@ class FileListDataType(BaseDataType):
             tile_file["name"] = os.path.basename(file_path)
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            file_path = "uploadedfiles/" + str(tile_file["name"])
+            file_path = "%s/%s" % (settings.UPLOADED_FILES_DIR, str(tile_file["name"]))
             tile_file["file_id"] = str(uuid.uuid4())
             if source_path:
                 source_file = os.path.join(source_path, tile_file["name"])
@@ -1679,7 +1675,7 @@ class FileListDataType(BaseDataType):
                 try:
                     with default_storage.open(source_file) as f:
                         current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
-                        filename = fs.save(os.path.join("uploadedfiles", os.path.basename(f.name)), File(f))
+                        filename = fs.save(os.path.join(settings.UPLOADED_FILES_DIR, os.path.basename(f.name)), File(f))
                         current_file.path = os.path.join(filename)
                         current_file.save()
                         tile_file["size"] = current_file.path.size
@@ -1705,7 +1701,7 @@ class FileListDataType(BaseDataType):
                     if file["file_id"]:
                         if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
-                            file_path = "uploadedfiles/" + file["name"]
+                            file_path = "%s/%s" % (settings.UPLOADED_FILES_DIR, file["name"])
                             try:
                                 file_model = models.File.objects.get(pk=file["file_id"])
                             except ObjectDoesNotExist:
@@ -1723,7 +1719,7 @@ class FileListDataType(BaseDataType):
                     logger.warning(_("This file's fileid is not a valid UUID"))
 
     def transform_export_values(self, value, *args, **kwargs):
-        return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
+        return ",".join([settings.MEDIA_URL + settings.UPLOADED_FILES_DIR + "/" + str(file["name"]) for file in value])
 
     def is_a_literal_in_rdf(self):
         return False

@@ -53,7 +53,7 @@ define([
 
             this.activeTab.subscribe(val => {
                 if (val == "import") {
-                    self.fetchLoadEvent();
+                    setTimeout(this.fetchLoadEvent, 500);
                 }
             });
 
