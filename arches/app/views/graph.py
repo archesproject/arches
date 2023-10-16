@@ -492,10 +492,11 @@ class GraphDataView(View):
         if old_node_data.config.get("imagesOnly", None) is False and new_node_data["config"]["imagesOnly"]:
             nodegroup_id = new_node_data["nodegroup_id"]
             for file_type in models.TileModel.objects.filter(
-                nodegroup_id=nodegroup_id
+                nodegroup_id=nodegroup_id,
+                data__has_key=str(old_node_data.pk),
             ).annotate(
                 file_data=Func(
-                    F(f"data__{nodegroup_id}"),
+                    F(f"data__{old_node_data.pk}"),
                     function="JSONB_ARRAY_ELEMENTS",
                 )
             ).values_list(F("file_data__type"), flat=True).distinct():
