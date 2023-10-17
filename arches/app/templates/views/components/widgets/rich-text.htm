@@ -3,11 +3,18 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}">
     <div class="form-group">
-        <div class="widget-inline-tools-collapser" data-bind=" click: function() {
-            showi18nOptions(!showi18nOptions());
-        }">
+        <div class="widget-inline-tools-collapser" tabindex="0" role="button" 
+            data-bind="onEnterkeyClick, onSpaceClick, click: function() {
+                showi18nOptions(!showi18nOptions());
+            }, 
+            attr: {
+                'aria-expanded': showi18nOptions().toString(),
+                'aria-label': $root.translations.languageSettingsLabel(label()),
+                'aria-controls': uid
+            }"
+        >
             <span style="flex: 1">
                 <label class="control-label widget-input-label" data-bind="text:label"></label>
                 <!-- ko if: node -->
@@ -24,19 +31,21 @@
                 <span data-bind="text: $root.translations.languages"></span>
             </span>
         </div>
-        <div class="form-horizontal" data-bind="if: showi18nOptions">
-            <div class="i18n-style-tools-panel">
+        <div class="form-horizontal" data-bind="if: showi18nOptions, attr: {id: uid}">
+            <div class="i18n-style-tools-panel" data-bind="let: {'lang_dd': Math.random().toString(), 'lang_dir': Math.random().toString()}">
                 <div style="display: flex; flex-direction: column; max-width:600px">
-                    <label class="widget-input-label i18n-style-tools-label" for="lang_dd">
-                        <span data-bind="text: $root.translations.language"></span>
-                    </label>
-                    <select id="lang_dd" style="flex:1" name="language" data-bind="options: languages, optionsText: function(item){return item.name + ' (' + item.code + ')'}, value: currentLanguage, chosen: {width:'100%'}">
-                    </select>
-                    <label class="widget-input-label i18n-style-tools-label" for="lang_dir">
-                        <span data-bind="text: $root.translations.direction"></span>
-                    </label>
+                    <span class="widget-input-label i18n-style-tools-label" data-bind="text: $root.translations.language"></span>
+                    <select style="flex:1" name="language" 
+                        data-bind="
+                            options: languages, 
+                            optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
+                            value: currentLanguage, chosen: {width:'100%'},
+                            attr: {'aria-label': $root.translations.language},
+                        "
+                    ></select>
+
+                    <span class="widget-input-label i18n-style-tools-label" data-bind="text: $root.translations.direction"></span>
                     <select
-                        id="lang_dir"
                         style="flex:1"
                         name="language"
                         data-bind="
@@ -48,6 +57,7 @@
                                 { text: $root.translations.leftToRight, value: 'ltr' },
                                 { text: $root.translations.rightToLeft, value: 'rtl' },
                             ],
+                            attr: {'aria-label': $root.translations.direction},
                         "
                     ></select>
                 </div>
@@ -64,7 +74,10 @@
                     placeholder: placeholder, 
                     ckeditorOptions: {},  
                     valueUpdate: 'afterkeydown', 
-                    attr: {disabled: disabled}
+                    attr: {
+                        disabled: disabled,
+                        name: label(),
+                    },
                 "></textarea>
         </div>
     </div>
@@ -88,7 +101,11 @@
         placeholder: placeholder,
         ckeditorOptions: {},  
         valueUpdate: 'afterkeydown', 
-        attr: {disabled: disabled}
+        attr: {
+            disabled: disabled,
+            name: $root.translations.placeholderFor(label()),
+        },
+        title: placeholder
     "
 ></textarea>
 {% endblock config_form %}
