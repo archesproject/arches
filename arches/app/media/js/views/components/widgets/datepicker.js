@@ -80,7 +80,7 @@ define([
         if (self.form && this.defaultValue() === 'Date of Data Entry') {
             if (this.value() === 'Date of Data Entry') {
                 const today = new Date();
-                self.value(today.toLocaleDateString("en-CA"));
+                self.value(today.toLocaleDateString("en-CA")); //"en-CA" formats the date in the desired format YYYY-MM-DD
                 const tileData = JSON.parse(self.tile._tileData());
                 tileData[this.node.id] = today.toLocaleDateString("en-CA");
                 self.tile._tileData(koMapping.toJSON(tileData));
