@@ -127,20 +127,34 @@ class Migration(migrations.Migration):
     """
 
     update_check_excess_tiles_trigger = """
-        create or replace procedure __arches_complete_bulk_load() AS
+        DROP PROCEDURE IF EXISTS __arches_complete_bulk_load();
+        CREATE OR REPLACE PROCEDURE __arches_complete_bulk_load(refresh_relations_graphids boolean) AS
         $$
             DECLARE
                 cardinality_violations bigint;
             BEGIN
-                alter table tiles enable trigger __arches_check_excess_tiles_trigger;
-                alter table tiles enable trigger __arches_trg_update_spatial_attributes;
+                ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
+                ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
+                IF refresh_relations_graphids THEN
+                    UPDATE resource_x_resource x
+                    SET resourceinstancefrom_graphid = r.graphid
+                    FROM resource_instances r
+                    WHERE r.resourceinstanceid = x.resourceinstanceidfrom
+                    AND x.resourceinstancefrom_graphid is null;
+                    UPDATE resource_x_resource x
+                    SET resourceinstanceto_graphid = r.graphid
+                    FROM resource_instances r
+                    WHERE r.resourceinstanceid = x.resourceinstanceidto
+                    AND x.resourceinstanceto_graphid is null;
+                END IF;
             END
         $$
         language plpgsql;
     """
 
     restore_check_excess_tiles_trigger = """
-        create or replace procedure __arches_complete_bulk_load() AS
+        DROP PROCEDURE IF EXISTS __arches_complete_bulk_load(boolean);
+        CREATE OR REPLACE PROCEDURE __arches_complete_bulk_load() AS
         $$
             DECLARE
                 cardinality_violations bigint;
