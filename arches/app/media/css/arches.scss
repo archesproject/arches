@@ -10269,12 +10269,13 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-title-bar {
-    height: 40px;
-    padding: 10px;
+    height: 32px;
+    padding: 8px;
     background: #fff;
     border: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
-    max-width: 311px;
+    // max-width: 311px;
+    max-width: 14vw;
 }
 
 .mapboxgl-popup-content .hover-feature-title-bar {
@@ -10286,8 +10287,8 @@ a.clear-geojson-button:hover {
     position: absolute;
     right: 0px;
     top: 0px;
-    height: 40px;
-    width: 40px;
+    height: 32px;
+    width: 32px;
     border: 1px solid #ddd;
     padding-bottom: 4px;
     cursor: pointer;
@@ -10306,19 +10307,19 @@ a.clear-geojson-button:hover {
 }
 
 .hover-feature-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: #25476A;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 10px;
+    padding: 6px 4px;
 }
 
-.hover-feature-nav-right+.hover-feature-title {
-    width: 250px;
-    margin-left: -4px;
-}
+// .hover-feature-nav-right+.hover-feature-title {
+//     width: 250px;
+//     margin-left: -4px;
+// }
 
 .hover-feature-nav-left {
     height: 28px;
@@ -10387,15 +10388,15 @@ a.clear-geojson-button:hover {
     text-align: center;
 }
 
-.hover-feature-body {
-    padding: 10px 15px 15px 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 350px;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
+// .hover-feature-body {
+//     padding: 10px 15px 15px 15px;
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     width: 350px;
+//     border-left: 1px solid #ddd;
+//     border-right: 1px solid #ddd;
+// }
 
 .hover-feature {
     font-size: 13px;
@@ -13275,7 +13276,7 @@ a.jstree-anchor.permissions-widget {
 }
 
 .mapboxgl-popup-content {
-    width: 350px;
+    width: 14vw;
     padding: 0px;
 }
 
