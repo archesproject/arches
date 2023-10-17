@@ -1,5 +1,6 @@
 define([
     'knockout',
+    'knockout-mapping',
     'underscore',
     'viewmodels/widget',
     'moment',
@@ -8,7 +9,7 @@ define([
     'bindings/moment-date',
     'bindings/chosen',
     'bindings/key-events-click',
-], function(ko, _, WidgetViewModel, moment, datePickerWidgetTemplate) {
+], function(ko, koMapping, _, WidgetViewModel, moment, datePickerWidgetTemplate) {
     /**
      * registers a datepicker-widget component for use in forms
      * @function external:"ko.components".datepicker-widget
@@ -26,7 +27,6 @@ define([
         var self = this;
         params.configKeys = ['minDate', 'maxDate', 'viewMode', 'dateFormat', 'defaultValue'];
 
-         
         WidgetViewModel.apply(this, [params]);
 
         if (self.node.config && ko.unwrap(self.node.config.dateFormat)) {
@@ -79,18 +79,11 @@ define([
 
         if (self.form && this.defaultValue() === 'Date of Data Entry') {
             if (this.value() === 'Date of Data Entry') {
-                var today = new Date();
-                var dd = today.getDate();
-                var mm = today.getMonth()+1;
-                var yyyy = today.getFullYear();
-                if(dd<10) {
-                    dd = '0'+dd;
-                }
-                if(mm<10) {
-                    mm = '0'+mm;
-                }
-                today = yyyy + '-' + mm + '-' + dd;
-                self.value(today);
+                const today = new Date();
+                self.value(today.toLocaleDateString("en-CA"));
+                const tileData = JSON.parse(self.tile._tileData());
+                tileData[this.node.id] = today.toLocaleDateString("en-CA");
+                self.tile._tileData(koMapping.toJSON(tileData));
             }
         }
 

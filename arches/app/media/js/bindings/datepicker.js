@@ -75,12 +75,19 @@ define([
 
             $(element).datetimepicker(options);
 
-            ko.utils.registerEventHandler(element, "dp.change", function(event) {
-                var value = allBindingsAccessor().value;
-                var picker = $(element).data("DateTimePicker");
-                value.subscribe(val=> {
+            var value = allBindingsAccessor().value;
+            var picker = $(element).data("DateTimePicker");
+            value.subscribe(val=> {
+                if (val !== 'Date of Data Entry'){
                     picker.date(val);
-                });
+                } else {
+                    const today = new Date();
+                    picker.date(today.toLocaleDateString("en-CA")); //"en-CA" formats the date in the desired format YYYY-MM-DD
+                    value(today.toLocaleDateString("en-CA"));
+                }
+            });
+
+            ko.utils.registerEventHandler(element, "dp.change", function(event) {
                 if (ko.isObservable(value)) {
                     if (value() === "" || event.date === false) {
                         value(null);
