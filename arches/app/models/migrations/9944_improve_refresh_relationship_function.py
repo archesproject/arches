@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10041_limit_number_of_bulk_edit'),
+        ('models', '10120_replace_whole_word_bulk_edit'),
     ]
 
     update_refresh_tile_resource_relationship_function = """
