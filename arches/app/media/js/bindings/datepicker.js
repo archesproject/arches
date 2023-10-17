@@ -75,9 +75,15 @@ define([
 
             $(element).datetimepicker(options);
 
+            var value = allBindingsAccessor().value;
+            var picker = $(element).data("DateTimePicker");
+            value.subscribe(val=> {
+                if (val !== 'Date of Data Entry'){
+                    picker.date(val);
+                }
+            });
+
             ko.utils.registerEventHandler(element, "dp.change", function(event) {
-                var value = allBindingsAccessor().value;
-                var picker = $(element).data("DateTimePicker");
                 if (ko.isObservable(value)) {
                     if (value() === "" || event.date === false) {
                         value(null);
