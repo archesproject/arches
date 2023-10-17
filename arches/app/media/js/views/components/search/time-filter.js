@@ -102,7 +102,7 @@ define([
                 this.date_nodes(response.date_nodes);
                 this.graph_models(response.graph_models);
                 this.restoreState();
-                $("#" + this.dateDropdownEleId).trigger("chosen:updated");
+                $("#" + this.dateDropdownEleId).trigger("change.select2");
 
                 this.filterChanged = ko.computed(function(){
                     if(!!this.filter.fromDate() || !!this.filter.toDate()){
