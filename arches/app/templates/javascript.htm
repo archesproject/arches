@@ -909,6 +909,7 @@
         add_resource='(graphid)=>{return "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
+        workflow_history='"{% url "workflow_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
         mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
         help_template="{% url 'help_templates' %}"
