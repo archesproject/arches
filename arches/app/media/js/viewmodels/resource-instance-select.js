@@ -1,12 +1,13 @@
 define([
+    'jquery',
     'knockout',
     'underscore',
-    'jquery',
     'arches',
     'viewmodels/widget',
     'utils/ontology',
+    'select-woo',
     'views/components/resource-report-abstract',
-], function(ko, _, $, arches, WidgetViewModel, ontologyUtils) {
+], function($, ko, _, arches, WidgetViewModel, ontologyUtils) {
     var resourceLookup = {};
     var graphCache = {};
 
@@ -43,6 +44,7 @@ define([
         params.configKeys = ['placeholder', 'defaultResourceInstance'];
         this.preview = arches.graphs.length > 0;
         this.renderContext = params.renderContext;
+        this.label = params.label;
         this.relationship = ko.observable();
         /* 
             shoehorn logic to piggyback off of search context functionality. 
@@ -52,10 +54,7 @@ define([
             self.renderContext = 'search';
         }
 
-        this.allowInstanceCreation = params.allowInstanceCreation === false ? false : true;
-        if (self.renderContext === 'search') {
-            this.allowInstanceCreation = params.allowInstanceCreation === true ? true : false;
-        }
+        this.allowInstanceCreation = typeof params.allowInstanceCreation === 'undefined' ? true : !!params.allowInstanceCreation;
         if (!!params.configForm) {
             this.allowInstanceCreation = false;
         }
@@ -341,64 +340,62 @@ define([
             allowClear: self.renderContext === 'search' ? true : false,
             onSelect: function(item) {
                 self.selectedItem(item);
-                if (!(self.renderContext === 'search') || self.allowInstanceCreation) {
-                    if (item._source) {
-                        if (self.renderContext === 'search'){
-                            self.value(item._id);
-                        } else {
-                            var ret = self.makeObject(item._id, item._source);
-                            self.setValue(ret);
-                            window.setTimeout(function() {
-                                if(self.displayOntologyTable){
-                                    self.resourceToAdd("");
-                                }
-                            }, 250);    
-                        }
+                if (item._source) {
+                    if (self.renderContext === 'search'){
+                        self.value(item._id);
                     } else {
-                        // This section is used when creating a new resource Instance
-                        if(!self.preview){
-                            var params = {
-                                graphid: item._id,
-                                complete: ko.observable(false),
-                                resourceid: ko.observable(),
-                                tileid: ko.observable()
-                            };
-                            self.newResourceInstance(params);
-                            var clearNewInstance = function() {
-                                self.newResourceInstance(null);
-                                window.setTimeout(function() {
-                                    self.resourceToAdd("");
-                                }, 250);
-                            };
-                            let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
-                            resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
-                            params.complete.subscribe(function() {
-                                if (params.resourceid()) {
-                                    if (self.renderContext === 'search'){
-                                        self.value(params.resourceid());
-                                        clearNewInstance();
-                                    } else {
-                                        window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                            .then(function(response){
-                                                if(response.ok) {
-                                                    return response.json();
-                                                }
-                                                throw("error");
-                                            })
-                                            .then(function(json) {
-                                                var item = json.results.hits.hits[0];
-                                                var ret = self.makeObject(params.resourceid(), item._source);
-                                                self.setValue(ret);
-                                            })
-                                            .finally(function(){
-                                                clearNewInstance();
-                                            });
-                                    }
-                                } else {
+                        var ret = self.makeObject(item._id, item._source);
+                        self.setValue(ret);
+                        window.setTimeout(function() {
+                            if(self.displayOntologyTable){
+                                self.resourceToAdd("");
+                            }
+                        }, 250);    
+                    }
+                } else {
+                    // This section is used when creating a new resource Instance
+                    if(!self.preview){
+                        var params = {
+                            graphid: item._id,
+                            complete: ko.observable(false),
+                            resourceid: ko.observable(),
+                            tileid: ko.observable()
+                        };
+                        self.newResourceInstance(params);
+                        var clearNewInstance = function() {
+                            self.newResourceInstance(null);
+                            window.setTimeout(function() {
+                                self.resourceToAdd("");
+                            }, 250);
+                        };
+                        let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
+                        resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
+                        params.complete.subscribe(function() {
+                            if (params.resourceid()) {
+                                if (self.renderContext === 'search'){
+                                    self.value(params.resourceid());
                                     clearNewInstance();
+                                } else {
+                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                        .then(function(response){
+                                            if(response.ok) {
+                                                return response.json();
+                                            }
+                                            throw("error");
+                                        })
+                                        .then(function(json) {
+                                            var item = json.results.hits.hits[0];
+                                            var ret = self.makeObject(params.resourceid(), item._source);
+                                            self.setValue(ret);
+                                        })
+                                        .finally(function(){
+                                            clearNewInstance();
+                                        });
                                 }
-                            });
-                        }
+                            } else {
+                                clearNewInstance();
+                            }
+                        });
                     }
                 }
             },
@@ -408,7 +405,9 @@ define([
                 },
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term, page) {
+                data: function(requestParams) {
+                    let term = requestParams.term || '';
+                    let page = requestParams.page || 1;
                     //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
                     // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                     // var regex = new RegExp(expression);
@@ -460,7 +459,7 @@ define([
                         return queryString.toString();
                     }
                 },
-                results: function(data, page) {
+                processResults: function(data) {
                     if (!data['paging-filter'].paginator.has_next && self.allowInstanceCreation) {
                         self.resourceTypesToDisplayInDropDown().forEach(function(graphid) {
                             var graph = self.graphLookup[graphid];
@@ -475,32 +474,42 @@ define([
                             }
                         });
                     }
+                    data.results.hits.hits.forEach(function(hit){
+                        hit.id = hit._id;
+                    });
                     return {
-                        results: data.results.hits.hits,
-                        more: data['paging-filter'].paginator.has_next
+                        "results": data.results.hits.hits,
+                        "pagination": {
+                            "more": data['paging-filter'].paginator.has_next
+                        }
                     };
                 }
             },
-            id: function(item) {
-                return item._id;
-            },
-            formatResult: function(item) {
-                if (item._source) {
-                    const iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
-                    return `<i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}`;
-                } else {
-                    const graph = self.graphLookup[item._id];
-                    if (self.allowInstanceCreation && graph.publication_id) {
-                        return '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+            templateResult: function(item) {
+                let res = '';
+                if(!item.loading){
+                    if (item._source) {
+                        const iconClass = self.graphLookup[item._source.graph_id]?.iconclass;
+                        res = `<span style="cursor:pointer"><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
+                    } else {
+                        const graph = self.graphLookup[item._id];
+                        if (self.allowInstanceCreation && graph.publication_id) {
+                            res = '<b> ' + arches.translations.riSelectCreateNew.replace('${graphName}', item.name) + ' . . . </b>';
+                        }
                     }
                 }
+                return $(res);
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
+                let ret = '';
                 if (item._source) {
-                    return `<i class="fa ${item._source.iconclass} sm-icon-wrap"></i> ${item._source.displayname}`;
+                    var graph = self.graphLookup[item._source.graph_id];
+                    var iconClass = graph?.iconclass || '';
+                    ret = `<span><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
                 } else {
-                    return item.name;
+                    ret = item.name;
                 }
+                return $(ret);
             },
             initSelection: function(ele, callback) {
                 if(self.renderContext === "search" && self.value() !== "" && !self.graphIds().includes(self.value())) {
@@ -526,20 +535,23 @@ define([
            
                         if (resourceInstance) { lookups.push(resourceInstance); }
                     });
-
                     Promise.all(lookups).then(function(arr){
+                        var ret = [];
                         if (arr.length) {
-                            var ret = arr.map(function(item) {
+                            ret = arr.map(function(item) {
                                 return {"_source":{"displayname": item["_source"].displayname, "iconclass": self.graphLookup[item._source.graph_id]?.iconclass || 'fa fa-question'}, "_id":item["_id"]};
                             });
                             if(self.multiple === false) {
                                 ret = ret[0];
                             }
-                            callback(ret);
                         }
+                        callback(ret);
                     });
                 } else if (self.graphIds().includes(self.value())){
                     self.value(null);
+                    callback([]);
+                } else {
+                    callback([]);
                 }
             }
         };

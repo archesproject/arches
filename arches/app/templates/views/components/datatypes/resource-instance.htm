@@ -69,7 +69,7 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <input 
+                                    <select 
                                         style="width:100%; display:inline-block; margin: 3px 0px;" 
                                         data-bind="
                                             select2Query: {
@@ -83,7 +83,7 @@
                                             }, 
                                             attr: {'aria-label': $root.translations.defaultRelationshipToResource($data.name)}
                                         "
-                                    >
+                                    ></select>
                                 </span>
 
                                 <span class="col-xs-12" data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
@@ -104,7 +104,7 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
+                                    <select style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
                                             select2Config: self.getSelect2ConfigForOntologyProperties(
                                                 $data.inverseOntologyProperty, 
@@ -115,7 +115,7 @@
                                             )
                                         },
                                         attr: {'aria-label': $root.translations.defaultInverseRelationshipToResource($data.name)}
-                                    ">
+                                    "></select>
                                 </span>
 
                                 <span class="col-xs-12" data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
@@ -211,17 +211,17 @@
     <select 
         class="resources" 
         data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: $root.translations.references, value: '' },
-                { text: $root.translations.doesNotReference, value: '!' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            attr: {'aria-label': $root.translations.searchCriteria}
+            select2Query: {
+                select2Config:{
+                    data: [
+                        { text: $root.translations.references, id: '' },
+                        { text: $root.translations.doesNotReference, id: '!' },
+                        { text: $root.translations.hasNoValue, id: 'null' },
+                        { text: $root.translations.hasAnyValue, id: 'not_null' },
+                    ],
+                    value: op
+            }},
+            attr: {'data-label': $root.translations.searchCriteria}
         "
     ></select>
 </div>
@@ -231,8 +231,9 @@
         params: {
             config: {
                 placeholder: $root.translations.selectAResource,
+                label: $root.translations.selectAResource,
             },
-            label: '',
+            allowInstanceCreation: false,
             value: searchValue,
             node: node,
             disabled: false,

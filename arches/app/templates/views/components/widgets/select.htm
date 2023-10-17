@@ -10,8 +10,8 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <input style="display:inline-block;"
-                data-bind="select2: {
+            <select style="display:inline-block;"
+                data-bind="select2Query: {
                     select2Config: {
                         clickBubble: true,
                         disabled: disabled,
@@ -21,7 +21,8 @@
                         placeholder: placeholder,
                         allowClear: true
                     }
-                }, attr: {'aria-label': label} ">
+                }, attr: {'data-label': label} ">
+            </select>
         </div>
     </div>
 </div>
@@ -47,8 +48,8 @@
             </div>
 
             <div class="col-xs-12">
-                <input style="display:inline-block;"
-                    data-bind="select2: {
+                <select style="display:inline-block;"
+                    data-bind="select2Query: {
                         select2Config: {
                             clickBubble: true,
                             data: options,
@@ -58,6 +59,7 @@
                             allowClear: true
                         }
                     }, attr: {'aria-label': $root.translations.selectDefaultValue}">
+                </select>
             </div>
         </div>
     </div>

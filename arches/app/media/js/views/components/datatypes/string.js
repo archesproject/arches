@@ -13,14 +13,12 @@ define([
             this.op = ko.observable(filter.op || '~');
             this.languages = ko.observableArray();
             this.languages(arches.languages);
-            this.language = ko.observable(
-                arches.languages.find(lang => lang.code == arches.activeLanguage)
-            );
+            this.language = ko.observable(arches.activeLanguage);
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
                 return {
                     op: self.op(),
-                    lang: self.language()?.code,
+                    lang: self.language(),
                     val: self.searchValue()
                 };
             }).extend({ throttle: 750 });

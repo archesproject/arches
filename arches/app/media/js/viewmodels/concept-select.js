@@ -89,44 +89,57 @@ define([
                 url: arches.urls.paged_dropdown,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term, page) {
+                data: function(requestParams) {
+                    let term = requestParams.term || '';
+                    let page = requestParams.page || 1;
                     return {
                         conceptid: ko.unwrap(params.node.config.rdmCollection),
                         query: term,
                         page: page
                     };
                 },
-                results: function(data) {
+                processResults: function(data) {
                     data.results.forEach(function(result) {
                         if (result.collector) {
                             delete result.id;
                         }
                     });
                     return {
-                        results: data.results,
-                        more: data.more
+                        "results": data.results,
+                        "pagination": {
+                            "more": data.more
+                        }
                     };
                 }
             },
-            id: function(item) {
-                return item.id;
-            },
-            formatResult: function(item) {
+            templateResult: function(item) {
                 var indentation = '';
                 for (var i = 0; i < item.depth-1; i++) {
                     indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
                 }
                 return indentation + item.text;
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
                 return item.text;
-            },
-            clear: function() {
-                self.value('');
             },
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();
             }),
+            // init: function(el){
+            //     valueData.forEach(function(data) {
+            //         var option = new Option(data.text, data.id, true, true);
+            //         $(el).append(option).trigger('change');
+
+            //         // manually trigger the `select2:select` event
+            //         $(el).trigger({
+            //             type: 'select2:select',
+            //             params: {
+            //                 data: data
+            //             }
+            //         });
+            //     });
+            // },
+            initComplete: false,
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
                 
@@ -158,31 +171,42 @@ define([
                             valueData.reverse();
                         }
 
-                    }
-                    else {
+                        if(!self.select2Config.initComplete){
+                            valueData.forEach(function(data) {
+                                var option = new Option(data.text, data.id, true, true);
+                                $(el).append(option);
+                            });
+                            self.select2Config.initComplete = true;
+                        }
+                    } else {
                         valueData = {
                             id: data,
                             text: NAME_LOOKUP[data],
                         };
                     }
 
-                    if (valueData) { callback(valueData); }
+                    callback(valueData);
                 };
 
-                valueList.forEach(function(value) {
-                    if (ko.unwrap(value)) {
-                        if (NAME_LOOKUP[value]) {
-                            setSelectionData(value);
-                        } else {
-                            $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
-                                dataType: "json"
-                            }).done(function(data) {
-                                NAME_LOOKUP[value] = data.value;
+                if (valueList.length > 0) {
+                    valueList.forEach(function(value) {
+                        if (ko.unwrap(value)) {
+                            if (NAME_LOOKUP[value]) {
                                 setSelectionData(value);
-                            });
+                            } else {
+                                $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
+                                    dataType: "json"
+                                }).done(function(data) {
+                                    NAME_LOOKUP[value] = data.value;
+                                    setSelectionData(value);
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }else{
+                    callback([]);
+                }
+
 
             }
         };

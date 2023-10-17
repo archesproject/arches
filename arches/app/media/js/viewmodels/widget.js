@@ -87,7 +87,7 @@ define([
             subscribeConfigObservable(obs, key);
         });
 
-        if (ko.isObservable(this.defaultValue)) {
+        if (ko.isObservable(this.value) && ko.isObservable(this.defaultValue)) {
             var defaultValue = this.defaultValue();
             if (this.tile && !this.tile.noDefaults && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);
