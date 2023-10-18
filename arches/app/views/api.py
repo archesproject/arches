@@ -1038,13 +1038,14 @@ class ResourceReport(APIBase):
         if uncompacted_value == "true":
             compact = False
         perm = "read_nodegroup"
+        user = request.user
 
         resource = Resource.objects.get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
 
         if not template.preload_resource_data:
-            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version, user=request.user, perm=perm)})
+            return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version, user=user, perm=perm)})
 
         resp = {
             "datatypes": models.DDataType.objects.all(),
@@ -1052,7 +1053,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "report_json": resource.to_json(compact=compact, version=version),
+            "report_json": resource.to_json(compact=compact, version=version, user=user, perm=perm),
         }
 
         if "template" not in exclude:

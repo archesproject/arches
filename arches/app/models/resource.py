@@ -51,6 +51,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_restricted_users,
     get_restricted_instances,
+    user_can_read_resource,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -662,7 +663,17 @@ class Resource(models.ResourceInstance):
             resourceinstance_graphid=resourceinstance_graphid,
         )
 
-        ret["total"] = {"value": resource_relations["total"]}
+        resource_relations["hits"]["hits"] = list(
+            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidto"]), resource_relations["hits"]["hits"])
+        )
+
+        resource_relations["hits"]["hits"] = list(
+            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidfrom"]), resource_relations["hits"]["hits"])
+        )
+
+        resource_relations["hits"]["total"]["value"] = len(resource_relations["hits"]["hits"])        
+        ret["total"] = resource_relations["hits"]["total"]
+ 
         instanceids = set()
 
         restricted_instances = get_restricted_instances(user, se) if user is not None else []
