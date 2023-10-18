@@ -1289,6 +1289,11 @@ class FileListDataType(BaseDataType):
             errors.append({"type": "ERROR", "message": message})
         return errors
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
             for f in tile.data[str(nodeid)]:
@@ -1796,6 +1801,11 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document["tiles"]:
@@ -2113,6 +2123,11 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
 
 class NodeValueDataType(BaseDataType):
