@@ -1935,6 +1935,11 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append({"type": error_type, "message": message})
         return errors
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def post_tile_save(self, tile, nodeid, request):
         ret = False
         sql = """
@@ -2123,11 +2128,6 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
     def collects_multiple_values(self):
         return True
-
-    def clean(self, tile, nodeid):
-        super().clean(tile, nodeid)
-        if tile.data[nodeid] == []:
-            tile.data[nodeid] = None
 
 
 class NodeValueDataType(BaseDataType):
