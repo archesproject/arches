@@ -51,6 +51,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/slick.min.css' %}">
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/accessible-slick-theme.min.css' %}">
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/index.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/index-slider.css' %}">
         {% if app_settings.ACCESSIBILITY_MODE %}
             {% compress css %}
                 <link rel="stylesheet" type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" media="screen">
@@ -162,13 +163,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </ul>
                 </nav>
 
-                <!-- Slider -->
+                <!-- Slider - Start -->
                 <div class="home-slider">
                     <div class="slide-img-container">
                         <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="null">
                         <div class="slide-caption">
                             <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                            <p>{% trans "A web and mobile platform for" %}</p>
+                            <p>{% trans "zzA web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
                         <div class="slide-img-attribution">{% trans "Image courtesy of Luis Alfonso Orellana" %}</div>
@@ -189,9 +190,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
-                        <div class="slide-img-attribution">{% trans "Info to be added" %}</div>
+                        <div class="slide-img-attribution">{% trans "Potala Palace in Lhasa, Tibet" %}</div>
                     </div>
                 </div>
+                <!-- Slider - End -->
 
                 <!-- Down button -->
                 <a href="#info-block-1" class="down-button"><i class="fa fa-angle-down down-button-icon"></i></a>
