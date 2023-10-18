@@ -264,7 +264,7 @@ define([
 
         this.makeObject = function(id, esSource){
             var graph = self.graphLookup[esSource.graph_id];
-            var iconClass = graph.iconclass  || 'fa fa-question';
+            var iconClass = graph?.iconclass  || 'fa fa-question';
 
             var ontologyProperty;
             var inverseOntologyProperty;
