@@ -30,12 +30,12 @@ class WorkflowHistoryView(View):
         data = json.loads(request.body)
         stepdata = data.get("stepdata", {})
         componentdata = data.get("componentdata", {})
-        workflowname = data.get("workflowname")
 
         # TODO(Django 5.0) rewrite as a simpler update_or_create()
         # call using different `defaults` vs. `create_defaults`
         with transaction.atomic():
             workflowid = data["workflowid"]
+            workflowname = data["workflowname"]
             try:
                 history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
                     workflowid = workflowid,
@@ -44,6 +44,7 @@ class WorkflowHistoryView(View):
                     defaults = {
                         "stepdata": stepdata,
                         "componentdata": componentdata,
+                        "workflowname": workflowname,
                         "user": request.user,
                         "completed": data.get("completed", False),
                     },

@@ -150,6 +150,7 @@ define([
                 lockExternalStep: self.lockExternalStep,
                 lockableExternalSteps: self.lockableExternalSteps,
                 workflowId: self.workflowId,
+                workflowName: self.workflow.plugin.componentname,
                 alert: self.alert,
                 outerSaveOnQuit: self.outerSaveOnQuit,
                 isStepActive: self.active,
