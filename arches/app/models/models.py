@@ -17,6 +17,7 @@ import logging
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
@@ -27,7 +28,7 @@ from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
@@ -281,6 +282,9 @@ class EditLog(models.Model):
     class Meta:
         managed = True
         db_table = "edit_log"
+        indexes = [
+            models.Index(fields=["transactionid"]),
+        ]
 
 
 class ExternalOauthToken(models.Model):
@@ -322,7 +326,7 @@ class ResourceRevisionLog(models.Model):
 
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True)
-    path = models.FileField(upload_to="uploadedfiles")
+    path = models.FileField(upload_to=import_class_from_string(settings.FILENAME_GENERATOR))
     tile = models.ForeignKey("TileModel", db_column="tileid", null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
@@ -338,6 +342,8 @@ class File(models.Model):
 class TempFile(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to="archestemp")
+    created = models.DateTimeField(auto_now_add=True)
+    source = models.TextField()
 
     def __init__(self, *args, **kwargs):
         super(TempFile, self).__init__(*args, **kwargs)
@@ -1510,8 +1516,12 @@ def send_email_on_save(sender, instance, **kwargs):
                 email_to = instance.recipient.email
             else:
                 email_to = context["email"]
+
+            if type(email_to) is not list:
+                email_to = [email_to]
+
             subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to)
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             if instance.notif.notiftype.webnotify is not True:
@@ -1519,7 +1529,8 @@ def send_email_on_save(sender, instance, **kwargs):
                 instance.save()
         except Exception as e:
             logger = logging.getLogger(__name__)
-            logger.warn("Email Server not correctly set up. See settings to configure.")
+            logger.warning(e)
+            logger.warning("Error occurred sending email.  See previous stack trace and check email configuration in settings.py.")
 
     return False
 
@@ -1562,6 +1573,19 @@ class Plugin(models.Model):
     class Meta:
         managed = True
         db_table = "plugins"
+
+
+class WorkflowHistory(models.Model):
+    workflowid = models.UUIDField(primary_key=True)
+    stepdata = JSONField(null=False, default=dict)
+    componentdata = JSONField(null=False, default=dict)
+    created = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "workflow_history"
 
 
 class IIIFManifestValidationError(Exception):
@@ -1710,6 +1734,7 @@ class LoadStaging(models.Model):
     nodegroup_depth = models.IntegerField(default=1)
     source_description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
+    operation = models.TextField(default='insert')
 
     class Meta:
         managed = True

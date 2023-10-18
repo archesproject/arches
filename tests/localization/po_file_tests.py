@@ -11,7 +11,7 @@ from arches.app.models.system_settings import settings
 from unittest.mock import Mock, MagicMock
 
 # these tests can be run from the command line via
-# python manage.py test tests/localization/po_file_tests.py --settings="tests.test_settings"
+# python manage.py test tests/localization/po_file_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class PoFileTests(TestCase):
@@ -39,7 +39,7 @@ class PoFileTests(TestCase):
         CardXNodeXWidget.objects.all = m_all_method
         CardModel.objects.all = m_all_method
         writer.populate()
-        self.assertEquals(m_all_method.call_count, 2)
+        self.assertEqual(m_all_method.call_count, 2)
 
     def test_populate_from_card_x_node_x_widget(self):
         "Test to ensure PO Entries are appended with appropriate english messageids (no translations)"

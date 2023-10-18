@@ -2,12 +2,13 @@ define([
     'knockout',
     'underscore',
     'knockout-mapping',
+    'arches',
     'uuid',
+    'js-cookie',
     'views/components/workflows/workflow-component-abstract',
     'templates/views/components/plugins/workflow-step.htm'
-], function(ko, _, koMapping, uuid, WorkflowComponentAbstract, workflowStepTemplate) {
-    const STEPS_LABEL = 'workflow-steps';
-    const STEP_ID_LABEL = 'workflow-step-id';
+], function(ko, _, koMapping, arches, uuid, Cookies, WorkflowComponentAbstract, workflowStepTemplate) {
+    const COMPONENT_ID_LOOKUP_LABEL = 'componentIdLookup';
 
     var WorkflowStep = function(config) {
          
@@ -38,7 +39,7 @@ define([
 
         this.componentIdLookup = ko.observable();
         this.componentIdLookup.subscribe(function(componentIdLookup) {
-            self.setToLocalStorage('componentIdLookup', componentIdLookup);
+            self.setToWorkflowHistory(COMPONENT_ID_LOOKUP_LABEL, componentIdLookup);
         });
 
 
@@ -50,15 +51,12 @@ define([
         this.lockableExternalSteps = config.lockableExternalSteps || [];
 
         this.complete = ko.computed(function() {
-            var complete = true; 
-            
-            Object.values(self.workflowComponentAbstractLookup()).forEach(function(workflowComponentAbstract) {
-                if (!workflowComponentAbstract.complete()) {
-                    complete = false;
-                }
-            });
-
-            return complete;
+            const components = Object.values(self.workflowComponentAbstractLookup());
+            if (!components.length) {
+                // New workflow being initialized.
+                return false;
+            }
+            return components.every(component => component.complete());
         });
 
         /* 
@@ -80,7 +78,8 @@ define([
 
         this.locked = ko.observable(false);
         this.locked.subscribe(function(value){
-            self.setToLocalStorage("locked", value);
+            // The componentIdLookup will be a noop, but we need to post the "locked" info
+            self.setToWorkflowHistory(COMPONENT_ID_LOOKUP_LABEL, self.componentIdLookup());
         });
 
         this.initialize = function() {
@@ -99,15 +98,10 @@ define([
             }
 
             /* cached workflowComponentAbstract logic */ 
-            var cachedComponentIdLookup = self.getFromLocalStorage('componentIdLookup');
-            if (cachedComponentIdLookup) {
-                self.componentIdLookup(cachedComponentIdLookup);
-            }
-
-            /* step lock logic */ 
-            var locked = self.getFromLocalStorage('locked');
-            if (locked) {
-                self.locked(locked);
+            if (config.workflowHistory.stepData) {
+                const stepData = config.workflowHistory[ko.unwrap(self.name)];
+                self.componentIdLookup(stepData[COMPONENT_ID_LOOKUP_LABEL]);
+                self.locked(config.workflowHistory.stepdata.locked);
             }
     
             /* cached informationBox logic */
@@ -116,16 +110,16 @@ define([
             /* build page layout */ 
             ko.toJS(self.layoutSections).forEach(function(layoutSection) {
                 var uniqueInstanceNames = [];
-    
+
                 layoutSection.componentConfigs.forEach(function(componentConfigData) {
                     uniqueInstanceNames.push(componentConfigData.uniqueInstanceName);
                     self.updateWorkflowComponentAbstractLookup(componentConfigData);
                 });
-    
+
                 self.pageLayout.push([layoutSection.sectionTitle, uniqueInstanceNames]);
             });
 
-            /* assigns componentIdLookup to self, which updates localStorage */ 
+            /* assigns componentIdLookup to self, which updates workflow history */
             var componentIdLookup = Object.keys(self.workflowComponentAbstractLookup()).reduce(function(acc, key) {
                 acc[key] = self.workflowComponentAbstractLookup()[key].id();
                 return acc;
@@ -136,10 +130,13 @@ define([
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
-            var workflowComponentAbstractId;
+            var workflowComponentAbstractId = self.id();
 
-            if (self.getFromLocalStorage('componentIdLookup')) {
-                workflowComponentAbstractId = self.getFromLocalStorage('componentIdLookup')[workflowComponentAbtractData.uniqueInstanceName];
+            if (config.workflowHistory.stepData) {
+                const componentIdLookup = config.workflowHistory.stepData[COMPONENT_ID_LOOKUP_LABEL];
+                if (componentIdLookup) {
+                    workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
+                }
             }
 
             var workflowComponentAbstract = new WorkflowComponentAbstract({
@@ -156,6 +153,7 @@ define([
                 alert: self.alert,
                 outerSaveOnQuit: self.outerSaveOnQuit,
                 isStepActive: self.active,
+                workflowHistory: config.workflowHistory,
             });
 
             workflowComponentAbstractLookup[workflowComponentAbtractData.uniqueInstanceName] = workflowComponentAbstract;
@@ -182,9 +180,9 @@ define([
                     .catch(function(error) {
                         reject(error);
                     })
-                    .finally(function() {
-                        self.saving(false);
-                    });
+                    .finally(
+                        self.saving(false)
+                    );
             });
         };
 
@@ -204,27 +202,29 @@ define([
             });
         };
 
-        this.setToLocalStorage = function(key, value) {
-            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
+        this.setToWorkflowHistory = function(key, value) {
+            const workflowid = self.workflow.id();
+            const workflowHistory = {
+                workflowid,
+                completed: false,
+                stepdata: {
+                    // Django view will patch in this key, keeping existing keys
+                    [ko.unwrap(self.name)]: {
+                        [key]: value,
+                        locked: self.locked(),
+                    },
+                },
+            };
 
-            if (!allStepsLocalStorageData[ko.unwrap(self.name)]) {
-                allStepsLocalStorageData[ko.unwrap(self.name)] = {};
-            }
+            fetch(arches.urls.workflow_history + workflowid, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken')
+                },
+                body: JSON.stringify(workflowHistory),
+            });
 
-            allStepsLocalStorageData[ko.unwrap(self.name)][key] = value ? koMapping.toJSON(value) : value;
-
-            localStorage.setItem(
-                STEPS_LABEL, 
-                JSON.stringify(allStepsLocalStorageData)
-            );
-        };
-
-        this.getFromLocalStorage = function(key) {
-            var allStepsLocalStorageData = JSON.parse(localStorage.getItem(STEPS_LABEL)) || {};
-
-            if (allStepsLocalStorageData[ko.unwrap(self.name)] && typeof allStepsLocalStorageData[ko.unwrap(self.name)][key] !== "undefined") {
-                return JSON.parse(allStepsLocalStorageData[ko.unwrap(self.name)][key]);
-            }
         };
 
         this.toggleInformationBox = function() {

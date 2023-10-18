@@ -29,7 +29,7 @@ define([
 
 
         if (this.form) {
-            $(this.form).on('after-update', function(req, tile) {
+            this.form.on('after-update', function(req, tile) {
                 var hasdata = _.filter(tile.data, function(val, key) {
                     val = ko.unwrap(val);
                     if (val) {

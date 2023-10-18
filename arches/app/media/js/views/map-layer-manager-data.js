@@ -3,10 +3,14 @@ define([], function() {
         return string.replace(/,\s*}*$/, "}");
     }
 
-    const mapLayerManagerDataHTML = document.querySelector('#mapLayerManagerData');
-    const mapLayerManagerData = mapLayerManagerDataHTML.getAttribute('mapLayerManagerData');
-
-    const parsedMapLayerManagerData = JSON.parse(removeTrailingCommaFromObject(mapLayerManagerData));
-
-    return parsedMapLayerManagerData;
+    try {        
+        const mapLayerManagerDataHTML = document.querySelector('#mapLayerManagerData');
+        const mapLayerManagerData = mapLayerManagerDataHTML.getAttribute('mapLayerManagerData');
+    
+        const parsedMapLayerManagerData = JSON.parse(removeTrailingCommaFromObject(mapLayerManagerData));
+    
+        return parsedMapLayerManagerData;
+    } catch (error) {
+        console.error(error);
+    }
 });

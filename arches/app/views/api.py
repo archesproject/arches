@@ -15,6 +15,7 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from collections import OrderedDict
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
@@ -26,7 +27,7 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -545,12 +546,15 @@ class Resources(APIBase):
         return JSONResponse(out, indent=indent)
 
     def put(self, request, resourceid, slug=None, graphid=None):
-        indent = request.GET.get("indent", None)
-
         allowed_formats = ["arches-json", "json-ld"]
+        indent = request.GET.get("indent", None)
         format = request.GET.get("format", "json-ld")
+        
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+        
+        if format == "json-ld" and slug is None and graphid is None:
+            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
 
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
@@ -558,14 +562,6 @@ class Resources(APIBase):
             with transaction.atomic():
                 try:
                     if format == "json-ld":
-                        try:
-                            # DELETE
-                            resource_instance = Resource.objects.get(pk=resourceid)
-                            resource_instance.delete()
-                        except models.ResourceInstance.DoesNotExist:
-                            pass
-
-                        # POST
                         data = JSONDeserializer().deserialize(request.body)
                         reader = JsonLdReader()
                         if slug is not None:
@@ -580,6 +576,12 @@ class Resources(APIBase):
                             response = []
                             for resource in reader.resources:
                                 with transaction.atomic():
+                                    try:
+                                        # DELETE
+                                        resource_instance = Resource.objects.get(pk=resource.pk)
+                                        resource_instance.delete()
+                                    except models.ResourceInstance.DoesNotExist:
+                                        pass
                                     resource.save(request=request)
                                 response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                             return JSONResponse(response, indent=indent, status=201)
@@ -624,12 +626,16 @@ class Resources(APIBase):
                     return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
-        indent = request.POST.get("indent", None)
         allowed_formats = ["arches-json", "json-ld"]
+        indent = request.POST.get("indent", None)
         format = request.GET.get("format", "json-ld")
+        
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
+        if format == "json-ld" and slug is None and graphid is None:
+            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
+        
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 if format == "json-ld":
@@ -1252,12 +1258,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
         user = request.user
         perm = "read_nodegroup"
 
-        return JSONResponse(
-            {
-                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm)
-                for resource in Resource.objects.filter(pk__in=resource_ids)
-            }
-        )
+        disambiguated_resource_instances = OrderedDict().fromkeys(resource_ids)
+        for resource in Resource.objects.filter(pk__in=resource_ids):
+            disambiguated_resource_instances[str(resource.pk)] = resource.to_json(
+                compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm
+            )
+
+        return JSONResponse(disambiguated_resource_instances, sort_keys=False)
 
 
 @method_decorator(csrf_exempt, name="dispatch")

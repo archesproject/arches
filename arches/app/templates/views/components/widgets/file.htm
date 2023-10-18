@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="class: nodeCssClasses">
     <div class="form-group">
         <span class="control-label widget-input-label" for="" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -54,13 +54,13 @@
                 <div class="file-upload-options">
                     <div class="file-upload-options-grow list-filter">
                     <!--ko if: filesJSON().length > 1-->
-                    
-                        <input 
+
+                        <input
                             data-bind="
                                 attr: {placeholder: $root.translations.findAFile + '...', 'aria-label': $root.translations.findAFile},
                                 textInput: filter
-                            " 
-                            type="text" 
+                            "
+                            type="text"
                             class="file-upload-filter"
                         >
                         <!-- Clear Search -->
@@ -87,8 +87,7 @@
                 </div>
             </div>
             <div class="dz-previews" data-bind="css: uniqueidClass">
-            <!-- ko if: !filter() -->
-                <!-- ko foreach: pagedList(filesJSON()) -->
+                <!-- ko foreach: pagedList(filter() ? filteredList() : filesJSON()) -->
                 <div class="file-upload-card">
                     <div class="media-body">
                         <div class="media-block">
@@ -120,41 +119,6 @@
                     </div>
                 </div>
                 <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko if: filter() -->
-                <!-- ko foreach: pagedList(filteredList()) -->
-                <div class="file-upload-card">
-                    <div class="media-body">
-                        <div class="media-block">
-                            <div class="media-left">
-                                <span><i class="fa fa-file fa-lg"></i></span>
-                            </div>
-                            <div class="media-body file-upload-card-detail">
-                                <div class="media-left">
-                                    <span class="text-main mar-no text-overflow" data-bind="text: name"></span>
-                                    <!-- ko if: $data.error -->
-                                    <span class="dz-error text-danger text-sm" data-bind="text: $root.translations.error"></span>
-                                    <!-- /ko -->
-                                    <span class="text-sm">
-                                        <a data-bind="attr: {href: ko.unwrap(url) ? $parent.getFileUrl(url) : content, download: name}, click: function(){return ko.unwrap(url) ? true : false}, clickBubble: false">
-                                            <span data-bind="text: ko.unwrap(url) ? $root.translations.download : $root.translations.unsaved"></span>
-                                        </a>
-                                    </span>
-                                </div>
-                                <div class="file-upload-card-detail-right">
-                                    <div class="media-right" data-bind="click: $parent.removeFile">
-                                        <button class="btn btn-xs btn-danger btn-file-cancel"><i class="ion ion-close"></i></button>
-                                    </div>
-                                    <div>
-                                        <span class="text-sm" data-bind="html: $parent.formatSize($data)"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /ko -->
-            <!-- /ko -->
             </div>
             <div data-bind="style: {visibility: pageCtReached()}">
                 <select type="button" class="btn btn-file-upload-limit" data-bind="value: pageCt" aria-label="{% trans 'Number of Files Shown' %}">
@@ -176,11 +140,11 @@
     <span data-bind="text: $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        class="form-control input-md widget-input" 
+    <input
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.exampleFileTypes, 'aria-label': $root.translations.acceptedFileTypes},
-            value: acceptedFiles, 
+            value: acceptedFiles,
             valueUpdate: 'keyup'
         "
     >
@@ -190,9 +154,9 @@
     <span data-bind="text: $root.translations.maxFileSize"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.maxFileSize, 'aria-label': $root.translations.maxFileSize},
             value: maxFilesize
@@ -203,16 +167,16 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 
 <!-- ko if: uploadedFiles().length === 0 -->
-<dd>
+<dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dd>
+<dd data-bind="class: $parent.nodeCssClasses">
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
@@ -221,7 +185,7 @@
 <!-- /ko -->
 
 <!-- ko if: reportImages().length > 0 -->
-<dd>
+<dd data-bind="class: nodeCssClasses">
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
@@ -236,5 +200,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue()"></span>
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue(), class: nodeCssClasses"></span>
 {% endblock display_value %}

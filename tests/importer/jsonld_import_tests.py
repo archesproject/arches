@@ -7,7 +7,7 @@ from django.test.client import RequestFactory, Client
 from django.urls import reverse
 from django.db import connection
 from arches.app.utils.i18n import LanguageSynchronizer
-from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
+from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL, DELETE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
@@ -20,12 +20,14 @@ from arches.app.utils.data_management.resources.formats.rdffile import JsonLdRea
 from pyld.jsonld import expand
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/jsonld_import_tests.py --settings="tests.test_settings"
+# python manage.py test tests/importer/jsonld_import_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class JsonLDImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         # This runs once per instantiation
         cls.loadOntology()
         cls.factory = RequestFactory()
@@ -128,6 +130,13 @@ class JsonLDImportTests(ArchesTestCase):
         ]:
             graph = Graph.objects.get(pk=graph_id)
             graph.publish(user=User.objects.get(pk=1))
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = connection.cursor()
+        cursor.execute(DELETE_TOKEN_SQL)
+
+        super().tearDownClass()
 
     def setUp(self):
         pass
