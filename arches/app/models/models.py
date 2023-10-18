@@ -1572,6 +1572,7 @@ class Plugin(models.Model):
 
 class WorkflowHistory(models.Model):
     workflowid = models.UUIDField(primary_key=True)
+    workflowname = models.TextField(null=True, default=None)
     stepdata = JSONField(null=False, default=dict)
     componentdata = JSONField(null=False, default=dict)
     created = models.DateTimeField(auto_now_add=True)

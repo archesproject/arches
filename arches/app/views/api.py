@@ -1429,6 +1429,13 @@ class NodeValue(APIBase):
         return response
 
 
+class UserIncompleteWorkflows(APIBase):
+    def get(self, request):
+        return JSONResponse({
+            "incomplete_workflows": models.WorkflowHistory.objects.filter(user=request.user, completed=False).exclude(componentdata__iexact='{}')
+        })
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Validator(APIBase):
     """

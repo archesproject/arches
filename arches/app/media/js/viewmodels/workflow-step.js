@@ -206,6 +206,7 @@ define([
             const workflowid = self.workflow.id();
             const workflowHistory = {
                 workflowid,
+                workflowname: self.workflow.plugin.componentname,
                 completed: false,
                 stepdata: {
                     // Django view will patch in this key, keeping existing keys

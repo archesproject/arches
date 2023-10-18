@@ -30,6 +30,7 @@ class WorkflowHistoryView(View):
         data = json.loads(request.body)
         stepdata = data.get("stepdata", {})
         componentdata = data.get("componentdata", {})
+        workflowname = data.get("workflowname")
 
         # TODO(Django 5.0) rewrite as a simpler update_or_create()
         # call using different `defaults` vs. `create_defaults`
@@ -38,6 +39,7 @@ class WorkflowHistoryView(View):
             try:
                 history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
                     workflowid = workflowid,
+                    workflowname = workflowname,
                     user = request.user,
                     defaults = {
                         "stepdata": stepdata,
