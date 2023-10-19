@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10097_add_editlog_index"),
+        ("models", "10121_workflowhistory"),
     ]
 
     add_bulk_data_deletion = """

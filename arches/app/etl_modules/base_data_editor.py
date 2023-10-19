@@ -372,9 +372,9 @@ class BulkStringEditor(BaseBulkEditor):
             event_created = self.create_load_event(cursor, load_details)
             if event_created["success"]:
                 if use_celery_bulk_edit:
-                    response = self.run_load_task_async(request, self.loadid)
+                    response = self.run_bulk_task_async(request, self.loadid)
                 else:
-                    response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+                    response = self.run_bulk_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
@@ -382,7 +382,7 @@ class BulkStringEditor(BaseBulkEditor):
         return response
 
     @load_data_async
-    def run_load_task_async(self, request):
+    def run_bulk_task_async(self, request):
         graph_id = request.POST.get("graph_id", None)
         node_id = request.POST.get("node_id", None)
         operation = request.POST.get("operation", None)
@@ -413,7 +413,7 @@ class BulkStringEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, userid, loadid, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
+    def run_bulk_task(self, userid, loadid, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
         case_insensitive = False

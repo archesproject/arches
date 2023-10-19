@@ -17,7 +17,6 @@ from arches.app.utils.index_database import index_resources_by_transaction
 logger = logging.getLogger(__name__)
 
 
-
 class BulkDataDeletion(BaseBulkEditor):
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}

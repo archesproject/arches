@@ -323,7 +323,7 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
 
     try:
         BulkDataDeletion = bulk_data_deletion.BulkDataDeletion(loadid=load_id)
-        BulkDataDeletion.run_load_task(userid, load_id, graph_id, nodegroup_id, resourceids)
+        BulkDataDeletion.run_bulk_task(userid, load_id, graph_id, nodegroup_id, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
