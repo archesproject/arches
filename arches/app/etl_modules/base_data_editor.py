@@ -281,13 +281,13 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
+        pattern = old_text
         if operation == "replace":
             if case_insensitive == "true":
                 operation = "replace_i"
             if whole_word == "true":
                 pattern = "\\y{0}\\y".format(old_text)
-            else:
-                pattern = old_text
+
         if also_trim == "true":
             operation = operation + "_trim"
 
@@ -337,13 +337,13 @@ class BulkStringEditor(BaseBulkEditor):
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
+        pattern = old_text
         if operation == "replace":
             if case_insensitive == "true":
                 operation = "replace_i"
             if whole_word == "true":
                 pattern = "\\y{0}\\y".format(old_text)
-            else:
-                pattern = old_text
+
         if also_trim == "true":
             operation = operation + "_trim"
 
@@ -400,13 +400,13 @@ class BulkStringEditor(BaseBulkEditor):
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
 
+        pattern = old_text
         if operation == "replace":
             if case_insensitive == "true":
                 operation = "replace_i"
             if whole_word == "true":
                 pattern = "\\y{0}\\y".format(old_text)
-            else:
-                pattern = old_text
+
         if also_trim == "true":
             operation = operation + "_trim"
 
