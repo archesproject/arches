@@ -1,0 +1,1 @@
+<template>I'm in the editor</template>

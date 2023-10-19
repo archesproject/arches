@@ -5,7 +5,9 @@
         "build_production": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
         "build_development": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
         "build_test": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js --env test=true",
-        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config arches/webpack/webpack.config.dev.js"
+        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config arches/webpack/webpack.config.dev.js",
+        "gettext:extract": "./arches/app/media/node_modules/.bin/vue-gettext-extract",
+        "gettext:compile": "./arches/app/media/node_modules/.bin/vue-gettext-compile"
     },
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
@@ -66,6 +68,7 @@
         "moment-timezone": "~0.5.43",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
+        "primevue": "^3.35.0",
         "proj4": "^2.3.15",
         "regenerator-runtime": "^0.13.9",
         "requirejs": "~2.3.2",
@@ -75,6 +78,7 @@
         "underscore": "~1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.3.4",
+        "vue3-gettext": "^3.0.0-beta.1",
         "webpack-bundle-tracker": "^1.4.0"
     },
     "nodeModulesPaths": {

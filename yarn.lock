@@ -3012,8 +3012,6 @@ arches-dev-dependencies@archesproject/arches-dev-dependencies#dev/7.5.x:
     stylelint-config-standard "^24.0.0"
     stylelint-webpack-plugin "^3.1.1"
     text-loader "^0.0.1"
-    vue-loader "^17.2.2"
-    vue-template-compiler "^2.7.14"
     webpack "^5.77.0"
     webpack-cli "^4.9.1"
     webpack-dev-server "^4.7.3"
@@ -5980,7 +5978,12 @@ knockout-mapping@~2.6.0:
   resolved "https://registry.yarnpkg.com/knockout-mapping/-/knockout-mapping-2.6.0.tgz#052759d01ecf30d4947e8ebe64ad2c82933f06ff"
   integrity sha512-Q4dh1RSU/54TRCbZCYCBHC462T64fgnYly6UOyzDA2h8CEgthtN/AL6rXYVmoKYTbRtfvVHyLalKztVOe85Pmw==
 
-knockout@>=2.3.0, knockout@~3.5.1:
+knockout@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.5.0.tgz#6d3e19bf53b1dc4d8de81c97a5ba9672443dc292"
+  integrity sha512-vBUF/IsBDzaejHkNpiquKdc5uPrImXuQ4Mb9lEfNNJ5cyHGI8ThDupR+h3eMFZhfmPE/brfwcIAn/fm0yOvJUg==
+
+knockout@>=2.3.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.5.1.tgz#62c81e81843bea2008fd23c575edd9ca978e75cf"
   integrity sha512-wRJ9I4az0QcsH7A4v4l0enUpkS++MBx0BnL/68KaLzJg7x1qmbjSlwEoCNol7KTYZ+pmtI7Eh2J0Nu6/2Z5J/Q==
@@ -7332,6 +7335,11 @@ pretty-error@^4.0.0:
   dependencies:
     lodash "^4.17.20"
     renderkid "^3.0.0"
+
+primevue@^3.35.0:
+  version "3.35.0"
+  resolved "https://registry.yarnpkg.com/primevue/-/primevue-3.35.0.tgz#dd12b1361c5bf731f75cc668f813b8504e43fb53"
+  integrity sha512-p1YTxBtxG9SyGvHKRqO0LbacJZUYJfUOPgLu7kwhXR34E1Rcmu6iDBnZ2c3jkH+wmRL4fMzQmNnpX6DUrLtGfQ==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
