@@ -1,4 +1,5 @@
 import uuid
+import datetime
 
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -22,7 +23,7 @@ class WorkflowHistoryTests(ArchesTestCase):
             workflowid=str(uuid.uuid1()),
             workflowname='test-name',
             user=self.admin,
-            created=False,
+            created=datetime.datetime.now(),
             stepdata={
                 "set-project-name": {
                     "componentIdLookup": {
