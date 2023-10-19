@@ -1580,7 +1580,8 @@ class WorkflowHistory(models.Model):
     workflowname = models.TextField(null=True, default=None)
     stepdata = JSONField(null=False, default=dict)
     componentdata = JSONField(null=False, default=dict)
-    created = models.DateTimeField(auto_now_add=True)
+    # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
+    created = models.DateTimeField(default=datetime.datetime.now, null=False)  
     user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
     completed = models.BooleanField(default=False)
 
