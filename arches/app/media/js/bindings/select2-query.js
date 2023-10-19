@@ -15,6 +15,10 @@ define([
                 allowClear: false,
                 minimumResultsForSearch: 8
             });
+            var attr = allBindingsAccessor()?.attr;
+            if(!!attr && Object.hasOwn(attr, 'data-label')){
+                el.setAttribute('aria-label', attr['data-label']);
+            }
             var value = select2Config.value;
             value.extend({ rateLimit: 250 });
             // select2Config.value = value();
