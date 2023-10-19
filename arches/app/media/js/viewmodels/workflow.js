@@ -416,14 +416,7 @@ define([
             });
         };
 
-        this.finishWorkflow = function() {
-            if (self.activeStep().hasUnsavedData()) {
-                self.activeStep().save().then(function() {
-                    this.finishWorkflow();
-                });
-                return;
-            }
-
+        this.markWorkflowComplete = function() {
             const workflowid = self.id();
             const workflowHistory = {
                 workflowid,
@@ -440,6 +433,16 @@ define([
             });
 
             window.location.assign(self.quitUrl);
+        }
+
+        this.finishWorkflow = function() {
+            if (self.activeStep().hasUnsavedData()) {
+                self.activeStep().save().then(function() {
+                    self.markWorkflowComplete();
+                });
+                return;
+            }
+            self.markWorkflowComplete();
         };
 
         this.quitWorkflow = function(){
