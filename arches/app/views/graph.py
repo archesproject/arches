@@ -460,8 +460,6 @@ class GraphDataView(View):
             return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except PublishedModelError as e:
-            return JSONErrorResponse(e.title, e.message)
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
