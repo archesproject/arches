@@ -201,7 +201,7 @@ def on_chord_error(request, exc, traceback):
 def load_excel_data(import_module, importer_name, userid, files, summary, result, temp_dir, loadid):
     logger = logging.getLogger(__name__)
     try:
-        import_module.run_load_task(files, summary, result, temp_dir, loadid)
+        import_module.run_load_task(userid, files, summary, result, temp_dir, loadid)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -276,7 +276,7 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
 
     try:
         ImportSingleCsv = import_single_csv.ImportSingleCsv()
-        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
+        ImportSingleCsv.run_load_task(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -293,14 +293,14 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
 
 
 @shared_task
-def edit_bulk_string_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+def edit_bulk_string_data(userid, load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
     from arches.app.etl_modules import base_data_editor
 
     logger = logging.getLogger(__name__)
 
     try:
         BulkStringEditor = base_data_editor.BulkStringEditor(loadid=load_id)
-        BulkStringEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+        BulkStringEditor.run_load_task(userid, load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")

@@ -87,11 +87,11 @@
                         <span data-bind="text: $root.translations.addRelationshipInstruction"></span>
                     </h3>
                     <div style="min-width: 300px;">
-                        <input style="display:inline-block;" data-bind="
+                        <select style="display:inline-block;" data-bind="
                             select2Query: {
                                 select2Config: select2Config
-                            }
-                        ">
+                            }">
+                        </select>
                     </div>
                 </div>
 
@@ -157,11 +157,11 @@
                                         <span class="col-sm-4" style="padding-right: 5px;text-align: right;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                         <span class="col-sm-4">
-                                            <input style="width:30%; display:inline-block;" data-bind="
+                                            <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.select-ontology-property)
-                                                }
-                                            ">
+                                                }">
+                                            </select>
                                         </span>
                                         <span class="col-sm-4" style="padding-left: 5px;"
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
@@ -175,11 +175,11 @@
                                         <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                         <span class="col-sm-4">
-                                            <input style="width:30%; display:inline-block;" data-bind="
+                                            <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.select-ontology-property)
-                                                }
-                                            ">
+                                                }">
+                                            </select>
                                         </span>
                                         <span class="col-sm-4" style="padding-left: 5px;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
@@ -194,11 +194,11 @@
                                         <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                         <span class="col-sm-4">
-                                            <input style="width:30%; display:inline-block;" data-bind="
+                                            <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.select-ontology-property)
-                                                }
-                                            ">
+                                                }">
+                                            </select>
                                         </span>
                                         <span class="col-sm-4" style="padding-left: 5px;"
                                         data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
@@ -212,11 +212,11 @@
                                             <span class="col-sm-4" style="padding-right: 5px; text-align: right;"
                                             data-bind="text: resource.displayname + ' (' + self.makeFriendly(relationship.resource.root_ontology_class) + ')'"></span>
                                             <span class="col-sm-4">
-                                                <input style="width:30%; display:inline-block;" data-bind="
+                                                <select style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.select-ontology-property)
-                                                    }
-                                                ">
+                                                    }">
+                                                </select>
                                             </span>
                                         <span class="col-sm-4" style="padding-left: 5px;"
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
@@ -249,7 +249,7 @@
                                             <span data-bind="text: $root.translations.relationship"></span>
                                             <i class="ion-ios-checkmark-outline"></i></label>
                                         <div class="col-xs-12">
-                                            <input style="width:30%; display:inline-block;" data-bind="select2: {
+                                            <select style="width:30%; display:inline-block;" data-bind="select2Query: {
                                                     select2Config: {
                                                         clickBubble: true,
                                                         data: self.relationshipTypes,
@@ -258,6 +258,7 @@
                                                         placeholder: self.relationshipTypePlaceholder
                                                     }
                                                 }">
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

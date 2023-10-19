@@ -160,6 +160,10 @@
     <!-- ko if: loadDetails -->
     <!-- ko ifnot: loading() -->
     <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fileName + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: loadDetails.file_name"></span>
+    </div>
+    <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetResource + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: getGraphName(loadDetails.graph)"></span>
     </div>

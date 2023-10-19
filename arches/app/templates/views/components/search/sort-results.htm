@@ -5,18 +5,22 @@
 <select 
     style="text-align-last:unset;" 
     data-bind="
-        value: filter, 
         options: [
             {'id':'', 'name':$root.translations.unsorted}, 
             {'id':'asc', 'name':$root.translations.ascending}, 
             {'id':'desc', 'name':$root.translations.descending}
-        ], 
-        chosen: { width: '100%', disable_search: true}, 
+        ],
         optionsText: 'name', 
         optionsValue: 'id',
+        select2Query: {
+            select2Config:{
+                value: filter,
+                allowClear: false,
+                minimumResultsForSearch: -1
+        }},
         attr: {
-            'aria-label': $root.translations.sortSearchResults
+            'data-label': $root.translations.sortSearchResults
         }
-    "
-></select>
+    ">
+</select>
 <!-- End Sort Results Selector-->

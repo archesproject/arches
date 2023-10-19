@@ -44,7 +44,7 @@
                 <span class="h5" data-bind="text: $root.translations.buffer"></span>
                 <div class="form-inline">
                     <span data-bind="text: $root.translations.distance"></span>
-                    <input 
+                    <input style="height: 30px;"
                         type="number" 
                         min=0.0 
                         class="buffer-input" 
@@ -56,13 +56,20 @@
                             textInput: buffer
                         "
                     >
-                    <select class="form-control" style="vertical-align: top;" 
-                        data-bind="options: bufferUnits, 
-                        optionsText:'name', 
-                        optionsValue:'val', 
-                        value: bufferUnit, 
-                        attr: {'aria-label': $root.translations.selectBufferUnits}"
-                    ></select>
+                    <span style="width: 100px; display: inline-block;">
+                        <select class="form-control" style="vertical-align: top;" 
+                            data-bind="options: bufferUnits, 
+                            optionsText:'name', 
+                            optionsValue:'val',
+                            select2Query: {
+                                select2Config:{
+                                    value: bufferUnit,
+                                    allowClear: false,
+                                    minimumResultsForSearch: -1
+                            }},
+                            attr: {'data-label': $root.translations.selectBufferUnits}"
+                        ></select>
+                    </span>
                 </div>
             </div>
 
@@ -72,18 +79,17 @@
                 <select 
                     id="filter-select"
                     data-bind="
-                        placeholder: $root.translations.drawA,
-                        value: selectedTool,
-                        valueAllowUnset: true,
                         options: spatialFilterTypes,
                         optionsText: 'title',
                         optionsValue: 'drawMode',
-                        chosen: {
-                            'width': '100%',
-                            'disable_search_threshold': 10,
-                            'allow_single_deselect': true
-                        },
-                        attr: {'aria-label': $root.translations.selectAFilter}
+                        select2Query: {
+                            select2Config:{
+                                value: selectedTool,
+                                placeholder: $root.translations.drawA,
+                                allowClear: false,
+                                minimumResultsForSearch: -1
+                        }},
+                        attr: {'data-label': $root.translations.selectAFilter}
                     "
                 ></select>
             </div>

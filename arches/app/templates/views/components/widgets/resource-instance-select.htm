@@ -7,13 +7,13 @@
 <!-- ko ifnot: self.displayOntologyTable -->
 <div class="row" style="margin: 0px;">
     <div class="col-xs-12 resource-instance-wrapper">
-        <input style="width:30%; display:inline-block;"
+        <select style="width:30%; display:inline-block;"
             data-bind="
                 select2Query: {
                     select2Config: select2Config
                 },
-                attr: {'aria-label': label}
-            ">
+                attr: {'data-label': label, 'aria-label': label}
+            "></select>
     </div>
 </div>
 <!-- /ko -->
@@ -27,13 +27,13 @@
 
         <div class="row" style="margin: 0px;">
             <div class="col-xs-12 resource-instance-wrapper">
-                <input style="width:30%; display:inline-block;"
+                <select style="width:30%; display:inline-block;"
                     data-bind="
                         select2Query: {
                             select2Config: select2Config
                         },
-                        attr: {'aria-label': label}
-                    ">
+                        attr: {'data-label': label, 'aria-label': label}
+                    "></select>
             </div>
 
         </div>
@@ -121,7 +121,7 @@
 
                                     <!-- Property -->
                                     <span class="col-xs-12">
-                                        <input 
+                                        <select 
                                             style="max-width:100%; display:inline-block; margin: 3px 0px;" 
                                             data-bind="
                                                 select2Query: {
@@ -134,7 +134,7 @@
                                                 },
                                                 attr: {'aria-labeledby': resourceToRRLabel},
                                             "
-                                        >
+                                        ></select>
                                     </span>
 
                                     <!-- rr name -->
@@ -157,7 +157,7 @@
 
                                     <!-- Property -->
                                     <span class="col-xs-12">
-                                        <input 
+                                        <select 
                                             style="width:100%; display:inline-block; margin: 3px 0px;" 
                                             data-bind="
                                                 select2Query: {
@@ -170,7 +170,7 @@
                                                 },
                                                 attr: {'aria-labeledby': rrToResourceLabel},
                                             "
-                                        >
+                                        ></select>
                                     </span>
 
                                     <!-- Instance name -->
@@ -248,27 +248,29 @@
     <!--ko let: {self: $data} -->
     <!-- ko ifnot: self.displayOntologyTable -->
     <div class="row" style="margin: 0px;">
-        <div class="col-xs-12 resource-instance-wrapper">
-            <input style="width:30%; display:inline-block;" data-bind="
+                <div class="col-xs-12 resource-instance-wrapper">
+            <select style="width:30%; display:inline-block;" data-bind="
                     select2Query: {
                         select2Config: select2Config
                     },
-                    attr: {'aria-label': $root.translations.defaultValue}
+                    attr: {'aria-label': $root.translations.defaultValue, 'data-label': $root.translations.defaultValue}
                 ">
+            </select>
         </div>
     </div>
     <!-- /ko -->
     <!-- ko if: self.displayOntologyTable -->
     <div class="row widget-wrapper" data-bind="visible: !newResourceInstance()">
         <div class="form-group">
-            <div class="row" style="margin: 0px;">
+                        <div class="row" style="margin: 0px;">
                 <div class="col-xs-12 resource-instance-wrapper">
-                    <input style="width:30%; display:inline-block;" data-bind="                 
+                    <select style="width:30%; display:inline-block;" data-bind="                 
                             select2Query: {
                                 select2Config: select2Config
                             },
-                            attr: {'aria-label': $root.translations.defaultValue}
+                            attr: {'aria-label': $root.translations.defaultValue, 'data-label': $root.translations.defaultValue}
                         ">
+                    </select>
                 </div>
             </div>
         </div>
@@ -347,7 +349,7 @@
     
                                         <!-- Property -->
                                         <span class="col-xs-12">
-                                            <input 
+                                            <select 
                                                 style="max-width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                                     select2Query: {
@@ -358,9 +360,8 @@
                                                             $root.translations.selectAnOntologyProperty
                                                         )
                                                     },
-                                                    attr: {'aria-labeledby': resourceToRRLabel},
-                                                "
-                                            >
+                                                    attr: {'aria-labeledby': resourceToRRLabel} ">
+                                            </select>
                                         </span>
     
                                         <!-- rr name -->
@@ -384,7 +385,7 @@
     
                                         <!-- Property -->
                                         <span class="col-xs-12">
-                                            <input 
+                                            <select 
                                                 style="width:100%; display:inline-block; margin: 3px 0px;"
                                                 data-bind="
                                                     select2Query: {
@@ -395,9 +396,8 @@
                                                             $root.translations.selectAnOntologyProperty
                                                         )
                                                     },
-                                                    attr: {'aria-labeledby': rrToResourceLabel},
-                                                "
-                                            >
+                                                    attr: {'aria-labeledby': rrToResourceLabel}">
+                                            </select>
                                         </span>
     
                                         <!-- Instance name -->
