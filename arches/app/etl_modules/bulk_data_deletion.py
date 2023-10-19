@@ -28,7 +28,7 @@ class BulkDataDeletion(BaseBulkEditor):
                 resources = Resource.objects.filter(graph_id=graphid)
             elif resourceids:
                 resources = Resource.objects.filter(pk__in=resourceids)
-            for resource in resources.iterator():
+            for resource in resources.iterator(chunk_size=2000):
                 resource.delete(user=user, index=False, transaction_id=loadid)
             result["success"] = True
         except Exception as e:
@@ -46,7 +46,7 @@ class BulkDataDeletion(BaseBulkEditor):
                 tiles = Tile.objects.filter(nodegroup_id=nodegroupid).filter(resourceinstance_id__in=resourceids)
             else:
                 tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
-            for tile in tiles.iterator():
+            for tile in tiles.iterator(chunk_size=2000):
                 request = HttpRequest()
                 request.user = user
                 tile.delete(request=request, index=False, transaction_id=loadid)
@@ -84,9 +84,9 @@ class BulkDataDeletion(BaseBulkEditor):
             event_created = self.create_load_event(cursor, load_details)
             if event_created["success"]:
                 if use_celery_bulk_delete:
-                    response = self.run_load_task_async(request, self.loadid)
+                    response = self.run_bulk_task_async(request, self.loadid)
                 else:
-                    response = self.run_load_task(self.userid, self.loadid, graph_id, nodegroup_id, resourceids)
+                    response = self.run_bulk_task(self.userid, self.loadid, graph_id, nodegroup_id, resourceids)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
@@ -94,7 +94,7 @@ class BulkDataDeletion(BaseBulkEditor):
         return response
 
     @load_data_async
-    def run_load_task_async(self, request):
+    def run_bulk_task_async(self, request):
         graph_id = request.POST.get("graph_id", None)
         nodegroup_id = request.POST.get("nodegroup_id", None)
         resourceids = request.POST.get("resourceids", None)
@@ -114,7 +114,7 @@ class BulkDataDeletion(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, userid, loadid, graph_id, nodegroup_id, resourceids):
+    def run_bulk_task(self, userid, loadid, graph_id, nodegroup_id, resourceids):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
 
