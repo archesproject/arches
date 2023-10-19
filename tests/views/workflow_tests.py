@@ -20,6 +20,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         """The POST tests manipulate this object, so recreate it for simplicity."""
         self.history = WorkflowHistory.objects.create(
             workflowid=str(uuid.uuid1()),
+            workflowname='test-name',
             user=self.admin,
             created=False,
             stepdata={
@@ -88,6 +89,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         self.client.force_login(self.admin)
         post_data = {
             "workflowid": str(self.history.workflowid),  # required
+            "workflowname": 'test-name',
             "stepdata": {
                 # Add a second step.
                 "set-project-statement": {
@@ -140,7 +142,7 @@ class WorkflowHistoryTests(ArchesTestCase):
 
         response = self.client.post(
             reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
-            {"workflowid": str(self.history.workflowid), "completed": True},
+            {"workflowid": str(self.history.workflowid), "workflowname": 'test-name', "completed": True},
             content_type="application/json",
         )
 
