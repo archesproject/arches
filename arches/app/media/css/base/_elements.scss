@@ -5,9 +5,10 @@ body {
     }
 }
 
-header, main {
-    @include break-at(tablet-max) {
-        max-width: calc(100vw - 65px);
+#container {
+    height: 100vh;
+    @include break-at(small-desktop-max) {
+        height: auto;
     }
 }
 

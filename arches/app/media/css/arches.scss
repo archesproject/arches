@@ -2124,10 +2124,8 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-wrapper {
     flex: 1;
-    /*height: 100%;*/
     height: calc(100vh - 101px);
     position: relative;
-    /*overflow: hidden;*/
     overflow-x: hidden;
     overflow-y: auto;
     background-color: #fafafa;
@@ -2153,6 +2151,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
+    width: calc(100% - 75px);
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
@@ -4250,7 +4249,6 @@ div.dropdown-menu.open {
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
-    height: calc(100vh - 50px);
     position: relative;
 }
 
@@ -7769,7 +7767,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .report-toolbar-title {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-weight: 500;
     margin-top: 0px;
     width: 400px;
@@ -8625,10 +8623,6 @@ a.clear-geojson-button:hover {
     font-size: 1.3rem;
 }
 
-.workbench-card-container .mapboxgl-ctrl-geocoder {
-    margin-right: 90px;
-}
-
 .workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
     visibility: visible;
 }
@@ -9314,7 +9308,7 @@ a.search-query-link-captions:focus {
     margin-bottom: 0px;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     transition: all .5s;
     margin-top: inherit;
@@ -12139,7 +12133,6 @@ a.filter-tools:hover {
         line-height: 0.9;
     }
     .relationships-list {
-        height: calc(100% - 185px);
         border: 1px solid rgb(221, 221, 221);
         overflow-y: auto;
         .relationships-list-item {

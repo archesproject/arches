@@ -1,3 +1,18 @@
-.report-print-date {
-    font-size: 1.2rem;
+.resource-report-abstract-container {
+    width: calc(100vw - 55px);
+    .resource-component-abstract {
+        overflow-y: auto;
+        .report-title-bar {
+            .report-toolbar-title {
+                @include break-at(small-desktop-max) {
+                    min-width: 0;
+                    width: auto;
+                    padding: 14px 0 5px 5px;
+                }
+            }
+            .report-print-date {
+                font-size: 1.2rem;
+            }
+        }
+    }   
 }
