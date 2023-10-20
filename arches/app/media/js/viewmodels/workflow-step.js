@@ -150,6 +150,7 @@ define([
                 lockExternalStep: self.lockExternalStep,
                 lockableExternalSteps: self.lockableExternalSteps,
                 workflowId: self.workflowId,
+                workflowName: self.workflow.plugin.componentname,
                 alert: self.alert,
                 outerSaveOnQuit: self.outerSaveOnQuit,
                 isStepActive: self.active,
@@ -206,6 +207,7 @@ define([
             const workflowid = self.workflow.id();
             const workflowHistory = {
                 workflowid,
+                workflowname: self.workflow.plugin.componentname,
                 completed: false,
                 stepdata: {
                     // Django view will patch in this key, keeping existing keys

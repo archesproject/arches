@@ -256,6 +256,7 @@ urlpatterns = [
         name="api_bulk_disambiguated_resource_instance",
     ),
     re_path(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
+    re_path(r"^api/user_incomplete_workflows$", api.UserIncompleteWorkflows.as_view(), name="api_user_incomplete_workflows"),
     re_path(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     re_path(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     re_path(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),

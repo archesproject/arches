@@ -624,6 +624,7 @@ define([
         var self = this;
 
         this.workflowId = params.workflowId;
+        this.workflowName = params.workflowName;
         this.componentData = params.componentData;
         this.workflowHistory = params.workflowHistory;
         this.alert = params.alert;
@@ -758,8 +759,11 @@ define([
 
         this.setToWorkflowHistory = async function(key, value) {
             const workflowid = self.workflowId;
+            const workflowname = self.workflowName;
+            
             const workflowHistory = {
                 workflowid,
+                workflowname,
                 completed: false,
                 componentdata: {
                     // Django view will patch in this key, keeping existing keys

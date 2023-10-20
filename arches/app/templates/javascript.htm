@@ -935,6 +935,7 @@
         api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
         api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
         api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
+        api_user_incomplete_workflows="{% url 'api_user_incomplete_workflows' %}"
         geojson="{% url 'geojson' %}"
         icons="{% url 'icons' %}"
         ontology_properties="{% url 'ontology_properties' %}"
