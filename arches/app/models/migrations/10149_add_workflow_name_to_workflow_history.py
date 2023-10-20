@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10121_workflowhistory'),
+        ('models', '9973_bulk_deleting_module'),
     ]
 
     operations = [
