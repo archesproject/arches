@@ -663,17 +663,16 @@ class Resource(models.ResourceInstance):
             resourceinstance_graphid=resourceinstance_graphid,
         )
 
-        resource_relations["hits"]["hits"] = list(
-            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidto"]), resource_relations["hits"]["hits"])
+        resource_relations["relations"] = list(
+            filter(
+                lambda x: user_can_read_resource(user, x.resourceinstanceidto_id)
+                and user_can_read_resource(user, x.resourceinstanceidfrom_id),
+                resource_relations["relations"],
+            )
         )
+        resource_relations["total"] = len(resource_relations["relations"])
+        ret["total"] = {"value": resource_relations["total"]}
 
-        resource_relations["hits"]["hits"] = list(
-            filter(lambda x: user_can_read_resource(user, x["_source"]["resourceinstanceidfrom"]), resource_relations["hits"]["hits"])
-        )
-
-        resource_relations["hits"]["total"]["value"] = len(resource_relations["hits"]["hits"])        
-        ret["total"] = resource_relations["hits"]["total"]
- 
         instanceids = set()
 
         restricted_instances = get_restricted_instances(user, se) if user is not None else []
@@ -700,7 +699,6 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
-
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
