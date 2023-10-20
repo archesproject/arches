@@ -40,6 +40,13 @@ define([
             return this.card.widgets().length === 0;
         }, this);
 
+        this.componentCssClasses = function(widget) {
+            return ["card_component",
+                ko.unwrap(widget.node?.graph?.attributes?.slug),
+                ko.unwrap(widget.node?.alias),
+                widget?.widgetLookup[ko.unwrap(widget?.widget_id)].name].join(" ");
+        };
+
 
         this.initialize = function() {
             self.card.showForm(true);
@@ -66,7 +73,7 @@ define([
             self.dirty = ko.computed(function() {
                 if (!ko.unwrap(self.tiles)) {
                     return true;
-                } 
+                }
                 else {
                     return ko.unwrap(self.tiles).reduce(function(acc, tile) {
                         if (tile.dirty()) {
@@ -202,7 +209,7 @@ define([
             TODO: Reverse this logic to be in-line with card UX in resource_editor using this logic:
                     params.card && params.card.cardinality === 'n'
                     && params.form.componentData.cardinalityOverride !== '1'
-        */ 
+        */
         if (params.renderContext === 'workflow') {
             if (params.form.componentData.cardinalityOverride === 'n') {
                 self.card.selected(true);  // cardinality 'n' cards will display appropriately
@@ -242,7 +249,7 @@ define([
                 }
             });
         };
-        
+
         this.createParentAndChild = async(parenttile, childcard) => {
             try{
                 const newSave = await self.card.saveParentTile(parenttile);
