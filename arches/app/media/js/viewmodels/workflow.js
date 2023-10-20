@@ -420,6 +420,7 @@ define([
             const workflowid = self.id();
             const workflowHistory = {
                 workflowid,
+                workflowname: self.componentName,
                 completed: true,
             };
 
