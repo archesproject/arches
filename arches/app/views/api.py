@@ -41,7 +41,7 @@ from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
 from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
@@ -58,6 +58,7 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
 )
 from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -1436,8 +1437,13 @@ class NodeValue(APIBase):
 
 class UserIncompleteWorkflows(APIBase):
     def get(self, request):
+        if not user_is_resource_editor(request.user):
+            return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
+        
         return JSONResponse({
-            "incomplete_workflows": models.WorkflowHistory.objects.filter(user=request.user, completed=False).exclude(componentdata__iexact='{}')
+            "incomplete_workflows": models.WorkflowHistory.objects.filter(
+                user=request.user, completed=False
+            ).exclude(componentdata__iexact='{}').order_by('created')
         })
 
 

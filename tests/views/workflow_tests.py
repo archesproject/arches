@@ -24,6 +24,7 @@ class WorkflowHistoryTests(ArchesTestCase):
             workflowname='test-name',
             user=self.admin,
             created=datetime.datetime.now(),
+            completed=False,
             stepdata={
                 "set-project-name": {
                     "componentIdLookup": {
