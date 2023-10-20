@@ -18,6 +18,7 @@ from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.utils.decorators import user_created_transaction_match
 import arches.app.utils.task_management as task_management
+from arches.app.utils.db_utils import dictfetchall
 from arches.app.utils.transaction import reverse_edit_log_entries
 from arches.app.views.search import search_results
 
@@ -77,10 +78,6 @@ class BaseBulkEditor:
     def get_nodes(self, request):
         graphid = request.POST.get("graphid")
 
-        def dictfetchall(cursor):
-            columns = [col[0] for col in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """
@@ -101,6 +98,22 @@ class BaseBulkEditor:
         if graphid not in self.node_lookup.keys():
             self.node_lookup[graphid] = Node.objects.filter(graph_id=graphid)
         return self.node_lookup[graphid]
+
+    def get_nodegroups(self, request):
+        graphid = request.POST.get("graphid")
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT ng.nodegroupid, n.name
+                FROM node_groups ng JOIN nodes n
+                ON n.nodeid = ng.nodegroupid
+                WHERE n.graphid = %s
+                ORDER BY n.name;
+            """,
+                [graphid],
+            )
+            nodegroups = dictfetchall(cursor)
+        return {"success": True, "data": nodegroups}
 
     def create_load_event(self, cursor, load_details):
         result = {"success": False}
