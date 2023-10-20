@@ -35,13 +35,16 @@ class WorkflowHistoryView(View):
         # call using different `defaults` vs. `create_defaults`
         with transaction.atomic():
             workflowid = data["workflowid"]
+            workflowname = data["workflowname"]
             try:
                 history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
                     workflowid = workflowid,
+                    workflowname = workflowname,
                     user = request.user,
                     defaults = {
                         "stepdata": stepdata,
                         "componentdata": componentdata,
+                        "workflowname": workflowname,
                         "user": request.user,
                         "completed": data.get("completed", False),
                     },
