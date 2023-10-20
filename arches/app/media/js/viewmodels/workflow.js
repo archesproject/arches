@@ -438,12 +438,10 @@ define([
 
         this.finishWorkflow = function() {
             if (self.activeStep().hasUnsavedData()) {
-                self.activeStep().save().then(function() {
-                    self.markWorkflowComplete();
-                });
-                return;
+                self.activeStep().save().then(self.markWorkflowComplete);
+            } else {
+                self.markWorkflowComplete();
             }
-            self.markWorkflowComplete();
         };
 
         this.quitWorkflow = function(){
