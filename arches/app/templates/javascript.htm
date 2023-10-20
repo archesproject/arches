@@ -819,6 +819,9 @@
         apply-to-selected-files='{% trans "Apply to Selected Files" as applyToSelectedFiles %} "{{ applyToSelectedFiles|escapejs }}"'
         apply-same-loader-to-all='{% trans "Apply the same loader to all selected files in the dataset" as applySameLoaderToAll %} "{{ applySameLoaderToAll|escapejs }}"'
         id-column-selection='{% trans "Use as an id" as idColumnSelection %} "{{ idColumnSelection|escapejs }}"'
+        configure='{% trans "Configure" as configure %} "{{ configure|escapejs }}"'
+        config-map-filter='{% trans "Configure Map Filter" as configMapFilter %} "{{ configMapFilter|escapejs }}"'
+        map-filter-autozoom-label='{% trans "Automatically zoom to the extent of search results as they update" as mapFilterAutozoomLabel %} "{{ mapFilterAutozoomLabel|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
@@ -973,6 +976,7 @@
         map-default-zoom="{{ map_info.zoom | unlocalize }}"
         map-default-min-zoom="{{ map_info.map_min_zoom | unlocalize }}"
         map-default-max-zoom="{{ map_info.map_max_zoom | unlocalize }}"
+        map-filter-auto-zoom="{{ map_info.map_filter_auto_zoom | unlocalize }}"
         map-layers='[{% for map_layer in map_layers %}{
             "maplayerid": "{{ map_layer.maplayerid }}",
             "name": "{{ map_layer.name }}",

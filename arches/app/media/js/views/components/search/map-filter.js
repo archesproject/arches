@@ -13,13 +13,25 @@ define([
     'geojson-extent',
     'uuid',
     'geojsonhint',
-], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
+    'js-cookie'
+], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint, Cookies) {
     var componentName = 'map-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
              
             this.dependenciesLoaded = ko.observable(false);
+            this.resultsAutoZoomEnabled = ko.observable(Cookies.get('arches-map-auto-zoom') !== undefined ? Cookies.get('arches-map-auto-zoom') : arches.mapFilterAutoZoom);
+            this.resultsAutoZoomEnabled.subscribe(function(settingValue) {
+                Cookies.set('arches-map-auto-zoom', settingValue);
+            });
+            
+            
+            this.mapFitBounds = function(bounds, options, force){
+                if(this.resultsAutoZoomEnabled() || force){
+                    this.map().fitBounds(bounds, options);
+                }
+            }
 
             require(['mapbox-gl', 'mapbox-gl-draw'], (mapbox, mbdraw) => {
                 self.mapboxgl = mapbox;
@@ -142,7 +154,7 @@ define([
                     if(geoJSON.features.length > 0){
                         var extent = geojsonExtent(geoJSON);
                         var bounds = new this.mapboxgl.LngLatBounds(extent);
-                        this.map().fitBounds(bounds, {
+                        this.mapFitBounds(bounds, {
                             padding: parseInt(this.buffer(), 10)
                         });
                     }
@@ -294,7 +306,7 @@ define([
                     var geojsonFC = self.filter.feature_collection();
                     var extent = geojsonExtent(geojsonFC);
                     var bounds = new this.mapboxgl.LngLatBounds(extent);
-                    self.map().fitBounds(bounds, {
+                    self.mapFitBounds(bounds, {
                         padding: self.buffer()
                     });
                 } else {
@@ -498,9 +510,9 @@ define([
             });
             var bounds = new this.mapboxgl.LngLatBounds(geojsonExtent(mapData.geom));
             var maxZoom = ko.unwrap(this.maxZoom);
-            this.map().fitBounds(bounds, {
+            this.mapFitBounds(bounds, {
                 maxZoom: maxZoom > 17 ? 17 : maxZoom
-            });
+            }, true);
         },
 
         updateQuery: function() {
@@ -596,10 +608,10 @@ define([
                 ];
                 var maxZoom = ko.unwrap(this.maxZoom);
                 maxZoom = maxZoom > 17 ? 17 : maxZoom;
-                this.map().fitBounds(bounds, {
+                this.mapFitBounds(bounds, {
                     padding: 45,
                     maxZoom: maxZoom
-                });
+                }, !this.pageLoaded);
             }
         }
     });
