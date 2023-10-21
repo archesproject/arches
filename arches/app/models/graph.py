@@ -573,9 +573,9 @@ class Graph(models.GraphModel):
     def delete(self):
         with transaction.atomic():
             try:
-                editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
+                editable_future_graph = Graph.objects.get(source_identifier_id=self.graphid)
                 editable_future_graph.delete()
-            except models.GraphModel.DoesNotExist:
+            except Graph.DoesNotExist:
                 pass  # no editable future graph to delete
 
             for nodegroup in self.get_nodegroups():
@@ -815,6 +815,8 @@ class Graph(models.GraphModel):
         """
         nodegroup_map = {}
         copy_of_self = deepcopy(self)
+
+        copy_of_self.publication = None
 
         if root is not None:
             root["nodegroup_id"] = root["nodeid"]
@@ -1842,10 +1844,10 @@ class Graph(models.GraphModel):
         """
         with transaction.atomic():
             try:
-                previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
+                previous_editable_future_graph = Graph.objects.get(source_identifier_id=self.graphid)
                 previous_editable_future_graph.delete()
-            except models.GraphModel.DoesNotExist:
-                previous_editable_future_graph = None
+            except Graph.DoesNotExist:
+                pass
 
             graph_copy = self.copy(set_source=True)
 
