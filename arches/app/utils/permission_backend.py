@@ -316,7 +316,11 @@ def get_resource_types_by_perm(user, perms):
     graphs = set()
     nodegroups = get_nodegroups_by_perm(user, perms)
     for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
-        if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+        if (
+            node.graph.isresource 
+            and not node.graph.source_identifier
+            and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        ):
             graphs.add(node.graph)
     return list(graphs)
 
