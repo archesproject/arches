@@ -399,9 +399,9 @@ class GraphIsActive(APIBase):
         graph = Graph.objects.get(pk=graph_id)
 
         if graph.source_identifier:
-            grah = graph.source_identifier
+            graph = graph.source_identifier
 
-        return JSONResponse(grah.is_active)
+        return JSONResponse(graph.is_active)
 
     def post(self, request, graph_id=None):
         try:

@@ -47,9 +47,24 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
-            viewModel.isGraphActive = ko.observable(data['graph']['is_active']);
+            viewModel.isGraphActive = ko.observable();
 
-            viewModel.hasDirtyWidget = ko.observable();
+            fetch(arches.urls.graph_is_active_api(data.graphid)).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    viewModel.alert(new AlertViewModel(
+                        'ep-alert-red', 
+                        _("Could not obtain the Resource Model active status"),
+                        _('Please contact your System Administrator'),
+                        null,
+                        function(){},
+                    ));
+                }
+            }).then(responseJSON => {
+                viewModel.isGraphActive(responseJSON);
+            });
 
             viewModel.isGraphActive.subscribe(isGraphActive => {
                 $.ajax({
@@ -73,6 +88,8 @@ define([
                     }
                 });
             });
+
+            viewModel.hasDirtyWidget = ko.observable();
 
             viewModel.isDirty = ko.pureComputed(() => {
                 let isDirty = false;
