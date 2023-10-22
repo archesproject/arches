@@ -1161,10 +1161,10 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_serialized_cards = []
             permitted_cards = []
-            for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
+            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
                 if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
 
             cardwidgets = [
@@ -1173,7 +1173,7 @@ class ResourceReport(APIBase):
                 for widget in widgets
             ]
 
-            resp["cards"] = permitted_serialized_cards
+            resp["cards"] = permitted_cards
             resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)
