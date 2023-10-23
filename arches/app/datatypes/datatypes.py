@@ -277,7 +277,8 @@ class StringDataType(BaseDataType):
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             for key in edge_info["range_tile_data"].keys():
-                g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
+                if edge_info["range_tile_data"][key]["value"]:
+                    g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -1594,18 +1595,14 @@ class FileListDataType(BaseDataType):
                                 logger.exception(_("File does not exist"))
 
             files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, [])
+            tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
             for file_data in files:
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).exists():
-                    original_storage = file_model.path.storage
-                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
-                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
-                        file_model.path.storage = FileSystemStorage()
+                if tile_exists:
                     file_model.save()
-                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
@@ -1613,6 +1610,7 @@ class FileListDataType(BaseDataType):
                         if file_json["name"] == file_data.name and file_json["url"] is None:
                             file_json["file_id"] = str(file_model.pk)
                             file_json["url"] = settings.MEDIA_URL + str(file_model.fileid)
+                            file_json["path"] = file_model.path.name
                             file_json["status"] = "uploaded"
                             resave_tile = True
                         updated_file_records.append(file_json)
