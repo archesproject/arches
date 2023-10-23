@@ -400,6 +400,28 @@ class Wildcard(Dsl):
         self.dsl = {"wildcard": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
 
 
+class Regex(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
+
+        self.dsl = {
+            "regexp": {
+                self.field: {
+                    "value": self.query,
+                    "flags": "ALL",
+                    "case_insensitive": self.case_insensitive
+                }
+            }
+        }
+
+
 class Prefix(Dsl):
     """
     https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
