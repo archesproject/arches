@@ -15,6 +15,7 @@ import uuid
 import datetime
 import logging
 
+import django.utils.timezone
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -1571,7 +1572,11 @@ def send_email_on_save(sender, instance, **kwargs):
         except Exception as e:
             logger = logging.getLogger(__name__)
             logger.warning(e)
+<<<<<<< HEAD
             logger.warning("Error occurred sending email.  See previous stack trace.")
+=======
+            logger.warning("Error occurred sending email.  See previous stack trace and check email configuration in settings.py.")
+>>>>>>> 04168f36e63103cd7efba0e8dd51ecb996cb13bf
 
     return False
 
@@ -1614,6 +1619,21 @@ class Plugin(models.Model):
     class Meta:
         managed = True
         db_table = "plugins"
+
+
+class WorkflowHistory(models.Model):
+    workflowid = models.UUIDField(primary_key=True)
+    workflowname = models.CharField(null=True)
+    stepdata = JSONField(null=False, default=dict)
+    componentdata = JSONField(null=False, default=dict)
+    # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
+    created = models.DateTimeField(default=django.utils.timezone.now, null=False)  
+    user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "workflow_history"
 
 
 class IIIFManifestValidationError(Exception):

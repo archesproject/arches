@@ -743,8 +743,10 @@
         etl-single-csv-title='{% trans "Import Format: Single .csv file" as etlSingleCSVTitle %} "{{ etlSingleCSVTitle|escapejs }}"'
         bulk-data-edit-details='{% trans "Bulk Data Edit Details" as bulkDataEditDetails %} "{{ bulkDataEditDetails|escapejs }}"'
         no-data-to-preview='{% trans "Nothing to update. Your data already meets your requirements." as noDataToPreview %} "{{ noDataToPreview|escapejs }}"'
-        resource-model-editied='{% trans "Resource Model Edited" as resourceModelEditied %} "{{ resourceModelEditied|escapejs }}"'
+        resource-model-edited='{% trans "Resource Model Edited" as resourceModelEdited %} "{{ resourceModelEdited|escapejs }}"'
         field-name-edited='{% trans "Field Name Edited" as fieldNameEdited %} "{{ fieldNameEdited|escapejs }}"'
+        resource-model-deleted='{% trans "Resource Model Deleted" as resourceModelDeleted %} "{{ resourceModelDeleted|escapejs }}"'
+        field-name-deleted='{% trans "Field Name Deleted" as fieldNameDeleted %} "{{ fieldNameDeleted|escapejs }}"'
         edit-operation='{% trans "Edit Operation" as editOperation %} "{{ editOperation|escapejs }}"'
         file-summary='{% trans "File Summary" as fileSummary %} "{{ fileSummary|escapejs }}"'
         file-name='{% trans "File name" as fileName %} "{{ fileName|escapejs }}"'
@@ -803,6 +805,7 @@
         cancelled='{% trans "cancelled" as cancelled %} "{{ cancelled|escapejs }}"'
         remove-from-history='{% trans "remove from history" as removeFromHistory %} "{{ removeFromHistory|escapejs }}"'
         number-of-resources-updated='{% trans "Number of Resources Updated" as numberOfResourcesUpdated %} "{{ numberOfResourcesUpdated|escapejs }}"'
+        deleted-data='{% trans "Deleted Data" as deletedData %} "{{ deletedData|escapejs }}"'
         indexing='{% trans "indexing" as indexing %} "{{ indexing|escapejs }}"'
         loaded-but-unindexed='{% trans "loaded but unindexed" as loadedButUnindexed %} "{{ loadedButUnindexed|escapejs }}"'
         validating='{% trans "validating" as validating %} "{{ validating|escapejs }}"'
@@ -814,6 +817,7 @@
         bulk-string-editor-trim='{% trans "Trim Whitespace" as bulkStringEditorTrim %} "{{ bulkStringEditorTrim|escapejs }}"'
         bulk-string-editor-change-case='{% trans "Bulk String Editor - Change Case" as bulkStringEditorChangeCase %} "{{ bulkStringEditorChangeCase|escapejs }}"'
         bulk-string-editor-replace='{% trans "Replace Text" as bulkStringEditorReplace %} "{{ bulkStringEditorReplace|escapejs }}"'
+        bulk-data-deletion='{% trans "Bulk Data Deletion" as bulkDataDeletion %} "{{ bulkDataDeletion|escapejs }}"'
         select-edit-operation='{% trans "Select an Edit Operation" as SelectEditOperation %} "{{ SelectEditOperation|escapejs }}"'
         preview-count-stats='(limit, possible, resCount) => {return {% trans "Showing first ${limit} of ${possible} values in ${resCount} resources" as previewCountStats %} `{{ previewCountStats|escapejs }}` }'
         count-of-resources-updated='(count) => {return {% trans "Resources updated: ${count}" as countOfResourcesUpdated %} `{{ countOfResourcesUpdated|escapejs }}` }'
@@ -839,6 +843,7 @@
         updating-duration='{% trans "Updating duration" as updatingDuration %} "{{ updatingDuration|escapejs }}"'
         view-in-edit-log='{% trans "view in edit log" as viewInEditLog %} "{{ viewInEditLog|escapejs }}"'
         list-of-edited-resources='{% trans "List of Edited Resources" as listOfEditedResources %} "{{ listOfEditedResources|escapejs }}"'
+        list-of-deleted-data='{% trans "List of Deleted Data" as listOfDeletedData %} "{{ listOfDeletedData|escapejs }}"'
         manage='{% trans "Manage" as manage %} "{{ manage|escapejs }}"'
         unable-to-display-selected-file='{% trans "Unable to display the selected file" as unableToDisplaySelectedFile %} "{{ unableToDisplaySelectedFile|escapejs }}"'
         file-display-error-message1='{% trans "This file can't be displayed." as fileDisplayErrorMessage1 %} "{{ fileDisplayErrorMessage1|escapejs }}"'
@@ -965,6 +970,7 @@
         model_history='(graphid)=>{return "{% url "model_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
+        workflow_history='"{% url "workflow_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
         mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
         help_template="{% url 'help_templates' %}"
@@ -987,6 +993,7 @@
         api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
         api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
         api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
+        api_user_incomplete_workflows="{% url 'api_user_incomplete_workflows' %}"
         geojson="{% url 'geojson' %}"
         icons="{% url 'icons' %}"
         ontology_properties="{% url 'ontology_properties' %}"

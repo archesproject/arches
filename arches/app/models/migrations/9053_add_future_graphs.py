@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10120_replace_whole_word_bulk_edit"),
+        ("models", "10149_add_workflow_name_to_workflow_history"),
     ]
 
     operations = [

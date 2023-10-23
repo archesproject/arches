@@ -1595,12 +1595,13 @@ class FileListDataType(BaseDataType):
                                 logger.exception(_("File does not exist"))
 
             files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, [])
+            tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
             for file_data in files:
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).exists():
+                if tile_exists:
                     file_model.save()
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False

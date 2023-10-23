@@ -440,6 +440,7 @@ class GraphDataView(View):
                     ret.save()
 
                     ret.create_editable_future_graph()
+                    ret.publish()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
@@ -492,9 +493,9 @@ class GraphDataView(View):
                 graph.delete()
 
                 try:
-                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier_id)
+                    source_graph = Graph.objects.get(pk=graph.source_identifier_id)
                     source_graph.delete()
-                except models.GraphModel.DoesNotExist:
+                except Graph.DoesNotExist:
                     pass  # no sourcee graph to delete
 
                 return JSONResponse({"success": True})
@@ -626,7 +627,7 @@ class ModelHistoryView(GraphBaseView):
             user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
         )
         context["nav"]["title"] = self.graph.name
-        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
+        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "templates": ["graph-publications-help"]}
 
         return render(request, "views/graph/model-history.htm", context)
 

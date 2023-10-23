@@ -573,9 +573,9 @@ class Graph(models.GraphModel):
     def delete(self):
         with transaction.atomic():
             try:
-                editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
+                editable_future_graph = Graph.objects.get(source_identifier_id=self.graphid)
                 editable_future_graph.delete()
-            except models.GraphModel.DoesNotExist:
+            except Graph.DoesNotExist:
                 pass  # no editable future graph to delete
 
             for nodegroup in self.get_nodegroups():
@@ -815,6 +815,8 @@ class Graph(models.GraphModel):
         """
         nodegroup_map = {}
         copy_of_self = deepcopy(self)
+
+        copy_of_self.publication = None
 
         if root is not None:
             root["nodegroup_id"] = root["nodeid"]
@@ -1647,12 +1649,8 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("nodes", None)
 
-            # TODO: Remove this section when PR 9112 / Issue 9053 is merged
-            for key in ["cards", "widgets", "nodes"]:
-                if key in ret and ret[key]:
-                    ret[key].sort(key=lambda item: item["sortorder"] if item["sortorder"] else 0)
-            # TODO: End section to remove
-
+            # never serailize is_active state
+            ret.pop('is_active', None)
             res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
             return res
@@ -1842,10 +1840,10 @@ class Graph(models.GraphModel):
         """
         with transaction.atomic():
             try:
-                previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
+                previous_editable_future_graph = Graph.objects.get(source_identifier_id=self.graphid)
                 previous_editable_future_graph.delete()
-            except models.GraphModel.DoesNotExist:
-                previous_editable_future_graph = None
+            except Graph.DoesNotExist:
+                pass
 
             graph_copy = self.copy(set_source=True)
 
@@ -2235,6 +2233,7 @@ class Graph(models.GraphModel):
 
         updated_graph = Graph(serialized_graph)
         updated_graph.widgets = widget_dict
+        updated_graph.is_active = self.is_active
 
         updated_graph.save()
         updated_graph.create_editable_future_graph()
