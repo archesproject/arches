@@ -138,6 +138,10 @@ define([
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
+
+            if(!currentValue?.[currentLanguage.code]){
+                currentValue[currentLanguage.code] = {};
+            }
             currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
             
             if (ko.isObservable(self.value)) {
