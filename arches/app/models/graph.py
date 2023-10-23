@@ -1651,7 +1651,6 @@ class Graph(models.GraphModel):
 
             # never serailize is_active state
             ret.pop('is_active', None)
-            
             res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
             return res
@@ -2234,6 +2233,7 @@ class Graph(models.GraphModel):
 
         updated_graph = Graph(serialized_graph)
         updated_graph.widgets = widget_dict
+        updated_graph.is_active = self.is_active
 
         updated_graph.save()
         updated_graph.create_editable_future_graph()
