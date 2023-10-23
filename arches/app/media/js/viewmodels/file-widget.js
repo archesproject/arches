@@ -231,6 +231,7 @@ define([
         this.removeFile = function(file) {
             var filePosition;
             self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
+            self.shiftMetadataToggles(filePosition);
             var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
             var filesForUpload = self.filesForUpload();
             var uploadedFiles = self.uploadedFiles();
@@ -266,15 +267,36 @@ define([
         });
 
         // metadata drawer toggles. 0-indexed. true = expanded
-        this.dropdownToggles = ko.observable({});
+        this.metadataToggles = ko.observable({});
+        this.shouldIgnoreToggleAction = false;
         this.toggleDropdown = (index) => {
-            // dz will emit a click, so this function runs once before the user clicks
-            const oldValue = self.dropdownToggles()[index];
-            self.dropdownToggles({
-                ...self.dropdownToggles(),
-                [index]: !oldValue,
-            });
+            // dz emits clicks for each uploaded file; we need to ignore those.
+            if (this.shouldIgnoreToggleAction) {
+                if (index === this.uploadedFiles().length + this.filesForUpload().length - 1) {
+                    // Last click emitted by dz: reset variable
+                    this.shouldIgnoreToggleAction = false;
+                } // else: noop
+            } else {
+                const oldValue = self.metadataToggles()[index];
+                self.metadataToggles({
+                    ...self.metadataToggles(),
+                    [index]: oldValue === undefined ? false : !oldValue,
+                });
+            }
         };
+
+        self.shiftMetadataToggles = function(filePosition) {
+            const newToggles = {}
+            for (const [key, val] of Object.entries(self.metadataToggles())) {
+                const keyAsInt = Number.parseInt(key);
+                if (keyAsInt < filePosition) {
+                    newToggles[keyAsInt] = val;
+                } else if (keyAsInt !== filePosition) {
+                    newToggles[keyAsInt - 1] = val;
+                }
+            }
+            self.metadataToggles(newToggles);
+        }
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -293,9 +315,8 @@ define([
 
                 this.on("addedfile", function(file) {
                     self.filesForUpload.push(file);
-                    // "true" is a misnomer: we're expecting dz to immediately emit
-                    // a click and cause this to become false.
-                    self.dropdownToggles()[Object.keys(self.dropdownToggles()).length] = true;
+                    self.shouldIgnoreToggleAction = true;
+                    self.metadataToggles()[Object.keys(self.metadataToggles()).length] = false;
                 });
 
                 this.on("error", function(file, error) {
@@ -305,6 +326,9 @@ define([
 
                 this.on("removedfile", function(file) {
                     self.filesForUpload.remove(file);
+                    // "removedfile" action only reachable via "Delete all files"
+                    // so just clear all the toggle states.
+                    self.metadataToggles({});
                 });
             }
         };
@@ -314,6 +338,7 @@ define([
                 self.dropzone.removeAllFiles(true);
                 self.uploadedFiles.removeAll();
                 self.filesForUpload.removeAll();
+                self.metadataToggles({});
             }
         };
 
