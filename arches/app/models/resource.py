@@ -116,7 +116,7 @@ class Resource(models.ResourceInstance):
         """
 
         requested_language = None
-        
+
         if context and "language" in context:
             requested_language = context["language"]
         language = requested_language or get_language()
@@ -143,8 +143,6 @@ class Resource(models.ResourceInstance):
                 return self.descriptors[language][descriptor]
             except KeyError:
                 pass
-
-        return self.descriptors[language][descriptor]
 
     def save_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
         """
