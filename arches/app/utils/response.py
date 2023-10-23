@@ -49,7 +49,9 @@ class JSONResponse(HttpResponse):
 
 
 class JSONErrorResponse(JSONResponse):
-    def __init__(self, title=None, message=None, content={}, status=500, *args, **kwargs):
+    def __init__(self, title=None, message=None, content=None, status=500, *args, **kwargs):
+        if not content:
+            content = {}
         try:
             content["status"] = content.get("status", "false")
             content["success"] = content.get("success", False)
