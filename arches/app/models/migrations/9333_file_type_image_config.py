@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10041_limit_number_of_bulk_edit'),
+        ("models", "10149_add_workflow_name_to_workflow_history"),
     ]
 
     operations = [
