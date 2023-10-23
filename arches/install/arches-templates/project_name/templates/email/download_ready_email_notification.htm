@@ -1,0 +1,28 @@
+{% load static %}
+{% load template_tags %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        {% include 'custom_email_css.htm' %}
+    </head>
+
+    <body>
+
+        {% include 'custom_email_header.htm' %}
+
+        {% if username != "" %}
+            <p>Dear {{username}},</p>
+        {% endif %}
+        <p>Your request to download a set of search results is now ready. You have until {{expiration}} to access this download, after which time it'll be deleted.</p>
+        {% if link != "" %}
+            <p><a href="{{email_link}}">{{button_text}}</a></p>
+        {% endif %}
+
+        {% include 'custom_email_footer.htm' %}
+
+    </body>
+    
+</html>
