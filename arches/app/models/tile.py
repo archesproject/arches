@@ -485,11 +485,10 @@ class Tile(models.TileModel):
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
                 tile.save(*args, request=request, index=False, **kwargs)
-            
-            if index:
-                resource = Resource.objects.get(pk=self.resourceinstance_id)
-                resource.save_descriptors()
-                self.index(resource=resource)
+
+            resource = Resource.objects.get(pk=self.resourceinstance_id)
+            resource.save_descriptors(context={'tile': self})
+            self.index(resource=resource)
 
     def populate_missing_nodes(self):
         first_node = next(iter(self.data.items()), None)

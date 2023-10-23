@@ -72,6 +72,9 @@ class Resource(models.ResourceInstance):
         self.descriptor_function = None
         self.serialized_graph = None
         self.node_datatypes = None
+        self.descriptors = {}
+        self.name = {}
+
 
     def get_serialized_graph(self):
         if not self.serialized_graph:
@@ -112,13 +115,8 @@ class Resource(models.ResourceInstance):
 
         """
 
-        if self.descriptors is None:
-            self.descriptors = {}
-
-        if self.name is None:
-            self.name = {}
-
         requested_language = None
+        
         if context and "language" in context:
             requested_language = context["language"]
         language = requested_language or get_language()
@@ -146,7 +144,6 @@ class Resource(models.ResourceInstance):
             except KeyError:
                 pass
 
-        self.save_descriptors(context=context) # Save descriptors to resource instance
         return self.descriptors[language][descriptor]
 
     def save_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):

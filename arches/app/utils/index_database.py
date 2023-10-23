@@ -242,7 +242,6 @@ def index_resources_by_type(
             resource_types = resource_types.split(",")
         except:
             pass
-        # resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
