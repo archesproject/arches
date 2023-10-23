@@ -58,6 +58,7 @@ define([
         this.showPreview = ko.observable(false);
         this.searchUrl = ko.observable();
         this.caseInsensitive = ko.observable();
+        this.wholeWord = ko.observable();
         this.trim = ko.observable();
         this.numberOfResources = ko.observable(0);
         this.numberOfTiles = ko.observable(0);
@@ -127,6 +128,7 @@ define([
             if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
             if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
             if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
+            if (self.wholeWord()) { self.formData.append('whole_word', self.wholeWord()); }
             if (self.trim()) { self.formData.append('also_trim', self.trim()); }
             if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
             if (self.newText()) { self.formData.append('new_text', self.newText()); }
@@ -141,6 +143,7 @@ define([
             self.formData.delete('graph_id');
             self.formData.delete('language_code');
             self.formData.delete('case_insensitive');
+            self.formData.delete('whole_word');
             self.formData.delete('also_trim');
             self.formData.delete('old_text');
             self.formData.delete('new_text');
