@@ -519,6 +519,9 @@ UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 
 OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
+# Dictionary containing any additional context items for customising email templates
+EXTRA_EMAIL_CONTEXT = {}
+
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################

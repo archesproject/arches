@@ -163,6 +163,9 @@ class SignupView(View):
         )
 
     def post(self, request):
+        
+        from arches.app.utils.message_contexts import return_message_context
+        
         showform = True
         confirmation_message = ""
         postdata = request.POST.copy()
@@ -183,24 +186,25 @@ class SignupView(View):
                 return redirect(confirmation_link)
 
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-            email_context = {
-                "button_text": _("Signup for Arches"),
-                "link": confirmation_link,
-                "greeting": _(
-                    "Thanks for your interest in Arches. Click on link below \
+            email_context = return_message_context(
+                 _(
+                    "Thanks for your interest in {settings.APP_NAME}. Click on link below \
                     to confirm your email address! Use your email address to login."
                 ),
-                "closing": _(
+                 _(
                     "This link expires in 24 hours.  If you can't get to it before then, \
                     don't worry, you can always try again with the same email address."
                 ),
-            }
-
+                 None,
+                {"button_text": _("Signup for {settings.APP_NAME}"),
+                                    "link": confirmation_link}
+            )
+            
             html_content = render_to_string("email/general_notification.htm", email_context)  # ...
             text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_("Welcome to Arches!"), text_content, admin_email, [form.cleaned_data["email"]])
+            msg = EmailMultiAlternatives(_("Welcome to {settings.APP_NAME}!"), text_content, admin_email, [form.cleaned_data["email"]])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 

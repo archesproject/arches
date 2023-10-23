@@ -42,6 +42,7 @@ def message(arg):
 def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
+    from arches.app.utils.message_contexts import return_message_context
 
     settings.update_from_db()
 
@@ -78,22 +79,30 @@ def export_search_results(self, userid, request_values, format, report_link):
 
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
+    expiration_date = datetime.now() + timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
+    formatted_expiration_date = expiration_date.strftime("%A, %d %B %Y")
+
+    user = ""
+
+    if _user.first_name != "":
+        user = _user.first_name
+    else:
+        user = _user.username
+
+    context = return_message_context(
+        _(f"Hello,\nYour request to download a set of search results is now ready. You have until {formatted_expiration_date} to access this download, after which time it'll be deleted."),
+        _("Thank you"),
+        email,
+        {"link":str(exportid),"button_text":_("Download Now"),"name":export_name,"email_link":str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),"username":user},
+        )
+
     return {
         "taskid": self.request.id,
         "msg": _(
-            "Your search {} is ready for download. You have 24 hours to access this file, after which we'll automatically remove it."
-        ).format(export_name),
-        "notiftype_name": "Search Export Download Ready",
-        "context": dict(
-            greeting=_("Hello,\nYour request to download a set of search results is now ready."),
-            link=str(exportid),
-            button_text=_("Download Now"),
-            closing=_("Thank you"),
-            email=email,
-            name=export_name,
-            email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
+            f"Your search '{export_name}' is ready for download. You have until {formatted_expiration_date} to access this file, after which we'll automatically remove it."
         ),
-    }
+        "notiftype_name": "Search Export Download Ready",
+        "context":context}
 
 
 @shared_task(bind=True)
@@ -135,19 +144,21 @@ def index_resource(self, module, index_name, resource_id, tile_ids):
 
 @shared_task
 def package_load_complete(*args, **kwargs):
+    from arches.app.utils.message_contexts import return_message_context
+    
     valid_resource_paths = kwargs.get("valid_resource_paths")
+    
+    context = return_message_context(
+        _("Hello,\nYour package has successfully loaded into your Arches project."),
+          _("Thank you"),
+          "",
+          {"link":"","loaded_resource":[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],"link_text":_("Log me in")}
+          )
 
     msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
-    context = dict(
-        greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
-        loaded_resources=[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
-        link="",
-        link_text=_("Log me in"),
-        closing=_("Thank you"),
-        email="",
-    )
+    context = context
     notify_completion(msg, user, notifytype_name, context)
 
 
