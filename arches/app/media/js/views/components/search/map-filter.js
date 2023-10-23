@@ -21,12 +21,11 @@ define([
             var self = this;
              
             this.dependenciesLoaded = ko.observable(false);
-            this.resultsAutoZoomEnabled = ko.observable(Cookies.get('arches-map-auto-zoom') !== undefined ? Cookies.get('arches-map-auto-zoom') : arches.mapFilterAutoZoom);
+            this.resultsAutoZoomEnabled = ko.observable(Cookies.get('arches-map-auto-zoom') !== undefined ? Cookies.get('arches-map-auto-zoom') == "true" : arches.mapFilterAutoZoom);
             this.resultsAutoZoomEnabled.subscribe(function(settingValue) {
                 Cookies.set('arches-map-auto-zoom', settingValue);
             });
-            
-            
+
             this.mapFitBounds = function(bounds, options, force){
                 if(this.resultsAutoZoomEnabled() || force){
                     this.map().fitBounds(bounds, options);
