@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# For Ubuntu 18.04+
+# For Ubuntu 20.04+
+# Tested on Ubuntu 20.04
 
 # Use the yes command if you would like to install postgres/postgis,
 # node/yarn, and elasticsearch.
@@ -40,10 +41,15 @@ function install_postgres {
 }
 
 function install_yarn {
-  wget --quiet -O - https://deb.nodesource.com/setup_16.x | sudo -E bash -
   sudo apt-get update
-  sudo apt-get install -y nodejs
-  sudo apt install curl
+  sudo apt-get install -y ca-certificates curl gnupg
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+  echo NODE_MAJOR=18 >> ~/.profile
+  source ~/.profile
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && sudo apt-get update
+  sudo apt-get update
+  sudo apt-get install nodejs -y
   curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
   echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
   sudo apt update

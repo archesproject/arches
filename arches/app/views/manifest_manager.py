@@ -6,7 +6,7 @@ import shutil
 import uuid
 from revproxy.views import ProxyView
 from django.core.files.storage import default_storage
-from django.http import HttpRequest
+from django.http.response import Http404
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -112,11 +112,14 @@ class ManifestManagerView(View):
         def add_canvases(manifest, canvases):
             manifest.manifest["sequences"][0]["canvases"] += canvases
 
+        def check_canvas_in_use(canvas_id):
+            return models.VwAnnotation.objects.filter(canvas=canvas_id).exists()
+
         def delete_canvases(manifest, canvases_to_remove):
             canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
             canvases_in_use = []
             for canvas_id in canvas_ids_remove:
-                if self.check_canvas_in_use(canvas_id):
+                if check_canvas_in_use(canvas_id):
                     canvases_in_use.append(canvas_id)
             canvases = manifest.manifest["sequences"][0]["canvases"]
             if len(canvases_in_use) > 0:
@@ -208,10 +211,7 @@ class ManifestManagerView(View):
             canvases = []
             for f in files:
                 if os.path.splitext(f.name)[1].lower() in acceptable_types:
-                    try:
-                        image_json, image_id, file_url = create_image(f)
-                    except:
-                        return
+                    image_json, image_id, file_url = create_image(f)
 
                     canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                     canvases.append(canvas)
@@ -250,10 +250,7 @@ class ManifestManagerView(View):
                 canvases = []
                 for f in files:
                     if os.path.splitext(f.name)[1].lower() in acceptable_types:
-                        try:
-                            image_json, image_id, file_url = create_image(f)
-                        except:
-                            return
+                        image_json, image_id, file_url = create_image(f)
                         canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
                         canvases.append(canvas)
                     else:
@@ -261,7 +258,7 @@ class ManifestManagerView(View):
                 add_canvases(manifest, canvases)
             except:
                 logger.warning("You have to select a manifest to add images")
-                return None
+                raise
 
         change_manifest_metadata(manifest)
 
@@ -274,7 +271,7 @@ class ManifestManagerView(View):
             return resp.json()
         except:
             logger.warning("Manifest not created. Check if Cantaloupe running")
-            return None
+            raise
 
     def on_import(self, tile):
         raise NotImplementedError

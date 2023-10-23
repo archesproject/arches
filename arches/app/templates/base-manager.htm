@@ -345,8 +345,8 @@
                             <div class="" data-placement="bottom" data-toggle="tooltip" aria-expanded="true"
                                 data-original-title="{% trans 'Notifications' %}">
                                 <div>
-                                    <div data-bind="visible: unreadNotifs()" id="circle"></div>
                                     <div data-bind="visible: unreadNotifs()" id="circle-outline"></div>
+                                    <div data-bind="visible: unreadNotifs()" id="circle"></div>
                                     <i class="fa fa-bell"></i>
                                 </div>
                             </div>
@@ -387,6 +387,15 @@
                         <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Print" %}">
                                 <i class="ion-printer"></i>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        {% if nav.report_view %}
+                        <a href="{% url 'resource_report' resourceid %}" class="ep-tools ep-tools-right"
+                            data-bind="click:function () { navigate('{% url 'resource_report' resourceid %}') }" aria-label="{% trans 'View Report' %}">
+                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "View Report" %}">
+                                <i class="ion-android-document"></i>
                             </div>
                         </a>
                         {% endif %}
