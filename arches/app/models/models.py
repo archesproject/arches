@@ -1572,11 +1572,7 @@ def send_email_on_save(sender, instance, **kwargs):
         except Exception as e:
             logger = logging.getLogger(__name__)
             logger.warning(e)
-<<<<<<< HEAD
-            logger.warning("Error occurred sending email.  See previous stack trace.")
-=======
             logger.warning("Error occurred sending email.  See previous stack trace and check email configuration in settings.py.")
->>>>>>> 04168f36e63103cd7efba0e8dd51ecb996cb13bf
 
     return False
 
