@@ -286,7 +286,7 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
     logger = logging.getLogger(__name__)
 
     try:
-        ImportSingleCsv = import_single_csv.ImportSingleCsv()
+        ImportSingleCsv = import_single_csv.ImportSingleCsv(loadid=loadid)
         ImportSingleCsv.run_load_task(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
@@ -326,6 +326,28 @@ def edit_bulk_string_data(userid, load_id, module_id, graph_id, node_id, operati
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
+@shared_task
+def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
+    from arches.app.etl_modules import bulk_data_deletion
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        BulkDataDeletion = bulk_data_deletion.BulkDataDeletion(loadid=load_id)
+        BulkDataDeletion.run_bulk_task(userid, load_id, graph_id, nodegroup_id, resourceids)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Bulk Data Deletion: [{}]").format(status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
 
 @shared_task
 def reverse_etl_load(loadid):
