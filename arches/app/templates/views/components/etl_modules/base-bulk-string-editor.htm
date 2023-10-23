@@ -125,6 +125,12 @@
                     <label for="case-insensitive-input" data-bind="text: $root.translations.caseInsensitive"></label>
                 </span>
             </div>
+            <div>
+                <span class="form-check">
+                    <input id="whole-word-input" type="checkbox" data-bind="checked: wholeWord">
+                    <label for="whole-word-input" data-bind="text: $root.translations.wholeWord"></label>
+                </span>
+            </div>
         </div>
         <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
@@ -190,7 +196,7 @@
     <table class="table table-striped" style="border:1px solid #ddd;">
         <tbody>
             <tr>
-                <td style="min-width: 200px;"><span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEditied"></span></td>
+                <td style="min-width: 200px;"><span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEdited"></span></td>
                 <td><span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span></td>      
             </tr>
             <tr>
@@ -221,13 +227,9 @@
                 <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
                 <td>
                     <!-- ko foreach: load_details.number_of_import -->
-                    <span class="etl-loading-metadata-value" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
-                    <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesUpdated($data.total)"></div>
                     <!-- ko foreach: $data.tiles -->
-                    <div style="padding-left: 20px;">
-                        <span class="etl-loading-metadata-value" data-bind="text: $data.tile + ':'"></span>
-                        <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
-                    </div>
+                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfTilesUpdated($data.count)"></div>
                     <!-- /ko -->
                     <!-- /ko -->
                 </td>      

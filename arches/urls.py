@@ -51,6 +51,7 @@ from arches.app.views.resource import (
 )
 from arches.app.views.resource import ResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView
+from arches.app.views.workflow_history import WorkflowHistoryView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
@@ -255,9 +256,11 @@ urlpatterns = [
         name="api_bulk_disambiguated_resource_instance",
     ),
     re_path(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
+    re_path(r"^api/user_incomplete_workflows$", api.UserIncompleteWorkflows.as_view(), name="api_user_incomplete_workflows"),
     re_path(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     re_path(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     re_path(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
+    re_path(r"^workflow_history/(?P<workflowid>%s|())$" % uuid_regex, WorkflowHistoryView.as_view(), name="workflow_history"),
     re_path(r"^cards/(?P<resourceid>%s|())$" % uuid_regex, api.Card.as_view(), name="api_card"),
     re_path(r"^search_component_data/(?P<componentname>[-\w]+)$", api.SearchComponentData.as_view(), name="api_search_component_data"),
     re_path(r"^geojson$", api.GeoJSON.as_view(), name="geojson"),

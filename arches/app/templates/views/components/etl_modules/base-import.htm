@@ -53,12 +53,14 @@
 <!-- ko if: loadDetails.number_of_import -->
 <div style="padding: 5px 0">
     <h4>
-        <span data-bind="text: $root.translations.numberOfResourcesImported"></span>
+        <span data-bind="text: $root.translations.importedData"></span>
+        <span>
+            <a class="etl-status-link" target="_blank"
+                data-bind="text: '('+$root.translations.viewInEditLog+')', attr: { href: editHistoryUrl }">
+            </a>
+        </span>
     </h4>
     <div>
-        <div class="etl-status-link">
-            <a target="_blank" data-bind="text: $root.translations.listOfImportedResources, attr: { href: editHistoryUrl }"></a>
-        </div>
         <!-- ko foreach: loadDetails.number_of_import -->
         <span class="etl-loading-metadata-key" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>

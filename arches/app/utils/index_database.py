@@ -298,13 +298,11 @@ def index_resources_by_type(
 
 
 def _index_resource_batch(resourceids, recalculate_descriptors):
-    from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    return index_resources_using_singleprocessing(
-        resources, batch_size, quiet=True, se=_se, recalculate_descriptors=recalculate_descriptors
-    )
+    return index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=False, title="Indexing Resource Batch", recalculate_descriptors=recalculate_descriptors)
+
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
