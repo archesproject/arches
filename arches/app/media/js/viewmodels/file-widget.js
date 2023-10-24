@@ -70,6 +70,7 @@ define([
                         self.formData.delete('file-list_' + self.node.nodeid);
                     }
                 }
+                self.shouldIgnoreToggleAction = true;
             });
         }
         this.acceptedFiles.subscribe(function(val) {
@@ -268,9 +269,10 @@ define([
 
         // metadata drawer toggles. 0-indexed. true = expanded
         this.metadataToggles = ko.observable({});
-        this.shouldIgnoreToggleAction = false;
+        // dz emits clicks for each uploaded file.
+        // Flag to ignore those until we are sure those clicks are exhausted.
+        this.shouldIgnoreToggleAction = true;
         this.toggleDropdown = (index) => {
-            // dz emits clicks for each uploaded file; we need to ignore those.
             if (this.shouldIgnoreToggleAction) {
                 if (index === this.uploadedFiles().length + this.filesForUpload().length - 1) {
                     // Last click emitted by dz: reset variable
@@ -280,19 +282,25 @@ define([
                 const oldValue = self.metadataToggles()[index];
                 self.metadataToggles({
                     ...self.metadataToggles(),
-                    [index]: oldValue === undefined ? false : !oldValue,
+                    [index]: !oldValue,
                 });
             }
         };
 
         self.shiftMetadata = function(filePosition) {
             const newToggles = {};
+            var someDrawerWasOpenAfterRemovedPosition = false;
             for (const [key, val] of Object.entries(self.metadataToggles())) {
                 const keyAsInt = Number.parseInt(key);
                 if (keyAsInt < filePosition) {
                     newToggles[keyAsInt] = val;
-                } else if (keyAsInt !== filePosition) {
+                } else if (keyAsInt !== filePosition && !someDrawerWasOpenAfterRemovedPosition) {
                     newToggles[keyAsInt - 1] = val;
+                    if (val) {
+                        // Only the first of these seems to work (bootstrap bug?)
+                        // So set a flag to ensure we close subsequent drawers.
+                        someDrawerWasOpenAfterRemovedPosition = true;
+                    }
                 }
             }
             self.metadataToggles(newToggles);
