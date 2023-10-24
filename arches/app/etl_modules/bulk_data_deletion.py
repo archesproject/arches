@@ -57,6 +57,25 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return result
 
+    def index_resource_deletion(self, loadid, resourceids):
+        if not resourceids:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """SELECT DISTINCT resourceinstanceid
+                        FROM edit_log
+                        WHERE transactionid = %s::uuid;
+                    """, [loadid]
+                )
+                rows = cursor.fetchall()
+                resourceids = [ row[0] for row in rows ]
+
+        resource = Resource()
+        for resourceid in resourceids:
+            resource.delete_index(resourceid)
+
+    def index_tile_deletion(self, loadid):
+        index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
@@ -171,7 +190,10 @@ class BulkDataDeletion(BaseBulkEditor):
             )
 
         try:
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)            
+            if nodegroup_id:
+                self.index_tile_deletion(loadid)
+            else:
+                self.index_resource_deletion(loadid, resourceids)
         except Exception as e:
             logger.exception(e)
             with connection.cursor() as cursor:
