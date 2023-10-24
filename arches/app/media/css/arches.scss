@@ -1520,22 +1520,7 @@ ul.tabbed-report-tab-list {
 
 .file-viewer .loading-mask:after,
 .search-result-details .loading-mask::after {
-    position: fixed;
-    opacity: .5;
-    color: #7b7b7b;
-    content: '\f110';
-    -webkit-animation: fa-spin 2s infinite linear;
-    animation: fa-spin 2s infinite linear;
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 10vw;
-    margin-top: 42vh;
-    margin-left: 32vw;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
-    z-index: 100000001;
+    display: none;
 }
 
 .chart .plotly {
