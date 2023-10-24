@@ -802,10 +802,12 @@ class Command(BaseCommand):
                 modules.extend(glob.glob(os.path.join(extension, "*.py")))
 
                 if len(modules) > 0:
+                    if os.path.exists(module_dir) is False:
+                        os.mkdir(module_dir)
                     dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
                     if os.path.exists(dest_path) is False:
                         module = modules[0]
-                        shutil.copy(module, module_dir)
+                        shutil.copy(module, dest_path)
                         management.call_command(cmd, "register", source=module)
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(modules[0]))
