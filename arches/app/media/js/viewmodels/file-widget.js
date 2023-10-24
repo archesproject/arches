@@ -231,7 +231,7 @@ define([
         this.removeFile = function(file) {
             var filePosition;
             self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
-            self.shiftMetadataToggles(filePosition);
+            self.shiftMetadata(filePosition);
             var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
             var filesForUpload = self.filesForUpload();
             var uploadedFiles = self.uploadedFiles();
@@ -285,8 +285,8 @@ define([
             }
         };
 
-        self.shiftMetadataToggles = function(filePosition) {
-            const newToggles = {}
+        self.shiftMetadata = function(filePosition) {
+            const newToggles = {};
             for (const [key, val] of Object.entries(self.metadataToggles())) {
                 const keyAsInt = Number.parseInt(key);
                 if (keyAsInt < filePosition) {
@@ -296,6 +296,17 @@ define([
                 }
             }
             self.metadataToggles(newToggles);
+
+            const newMetadata = {};
+            for (const [key, val] of Object.entries(self.beforeChangeMetadataSnapshot())) {
+                const keyAsInt = Number.parseInt(key);
+                if (keyAsInt < filePosition) {
+                    newMetadata[keyAsInt] = val;
+                } else if (keyAsInt !== filePosition) {
+                    newMetadata[keyAsInt - 1] = val;
+                }
+            }
+            self.beforeChangeMetadataSnapshot(newMetadata);
         }
 
         this.dropzoneOptions = {
