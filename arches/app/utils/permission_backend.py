@@ -347,6 +347,35 @@ def user_can_delete_model_nodegroups(user, resource):
     return user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource)
 
 
+def user_can_read_graph(user, graph_id):
+    """
+    returns a boolean denoting if a user has permmission to read a model's nodegroups
+
+    Arguments:
+    user -- the user to check
+    graph_id -- a graph id to check if a user has permissions to that graph's type specifically
+
+    """
+
+    return user_has_graph_permissions(user, ["models.read_nodegroup"], graph_id)
+
+
+def user_has_graph_permissions(user, perms, graph_id):
+    """
+    Checks if a user has any explicit permissions to a model's nodegroups
+
+    Arguments:
+    user -- the user to check
+    perms -- the permssion string eg: "read_nodegroup" or list of strings
+    graph_id -- a graph id to check if a user has permissions to that graph's type specifically
+
+    """
+
+    nodegroups = get_nodegroups_by_perm(user, perms)
+    nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id).select_related("graph")
+    return nodes.exists()
+
+
 def user_has_resource_model_permissions(user, perms, resource):
     """
     Checks if a user has any explicit permissions to a model's nodegroups
@@ -358,9 +387,7 @@ def user_has_resource_model_permissions(user, perms, resource):
 
     """
 
-    nodegroups = get_nodegroups_by_perm(user, perms)
-    nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
-    return nodes.exists()
+    return user_has_graph_permissions(user, perms, resource.graph_id)
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
