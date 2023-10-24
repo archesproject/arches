@@ -70,7 +70,7 @@ define([
                         self.formData.delete('file-list_' + self.node.nodeid);
                     }
                 }
-                self.shouldIgnoreToggleAction = true;
+                self.beforeChangeMetadataSnapshot({});
             });
         }
         this.acceptedFiles.subscribe(function(val) {
@@ -177,7 +177,11 @@ define([
 
         this.filesJSON.subscribe(function(value) {
             // Preserve current metadata for yet-to-be-uploaded files
-            value.filter(file => file.file_id === null).forEach((file, i) => {
+            value.filter(
+                file => file.file_id === null
+                // Don't take a snapshot of the unsaved metadata if we're deleting it.
+                && self.filesForUpload().find(f => f.name === file.name)
+            ).forEach((file, i) => {
                 const { altText, title, attribution, description } = file;
                 const metadata = { altText, title, attribution, description };
                 if (self.metadataIsEmpty(metadata)) {
@@ -357,7 +361,7 @@ define([
                 self.dropzone.removeAllFiles(true);
                 self.uploadedFiles.removeAll();
                 self.filesForUpload.removeAll();
-                self.metadataToggles({});
+                self.beforeChangeMetadataSnapshot({});
             }
         };
 
