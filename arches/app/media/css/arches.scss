@@ -707,8 +707,9 @@ dl.inline-flex dd {
     width:100%;
 }
 
-.branch-csv-etl {
-    background-color: white;
+.branch-csv-etl,
+.bulk-load-status,
+.etl-error-report {
     width: 100%;
     display: flex;
     flex-direction: column;
