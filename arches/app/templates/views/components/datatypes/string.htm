@@ -18,18 +18,16 @@
     </select>
 </div>
 <div class="col-md-3 col-lg-2">
-    <select 
-        data-bind="
-            options: languages, 
-            optionsValue: 'code',
-            optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
-            select2Query: {
-                select2Config:{
-                    value: language,
-            }},
-            attr: {'data-label': $root.translations.languages}
-        "
-    ></select>
+    <select data-bind="
+        attr: {'data-label': $root.translations.languages},
+        options: languages, 
+        optionsValue: 'code',
+        optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
+        select2Query: {
+            select2Config:{
+                value: language
+        }}">
+    </select>
 </div>
 <div class="col-md-5 col-lg-7" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input 
@@ -37,7 +35,7 @@
         class="form-control input-lg" 
         style="height: 36px;" 
         data-bind="
-            attr: {placeholder: $root.translations.value, 'aria-label': $root.translations.value},
+            attr: {placeholder: $root.translations.value, 'aria-label': node.label},
             textInput: searchValue
         "
     >

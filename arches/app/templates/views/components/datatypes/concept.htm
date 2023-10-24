@@ -46,7 +46,7 @@
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <select style="display:inline-block;"
         data-bind="
-            attr: {'data-label': $root.translations.value},
+            attr: {'data-label': node.label},
             select2Query: {
                 select2Config: select2Config
             }
