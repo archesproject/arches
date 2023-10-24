@@ -2,6 +2,25 @@
 
 from django.db import migrations
 
+from arches.app.models.graph import Graph
+
+
+def using_custom_file_widgets(apps, schema_editor):
+    CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
+    return (
+        CardXNodeXWidget.objects.filter(widget_id="10000000-0000-0000-0000-000000000019").values_list("node__graph", flat=True).distinct()
+    )
+
+
+def publish_graph(apps, schema_editor):
+    for graph in Graph.objects.filter(pk__in=using_custom_file_widgets(apps, schema_editor)):
+        graph.publish(user=None)
+
+
+def unpublish_graph(apps, schema_editor):
+    for graph in Graph.objects.filter(pk__in=using_custom_file_widgets(apps, schema_editor)):
+        graph.unpublish()
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,16 +28,25 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # Changes to cards_x_nodes_x_widgets have no effect without republishing graph.
+        migrations.RunPython(unpublish_graph, publish_graph),
         migrations.RunSQL(
             sql="""
             UPDATE widgets
             SET defaultconfig = jsonb_set(defaultconfig, '{defaultValue}', '[]')
             WHERE name = 'file-widget';
+            UPDATE cards_x_nodes_x_widgets
+            SET config = jsonb_set(config, '{defaultValue}', '[]')
+            WHERE widgetid = '10000000-0000-0000-0000-000000000019';
             """,
             reverse_sql="""
             UPDATE widgets
             SET defaultconfig = defaultconfig - 'defaultValue'
             WHERE name = 'file-widget';
+            UPDATE cards_x_nodes_x_widgets
+            SET config = config - 'defaultValue'
+            WHERE widgetid = '10000000-0000-0000-0000-000000000019';
             """,
         ),
+        migrations.RunPython(publish_graph, unpublish_graph),
     ]
