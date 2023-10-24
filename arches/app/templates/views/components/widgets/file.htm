@@ -137,7 +137,7 @@
                             click: $parent.toggleDropdown($index())"
                     >
                         <div class="file-metadata">
-                            <i class="fa" aria-hidden="true" data-bind="class: $parent.metadataToggles()[$index()] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+                            <i class="fa" aria-hidden="true" data-bind="class: $parent.metadataDrawerCollapsedStatus()[$index()] ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
                             <span data-bind="text: $root.translations.additionalMetadata"></span>
                         </div>
                     </div>

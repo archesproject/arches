@@ -271,30 +271,27 @@ define([
             return "unique_id_" + self.unique_id;
         });
 
-        // metadata drawer toggles. 0-indexed. true = expanded
-        this.metadataToggles = ko.observable({});
-        // dz emits clicks for each uploaded file.
-        // Flag to ignore those until we are sure those clicks are exhausted.
-        this.shouldIgnoreToggleAction = true;
+        this.metadataDrawerCollapsedStatus = ko.observable({});  // 0-indexed. true = collapsed
         this.toggleDropdown = (index) => {
-            if (this.shouldIgnoreToggleAction) {
-                if (index === this.uploadedFiles().length + this.filesForUpload().length - 1) {
-                    // Last click emitted by dz: reset variable
-                    this.shouldIgnoreToggleAction = false;
-                } // else: noop
-            } else {
-                const oldValue = self.metadataToggles()[index];
-                self.metadataToggles({
-                    ...self.metadataToggles(),
-                    [index]: !oldValue,
+            const drawer = $(`.file-metadata-additional-${self.unique_id}${index}`)[0];
+            if (!drawer) {
+                self.metadataDrawerCollapsedStatus({
+                    ...self.metadataDrawerCollapsedStatus(),
+                    [index]: true,
                 });
+                return;
             }
+
+            self.metadataDrawerCollapsedStatus({
+                ...self.metadataDrawerCollapsedStatus(),
+                [index]: drawer.className.includes('collapse in'),
+            });
         };
 
         self.shiftMetadata = function(filePosition) {
             const newToggles = {};
             var someDrawerWasOpenAfterRemovedPosition = false;
-            for (const [key, val] of Object.entries(self.metadataToggles())) {
+            for (const [key, val] of Object.entries(self.metadataDrawerCollapsedStatus())) {
                 const keyAsInt = Number.parseInt(key);
                 if (keyAsInt < filePosition) {
                     newToggles[keyAsInt] = val;
@@ -307,7 +304,7 @@ define([
                     }
                 }
             }
-            self.metadataToggles(newToggles);
+            self.metadataDrawerCollapsedStatus(newToggles);
 
             const newMetadata = {};
             for (const [key, val] of Object.entries(self.beforeChangeMetadataSnapshot())) {
@@ -338,8 +335,6 @@ define([
 
                 this.on("addedfile", function(file) {
                     self.filesForUpload.push(file);
-                    self.shouldIgnoreToggleAction = true;
-                    self.metadataToggles()[Object.keys(self.metadataToggles()).length] = false;
                 });
 
                 this.on("error", function(file, error) {
@@ -349,9 +344,6 @@ define([
 
                 this.on("removedfile", function(file) {
                     self.filesForUpload.remove(file);
-                    // "removedfile" action only reachable via "Delete all files"
-                    // so just clear all the toggle states.
-                    self.metadataToggles({});
                 });
             }
         };
