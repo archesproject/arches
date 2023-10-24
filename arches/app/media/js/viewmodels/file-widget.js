@@ -9,7 +9,7 @@ define([
     'bindings/dropzone'
 ], function($, ko, _, arches, Dropzone, uuid, WidgetViewModel) {
     /**
-     * A viewmodel used for domain widgets
+     * A viewmodel used for file widgets
      *
      * @constructor
      * @name FileWidgetViewModel
