@@ -24,9 +24,15 @@ define([
             this.resultsAutoZoomEnabled = ko.observable(Cookies.get('arches-map-auto-zoom') !== undefined ? Cookies.get('arches-map-auto-zoom') == "true" : arches.mapFilterAutoZoom);
             this.resultsAutoZoomEnabled.subscribe(function(settingValue) {
                 Cookies.set('arches-map-auto-zoom', settingValue);
+                if(settingValue == true && self.lastResultsBounds !== undefined){
+                    self.mapFitBounds(self.lastResultsBounds, {
+                        padding: 45
+                    }, true);
+                }
             });
-
+            this.lastResultsBounds = undefined;
             this.mapFitBounds = function(bounds, options, force){
+                this.lastResultsBounds = bounds;
                 if(this.resultsAutoZoomEnabled() || force){
                     this.map().fitBounds(bounds, options);
                 }
@@ -590,7 +596,11 @@ define([
             this.searchGeometries([]);
         },
 
-        fitToAggregationBounds: function() {
+        zoomToAllFeaturesHandler: function(){
+            this.fitToAggregationBounds(true);
+        },
+
+        fitToAggregationBounds: function(forceFitBounds) {
             var agg = this.searchAggregations();
             var aggBounds;
             if (agg && agg.geo_aggs.bounds.bounds && this.map()) {
@@ -607,10 +617,17 @@ define([
                 ];
                 var maxZoom = ko.unwrap(this.maxZoom);
                 maxZoom = maxZoom > 17 ? 17 : maxZoom;
+                forceFitBounds = forceFitBounds == undefined ? !this.pageLoaded : forceFitBounds == true;
                 this.mapFitBounds(bounds, {
                     padding: 45,
                     maxZoom: maxZoom
-                }, !this.pageLoaded);
+                }, forceFitBounds);
+            }
+            else{
+                //TODO: handle autozoom if no results
+                // clear the lastResultsBounds
+                // either do nothing or zoom to the extent of the project boundary
+                this.lastResultsBounds = undefined;
             }
         }
     });
