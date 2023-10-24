@@ -107,7 +107,25 @@ define([
 
         this.filesJSON = ko.computed(function() {
             var filesForUpload = self.filesForUpload();
-            var uploadedFiles = self.uploadedFiles();
+            const uploadedFiles = self.uploadedFiles().map(file => {
+                if (ko.isObservable(file.title[self.activeLanguage].value)) {
+                    return file;
+                }
+                // Rewrap in observable if needed.
+                return {
+                    ...file,
+                    ...['altText', 'title', 'attribution', 'description'].map(attr => {
+                        return {
+                            ...file[attr],
+                            [self.activeLanguage]: {
+                                "value": ko.observable(file[attr][self.activeLanguage].value),
+                                "direction": ko.observable(file[attr][self.activeLanguage].direction),
+                            },
+                        }
+                    }),
+                };
+            });
+
             var standaloneObservable = self.standaloneObservable();  // for triggering update
             var beforeChangeMetadataSnapshot = self.beforeChangeMetadataSnapshot();
             return uploadedFiles.concat(
