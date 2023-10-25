@@ -3,6 +3,7 @@ import json
 import logging
 import uuid
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
@@ -122,7 +123,13 @@ class BulkDataDeletion(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            try:
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            except ValidationError:
+                return {
+                    "success": False,
+                    "data": {"title": _("Invalid Search Url"), "message": "Please, enter a valid search url "}
+                }
         if resourceids:
             resourceids = tuple(resourceids)
 
@@ -144,7 +151,13 @@ class BulkDataDeletion(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
         if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            try:
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            except ValidationError:
+                return {
+                    "success": False,
+                    "data": {"title": _("Invalid Search Url"), "message": "Please, enter a valid search url "}
+                }
 
         use_celery_bulk_delete = True
 

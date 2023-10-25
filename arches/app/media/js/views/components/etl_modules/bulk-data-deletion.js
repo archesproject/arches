@@ -15,18 +15,6 @@ define([
     const viewModel = function(params) {
         const self = this;
 
-        this.operationLabel = {
-            "trim": "Trim",
-            "replace": "Replace (Case Sensitive)",
-            "replace_i": "Replace (Case Insensitive)",
-            "capitalize": "Capitalize",
-            "capitalize_trim": "Capitalize (Also, remove leading/trailing spaces)",
-            "upper": "Uppercase",
-            "upper_trim": "Uppercase (Also, remove leading/trailing spaces)",
-            "lower": "Lowercase",
-            "lower_trim": "Lowercase (Also, remove leading/trailing spaces)",
-        };
-
         this.loadDetails = params.load_details;
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
@@ -81,6 +69,15 @@ define([
                 self.numberOfTiles(response.result.tile);
                 self.counting(false);
                 self.showCount(true);
+            }).fail( function(err) {
+                self.alert(
+                    new JsonErrorAlertViewModel(
+                        'ep-alert-red',
+                        err.responseJSON["data"],
+                        null,
+                        function(){}
+                    )
+                );
             });
         };
 
