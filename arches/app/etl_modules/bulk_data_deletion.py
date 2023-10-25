@@ -18,6 +18,42 @@ logger = logging.getLogger(__name__)
 
 
 class BulkDataDeletion(BaseBulkEditor):
+    def get_number_of_deletions(self, graph_id, nodegroup_id, resourceids):
+        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        params = {
+            "nodegroup_id": nodegroup_id,
+            "graph_id": graph_id,
+            "resourceids": resourceids,
+        }
+
+        tile_deletion_count = """
+            SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
+        """ + resourceids_query
+
+        resource_deletion_count = """
+            SELECT COUNT(resourceinstanceid)
+            FROM resource_instances
+            WHERE graphid = %(graph_id)s;
+        """
+
+        if nodegroup_id:
+            with connection.cursor() as cursor:
+                cursor.execute(tile_deletion_count, params)
+                row = cursor.fetchone()
+            print(row)
+            number_of_resource, number_of_tiles = row
+
+        elif not resourceids:
+            with connection.cursor() as cursor:
+                cursor.execute(resource_deletion_count, params)
+                row = cursor.fetchone()
+            number_of_resource, = row
+            number_of_tiles = 0
+
+        return number_of_resource, number_of_tiles
+
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}
         user = User.objects.get(id=userid)
@@ -75,6 +111,24 @@ class BulkDataDeletion(BaseBulkEditor):
 
     def index_tile_deletion(self, loadid):
         index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+
+    def count(self, request):
+        graph_id = request.POST.get("graph_id", None)
+        nodegroup_id = request.POST.get("nodegroup_id", None)
+        resourceids = request.POST.get("resourceids", None)
+        search_url = request.POST.get("search_url", None)
+
+        if resourceids:
+            resourceids = json.loads(resourceids)
+        if search_url:
+            resourceids = self.get_resourceids_from_search_url(search_url)
+        if resourceids:
+            resourceids = tuple(resourceids)
+
+        number_of_resource, number_of_tiles = self.get_number_of_deletions(graph_id, nodegroup_id, resourceids)
+        result = { "resource": number_of_resource, "tile": number_of_tiles }
+
+        return { "success": True, "data": result }
 
     def write(self, request):
         graph_id = request.POST.get("graph_id", None)

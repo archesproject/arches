@@ -45,12 +45,42 @@ define([
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
         this.searchUrl = ko.observable();
+        this.deleteTiles = ko.observable(false);
+        this.counting = ko.observable(false);
+        this.numberOfResources = ko.observable();
+        this.numberOfTiles = ko.observable();
+        this.showCount = ko.observable(false);
+
+        this.deleteTiles.subscribe((val) => {
+            if (!val){
+                self.selectedNodegroup(null);
+            }
+        });
+
+        this.ready = ko.computed(()=>{
+            self.showCount(false);
+            self.numberOfResources(null);
+            self.numberOfTiles(null);
+            return (self.searchUrl() && !self.deleteTiles()) || (self.selectedGraph() && !self.deleteTiles()) || (self.selectedNodegroup() && self.deleteTiles());
+        });
 
         this.getGraphs = function(){
             self.loading(true);
             self.submit('get_graphs').then(function(response){
                 self.graphs(response.result);
                 self.loading(false);
+            });
+        };
+
+        this.count = function(){
+            self.counting(true);
+            self.showCount(false);
+            this.addAllFormData();
+            self.submit('count').then(function(response){
+                self.numberOfResources(response.result.resource);
+                self.numberOfTiles(response.result.tile);
+                self.counting(false);
+                self.showCount(true);
             });
         };
 
