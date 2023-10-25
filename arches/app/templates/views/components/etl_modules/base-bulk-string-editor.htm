@@ -125,6 +125,12 @@
                     <label for="case-insensitive-input" data-bind="text: $root.translations.caseInsensitive"></label>
                 </span>
             </div>
+            <div>
+                <span class="form-check">
+                    <input id="whole-word-input" type="checkbox" data-bind="checked: wholeWord">
+                    <label for="whole-word-input" data-bind="text: $root.translations.wholeWord"></label>
+                </span>
+            </div>
         </div>
         <button data-bind="click: preview, css: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
@@ -181,76 +187,65 @@
 {% endblock task_details %}
 
 {% block etl_status %}
-<div>
-    <h4>
-        <span data-bind="text: $root.translations.bulkDataEditDetails"></span>
+<div class="bulk-load-status">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.bulkDataEditSummary"></span>
     </h4>
     <!-- ko if: load_details -->
     <!-- ko ifnot: loading() -->
-    <table class="table table-striped" style="border:1px solid #ddd;">
-        <tbody>
-            <tr>
-                <td style="min-width: 200px;"><span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEditied"></span></td>
-                <td><span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span></td>      
-            </tr>
-            <tr>
-                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameEdited"></span></td>
-                <td><span class="etl-loading-metadata-value" data-bind="text: load_details.node"></span></td>      
-            </tr>
-            <tr>
-                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.searchUrl"></span></td>
-                <td><span class="etl-loading-metadata-value" data-bind="text: load_details.search_url"></span></td>      
-            </tr>
-            <tr>
-                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation"></span></td>
-                <td>
-                    <span class="etl-loading-metadata-value" data-bind="text: operationLabel[load_details.operation]"></span>
-                </td>      
-            </tr>
-            <tr>
-                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.details"></span></td>
-                <td>
-                    <!-- ko if: ['replace', 'replace_i'].includes(load_details.operation) -->
-                    <span class="etl-loading-metadata-value" data-bind="text: load_details.details.old_text"></span>
-                    <i class="fa fa-long-arrow-right"></i>
-                    <span class="etl-loading-metadata-value" data-bind="text: load_details.details.new_text"></span>
-                    <!-- /ko -->
-                </td>      
-            </tr>
-            <tr>
-                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span></td>
-                <td>
-                    <!-- ko foreach: load_details.number_of_import -->
-                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesUpdated($data.total)"></div>
-                    <!-- ko foreach: $data.tiles -->
-                    <div class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfTilesUpdated($data.count)"></div>
-                    <!-- /ko -->
-                    <!-- /ko -->
-                </td>      
-            </tr>
-            <tr>
-                <td><span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfEditedResources"></span></td>
-                <td>
-                    <div class="etl-loading-metadata-value">
-                        <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.clickHere, attr: { href: editHistoryUrl }"></a>
-                    </div>
-                </td>      
-            </tr>
-        </tbody>
-    </table>
+    <div class="summary-header">
+        <span data-bind="text: $root.translations.editDetails"></span>
+    </div>
+    <div style="padding-top: 10px;" data-bind="if: load_details.graph">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEdited + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: getGraphName(load_details.graph)"></span>
+    </div>
+    <div data-bind="if: load_details.node">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameEdited + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.node"></span>      
+    </div>
+    <div data-bind="if: load_details.search_url">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.searchUrl + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.search_url"></span>      
+    </div>
+    <div data-bind="if: load_details.operation">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: operationLabel[load_details.operation]"></span>
+    </div>
+    <div data-bind="if: ['replace', 'replace_i'].includes(load_details.operation)">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.details + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.details.old_text"></span>
+        <i class="fa fa-long-arrow-right"></i>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.details.new_text"></span>
+    </div>
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span>
+        <!-- ko foreach: load_details.number_of_import -->
+        <div style="padding-left: 10px;" class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesUpdated($data.total)"></div>
+            <!-- ko foreach: $data.tiles -->
+            <div style="padding-left: 20px;" class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfTilesUpdated($data.count)"></div>
+            <!-- /ko -->
+        <!-- /ko -->
+    </div>
+    <div data-bind="if: editHistoryUrl">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfEditedResources + ':'"></span>
+        <span class="etl-loading-metadata-value">
+            <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.viewInEditLog, attr: { href: editHistoryUrl }"></a>
+        </span>
+    </div>
     <!-- /ko -->
     <!-- /ko -->
 </div>
 {% endblock etl_status %}
 
 {% block loading_status %}
-<div>
-    <h4>
+<div class="bulk-load-status">
+    <h4 class="summary-header">
         <span data-bind="text: $root.translations.updatingProgress"></span>
     </h4>
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingStatus + ':'"></span>
-        <span class="etl-updatingloading-metadata-value" data-bind="
+        <span class="etl-loading-metadata-value" data-bind="
             text:
                 selectedLoadEvent().status == 'indexed' ? $root.translations.completed
                 : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
