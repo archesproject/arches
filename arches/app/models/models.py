@@ -1686,6 +1686,7 @@ class ETLModule(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
+    reversible = models.BooleanField(default=True)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
     helptemplate = models.TextField(blank=True, null=True)
