@@ -11,8 +11,8 @@ define([
         if (this.search) {
             var filter = params.filterValue();
             this.op = ko.observable(filter.op || '~');
-            this.languages = ko.observableArray();
-            this.languages(arches.languages);
+            this.node = params.node;
+            this.languages = ko.observableArray(arches.languages);
             this.language = ko.observable(arches.activeLanguage);
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {

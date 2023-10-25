@@ -36,28 +36,25 @@
 
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select 
-        class="resources" 
-        data-bind="
-            select2Query: {
-                select2Config:{
-                    data: [
-                        { text: $root.translations.equals, id: 'eq' },
-                        { text: $root.translations.not, id: '!eq' },
-                        { text: $root.translations.hasNoValue, id: 'null' },
-                        { text: $root.translations.hasAnyValue, id: 'not_null' },
-                    ],
-                    value: op
-            }},
-            attr: {'data-label': $root.translations.searchCriteria}
-        "
-    ></select>
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: $root.translations.equals, id: 'eq' },
+                    { text: $root.translations.not, id: '!eq' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op
+        }}">
+    </select>
 </div>
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <select
         class="form-control library-search" 
         data-bind="
-            attr: {'data-label': $root.translations.value},
+            attr: {'data-label': node.label},
             select2Query: {
                 select2Config:{
                     data: options,

@@ -9,6 +9,7 @@ define([
          
         if (this.search) {
             var filter = params.filterValue();
+            this.node = params.node;
             this.op = ko.observable(filter.op || 'eq');
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
