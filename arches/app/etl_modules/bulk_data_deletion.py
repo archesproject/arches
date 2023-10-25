@@ -38,19 +38,20 @@ class BulkDataDeletion(BaseBulkEditor):
             WHERE graphid = %(graph_id)s;
         """
 
+        number_of_tiles = 0
         if nodegroup_id:
             with connection.cursor() as cursor:
                 cursor.execute(tile_deletion_count, params)
                 row = cursor.fetchone()
-            print(row)
             number_of_resource, number_of_tiles = row
 
-        elif not resourceids:
+        elif resourceids:
+            number_of_resource = len(resourceids)
+        else:
             with connection.cursor() as cursor:
                 cursor.execute(resource_deletion_count, params)
                 row = cursor.fetchone()
             number_of_resource, = row
-            number_of_tiles = 0
 
         return number_of_resource, number_of_tiles
 
