@@ -141,10 +141,10 @@ define([
             }
         });
 
-        this.write = function() {
+        this.delete = function() {
             self.addAllFormData();
             params.activeTab("import");
-            self.submit('write').then(data => {
+            self.submit('delete').then(data => {
                 //console.log(data.result);
             }).fail( function(err) {
                 self.alert(

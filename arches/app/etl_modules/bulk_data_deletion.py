@@ -130,7 +130,7 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return { "success": True, "data": result }
 
-    def write(self, request):
+    def delete(self, request):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         nodegroup_id = request.POST.get("nodegroup_id", None)
