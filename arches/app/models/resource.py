@@ -428,7 +428,8 @@ class Resource(models.ResourceInstance):
         document["numbers"] = []
         document["date_ranges"] = []
         document["ids"] = []
-        document["provisional_resource"] = "true" if sum([len(t.data) for t in tiles]) == 0 else "false"
+        tiles_have_authoritative_data = any(any(val is not None for val in t.data.values()) for t in tiles)
+        document["provisional_resource"] = "true" if tiles and not tiles_have_authoritative_data else "false"
 
         terms = []
 

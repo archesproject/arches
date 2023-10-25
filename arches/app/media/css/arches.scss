@@ -707,8 +707,9 @@ dl.inline-flex dd {
     width:100%;
 }
 
-.branch-csv-etl {
-    background-color: white;
+.branch-csv-etl,
+.bulk-load-status,
+.etl-error-report {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -1519,22 +1520,7 @@ ul.tabbed-report-tab-list {
 
 .file-viewer .loading-mask:after,
 .search-result-details .loading-mask::after {
-    position: fixed;
-    opacity: .5;
-    color: #7b7b7b;
-    content: '\f110';
-    -webkit-animation: fa-spin 2s infinite linear;
-    animation: fa-spin 2s infinite linear;
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 10vw;
-    margin-top: 42vh;
-    margin-left: 32vw;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
-    z-index: 100000001;
+    display: none;
 }
 
 .chart .plotly {
@@ -4411,7 +4397,7 @@ div.dropdown-menu.open {
     height: 8px;
     background: #55AA55;
     border-radius: 50%;
-    z-index: 10;
+    z-index: auto;
     position: absolute;
 }
 
@@ -4421,7 +4407,7 @@ div.dropdown-menu.open {
     background: #fff;
     border: 1px solid #6E7F93;
     border-radius: 50%;
-    z-index: 9;
+    z-index: auto;
     position: absolute;
     margin-left: -2px;
     margin-top: -2px;

@@ -277,7 +277,8 @@ class StringDataType(BaseDataType):
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             for key in edge_info["range_tile_data"].keys():
-                g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
+                if edge_info["range_tile_data"][key]["value"]:
+                    g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -1594,12 +1595,13 @@ class FileListDataType(BaseDataType):
                                 logger.exception(_("File does not exist"))
 
             files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, [])
+            tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
             for file_data in files:
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).exists():
+                if tile_exists:
                     file_model.save()
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
