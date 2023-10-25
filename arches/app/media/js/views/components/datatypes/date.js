@@ -29,6 +29,7 @@ define(['knockout', 'templates/views/components/datatypes/date.htm'], function(k
             var config = params.node.config || params.datatype.defaultconfig;
             var filter = params.filterValue();
             this.dateFormat = config.dateFormat;
+            this.node = params.node;
             this.op = ko.observable(filter.op || 'eq');
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
