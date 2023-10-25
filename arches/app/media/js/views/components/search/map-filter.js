@@ -21,9 +21,9 @@ define([
             var self = this;
              
             this.dependenciesLoaded = ko.observable(false);
-            this.resultsAutoZoomEnabled = ko.observable(Cookies.get('arches-map-auto-zoom') !== undefined ? Cookies.get('arches-map-auto-zoom') == "true" : arches.mapFilterAutoZoom);
+            this.resultsAutoZoomEnabled = ko.observable(Cookies.get(`${arches.cookiePrefix}-map-auto-zoom`) !== undefined ? Cookies.get(`${arches.cookiePrefix}-map-auto-zoom`) == "true" : arches.mapFilterAutoZoom);
             this.resultsAutoZoomEnabled.subscribe(function(settingValue) {
-                Cookies.set('arches-map-auto-zoom', settingValue);
+                Cookies.set(`${arches.cookiePrefix}-map-auto-zoom`, settingValue);
                 if(settingValue == true && self.lastResultsBounds !== undefined){
                     self.mapFitBounds(self.lastResultsBounds, {
                         padding: 45
@@ -624,9 +624,6 @@ define([
                 }, forceFitBounds);
             }
             else{
-                //TODO: handle autozoom if no results
-                // clear the lastResultsBounds
-                // either do nothing or zoom to the extent of the project boundary
                 this.lastResultsBounds = undefined;
             }
         }
