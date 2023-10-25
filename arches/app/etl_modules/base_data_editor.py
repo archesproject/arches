@@ -18,6 +18,7 @@ from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.utils.decorators import user_created_transaction_match
 import arches.app.utils.task_management as task_management
+from arches.app.utils.db_utils import dictfetchall
 from arches.app.utils.transaction import reverse_edit_log_entries
 from arches.app.views.search import search_results
 
@@ -77,10 +78,6 @@ class BaseBulkEditor:
     def get_nodes(self, request):
         graphid = request.POST.get("graphid")
 
-        def dictfetchall(cursor):
-            columns = [col[0] for col in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """
@@ -101,6 +98,22 @@ class BaseBulkEditor:
         if graphid not in self.node_lookup.keys():
             self.node_lookup[graphid] = Node.objects.filter(graph_id=graphid)
         return self.node_lookup[graphid]
+
+    def get_nodegroups(self, request):
+        graphid = request.POST.get("graphid")
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT ng.nodegroupid, n.name
+                FROM node_groups ng JOIN nodes n
+                ON n.nodeid = ng.nodegroupid
+                WHERE n.graphid = %s
+                ORDER BY n.name;
+            """,
+                [graphid],
+            )
+            nodegroups = dictfetchall(cursor)
+        return {"success": True, "data": nodegroups}
 
     def create_load_event(self, cursor, load_details):
         result = {"success": False}
@@ -281,13 +294,13 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
 
+        pattern = old_text
         if operation == "replace":
             if case_insensitive == "true":
                 operation = "replace_i"
             if whole_word == "true":
                 pattern = "\\y{0}\\y".format(old_text)
-            else:
-                pattern = old_text
+
         if also_trim == "true":
             operation = operation + "_trim"
 
@@ -337,13 +350,13 @@ class BulkStringEditor(BaseBulkEditor):
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
+        pattern = old_text
         if operation == "replace":
             if case_insensitive == "true":
                 operation = "replace_i"
             if whole_word == "true":
                 pattern = "\\y{0}\\y".format(old_text)
-            else:
-                pattern = old_text
+
         if also_trim == "true":
             operation = operation + "_trim"
 
@@ -400,13 +413,13 @@ class BulkStringEditor(BaseBulkEditor):
         if search_url:
             resourceids = self.get_resourceids_from_search_url(search_url)
 
+        pattern = old_text
         if operation == "replace":
             if case_insensitive == "true":
                 operation = "replace_i"
             if whole_word == "true":
                 pattern = "\\y{0}\\y".format(old_text)
-            else:
-                pattern = old_text
+
         if also_trim == "true":
             operation = operation + "_trim"
 

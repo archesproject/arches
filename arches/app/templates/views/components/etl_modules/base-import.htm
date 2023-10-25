@@ -10,8 +10,8 @@
 {% endblock etl_status %}
 
 {% block loading_status %}
-<div>
-    <h4>
+<div class="bulk-load-status">
+    <h4 class="summary-header">
         <span data-bind="text: $root.translations.loadingData"></span>
     </h4>
     <div>
@@ -51,8 +51,8 @@
 </div>
 
 <!-- ko if: loadDetails.number_of_import -->
-<div style="padding: 5px 0">
-    <h4>
+<div class="bulk-load-status" style="padding: 5px 0">
+    <h4 class="summary-header">
         <span data-bind="text: $root.translations.importedData"></span>
         <span>
             <a class="etl-status-link" target="_blank"
@@ -74,12 +74,12 @@
     </div>
 </div>
 <!-- /ko -->
-
 {% endblock loading_status %}
 
 {% block etl_error_report %}
-    <!-- ko if: validated -->
-    <h4>
+<!-- ko if: validated -->
+<div class="etl-error-report">
+    <h4 class="summary-header">
         <span data-bind="text: $root.translations.validationErrors"></span>
     </h4>
     <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
@@ -166,6 +166,7 @@
         </tbody>
         <!-- /ko -->            
     </table>
-    <!-- /ko -->
+</div>
+<!-- /ko -->
 {% endblock etl_error_report %}
 <!-- /ko -->
