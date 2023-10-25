@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10121_workflowhistory'),
+        ('models', '10150_add_default_value_file_list'),
     ]
 
     set_reversibility = """
