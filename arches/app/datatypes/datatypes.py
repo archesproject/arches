@@ -762,13 +762,15 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         source_name = "resources-%s" % node.nodeid
         # layer_name = "%s - %s" % (node.graph.name, node.name)
-        layer_name = "All %ss" % (node.graph.name)
         if not preview and node.config["layerName"] != "":
             layer_name = node.config["layerName"]
         layer_icon = node.graph.iconclass
         if not preview and node.config["layerIcon"] != "":
             layer_icon = node.config["layerIcon"]
 
+        layer_name = "All %ss" % (node.graph.name)
+        if node.graph.name[-1] == 'y':
+            layer_name = "All %s" % (node.graph.name.replace('y','ies'))
         layer_legend = node.config["layerLegend"]
 
         if not preview and node.config["advancedStyling"]:
