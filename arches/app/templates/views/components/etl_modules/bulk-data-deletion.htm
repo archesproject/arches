@@ -93,14 +93,14 @@
             <span data-bind="text: $root.translations.deleteResourceCount(numberOfResources())"></span>
         </p>
         <!-- /ko -->
-        <button data-bind="click: count, attr: {disabled: !ready()}" class="btn btn-success">
+        <button data-bind="click: count, disable: !ready()" class="btn btn-success">
             <span data-bind="text: $root.translations.confirm"></span>
             <i class="fa fa-spin fa-spinner" data-bind="visible: counting()"></i>
         </button>
     </div>
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: delete, attr: {disabled: !ready() || !showCount()}" class="btn btn-success">
+    <button style="margin-right: 8px;" data-bind="click: bulkDelete, disable: (!ready() || !showCount())" class="btn btn-success">
         <span data-bind="text: $root.translations.start"></span>
     </button>
 </div>

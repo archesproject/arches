@@ -141,7 +141,7 @@ define([
             }
         });
 
-        this.delete = function() {
+        this.bulkDelete = function() {
             self.addAllFormData();
             params.activeTab("import");
             self.submit('delete').then(data => {
