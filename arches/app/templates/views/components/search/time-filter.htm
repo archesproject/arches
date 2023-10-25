@@ -28,17 +28,17 @@
                 class="resources"
                 data-bind="
                     select2Query:{ select2Config:{
+                        value: filter.dateNodeId,
                         dropdownCssClass: 'select2-zindex',
                         placeholder: $root.translations.dateType,
-                        value: filter.dateNodeId
                     }}, 
                     attr: {id:dateDropdownEleId, 'data-label': $root.translations.searchDateType} 
                 "
             >
                 <option data-bind="text: $root.translations.searchAllDates"></option>
-                <!-- ko foreach: { data: graph_models, as: 'graph' } -->
+                <!-- ko foreach: { data: graphModels, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
-                        <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
+                        <!-- ko foreach: { data: $parent.dateNodes, as: 'node' } -->
                             <!-- ko if: graph.graphid === node.graph_id -->
                                 <option data-bind="attr: { value: node.nodeid }, text: node.label"></option>
                             <!-- /ko -->
@@ -58,8 +58,8 @@
                     attr: {'data-label': $root.translations.searchDateRange},
                     select2Query:{ 
                         select2Config: {
+                            value: dateRangeType,
                             dropdownCssClass: 'select2-zindex',
-                            value: dateRangeType, 
                             placeholder: $root.translations.select,
                             minimumResultsForSearch: -1,
                             data: [
