@@ -1578,7 +1578,7 @@ class Plugin(models.Model):
 
 class WorkflowHistory(models.Model):
     workflowid = models.UUIDField(primary_key=True)
-    workflowname = models.CharField(null=True)
+    workflowname = models.CharField(null=True, max_length=255)
     stepdata = JSONField(null=False, default=dict)
     componentdata = JSONField(null=False, default=dict)
     # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
