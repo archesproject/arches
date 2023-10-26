@@ -67,7 +67,6 @@ define([
             self.submit('count').then(function(response){
                 self.numberOfResources(response.result.resource);
                 self.numberOfTiles(response.result.tile);
-                self.counting(false);
                 self.showCount(true);
             }).fail( function(err) {
                 self.alert(
@@ -78,6 +77,8 @@ define([
                         function(){}
                     )
                 );
+            }).always( function(){
+                self.counting(false);
             });
         };
 
