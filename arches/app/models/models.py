@@ -597,17 +597,17 @@ class Node(models.Model):
             return not TileModel.objects.filter(nodegroup=self.nodegroup).exists()
 
     def get_relatable_resources(self):
-        relatable_resource_ids = [
-            r2r.resourceclassfrom
-            for r2r in Resource2ResourceConstraint.objects.filter(resourceclassto_id=self.nodeid)
-            if r2r.resourceclassfrom is not None
-        ]
-        relatable_resource_ids = relatable_resource_ids + [
-            r2r.resourceclassto
-            for r2r in Resource2ResourceConstraint.objects.filter(resourceclassfrom_id=self.nodeid)
-            if r2r.resourceclassto is not None
-        ]
-        return relatable_resource_ids
+        relatable_resource_model_topnodes = set()
+        constraints = Resource2ResourceConstraint.objects.filter(
+            Q(resourceclassto_id=self.nodeid) | Q(resourceclassfrom_id=self.nodeid)
+        ).exclude(
+            Q(resourceclassto__isnull=True) & Q(resourceclassfrom__isnull=True)
+        )
+        for r2r in constraints:
+            relatable_resource_model_topnodes.add(r2r.resourceclassfrom)
+            relatable_resource_model_topnodes.add(r2r.resourceclassto)
+
+        return list(relatable_resource_model_topnodes)
 
     def set_relatable_resources(self, new_ids):
         old_ids = [res.nodeid for res in self.get_relatable_resources()]

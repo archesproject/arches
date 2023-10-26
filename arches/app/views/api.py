@@ -1221,6 +1221,9 @@ class OntologyProperty(APIBase):
 
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
+        # from datetime import timedelta
+        # from time import time
+        # start = time()
         exclude = request.GET.get("exclude", [])
         uncompacted_value = request.GET.get("uncompacted")
         version = request.GET.get("v")
@@ -1249,6 +1252,11 @@ class ResourceReport(APIBase):
         if "template" not in exclude:
             resp["template"] = template
 
+        # elapsed = time() - start
+        # print(f"_______Time to A = {timedelta(seconds=elapsed)}")
+        # start = time()
+
+
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
@@ -1271,13 +1279,22 @@ class ResourceReport(APIBase):
 
             resp["related_resources"] = related_resources_summary
 
+
+        # elapsed = time() - start
+        # print(f"_______Time to B = {timedelta(seconds=elapsed)}")
+        # start = time()
+
         if "tiles" not in exclude:
             permitted_tiles = TileProxyModel.objects.filter(resourceinstance=resource, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
+            existing_permitted_tile_nodegroupids = list(permitted_tiles.values_list('nodegroup_id', flat=True))
 
             resp["tiles"] = permitted_tiles
 
+        # elapsed = time() - start
+        # print(f"_______Time to C = {timedelta(seconds=elapsed)}")
+        # start = time()
         if "cards" not in exclude:
-            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
+            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=existing_permitted_tile_nodegroupids).select_related("nodegroup").order_by("sortorder")
 
             cardwidgets = [
                 widget
@@ -1287,6 +1304,8 @@ class ResourceReport(APIBase):
 
             resp["cards"] = permitted_cards
             resp["cardwidgets"] = cardwidgets
+        # elapsed = time() - start
+        # print(f"_______Time to D = {timedelta(seconds=elapsed)}")
 
         return JSONResponse(resp)
 
