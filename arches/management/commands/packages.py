@@ -1243,7 +1243,7 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 print(os.path.join(path))
-                with open(path, "rU") as f:
+                with open(path, "r") as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
                     errors.extend(errs)
@@ -1251,7 +1251,7 @@ class Command(BaseCommand):
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith(".json")]
                 for file_path in file_paths:
                     print(os.path.join(path, file_path))
-                    with open(os.path.join(path, file_path), "rU") as f:
+                    with open(os.path.join(path, file_path), "r") as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
                         errors.extend(errs)
@@ -1388,6 +1388,6 @@ class Command(BaseCommand):
 
         for path in source:
             if os.path.isfile(os.path.join(path)):
-                with open(path, "rU") as f:
+                with open(path, "r") as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)
