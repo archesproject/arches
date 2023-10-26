@@ -4,118 +4,134 @@
 {% block task_details %}
 <!-- ko ifnot: loading() -->
 <div class="etl-module-component-container">
-<div class="etl-module-body">
-    <h2>
-        <span data-bind="text: $root.translations.bulkDataDeletion"></span>
-    </h2>
-    <p class="pad-btm">
-        {% blocktrans %}Delete The Selected Resources or Tiles{% endblocktrans %}
-    </p>
-    <section class="etl-module-component">
-        <div class="etl-module-component-block">
-            <span class="etl-module-subtitle" data-bind="text: $root.translations.deleteResources"></span>
-            <span class="switch switch-small" tabindex="0" role="switch"
-                data-bind="
-                    css: {'on': deleteTiles()},
-                    click: function(){deleteTiles(!deleteTiles())}
-                "><small></small></span>
-            <span class="etl-module-subtitle" data-bind="text: $root.translations.deleteTiles"></span>
-        </div>
-        <!-- ko if: deleteTiles() -->
+    <div class="etl-module-body">
+        <h2>
+            <span data-bind="text: $root.translations.bulkDataDeletion"></span>
+        </h2>
         <p class="pad-btm">
-            {% blocktrans %}You can delete the tiles by selecting the nodegroup.
-                The selections can be further limited using the optional search url.{% endblocktrans %}
+            {% blocktrans %}Delete The Selected Resources or Tiles{% endblocktrans %}
         </p>
-        <!-- /ko -->
-        <!-- ko ifnot: deleteTiles() -->
-        <p class="pad-btm">
-            {% blocktrans %}You can delete the resources by selecting the graph or using search url.
-                If you choose both, only the intersection will be deleted.{% endblocktrans %}
-        </p>
-        <!-- /ko -->
+        <section class="etl-module-component">
+            <div class="delete-type-container">
+                <div class="delete-type-button" role="button" data-bind="
+                    click:()=>{ activeTab('TileDeletion') },
+                    css: { active:activeTab()==='TileDeletion' }">
+                    {% trans "Delete Tiles" %}
+                </div>
+                <div class="delete-type-button" role="button" data-bind="
+                    click:()=>{ activeTab('DeletionBySearchUrl') },
+                    css: { active:activeTab()==='DeletionBySearchUrl' }">
+                    {% trans "Delete Resources by Search Url" %}
+                </div>
+                <div class="delete-type-button" role="button" data-bind="
+                    click:()=>{ activeTab('DeletionByGraph') },
+                    css: { active:activeTab()==='DeletionByGraph' }">
+                {% trans "Delete Resources by Resource Model" %}
+                </div>
+            </div>
+            <!-- ko if: activeTab() === "TileDeletion" -->
+            <p class="pad-btm">
+                {% blocktrans %}You can delete the tiles by selecting the nodegroup.
+                    The selections can be further limited using the optional search url.{% endblocktrans %}
+            </p>
+            <!-- /ko -->
+            <!-- ko if: activeTab() === "DeletionBySearchUrl" -->
+            <p class="pad-btm">
+                {% blocktrans %}You can delete the resources by selecting the graph.{% endblocktrans %}
+            </p>
+            <!-- /ko -->
+            <!-- ko if: activeTab() === "DeletionByGraph" -->
+            <p class="pad-btm">
+                {% blocktrans %}You can delete the resources using search url.{% endblocktrans %}
+            </p>
+            <!-- /ko -->
+            <!-- ko ifnot: activeTab() === "DeletionBySearchUrl" -->
+            <div class="etl-module-component-block">
+                <h3>
+                    <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
+                </h3>
+                <select id="resource-model-select" data-bind="
+                    value: selectedGraph,
+                    options: graphs,
+                    optionsText: 'name',
+                    optionsValue: 'graphid',
+                    optionsCaption: $root.translations.select + '...',
+                    valueAllowUnset: true,
+                    chosen: {width: '500px'}"
+                ></select>
+            </div>
+            <!-- /ko -->
+            <!-- ko if: activeTab() === "TileDeletion" -->
+            <div class="etl-module-component-block">
+                <h3>
+                    <label for="nodegroup-select" data-bind="text: $root.translations.selectANodegroup"></label>
+                </h3>
+                <select id="nodegroup-select" data-bind="
+                    value: selectedNodegroup,
+                    options: nodegroups,
+                    optionsText: 'name',
+                    optionsCaption: $root.translations.select + '...',
+                    optionsValue: 'nodegroupid',
+                    valueAllowUnset: true,
+                    chosen: {width: '500px'}"
+                ></select>
+            </div>
+            <!-- /ko -->
+            <!-- ko ifnot: activeTab() === "DeletionByGraph" -->
+            <div class="etl-module-component-block">
+                <h3>
+                    <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+                </h3>
+                <textarea id="search-url-input"
+                    style="min-height: 100px; width: 80%;"
+                    class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
+                ></textarea>
+            </div>
+            <!-- /ko -->
+        </section>
         <div class="etl-module-component-block">
-            <h3>
-                <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
-            </h3>
-            <select id="resource-model-select" data-bind="
-                value: selectedGraph,
-                options: graphs,
-                optionsText: 'name',
-                optionsValue: 'graphid',
-                optionsCaption: $root.translations.select + '...',
-                valueAllowUnset: true,
-                chosen: {width: '500px'}"
-            ></select>
+            <p class="pad-btm">
+                <!-- ko if: searchUrl() && !selectedGraph() && !selectedNodegroup()  -->
+                {% blocktrans %}This selection will delete the resource instances from search url{% endblocktrans %}
+                <!-- /ko -->
+                <!-- ko if: searchUrl() && selectedGraph() && !selectedNodegroup() -->
+                {% blocktrans %}This selection will delete the resource instances from search url and the selected resource model{% endblocktrans %}
+                <!-- /ko -->
+                <!-- ko if: searchUrl() && selectedNodegroup() -->
+                {% blocktrans %}This selection will delete the tiles in the selected nodegroup from search url{% endblocktrans %}
+                <!-- /ko -->
+                <!-- ko if: !searchUrl() && selectedGraph() && !selectedNodegroup() -->
+                {% blocktrans %}This selection will delete all the resource instances from the selected resource model{% endblocktrans %}
+                <!-- /ko -->
+                <!-- ko if: !searchUrl() && selectedNodegroup() -->
+                {% blocktrans %}This selection will delete the tiles in the selected nodegroup{% endblocktrans %}
+                <!-- /ko -->
+            </p>
+            <button data-bind="click: count, disable: !ready()" class="btn btn-success">
+                <span data-bind="text: $root.translations.confirm"></span>
+                <i class="fa fa-spin fa-spinner" data-bind="visible: counting()"></i>
+            </button>
+            <!-- ko if: showCount() && deleteTiles() -->
+            <p>
+                <i class="fa fa-info-circle"></i>
+                <span data-bind="text: $root.translations.deleteTileCount(numberOfTiles(),numberOfResources())"></span>
+            </p>
+            <!-- /ko -->
+            <!-- ko if: showCount() && !deleteTiles() -->
+            <p style="margin-top: 15px;" >
+                <i class="fa fa-info-circle"></i>
+                <span data-bind="text: $root.translations.deleteResourceCount(numberOfResources())"></span>
+            </p>
+            <!-- /ko -->
         </div>
-        <!-- ko if: deleteTiles() -->
-        <div class="etl-module-component-block">
-            <h3>
-                <label for="node-select" data-bind="text: $root.translations.selectANodegroup"></label>
-            </h3>
-            <select id="nodegroup-select" data-bind="
-                value: selectedNodegroup,
-                options: nodegroups,
-                optionsText: 'name',
-                optionsCaption: $root.translations.select + '...',
-                optionsValue: 'nodegroupid',
-                valueAllowUnset: true,
-                chosen: {width: '500px'}"
-            ></select>
-        </div>
-        <!-- /ko -->
-        <div class="etl-module-component-block">
-            <h3>
-                <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
-            </h3>
-            <textarea id="search-url-input"
-                style="min-height: 100px; width: 80%;"
-                class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
-            ></textarea>
-        </div>
-    </section>
-    <div class="etl-module-component-block">
-        <p class="pad-btm">
-            <!-- ko if: searchUrl() && !selectedGraph() && !selectedNodegroup()  -->
-            {% blocktrans %}This selection will delete the resource instances from search url{% endblocktrans %}
-            <!-- /ko -->
-            <!-- ko if: searchUrl() && selectedGraph() && !selectedNodegroup() -->
-            {% blocktrans %}This selection will delete the resource instances from search url and the selected resource model{% endblocktrans %}
-            <!-- /ko -->
-            <!-- ko if: searchUrl() && selectedNodegroup() -->
-            {% blocktrans %}This selection will delete the tiles in the selected nodegroup from search url{% endblocktrans %}
-            <!-- /ko -->
-            <!-- ko if: !searchUrl() && selectedGraph() && !selectedNodegroup() -->
-            {% blocktrans %}This selection will delete all the resource instances from the selected resource model{% endblocktrans %}
-            <!-- /ko -->
-            <!-- ko if: !searchUrl() && selectedNodegroup() -->
-            {% blocktrans %}This selection will delete the tiles in the selected nodegroup{% endblocktrans %}
-            <!-- /ko -->
-        </p>
-        <button data-bind="click: count, disable: !ready()" class="btn btn-success">
-            <span data-bind="text: $root.translations.confirm"></span>
-            <i class="fa fa-spin fa-spinner" data-bind="visible: counting()"></i>
-        </button>
-        <!-- ko if: showCount() && deleteTiles() -->
-        <p>
-            <i class="fa fa-info-circle"></i>
-            <span data-bind="text: $root.translations.deleteTileCount(numberOfTiles(),numberOfResources())"></span>
-        </p>
-        <!-- /ko -->
-        <!-- ko if: showCount() && !deleteTiles() -->
-        <p style="margin-top: 15px;" >
-            <i class="fa fa-info-circle"></i>
-            <span data-bind="text: $root.translations.deleteResourceCount(numberOfResources())"></span>
-        </p>
-        <!-- /ko -->
     </div>
-</div>
-<div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" class="btn btn-success" data-bind="
-        click: bulkDelete,
-        disable: (!ready() || !showCount() || numberOfResources()+numberOfTiles() === 0 )">
-        <span data-bind="text: $root.translations.start"></span>
-    </button>
-</div>
+    <div class="tabbed-workflow-footer, etl-module-footer">
+        <button style="margin-right: 8px;" class="btn btn-success" data-bind="
+            click: bulkDelete,
+            disable: (!ready() || !showCount() || numberOfResources()+numberOfTiles() === 0 )">
+            <span data-bind="text: $root.translations.start"></span>
+        </button>
+    </div>
 </div>
 <!-- /ko -->
 {% endblock task_details %}

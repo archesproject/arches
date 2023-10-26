@@ -39,6 +39,7 @@ define([
         this.numberOfTiles = ko.observable();
         this.showCount = ko.observable(false);
 
+        this.activeTab  = ko.observable("TileDeletion");
         this.deleteTiles.subscribe((val) => {
             if (!val){
                 self.selectedNodegroup(null);

@@ -777,6 +777,25 @@ h4.branch-xl-title {
     margin-top: 25px;
 }
 
+.etl-module-component .delete-type-container{
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+}
+.etl-module-component .delete-type-button{
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 10px 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #ddd;
+    margin-right: 12px;
+}
+.etl-module-component .delete-type-button.active {
+    font-weight: bold;
+}
+
 .tabbed-workflow-footer, .etl-module-footer {
     background-color: #445769;
     border-top: 1px solid #0E2031;
