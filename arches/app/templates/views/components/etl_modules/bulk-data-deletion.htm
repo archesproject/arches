@@ -12,14 +12,14 @@
         {% blocktrans %}Delete The Selected Resources or Tiles{% endblocktrans %}
     </p>
     <section class="etl-module-component">
-        <div class="form-group">
-            <h3>{% trans "Delete Resources" %}</h3>
+        <div class="form-group etl-module-component-block">
+            <span class="etl-module-subtitle" data-bind="text: $root.translations.deleteResources"></span>
             <span class="switch switch-small" tabindex="0" role="switch"
                 data-bind="
                     css: {'on': deleteTiles()},
                     click: function(){deleteTiles(!deleteTiles())}
                 "><small></small></span>
-            <h3>{% trans "Delete Tiles" %}</h3>
+            <span class="etl-module-subtitle" data-bind="text: $root.translations.deleteTiles"></span>
         </div>
         <div class="etl-module-component-block">
             <h3>
@@ -90,7 +90,7 @@
         </p>
         <!-- /ko -->
         <!-- ko if: showCount() && !deleteTiles() -->
-        <p>
+        <p style="margin-top: 15px;" >
             <i class="fa fa-info-circle"></i>
             <span data-bind="text: $root.translations.deleteResourceCount(numberOfResources())"></span>
         </p>

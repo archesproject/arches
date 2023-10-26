@@ -78,6 +78,7 @@ define([
                     )
                 );
             }).always( function(){
+                self.deleteAllFormData();
                 self.counting(false);
             });
         };
