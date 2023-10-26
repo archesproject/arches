@@ -15,13 +15,11 @@ define([
                 allowClear: false,
                 minimumResultsForSearch: 8
             });
+            var value = select2Config.value;
             var attr = allBindingsAccessor()?.attr;
             if(!!attr && Object.hasOwn(attr, 'data-label')){
                 el.setAttribute('aria-label', attr['data-label']);
             }
-            var value = select2Config.value;
-            value.extend({ rateLimit: 250 });
-            // select2Config.value = value();
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
                 $(el).selectWoo('destroy');
@@ -72,6 +70,7 @@ define([
                 $(el).selectWoo(select2Config);
                 
                 if (value) {
+                    value.extend({ rateLimit: 250 });
                     // initialize the dropdown with the value
                     $(el).val(value());
                     $(el).trigger('change.select2'); 

@@ -37,16 +37,16 @@
     <span data-bind="text: $root.translations.dateFormat"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select
-        data-bind="
-            attr: {'data-label': $root.translations.dateFormat},
-            select2Query: {
-                select2Config:{
-                    data: options,
-                    value: dateFormat,
-                    placeholder: $root.translations.dateFormat
-            }}
-        "
-    ></select>
+    <select data-bind="
+        attr: {'data-label': $root.translations.dateFormat},
+        select2Query: {
+            select2Config:{
+                value: dateFormat,
+                data: dateFormatOptions,
+                allowClear: false,
+                minimumResultsForSearch: -1,
+                placeholder: $root.translations.dateFormat
+        }}">
+    </select>
 </div>
 <!-- /ko -->
