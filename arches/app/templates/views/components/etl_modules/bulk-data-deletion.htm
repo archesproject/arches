@@ -107,17 +107,17 @@
                 {% blocktrans %}This selection will delete the tiles in the selected nodegroup{% endblocktrans %}
                 <!-- /ko -->
             </p>
-            <button data-bind="click: count, disable: !ready()" class="btn btn-success">
-                <span data-bind="text: $root.translations.confirm"></span>
-                <i class="fa fa-spin fa-spinner" data-bind="visible: counting()"></i>
+            <button data-bind="click: preview, disable: !ready()" class="btn btn-success">
+                <span data-bind="text: $root.translations.preview"></span>
+                <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
             </button>
-            <!-- ko if: showCount() && deleteTiles() -->
+            <!-- ko if: showPreview() && deleteTiles() -->
             <p>
                 <i class="fa fa-info-circle"></i>
                 <span data-bind="text: $root.translations.deleteTileCount(numberOfTiles(),numberOfResources())"></span>
             </p>
             <!-- /ko -->
-            <!-- ko if: showCount() && !deleteTiles() -->
+            <!-- ko if: showPreview() && !deleteTiles() -->
             <p style="margin-top: 15px;" >
                 <i class="fa fa-info-circle"></i>
                 <span data-bind="text: $root.translations.deleteResourceCount(numberOfResources())"></span>
@@ -128,7 +128,7 @@
     <div class="tabbed-workflow-footer, etl-module-footer">
         <button style="margin-right: 8px;" class="btn btn-success" data-bind="
             click: bulkDelete,
-            disable: (!ready() || !showCount() || numberOfResources()+numberOfTiles() === 0 )">
+            disable: (!ready() || !showPreview() || numberOfResources()+numberOfTiles() === 0 )">
             <span data-bind="text: $root.translations.start"></span>
         </button>
     </div>

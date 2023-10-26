@@ -112,7 +112,7 @@ class BulkDataDeletion(BaseBulkEditor):
     def index_tile_deletion(self, loadid):
         index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
 
-    def count(self, request):
+    def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
         nodegroup_id = request.POST.get("nodegroup_id", None)
         resourceids = request.POST.get("resourceids", None)

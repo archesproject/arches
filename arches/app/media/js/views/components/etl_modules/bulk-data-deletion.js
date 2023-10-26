@@ -34,10 +34,10 @@ define([
         this.resourceids = ko.observable();
         this.searchUrl = ko.observable();
         this.deleteTiles = ko.observable(false);
-        this.counting = ko.observable(false);
+        this.previewing = ko.observable(false);
         this.numberOfResources = ko.observable();
         this.numberOfTiles = ko.observable();
-        this.showCount = ko.observable(false);
+        this.showPreview = ko.observable(false);
 
         this.activeTab  = ko.observable("TileDeletion");
         this.deleteTiles.subscribe((val) => {
@@ -47,7 +47,7 @@ define([
         });
 
         this.ready = ko.computed(()=>{
-            self.showCount(false);
+            self.showPreview(false);
             self.numberOfResources(null);
             self.numberOfTiles(null);
             return (self.searchUrl() && !self.deleteTiles()) || (self.selectedGraph() && !self.deleteTiles()) || (self.selectedNodegroup() && self.deleteTiles());
@@ -61,14 +61,14 @@ define([
             });
         };
 
-        this.count = function(){
-            self.counting(true);
-            self.showCount(false);
+        this.preview = function(){
+            self.previewing(true);
+            self.showPreview(false);
             this.addAllFormData();
-            self.submit('count').then(function(response){
+            self.submit('preview').then(function(response){
                 self.numberOfResources(response.result.resource);
                 self.numberOfTiles(response.result.tile);
-                self.showCount(true);
+                self.showPreview(true);
             }).fail( function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
@@ -80,7 +80,7 @@ define([
                 );
             }).always( function(){
                 self.deleteAllFormData();
-                self.counting(false);
+                self.previewing(false);
             });
         };
 
