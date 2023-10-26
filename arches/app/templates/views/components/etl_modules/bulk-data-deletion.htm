@@ -98,7 +98,9 @@
     </div>
 </div>
 <div class="tabbed-workflow-footer, etl-module-footer">
-    <button style="margin-right: 8px;" data-bind="click: bulkDelete, disable: (!ready() || !showCount())" class="btn btn-success">
+    <button style="margin-right: 8px;" class="btn btn-success" data-bind="
+        click: bulkDelete,
+        disable: (!ready() || !showCount() || numberOfResources()+numberOfTiles() === 0 )">
         <span data-bind="text: $root.translations.start"></span>
     </button>
 </div>
