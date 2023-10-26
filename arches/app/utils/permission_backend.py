@@ -357,10 +357,10 @@ def user_can_read_graph(user, graph_id):
 
     """
 
-    return user_has_graph_permissions(user, ["models.read_nodegroup"], graph_id)
+    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], graph_id=graph_id)
 
 
-def user_has_graph_permissions(user, perms, graph_id):
+def user_has_resource_model_permissions(user, perms, resource=None, graph_id=None):
     """
     Checks if a user has any explicit permissions to a model's nodegroups
 
@@ -371,23 +371,12 @@ def user_has_graph_permissions(user, perms, graph_id):
 
     """
 
+    if resource:
+        graph_id = resource.graph_id
+
     nodegroups = get_nodegroups_by_perm(user, perms)
     nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id).select_related("graph")
     return nodes.exists()
-
-
-def user_has_resource_model_permissions(user, perms, resource):
-    """
-    Checks if a user has any explicit permissions to a model's nodegroups
-
-    Arguments:
-    user -- the user to check
-    perms -- the permssion string eg: "read_nodegroup" or list of strings
-    resource -- a resource instance to check if a user has permissions to that resource's type specifically
-
-    """
-
-    return user_has_graph_permissions(user, perms, resource.graph_id)
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
