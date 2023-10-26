@@ -12,7 +12,7 @@
         {% blocktrans %}Delete The Selected Resources or Tiles{% endblocktrans %}
     </p>
     <section class="etl-module-component">
-        <div class="form-group etl-module-component-block">
+        <div class="etl-module-component-block">
             <span class="etl-module-subtitle" data-bind="text: $root.translations.deleteResources"></span>
             <span class="switch switch-small" tabindex="0" role="switch"
                 data-bind="
@@ -21,6 +21,18 @@
                 "><small></small></span>
             <span class="etl-module-subtitle" data-bind="text: $root.translations.deleteTiles"></span>
         </div>
+        <!-- ko if: deleteTiles() -->
+        <p class="pad-btm">
+            {% blocktrans %}You can delete the tiles by selecting the nodegroup.
+                The selections can be further limited using the optional search url.{% endblocktrans %}
+        </p>
+        <!-- /ko -->
+        <!-- ko ifnot: deleteTiles() -->
+        <p class="pad-btm">
+            {% blocktrans %}You can delete the resources by selecting the graph or using search url.
+                If you choose both, only the intersection will be deleted.{% endblocktrans %}
+        </p>
+        <!-- /ko -->
         <div class="etl-module-component-block">
             <h3>
                 <label for="resource-model-select" data-bind="text: $root.translations.selectAResourceModel"></label>
