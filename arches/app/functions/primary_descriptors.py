@@ -42,7 +42,10 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
                 tile = context.get('tile')
 
-                if not tile or tile.sortorder != 0:
+                if tile and tile.sortorder: 
+                    return result
+
+                if not tile:
                     tile = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
                         resourceinstance_id=resource.resourceinstanceid
                     ).first()
