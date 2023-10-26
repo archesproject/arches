@@ -106,13 +106,13 @@ class BaseBulkEditor:
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT ng.nodegroupid, n.name
-                FROM node_groups ng JOIN nodes n
-                ON n.nodeid = ng.nodegroupid
-                WHERE n.graphid = %s
-                ORDER BY n.name;
+                SELECT ng.nodegroupid, c.name ->> %s name
+                FROM node_groups ng JOIN cards c
+                ON c.nodegroupid = ng.nodegroupid
+                WHERE c.graphid = %s
+                ORDER BY c.name;
             """,
-                [graphid],
+                [settings.LANGUAGE_CODE, graphid],
             )
             nodegroups = dictfetchall(cursor)
         return {"success": True, "data": nodegroups}
