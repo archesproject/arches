@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 class BulkDataDeletion(BaseBulkEditor):
     def get_number_of_deletions(self, graph_id, nodegroup_id, resourceids):
-        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        graph_query = "WHERE graphid = %(graph_id)s" if graph_id else ""
+        operator = "AND " if graph_query else "WHERE "
+        resourceids_query = operator + "resourceinstanceid IN %(resourceids)s" if resourceids else ""
         params = {
             "nodegroup_id": nodegroup_id,
             "graph_id": graph_id,
@@ -36,23 +38,19 @@ class BulkDataDeletion(BaseBulkEditor):
         resource_deletion_count = """
             SELECT COUNT(resourceinstanceid)
             FROM resource_instances
-            WHERE graphid = %(graph_id)s;
-        """
+        """ + graph_query + resourceids_query
 
-        number_of_tiles = 0
         if nodegroup_id:
             with connection.cursor() as cursor:
                 cursor.execute(tile_deletion_count, params)
                 row = cursor.fetchone()
             number_of_resource, number_of_tiles = row
-
-        elif resourceids:
-            number_of_resource = len(resourceids)
         else:
             with connection.cursor() as cursor:
                 cursor.execute(resource_deletion_count, params)
                 row = cursor.fetchone()
             number_of_resource, = row
+            number_of_tiles = 0
 
         return number_of_resource, number_of_tiles
 
