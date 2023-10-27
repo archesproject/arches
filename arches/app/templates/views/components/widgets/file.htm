@@ -231,7 +231,7 @@
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dt class="first" data-bind="text: $parent.label"></dt>
+<dt class="first" data-bind="text: $parent.label, class: $parent.nodeCssClasses"></dt>
 <dd class="first" data-bind="class: $parent.nodeCssClasses" style="border-top: 1px lightgray; border-top-style: solid;"></dt>
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
@@ -253,15 +253,13 @@
 <!-- /ko -->
 
 <!-- ko foreach: reportImages() -->
-<dt class="first" data-bind="text: $parent.label"></dt>
-<dd class="first" data-bind="class: nodeCssClasses">
-    <div id="report-image-grid" class="report-image-grid">
-        <div class="rp-image-grid-item">
-            <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
-                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url),
-                alt: $data.altText[$parent.activeLanguage].value ?? name}">
-            </a>
-        </div>
+<dt class="first" data-bind="text: $parent.label, class: $parent.nodeCssClasses"></dt>
+<dd class="first" data-bind="class: $parent.nodeCssClasses">
+    <div class="rp-image-grid-item">
+        <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
+            <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url),
+            alt: $data.altText[$parent.activeLanguage].value ?? name}">
+        </a>
     </div>
 </dd>
 <!-- ko if: title[$parent.activeLanguage].value -->
