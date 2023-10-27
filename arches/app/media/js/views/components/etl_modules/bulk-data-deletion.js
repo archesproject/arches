@@ -37,6 +37,7 @@ define([
         this.numberOfResources = ko.observable();
         this.numberOfTiles = ko.observable();
         this.showPreview = ko.observable(false);
+        this.previewValue = ko.observable();
 
         this.activeTab  = ko.observable("TileDeletion");
         this.activeTab.subscribe(() => {
@@ -69,6 +70,7 @@ define([
             self.submit('preview').then(function(response){
                 self.numberOfResources(response.result.resource);
                 self.numberOfTiles(response.result.tile);
+                self.previewValue(response.result.preview);
                 self.showPreview(true);
             }).fail( function(err) {
                 self.alert(

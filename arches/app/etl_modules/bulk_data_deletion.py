@@ -27,11 +27,11 @@ class BulkDataDeletion(BaseBulkEditor):
             "language_code": settings.LANGUAGE_CODE,
         }
 
-        resourceids_query = "AND r.resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         tile_deletion_count = """
-            SELECT g.name ->> %(language_code)s, COUNT(DISTINCT t.resourceinstanceid), COUNT(t.tileid)
-            FROM tiles t, graphs g
-            WHERE t.nodegroupid = %(nodegroup_id)s
+            SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
         """ + resourceids_query
 
         resource_deletion_count = """
@@ -69,6 +69,41 @@ class BulkDataDeletion(BaseBulkEditor):
             number_of_tiles = 0
 
         return number_of_resource, number_of_tiles
+
+    def get_sample_data(self, nodegroup_id, resourceids):
+        params = {
+            "nodegroup_id": nodegroup_id,
+            "resourceids": resourceids,
+        }
+
+        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        get_sample_resource_ids = """
+            SELECT DISTINCT resourceinstanceid
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
+        """ + resourceids_query + """
+            LIMIT 5
+        """
+
+        get_sample_tiledata = """
+            SELECT tiledata
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
+        """ + resourceids_query + """
+            LIMIT 5
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(get_sample_resource_ids, params)
+            rows = cursor.fetchall()
+        smaple_resource_ids = [row[0] for row in rows]
+
+        with connection.cursor() as cursor:
+            cursor.execute(get_sample_tiledata, params)
+            rows = cursor.fetchall()
+        sample_data = [row[0] for row in rows]
+
+        return sample_data
 
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}
@@ -149,6 +184,10 @@ class BulkDataDeletion(BaseBulkEditor):
 
         number_of_resource, number_of_tiles = self.get_number_of_deletions(graph_id, nodegroup_id, resourceids)
         result = { "resource": number_of_resource, "tile": number_of_tiles }
+
+        if nodegroup_id:
+            sample_data = self.get_sample_data(nodegroup_id, resourceids)
+            result["preview"] = sample_data
 
         return { "success": True, "data": result }
 

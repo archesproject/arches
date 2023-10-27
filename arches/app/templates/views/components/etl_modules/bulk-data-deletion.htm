@@ -111,13 +111,36 @@
                 <span data-bind="text: $root.translations.preview"></span>
                 <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
             </button>
-            <!-- ko if: showPreview() && activeTab() === "TilesDeletion" -->
-            <p>
-                <i class="fa fa-info-circle"></i>
-                <span data-bind="text: $root.translations.deleteTileCount(numberOfTiles(),numberOfResources())"></span>
-            </p>
+            <!-- ko if: showPreview() && activeTab() === "TileDeletion" -->
+            <!-- ko if: numberOfTiles() === 0 -->
+            <h3 style="margin-top: 0px;">
+                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
+            </h3>
             <!-- /ko -->
-            <!-- ko if: showPreview() && activeTab() !== "TilesDeletion" -->
+            <!-- ko if: numberOfTiles() > 0 -->
+            <p style="margin-top: 15px;">
+                <i class="fa fa-info-circle"></i>
+                <span data-bind="text: $root.translations.previewCountStats(5,numberOfTiles(),numberOfResources())"></span>
+            </p>
+            <table class="table table-striped csv-mapping-table">
+                <thead>
+                    <tr>
+                        <th style="border-bottom: 1px solid #ddd; vertical-align: top;">
+                            <span data-bind="text: $root.translations.toBeDeletedTiles"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ko foreach: { data: previewValue(), as: "value" } -->
+                    <tr>
+                        <td style="vertical-align: text-top;" data-bind="text: value"></td>
+                    </tr>
+                    <!-- /ko -->
+                </tbody>
+            </table>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: showPreview() && activeTab() !== "TileDeletion" -->
             <p style="margin-top: 15px;" >
                 <i class="fa fa-info-circle"></i>
                 <span data-bind="text: $root.translations.followingResourcesBeDeleted"></span>
