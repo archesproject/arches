@@ -106,10 +106,12 @@ class BaseBulkEditor:
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT ng.nodegroupid, c.name ->> %s name
-                FROM node_groups ng JOIN cards c
-                ON c.nodegroupid = ng.nodegroupid
-                WHERE c.graphid = %s
+                SELECT ng.nodegroupid, c.name ->> %s card_name, n.name node_name
+                FROM node_groups ng, cards c, nodes n
+                WHERE c.nodegroupid = ng.nodegroupid
+                AND ng.nodegroupid = n.nodeid
+                AND c.graphid = %s
+                AND c.visible = true
                 ORDER BY c.name;
             """,
                 [settings.LANGUAGE_CODE, graphid],

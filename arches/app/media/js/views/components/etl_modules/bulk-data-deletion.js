@@ -131,7 +131,10 @@ define([
                 self.loading(true);
                 self.formData.append('graphid', graph);
                 self.submit('get_nodegroups').then(function(response){
-                    const nodegroups = response.result;
+                    const nodegroups = response.result.map(nodegroup => (
+                        { ...nodegroup,
+                            label: `${nodegroup.card_name} (${nodegroup.node_name})` 
+                        }));
                     self.selectedNodegroup(null);
                     self.nodegroups(nodegroups);
                     self.loading(false);
