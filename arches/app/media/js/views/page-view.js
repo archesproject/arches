@@ -143,7 +143,7 @@ define([
                 openEdits: function(openButton, escListenScope, closeButton) {
                     self.viewModel.getProvisionalHistory();
                     self.viewModel.editsOpen(!(self.viewModel.editsOpen()));
-                    self.viewModel.handleEscKey(openButton, escListenScope, closeButton);
+                    setTimeout(() => {self.viewModel.handleEscKey(openButton, escListenScope, closeButton)}, 500);
                 },
                 openHelp: function(helpTemplates, openButton, escListenScope, closeButton) {
                     helpTemplates.forEach(template => self.viewModel.getHelp(template));
