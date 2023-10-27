@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10150_add_default_value_file_list"),
+        ("models", "10165_etlmodule_reversible"),
     ]
 
     operations = [
