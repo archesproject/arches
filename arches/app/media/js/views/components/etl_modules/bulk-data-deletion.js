@@ -33,24 +33,25 @@ define([
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
         this.searchUrl = ko.observable();
-        this.deleteTiles = ko.observable(false);
         this.previewing = ko.observable(false);
         this.numberOfResources = ko.observable();
         this.numberOfTiles = ko.observable();
         this.showPreview = ko.observable(false);
 
         this.activeTab  = ko.observable("TileDeletion");
-        this.deleteTiles.subscribe((val) => {
-            if (!val){
-                self.selectedNodegroup(null);
-            }
+        this.activeTab.subscribe(() => {
+            self.selectedGraph(null);
+            self.selectedNodegroup(null);
+            self.searchUrl(null);
         });
 
         this.ready = ko.computed(()=>{
             self.showPreview(false);
             self.numberOfResources(null);
             self.numberOfTiles(null);
-            return (self.searchUrl() && !self.deleteTiles()) || (self.selectedGraph() && !self.deleteTiles()) || (self.selectedNodegroup() && self.deleteTiles());
+            return (self.searchUrl() && self.activeTab() === "DeletionBySearchUrl")
+                || (self.selectedGraph() && self.activeTab() === "DeletionByGraph")
+                || (self.selectedNodegroup() && self.activeTab() === "TileDeletion");
         });
 
         this.getGraphs = function(){
