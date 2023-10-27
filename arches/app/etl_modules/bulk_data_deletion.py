@@ -20,36 +20,52 @@ logger = logging.getLogger(__name__)
 
 class BulkDataDeletion(BaseBulkEditor):
     def get_number_of_deletions(self, graph_id, nodegroup_id, resourceids):
-        graph_query = "WHERE graphid = %(graph_id)s" if graph_id else ""
-        operator = "AND " if graph_query else "WHERE "
-        resourceids_query = operator + "resourceinstanceid IN %(resourceids)s" if resourceids else ""
         params = {
             "nodegroup_id": nodegroup_id,
             "graph_id": graph_id,
             "resourceids": resourceids,
+            "language_code": settings.LANGUAGE_CODE,
         }
 
+        resourceids_query = "AND r.resourceinstanceid IN %(resourceids)s" if resourceids else ""
         tile_deletion_count = """
-            SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
-            FROM tiles
-            WHERE nodegroupid = %(nodegroup_id)s
+            SELECT g.name ->> %(language_code)s, COUNT(DISTINCT t.resourceinstanceid), COUNT(t.tileid)
+            FROM tiles t, graphs g
+            WHERE t.nodegroupid = %(nodegroup_id)s
         """ + resourceids_query
 
         resource_deletion_count = """
-            SELECT COUNT(resourceinstanceid)
-            FROM resource_instances
-        """ + graph_query + resourceids_query
+            SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
+            FROM resource_instances r, graphs g
+            WHERE g.graphid = %(graph_id)s
+            AND r.graphid = g.graphid
+            GROUP BY g.name
+        """
+
+        search_url_deletion_count = """
+            SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
+            FROM resource_instances r, graphs g
+            WHERE r.graphid = g.graphid
+            AND r.resourceinstanceid IN %(resourceids)s
+            GROUP BY g.name
+        """
 
         if nodegroup_id:
             with connection.cursor() as cursor:
                 cursor.execute(tile_deletion_count, params)
                 row = cursor.fetchone()
             number_of_resource, number_of_tiles = row
+        elif resourceids:
+            with connection.cursor() as cursor:
+                cursor.execute(search_url_deletion_count, params)
+                rows = cursor.fetchall()
+            number_of_resource = [{"name":i[0], "count":i[1]} for i in rows]
+            number_of_tiles = 0
         else:
             with connection.cursor() as cursor:
                 cursor.execute(resource_deletion_count, params)
-                row = cursor.fetchone()
-            number_of_resource, = row
+                rows = cursor.fetchall()
+            number_of_resource = [{"name":i[0], "count":i[1]} for i in rows]
             number_of_tiles = 0
 
         return number_of_resource, number_of_tiles

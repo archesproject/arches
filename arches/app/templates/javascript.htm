@@ -780,6 +780,7 @@
         delete-resource-count='(resource) => {return {% trans "${resource} resources will be deleted" as deleteResourceCount %} `{{ deleteResourceCount|escapejs }}` }'
         delete-tiles='{% trans "Delete Tiles" as deleteTiles %} "{{ deleteTiles|escapejs }}"'
         delete-resources='{% trans "Delete Resources" as deleteResources %} "{{ deleteResources|escapejs }}"'
+        following-resources-be-deleted='{% trans "The following resources will be deleted" as followingResourcesBeDeleted %} "{{ followingResourcesBeDeleted|escapejs }}"'
         bulk-edit-limit-warning='(limit) => {return {% trans "For safety, only ${limit} bulk edits are allowed at a time.  If you need to edit more than ${limit} entries, you will need to perform the operation multiple times." as bulkEditLimitWarning %} `{{ bulkEditLimitWarning|escapejs }}`}'
         show='{% trans "show" as show %} "{{ show|escapejs }}"'
         hide='{% trans "hide" as hide %} "{{ hide|escapejs }}"'

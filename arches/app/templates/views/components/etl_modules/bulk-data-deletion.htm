@@ -111,17 +111,20 @@
                 <span data-bind="text: $root.translations.preview"></span>
                 <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
             </button>
-            <!-- ko if: showPreview() && deleteTiles() -->
+            <!-- ko if: showPreview() && activeTab() === "TilesDeletion" -->
             <p>
                 <i class="fa fa-info-circle"></i>
                 <span data-bind="text: $root.translations.deleteTileCount(numberOfTiles(),numberOfResources())"></span>
             </p>
             <!-- /ko -->
-            <!-- ko if: showPreview() && !deleteTiles() -->
+            <!-- ko if: showPreview() && activeTab() !== "TilesDeletion" -->
             <p style="margin-top: 15px;" >
                 <i class="fa fa-info-circle"></i>
-                <span data-bind="text: $root.translations.deleteResourceCount(numberOfResources())"></span>
+                <span data-bind="text: $root.translations.followingResourcesBeDeleted"></span>
             </p>
+            <!-- ko foreach: {data: numberOfResources(), as: "numberOfResource"} -->
+            <div style="margin-left: 20px;" data-bind="text: `${numberOfResource.name}: ${numberOfResource.count}`"></div>
+            <!-- /ko -->
             <!-- /ko -->
         </div>
     </div>
