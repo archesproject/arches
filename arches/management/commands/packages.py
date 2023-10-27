@@ -7,7 +7,6 @@ import uuid
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
-import imp
 import logging
 from arches.setup import unzip_file
 from arches.management.commands import utils
@@ -817,10 +816,14 @@ class Command(BaseCommand):
             root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
             dest_dir = os.path.join(root, "search_indexes")
 
+            if index_files:
+                module_name = "package_settings"
+                file_path = os.path.join(settings.APP_ROOT, "package_settings.py")
+                utils.load_source(module_name, file_path)
+
             for index_file in index_files:
                 shutil.copy(index_file, dest_dir)
-                package_settings = imp.load_source("", os.path.join(settings.APP_ROOT, "package_settings.py"))
-                for index in package_settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                for index in sys.modules[module_name].ELASTICSEARCH_CUSTOM_INDEXES:
                     es_index = import_class_from_string(index["module"])(index["name"])
                     es_index.prepare_index()
 
