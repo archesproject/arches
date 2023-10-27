@@ -83,7 +83,6 @@
 .file-upload-footer {
     background: #f1f1f1;
     color: rgb(89, 56, 255);
-    ;
     display: flex;
     justify-content: left;
     align-items: center;
@@ -111,7 +110,11 @@
     max-width: unset;
 }
 
-.rp-report-tile dt.first, .rp-report-tile dd.first {
-    border: 1px lightgray;
-    border-top-style: solid;
+.rp-report-tile dt.first, 
+.rp-report-tile dd.first {
+    margin-top: 40px !important;
+
+    &:first-of-type {
+        margin-top: 0px !important;
+    }
 }

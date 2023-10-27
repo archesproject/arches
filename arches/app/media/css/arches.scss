@@ -7406,9 +7406,7 @@ li.search-field {
 }
 
 .grid:after,
-.report-image-grid:after,
-.report-image-grid:after,
-.grid:after {
+.report-image-grid:after {
     content: '';
     display: block;
     clear: both;
@@ -7870,11 +7868,6 @@ a.mega-dropdown-toggle.disabled {
 
 .no-instructions-shim {
     margin-top: -60px;
-}
-
-.report-image-grid {
-    width: 100%;
-    margin-bottom: 20px;
 }
 
 .search .grid .library-card {
