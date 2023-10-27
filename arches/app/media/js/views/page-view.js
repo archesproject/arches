@@ -138,7 +138,7 @@ define([
                 openNotifs: function(openButton, escListenScope, closeButton) {
                     self.viewModel.getNotifications();
                     self.viewModel.notifsOpen(!(self.viewModel.notifsOpen()));
-                    self.viewModel.handleEscKey(openButton, escListenScope, closeButton);
+                    setTimeout(() => {self.viewModel.handleEscKey(openButton, escListenScope, closeButton)}, 500);
                 },
                 openEdits: function(openButton, escListenScope, closeButton) {
                     self.viewModel.getProvisionalHistory();
@@ -148,7 +148,7 @@ define([
                 openHelp: function(helpTemplates, openButton, escListenScope, closeButton) {
                     helpTemplates.forEach(template => self.viewModel.getHelp(template));
                     self.viewModel.helpOpen(!(self.viewModel.helpOpen()));
-                    self.viewModel.handleEscKey(openButton, escListenScope, closeButton);
+                    setTimeout(() => {self.viewModel.handleEscKey(openButton, escListenScope, closeButton)}, 500);
                 },
                 closeNotifs: function() {
                     self.viewModel.getNotifications();
