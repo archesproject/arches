@@ -106,15 +106,23 @@ class BaseBulkEditor:
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT ng.nodegroupid, c.name ->> %s card_name, n.name node_name
-                FROM node_groups ng, cards c, nodes n
-                WHERE c.nodegroupid = ng.nodegroupid
-                AND ng.nodegroupid = n.nodeid
-                AND c.graphid = %s
-                AND c.visible = true
-                ORDER BY c.name;
+                WITH RECURSIVE card_tree(nodegroupid, parentnodegroupid, name) AS (
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, c.name ->> %s name
+                    FROM node_groups ng, cards c
+                    WHERE c.nodegroupid = ng.nodegroupid
+                    AND c.graphid = %s
+                    AND ng.parentnodegroupid IS null
+                    AND c.visible = true
+                UNION
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, (ct.name || ' - ' || (c.name ->> %s)) name
+                    FROM node_groups ng, cards c, card_tree ct
+                    WHERE ng.parentnodegroupid = ct.nodegroupid
+                    AND c.nodegroupid = ng.nodegroupid
+                    AND c.visible = true
+                )
+                SELECT nodegroupid, name FROM card_tree ORDER BY name
             """,
-                [settings.LANGUAGE_CODE, graphid],
+                [settings.LANGUAGE_CODE, graphid, settings.LANGUAGE_CODE],
             )
             nodegroups = dictfetchall(cursor)
         return {"success": True, "data": nodegroups}
