@@ -126,7 +126,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="value: $data.altText[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.alternativeText}"
+                                data-bind="textInput: $data.altText[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.alternativeText}"
                             />
                         </div>
                     </div>
@@ -147,7 +147,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="value: $data.title[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.title}"
+                                data-bind="textInput: $data.title[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.title}"
                             />
                         </div>
                         <div class="file-metadata col-sm-6">
@@ -155,7 +155,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="value: $data.attribution[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.attribution}"
+                                data-bind="textInput: $data.attribution[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.attribution}"
                             />
                         </div>
                         <div class="file-metadata">
@@ -163,7 +163,7 @@
                             <input
                                 type="text"
                                 class="form-control"
-                                data-bind="value: $data.description[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.description}"
+                                data-bind="textInput: $data.description[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.description}"
                                 style="resize: vertical;"
                             />
                         </div>
@@ -199,8 +199,7 @@
                 ? $root.translations.exampleImageTypes : $root.translations.exampleFileTypes,
             'aria-label': node.config.imagesOnly
                 ? $root.translations.acceptedFileTypesImagesOnly : $root.translations.acceptedFileTypes},
-            value: acceptedFiles,
-            valueUpdate: 'keyup'
+            textInput: acceptedFiles
         "
     >
 </div>
