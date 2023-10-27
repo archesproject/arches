@@ -572,8 +572,10 @@ class EDTFDataType(BaseDataType):
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    group_query = Bool()
+                    group_query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
+                    group_query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    query.must(group_query)
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
