@@ -32,7 +32,7 @@ define([
         this.formData = new window.FormData();
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
-        this.searchUrl = ko.observable('http://localhost:8000/search?paging-filter=1&tiles=true&format=tilecsv&reportlink=false&precision=6&total=291&term-filter=%5B%7B%22inverted%22%3Afalse%2C%22type%22%3A%22string%22%2C%22context%22%3A%22%22%2C%22context_label%22%3A%22%22%2C%22id%22%3A%22test%22%2C%22text%22%3A%22test%22%2C%22value%22%3A%22test%22%7D%5D&language=*');
+        this.searchUrl = ko.observable();
         this.previewing = ko.observable(false);
         this.numberOfResources = ko.observable();
         this.numberOfTiles = ko.observable();
