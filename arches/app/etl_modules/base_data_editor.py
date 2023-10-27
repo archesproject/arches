@@ -114,7 +114,7 @@ class BaseBulkEditor:
                     AND ng.parentnodegroupid IS null
                     AND c.visible = true
                 UNION
-                    SELECT ng.nodegroupid, ng.parentnodegroupid, (ct.name || ' - ' || (c.name ->> %s)) name
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, (ct.name || ' > ' || (c.name ->> %s)) name
                     FROM node_groups ng, cards c, card_tree ct
                     WHERE ng.parentnodegroupid = ct.nodegroupid
                     AND c.nodegroupid = ng.nodegroupid
