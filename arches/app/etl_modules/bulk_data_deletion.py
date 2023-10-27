@@ -9,11 +9,14 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
+from arches.app.models.models import TileModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
 import arches.app.tasks as tasks
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.utils.label_based_graph import LabelBasedGraph
+from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 
 logger = logging.getLogger(__name__)
 
@@ -97,13 +100,23 @@ class BulkDataDeletion(BaseBulkEditor):
             cursor.execute(get_sample_resource_ids, params)
             rows = cursor.fetchall()
         smaple_resource_ids = [row[0] for row in rows]
+        sample_data = []
+        for resourceid in smaple_resource_ids:
+            resource = Resource.objects.get(pk=resourceid)
+            resource.tiles = list(TileModel.objects.filter(resourceinstance=resourceid).filter(nodegroup_id=nodegroup_id))
+            lbg = LabelBasedGraph.from_resource(
+                resource=resource,
+                compact=True,
+                hide_empty_nodes=True,
+                hide_hidden_nodes=True
+            )
+            for data in lbg.values():
+                for datum in data:
+                    sample_data.append(datum)
+            if len(sample_data) >= 5:
+                break
 
-        with connection.cursor() as cursor:
-            cursor.execute(get_sample_tiledata, params)
-            rows = cursor.fetchall()
-        sample_data = [row[0] for row in rows]
-
-        return sample_data
+        return sample_data[0:5]
 
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}

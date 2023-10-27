@@ -113,14 +113,14 @@
             </button>
             <!-- ko if: showPreview() && activeTab() === "TileDeletion" -->
             <!-- ko if: numberOfTiles() === 0 -->
-            <h3 style="margin-top: 0px;">
-                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
-            </h3>
+            <p style="margin-top: 15px;">
+                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToDelete"></span>
+            </p>
             <!-- /ko -->
             <!-- ko if: numberOfTiles() > 0 -->
             <p style="margin-top: 15px;">
                 <i class="fa fa-info-circle"></i>
-                <span data-bind="text: $root.translations.previewCountStats(5,numberOfTiles(),numberOfResources())"></span>
+                <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
             </p>
             <table class="table table-striped csv-mapping-table">
                 <thead>
