@@ -117,6 +117,57 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="file-metadata">
+                            <label data-bind="text: $root.translations.alternativeText"></label>
+                            <a href="#" data-toggle="tooltip" data-bind="attr: {title: $root.translations.altTextHelp}">
+                                <i class="fa fa-question-circle" aria-hidden="true" style="padding-left: 3px;"></i>
+                            </a>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="textInput: $data.altText[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.alternativeText}"
+                            />
+                        </div>
+                    </div>
+                    <div class="row"
+                        data-toggle="collapse"
+                        style="cursor: pointer"
+                        data-bind="attr: {'data-target': '.file-metadata-additional-' + $parent.unique_id + $index()},
+                            click: $parent.toggleDropdown($index())"
+                    >
+                        <div class="file-metadata">
+                            <i class="fa" aria-hidden="true" data-bind="class: $parent.metadataDrawerCollapsedStatus()[$index()] ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                            <span data-bind="text: $root.translations.additionalMetadata"></span>
+                        </div>
+                    </div>
+                    <div class="row collapse" data-bind="class: 'file-metadata-additional-' + $parent.unique_id + $index()">
+                        <div class="file-metadata col-sm-6">
+                            <label data-bind="text: $root.translations.title"></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="textInput: $data.title[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.title}"
+                            />
+                        </div>
+                        <div class="file-metadata col-sm-6">
+                            <label data-bind="text: $root.translations.attribution"></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="textInput: $data.attribution[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.attribution}"
+                            />
+                        </div>
+                        <div class="file-metadata">
+                            <label data-bind="text: $root.translations.description"></label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                data-bind="textInput: $data.description[$parent.activeLanguage].value, attr: {'aria-label': $root.translations.description}"
+                                style="resize: vertical;"
+                            />
+                        </div>
+                    </div>
                 </div>
                 <!-- /ko -->
             </div>
@@ -137,15 +188,18 @@
 
 {% block config_form %}
 <div class="control-label">
-    <span data-bind="text: $root.translations.acceptedFileTypes"></span>
+    <span data-bind="text: node.config.imagesOnly
+        ? $root.translations.acceptedFileTypesImagesOnly : $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
     <input
         class="form-control input-md widget-input"
         data-bind="
-            attr: {placeholder: $root.translations.exampleFileTypes, 'aria-label': $root.translations.acceptedFileTypes},
-            value: acceptedFiles,
-            valueUpdate: 'keyup'
+            attr: {placeholder: node.config.imagesOnly
+                ? $root.translations.exampleImageTypes : $root.translations.exampleFileTypes,
+            'aria-label': node.config.imagesOnly
+                ? $root.translations.acceptedFileTypesImagesOnly : $root.translations.acceptedFileTypes},
+            textInput: acceptedFiles
         "
     >
 </div>
@@ -167,35 +221,58 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label, class: nodeCssClasses"></dt>
 
 <!-- ko if: uploadedFiles().length === 0 -->
+<dt data-bind="text: label"></dt>
 <dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dd data-bind="class: $parent.nodeCssClasses">
+<dt class="first" data-bind="text: $parent.label, class: $parent.nodeCssClasses"></dt>
+<dd class="first" data-bind="class: $parent.nodeCssClasses" style="border-top: 1px lightgray; border-top-style: solid;"></dt>
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
     </a>
 </dd>
+<!-- ko if: title[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.title"></dt>
+<dd data-bind="text: title[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: attribution[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.attribution"></dt>
+<dd data-bind="text: attribution[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: description[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.description"></dt>
+<dd data-bind="text: description[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
 <!-- /ko -->
 
-<!-- ko if: reportImages().length > 0 -->
-<dd data-bind="class: nodeCssClasses">
-    <div id="report-image-grid" class="report-image-grid">
-        <!-- ko foreach: reportImages() -->
-        <div class="rp-image-grid-item">
-            <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
-                <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url), alt: name}">
-            </a>
-        </div>
-        <!-- /ko -->
+<!-- ko foreach: reportImages() -->
+<dt class="first" data-bind="text: $parent.label, class: $parent.nodeCssClasses"></dt>
+<dd class="first" data-bind="class: $parent.nodeCssClasses">
+    <div class="rp-image-grid-item">
+        <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
+            <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url),
+            alt: $data.altText[$parent.activeLanguage].value ?? name}">
+        </a>
     </div>
 </dd>
+<!-- ko if: title[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.title"></dt>
+<dd data-bind="text: title[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: attribution[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.attribution"></dt>
+<dd data-bind="text: attribution[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
+<!-- ko if: description[$parent.activeLanguage].value -->
+<dt data-bind="text: $root.translations.description"></dt>
+<dd data-bind="text: description[$parent.activeLanguage].value"></dd>
+<!-- /ko -->
 <!-- /ko -->
 {% endblock report %}
 
