@@ -481,13 +481,15 @@ class GraphModel(models.Model):
         else:
             return True
 
-    def get_published_graph(self, language=None):
+    def get_published_graph(self, language=None, raise_if_missing=False):
         if not language:
             language = translation.get_language()
 
         try:
             graph = PublishedGraph.objects.get(publication=self.publication, language=language)
         except PublishedGraph.DoesNotExist:
+            if raise_if_missing:
+                raise
             graph = None
 
         return graph
