@@ -15,6 +15,7 @@ from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 
+from django.core.files.images import get_image_dimensions
 from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -1484,6 +1485,7 @@ class FileListDataType(BaseDataType):
         if len(file_type_errors) > 0:
             title = _("Invalid File Type")
             errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
+
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1507,6 +1509,22 @@ class FileListDataType(BaseDataType):
             config = node.config
             limit = config["maxFiles"]
             max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
+
+            images_only = config.get("imagesOnly", False)
+            if images_only and request:
+                for metadata in value:
+                    if not any(localizedString["value"] for localizedString in metadata.get("altText", {}).values()):
+                        errors.append({
+                            "type": "ERROR",
+                            "title": _("Missing alt text"),
+                            "message": _("The image '{0}' is missing an alternative text.").format(metadata["name"]),
+                        })
+                files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
+                for file in files:
+                    width, height = get_image_dimensions(file.file)
+                    if not width or not height:
+                        title = _("Invalid File Type")
+                        errors.append({"type": "ERROR", "message": _("This node allows only images."), "title": title})
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
