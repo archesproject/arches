@@ -4,6 +4,7 @@ define([
     'underscore',
     'arches',
     'views/tree-view',
+    'bindings/clipboard',
 ], function($, ko, _, arches, TreeView) {
     var loading = ko.observable(false);
 
@@ -73,6 +74,7 @@ define([
             this.toggleIds = function() {
                 self.showIds(!self.showIds());
             };
+            this.translations = arches.translations;
             this.showGrid = ko.observable(false);
             this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             TreeView.prototype.initialize.apply(this, arguments);
@@ -248,21 +250,8 @@ define([
         },
         toggleGrid: function(){
             this.showGrid(!this.showGrid());
-        },
-
-        copyNodeId: function(node, e) {
-            function restoreTitle(e) {
-                $(e.target).tooltip('hide') 
-                $(e.target).attr('data-original-title', 'Copy UUID to Clipboard')
-                $(e.target).off('mouseleave', restoreTitle)
-            };
-            $(e.target).attr('data-original-title', 'Copied to Clipboard!')
-            $(e.target).tooltip('show')
-            $(e.target).on('mouseleave', restoreTitle)
-
-            var nodeId = node.nodeid
-            navigator.clipboard.writeText(nodeId);
         }
+
     });
     return GraphTree;
 });
