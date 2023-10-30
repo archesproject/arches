@@ -96,8 +96,8 @@ define([
 
         const createStrObject = str => {
             return {[arches.activeLanguage]: {
-                "value": str,
                 "direction": arches.languages.find(lang => lang.code == arches.activeLanguage).default_direction,
+                "value": str,
             }};
         };
         this.activeLanguage = arches.activeLanguage;
@@ -117,29 +117,29 @@ define([
                     altText: {
                         ...file.altText,
                         [self.activeLanguage]: {
-                            "value": ko.observable(file.altText[self.activeLanguage].value),
                             "direction": ko.observable(file.altText[self.activeLanguage].direction),
+                            "value": ko.observable(file.altText[self.activeLanguage].value),
                         },
                     },
                     title: {
                         ...file.title,
                         [self.activeLanguage]: {
-                            "value": ko.observable(file.title[self.activeLanguage].value),
                             "direction": ko.observable(file.title[self.activeLanguage].direction),
+                            "value": ko.observable(file.title[self.activeLanguage].value),
                         },
                     },
                     attribution: {
                         ...file.attribution,
                         [self.activeLanguage]: {
-                            "value": ko.observable(file.attribution[self.activeLanguage].value),
                             "direction": ko.observable(file.attribution[self.activeLanguage].direction),
+                            "value": ko.observable(file.attribution[self.activeLanguage].value),
                         },
                     },
                     description: {
                         ...file.description,
                         [self.activeLanguage]: {
-                            "value": ko.observable(file.description[self.activeLanguage].value),
                             "direction": ko.observable(file.description[self.activeLanguage].direction),
+                            "value": ko.observable(file.description[self.activeLanguage].value),
                         },
                     },
                 };
