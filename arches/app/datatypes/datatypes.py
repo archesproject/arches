@@ -1513,7 +1513,7 @@ class FileListDataType(BaseDataType):
             images_only = config.get("imagesOnly", False)
             if images_only and request:
                 for metadata in value:
-                    if not metadata.get("altText", ""):
+                    if not any(localizedString["value"] for localizedString in metadata.get("altText", {}).values()):
                         errors.append({
                             "type": "ERROR",
                             "title": _("Missing alt text"),
