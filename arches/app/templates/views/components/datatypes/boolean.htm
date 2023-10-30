@@ -4,18 +4,22 @@
 <!-- ko if: $data.search -->
 {% block search %}
 <div class="col-sm-12">
-    <select class="resources" data-bind="select2Query: { select2Config: {
-        value: searchValue,
-        data: [
-            {id: '', text: $root.translations.selectAnOption},
-            {id: 't', text: trueLabel},
-            {id: 'f', text: falseLabel},
-            {id: 'null', text: $root.translations.hasNoValue},
-            {id: 'not_null', text: $root.translations.hasAnyValue}
-        ],
-        allowClear: true,
-        placeholder: $root.translations.selectAnOption
-    }}"></select>
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label}, 
+        select2Query: { 
+            select2Config: {
+                value: searchValue,
+                data: [
+                    {id: '', text: $root.translations.selectAnOption},
+                    {id: 't', text: trueLabel},
+                    {id: 'f', text: falseLabel},
+                    {id: 'null', text: $root.translations.hasNoValue},
+                    {id: 'not_null', text: $root.translations.hasAnyValue}
+                ],
+                allowClear: true,
+                placeholder: $root.translations.selectAnOption
+        }}">
+    </select>
 </div>
 {% endblock search %}
 <!-- /ko -->

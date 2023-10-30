@@ -13,6 +13,7 @@ define([
             this.options = params.node.config.options;
             this.options.unshift({id:"", selected:true, text:"Select an Option"});
             var filter = params.filterValue();
+            this.node = params.node;
             this.op = ko.observable(filter.op || 'eq');
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {

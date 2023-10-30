@@ -25,19 +25,20 @@
                 <span data-bind="text: $root.translations.type"></span>
             </div>
             <select 
-                class="resources" 
-                tabindex="0" 
+                class="resources"
                 data-bind="
-                    placeholder: $root.translations.dateType,
-                    value: filter.dateNodeId, 
-                    chosen:{ width: '100%' }, 
-                    attr: {id:dateDropdownEleId, 'aria-label': $root.translations.searchDateType} 
+                    select2Query:{ select2Config:{
+                        value: filter.dateNodeId,
+                        dropdownCssClass: 'select2-zindex',
+                        placeholder: $root.translations.dateType,
+                    }}, 
+                    attr: {id:dateDropdownEleId, 'data-label': $root.translations.searchDateType} 
                 "
             >
                 <option data-bind="text: $root.translations.searchAllDates"></option>
-                <!-- ko foreach: { data: graph_models, as: 'graph' } -->
+                <!-- ko foreach: { data: graphModels, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
-                        <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
+                        <!-- ko foreach: { data: $parent.dateNodes, as: 'node' } -->
                             <!-- ko if: graph.graphid === node.graph_id -->
                                 <option data-bind="attr: { value: node.nodeid }, text: node.label"></option>
                             <!-- /ko -->
@@ -52,27 +53,29 @@
             <div class="search-label">
                 <span data-bind="text: $root.translations.within"></span>
             </div>
-            <select 
-                class="resources" 
-                tabindex="0" 
+            <select class="resources"
                 data-bind="
-                    attr: {placeholder: $root.translations.select, 'aria-label': $root.translations.searchDateRange},
-                    value: dateRangeType, 
-                    chosen:{ width: '100%' },
-                    optionsText: 'text',
-                    optionsValue: 'value',
-                    options: [
-                        { text: $root.translations.customDateRange, value: 'custom' },
-                        { text: $root.translations.today, value: 'today' },
-                        { text: $root.translations.lastSevenDays, value: 'last-7' },
-                        { text: $root.translations.lastThirtyDays, value: 'last-30' },
-                        { text: $root.translations.thisWeek, value: 'this-week' },
-                        { text: $root.translations.thisMonth, value: 'this-month' },
-                        { text: $root.translations.thisQuarter, value: 'this-quarter' },
-                        { text: $root.translations.thisYear, value: 'this-year' },
-                    ],
-                "
-            ></select>
+                    attr: {'data-label': $root.translations.searchDateRange},
+                    select2Query:{ 
+                        select2Config: {
+                            value: dateRangeType,
+                            dropdownCssClass: 'select2-zindex',
+                            placeholder: $root.translations.select,
+                            minimumResultsForSearch: -1,
+                            data: [
+                                { text: $root.translations.customDateRange, id: 'custom' },
+                                { text: $root.translations.today, id: 'today' },
+                                { text: $root.translations.lastSevenDays, id: 'last-7' },
+                                { text: $root.translations.lastThirtyDays, id: 'last-30' },
+                                { text: $root.translations.thisWeek, id: 'this-week' },
+                                { text: $root.translations.thisMonth, id: 'this-month' },
+                                { text: $root.translations.thisQuarter, id: 'this-quarter' },
+                                { text: $root.translations.thisYear, id: 'this-year' },
+                            ],
+                        }
+                    }
+                ">
+            </select>
         </div>
 
     </div>

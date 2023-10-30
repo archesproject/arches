@@ -9,7 +9,7 @@ define([
     'bindings/dropzone'
 ], function($, ko, _, arches, Dropzone, uuid, WidgetViewModel) {
     /**
-     * A viewmodel used for domain widgets
+     * A viewmodel used for file widgets
      *
      * @constructor
      * @name FileWidgetViewModel
@@ -29,7 +29,7 @@ define([
 
 
         if (this.form) {
-            $(this.form).on('after-update', function(req, tile) {
+            this.form.on('after-update', function(req, tile) {
                 var hasdata = _.filter(tile.data, function(val, key) {
                     val = ko.unwrap(val);
                     if (val) {

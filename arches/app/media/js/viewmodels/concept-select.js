@@ -82,7 +82,7 @@ define([
             value: self.value,
             clickBubble: true,
             multiple: self.multiple,
-            closeOnSlect: false,
+            closeOnSelect: false,
             placeholder: self.placeholder,
             allowClear: true,
             ajax: {

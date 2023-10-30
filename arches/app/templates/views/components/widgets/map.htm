@@ -3,7 +3,7 @@
 {% load template_tags %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="class: nodeCssClasses">
     <div class="form-group">
         <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -17,14 +17,14 @@
 {% endblock form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko if: summaryDetails.length === 0 -->
-<dd>
+<dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 <!-- ko ifnot: summaryDetails.length === 0  -->
-<dd data-bind="foreach: summaryDetails">
+<dd data-bind="foreach: summaryDetails, class: nodeCssClasses">
     <div style='margin-bottom:2px' data-bind="text: JSON.stringify($data.geometry)"></div>
 </dd>
 <!-- /ko -->
@@ -68,8 +68,7 @@
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.longitudeXCoordinate, 'aria-label': $root.translations.longitudeXCoordinate},
-            value: centerX, 
-            valueUpdate: 'keyup'
+            textInput: centerX
         "
     >
 </div>
@@ -82,8 +81,7 @@
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.latitudeYCoordinate, 'aria-label': $root.translations.latitudeYCoordinate},
-            value: centerY, 
-            valueUpdate: 'keyup'
+            textInput: centerY
         "
     >
 </div>
@@ -98,14 +96,13 @@
         class="form-control input-md widget-input" 
         data-bind="
             attr: {placeholder: $root.translations.zoomLevel, 'aria-label': $root.translations.zoomLevel},
-            value: zoom, 
-            valueUpdate: 'keyup'
+            textInput: zoom
         "
     >
 </div>
 {% endblock config_form %}
 
 {% block display_value %}
-<span data-bind="text: displayValue()"></span>
-<span data-bind="text: $root.translations.features"></span>
+<span data-bind="text: displayValue(), class: nodeCssClasses"></span>
+<span data-bind="text: $root.translations.features, class: nodeCssClasses"></span>
 {% endblock display_value %}
