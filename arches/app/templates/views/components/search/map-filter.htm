@@ -13,16 +13,6 @@
     </span>
 </div>
 {{ block.super }}
-<div class="workbench-card-sidebar-tab" data-bind="onEnterkeyClick, onSpaceClick, click: function() {
-    toggleTab('config');
-}, css: {
-    'active': activeTab() === 'config'
-}">
-    <i class="fa fa-cog"></i>
-    <span class="map-sidebar-text">
-        <span data-bind="text: $root.translations.configure"></span>
-    </span>
-</div>
 {% endblock tabs %}
 
 {% block sidepanel %}
@@ -141,29 +131,6 @@
     </div>
     <!--/ko -->
 
-<!--/ko -->
-<!--ko if: activeTab() === 'config' -->
-<div class="workbench-card-sidepanel-header-container">
-    <h4 class="workbench-card-sidepanel-header" data-bind="onEnterkeyClick, onSpaceClick, click: hideSidePanel">
-        <span data-bind="text: $root.translations.configMapFilter"></span>
-    </h4>
-</div>
-<div class="workbench-card-sidepanel-border"></div>
-<div class="workbench-card-sidepanel-body">
-    <div data-bind="
-                    component: { 
-                        name: 'views/components/simple-switch', 
-                        params: {
-                                value: resultsAutoZoomEnabled, 
-                                config:{ 
-                                    label: $root.translations.mapFilterAutozoomLabel,
-                                    subtitle: ''
-                                }
-                            }
-                        }
-                    ">
-    </div>
-</div>
 <!--/ko -->
 {{ block.super }}
 {% endblock sidepanel %}

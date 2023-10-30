@@ -12,25 +12,15 @@ define([
     'geohash',
     'geojson-extent',
     'uuid',
-    'geojsonhint',
-    'js-cookie'
-], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint, Cookies) {
+    'geojsonhint'
+], function($, _, ko, arches, mapFilterTemplate, BaseFilter, MapComponentViewModel, binFeatureCollection, mapStyles, turf, geohash,  geojsonExtent, uuid, geojsonhint) {
     var componentName = 'map-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
              
             this.dependenciesLoaded = ko.observable(false);
-            this.resultsAutoZoomEnabled = ko.observable(Cookies.get(`${arches.cookiePrefix}-map-auto-zoom`) !== undefined ? Cookies.get(`${arches.cookiePrefix}-map-auto-zoom`) == "true" : arches.mapFilterAutoZoom);
-            this.resultsAutoZoomEnabled.subscribe(function(settingValue) {
-                Cookies.set(`${arches.cookiePrefix}-map-auto-zoom`, settingValue);
-                if(settingValue == true && self.lastResultsBounds !== undefined){
-                    self.mapFitBounds(self.lastResultsBounds, {
-                        padding: 45
-                    }, true);
-                }
-            });
-            this.lastResultsBounds = undefined;
+            this.resultsAutoZoomEnabled = ko.observable(arches.mapFilterAutoZoom);
             this.mapFitBounds = function(bounds, options, force){
                 this.lastResultsBounds = bounds;
                 if(this.resultsAutoZoomEnabled() || force){
@@ -622,9 +612,6 @@ define([
                     padding: 45,
                     maxZoom: maxZoom
                 }, forceFitBounds);
-            }
-            else{
-                this.lastResultsBounds = undefined;
             }
         }
     });

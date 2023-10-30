@@ -85,6 +85,5 @@ def app_settings(request=None):
             "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
             "DEBUG": settings.DEBUG,
-            "SESSION_COOKIE_NAME": settings.SESSION_COOKIE_NAME,
         }
     }
