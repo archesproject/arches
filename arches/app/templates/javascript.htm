@@ -959,7 +959,6 @@
             "label": "{{ concept_collection.label | escapejs }}",
             "id": "{{ concept_collection.id }}"
         },{% endfor %}]'
-        cookie-prefix="{{ app_settings.SESSION_COOKIE_NAME }}"
         export-html-templates='[{% for template in export_html_templates %} "{{ template }}", {% endfor %}]'
         geocoder-default="{{ map_info.geocoder_default }}"
         geocoding-providers='[{% for provider in geocoding_providers %}{
@@ -1033,7 +1032,6 @@
         user-email='{{ user.email }}'
         use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
         version="{{ app_settings.VERSION }}"
-
     ></div>
     {% endblock arches_data %}
 
