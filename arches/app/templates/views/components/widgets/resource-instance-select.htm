@@ -5,7 +5,7 @@
 {% block form %}
 <!--ko let: {self: $data} -->
 <!-- ko ifnot: self.displayOntologyTable -->
-<div class="row" style="margin: 0px;">
+<div class="row" style="margin: 0px;" data-bind="class: nodeCssClasses">
     <div class="col-xs-12 resource-instance-wrapper">
         <select style="width:30%; display:inline-block;"
             data-bind="
@@ -18,7 +18,7 @@
 </div>
 <!-- /ko -->
 <!-- ko if: self.displayOntologyTable -->
-<div class="row widget-wrapper" data-bind="visible: !newResourceInstance()">
+<div class="row widget-wrapper" data-bind="visible: !newResourceInstance(), class: nodeCssClasses">
     <div class="form-group">
         <span class="control-label widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -43,10 +43,10 @@
         <!-- ko if: !!value() && value().length > 5-->
         <div class="rr-widget-filter-panel">
             <div class="list-filter">
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    style="width: 225px; height:28px;" 
+                <input
+                    type="text"
+                    class="form-control"
+                    style="width: 225px; height:28px;"
                     data-bind="
                         attr: {placeholder: $root.translations.filter + '...', 'aria-label': $root.translations.filter}, 
                         textInput: filter
@@ -126,9 +126,9 @@
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                        $data.ontologyProperty, 
-                                                        self.rootOntologyClass, 
-                                                        $data.ontologyClass(), 
+                                                        $data.ontologyProperty,
+                                                        self.rootOntologyClass,
+                                                        $data.ontologyClass(),
                                                         $root.translations.selectAnOntologyProperty
                                                     )
                                                 },
@@ -162,9 +162,9 @@
                                             data-bind="
                                                 select2Query: {
                                                     select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                        $data.inverseOntologyProperty, 
-                                                        $data.ontologyClass(), 
-                                                        self.rootOntologyClass, 
+                                                        $data.inverseOntologyProperty,
+                                                        $data.ontologyClass(),
+                                                        self.rootOntologyClass,
                                                         $root.translations.selectAnOntologyProperty
                                                     )
                                                 },
@@ -233,7 +233,7 @@
         <span data-bind="text: $root.translations.placeholder"></span>
     </div>
     <div class="col-xs-12 pad-no crud-widget-container">
-        <input 
+        <input
             class="form-control input-md widget-input"
             data-bind="
                 attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
@@ -274,14 +274,14 @@
                 </div>
             </div>
         </div>
-    
+
         <div class="rr-widget">
             <!-- ko if: !!value() && value().length > 5-->
             <div class="rr-widget-filter-panel">
                 <div class="list-filter">
-                    <input 
-                        type="text" 
-                        class="form-control" 
+                    <input
+                        type="text"
+                        class="form-control"
                         style="width: 225px; height:28px;"
                         data-bind="
                             attr: {placeholder: $root.translations.filter + '...', 'aria-label': $root.translations.filter},
@@ -294,7 +294,7 @@
                 </div>
             </div>
             <!-- /ko -->
-    
+
             <!-- ko if: relationshipsInFilter().length > 0-->
             <div class="rr-table">
                 <div data-bind='foreach: relationshipsInFilter' style="display: flex; flex-direction: column;">
@@ -346,7 +346,7 @@
                                         <span class="col-xs-12" style="text-align: left;"
                                             data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
                                         </span>
-    
+
                                         <!-- Property -->
                                         <span class="col-xs-12">
                                             <select 
@@ -354,22 +354,22 @@
                                                 data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                            $data.ontologyProperty, 
-                                                            self.rootOntologyClass, 
-                                                            $data.ontologyClass(), 
+                                                            $data.ontologyProperty,
+                                                            self.rootOntologyClass,
+                                                            $data.ontologyClass(),
                                                             $root.translations.selectAnOntologyProperty
                                                         )
                                                     },
                                                     attr: {'aria-labeledby': resourceToRRLabel} ">
                                             </select>
                                         </span>
-    
+
                                         <!-- rr name -->
                                         <span class="col-xs-12"
                                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'"></span>
                                     </div>
                                 </div>
-    
+
                                 <!-- Relationship from rr to instance -->
                                 <div class="row">
                                     <div class="col-xs-12" style="font-weight: bold; margin-bottom:5px;" data-bind="attr: {id: rrToResourceLabel }">
@@ -382,7 +382,7 @@
                                         <span class="col-xs-12" style="text-align: left;"
                                             data-bind="text: $data.resourceName() + ' (' + self.makeFriendly($data.ontologyClass()) + ')'">
                                         </span>
-    
+
                                         <!-- Property -->
                                         <span class="col-xs-12">
                                             <select 
@@ -390,16 +390,16 @@
                                                 data-bind="
                                                     select2Query: {
                                                         select2Config: self.getSelect2ConfigForOntologyProperties(
-                                                            $data.inverseOntologyProperty, 
-                                                            $data.ontologyClass(), 
-                                                            self.rootOntologyClass, 
+                                                            $data.inverseOntologyProperty,
+                                                            $data.ontologyClass(),
+                                                            self.rootOntologyClass,
                                                             $root.translations.selectAnOntologyProperty
                                                         )
                                                     },
                                                     attr: {'aria-labeledby': rrToResourceLabel}">
                                             </select>
                                         </span>
-    
+
                                         <!-- Instance name -->
                                         <span class="col-xs-12"
                                             data-bind="text: self.resourceInstanceDisplayName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'">
@@ -413,11 +413,11 @@
             </div>
             <!-- /ko -->
         </div>
-    
+
         <div data-bind="if: !!value() && value().hasOwnProperty('length') && value().length > 1">
             <div class='file-workbench-filecount' data-bind='text: value().length + $root.translations.relationships'></div>
         </div>
-    
+
     </div>
     <!-- /ko -->
     <!-- /ko -->
@@ -425,15 +425,16 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko foreach: value -->
 <dd>
-    <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+ko.unwrap(resourceId) }" target="_blank"></a>
+    <a data-bind="text: resourceName, attr: { href: $parent.resourceReportUrl+ko.unwrap(resourceId) }
+                  , class: $parent.nodeCssClasses" target="_blank"></a>
 </dd>
 <!-- /ko -->
 <!-- ko if: (!!value() && value().length === 0) || value() === null -->
 <dd>
-    <span data-bind="text: $root.translations.none"></span>
+    <span data-bind="text: $root.translations.none, class: nodeCssClasses"></span>
 </dd>
 <!-- /ko -->
 {% endblock report %}

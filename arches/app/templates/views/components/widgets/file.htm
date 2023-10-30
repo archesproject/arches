@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="class: nodeCssClasses">
     <div class="form-group">
         <span class="control-label widget-input-label" for="" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -54,13 +54,13 @@
                 <div class="file-upload-options">
                     <div class="file-upload-options-grow list-filter">
                     <!--ko if: filesJSON().length > 1-->
-                    
-                        <input 
+
+                        <input
                             data-bind="
                                 attr: {placeholder: $root.translations.findAFile + '...', 'aria-label': $root.translations.findAFile},
                                 textInput: filter
-                            " 
-                            type="text" 
+                            "
+                            type="text"
                             class="file-upload-filter"
                         >
                         <!-- Clear Search -->
@@ -140,11 +140,11 @@
     <span data-bind="text: $root.translations.acceptedFileTypes"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        class="form-control input-md widget-input" 
+    <input
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.exampleFileTypes, 'aria-label': $root.translations.acceptedFileTypes},
-            value: acceptedFiles, 
+            value: acceptedFiles,
             valueUpdate: 'keyup'
         "
     >
@@ -154,9 +154,9 @@
     <span data-bind="text: $root.translations.maxFileSize"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        type="number" 
-        class="form-control input-md widget-input" 
+    <input
+        type="number"
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.maxFileSize, 'aria-label': $root.translations.maxFileSize},
             value: maxFilesize
@@ -167,16 +167,16 @@
 {% endblock config_form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 
 <!-- ko if: uploadedFiles().length === 0 -->
-<dd>
+<dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
 <!-- /ko -->
 
 <!-- ko foreach: reportFiles() -->
-<dd>
+<dd data-bind="class: $parent.nodeCssClasses">
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
@@ -185,7 +185,7 @@
 <!-- /ko -->
 
 <!-- ko if: reportImages().length > 0 -->
-<dd>
+<dd data-bind="class: nodeCssClasses">
     <div id="report-image-grid" class="report-image-grid">
         <!-- ko foreach: reportImages() -->
         <div class="rp-image-grid-item">
@@ -200,5 +200,5 @@
 {% endblock report %}
 
 {% block display_value %}
-<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue()"></span>
+<span data-bind="text: Number.isInteger(displayValue()) ? displayValue() + $root.translations.filesUploaded : displayValue(), class: nodeCssClasses"></span>
 {% endblock display_value %}
