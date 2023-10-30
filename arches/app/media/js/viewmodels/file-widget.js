@@ -114,15 +114,34 @@ define([
                 // Rewrap in observable if needed.
                 return {
                     ...file,
-                    ...['altText', 'title', 'attribution', 'description'].map(attr => {
-                        return {
-                            ...file[attr],
-                            [self.activeLanguage]: {
-                                "value": ko.observable(file[attr][self.activeLanguage].value),
-                                "direction": ko.observable(file[attr][self.activeLanguage].direction),
-                            },
-                        }
-                    }),
+                    altText: {
+                        ...file.altText,
+                        [self.activeLanguage]: {
+                            "value": ko.observable(file.altText[self.activeLanguage].value),
+                            "direction": ko.observable(file.altText[self.activeLanguage].direction),
+                        },
+                    },
+                    title: {
+                        ...file.title,
+                        [self.activeLanguage]: {
+                            "value": ko.observable(file.title[self.activeLanguage].value),
+                            "direction": ko.observable(file.title[self.activeLanguage].direction),
+                        },
+                    },
+                    attribution: {
+                        ...file.attribution,
+                        [self.activeLanguage]: {
+                            "value": ko.observable(file.attribution[self.activeLanguage].value),
+                            "direction": ko.observable(file.attribution[self.activeLanguage].direction),
+                        },
+                    },
+                    description: {
+                        ...file.description,
+                        [self.activeLanguage]: {
+                            "value": ko.observable(file.description[self.activeLanguage].value),
+                            "direction": ko.observable(file.description[self.activeLanguage].direction),
+                        },
+                    },
                 };
             });
 
