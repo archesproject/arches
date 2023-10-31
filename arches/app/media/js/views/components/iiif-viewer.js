@@ -312,7 +312,9 @@ define([
                 url: arches.urls.iiifmanifest,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term, page) {
+                data: function(requestParams) {
+                    let term = requestParams.term || '';
+                    let page = requestParams.page || 1;
                     var data = {
                         start: (page-1)*limit,
                         limit: limit
@@ -321,25 +323,27 @@ define([
                     if (term) data.query = term;
                     return data;
                 },
-                results: function(data, page) {
+                processResults: function(data) {
                     var results = data.results;
                     if (validateUrl(queryTerm)) results.unshift({
                         url: queryTerm,
                         label: queryTerm
                     });
+                    results.forEach((item) => {
+                        item.id = item.url;
+                    });
                     return {
-                        results: results,
-                        more: data.count >= (page*limit)
+                        "results": results,
+                        "pagination": {
+                            "more": data.more
+                        }
                     };
                 }
             },
-            id: function(item) {
-                return item.url;
-            },
-            formatResult: function(item) {
+            templateResult: function(item) {
                 return item.label;
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
                 return item.label;
             },
             clear: function() {
@@ -348,8 +352,8 @@ define([
             isEmpty: ko.computed(function() {
                 return self.manifest() === '' || !self.manifest();
             }, this),
-            initSelection: function() {
-                return;
+            initSelection: function(el, callback) {
+                callback([]);
             }
         };
 

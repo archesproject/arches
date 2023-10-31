@@ -341,11 +341,11 @@
                 <span data-bind="text: $root.translations.selectAManifest + ':'"></span>
             </div>
             <div class="manifest-editor-input">
-                <input class="form-control input-lg widget-input"
-                    data-bind="value: manifest,
-                    select2Query: {
+                <select class="form-control input-lg widget-input"
+                    data-bind="select2Query: {
                         select2Config: manifestSelectConfig
                     }">
+                </select>
             </div>
 
             <div class="install-buttons">
