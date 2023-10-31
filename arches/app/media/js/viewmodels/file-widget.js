@@ -247,9 +247,13 @@ define([
             // Hydrate the metadata fields in place with the active language keys if missing
             const vals = self.value();
             vals.forEach(val => {
-                Object.values(val).filter(innerVal => typeof innerVal === 'object').forEach(i18nObj => {
-                    if (i18nObj[arches.activeLanguage] === undefined) {
-                        i18nObj[arches.activeLanguage] = createStrObject('')[arches.activeLanguage];
+                ['altText', 'title', 'attribution', 'description'].forEach(metadataAttr => {
+                    if (!val[metadataAttr]) {
+                        // Metadata fields missing entirely
+                        val[metadataAttr] = createStrObject('');  // ensures active language
+                    } else if (!val[metadataAttr][arches.activeLanguage]) {
+                        // Active language missing
+                        val[metadataAttr][arches.activeLanguage] = createStrObject('')[arches.activeLanguage];
                     }
                 });
             });
