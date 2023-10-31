@@ -182,6 +182,7 @@ def search_terms(request):
                                     "type": "concept",
                                     "context": top_concept_id,
                                     "context_label": top_concept_label,
+                                    "graphid": "",
                                     "id": i,
                                     "text": result["key"],
                                     "value": concept["key"],
@@ -189,11 +190,13 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
+                    context_label, graphid = get_resource_model_label(result)
                     ret[index].append(
                         {
                             "type": "term",
                             "context": "",
-                            "context_label": get_resource_model_label(result),
+                            "context_label": context_label,
+                            "graphid": graphid,
                             "id": i,
                             "text": result["key"],
                             "value": result["key"],
@@ -210,7 +213,7 @@ def get_resource_model_label(result):
             nodegroup_id = nodegroup["key"]
             node = models.Node.objects.get(nodeid=nodegroup_id)
             graph = node.graph
-        return "{0} - {1}".format(graph.name, node.name)
+        return "{0} - {1}".format(graph.name, node.name), graph.graphid
     else:
         return ""
 
