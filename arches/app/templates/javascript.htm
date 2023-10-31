@@ -987,6 +987,7 @@
         map-default-zoom="{{ map_info.zoom | unlocalize }}"
         map-default-min-zoom="{{ map_info.map_min_zoom | unlocalize }}"
         map-default-max-zoom="{{ map_info.map_max_zoom | unlocalize }}"
+        map-filter-auto-zoom="{{ map_info.map_filter_auto_zoom | unlocalize }}"
         map-layers='[{% for map_layer in map_layers %}{
             "maplayerid": "{{ map_layer.maplayerid }}",
             "name": "{{ map_layer.name }}",
@@ -1037,6 +1038,7 @@
         user-email='{{ user.email }}'
         use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
         version="{{ app_settings.VERSION }}"
+
     ></div>
     {% endblock arches_data %}
 
