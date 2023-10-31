@@ -803,8 +803,10 @@ class EDTFDataType(BaseDataType):
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    group_query = Bool()
+                    group_query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
+                    group_query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    query.must(group_query)
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
@@ -1538,6 +1540,11 @@ class FileListDataType(BaseDataType):
             errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
             for f in tile.data[str(nodeid)]:
@@ -2097,6 +2104,11 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         node = models.Node.objects.get(nodeid=nodeid)
@@ -2231,6 +2243,11 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append(error_message)
 
         return errors
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def pre_tile_save(self, tile, nodeid):
         relationships = tile.data[nodeid]
