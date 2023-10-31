@@ -61,13 +61,18 @@ class SearchResultsExporter(object):
         self.output = {}
         self.set_precision = GeoUtils().set_precision
 
-    def insert_subcard_below_parent_card(self, main_card_list, sub_card_list):
-        for sub_card in sub_card_list:
-            parent_obj = sub_card.nodegroup.parentnodegroup_id
-            for main_card in main_card_list:
-                if main_card.nodegroup_id == parent_obj:
-                    index_number = main_card_list.index(main_card) + 1
-                    main_card_list.insert(index_number, sub_card)
+    def insert_subcard_below_parent_card(self, main_card_list, sub_card_list, subcards_added):
+        for main_card in main_card_list:
+            sub_cards_to_add = []
+            for sub_card in sub_card_list:
+                if main_card.nodegroup_id == sub_card.nodegroup.parentnodegroup_id:
+                    if sub_card not in main_card_list:
+                        sub_cards_to_add.append(sub_card)
+                        subcards_added[0] = True
+            index_number = main_card_list.index(main_card) + 1
+            main_card_list[index_number:index_number] = sub_cards_to_add
+            
+        
 
     def return_ordered_header(self, graphid, export_type):
 
@@ -93,11 +98,15 @@ class SearchResultsExporter(object):
 
         subcard_list_with_sort.sort(key=lambda x: x.sortorder, reverse=True)
 
-        self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort)
+        # Loop down through the levels of subcards, 'till no more sub-levels may be added.
+        subcards_added = [True]
+        while subcards_added[0]:
+            subcards_added = [False]
+            self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort, subcards_added)
 
-        # Cards in subcard_list_with_sort are added after cards with no sort
+            # Cards in subcard_list_with_sort are added after cards with no sort
 
-        self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort)
+            self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort, subcards_added)
 
         # Create a list of nodes within each card and order them according to sort
         # order then add them to the main list of
