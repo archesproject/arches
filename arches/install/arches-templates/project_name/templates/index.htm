@@ -196,7 +196,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Slider - End -->
 
                 <!-- Down button -->
-                <a href="#info-block-1" class="down-button" aria-label="Go to content"><i class="fa fa-angle-down down-button-icon"></i></a>
+                <a href="#info-block-1" class="down-button" aria-label="{% trans 'Go to content' %}"><i class="fa fa-angle-down down-button-icon"></i></a>
 
             </section>
             <!-- End Intro Section -->
@@ -525,8 +525,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     dots: true,
                     autoplay: true,
                     autoplaySpeed: 6000,
-                    prevArrow:"<button type='button' class='slick-prev pull-left' aria-label='Go to previous slide'><i class='fa fa-chevron-left' aria-hidden='true'></i></button>",
-                    nextArrow:"<button type='button' class='slick-next pull-right' aria-label='Go to next slide'><i class='fa fa-chevron-right' aria-hidden='true'></i></button>"
+                    prevArrow:`<button type='button' class='slick-prev pull-left' aria-label="{% trans 'Go to previous slide' %}"><i class='fa fa-chevron-left' aria-hidden='true'></i></button>`,
+                    nextArrow:`<button type='button' class='slick-next pull-right' aria-label="{% trans 'Go to next slide' %}"><i class='fa fa-chevron-right' aria-hidden='true'></i></button>`
                 });
 
                 var ViewModel = function () {
