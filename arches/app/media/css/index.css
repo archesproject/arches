@@ -1,4 +1,5 @@
 @import url(../node_modules/chosen-js/chosen.css);
+@import url(./index-slider-legacy.css);
 
 html, body {
     overflow-x: hidden;
@@ -600,12 +601,12 @@ footer .footer-links {
 
 .down-button-icon {
     font-size: 2.1rem;
-    height: 50px;
-    width: 50px;
+    height: 44px;
+    width: 45px;
     align-items: center;
     justify-content: center;
     opacity: .7;
-    line-height: 50px;
+    line-height: 47px;
 }
 
 .data-type-icon {

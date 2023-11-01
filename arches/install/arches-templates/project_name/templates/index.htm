@@ -166,37 +166,37 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <!-- Slider - Start -->
                 <div class="home-slider">
                     <div class="slide-img-container">
-                        <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="null">
-                        <div class="slide-caption">
-                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                            <p>{% trans "zzA web and mobile platform for" %}</p>
-                            <p>{% trans "managing your most important resource information" %}</p>
-                        </div>
-                        <div class="slide-img-attribution">{% trans "Image courtesy of Luis Alfonso Orellana" %}</div>
-                    </div>
-                    <div class="slide-img-container">
-                        <img src="{% webpack_static 'img/landing/bhutan_tigersnest_lr.jpg' %}" alt="null">
+                        <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="" aria-describedby="slide1-attribution">
                         <div class="slide-caption">
                             <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
-                        <div class="slide-img-attribution">{% trans "Taktsang Palphug Monastery (also known as Paro Takstang or Tiger's Nest Monastery), Bhutan" %}</div>
+                        <div id="slide1-attribution" class="slide-img-attribution">{% trans "Image courtesy of Luis Alfonso Orellana" %}</div>
                     </div>
                     <div class="slide-img-container">
-                        <img src="{% webpack_static 'img/landing/potala_palace.jpg' %}" alt="null">
+                        <img src="{% webpack_static 'img/landing/bhutan_tigersnest_lr.jpg' %}" alt="" aria-describedby="slide2-attribution">
                         <div class="slide-caption">
                             <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
-                        <div class="slide-img-attribution">{% trans "Potala Palace in Lhasa, Tibet" %}</div>
+                        <div id="slide2-attribution" class="slide-img-attribution">{% trans "Taktsang Palphug Monastery (also known as Paro Takstang or Tiger's Nest Monastery), Bhutan" %}</div>
+                    </div>
+                    <div class="slide-img-container">
+                        <img src="{% webpack_static 'img/landing/potala_palace.jpg' %}" alt="" aria-describedby="slide3-attribution">
+                        <div class="slide-caption">
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <p>{% trans "A web and mobile platform for" %}</p>
+                            <p>{% trans "managing your most important resource information" %}</p>
+                        </div>
+                        <div id="slide3-attribution" class="slide-img-attribution">{% trans "Potala Palace in Lhasa, Tibet" %}</div>
                     </div>
                 </div>
                 <!-- Slider - End -->
 
                 <!-- Down button -->
-                <a href="#info-block-1" class="down-button"><i class="fa fa-angle-down down-button-icon"></i></a>
+                <a href="#info-block-1" class="down-button" aria-label="Go to content"><i class="fa fa-angle-down down-button-icon"></i></a>
 
             </section>
             <!-- End Intro Section -->
@@ -436,6 +436,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'knockout': "{% webpack_static 'node_modules/knockout/build/output/knockout-latest' %}",
             'bootstrap': "{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min' %}",
             'one-app': "{% webpack_static 'plugins/one.app' %}",
+            'themepunch-tools': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min' %}",
+            'themepunch-revolution': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution' %}",
+            'revolution-slider': "{% webpack_static 'plugins/revolution-slider' %}",
             'slick': "{% webpack_static 'plugins/slick/slick.min' %}",
         },
         shim: {
@@ -451,6 +454,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'one-app': {
                 deps: ['jquery'],
             },
+            'themepunch-tools': {
+                deps: ['jquery'],
+            },
+            'themepunch-revolution': {
+                deps: ['jquery'],
+            },
+            'revolution-slider': {
+                deps: ['jquery'],
+            },
             'slick': {
                 deps: ['jquery'],
             }
@@ -462,6 +474,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'knockout',
             'bootstrap',
             'one-app',
+            'themepunch-tools',
+            'themepunch-revolution',
+            'revolution-slider',
             'slick',
             'bindings/chosen',
             'bindings/key-events-click',
@@ -506,13 +521,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 //slider
                 $('.home-slider').slick({
-                    accessibility: true,
                     arrowsPlacement: 'split',
                     dots: true,
                     autoplay: true,
                     autoplaySpeed: 6000,
-                    prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fa fa-chevron-left' aria-hidden='true'></i></button>",
-                    nextArrow:"<button type='button' class='slick-next pull-right'><i class='fa fa-chevron-right' aria-hidden='true'></i></button>"
+                    prevArrow:"<button type='button' class='slick-prev pull-left' aria-label='Go to previous slide'><i class='fa fa-chevron-left' aria-hidden='true'></i></button>",
+                    nextArrow:"<button type='button' class='slick-next pull-right' aria-label='Go to next slide'><i class='fa fa-chevron-right' aria-hidden='true'></i></button>"
                 });
 
                 var ViewModel = function () {
