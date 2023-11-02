@@ -5,6 +5,7 @@ define([
 ], function(ko, _, fileListDatatypeTemplate) {
     var name = 'file-list-datatype-config';
     const viewModel = function(params) {
+        const self = this;
         this.config = params.config;
         this.search = params.search;
 
@@ -19,6 +20,7 @@ define([
             params.config.imagesOnly(val);
         });
 
+        params.config.imagesOnly.subscribe((val) => self.imagesOnly(val));
         this.activated = params.config.activateMax;
     };
 
