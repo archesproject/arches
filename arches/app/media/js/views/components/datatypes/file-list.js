@@ -5,6 +5,7 @@ define([
 ], function(ko, _, fileListDatatypeTemplate) {
     var name = 'file-list-datatype-config';
     const viewModel = function(params) {
+        const self = this;
         this.config = params.config;
         this.search = params.search;
          
@@ -12,7 +13,9 @@ define([
         this.maxFiles.subscribe(function(val) {
             var int = parseInt(val);
             if(int > 0) { params.config.maxFiles(int); }
+            else { self.maxFiles(1); }
         });
+        params.config.maxFiles.subscribe((val) => self.maxFiles(val));
         this.activated = params.config.activateMax;
     };
 
