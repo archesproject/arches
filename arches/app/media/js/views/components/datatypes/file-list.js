@@ -15,12 +15,7 @@ define([
             if(int > 0) { params.config.maxFiles(int); }
         });
 
-        this.imagesOnly = ko.observable(params.config.imagesOnly());
-        this.imagesOnly.subscribe(function(val) {
-            params.config.imagesOnly(val);
-        });
-
-        params.config.imagesOnly.subscribe((val) => self.imagesOnly(val));
+        this.imagesOnly = params.config.imagesOnly;
         this.activated = params.config.activateMax;
     };
 
