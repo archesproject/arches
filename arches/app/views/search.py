@@ -21,6 +21,7 @@ from datetime import datetime
 import logging
 import os
 import json
+import sys
 from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -260,7 +261,13 @@ def export_results(request):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
-        with NamedTemporaryFile() as tmp:
+        
+        if sys.platform != "win32":
+            tmp = NamedTemporaryFile()
+        else:
+            tmp = NamedTemporaryFile(dir=settings.TILE_EXCEL_EXPORT_TEMP_DIRECTORY, delete=settings.TILE_EXCEL_EXPORT_TEMP_FILE_DELETE)
+                    
+        with tmp:
             wb.save(tmp.name)
             tmp.seek(0)
             stream = tmp.read()
