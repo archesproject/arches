@@ -262,10 +262,10 @@ def export_results(request):
         export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
         
-        if sys.platform != "win32":
-            tmp = NamedTemporaryFile()
-        else:
+        if sys.platform == "win32":
             tmp = NamedTemporaryFile(dir=settings.TILE_EXCEL_EXPORT_TEMP_DIRECTORY, delete=settings.TILE_EXCEL_EXPORT_TEMP_FILE_DELETE)
+        else:
+            tmp = NamedTemporaryFile()
                     
         with tmp:
             wb.save(tmp.name)
