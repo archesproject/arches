@@ -94,7 +94,7 @@ define([
             return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
         };
 
-        const createStrObject = str => {
+        this.createStrObject = str => {
             return {[arches.activeLanguage]: {
                 "direction": arches.languages.find(lang => lang.code == arches.activeLanguage).default_direction,
                 "value": str,
@@ -151,10 +151,10 @@ define([
                 _.map(filesForUpload, function(file, i) {
                     return {
                         name: file.name,
-                        altText: beforeChangeMetadataSnapshot[i]?.altText ?? createStrObject(''),
-                        title: beforeChangeMetadataSnapshot[i]?.title ?? createStrObject(''),
-                        attribution: beforeChangeMetadataSnapshot[i]?.attribution ?? createStrObject(''),
-                        description: beforeChangeMetadataSnapshot[i]?.description ?? createStrObject(''),
+                        altText: beforeChangeMetadataSnapshot[i]?.altText ?? self.createStrObject(''),
+                        title: beforeChangeMetadataSnapshot[i]?.title ?? self.createStrObject(''),
+                        attribution: beforeChangeMetadataSnapshot[i]?.attribution ?? self.createStrObject(''),
+                        description: beforeChangeMetadataSnapshot[i]?.description ?? self.createStrObject(''),
                         accepted: file.accepted,
                         height: file.height,
                         lastModified: file.lastModified,
@@ -203,7 +203,7 @@ define([
                 && a.attribution[this.activeLanguage].value === b.title[this.activeLanguage].value
                 && a.description[this.activeLanguage].value === b.title[this.activeLanguage].value
             );
-        }
+        };
 
         this.metadataIsEmpty = (metadata) => {
             return !metadata.altText[this.activeLanguage].value
@@ -250,10 +250,10 @@ define([
                 ['altText', 'title', 'attribution', 'description'].forEach(metadataAttr => {
                     if (!val[metadataAttr]) {
                         // Metadata fields missing entirely
-                        val[metadataAttr] = createStrObject('');  // ensures active language
+                        val[metadataAttr] = self.createStrObject('');  // ensures active language
                     } else if (!val[metadataAttr][arches.activeLanguage]) {
                         // Active language missing
-                        val[metadataAttr][arches.activeLanguage] = createStrObject('')[arches.activeLanguage];
+                        val[metadataAttr][arches.activeLanguage] = self.createStrObject('')[arches.activeLanguage];
                     }
                 });
             });
