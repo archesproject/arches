@@ -5,6 +5,7 @@ define([
 ], function(ko, _, fileListDatatypeTemplate) {
     var name = 'file-list-datatype-config';
     const viewModel = function(params) {
+        const self = this;
         this.config = params.config;
         this.search = params.search;
 
@@ -14,11 +15,7 @@ define([
             if(int > 0) { params.config.maxFiles(int); }
         });
 
-        this.imagesOnly = ko.observable(params.config.imagesOnly());
-        this.imagesOnly.subscribe(function(val) {
-            params.config.imagesOnly(val);
-        });
-
+        this.imagesOnly = params.config.imagesOnly;
         this.activated = params.config.activateMax;
     };
 
