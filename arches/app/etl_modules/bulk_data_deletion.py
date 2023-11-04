@@ -15,7 +15,6 @@ from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
 import arches.app.tasks as tasks
 from arches.app.utils.index_database import index_resources_by_transaction
-from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 
 logger = logging.getLogger(__name__)
@@ -104,15 +103,16 @@ class BulkDataDeletion(BaseBulkEditor):
         for resourceid in smaple_resource_ids:
             resource = Resource.objects.get(pk=resourceid)
             resource.tiles = list(TileModel.objects.filter(resourceinstance=resourceid).filter(nodegroup_id=nodegroup_id))
-            lbg = LabelBasedGraph.from_resource(
+            lbg = LabelBasedGraphV2.from_resource(
                 resource=resource,
                 compact=True,
                 hide_empty_nodes=True,
                 hide_hidden_nodes=True
             )
-            for data in lbg.values():
+            for data in lbg["resource"].values():
                 for datum in data:
-                    sample_data.append(datum)
+                    tile_values = {k: v["@display_value"] for k, v in datum.items()}
+                    sample_data.append(tile_values)
             if len(sample_data) >= 5:
                 break
 
