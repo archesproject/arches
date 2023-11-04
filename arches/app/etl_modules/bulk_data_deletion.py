@@ -190,7 +190,7 @@ class BulkDataDeletion(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": "Please, enter a valid search url "}
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
                 }
         if resourceids:
             resourceids = tuple(resourceids)
@@ -222,7 +222,7 @@ class BulkDataDeletion(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": "Please, enter a valid search url "}
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
                 }
 
         use_celery_bulk_delete = True

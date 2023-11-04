@@ -318,7 +318,7 @@ class BulkStringEditor(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": "Please, enter a valid search url "}
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
                 }
         if resourceids:
             resourceids = tuple(resourceids)
@@ -340,7 +340,7 @@ class BulkStringEditor(BaseBulkEditor):
         except TypeError:
             return {
                 "success": False,
-                "data": {"title": _("Invalid Search Url"), "message": "Please, enter a valid search url "}
+                "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
             }
 
         return_list = []
