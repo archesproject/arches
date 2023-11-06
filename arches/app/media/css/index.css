@@ -1,4 +1,5 @@
 @import url(../node_modules/chosen-js/chosen.css);
+@import url(./index-slider-legacy.css);
 
 html, body {
     overflow-x: hidden;
@@ -61,6 +62,20 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     margin-bottom: 0px;
 }
 
+.navbar-header {
+    position: relative;
+}
+
+.navbar-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    float: none;
+    padding: 0;
+    margin: 0 10px;
+}
+
 .navbar-nav>li>a {
     color: #fff;
     font-size: 0.68rem;
@@ -73,7 +88,8 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     border-radius: 2px;
 }
 
-.v5-splash-navbar .navbar-nav>li>a:hover {
+.v5-splash-navbar .navbar-nav>li>a:hover,
+.v5-splash-navbar .navbar-nav>li>a:focus {
     background: #000;
     color: #13ce67;
 }
@@ -149,17 +165,6 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     border-radius: 0px;
 }
 
-/*.v5-splash-nav {
-    position: fixed;
-    top: 0px;
-    width: 100%;
-    z-index: 500;
-    background-color: #041B33;
-    border: none;
-    padding: 12px 120px 12px 120px;
-    border-radius: 0px;
-}*/
-
 .cons-splash-nav {
     z-index: 500;
     background-color: rgba(0, 0, 0, 0);
@@ -211,27 +216,6 @@ ul.v5-splash-list > li > a:focus, ul.v5-splash-list > li > a:hover {
 
 ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-color: rgba(0, 0, 0, 0.174);
-}
-
-.v5-splash-caption {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px!important;
-    left: 10vw!important;
-}
-
-.v5-splash-caption h2 {
-    font-size: 2.65rem;
-    font-weight: 300;
-    color: #fff;
-    padding-bottom: 5px;
-}
-
-.v5-splash-caption p {
-    font-size: 1.39rem;
-    font-weight: 300;
-    color: #fff;
-    line-height: 0.7;
-    padding: 0px 20px;
 }
 
 .navbar-brand-v5 {
@@ -393,16 +377,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
     background-image: linear-gradient(transparent, rgba(0,0,0,.45));
 }
 
-.image-attribution {
-    position: absolute; 
-    bottom: 1vh;
-    right: 15px; 
-    color: #bbb; 
-    padding: 10px; 
-    background: rgba(0,0,0,.5);
-    font-size: 0.61rem;
-}
-
 .app-info-block {
     min-height: 600px;
     padding: 80px 150px 140px 150px;
@@ -421,12 +395,6 @@ ul.cons-splash-list > li > a:focus, ul.cons-splash-list > li > a:hover {
 
 .app-info-block:nth-child(even) {
     background: #f8f8f8;
-}
-
-.app-info-block.intro-section h2 {
-    color: #fff;
-    font-size: 2.64rem;
-    padding: 10px 20px;
 }
 
 .app-info-block-header {
@@ -551,36 +519,28 @@ footer .footer-links {
     padding-bottom: 40px;
 }
 
-.vertical-nav-container-background {
+.vertical-nav-container {
     position: fixed;
-    right: 21px;
-    top: 325px;
-    z-index: 2500;
+    right: 16px;
+    top: 31%;
+    z-index: 3000;
     width: 22px;
+    padding: 4px;
     background: #041B33;
     border: 1px solid #000;
     border-radius: 5px;
-    height: 150px;
-    opacity: .85
-}
-
-.vertical-nav-container {
-    position: fixed;
-    right: 25px;
-    top: 345px;
-    z-index: 3000;
-    padding: 5px;
 }
 
 .vertical-nav-list {
     list-style: none;
+    padding-left: 0;
+    margin-top: 14px;
 }
 
 .vertical-nav-list li {
     width: 20px;
     height: 20px;
     position: relative;
-    right: -2px;
     margin-bottom: 2px;
 }
 
@@ -591,7 +551,6 @@ footer .footer-links {
     background: #aaa;
     margin-bottom: 12px;
     position: absolute;
-    left: 10px;
 }
 
 .vertical-nav-list-link.is-selected {
@@ -628,24 +587,26 @@ footer .footer-links {
 
 .down-button {
     position: absolute;
-    bottom: 10vh;
-    left: calc(50% - 20px);
+    bottom: 12vh;
+    left: calc(50% - 26px);
     z-index: 100;
     color: #fff;
     background: #2a2a2a;
     border: 1px solid #fff;
     border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    text-align: center;
 }
 
 .down-button-icon {
     font-size: 2.1rem;
-    padding-top: 4px;
-    padding-left: 10px;
-    height: 50px;
-    width: 50px;
+    height: 44px;
+    width: 45px;
     align-items: center;
     justify-content: center;
     opacity: .7;
+    line-height: 47px;
 }
 
 .data-type-icon {
@@ -736,36 +697,12 @@ footer .footer-links {
     padding: 0 10px;
 }
 
-.tp-caption {
-    position: absolute;
-    top: auto !important;
-    bottom: 20vh;
+body.dark p, li, .auth-options li a {
+    color: #eee;
+    font-size: 0.61rem;
 }
 
-@media screen and (max-height: 640px) {
-    .down-button {
-        bottom: 11.7vh;
-    }
-    .down-button-icon {
-        font-size: 2.6rem;
-        padding-top: 1vh;
-        padding-left: 2vh;
-        height: 7vh;
-        width: 7vh;
-    }
-}
-
-@media screen and (max-height: 640px) {
-    .down-button {
-        display: none;
-    }
-}
-
-@media (min-width: 768px) {
-    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
-        color: #eee;
-    }
-}
+/* ------------------------------Media queries------------------------------ */
 
 @media (min-width: 768px) and (max-width: 1024px) {
     .navbar-collapse.collapse {
@@ -804,33 +741,6 @@ footer .footer-links {
          margin-right: 10px; 
          margin-top: 10px;
     }
-    .v5-splash-caption {
-        left: 0!important;
-        width: 100%;
-        padding: 10px !important;
-    }
-    .v5-splash-caption p {
-        font-size: 0.6rem;
-    }
-    .app-info-block.intro-section h2 {
-        font-size: 0.87rem;
-    }
-    .image-attribution {
-        right: 0;
-    }
-    .tp-caption h2 {
-        font-size: 0.87rem!important;
-    }
-    .tp-caption p {
-        font-size: 0.6rem!important;
-    }
-}
-
-@media screen and (max-height: 375px) {
-    .v5-splash-caption, .image-attribution {
-        /*display: none;*/
-        padding: 0 10px !important;
-    }
 }
 
 @media (max-width: 768px) {
@@ -856,10 +766,6 @@ footer .footer-links {
 }
 
 @media (max-width: 1000px) {
-    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
-        padding-left: 12px;
-        margin-top: 14px;
-    }
     ul .auth-options {
         position: inherit;
         float:left;
@@ -867,12 +773,6 @@ footer .footer-links {
         list-style: none;
         margin-top: 0px;
         margin-right: -142px;
-    }
-    .app-info-block.intro-section h2 {
-        font-size: 5vw;
-    }
-    .v5-splash-caption p {
-        font-size: 3vw;
     }
 }
 
@@ -891,9 +791,4 @@ footer .footer-links {
     .copyright-container {
         padding: 30px 70px;
     }
-}
-
-body.dark p, li, .auth-options li a {
-    color: #eee;
-    font-size: 0.61rem;
 }

@@ -123,7 +123,7 @@
                 <span data-bind="text: $root.translations.editGeoJson"></span>
             </button>
             |
-            <button data-bind="click: fitToAggregationBounds">
+            <button data-bind="click: zoomToAllFeaturesHandler">
                 <i class="fa fa-search map-card-feature-edit"></i>
                 <span data-bind="text: $root.translations.zoomToAllFeatures"></span>
             </button>
@@ -161,7 +161,7 @@
             <span data-bind="text: $root.translations.acceptGeoJson"></span>
         </button>
     </div>
-    <!-- /ko -->
+    <!--/ko -->
 
 <!--/ko -->
 {{ block.super }}
