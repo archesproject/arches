@@ -126,8 +126,8 @@ class Migration(migrations.Migration):
         $$ language plpgsql;
     """
 
-    add_update_relationship_with_graphids = """
-        CREATE OR REPLACE PROCEDURE __arches_update_relationship_with_graphids() AS
+    add_update_resource_x_resource_with_graphids = """
+        CREATE OR REPLACE PROCEDURE __arches_update_resource_x_resource_with_graphids() AS
         $$
             UPDATE resource_x_resource x
             SET resourceinstancefrom_graphid = r.graphid
@@ -143,8 +143,8 @@ class Migration(migrations.Migration):
         LANGUAGE sql;
     """
 
-    remove_update_relationship_with_graphids = """
-        DROP PROCEDURE IF EXISTS __arches_update_relationship_with_graphids();
+    remove_update_resource_x_resource_with_graphids = """
+        DROP PROCEDURE IF EXISTS __arches_update_resource_x_resource_with_graphids();
     """
 
     operations = [
@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
             revert_refresh_tile_resource_relationship_function,
         ),
         migrations.RunSQL(
-            add_update_relationship_with_graphids,
-            remove_update_relationship_with_graphids
+            add_update_resource_x_resource_with_graphids,
+            remove_update_resource_x_resource_with_graphids
         ),
     ]
