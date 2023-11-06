@@ -14,7 +14,10 @@ logger = logging.getLogger(__name__)
 def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
     with connection.cursor() as cursor:
         try:
-            cursor.execute("""CALL __arches_prepare_bulk_load();""")
+            cursor.execute("""
+                alter table tiles disable trigger __arches_check_excess_tiles_trigger;
+                alter table tiles disable trigger __arches_trg_update_spatial_attributes;
+            """)
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
             saved = cursor.fetchone()[0]
             if saved:
@@ -66,10 +69,14 @@ def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
             }
         finally:
             try:
-                cursor.execute("""CALL __arches_complete_bulk_load(%s);""",[finalize_import])
+                cursor.execute("""
+                    alter table tiles enable trigger __arches_check_excess_tiles_trigger;
+                    alter table tiles enable trigger __arches_trg_update_spatial_attributes;
+                ;""")
 
                 if finalize_import:
                     cursor.execute("""SELECT __arches_refresh_spatial_views();""")
+                    cursor.execute("""SELECT __arches_update_relationship_with_graphids();""")
                     refresh_successful = cursor.fetchone()[0]
                     if not refresh_successful:
                         raise Exception('Unable to refresh spatial views')

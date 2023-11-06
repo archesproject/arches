@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10120_replace_whole_word_bulk_edit'),
+        ('models', '9333_file_type_image_config'),
     ]
 
     update_refresh_tile_resource_relationship_function = """
@@ -126,51 +126,26 @@ class Migration(migrations.Migration):
         $$ language plpgsql;
     """
 
-    update_check_excess_tiles_trigger = """
-        DROP PROCEDURE IF EXISTS __arches_complete_bulk_load();
-        CREATE OR REPLACE PROCEDURE __arches_complete_bulk_load(refresh_relations_graphids boolean) AS
+    add_update_relationship_with_graphids = """
+        CREATE OR REPLACE PROCEDURE __arches_update_relationship_with_graphids() AS
         $$
-            DECLARE
-                cardinality_violations bigint;
-            BEGIN
-                ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
-                ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
-                IF refresh_relations_graphids THEN
-                    UPDATE resource_x_resource x
-                    SET resourceinstancefrom_graphid = r.graphid
-                    FROM resource_instances r
-                    WHERE r.resourceinstanceid = x.resourceinstanceidfrom
-                    AND x.resourceinstancefrom_graphid is null;
-                    UPDATE resource_x_resource x
-                    SET resourceinstanceto_graphid = r.graphid
-                    FROM resource_instances r
-                    WHERE r.resourceinstanceid = x.resourceinstanceidto
-                    AND x.resourceinstanceto_graphid is null;
-                END IF;
-            END
+            UPDATE resource_x_resource x
+            SET resourceinstancefrom_graphid = r.graphid
+            FROM resource_instances r
+            WHERE r.resourceinstanceid = x.resourceinstanceidfrom
+            AND x.resourceinstancefrom_graphid is null;
+            UPDATE resource_x_resource x
+            SET resourceinstanceto_graphid = r.graphid
+            FROM resource_instances r
+            WHERE r.resourceinstanceid = x.resourceinstanceidto
+            AND x.resourceinstanceto_graphid is null;
         $$
-        language plpgsql;
+        LANGUAGE sql;
     """
 
-    restore_check_excess_tiles_trigger = """
-        DROP PROCEDURE IF EXISTS __arches_complete_bulk_load(boolean);
-        CREATE OR REPLACE PROCEDURE __arches_complete_bulk_load() AS
-        $$
-            DECLARE
-                cardinality_violations bigint;
-            BEGIN
-                alter table tiles enable trigger __arches_check_excess_tiles_trigger;
-                alter table tiles enable trigger __arches_trg_update_spatial_attributes;
-            END
-        $$
-        language plpgsql;
+    remove_update_relationship_with_graphids = """
+        DROP PROCEDURE IF EXISTS __arches_update_relationship_with_graphids();
     """
-
-
-    operations = [
-        migrations.RunSQL(update_check_excess_tiles_trigger, restore_check_excess_tiles_trigger),
-    ]
-
 
     operations = [
         migrations.RunSQL(
@@ -178,7 +153,7 @@ class Migration(migrations.Migration):
             revert_refresh_tile_resource_relationship_function,
         ),
         migrations.RunSQL(
-            update_check_excess_tiles_trigger,
-            restore_check_excess_tiles_trigger
+            add_update_relationship_with_graphids,
+            remove_update_relationship_with_graphids
         ),
     ]
