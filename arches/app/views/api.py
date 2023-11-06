@@ -872,6 +872,18 @@ class Card(APIBase):
         return JSONResponse(context, indent=4)
 
 
+class Plugins(View):
+    def get(self, request, plugin_id=None):
+        if plugin_id:
+            plugins = models.Plugin.objects.filter(pk=plugin_id)
+        else:
+            plugins = models.Plugin.objects.all()
+        
+        plugins = [plugin for plugin in plugins if self.request.user.has_perm("view_plugin", plugin)]
+
+        return JSONResponse(plugins)
+            
+
 class SearchExport(View):
     def get(self, request):
         from arches.app.search.search_export import SearchResultsExporter  # avoids circular import
