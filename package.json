@@ -91,6 +91,7 @@
         "js-cookie": "node_modules/js-cookie/src/js.cookie",
         "select2": "node_modules/select2/select2",
         "select-woo": "node_modules/select-woo/dist/js/selectWoo.full",
+        "select-woo-src": "node_modules/select-woo/src/js/select2",
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap.min",
         "jquery-ui": "node_modules/jqueryui/jquery-ui.min",
         "backbone": "node_modules/backbone/backbone-min",
