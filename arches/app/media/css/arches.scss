@@ -777,6 +777,25 @@ h4.branch-xl-title {
     margin-top: 25px;
 }
 
+.etl-module-component .delete-type-container{
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0px;
+}
+.etl-module-component .delete-type-button{
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 10px 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #ddd;
+    margin-right: 12px;
+}
+.etl-module-component .delete-type-button.active {
+    font-weight: bold;
+}
+
 .tabbed-workflow-footer, .etl-module-footer {
     background-color: #445769;
     border-top: 1px solid #0E2031;
@@ -13699,11 +13718,15 @@ ul.select2-choices:after {
     font-weight: 400;
 }
 
-.etl-module-body section h3 {
+.etl-module-body section h3, .etl-module-subtitle {
     font-size: 15px;
     color: #565656;
-    font-weight: 300;
+    font-weight: normal;
     margin: 10px 0px 5px 0px;
+}
+
+.etl-module-body section .switch-small {
+    margin: 0px 8px 3px;
 }
 
 .etl-module-body section .etl-module-component-block {
