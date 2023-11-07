@@ -95,7 +95,7 @@ class ManifestManagerView(View):
                         },
                     }
                 ],
-                "label": "",
+                "label": f"{file_name}",
                 "license": "TBD",
                 "thumbnail": {
                     "@id": thumbnail_id,
