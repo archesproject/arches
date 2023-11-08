@@ -72,8 +72,8 @@ class Resource(models.ResourceInstance):
         self.descriptor_function = None
         self.serialized_graph = None
         self.node_datatypes = None
-        self.descriptors = {}
-        self.name = {}
+        # self.descriptors = {}
+        # self.name = {}
 
 
     def get_serialized_graph(self):
@@ -114,6 +114,12 @@ class Resource(models.ResourceInstance):
             any key:value pairs needed to control the behavior of a custom descriptor function
 
         """
+
+        if self.descriptors is None:
+            self.descriptors = {}
+
+        if self.name is None:
+            self.name = {}
 
         requested_language = None
 

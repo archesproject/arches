@@ -537,11 +537,14 @@ class Tile(models.TileModel):
                         node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
                     except TypeError: #will catch if serialized_graph is None
                         node = models.Node.objects.get(nodeid=nodeid)
+
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid, index=index)
-                if index:
+
                     resource = Resource.objects.get(pk=self.resourceinstance_id)
                     resource.save_descriptors()
+
+                if index:
                     self.index(resource=resource)
             except IntegrityError as e:
                 logger.error(e)
