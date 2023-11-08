@@ -172,6 +172,11 @@ class ImportSingleCsv(BaseImportModule):
                 )
             self.loadid = loadid  # currently redundant, but be certain
             response = save_to_tiles(userid, loadid, multiprocessing=False)
+            cursor.execute("""SELECT __arches_update_relationship_with_graphids();""")
+            cursor.execute("""SELECT __arches_refresh_spatial_views();""")
+            refresh_successful = cursor.fetchone()[0]
+            if not refresh_successful:
+                raise Exception('Unable to refresh spatial views')
             return response
         else:
             with connection.cursor() as cursor:

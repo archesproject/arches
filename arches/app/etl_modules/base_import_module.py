@@ -175,6 +175,11 @@ class BaseImportModule:
             if len(result["validation"]["data"]) == 0:
                 self.loadid = loadid  # currently redundant, but be certain
                 save_to_tiles(userid, loadid, multiprocessing=False)
+                cursor.execute("""SELECT __arches_update_relationship_with_graphids();""")
+                cursor.execute("""SELECT __arches_refresh_spatial_views();""")
+                refresh_successful = cursor.fetchone()[0]
+                if not refresh_successful:
+                    raise Exception('Unable to refresh spatial views')
             else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",

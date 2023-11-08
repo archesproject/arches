@@ -450,7 +450,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         if data_updated["success"]:
             self.loadid = loadid  # currently redundant, but be certain
-            data_updated = save_to_tiles(userid, loadid, finalize_import=False)
+            save_to_tiles(userid, loadid, multiprocessing=False)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:

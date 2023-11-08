@@ -11,16 +11,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
+def save_to_tiles(userid, loadid, multiprocessing=True):
     with connection.cursor() as cursor:
         try:
-            cursor.execute("""
-                alter table tiles disable trigger __arches_check_excess_tiles_trigger;
-                alter table tiles disable trigger __arches_trg_update_spatial_attributes;
-            """)
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
             saved = cursor.fetchone()[0]
-            if saved:
+            if not saved:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    ("failed", datetime.now(), loadid),
+                )
+                return {"success": False, "data": "failed"}
+            else:
                 cursor.execute(
                     """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
                         FROM load_staging l, resource_instances r, graphs g
@@ -51,8 +53,8 @@ def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
 
                 number_of_import = json.dumps({ "number_of_import": [{ "name": k, "total": v["total"], "tiles": v["tiles"] } for k, v in number_of_resources.items()]})
                 cursor.execute(
-                    """UPDATE load_event SET load_details = load_details || %s::JSONB WHERE loadid = %s""",
-                    (number_of_import, loadid),
+                    """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
+                    ("completed", datetime.now(), number_of_import, loadid),
                 )
 
         except (IntegrityError, ProgrammingError) as e:
@@ -67,63 +69,34 @@ def save_to_tiles(userid, loadid, finalize_import=True, multiprocessing=True):
                 "title": _("Failed to complete load"),
                 "message": _("Unable to insert record into staging table"),
             }
-        finally:
-            try:
-                cursor.execute("""
-                    alter table tiles enable trigger __arches_check_excess_tiles_trigger;
-                    alter table tiles enable trigger __arches_trg_update_spatial_attributes;
-                ;""")
 
-                if finalize_import:
-                    cursor.execute("""SELECT __arches_refresh_spatial_views();""")
-                    cursor.execute("""SELECT __arches_update_relationship_with_graphids();""")
-                    refresh_successful = cursor.fetchone()[0]
-                    if not refresh_successful:
-                        raise Exception('Unable to refresh spatial views')
-            except Exception as e:
-                logger.exception(e)
-                cursor.execute(
-                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("unindexed", datetime.now(), True, True, loadid),
-                )
-
-        if saved:
+        try:
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=multiprocessing, recalculate_descriptors=True)
+            user = User.objects.get(id=userid)
+            user_email = getattr(user, "email", "")
+            user_firstname = getattr(user, "first_name", "")
+            user_lastname = getattr(user, "last_name", "")
+            user_username = getattr(user, "username", "")
+            cursor.execute(
+                """
+                    UPDATE edit_log e
+                    SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email, user_username) = (r.name ->> %s, %s, %s, %s, %s, %s)
+                    FROM resource_instances r
+                    WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
+                    AND transactionid = %s
+                """,
+                (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, user_username, loadid),
+            )
+            cursor.execute(
+                """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
+                ("indexed", datetime.now(), True, True, loadid),
+            )
+            return {"success": True, "data": "indexed"}
+        except Exception as e:
+            logger.exception(e)
             cursor.execute(
                 """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                ("completed", datetime.now(), loadid),
+                ("unindexed", datetime.now(), loadid),
             )
-            try:
-                index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
-                user = User.objects.get(id=userid)
-                user_email = getattr(user, "email", "")
-                user_firstname = getattr(user, "first_name", "")
-                user_lastname = getattr(user, "last_name", "")
-                user_username = getattr(user, "username", "")
-                cursor.execute(
-                    """
-                        UPDATE edit_log e
-                        SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email, user_username) = (r.name ->> %s, %s, %s, %s, %s, %s)
-                        FROM resource_instances r
-                        WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
-                        AND transactionid = %s
-                    """,
-                    (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, user_username, loadid),
-                )
-                cursor.execute(
-                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, loadid),
-                )
-                return {"success": True, "data": "indexed"}
-            except Exception as e:
-                logger.exception(e)
-                cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                    ("unindexed", datetime.now(), loadid),
-                )
-                return {"success": False, "data": "saved"}
-        else:
-            cursor.execute(
-                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                ("failed", datetime.now(), loadid),
-            )
-            return {"success": False, "data": "failed"}
+            return {"success": False, "data": "saved"}
+
