@@ -72,8 +72,6 @@ class Resource(models.ResourceInstance):
         self.descriptor_function = None
         self.serialized_graph = None
         self.node_datatypes = None
-        # self.descriptors = {}
-        # self.name = {}
 
 
     def get_serialized_graph(self):
