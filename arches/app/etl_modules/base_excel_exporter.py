@@ -1,5 +1,6 @@
 from datetime import datetime
 from io import BytesIO
+import json
 import zipfile
 from openpyxl.writer.excel import save_virtual_workbook
 from django.core.files import File as DjangoFile
@@ -78,8 +79,8 @@ class BaseExcelExporter:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "validated", self.moduleid, datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, complete, status, load_details, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, "validated", json.dumps({"graph": graph_name}), self.moduleid, datetime.now(), self.userid),
             )
 
         if use_celery:

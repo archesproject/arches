@@ -786,6 +786,8 @@
         delete-resource-count='(resource) => {return {% trans "${resource} resources will be deleted" as deleteResourceCount %} `{{ deleteResourceCount|escapejs }}` }'
         delete-tiles='{% trans "Delete Tiles" as deleteTiles %} "{{ deleteTiles|escapejs }}"'
         delete-resources='{% trans "Delete Resources" as deleteResources %} "{{ deleteResources|escapejs }}"'
+        is-being-prepared='{% trans "is being prepared" as isBeingPrepared %} "{{ isBeingPrepared|escapejs }}"'
+        resources-are-being-exported='{% trans "resources are being exported" as resourcesAreBeingExported %} "{{ resourcesAreBeingExported|escapejs }}"'
         tiles-to-be-deleted='{% trans "Tiles To Be Deleted" as tilesToBeDeleted %} "{{ tilesToBeDeleted|escapejs }}"'
         no-data-to-delete='{% trans "No data to delete from the above selection" as noDataToDelete %} "{{ noDataToDelete|escapejs }}"'
         following-resources-be-deleted='{% trans "The following resources will be deleted" as followingResourcesBeDeleted %} "{{ followingResourcesBeDeleted|escapejs }}"'
