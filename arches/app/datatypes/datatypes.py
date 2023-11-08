@@ -284,7 +284,7 @@ class StringDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         language = None
         try:
-            regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
+            regex = re.compile(r"(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
             match = regex.match(value)
             if match is not None:
                 language = match.groups()[1]
