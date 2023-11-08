@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 def save_to_tiles(userid, loadid, multiprocessing=True):
     with connection.cursor() as cursor:
+        saved = False
         try:
+            cursor.execute("""
+                ALTER TABLE TILES DISABLE TRIGGER __arches_check_excess_tiles_trigger;
+                ALTER TABLE TILES DISABLE TRIGGER __arches_trg_update_spatial_attributes;
+            """)
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
             saved = cursor.fetchone()[0]
             if not saved:
@@ -56,7 +61,6 @@ def save_to_tiles(userid, loadid, multiprocessing=True):
                     """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
                     ("completed", datetime.now(), number_of_import, loadid),
                 )
-
         except (IntegrityError, ProgrammingError) as e:
             logger.error(e)
             cursor.execute(
@@ -69,6 +73,11 @@ def save_to_tiles(userid, loadid, multiprocessing=True):
                 "title": _("Failed to complete load"),
                 "message": _("Unable to insert record into staging table"),
             }
+        finally:
+            cursor.execute("""
+                ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
+                ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
+            """)
 
         try:
             index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=multiprocessing, recalculate_descriptors=True)
