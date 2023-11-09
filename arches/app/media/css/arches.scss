@@ -12012,7 +12012,7 @@ a.filter-tools:hover {
                 cursor: pointer;
                 font-size: 1.4rem;
                 font-weight: 550;
-                line-height: 1.2;
+                line-height: 1.4;
             }
             .edge-node-graph-name {
                 font-size: 1.3rem;
@@ -12023,6 +12023,7 @@ a.filter-tools:hover {
                     cursor: pointer;
                     color: steelblue;
                     display: inline-block;
+                    font-size: 1.4rem;
                     i {
                         padding-right: 4px;
                     }
@@ -12117,12 +12118,17 @@ a.filter-tools:hover {
     }
     .relationships-list {
         height: calc(100% - 185px);
-        border: 1px solid rgb(221, 221, 221);
+        // border: 1px solid rgb(221, 221, 221);
         overflow-y: auto;
         .relationships-list-item {
+            &:last-child{
+                border-bottom: 1px solid #e9e9e9;
+            }
+            border-top: 1px solid #e9e9e9;
+            border-left: 1px solid #e9e9e9;
+            border-right: 1px solid #e9e9e9;
             padding: 8px;
             font-size: 1.1em;
-            border-bottom: 1px solid #e9e9e9;
             .relationships-list-item-type {
                 font-size: 1.3rem;
                 color: #777;
