@@ -74,6 +74,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Image configuration of file-list datatype
 - Perfomance Improvements
 - Support for compiling Vue components
+- Display of file thumbnails for formats other than images
 
 ## 7.6 LTS - Release date: June 15, 2024
 - Activity stream edit logs
