@@ -2,11 +2,13 @@
 {% load i18n %}
 
 <div class="relative" style="overflow-y: scroll;">
-    <div class="close-popup-panel-container" tabindex="0" role="button" id="search-export-close-btn"
-        data-bind="onEnterkeyClick, onSpaceClick, click: function(){selectedPopup(''); $root.shiftFocus('#search-export-open-btn');},
+    <div class="close-popup-panel-container">
+        <span class="close-popup-panel" tabindex="0" role="button" id="search-export-close-btn" 
+            data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function(){selectedPopup(''); $root.shiftFocus('#search-export-open-btn');},
             attr: {'aria-label': $root.translations.closeExportSearchResults},
-    ">
-        <span class="close-popup-panel" data-bind="text: $root.translations.exportSearchResults"></span>
+            text: $root.translations.exportSearchResults">
+        </span>
     </div>
     <hr class="title-underline">
 
