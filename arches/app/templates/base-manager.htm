@@ -438,6 +438,17 @@
                         </li>
                         {% endif %}
 
+                        {% if nav.report_view %}
+                        <li>
+                            <a href="{% url 'resource_report' resourceid %}" class="ep-tools ep-tools-right"
+                                data-bind="click:function () { navigate('{% url 'resource_report' resourceid %}') }" aria-label="{% trans 'View Report' %}">
+                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "View Report" %}">
+                                    <i class="ion-android-document"></i>
+                                </div>
+                            </a>
+                        </li>
+                        {% endif %}
+
                         {% if nav.print %}
                         <li>
                             <button class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }" aria-label="{% trans 'Print the page' %}">
@@ -446,15 +457,6 @@
                                 </div>
                             </button>
                         </li>
-                        {% endif %}
-
-                        {% if nav.report_view %}
-                        <a href="{% url 'resource_report' resourceid %}" class="ep-tools ep-tools-right"
-                            data-bind="click:function () { navigate('{% url 'resource_report' resourceid %}') }" aria-label="{% trans 'View Report' %}">
-                            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "View Report" %}">
-                                <i class="ion-android-document"></i>
-                            </div>
-                        </a>
                         {% endif %}
 
                         {% if nav.help %}
