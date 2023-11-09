@@ -93,7 +93,8 @@ require([
         var functionsToSave = [];
         viewModel.loading(true);
         viewModel.appliedFunctionList.items().forEach(function(fn){
-            if(fn.dirty() || !fn.function.component()){
+            if (fn.dirty() || !fn.function.component()
+                || (viewModel.selectedFunction() && _.contains(savedFunctions(), viewModel.selectedFunction().function_id) === false)) {
                 functionsToSave.push(fn.toJSON());
             }
         });
