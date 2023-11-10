@@ -71,6 +71,22 @@
     </h4>
     <!-- ko if: ko.unwrap(loadDetails) -->
     <div class="branch-csv-etl-load-summmary">
+        <!-- ko ifnot: ['failed','indexed'].includes(selectedLoadEvent().status) -->
+        <!-- ko if: loadDetails.graph && !loadDetails.number_of_resources -->
+        <div class="etl-loading-metadata-value">
+            <span  data-bind="text: loadDetails.graph + ' ' + $root.translations.isBeingPrepared"></span>
+            <i class="fa fa-spin fa-spinner"></i>    
+        </div>
+        <!-- /ko -->
+        <!-- ko if: loadDetails.number_of_resources -->
+        <div class="etl-loading-metadata-value">
+            <span  data-bind="text: loadDetails.number_of_resources + ' ' + loadDetails.graph + ' ' + $root.translations.resourcesAreBeingExported"></span>
+            <i class="fa fa-spin fa-spinner"></i>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: loadDetails.zipfile -->
         <div class="summary-header">
             <span data-bind="text: $root.translations.downloadExportedZipFile"></span>
         </div>
@@ -112,8 +128,9 @@
             <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRelatedFilesInZip + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_files"></span>
         </div>
+        <!-- /ko-->
     </div>
-    <!--/ko-->
+    <!-- /ko-->
 </div>
 {% endblock etl_status %}
 
