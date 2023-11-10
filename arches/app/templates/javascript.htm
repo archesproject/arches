@@ -224,6 +224,7 @@
         multiplier-if-date-is-approximate='{% trans "Multiplier if Date is Approximate (~)" as multiplierIfDateIsApproximate %} "{{ multiplierIfDateIsApproximate|escapejs }}"'
         multiplier-if-both='{% trans "Multiplier if Both (? and ~)" as multiplierIfBoth %} "{{ multiplierIfBoth|escapejs }}"'
         maximum-number-of-files='{% trans "Maximum Number of Files" as maximumNumberOfFiles %} "{{ maximumNumberOfFiles|escapejs }}"'
+        images-only='{% trans "Allow images only?" as imagesOnly %} "{{ imagesOnly|escapejs }}"'
         related-node='{% trans "Related Node" as relatedNode %} "{{ relatedNode|escapejs }}"'
         relationship-to-node='{% trans "Relationship to Node" as relationshipToNode %} "{{ relationshipToNode|escapejs }}"'
         subtitle='{% trans "Subtitle" as subtitle %} "{{ subtitle|escapejs }}"'
@@ -320,7 +321,6 @@
         search-date-range='{% trans "Select a date range to search" as searchDateRange %} "{{ searchDateRange|escapejs }}"'
         time-filter='{% trans "Time Filter" as timeFilter %} "{{ timeFilter|escapejs }}"'
         close-time-filter='{% trans "Close Time Filter" as closeTimeFilter %} "{{ closeTimeFilter|escapejs }}"'
-        date-interval='{% trans "Date Interval" as dateInterval %} "{{ dateInterval|escapejs }}"'
         minimum-date='{% trans "Minimum Date" as minimumDate %} "{{ minimumDate|escapejs }}"'
         maximum-date='{% trans "Maximum Date" as maximumDate %} "{{ maximumDate|escapejs }}"'
         date-format='{% trans "Date Format" as dateFormat %} "{{ dateFormat|escapejs }}"'
@@ -503,9 +503,11 @@
         files-uploaded='{% trans "files uploaded" as filesUploaded %} "{{ filesUploaded|escapejs }}"'
         max-file-size='{% trans "Max File Size (mb)" as maxFileSize %} "{{ maxFileSize|escapejs }}"'
         example-file-types='{% trans "example: .jpg, .png, .txt" as exampleFileTypes %} "{{ exampleFileTypes|escapejs }}"'
+        example-image-types='{% trans "example: .jpg, .png" as exampleImageTypes %} "{{ exampleImageTypes|escapejs }}"'
         valid-image-formats='{% trans "Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored" as validImageFormats %} "{{ validImageFormats|escapejs }}"'
         accepted-image-formats='{% trans "Accepted formats: .jpg, .png, .tiff" as acceptedImageFormats %} "{{ acceptedImageFormats|escapejs }}"'
         accepted-file-types='{% trans "Accepted File Types" as acceptedFileTypes %} "{{ acceptedFileTypes|escapejs }}"'
+        accepted-file-types-images-only='{% trans "Accepted Image Types" as acceptedFileTypesImagesOnly %} "{{ acceptedFileTypesImagesOnly|escapejs }}"'
         show-all-files='{% trans "Show all files" as showAllFiles %} "{{ showAllFiles|escapejs }}"'
         number-of-files-shown='{% trans "Number of Files Shown" as numberOfFiles %} "{{ numberOfFiles|escapejs }}"'
         show-first-five-files='{% trans "Show first 5 files" as showFirstFiveFiles %} "{{ showFirstFiveFiles|escapejs }}"'
@@ -724,6 +726,9 @@
         canvas='{% trans "Canvas" as canvas %} "{{ canvas|escapejs }}"'
         manage-image-service='{% trans "Manage Image Service" as manageImageService %} "{{ manageImageService|escapejs }}"'
         title='{% trans "Title" as title %} "{{ title|escapejs }}"'
+        alternative-text='{% trans "Alternative text" as altText %} "{{ altText|escapejs }}"'
+        alt-text-help='{% trans "Concise statement that assistive technology can pronounce to convey the meaning of the file" as altTextHelp %} "{{ altTextHelp|escapejs }}"'
+        additional-metadata='{% trans "Additional metadata" as additionalMetadata %} "{{ additionalMetadata|escapejs }}"'
         description='{% trans "Description" as description %} "{{ description|escapejs }}"'
         attribution='{% trans "Attribution" as attribution %} "{{ attribution|escapejs }}"'
         attribution-logo='{% trans "Attribution Logo" as attributionLogo %} "{{ attributionLogo|escapejs }}"'
@@ -1064,6 +1069,7 @@
         map-default-zoom="{{ map_info.zoom | unlocalize }}"
         map-default-min-zoom="{{ map_info.map_min_zoom | unlocalize }}"
         map-default-max-zoom="{{ map_info.map_max_zoom | unlocalize }}"
+        map-filter-auto-zoom="{{ map_info.map_filter_auto_zoom | unlocalize }}"
         map-layers='[{% for map_layer in map_layers %}{
             "maplayerid": "{{ map_layer.maplayerid }}",
             "name": "{{ map_layer.name }}",
@@ -1114,6 +1120,7 @@
         user-email='{{ user.email }}'
         use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
         version="{{ app_settings.VERSION }}"
+
     ></div>
     {% endblock arches_data %}
 

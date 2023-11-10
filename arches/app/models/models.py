@@ -481,13 +481,15 @@ class GraphModel(models.Model):
         else:
             return True
 
-    def get_published_graph(self, language=None):
+    def get_published_graph(self, language=None, raise_if_missing=False):
         if not language:
             language = translation.get_language()
 
         try:
             graph = PublishedGraph.objects.get(publication=self.publication, language=language)
         except PublishedGraph.DoesNotExist:
+            if raise_if_missing:
+                raise
             graph = None
 
         return graph
@@ -1691,6 +1693,7 @@ class ETLModule(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
+    reversible = models.BooleanField(default=True)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
     helptemplate = models.TextField(blank=True, null=True)

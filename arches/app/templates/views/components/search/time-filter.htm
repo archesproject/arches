@@ -1,13 +1,11 @@
 {% load i18n %}
 <div class="time-search-container relative" style="overflow-y: scroll;">
-
     <div class="close-popup-panel-container time-filter-title">
-        
         <span class="close-popup-panel" tabindex="0" role="button" id="time-filter-close-btn"
             data-bind="onEnterkeyClick, onSpaceClick, 
                 click: function(){selectedPopup(''); $root.shiftFocus('#time-filter-open-btn');},
                 attr: {'aria-label': $root.translations.closeTimeFilter},
-                text: $root.translations.dateInterval,
+                text: $root.translations.timeFilter,
         "></span>
         <div class="btn-group">
             <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" data-bind="click: function () { clear(); }"> 

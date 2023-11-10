@@ -70,6 +70,7 @@ define([
                         self.formData.delete('file-list_' + self.node.nodeid);
                     }
                 }
+                self.beforeChangeMetadataSnapshot({});
             });
         }
         this.acceptedFiles.subscribe(function(val) {
@@ -93,13 +94,67 @@ define([
             return '<span>' + parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + '</span> ' + sizes[i];
         };
 
+        const createStrObject = str => {
+            return {[arches.activeLanguage]: {
+                "direction": arches.languages.find(lang => lang.code == arches.activeLanguage).default_direction,
+                "value": str,
+            }};
+        };
+        this.activeLanguage = arches.activeLanguage;
+
+        this.beforeChangeMetadataSnapshot = ko.observable({});
+        this.standaloneObservable = ko.observableArray();
+
         this.filesJSON = ko.computed(function() {
             var filesForUpload = self.filesForUpload();
-            var uploadedFiles = self.uploadedFiles();
-            return ko.toJS(uploadedFiles.concat(
+            const uploadedFiles = self.uploadedFiles().map(file => {
+                if (ko.isObservable(file.title[self.activeLanguage].value)) {
+                    return file;
+                }
+                // Rewrap in observable if needed.
+                return {
+                    ...file,
+                    altText: {
+                        ...file.altText,
+                        [self.activeLanguage]: {
+                            "direction": ko.observable(file.altText[self.activeLanguage].direction),
+                            "value": ko.observable(file.altText[self.activeLanguage].value),
+                        },
+                    },
+                    title: {
+                        ...file.title,
+                        [self.activeLanguage]: {
+                            "direction": ko.observable(file.title[self.activeLanguage].direction),
+                            "value": ko.observable(file.title[self.activeLanguage].value),
+                        },
+                    },
+                    attribution: {
+                        ...file.attribution,
+                        [self.activeLanguage]: {
+                            "direction": ko.observable(file.attribution[self.activeLanguage].direction),
+                            "value": ko.observable(file.attribution[self.activeLanguage].value),
+                        },
+                    },
+                    description: {
+                        ...file.description,
+                        [self.activeLanguage]: {
+                            "direction": ko.observable(file.description[self.activeLanguage].direction),
+                            "value": ko.observable(file.description[self.activeLanguage].value),
+                        },
+                    },
+                };
+            });
+
+            var standaloneObservable = self.standaloneObservable();  // for triggering update
+            var beforeChangeMetadataSnapshot = self.beforeChangeMetadataSnapshot();
+            return uploadedFiles.concat(
                 _.map(filesForUpload, function(file, i) {
                     return {
                         name: file.name,
+                        altText: beforeChangeMetadataSnapshot[i]?.altText ?? createStrObject(''),
+                        title: beforeChangeMetadataSnapshot[i]?.title ?? createStrObject(''),
+                        attribution: beforeChangeMetadataSnapshot[i]?.attribution ?? createStrObject(''),
+                        description: beforeChangeMetadataSnapshot[i]?.description ?? createStrObject(''),
                         accepted: file.accepted,
                         height: file.height,
                         lastModified: file.lastModified,
@@ -114,7 +169,7 @@ define([
                         error: file.error
                     };
                 })
-            ));
+            );
         }).extend({throttle: 100});
 
         this.filesJSON.subscribe(function(value) {
@@ -138,6 +193,44 @@ define([
             }
         });
 
+        this.equalMetadata = (a, b) => {
+            if (!a || !b) {
+                return false;
+            }
+            return (
+                a.altText[this.activeLanguage].value === b.altText[this.activeLanguage].value
+                && a.title[this.activeLanguage].value === b.title[this.activeLanguage].value
+                && a.attribution[this.activeLanguage].value === b.title[this.activeLanguage].value
+                && a.description[this.activeLanguage].value === b.title[this.activeLanguage].value
+            );
+        }
+
+        this.metadataIsEmpty = (metadata) => {
+            return !metadata.altText[this.activeLanguage].value
+                && !metadata.title[this.activeLanguage].value
+                && !metadata.attribution[this.activeLanguage].value
+                && !metadata.description[this.activeLanguage].value
+        };
+
+        this.filesJSON.subscribe(function(value) {
+            // Preserve current metadata for yet-to-be-uploaded files
+            value.filter(
+                file => file.file_id === null
+                // Don't take a snapshot of the unsaved metadata if we're deleting it.
+                && self.filesForUpload().find(f => f.name === file.name)
+            ).forEach((file, i) => {
+                const { altText, title, attribution, description } = file;
+                const metadata = { altText, title, attribution, description };
+                if (self.metadataIsEmpty(metadata)) {
+                    return;
+                }
+                if (!self.equalMetadata(self.beforeChangeMetadataSnapshot()[i], metadata)) {
+                    self.beforeChangeMetadataSnapshot()[i] = metadata;
+                    self.standaloneObservable.push(Math.random());
+                }
+            });
+        }, this, 'beforeChange');
+
         this.getFileUrl = function(url){
             url = ko.unwrap(url);
             var httpRegex = /^https?:\/\//;
@@ -151,14 +244,27 @@ define([
         };
 
         if (Array.isArray(self.value())) {
-            this.uploadedFiles(self.value());
+            // Hydrate the metadata fields in place with the active language keys if missing
+            const vals = self.value();
+            vals.forEach(val => {
+                ['altText', 'title', 'attribution', 'description'].forEach(metadataAttr => {
+                    if (!val[metadataAttr]) {
+                        // Metadata fields missing entirely
+                        val[metadataAttr] = createStrObject('');  // ensures active language
+                    } else if (!val[metadataAttr][arches.activeLanguage]) {
+                        // Active language missing
+                        val[metadataAttr][arches.activeLanguage] = createStrObject('')[arches.activeLanguage];
+                    }
+                });
+            });
+            this.uploadedFiles(vals);
         }
         this.filter = ko.observable("");
         this.filteredList = ko.computed(function() {
             var arr = [], lowerName = "", filter = self.filter().toLowerCase();
             if(filter) {
                 self.filesJSON().forEach(function(f, i) {
-                    lowerName = f.name.toLowerCase();
+                    lowerName = ko.unwrap(f.name).toLowerCase();
                     if(lowerName.includes(filter)) { arr.push(self.filesJSON()[i]); }
                 });
             }
@@ -171,12 +277,13 @@ define([
         this.removeFile = function(file) {
             var filePosition;
             self.filesJSON().forEach(function(f, i) { if (f.file_id === file.file_id) { filePosition = i; } });
+            self.shiftMetadata(filePosition);
             var newfilePosition = filePosition === 0 ? 1 : filePosition - 1;
             var filesForUpload = self.filesForUpload();
             var uploadedFiles = self.uploadedFiles();
             if (file.file_id) {
                 file = _.find(uploadedFiles, function(uploadedFile) {
-                    return file.file_id ===  ko.unwrap(uploadedFile.file_id);
+                    return ko.unwrap(file.file_id) === ko.unwrap(uploadedFile.file_id);
                 });
                 self.uploadedFiles.remove(file);
             } else {
@@ -204,6 +311,53 @@ define([
         this.uniqueidClass = ko.computed(function() {
             return "unique_id_" + self.unique_id;
         });
+
+        this.metadataDrawerCollapsedStatus = ko.observable({});  // 0-indexed. true = collapsed
+        this.toggleDropdown = (index) => {
+            const drawer = $(`.file-metadata-additional-${self.unique_id}${index}`)[0];
+            if (!drawer) {
+                self.metadataDrawerCollapsedStatus({
+                    ...self.metadataDrawerCollapsedStatus(),
+                    [index]: true,
+                });
+                return;
+            }
+
+            self.metadataDrawerCollapsedStatus({
+                ...self.metadataDrawerCollapsedStatus(),
+                [index]: drawer.className.includes('collapse in'),
+            });
+        };
+
+        self.shiftMetadata = function(filePosition) {
+            const newToggles = {};
+            var someDrawerWasOpenAfterRemovedPosition = false;
+            for (const [key, val] of Object.entries(self.metadataDrawerCollapsedStatus())) {
+                const keyAsInt = Number.parseInt(key);
+                if (keyAsInt < filePosition) {
+                    newToggles[keyAsInt] = val;
+                } else if (keyAsInt !== filePosition && !someDrawerWasOpenAfterRemovedPosition) {
+                    newToggles[keyAsInt - 1] = val;
+                    if (val) {
+                        // Only the first of these seems to work (bootstrap bug?)
+                        // So set a flag to ensure we close subsequent drawers.
+                        someDrawerWasOpenAfterRemovedPosition = true;
+                    }
+                }
+            }
+            self.metadataDrawerCollapsedStatus(newToggles);
+
+            const newMetadata = {};
+            for (const [key, val] of Object.entries(self.beforeChangeMetadataSnapshot())) {
+                const keyAsInt = Number.parseInt(key);
+                if (keyAsInt < filePosition) {
+                    newMetadata[keyAsInt] = val;
+                } else if (keyAsInt !== filePosition) {
+                    newMetadata[keyAsInt - 1] = val;
+                }
+            }
+            self.beforeChangeMetadataSnapshot(newMetadata);
+        }
 
         this.dropzoneOptions = {
             url: "arches.urls.root",
@@ -240,6 +394,7 @@ define([
                 self.dropzone.removeAllFiles(true);
                 self.uploadedFiles.removeAll();
                 self.filesForUpload.removeAll();
+                self.beforeChangeMetadataSnapshot({});
             }
         };
 

@@ -109,8 +109,12 @@
                                 'aria-controls': filter.componentname + '-popup-tabpanel'
                             }
                         ">
-                            <i data-bind="css: filter.icon"></i>
-                            <p data-bind="text: filter.name"></p>
+                            <div data-placement="auto" data-toggle="tooltip" 
+                                data-bind="attr: {'data-original-title': filter.name}
+                            ">
+                                <i data-bind="css: filter.icon"></i>
+                                <p data-bind="text: filter.name"></p>
+                            </div>
                         </button>
                         {% endif %}
                         <!-- /ko -->
