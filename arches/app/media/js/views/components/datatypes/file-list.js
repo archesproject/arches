@@ -13,9 +13,11 @@ define([
         this.maxFiles.subscribe(function(val) {
             var int = parseInt(val);
             if(int > 0) { params.config.maxFiles(int); }
+            else { self.maxFiles(1); }
         });
 
         this.imagesOnly = params.config.imagesOnly;
+        params.config.maxFiles.subscribe((val) => self.maxFiles(val));
         this.activated = params.config.activateMax;
     };
 
