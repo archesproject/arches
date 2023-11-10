@@ -7,12 +7,14 @@ define([
     'views/components/workbench',
     'templates/views/components/iiif-popup.htm',
     'templates/views/components/iiif-viewer.htm',
+    'select-woo-src/utils',
+    'select-woo-src/data/array',
     'leaflet-iiif',
     'leaflet-fullscreen',
     'leaflet-side-by-side',
     'bindings/select2-query',
     'bindings/leaflet'
-], function($, ko, koMapping, L, arches, WorkbenchViewmodel, iiifPopup, iiifViewerTemplate) {
+], function($, ko, koMapping, L, arches, WorkbenchViewmodel, iiifPopup, iiifViewerTemplate, selectWooUtils, selectWooArrayAdapter) {
     var IIIFViewerViewmodel = function(params) {
         var self = this;
         var abortFetchManifest;
@@ -289,6 +291,8 @@ define([
                             canvas.thumbnail = canvas.thumbnail["@id"];
                         else if (canvas.images && canvas.images[0] && canvas.images[0].resource)
                             canvas.thumbnail = canvas.images[0].resource["@id"];
+                        canvas.id = self.getCanvasService(canvas);
+                        canvas.text = canvas.label;
                         canvases.push(canvas);
                     });
                 }
@@ -312,7 +316,9 @@ define([
                 url: arches.urls.iiifmanifest,
                 dataType: 'json',
                 quietMillis: 250,
-                data: function(term, page) {
+                data: function(requestParams) {
+                    let term = requestParams.term || '';
+                    let page = requestParams.page || 1;
                     var data = {
                         start: (page-1)*limit,
                         limit: limit
@@ -321,68 +327,62 @@ define([
                     if (term) data.query = term;
                     return data;
                 },
-                results: function(data, page) {
+                processResults: function(data) {
                     var results = data.results;
                     if (validateUrl(queryTerm)) results.unshift({
                         url: queryTerm,
                         label: queryTerm
                     });
+                    results.forEach((item) => {
+                        item.id = item.url;
+                    });
                     return {
-                        results: results,
-                        more: data.count >= (page*limit)
+                        "results": results,
+                        "pagination": {
+                            "more": data.more
+                        }
                     };
                 }
             },
-            id: function(item) {
-                return item.url;
-            },
-            formatResult: function(item) {
+            templateResult: function(item) {
                 return item.label;
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
                 return item.label;
-            },
-            clear: function() {
-                self.manifest('');
-            },
-            isEmpty: ko.computed(function() {
-                return self.manifest() === '' || !self.manifest();
-            }, this),
-            initSelection: function() {
-                return;
             }
+        };
+
+        var CustomDataAdapterClass = function(){
+            return {};
+        };
+
+        var CustomDataAdapter = selectWooUtils.Decorate(selectWooArrayAdapter, CustomDataAdapterClass);
+        CustomDataAdapter.prototype.current = function(callback){
+            const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == this.options.options.value());
+            callback([canvasObj]);
+        };
+        CustomDataAdapter.prototype.query = function(params, callback){
+            // self.canvases.subscribe(function(canvases){
+            //     callback({"results": canvases});
+            // });
+            callback({"results": self.canvases()});
         };
 
         const splitSelectConfig = {
             clickBubble: true,
             multiple: false,
             closeOnSelect: true,
-            allowClear: true,
-            data: () => {
-                const results = this.canvases();
-                return { results };
-            },
-            id: function(item) {
-                return self.getCanvasService(item);
-            },
-            containerCssClass: "split-controls-drop",
+            allowClear: false,
+            dataAdapter: CustomDataAdapter,
             dropdownCssClass: "split-controls-drop",
-            dropdownAutoWidth: true,
-            formatResult: function(item) {
-                return `<div class="image"><img src="${item.thumbnail}"/></div><div class="title">${item.label}</div>`; 
+            templateResult: function(item) {
+                if(item.loading){
+                    return "";
+                }
+                return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`); 
             },
-            formatSelection: function(item) {
+            templateSelection: function(item) {
                 return item?.label;
-            },
-            clear: function(abc) {
-                self.canvases('');
-            },
-            isEmpty: ko.computed(function() {
-                return self.canvases() === '' || !self.canvases();
-            }, this),
-            initSelection: function(element, callback) {
-                const canvasObj = self.canvases().find(canvas => self.getCanvasService(canvas) == element.val());
-                callback(canvasObj);
             }
         };
 
@@ -395,7 +395,7 @@ define([
             ...splitSelectConfig,
             value: this.canvas
         };
-
+        
         this.imageToolConfig = {
             ...splitSelectConfig,
             value: this.imageToolSelector
@@ -504,9 +504,6 @@ define([
             return { brightness, contrast, saturation, greyscale };
         });
 
-        this.canvasFilter.subscribe((value) => {
-            console.log(value);
-        });
         var updateCanvasLayerFilter = function() {
             var filter = self.canvasFilter();
             var map = self.map();

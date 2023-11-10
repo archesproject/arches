@@ -947,6 +947,7 @@ class IIIFManifest(APIBase):
         query = request.GET.get("query", None)
         start = int(request.GET.get("start", 0))
         limit = request.GET.get("limit", None)
+        more = False
 
         manifests = models.IIIFManifest.objects.all()
         if query is not None:
@@ -954,8 +955,9 @@ class IIIFManifest(APIBase):
         count = manifests.count()
         if limit is not None:
             manifests = manifests[start : start + int(limit)]
+            more = start + int(limit) < count
 
-        response = JSONResponse({"results": manifests, "count": count})
+        response = JSONResponse({"results": manifests, "count": count, "more": more})
         return response
 
 

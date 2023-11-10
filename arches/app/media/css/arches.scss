@@ -11727,6 +11727,11 @@ a.filter-tools:hover {
     width: 100%;
     padding-left: 20px;
     margin: 20px;
+
+    .install-buttons {
+        display: flex;
+        flex-wrap: wrap;
+    }
 }
 
 .gallery-expanded .manifest-editor {
