@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(userid, loadid, multiprocessing=False):
+def save_to_tiles(userid, loadid):
     with connection.cursor() as cursor:
         saved = False
         try:
@@ -80,7 +80,7 @@ def save_to_tiles(userid, loadid, multiprocessing=False):
             """)
 
         try:
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=multiprocessing, recalculate_descriptors=True)
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
             user = User.objects.get(id=userid)
             user_email = getattr(user, "email", "")
             user_firstname = getattr(user, "first_name", "")
