@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(userid, loadid, multiprocessing=True):
+def save_to_tiles(userid, loadid, multiprocessing=False):
     with connection.cursor() as cursor:
         saved = False
         try:

@@ -171,7 +171,7 @@ class ImportSingleCsv(BaseImportModule):
                     ("validated", loadid),
                 )
             self.loadid = loadid  # currently redundant, but be certain
-            response = save_to_tiles(userid, loadid, multiprocessing=False)
+            response = save_to_tiles(userid, loadid)
             with connection.cursor() as cursor:
                 cursor.execute("""CALL __arches_update_relationship_with_graphids();""")
                 cursor.execute("""SELECT __arches_refresh_spatial_views();""")

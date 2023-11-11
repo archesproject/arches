@@ -174,7 +174,7 @@ class BaseImportModule:
             result["validation"] = self.validate(loadid)
             if len(result["validation"]["data"]) == 0:
                 self.loadid = loadid  # currently redundant, but be certain
-                save_to_tiles(userid, loadid, multiprocessing=False)
+                save_to_tiles(userid, loadid)
                 cursor.execute("""CALL __arches_update_relationship_with_graphids();""")
                 cursor.execute("""SELECT __arches_refresh_spatial_views();""")
                 refresh_successful = cursor.fetchone()[0]
