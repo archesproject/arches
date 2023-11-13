@@ -55,7 +55,7 @@
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
             <!-- ko foreach: { data: report.cards, as: 'card' } -->
-                <!-- ko if: $parent.hideEmptyNodes() === false || card.tiles().length > 0 -->
+                <!-- ko if: ($parent.hideEmptyNodes() === false || card.tiles().length > 0) && ko.unwrap(card.model.visible) -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
                     <!-- ko component: {

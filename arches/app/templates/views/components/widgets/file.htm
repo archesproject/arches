@@ -117,6 +117,7 @@
                             </div>
                         </div>
                     </div>
+                    {% block file-metadata %}
                     <div class="row">
                         <div class="file-metadata">
                             <label data-bind="text: $root.translations.alternativeText"></label>
@@ -168,6 +169,7 @@
                             />
                         </div>
                     </div>
+                    {% endblock file-metadata %}
                 </div>
                 <!-- /ko -->
             </div>

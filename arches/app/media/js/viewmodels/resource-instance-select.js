@@ -93,7 +93,7 @@ define([
                     .then(function(json){
                         self.graphLookup[graphid] = json.graph;
                         self.graphLookupKeys(Object.keys(self.graphLookup));
-                        self.value.valueHasMutated();
+                        self.graphIds.push(json.graph.graphid);
                         return json.graph;
                     });
             }
