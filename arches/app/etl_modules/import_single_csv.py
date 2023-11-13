@@ -21,7 +21,7 @@ from arches.app.etl_modules.save import save_to_tiles
 
 
 class ImportSingleCsv(BaseImportModule):
-    def __init__(self, request=None):
+    def __init__(self, request=None, loadid=None):
         self.request = request if request else None
         self.userid = request.user.id if request else None
         self.loadid = request.POST.get("load_id") if request else None
