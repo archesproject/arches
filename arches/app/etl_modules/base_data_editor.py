@@ -131,9 +131,10 @@ class BaseBulkEditor:
         result = {"success": False}
         load_details_json = json.dumps(load_details)
         try:
+            load_description = 'initiating the load...'
             cursor.execute(
-                """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, self.moduleid, load_details_json, False, "running", datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_description, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, self.moduleid, load_details_json, False, "running", load_description, datetime.now(), self.userid),
             )
             result["success"] = True
         except Exception as e:
@@ -161,6 +162,12 @@ class BaseBulkEditor:
         cursor.execute(
             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
             (status, datetime.now(), self.loadid),
+        )
+
+    def log_event_details(self, cursor, details):
+        cursor.execute(
+            """UPDATE load_event SET load_description = (load_description || %s) WHERE loadid = %s""",
+            (details, self.loadid),
         )
 
     def get_resourceids_from_search_url(self, search_url):
@@ -414,18 +421,19 @@ class BulkStringEditor(BaseBulkEditor):
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
 
-        if resourceids:
-            resourceids = json.loads(resourceids)
-        if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
-        if resourceids:
-            resourceids = tuple(resourceids)
-
         use_celery_bulk_edit = True
 
         if use_celery_bulk_edit:
             response = self.run_load_task_async(request, self.loadid)
         else:
+            if resourceids:
+                resourceids = json.loads(resourceids)
+            if search_url:
+                with connection.cursor() as cursor:
+                    self.log_event_details(cursor, "done|Getting resources from search url...")
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            if resourceids:
+                resourceids = tuple(resourceids)
             response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, pattern, new_text, resourceids)
 
         return response
@@ -447,6 +455,8 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
+            with connection.cursor() as cursor:
+                self.log_event_details(cursor, "done|Getting resources from search url...")
             resourceids = self.get_resourceids_from_search_url(search_url)
 
         pattern = old_text
@@ -476,19 +486,22 @@ class BulkStringEditor(BaseBulkEditor):
             case_insensitive = True
 
         with connection.cursor() as cursor:
+            self.log_event_details(cursor, "done|Staging the data for edit...")
             data_staged = self.stage_data(cursor, module_id, graph_id, node_id, resourceids, operation, pattern, new_text, language_code, case_insensitive)
 
             if data_staged["success"]:
+                self.log_event_details(cursor, "done|Editing the data...")
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, pattern, new_text)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
-        if data_updated["success"]:
-            self.loadid = loadid  # currently redundant, but be certain
-            save_to_tiles(userid, loadid)
-            return {"success": True, "data": "done"}
-        else:
-            with connection.cursor() as cursor:
+            if data_updated["success"]:
+                self.log_event_details(cursor, "done|Saving the tiles...")
+                self.loadid = loadid  # currently redundant, but be certain
+                save_to_tiles(userid, loadid)
+                self.log_event_details(cursor, "done")
+                return {"success": True, "data": "done"}
+            else:
                 self.log_event(cursor, "failed")
-            return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}
+                return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}

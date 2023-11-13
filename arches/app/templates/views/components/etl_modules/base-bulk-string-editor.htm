@@ -243,9 +243,9 @@
     <h4 class="summary-header">
         <span data-bind="text: $root.translations.updatingProgress"></span>
     </h4>
-    <div>
-        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingStatus + ':'"></span>
-        <span class="etl-loading-metadata-value" data-bind="
+    <div style="display:flex;">
+        <div class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingStatus + ':'"></div>
+        <div class="etl-loading-metadata-value" data-bind="
             text:
                 selectedLoadEvent().status == 'indexed' ? $root.translations.completed
                 : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
@@ -255,7 +255,24 @@
                 : selectedLoadEvent().status == 'unloaded' ? $root.translations.unloaded
                 : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
                 : $root.translations.failed
-        "></span>  
+        "></div>
+        <!-- <div style="padding-left: 10px;" data-bind="if: selectedLoadEvent().status !== 'indexed'"> -->
+        <div style="padding-left: 10px;">
+            <div data-bind="click: function() { showStatusDetails(!showStatusDetails())}">
+                <!-- ko ifnot: showStatusDetails -->
+                <i class="fa fa-caret-right fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: showStatusDetails -->
+                <i class="fa fa-caret-down fa-lg"></i>
+                <!-- /ko -->
+            </div>
+            <!-- ko if: showStatusDetails -->
+            <div data-bind="foreach: statusDetails">
+                <div data-bind="text: $data"></div>
+            </div>
+            <i class="fa fa-spin fa-spinner fa-lg"></i>
+            <!-- /ko -->
+        </div>
     </div>
     <div style="padding-top: 10px;">
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.updatingStarted + ':'"></span>
