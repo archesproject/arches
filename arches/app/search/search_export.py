@@ -68,10 +68,10 @@ class SearchResultsExporter(object):
                 if main_card.nodegroup_id == sub_card.nodegroup.parentnodegroup_id:
                     if sub_card not in main_card_list:
                         sub_cards_to_add.append(sub_card)
-                        subcards_added[0] = True
+                        subcards_added = True
             index_number = main_card_list.index(main_card) + 1
             main_card_list[index_number:index_number] = sub_cards_to_add
-            
+        return subcards_added    
         
 
     def return_ordered_header(self, graphid, export_type):
@@ -98,15 +98,14 @@ class SearchResultsExporter(object):
 
         subcard_list_with_sort.sort(key=lambda x: x.sortorder, reverse=True)
 
-        # Loop down through the levels of subcards, 'till no more sub-levels may be added.
-        subcards_added = [True]
-        while subcards_added[0]:
-            subcards_added = [False]
-            self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort, subcards_added)
+        def order_cards(subcards_added=True):
+            if subcards_added == True:
+                subcards_added = False
+                unsorted_subcards_added = self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort, subcards_added)
+                sorted_subcards_added = self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort, unsorted_subcards_added)
+                order_cards(sorted_subcards_added)
 
-            # Cards in subcard_list_with_sort are added after cards with no sort
-
-            self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort, subcards_added)
+        order_cards()
 
         # Create a list of nodes within each card and order them according to sort
         # order then add them to the main list of
