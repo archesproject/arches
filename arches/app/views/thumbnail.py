@@ -1,8 +1,5 @@
-from arches.app.models.resource import Resource
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseNotFound
-from django.utils.translation import get_language
-import requests
 from arches.app.utils.search_thumbnail_fetcher_factory import SearchThumbnailFetcherFactory
 
 class ThumbnailView(View):
