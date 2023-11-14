@@ -176,8 +176,31 @@ article.main-search-container {
         }
         .tab-content {
             height: calc(100vh - 100px);
+            @include break-at(mobile-max) {
+                overflow: visible;
+            }
+            .tab-content-component {
+                height: calc(100vh - 100px);
+                @include break-at(mobile) {
+                    height: 100vh;
+                    overflow: visible;
+                }
+            }
             .workbench-card-sidebar {
+                @include break-at(mobile) {
+                    position: static;
+                    display: inline-flex;
+                    height: fit-content;
+                    width: calc(100vw - 50px);
+                    justify-content: center;
+                    border: 0;
+                }
                 .workbench-card-sidebar-tab {
+                    @include break-at(mobile) {
+                        border: 1px solid #d8d8d8;
+                        min-width: 50px;
+                        margin: 1px;
+                    }
                     @include break-at(small-desktop-max) {
                         height: 3em;
                         padding: 4px;
@@ -185,7 +208,17 @@ article.main-search-container {
                     }
                 }
             }
+            .workbench-card-container {
+                @include break-at(mobile) {
+                    width: 100%;
+                }
+            }
             .workbench-card-sidepanel {
+                @include break-at(mobile) {
+                    position: absolute;
+                    right: 0;
+                    width: inherit;
+                }
                 @include break-at(small-desktop-max) {
                     height: 100%;
                     width: calc(100% - 75px);
@@ -246,6 +279,9 @@ article.main-search-container {
                 }
             }
             .mapboxgl-ctrl-geocoder {
+                @include break-at(mobile) {
+                    margin: 3px;
+                }
                 @include break-at(mobile-max) {
                     width: 48vw;
                     min-width: 0;
