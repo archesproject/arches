@@ -214,14 +214,14 @@ article.main-search-container {
                 }
             }
             .workbench-card-sidepanel {
-                @include break-at(mobile) {
-                    position: absolute;
-                    right: 0;
-                    width: inherit;
-                }
                 @include break-at(small-desktop-max) {
                     height: 100%;
                     width: calc(100% - 75px);
+                }
+                @include break-at(mobile) {
+                    position: absolute;
+                    right: 0;
+                    width: 100%;
                 }
                 .workbench-card-sidepanel-header-container {
                     @include break-at(small-desktop-max) {
