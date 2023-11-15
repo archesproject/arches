@@ -7,7 +7,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9334_populate_iiifmanifest_globalid'),
+        ('models', '10260_populate_iiifmanifest_globalid'),
     ]
 
     operations = [

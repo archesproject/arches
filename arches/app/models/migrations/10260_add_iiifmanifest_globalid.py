@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9333_file_type_image_config'),
+        ('models', '9944_improve_refresh_relationship_function'),
     ]
 
     operations = [

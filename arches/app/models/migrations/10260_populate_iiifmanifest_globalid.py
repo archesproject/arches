@@ -13,7 +13,7 @@ def gen_uuid(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "9334_add_iiifmanifest_globalid"),
+        ("models", "10260_add_iiifmanifest_globalid"),
     ]
 
     operations = [
