@@ -497,10 +497,8 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
             if data_updated["success"]:
-                self.log_event_details(cursor, "done|Saving the tiles...")
                 self.loadid = loadid  # currently redundant, but be certain
                 save_to_tiles(userid, loadid)
-                self.log_event_details(cursor, "done")
                 return {"success": True, "data": "done"}
             else:
                 self.log_event(cursor, "failed")
