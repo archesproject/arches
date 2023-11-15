@@ -21,10 +21,10 @@ from arches.app.etl_modules.save import save_to_tiles
 
 
 class ImportSingleCsv(BaseImportModule):
-    def __init__(self, request=None):
+    def __init__(self, request=None, loadid=None):
         self.request = request if request else None
+        self.loadid = request.POST.get("load_id") if request else loadid
         self.userid = request.user.id if request else None
-        self.loadid = request.POST.get("load_id") if request else None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
@@ -171,7 +171,13 @@ class ImportSingleCsv(BaseImportModule):
                     ("validated", loadid),
                 )
             self.loadid = loadid  # currently redundant, but be certain
-            response = save_to_tiles(userid, loadid, multiprocessing=False)
+            response = save_to_tiles(userid, loadid)
+            with connection.cursor() as cursor:
+                cursor.execute("""CALL __arches_update_relationship_with_graphids();""")
+                cursor.execute("""SELECT __arches_refresh_spatial_views();""")
+                refresh_successful = cursor.fetchone()[0]
+            if not refresh_successful:
+                raise Exception('Unable to refresh spatial views')
             return response
         else:
             with connection.cursor() as cursor:
