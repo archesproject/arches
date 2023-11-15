@@ -256,22 +256,25 @@
                 : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
                 : $root.translations.failed
         "></div>
-        <!-- <div style="padding-left: 10px;" data-bind="if: selectedLoadEvent().status !== 'indexed'"> -->
         <div style="padding-left: 10px;">
-            <div data-bind="click: function() { showStatusDetails(!showStatusDetails())}">
-                <!-- ko ifnot: showStatusDetails -->
-                <i class="fa fa-caret-right fa-lg"></i>
-                <!-- /ko -->
+            <div style="padding-left: 10px;">
+                <div data-bind="click: function() { showStatusDetails(!showStatusDetails())}">
+                    <!-- ko ifnot: showStatusDetails -->
+                    <i class="fa fa-caret-right fa-lg"></i>
+                    <!-- /ko -->
+                    <!-- ko if: showStatusDetails -->
+                    <i class="fa fa-caret-down fa-lg"></i>
+                    <!-- /ko -->
+                </div>
                 <!-- ko if: showStatusDetails -->
-                <i class="fa fa-caret-down fa-lg"></i>
+                <div data-bind="foreach: statusDetails">
+                    <div data-bind="text: $data"></div>
+                </div>
+                <div data-bind="ifnot: ['indexed','failed'].includes(selectedLoadEvent().status)">
+                    <i class="fa fa-spin fa-spinner fa-lg"></i>
+                </div>
                 <!-- /ko -->
             </div>
-            <!-- ko if: showStatusDetails -->
-            <div data-bind="foreach: statusDetails">
-                <div data-bind="text: $data"></div>
-            </div>
-            <i class="fa fa-spin fa-spinner fa-lg"></i>
-            <!-- /ko -->
         </div>
     </div>
     <div style="padding-top: 10px;">

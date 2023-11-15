@@ -131,7 +131,7 @@ class BaseBulkEditor:
         result = {"success": False}
         load_details_json = json.dumps(load_details)
         try:
-            load_description = 'initiating the load...'
+            load_description = 'Preparing the load...'
             cursor.execute(
                 """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_description, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
                 (self.loadid, self.moduleid, load_details_json, False, "running", load_description, datetime.now(), self.userid),
@@ -166,7 +166,7 @@ class BaseBulkEditor:
 
     def log_event_details(self, cursor, details):
         cursor.execute(
-            """UPDATE load_event SET load_description = (load_description || %s) WHERE loadid = %s""",
+            """UPDATE load_event SET load_description = concat(load_description, %s) WHERE loadid = %s""",
             (details, self.loadid),
         )
 
