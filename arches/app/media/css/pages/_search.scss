@@ -186,7 +186,8 @@ article.main-search-container {
                     overflow: visible;
                 }
             }
-            .workbench-card-sidebar {
+            .workbench-card-sidebar,
+            div[role="tablist"] {
                 @include break-at(mobile) {
                     position: static;
                     display: inline-flex;
@@ -195,7 +196,8 @@ article.main-search-container {
                     justify-content: center;
                     border: 0;
                 }
-                .workbench-card-sidebar-tab {
+                .workbench-card-sidebar-tab,
+                div > .workbench-card-sidebar-tab {
                     @include break-at(mobile) {
                         border: 1px solid #d8d8d8;
                         min-width: 50px;
