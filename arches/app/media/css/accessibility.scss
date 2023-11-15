@@ -15,6 +15,7 @@ $leftnav-active: #184E6C;
 $leftnav-active-pointer: transparent #FFF transparent transparent;
 $search-dropdown-pill-bg: #1C6615;
 $adv-search-facet-btn-txt: #000;
+$map-filter-inactive-option: #595959;
 
 a, button {
     &.search-candidate-title,
@@ -180,6 +181,11 @@ embed:focus-visible,
     box-sizing: border-box;
 }
 
+.basemap-listing,
+.overlay-listing,
+.legend-listing {
+    color: $map-filter-inactive-option;
+}
 
 ///////////// Index page specific styles /////////////
 .application-name h1 {
