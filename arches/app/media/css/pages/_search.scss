@@ -174,6 +174,11 @@ article.main-search-container {
                 }
             }
         }
+        .card-form-preview-container{
+            @include break-at(mobile) {
+                overflow-y: visible;
+            }
+        }
         .tab-content {
             height: calc(100vh - 100px);
             @include break-at(mobile-max) {
@@ -184,6 +189,28 @@ article.main-search-container {
                 @include break-at(mobile) {
                     height: 100vh;
                     overflow: visible;
+                }
+                .workbench-card-wrapper {
+                    .workbench-card-container-wrapper {
+                        @include break-at(mobile){
+                            width: 100%;
+                        }
+                        .related-resources-graph-controls {
+                            @include break-at(mobile) {
+                                right: 2px;
+                                top: 5px;
+
+                            }
+                        }
+                        .related-resources-graph-controls-instructions {
+                            @include break-at(mobile) {
+                                font-size: 1rem;
+                                margin-top: 0px;
+                                right: 2px;
+                                top: 40px;
+                            }
+                        }
+                    }
                 }
             }
             .workbench-card-sidebar,
