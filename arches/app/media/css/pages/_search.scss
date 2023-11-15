@@ -191,6 +191,10 @@ article.main-search-container {
                     overflow: visible;
                 }
                 .workbench-card-wrapper {
+                    @include break-at(mobile) {
+                        height: 100vh;
+                        overflow-y: visible;
+                    }
                     .workbench-card-container-wrapper {
                         @include break-at(mobile){
                             width: 100%;
@@ -199,7 +203,6 @@ article.main-search-container {
                             @include break-at(mobile) {
                                 right: 2px;
                                 top: 5px;
-
                             }
                         }
                         .related-resources-graph-controls-instructions {
