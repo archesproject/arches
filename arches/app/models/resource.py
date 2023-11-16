@@ -250,7 +250,7 @@ class Resource(models.ResourceInstance):
         """
 
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-        if user:
+        if user and perm:
             self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
 
     # # flatten out the nested tiles into a single array
