@@ -57,7 +57,7 @@
 }
 
 .select2-selection__clear {
-    margin: 0 8px;
+    padding: 0 8px;
     font-size: 1.5em;
 
     &:hover {
@@ -66,4 +66,19 @@
 }
 .select2-dropdown.select2-zindex {
     z-index: 999999;
+}
+
+.select2-container--open .select2-selection--multiple:before { 
+    border-top:0; 
+    border-bottom: 5px solid #888; 
+} 
+
+.select2-selection--multiple:before {
+    content: "";
+    position: absolute;
+    right: 7px;
+    top: 42%;
+    border-top: 5px solid #888;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
 }
