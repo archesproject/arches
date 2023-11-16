@@ -161,19 +161,20 @@ a, button {
 }
 
 // Focus indicator
+select2-search__field
 div.chosen-container-active:not(.chosen-with-drop) a.chosen-single,
 ul.chosen-results li.highlighted,
 ul.select2-results li.select2-highlighted,
 a[href]:focus-visible,
 area[href]:focus-visible,
-input:focus-visible,
+input:focus-visible:not(.select2-search__field),
 select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 iframe:focus-visible,
 object:focus-visible,
 embed:focus-visible,
-*[tabindex]:focus-visible,
+*[tabindex]:focus-visible:not(.select2-search__field),
 *[contenteditable]:focus-visible {
     outline: 2.5px solid #000 !important;
     outline-offset: -2.5px !important;
