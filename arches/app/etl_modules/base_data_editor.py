@@ -3,6 +3,8 @@ import json
 import logging
 from urllib.parse import urlsplit, parse_qs
 import uuid
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.decorators import method_decorator
@@ -104,13 +106,23 @@ class BaseBulkEditor:
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT ng.nodegroupid, n.name
-                FROM node_groups ng JOIN nodes n
-                ON n.nodeid = ng.nodegroupid
-                WHERE n.graphid = %s
-                ORDER BY n.name;
+                WITH RECURSIVE card_tree(nodegroupid, parentnodegroupid, name) AS (
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, c.name ->> %s name
+                    FROM node_groups ng, cards c
+                    WHERE c.nodegroupid = ng.nodegroupid
+                    AND c.graphid = %s
+                    AND ng.parentnodegroupid IS null
+                    AND c.visible = true
+                UNION
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, (ct.name || ' > ' || (c.name ->> %s)) name
+                    FROM node_groups ng, cards c, card_tree ct
+                    WHERE ng.parentnodegroupid = ct.nodegroupid
+                    AND c.nodegroupid = ng.nodegroupid
+                    AND c.visible = true
+                )
+                SELECT nodegroupid, name FROM card_tree ORDER BY name
             """,
-                [graphid],
+                [settings.LANGUAGE_CODE, graphid, settings.LANGUAGE_CODE],
             )
             nodegroups = dictfetchall(cursor)
         return {"success": True, "data": nodegroups}
@@ -156,6 +168,11 @@ class BaseBulkEditor:
         request.user = self.request.user
         request.method = "GET"
         request.GET["export"] = True
+        validate = URLValidator()
+        try:
+            validate(search_url)
+        except:
+            raise
         params = parse_qs(urlsplit(search_url).query)
         for k, v in params.items():
             request.GET.__setitem__(k, v[0])
@@ -192,6 +209,12 @@ class BulkStringEditor(BaseBulkEditor):
             language_code = "en"
 
         if search_url:
+            validate = URLValidator()
+            try:
+                validate(search_url)
+            except:
+                raise
+
             params = parse_qs(urlsplit(search_url).query)
             for k, v in params.items():
                 request.GET.__setitem__(k, v[0])
@@ -290,7 +313,13 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            try:
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            except ValidationError:
+                return {
+                    "success": False,
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                }
         if resourceids:
             resourceids = tuple(resourceids)
 
@@ -304,9 +333,16 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word
-        )
+        try:
+            first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
+                node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word
+            )
+        except TypeError:
+            return {
+                "success": False,
+                "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+            }
+
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -450,7 +486,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         if data_updated["success"]:
             self.loadid = loadid  # currently redundant, but be certain
-            data_updated = save_to_tiles(userid, loadid, finalize_import=False)
+            save_to_tiles(userid, loadid)
             return {"success": True, "data": "done"}
         else:
             with connection.cursor() as cursor:

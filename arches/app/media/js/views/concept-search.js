@@ -8,20 +8,22 @@ define(['jquery', 'underscore', 'backbone', 'select-woo', 'arches'], function($,
 
         render: function(){
             var self = this;
-            this.searchbox = this.$el.find('input.concept_search_widget').select2({
+            this.searchbox = this.$el.find('select.concept_search_widget').selectWoo({
                 multiple: false,
                 maximumselectionsize: 1,
                 minimumInputLength: 2,
                 ajax: {
-                    url: this.getUrl(),
+                    url: this.getUrl,
                     dataType: 'json',
-                    data: function(term, page) {
+                    data: function(requestParams) {
+                        let term = requestParams.term || '';
+                        let page = requestParams.page || 1;
                         return {
                             q: term, // search term
                             page_limit: 30
                         };
                     },
-                    results: function(data, page) {
+                    processResults: function(data) {
                         var results = [];
                         $.each(data.hits.hits, function(){
                             results.push({
@@ -31,20 +33,23 @@ define(['jquery', 'underscore', 'backbone', 'select-woo', 'arches'], function($,
                                 scheme: this.in_scheme_name
                             });
                         }, this);
-                        return {results: results};
+                        return {
+                            "results": results,
+                            "pagination": {
+                                "more": false
+                            }
+                        };
                     }
                 },
-                formatResult:function(result, container, query, escapeMarkup){
-                    var markup=[];
-                    window.Select2.util.markMatch(result.text, query.term, markup, escapeMarkup);
+                templateResult:function(result){
                     result.scheme = result.scheme ? '(' + _.escape(result.scheme) + ')' : '';
-                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span><i class="concept_result_schemaname">' + result.scheme + '</i>';
+                    var formatedresult = $('<span class="concept_result">' + result.text  + '</span><i class="concept_result_schemaname">' + result.scheme + '</i>');
                     return formatedresult;
                 },
                 escapeMarkup: function(m) { return m; }
-            }).on("select2-selecting", function(e, el) {
-                self.trigger("select2-selecting", e, el);
-            });            
+            }).on("select2:selecting", function(e) {
+                self.trigger("select2:selecting", e);
+            }); 
         },
 
         getUrl: function(){

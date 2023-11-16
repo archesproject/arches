@@ -310,8 +310,9 @@ define([
             value: this.manifest,
             clickBubble: true,
             multiple: false,
-            closeOnSelect: false,
+            closeOnSelect: true,
             allowClear: true,
+            placeholder: arches.translations.selectAManifest,
             ajax: {
                 url: arches.urls.iiifmanifest,
                 dataType: 'json',

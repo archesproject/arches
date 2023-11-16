@@ -70,24 +70,28 @@ define([
                 $(el).selectWoo(select2Config);
                 
                 if (value) {
-                    value.extend({ rateLimit: 250 });
+                    value.extend({ rateLimit: 100 });
                     // initialize the dropdown with the value
                     $(el).val(value());
                     $(el).trigger('change.select2'); 
     
                     // update the dropdown if something else changes the value
                     value.subscribe(function(newVal) {
-                        console.log(newVal);
+                        //console.log(newVal);
                         // select2Config.value = newVal;
                         $(el).val(newVal);
                         $(el).trigger('change.select2');
 
                         if(!newVal){
-                            renderPlaceholder();
+                            window.setTimeout(function(){
+                                renderPlaceholder();
+                            },300);
                         }
                     }, this);
                 }
-                renderPlaceholder();
+                window.setTimeout(function(){
+                    renderPlaceholder();
+                },300);
             });
 
             

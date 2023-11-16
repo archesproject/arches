@@ -203,7 +203,14 @@ define([
                 self.numberOfResources(data.result.number_of_resources);
                 self.numberOfTiles(data.result.number_of_tiles);
             }).fail(function(err) {
-                console.log(err);
+                self.alert(
+                    new JsonErrorAlertViewModel(
+                        'ep-alert-red',
+                        err.responseJSON["data"],
+                        null,
+                        function(){}
+                    )
+                );
             }).always(function() {
                 self.previewing(false);
                 self.deleteAllFormData();

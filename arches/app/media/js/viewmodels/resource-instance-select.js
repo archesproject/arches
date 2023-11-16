@@ -93,7 +93,7 @@ define([
                     .then(function(json){
                         self.graphLookup[graphid] = json.graph;
                         self.graphLookupKeys(Object.keys(self.graphLookup));
-                        self.value.valueHasMutated();
+                        self.graphIds.push(json.graph.graphid);
                         return json.graph;
                     });
             }
@@ -324,11 +324,18 @@ define([
 
 
         this.url = ko.observable(arches.urls.search_results);
-        this.resourceToAdd = ko.observable("");
+        this.resourceToAdd = ko.observable(null);
 
         this.disabled = ko.computed(function() {
             return ko.unwrap(self.waitingForGraphToDownload) || ko.unwrap(params.disabled) || !!ko.unwrap(params.form?.locked);
         });
+
+        // this is a hack to get the dropdown to clear properly
+        // for some reason setting self.resourceToAdd("") didn't work
+        var select2ele = null;
+        this.clearDropDown = function(){
+            select2ele.val(null).trigger('change');
+        };
         
         this.select2Config = {
             value: self.renderContext === 'search' ? self.value : self.resourceToAdd,
@@ -348,7 +355,7 @@ define([
                         self.setValue(ret);
                         window.setTimeout(function() {
                             if(self.displayOntologyTable){
-                                self.resourceToAdd("");
+                                self.clearDropDown();
                             }
                         }, 250);    
                     }
@@ -365,7 +372,7 @@ define([
                         var clearNewInstance = function() {
                             self.newResourceInstance(null);
                             window.setTimeout(function() {
-                                self.resourceToAdd("");
+                                self.clearDropDown();
                             }, 250);
                         };
                         let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
@@ -512,6 +519,7 @@ define([
                 return $(ret);
             },
             initSelection: function(ele, callback) {
+                select2ele = ele;
                 if(self.renderContext === "search" && self.value() !== "" && !self.graphIds().includes(self.value())) {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
