@@ -77,7 +77,7 @@ define([
     
                     // update the dropdown if something else changes the value
                     value.subscribe(function(newVal) {
-                        console.log(newVal);
+                        //console.log(newVal);
                         // select2Config.value = newVal;
                         $(el).val(newVal);
                         $(el).trigger('change.select2');
