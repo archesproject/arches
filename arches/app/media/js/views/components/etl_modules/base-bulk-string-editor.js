@@ -28,6 +28,9 @@ define([
         };
 
         this.load_details = params.load_details;
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.statusDetails = this.selectedLoadEvent()?.load_description?.split("|");
+        this.showStatusDetails = ko.observable(false);
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
