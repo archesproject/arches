@@ -243,14 +243,14 @@ class Resource(models.ResourceInstance):
         if index is True:
             self.index(context)
 
-    def load_tiles(self, user=None, perm=None):
+    def load_tiles(self, user=None, perm='read_nodegroup'):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
 
         """
 
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-        if user and perm:
+        if user:
             self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
 
     # # flatten out the nested tiles into a single array
