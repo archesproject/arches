@@ -1,5 +1,7 @@
 import logging
 import uuid
+import base64
+from PIL import Image
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from django.shortcuts import redirect
@@ -14,16 +16,29 @@ logger = logging.getLogger(__name__)
 
 class FileView(View):
     def get(self, request, fileid=None):
+        get_thumbnail = False if request.GET.get("thumbnail", "false")  == "false" else True
         file = File.objects.get(pk=fileid)
         path = file.path.url
+
+        def get_file():
+            if file.thumbnail_data is None and settings.GENERATE_THUMBNAILS_ON_DEMAND:
+                file.make_thumbnail()
+                file.save()
+            if get_thumbnail and file.thumbnail_data:
+                return HttpResponse(file.thumbnail_data, content_type="image/png")
+            else:
+                return redirect(path)
+        
         if settings.RESTRICT_MEDIA_ACCESS:
             permission = request.user.has_perm("read_nodegroup", file.tile.nodegroup)
             permitted = permission is None or permission is True
             if permitted:
-                return redirect(path)
+                return get_file()
             else:
                 raise PermissionDenied()
-        return redirect(path)
+        
+        else:
+            return get_file()
 
 
 class TempFileView(View):

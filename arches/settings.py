@@ -103,6 +103,9 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
+THUMBNAIL_GENERATOR = "arches.app.utils.thumbnail_generator.ThumbnailGenerator"
+GENERATE_THUMBNAILS_ON_DEMAND = False
+
 # This should point to the url where you host your site
 # Make sure to use a trailing slash
 PUBLIC_SERVER_ADDRESS = "http://localhost:8000/"
