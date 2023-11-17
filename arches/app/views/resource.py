@@ -863,7 +863,7 @@ class RelatedResourcesView(BaseManagerView):
             Takes the graphid of a resource, finds the graphs root node, and returns the relatable graphids
             """
             top_node = models.Node.objects.filter(graph_id=graphid, istopnode=True)[0]
-            relatable_resources = [str(graph_id) for graph_id in top_node.get_relatable_resources()]
+            relatable_resources = [str(node.graph_id) for node in top_node.get_relatable_resources()]
             return relatable_resources
 
         def confirm_relationship_permitted(to_id, from_id):
