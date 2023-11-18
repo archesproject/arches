@@ -243,7 +243,7 @@ class Resource(models.ResourceInstance):
         if index is True:
             self.index(context)
 
-    def load_tiles(self, user=None, perm=None):
+    def load_tiles(self, user=None, perm='read_nodegroup'):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
 

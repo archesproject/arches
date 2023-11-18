@@ -12733,11 +12733,6 @@ a.filter-tools:hover {
     cursor: pointer;
 }
 
-.etl-status-link {
-    color: steelblue;
-    cursor: pointer;
-}
-
 .etl-job-task-bar .task a:hover{
     background: rgba(156, 195, 228, 0.35);
     border: 1px solid #6AA0CC;
@@ -12814,6 +12809,11 @@ a.filter-tools:hover {
     padding-top: 0px;
     padding-bottom: 5px;
     color: #454545;
+}
+
+.etl-status-link {
+    color: steelblue;
+    cursor: pointer;
 }
 
 section .etl-preview table {
