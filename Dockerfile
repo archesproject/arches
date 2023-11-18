@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base
+FROM ubuntu:22.04 as base
 USER root
 
 ## Setting default environment variables
@@ -30,17 +30,17 @@ RUN set -ex \
         docbook-mathml \
         libgdal-dev \
         libpq-dev \
-        python3.8 \
-        python3.8-dev \
+        python3.10 \
+        python3.10-dev \
         curl \
-        python3.8-distutils \
+        python3.10-distutils \
         libldap2-dev libsasl2-dev ldap-utils \
         dos2unix \
         " \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends $BUILD_DEPS \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3.8 get-pip.py
+    && python3.10 get-pip.py
 
 RUN pip3 wheel --no-cache-dir -r ${WHEELS}/requirements.txt  \
     && pip3 wheel --no-cache-dir -r ${WHEELS}/requirements_dev.txt  \
@@ -70,19 +70,19 @@ RUN set -ex \
         libgdal-dev \
         python3-venv \
         postgresql-client-12 \
-        python3.8 \
-        python3.8-distutils \
-        python3.8-venv \
+        python3.10 \
+        python3.10-distutils \
+        python3.10-venv \
     " \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends curl \
-    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends $RUN_DEPS \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3.8 get-pip.py \
+    && python3.10 get-pip.py \
     && apt-get install -y nodejs \
     && npm install -g yarn
 
@@ -99,7 +99,7 @@ WORKDIR ${WEB_ROOT}
 
 RUN mv ${WHEELS}/entrypoint.sh entrypoint.sh
 
-RUN python3.8 -m venv ENV \
+RUN python3.10 -m venv ENV \
     && . ENV/bin/activate \
     && pip install wheel setuptools requests \
     && pip install rjsmin==1.2.0 MarkupSafe==2.0.0 \
