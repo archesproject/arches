@@ -141,8 +141,9 @@ class SKOSReader(object):
                             concept_id = self.generate_uuid_from_subject(baseuuid, object)
                             raise Exception(f"The Concept Scheme defines a \"narrower\" relation to a concept instead of using \"hasTopConcept\".  First concept with incorrect relation: {object}")
 
-                if len(self.relations) == 0:
-                    raise Exception("The SKOS file doesn't appear to have any Top Concepts defined.")
+                # RMV[PTW]: this seems to regularly be the case for collections.xml
+                # if len(self.relations) == 0:
+                #     raise Exception("The SKOS file doesn't appear to have any Top Concepts defined.")
 
                 concept_scheme.addvalue(
                     {
