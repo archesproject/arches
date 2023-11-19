@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "7787_relational_data_model"),
+        ("models", "10121_workflowhistory"),
     ]
 
     operations = [
