@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.app.views.language import LanguageView
 from django.views.decorators.cache import cache_page
 from django.contrib.auth import views as auth_views
+from django.contrib.staticfiles import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
@@ -321,3 +322,7 @@ if settings.DEBUG:
         urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
     except:
         pass
+
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)\$', views.serve)
+    ]
