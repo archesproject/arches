@@ -46,7 +46,7 @@
     color: #fff;
     cursor: pointer;
     position: fixed;
-    bottom: 55px;
+    bottom: 20px;
     font-size: 20px;
     right: 20px;
     border-radius: 2px;
@@ -59,6 +59,10 @@
     	-webkit-transition: opacity .3s!important;
     	transition: opacity .3s!important;
 	}
+	@include break-at(mobile) {
+        bottom: 5px;
+		right: 35px
+    }
 }
 
 .btn-sm, .btn-icon.btn-sm {

@@ -23,6 +23,7 @@
 @import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
+@import "css/abstracts";
 @import "sidenav.scss";
 @import "edit-history.scss";
 @import "tree.scss";
@@ -8618,6 +8619,15 @@ a.clear-geojson-button:hover {
 
 .mapboxgl-ctrl-geocoder--input {
     font-size: 1.3rem;
+    @include break-at(mobile) {
+        height: 30px;
+    }
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+    @include break-at(mobile) {
+        top: 5px;
+    }
 }
 
 .workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {

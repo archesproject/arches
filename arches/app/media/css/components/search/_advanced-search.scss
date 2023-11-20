@@ -4,12 +4,18 @@
 	@include break-at(small-desktop-max) {
 		flex-direction: column-reverse;
 	}
-	.facets-search-container {
-		@include break-at(small-desktop-max) {
-			flex: 1;
-			width: 100%;
-		}
-	}
+    .facets-search-container {
+        width: calc(100% - 275px);
+        height: calc(100vh - 115px);
+        overflow-y: auto;
+        padding: 5px;
+        background: white;
+        border-inline-start: 1px #e0e0e0 solid;
+        @include break-at(small-desktop-max) {
+            flex: 1;
+            width: 100%;
+        }
+    }
 	.facets-container {
 		@include break-at(small-desktop-max) {
 			flex: 1;
@@ -38,20 +44,14 @@
     border-inline-start: 1px solid #ddd;
 }
 
-.facets-search-container {
-    width: calc(100% - 275px);
-    height: calc(100vh - 115px);
-    overflow-y: auto;
-    padding: 2px;
-    background: white;
-    border-inline-start: 1px #e0e0e0 solid;
-}
-
 .faceted-search-card-container {
     border: 1px solid #ddd;
     padding: 20px;
     margin: 15px;
     background: #f9f9f9;
+    @include break-at(small-desktop-max) {
+        margin: 0px;
+    }
 }
 
 .search-facets {
@@ -154,8 +154,8 @@ a.search-facet-item.disabled {
 }
 
 .facet-btn-group {
-    display: block;
-    margin: 10px 15px 50px 15px;
+    display: flex;
+    margin: 5px 20px;
 }
 
 .facet-btn {
