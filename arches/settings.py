@@ -611,6 +611,9 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
+# Map filter auto adjusts map extent to fit results. If False, map extent will not change when filtering results.
+MAP_FILTER_AUTO_ZOOM_ENABLED = True
+
 # If True, users can make edits to graphs that are locked
 # (generally because they have resource intances saved against them)
 # Changing this setting to True and making graph modifications may result in

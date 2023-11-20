@@ -500,13 +500,15 @@ class GraphModel(models.Model):
         else:
             return True
 
-    def get_published_graph(self, language=None):
+    def get_published_graph(self, language=None, raise_if_missing=False):
         if not language:
             language = translation.get_language()
 
         try:
             graph = PublishedGraph.objects.get(publication=self.publication, language=language)
         except PublishedGraph.DoesNotExist:
+            if raise_if_missing:
+                raise
             graph = None
 
         return graph
@@ -1611,7 +1613,7 @@ class Plugin(models.Model):
 
 class WorkflowHistory(models.Model):
     workflowid = models.UUIDField(primary_key=True)
-    workflowname = models.CharField(null=True)
+    workflowname = models.CharField(null=True, max_length=255)
     stepdata = JSONField(null=False, default=dict)
     componentdata = JSONField(null=False, default=dict)
     # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
@@ -1722,6 +1724,7 @@ class ETLModule(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
+    reversible = models.BooleanField(default=True)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
     helptemplate = models.TextField(blank=True, null=True)
