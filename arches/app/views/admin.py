@@ -30,11 +30,6 @@ from django.core.cache import caches
 class ReIndexResources(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-
-        for graph_id in data['graphids']:
-            for resource in Resource.objects.filter(graph_id=graph_id):
-                resource.save_descriptors()
-
         index_resources_by_type(data["graphids"], clear_index=False, batch_size=4000, quiet=True, recalculate_descriptors=True)
         
         return JSONResponse(data)
