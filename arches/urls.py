@@ -301,6 +301,7 @@ urlpatterns = [
     re_path(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
     re_path(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     re_path(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
+    re_path(r"^manifest/(?P<id>%s)$" % uuid_regex, api.Manifest.as_view(), name="manifest"),
     re_path(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
     re_path(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
     re_path(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
