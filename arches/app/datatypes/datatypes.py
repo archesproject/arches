@@ -15,6 +15,7 @@ from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 
+from django.core.files.images import get_image_dimensions
 from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -284,7 +285,7 @@ class StringDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         language = None
         try:
-            regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
+            regex = re.compile(r"(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
             match = regex.match(value)
             if match is not None:
                 language = match.groups()[1]
@@ -802,8 +803,10 @@ class EDTFDataType(BaseDataType):
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    group_query = Bool()
+                    group_query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
+                    group_query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    query.must(group_query)
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
@@ -1484,6 +1487,7 @@ class FileListDataType(BaseDataType):
         if len(file_type_errors) > 0:
             title = _("Invalid File Type")
             errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
+
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1507,6 +1511,22 @@ class FileListDataType(BaseDataType):
             config = node.config
             limit = config["maxFiles"]
             max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
+
+            images_only = config.get("imagesOnly", False)
+            if images_only and request:
+                for metadata in value:
+                    if not any(localizedString["value"] for localizedString in metadata.get("altText", {}).values()):
+                        errors.append({
+                            "type": "ERROR",
+                            "title": _("Missing alt text"),
+                            "message": _("The image '{0}' is missing an alternative text.").format(metadata["name"]),
+                        })
+                files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
+                for file in files:
+                    width, height = get_image_dimensions(file.file)
+                    if not width or not height:
+                        title = _("Invalid File Type")
+                        errors.append({"type": "ERROR", "message": _("This node allows only images."), "title": title})
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
@@ -1536,6 +1556,11 @@ class FileListDataType(BaseDataType):
             title = _("Unexpected File Error")
             errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
@@ -2094,6 +2119,11 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         node = models.Node.objects.get(nodeid=nodeid)
@@ -2228,6 +2258,11 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append(error_message)
 
         return errors
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def pre_tile_save(self, tile, nodeid):
         relationships = tile.data[nodeid]

@@ -110,7 +110,7 @@ class BusinessDataImporter(object):
                 if isfile(join(path)):
                     self.file_format = os.path.splitext(file[0])[1].strip(".")
                     if self.file_format == "json":
-                        with open(file[0], "rU") as f:
+                        with open(file[0], "r") as f:
                             archesfile = JSONDeserializer().deserialize(f)
                             if "graph" in list(archesfile.keys()):
                                 self.graphs = archesfile["graph"]
@@ -205,7 +205,7 @@ class BusinessDataImporter(object):
                     business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id
                 )
             elif file_format == "jsonl":
-                with open(self.file[0], "rU") as openf:
+                with open(self.file[0], "r") as openf:
                     lines = openf.readlines()
                     if use_multiprocessing is True:
                         pool = Pool(cpu_count())

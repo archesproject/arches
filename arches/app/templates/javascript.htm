@@ -225,7 +225,7 @@
         download='{% trans "Download" as download %} "{{ download|escapejs }}"'
         download-zip-file='{% trans "Download Zip File" as downloadZipFile %} "{{ downloadZipFile|escapejs }}"'
         triggering-nodegroups='{% trans "Triggering Nodegroups" as triggeringNodegroups %} "{{ triggeringNodegroups|escapejs }}"'
-        select-a-nodegroup='{% trans "Select a Nodegroup" as selectANodegroup %} "{{ selectANodegroup|escapejs }}"'
+        select-a-nodegroup='{% trans "Select a nodegroup" as selectANodegroup %} "{{ selectANodegroup|escapejs }}"'
         no-relationships-added='{% trans "No Relationships Added" as noRelationshipsAdded %} "{{ noRelationshipsAdded|escapejs }}"'
         relate-resource='{% trans "Relate Resource" as relateResource %} "{{ relateResource|escapejs }}"'
         cannot-be-related='{% trans "Cannot Be Related" as cannotBeRelated %} "{{ cannotBeRelated|escapejs }}"'
@@ -259,6 +259,7 @@
         multiplier-if-date-is-approximate='{% trans "Multiplier if Date is Approximate (~)" as multiplierIfDateIsApproximate %} "{{ multiplierIfDateIsApproximate|escapejs }}"'
         multiplier-if-both='{% trans "Multiplier if Both (? and ~)" as multiplierIfBoth %} "{{ multiplierIfBoth|escapejs }}"'
         maximum-number-of-files='{% trans "Maximum Number of Files" as maximumNumberOfFiles %} "{{ maximumNumberOfFiles|escapejs }}"'
+        images-only='{% trans "Allow images only?" as imagesOnly %} "{{ imagesOnly|escapejs }}"'
         related-node='{% trans "Related Node" as relatedNode %} "{{ relatedNode|escapejs }}"'
         relationship-to-node='{% trans "Relationship to Node" as relationshipToNode %} "{{ relationshipToNode|escapejs }}"'
         subtitle='{% trans "Subtitle" as subtitle %} "{{ subtitle|escapejs }}"'
@@ -293,7 +294,8 @@
         concept-collection='{% trans "Concept Collection" as conceptCollection %} "{{ conceptCollection|escapejs }}"'
         select-a-concept-collection='{% trans "Select a concept collection" as selectAConceptCollection %} "{{ selectAConceptCollection|escapejs }}"'
         search-url='{% trans "Search Url" as SearchUrl %} "{{ SearchUrl|escapejs }}"'
-        use-search-url='{% trans "Use search url (optional)" as useSearchUrl %} "{{ useSearchUrl|escapejs }}"'
+        use-search-url='{% trans "Use search url" as useSearchUrl %} "{{ useSearchUrl|escapejs }}"'
+        use-search-url-optional='{% trans "Use search url (optional)" as useSearchUrlOptional %} "{{ useSearchUrlOptional|escapejs }}"'
         before='{% trans "Before" as before %} "{{ before|escapejs }}"'
         after='{% trans "After" as after %} "{{ after|escapejs }}"'
         case-insensitive='{% trans "Case Insensitive" as caseInsensitive %} "{{ caseInsensitive|escapejs }}"'
@@ -491,9 +493,11 @@
         files-uploaded='{% trans "files uploaded" as filesUploaded %} "{{ filesUploaded|escapejs }}"'
         max-file-size='{% trans "Max File Size (mb)" as maxFileSize %} "{{ maxFileSize|escapejs }}"'
         example-file-types='{% trans "example: .jpg, .png, .txt" as exampleFileTypes %} "{{ exampleFileTypes|escapejs }}"'
+        example-image-types='{% trans "example: .jpg, .png" as exampleImageTypes %} "{{ exampleImageTypes|escapejs }}"'
         valid-image-formats='{% trans "Images formatted as .jpg, .png, .tiff files may be uploaded. Other formats will be ignored" as validImageFormats %} "{{ validImageFormats|escapejs }}"'
         accepted-image-formats='{% trans "Accepted formats: .jpg, .png, .tiff" as acceptedImageFormats %} "{{ acceptedImageFormats|escapejs }}"'
         accepted-file-types='{% trans "Accepted File Types" as acceptedFileTypes %} "{{ acceptedFileTypes|escapejs }}"'
+        accepted-file-types-images-only='{% trans "Accepted Image Types" as acceptedFileTypesImagesOnly %} "{{ acceptedFileTypesImagesOnly|escapejs }}"'
         show-all-files='{% trans "Show all files" as showAllFiles %} "{{ showAllFiles|escapejs }}"'
         number-of-files-shown='{% trans "Number of Files Shown" as numberOfFiles %} "{{ numberOfFiles|escapejs }}"'
         show-first-five-files='{% trans "Show first 5 files" as showFirstFiveFiles %} "{{ showFirstFiveFiles|escapejs }}"'
@@ -694,6 +698,9 @@
         canvas='{% trans "Canvas" as canvas %} "{{ canvas|escapejs }}"'
         manage-image-service='{% trans "Manage Image Service" as manageImageService %} "{{ manageImageService|escapejs }}"'
         title='{% trans "Title" as title %} "{{ title|escapejs }}"'
+        alternative-text='{% trans "Alternative text" as altText %} "{{ altText|escapejs }}"'
+        alt-text-help='{% trans "Concise statement that assistive technology can pronounce to convey the meaning of the file" as altTextHelp %} "{{ altTextHelp|escapejs }}"'
+        additional-metadata='{% trans "Additional metadata" as additionalMetadata %} "{{ additionalMetadata|escapejs }}"'
         description='{% trans "Description" as description %} "{{ description|escapejs }}"'
         attribution='{% trans "Attribution" as attribution %} "{{ attribution|escapejs }}"'
         attribution-logo='{% trans "Attribution Logo" as attributionLogo %} "{{ attributionLogo|escapejs }}"'
@@ -733,7 +740,8 @@
         preview='{% trans "Preview" as preview %} "{{ preview|escapejs }}"'
         etl-file-upload-message='{% trans "Use this workflow to upload a file with data that you want to use to create new data instances of a model." as etlFileUploadMessage %} "{{ etlFileUploadMessage|escapejs }}"'
         etl-single-csv-title='{% trans "Import Format: Single .csv file" as etlSingleCSVTitle %} "{{ etlSingleCSVTitle|escapejs }}"'
-        bulk-data-edit-details='{% trans "Bulk Data Edit Details" as bulkDataEditDetails %} "{{ bulkDataEditDetails|escapejs }}"'
+        bulk-data-edit-summary='{% trans "Bulk Data Edit Summary" as bulkDataEditSummary %} "{{ bulkDataEditSummary|escapejs }}"'
+        edit-details='{% trans "Edit Details" as editDetails %} "{{ editDetails|escapejs }}"'
         no-data-to-preview='{% trans "Nothing to update. Your data already meets your requirements." as noDataToPreview %} "{{ noDataToPreview|escapejs }}"'
         resource-model-edited='{% trans "Resource Model Edited" as resourceModelEdited %} "{{ resourceModelEdited|escapejs }}"'
         field-name-edited='{% trans "Field Name Edited" as fieldNameEdited %} "{{ fieldNameEdited|escapejs }}"'
@@ -752,7 +760,7 @@
         showing-all='{% trans "Showing All" as showingAll %} "{{ showingAll|escapejs }}"'
         rows='{% trans "Rows" as rows %} "{{ rows|escapejs }}"'
         import-data='{% trans "Import data" as importData %} "{{ importData|escapejs }}"'
-        import-single-csv='{% trans "Import Single CSV" as importSingleCsv %} "{{ importSingleCsv|escapejs }}"'
+        single-csv-import-summary='{% trans "Single CSV Import Summary" as singleCsvImportSummary %} "{{ singleCsvImportSummary|escapejs }}"'
         target-resource='{% trans "Target resource" as targetResource %} "{{ targetResource|escapejs }}"'
         target-fields='{% trans "Target fields" as targetFields %} "{{ targetFields|escapejs }}"'
         download-templates='{% trans "Download Templates" as downloadTemplates %} "{{ downloadTemplates|escapejs }}"'
@@ -814,13 +822,23 @@
         preview-count-stats='(limit, possible, resCount) => {return {% trans "Showing first ${limit} of ${possible} values in ${resCount} resources" as previewCountStats %} `{{ previewCountStats|escapejs }}` }'
         count-of-resources-updated='(count) => {return {% trans "Resources updated: ${count}" as countOfResourcesUpdated %} `{{ countOfResourcesUpdated|escapejs }}` }'
         count-of-tiles-updated='(count) => {return {% trans "Tiles updated: ${count}" as countOfTilesUpdated %} `{{ countOfTilesUpdated|escapejs }}` }'
+        count-of-resources-deleted='(count) => {return {% trans "Resources deleted: ${count}" as countOfResourcesDeleted %} `{{ countOfResourcesDeleted|escapejs }}` }'
+        count-of-tiles-deleted='(count) => {return {% trans "Tiles deleted: ${count}" as countOfTilesDeleted %} `{{ countOfTilesDeleted|escapejs }}` }'
+        delete-tile-count='(tile, resource) => {return {% trans "${tile} tiles from ${resource} resources will be deleted" as deleteTileCount %} `{{ deleteTileCount|escapejs }}` }'
+        delete-resource-count='(resource) => {return {% trans "${resource} resources will be deleted" as deleteResourceCount %} `{{ deleteResourceCount|escapejs }}` }'
+        delete-tiles='{% trans "Delete Tiles" as deleteTiles %} "{{ deleteTiles|escapejs }}"'
+        delete-resources='{% trans "Delete Resources" as deleteResources %} "{{ deleteResources|escapejs }}"'
+        is-being-prepared='{% trans "is being prepared" as isBeingPrepared %} "{{ isBeingPrepared|escapejs }}"'
+        resources-are-being-exported='{% trans "resources are being exported" as resourcesAreBeingExported %} "{{ resourcesAreBeingExported|escapejs }}"'
+        tiles-to-be-deleted='{% trans "Tiles To Be Deleted" as tilesToBeDeleted %} "{{ tilesToBeDeleted|escapejs }}"'
+        no-data-to-delete='{% trans "No data to delete from the above selection" as noDataToDelete %} "{{ noDataToDelete|escapejs }}"'
+        following-resources-be-deleted='{% trans "The following resources will be deleted" as followingResourcesBeDeleted %} "{{ followingResourcesBeDeleted|escapejs }}"'
         bulk-edit-limit-warning='(limit) => {return {% trans "For safety, only ${limit} bulk edits are allowed at a time.  If you need to edit more than ${limit} entries, you will need to perform the operation multiple times." as bulkEditLimitWarning %} `{{ bulkEditLimitWarning|escapejs }}`}'
         show='{% trans "show" as show %} "{{ show|escapejs }}"'
         hide='{% trans "hide" as hide %} "{{ hide|escapejs }}"'
         first-five-shown='{% trans "First 5 errors are shown" as firstFiveShown %} "{{ firstFiveShown|escapejs }}"'
         validation-errors='{% trans "Validation Errors" as validationErrors %} "{{ validationErrors|escapejs }}"'
         no-error-found='{% trans "No Error Found" as noErrorFound %} "{{ noErrorFound|escapejs }}"'
-        click-here='{% trans "click here" as clickHere %} "{{ clickHere|escapejs }}"'
         loading-data='{% trans "Loading data" as loadingData %} "{{ loadingData|escapejs }}"'
         loading-status='{% trans "Loading status" as loadingStatus %} "{{ loadingStatus|escapejs }}"'
         loading-started='{% trans "Loading started" as loadingStarted %} "{{ loadingStarted|escapejs }}"'
@@ -828,11 +846,11 @@
         load-duration='{% trans "Load duration" as loadDuration %} "{{ loadDuration|escapejs }}"'
         indexing-ended='{% trans "Indexing ended" as indexingEnded %} "{{ indexingEnded|escapejs }}"'
         indexing-duration='{% trans "Indexing duration" as indexingDuration %} "{{ indexingDuration|escapejs }}"'
-        updating-progress='{% trans "Updating Progress" as updatingProgress %} "{{ updatingProgress|escapejs }}"'
-        updating-status='{% trans "Updating status" as updatingStatus %} "{{ updatingStatus|escapejs }}"'
-        updating-started='{% trans "Updating started" as updatingStarted %} "{{ updatingStarted|escapejs }}"'
-        updating-ended='{% trans "Updating ended" as updatingEnded %} "{{ updatingEnded|escapejs }}"'
-        updating-duration='{% trans "Updating duration" as updatingDuration %} "{{ updatingDuration|escapejs }}"'
+        bulk-edit-progress-details='{% trans "Bulk Edit Progress Details" as bulkEditProgressDetails %} "{{ bulkEditProgressDetails|escapejs }}"'
+        bulk-edit-status='{% trans "Bulk edit status" as bulkEditStatus %} "{{ bulkEditStatus|escapejs }}"'
+        bulk-edit-started='{% trans "Bulk edit started" as bulkEditStarted %} "{{ bulkEditStarted|escapejs }}"'
+        bulk-edit-ended='{% trans "Bulk edit ended" as bulkEditEnded %} "{{ bulkEditEnded|escapejs }}"'
+        bulk-edit-duration='{% trans "Bulk edit duration" as bulkEditDuration %} "{{ bulkEditDuration|escapejs }}"'
         view-in-edit-log='{% trans "view in edit log" as viewInEditLog %} "{{ viewInEditLog|escapejs }}"'
         list-of-edited-resources='{% trans "List of Edited Resources" as listOfEditedResources %} "{{ listOfEditedResources|escapejs }}"'
         list-of-deleted-data='{% trans "List of Deleted Data" as listOfDeletedData %} "{{ listOfDeletedData|escapejs }}"'
@@ -866,6 +884,8 @@
         apply-to-selected-files='{% trans "Apply to Selected Files" as applyToSelectedFiles %} "{{ applyToSelectedFiles|escapejs }}"'
         apply-same-loader-to-all='{% trans "Apply the same loader to all selected files in the dataset" as applySameLoaderToAll %} "{{ applySameLoaderToAll|escapejs }}"'
         id-column-selection='{% trans "Use as an id" as idColumnSelection %} "{{ idColumnSelection|escapejs }}"'
+        copy-node-id-to-clipboard='{% trans "Copy Node ID to Clipboard" as copyNodeIdToClipboard %} "{{ copyNodeIdToClipboard|escapejs }}"'
+        copied-node-id-to-clipboard='{% trans "Copied to Clipboard!" as copiedNodeIdToClipboard %} "{{ copiedNodeIdToClipboard|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
@@ -964,6 +984,7 @@
         transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
         mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
         help_template="{% url 'help_templates' %}"
+        api_plugins='"{% url "api_plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
         graph_has_unpublished_changes_api='(graphid)=>{return "{% url "graph_has_unpublished_changes_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
         graph_is_active_api='(graphid)=>{return "{% url "graph_is_active_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
@@ -1027,6 +1048,7 @@
         map-default-zoom="{{ map_info.zoom | unlocalize }}"
         map-default-min-zoom="{{ map_info.map_min_zoom | unlocalize }}"
         map-default-max-zoom="{{ map_info.map_max_zoom | unlocalize }}"
+        map-filter-auto-zoom="{{ map_info.map_filter_auto_zoom | unlocalize }}"
         map-layers='[{% for map_layer in map_layers %}{
             "maplayerid": "{{ map_layer.maplayerid }}",
             "name": "{{ map_layer.name }}",
@@ -1077,6 +1099,7 @@
         user-email='{{ user.email }}'
         use-semantic-relationships="{{ app_settings.USE_SEMANTIC_RESOURCE_RELATIONSHIPS|lower }}"
         version="{{ app_settings.VERSION }}"
+
     ></div>
     {% endblock arches_data %}
 
