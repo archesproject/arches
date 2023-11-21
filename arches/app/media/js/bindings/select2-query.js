@@ -13,7 +13,7 @@ define([
                 clickBubble: true,
                 multiple: false,
                 allowClear: false,
-                minimumResultsForSearch: 8
+                minimumResultsForSearch: 5
             });
             var value = select2Config.value;
             var attr = allBindingsAccessor()?.attr;
@@ -22,7 +22,10 @@ define([
             }
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
-                $(el).selectWoo('destroy');
+                try{
+                    $(el).selectWoo('destroy');
+                }
+                catch(e){}
                 $(el).off("select2:selecting");
                 $(el).off("select2:opening");
                 $(el).off("change");
