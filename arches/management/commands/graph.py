@@ -58,11 +58,17 @@ class Command(BaseCommand):
             help="A username required for the publication of graphs.",
         )
         parser.add_argument(
+            "--update",
+            action="store_true",
+            dest="update",
+            help="This will update PublishedGraph instances without creating a new GraphPublication.",
+        )
+        parser.add_argument(
             "-ui",
             "--update_instances",
             action="store_true",
             dest="update_instances",
-            help="Do would want to assign new graph publication ids to all corresponding resource instances?",
+            help="Do you want to assign new graph publication ids to all corresponding resource instances?",
         )
 
     def handle(self, *args, **options):
@@ -72,17 +78,32 @@ class Command(BaseCommand):
             self.graphs = Graph.objects.filter(isresource=True)
 
         self.update_instances = True if options["update_instances"] else False
+        self.update = True if options["update"] else False
 
         if options["operation"] == "publish":
             self.publish(options["username"])
 
     def publish(self, username):
         user = User.objects.get(username=username)
-        print("\nPublishing ...")
+
+        if self.update:
+            print("\nUpdating Publications...")
+        else:
+            print("\nPublishing ...")
+
         graphids = []
         for graph in self.graphs:
             if not graph.source_identifier_id:
                 graphids.append(str(graph.pk))
+            
+                print(graph.name)
+                
+                if self.update:
+                    graph.update_published_graphs()
+                else:
+                    graph.publish(user)
+
+            graphids.append(str(graph.pk))
         if self.update_instances:
             graphids = tuple(graphids)
             with connection.cursor() as cursor:

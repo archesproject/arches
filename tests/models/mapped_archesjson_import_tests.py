@@ -39,7 +39,7 @@ class mappedArchesJSONImportTests(ArchesTestCase):
 
     def setUp(self):
         ResourceInstance.objects.all().delete()
-        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
