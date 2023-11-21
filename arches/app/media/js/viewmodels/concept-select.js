@@ -125,26 +125,11 @@ define([
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();
             }),
-            // init: function(el){
-            //     valueData.forEach(function(data) {
-            //         var option = new Option(data.text, data.id, true, true);
-            //         $(el).append(option).trigger('change');
-
-            //         // manually trigger the `select2:select` event
-            //         $(el).trigger({
-            //             type: 'select2:select',
-            //             params: {
-            //                 data: data
-            //             }
-            //         });
-            //     });
-            // },
-            initComplete: false,
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
                 
                 var setSelectionData = function(data) {
-                    var valueData;
+                    var valueData = [];
 
                     if (self.multiple) {
                         if (!(data instanceof Array)) { data = [data]; }
@@ -170,21 +155,16 @@ define([
                         if (valueData[0].id !== valueList[0]) {
                             valueData.reverse();
                         }
-
-                        if(!self.select2Config.initComplete){
-                            valueData.forEach(function(data) {
-                                var option = new Option(data.text, data.id, true, true);
-                                $(el).append(option);
-                            });
-                            self.select2Config.initComplete = true;
-                        }
                     } else {
-                        valueData = {
+                        valueData = [{
                             id: data,
                             text: NAME_LOOKUP[data],
-                        };
+                        }];
                     }
-
+                    valueData.forEach(function(data) {
+                        var option = new Option(data.text, data.id, true, true);
+                        $(el).append(option);
+                    });
                     callback(valueData);
                 };
 
