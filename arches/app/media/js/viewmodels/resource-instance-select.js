@@ -5,10 +5,10 @@ define([
     'arches',
     'viewmodels/widget',
     'utils/ontology',
+    'utils/resource',
     'select-woo',
     'views/components/resource-report-abstract',
-], function($, ko, _, arches, WidgetViewModel, ontologyUtils) {
-    var resourceLookup = {};
+], function($, ko, _, arches, WidgetViewModel, ontologyUtils, resourceUtils) {
     var graphCache = {};
 
     require(['views/components/related-instance-creator']);
@@ -24,7 +24,9 @@ define([
     * the table of ontologyProperties below the dropdown otherwise the table will be hidden and you will have to populate params.graphids
     * @param  {boolean} params.graphids (optional) - if params.node is not supplied then you need to supply a list of graphids that can be used to get resource instances for the dropdown
     * @param  {boolean} params.multiple - whether to display multiple values in the dropdown/table
-    * @param  {boolean} params.allowInstanceCreation - whether the dropdown will give the user the option to create a new resource instance
+    * @param  {boolean} params.allowInstanceCreation - whether the dropdown will give the user the option to create a new resource instance, defaults to true
+    * @param  {boolean} params.onlyManageResourceIds - whether the value the dropdown manages should just be a resource id or a related resource object that contains the ontology properties as well as the resource id, defaults to false
+    * @param  {boolean} params.displayOntologyTable - true to display the table beneath the dropdown when users select an item, false if that item should be displayed in the dropdown itself, defaults to !!params.node
     * @param  {string} params.searchString (optional) - will limit the search results by the search string (it has to be full URL) and will override node.config.searchString if there is one
     * @param  {function} params.termFilter (optional) - a function to override the default term filter used when typing into the dropdown to search for resources
     * this.termFilter = function(term, data){
@@ -46,28 +48,39 @@ define([
         this.renderContext = params.renderContext;
         this.label = params.label;
         this.relationship = ko.observable();
-        /*
-            shoehorn logic to piggyback off of search context functionality.
-            Should be refactored when we get the chance for better component clarity.
-        */
-        if (params.renderContext === 'workflow') {
-            self.renderContext = 'search';
-        }
-
         this.allowInstanceCreation = typeof params.allowInstanceCreation === 'undefined' ? true : !!params.allowInstanceCreation;
-        if (!!params.configForm) {
-            this.allowInstanceCreation = false;
-        }
-
+        this.onlyManageResourceIds = !!(params?.onlyManageResourceIds);
+        this.displayOntologyTable = params?.displayOntologyTable ?? !!params.node;
         this.multiple = params.multiple || false;
         this.value = params.value || undefined;
         this.selectedItem = params.selectedItem || ko.observable();
         this.rootOntologyClass = '';
         this.graphIsSemantic = false;
         this.resourceTypesToDisplayInDropDown = ko.observableArray(!!params.graphids ? ko.toJS(params.graphids) : []);
-        this.displayOntologyTable = this.renderContext !== 'search' && !!params.node;
         this.graphIds = ko.observableArray();
         this.searchString = params.searchString || ko.unwrap(params.node?.config.searchString);
+        
+        if (!!params.configForm) {
+            this.allowInstanceCreation = false;
+        }
+        
+        /*
+            we should really not be using the "renderContext" property, but rather
+            we should set the values that define how the component operates directly.
+            ie: allowInstanceCreation, or displayOntologyTable
+            the following bits of code are just for backward compatibility
+        */
+        if (params.renderContext === 'workflow') {
+            self.allowInstanceCreation = true;
+            self.displayOntologyTable = false;
+            self.onlyManageResourceIds = true;
+        }
+
+        if (params.renderContext === 'search') {
+            self.allowInstanceCreation = false;
+            self.displayOntologyTable = false;
+            self.onlyManageResourceIds = true;
+        }
 
         this.waitingForGraphToDownload = ko.computed(function(){
             if (!!params.node && this.resourceTypesToDisplayInDropDown().length > 0){
@@ -177,14 +190,6 @@ define([
 
         this.displayValue = ko.observable('');
 
-        //
-        // this.close is only called if newResourceInstance is True and the user
-        // decides not to add the new resource instance, and closes the window without adding it
-        //
-        this.close = function(){
-            this.newResourceInstance(null);
-        };
-        
         this.openReport = function(resourceId) {
             this.reportResourceId(resourceId);
             $('#resource-report-panel button').focus();    
@@ -205,26 +210,7 @@ define([
             }
         };
 
-        this.lookupResourceInstanceData = function(resourceid) {
-            if (resourceLookup[resourceid]) {
-                return Promise.resolve(resourceLookup[resourceid]);
-            } else {
-                return window.fetch(`${arches.urls.search_results}?id=${resourceid}&tiles=true`)
-                    .then(function(response){
-                        if(response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(function(json) {
-                        if (json) {
-                            resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
-                            return resourceLookup[resourceid];
-                        }
-                    });
-            }
-        };
-
-        if(self.renderContext !== 'search'){
+        if(!self.onlyManageResourceIds){
             var updateNameAndOntologyClass = function(values) {
                 var names = [];
                 var value = ko.unwrap(values);
@@ -243,7 +229,7 @@ define([
                             if(!val.iconClass) {
                                 Object.defineProperty(val, 'iconClass', {value: ko.observable()});
                             }
-                            self.lookupResourceInstanceData(ko.unwrap(val.resourceId))
+                            resourceUtils.lookupResourceInstanceData(ko.unwrap(val.resourceId))
                                 .then(function(resourceInstance) {
                                     if (resourceInstance) {
                                         names.push(resourceInstance["_source"].displayname);
@@ -338,17 +324,17 @@ define([
         };
         
         this.select2Config = {
-            value: self.renderContext === 'search' ? self.value : self.resourceToAdd,
+            value: self.onlyManageResourceIds ? self.value : self.resourceToAdd,
             clickBubble: true,
             disabled: this.disabled,
             multiple: !self.displayOntologyTable ? params.multiple : false,
             placeholder: this.placeholder() || arches.translations.riSelectPlaceholder,
             closeOnSelect: true,
-            allowClear: self.renderContext === 'search' ? true : false,
+            allowClear: self.displayOntologyTable ? false : true,
             onSelect: function(item) {
                 self.selectedItem(item);
                 if (item._source) {
-                    if (self.renderContext === 'search' || self.allowInstanceCreation){
+                    if (self.onlyManageResourceIds){
                         self.value(item._id);
                     } else {
                         var ret = self.makeObject(item._id, item._source);
@@ -369,38 +355,43 @@ define([
                             tileid: ko.observable()
                         };
                         self.newResourceInstance(params);
-                        var clearNewInstance = function() {
-                            self.newResourceInstance(null);
-                            window.setTimeout(function() {
-                                self.clearDropDown();
-                            }, 250);
-                        };
+                        select2ele.prop("disabled", "disabled");
+
                         let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
                         resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
                         params.complete.subscribe(function() {
+                            select2ele.prop("disabled", "");
                             if (params.resourceid()) {
-                                if (self.renderContext === 'search'){
-                                    self.value(params.resourceid());
-                                    clearNewInstance();
-                                } else {
-                                    window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
-                                        .then(function(response){
-                                            if(response.ok) {
-                                                return response.json();
-                                            }
-                                            throw("error");
-                                        })
-                                        .then(function(json) {
-                                            var item = json.results.hits.hits[0];
+                                window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
+                                    .then(function(response){
+                                        if(response.ok) {
+                                            return response.json();
+                                        }
+                                        throw("error");
+                                    })
+                                    .then(function(json) {
+                                        var item = json.results.hits.hits[0];
+                                        if (self.displayOntologyTable){
                                             var ret = self.makeObject(params.resourceid(), item._source);
                                             self.setValue(ret);
-                                        })
-                                        .finally(function(){
-                                            clearNewInstance();
-                                        });
-                                }
+                                        } else {
+                                            var newOption = new Option(item._source.displayname, params.resourceid(), true, true);
+                                            $(select2ele).append(newOption);
+                                            self.value(params.resourceid());
+                                        }
+                                    })
+                                    .finally(function(){
+                                        self.newResourceInstance(null);
+                                        if(self.displayOntologyTable){
+                                            window.setTimeout(function() {
+                                                self.clearDropDown();
+                                            }, 250);
+                                        }
+                                    });
                             } else {
-                                clearNewInstance();
+                                // user decided not to add the resource
+                                self.newResourceInstance(null);
+                                self.clearDropDown();
                             }
                         });
                     }
@@ -513,14 +504,15 @@ define([
                     var graph = self.graphLookup[item._source.graph_id];
                     var iconClass = graph?.iconclass || '';
                     ret = `<span><i class="fa ${iconClass} sm-icon-wrap"></i> ${item._source.displayname}</span>`;
+                    return $(ret);
                 } else {
-                    ret = item.name;
+                    ret = item.name ?? item.text;
+                    return ret;
                 }
-                return $(ret);
             },
             initSelection: function(ele, callback) {
                 select2ele = ele;
-                if(self.renderContext === "search" && self.value() !== "" && !self.graphIds().includes(self.value())) {
+                if(!self.displayOntologyTable && !!self.value() && !self.graphIds().includes(self.value())) {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
                         values = [self.value()];
@@ -537,7 +529,7 @@ define([
                             resourceId = ko.unwrap(val.resourceId);
                         }
 
-                        var resourceInstance = self.lookupResourceInstanceData(resourceId).then(
+                        var resourceInstance = resourceUtils.lookupResourceInstanceData(resourceId).then(
                             function(resourceInstance) { return resourceInstance; }
                         );
 
