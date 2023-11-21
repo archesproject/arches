@@ -85,7 +85,11 @@ class Command(BaseCommand):
 
     def publish(self, username):
         user = User.objects.get(username=username)
-        print("\nPublishing ...")
+
+        if self.update:
+            print("\nUpdating Publications...")
+        else:
+            print("\nPublishing ...")
 
         graphids = []
         for graph in self.graphs:
