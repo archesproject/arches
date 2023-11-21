@@ -707,8 +707,9 @@ dl.inline-flex dd {
     width:100%;
 }
 
-.branch-csv-etl {
-    background-color: white;
+.branch-csv-etl,
+.bulk-load-status,
+.etl-error-report {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -774,6 +775,25 @@ h4.branch-xl-title {
 
 .branch-xl-file-contents-container {
     margin-top: 25px;
+}
+
+.etl-module-component .delete-type-container{
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0px;
+}
+.etl-module-component .delete-type-button{
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 10px 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #ddd;
+    margin-right: 12px;
+}
+.etl-module-component .delete-type-button.active {
+    font-weight: bold;
 }
 
 .tabbed-workflow-footer, .etl-module-footer {
@@ -1519,22 +1539,7 @@ ul.tabbed-report-tab-list {
 
 .file-viewer .loading-mask:after,
 .search-result-details .loading-mask::after {
-    position: fixed;
-    opacity: .5;
-    color: #7b7b7b;
-    content: '\f110';
-    -webkit-animation: fa-spin 2s infinite linear;
-    animation: fa-spin 2s infinite linear;
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 10vw;
-    margin-top: 42vh;
-    margin-left: 32vw;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
-    z-index: 100000001;
+    display: none;
 }
 
 .chart .plotly {
@@ -7451,9 +7456,7 @@ li.search-field {
 }
 
 .grid:after,
-.report-image-grid:after,
-.report-image-grid:after,
-.grid:after {
+.report-image-grid:after {
     content: '';
     display: block;
     clear: both;
@@ -7915,11 +7918,6 @@ a.mega-dropdown-toggle.disabled {
 
 .no-instructions-shim {
     margin-top: -60px;
-}
-
-.report-image-grid {
-    width: 100%;
-    margin-bottom: 20px;
 }
 
 .search .grid .library-card {
@@ -13751,11 +13749,15 @@ ul.select2-choices:after {
     font-weight: 400;
 }
 
-.etl-module-body section h3 {
+.etl-module-body section h3, .etl-module-subtitle {
     font-size: 15px;
     color: #565656;
-    font-weight: 300;
+    font-weight: normal;
     margin: 10px 0px 5px 0px;
+}
+
+.etl-module-body section .switch-small {
+    margin: 0px 8px 3px;
 }
 
 .etl-module-body section .etl-module-component-block {
@@ -13821,11 +13823,6 @@ ul.select2-choices:after {
 .etl-job-task-bar .task a{
     padding: 7px;
     text-decoration: none;
-    color: steelblue;
-    cursor: pointer;
-}
-
-.etl-status-link {
     color: steelblue;
     cursor: pointer;
 }
@@ -13906,6 +13903,11 @@ ul.select2-choices:after {
     padding-top: 0px;
     padding-bottom: 5px;
     color: #454545;
+}
+
+.etl-status-link {
+    color: steelblue;
+    cursor: pointer;
 }
 
 section .etl-preview table {

@@ -77,7 +77,7 @@ class ArchesTestCase(TestCase):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
-            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "rU") as f:
+            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"], True)
             BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()

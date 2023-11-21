@@ -64,6 +64,7 @@ define([
 
         this.nodeCssClasses = ko.pureComputed(function() {
             return [ko.unwrap(self.node?.alias),
+                self.node?.graph?.attributes?.slug,
                 self.widget?.widgetLookup[ko.unwrap(self.widget?.widget_id)].name
                 ].join(" ").trim();
         });

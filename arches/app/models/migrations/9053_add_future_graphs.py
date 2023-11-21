@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10149_add_workflow_name_to_workflow_history"),
+        ("models", "10260_add_iiifmanifest_globalid"),
     ]
 
     operations = [

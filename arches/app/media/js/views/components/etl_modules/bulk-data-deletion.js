@@ -15,18 +15,6 @@ define([
     const viewModel = function(params) {
         const self = this;
 
-        this.operationLabel = {
-            "trim": "Trim",
-            "replace": "Replace (Case Sensitive)",
-            "replace_i": "Replace (Case Insensitive)",
-            "capitalize": "Capitalize",
-            "capitalize_trim": "Capitalize (Also, remove leading/trailing spaces)",
-            "upper": "Uppercase",
-            "upper_trim": "Uppercase (Also, remove leading/trailing spaces)",
-            "lower": "Lowercase",
-            "lower_trim": "Lowercase (Also, remove leading/trailing spaces)",
-        };
-
         this.loadDetails = params.load_details;
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
@@ -45,12 +33,57 @@ define([
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
         this.searchUrl = ko.observable();
+        this.previewing = ko.observable(false);
+        this.numberOfResources = ko.observable();
+        this.numberOfTiles = ko.observable();
+        this.showPreview = ko.observable(false);
+        this.previewValue = ko.observable();
+
+        this.activeTab  = ko.observable("TileDeletion");
+        this.activeTab.subscribe(() => {
+            self.selectedGraph(null);
+            self.selectedNodegroup(null);
+            self.searchUrl(null);
+        });
+
+        this.ready = ko.computed(()=>{
+            self.showPreview(false);
+            self.numberOfResources(null);
+            self.numberOfTiles(null);
+            return (self.searchUrl() && self.activeTab() === "DeletionBySearchUrl")
+                || (self.selectedGraph() && self.activeTab() === "DeletionByGraph")
+                || (self.selectedNodegroup() && self.activeTab() === "TileDeletion");
+        });
 
         this.getGraphs = function(){
             self.loading(true);
             self.submit('get_graphs').then(function(response){
                 self.graphs(response.result);
                 self.loading(false);
+            });
+        };
+
+        this.preview = function(){
+            self.previewing(true);
+            self.showPreview(false);
+            this.addAllFormData();
+            self.submit('preview').then(function(response){
+                self.numberOfResources(response.result.resource);
+                self.numberOfTiles(response.result.tile);
+                self.previewValue(response.result.preview?.map((value) => JSON.stringify(value)));
+                self.showPreview(true);
+            }).fail( function(err) {
+                self.alert(
+                    new JsonErrorAlertViewModel(
+                        'ep-alert-red',
+                        err.responseJSON["data"],
+                        null,
+                        function(){}
+                    )
+                );
+            }).always( function(){
+                self.deleteAllFormData();
+                self.previewing(false);
             });
         };
 
@@ -111,10 +144,10 @@ define([
             }
         });
 
-        this.write = function() {
+        this.bulkDelete = function() {
             self.addAllFormData();
             params.activeTab("import");
-            self.submit('write').then(data => {
+            self.submit('delete').then(data => {
                 //console.log(data.result);
             }).fail( function(err) {
                 self.alert(

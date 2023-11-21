@@ -106,7 +106,7 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
         # Models
         for model_name in ["object_model", "document_model"]:
-            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "rU") as f:
+            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
 
