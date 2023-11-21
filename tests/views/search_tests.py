@@ -58,7 +58,7 @@ class SearchTests(ArchesTestCase):
 
         LanguageSynchronizer.synchronize_settings_with_db()
         models.ResourceInstance.objects.all().delete()
-        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 

@@ -68,7 +68,10 @@ define([
                             return response.json();
                         }
                     }).then(function(data){
-                        data.events.map((event)=> { event.loading = ko.observable(false); });
+                        data.events.map((event)=> {
+                            event.loading = ko.observable(false);
+                        });
+                        
                         self.loadEvents(data.events);
                         self.paginator(data.paginator);
                         const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);

@@ -175,7 +175,9 @@ define([
                             setSelectionData(value);
                         } else {
                             $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
-                                dataType: "json"
+                                dataType: "json",
+                                // select2 keeps refs to DOM element and can't handle parallel init'ing.
+                                async: false,
                             }).done(function(data) {
                                 NAME_LOOKUP[value] = data.value;
                                 setSelectionData(value);

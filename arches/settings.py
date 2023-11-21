@@ -611,6 +611,9 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
+# Map filter auto adjusts map extent to fit results. If False, map extent will not change when filtering results.
+MAP_FILTER_AUTO_ZOOM_ENABLED = True
+
 # If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 

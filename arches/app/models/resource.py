@@ -51,6 +51,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_restricted_users,
     get_restricted_instances,
+    user_can_read_graph,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -241,7 +242,7 @@ class Resource(models.ResourceInstance):
         if index is True:
             self.index(context)
 
-    def load_tiles(self, user=None, perm=None):
+    def load_tiles(self, user=None, perm='read_nodegroup'):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
 
@@ -427,7 +428,8 @@ class Resource(models.ResourceInstance):
         document["numbers"] = []
         document["date_ranges"] = []
         document["ids"] = []
-        document["provisional_resource"] = "true" if sum([len(t.data) for t in tiles]) == 0 else "false"
+        tiles_have_authoritative_data = any(any(val is not None for val in t.data.values()) for t in tiles)
+        document["provisional_resource"] = "true" if tiles and not tiles_have_authoritative_data else "false"
 
         terms = []
 
@@ -666,15 +668,23 @@ class Resource(models.ResourceInstance):
         restricted_instances = get_restricted_instances(user, se) if user is not None else []
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
-            try:
-                preflabel = get_preflabel_from_valueid(relation["relationshiptype"], lang)
-                relation["relationshiptype_label"] = preflabel["value"] or ""
-            except:
-                relation["relationshiptype_label"] = relation["relationshiptype"] or ""
-
             resourceid_to = relation["resourceinstanceidto"]
             resourceid_from = relation["resourceinstanceidfrom"]
-            if resourceid_to not in restricted_instances and resourceid_from not in restricted_instances:
+            resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
+            resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
+
+            if (
+                resourceid_to not in restricted_instances 
+                and resourceid_from not in restricted_instances
+                and user_can_read_graph(user, resourceinstanceto_graphid)
+                and user_can_read_graph(user, resourceinstancefrom_graphid)
+            ):
+                try:
+                    preflabel = get_preflabel_from_valueid(relation["relationshiptype"], lang)
+                    relation["relationshiptype_label"] = preflabel["value"] or ""
+                except:
+                    relation["relationshiptype_label"] = relation["relationshiptype"] or ""
+
                 ret["resource_relationships"].append(relation)
                 instanceids.add(str(resourceid_to))
                 instanceids.add(str(resourceid_from))
