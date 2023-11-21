@@ -4255,6 +4255,7 @@ div.dropdown-menu.open {
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
+    height: calc(100vh - 50px);
     position: relative;
 }
 
@@ -9988,15 +9989,6 @@ table.table.dataTable {
 
 .search-dropdown {
     /*max-height: 36px;*/
-}
-
-.search-toolbar {
-    display: -webkit-flex;
-    display: flex;
-    width: 100%;
-    height: 51px;
-    background: #f4f4f4;
-    border-bottom: solid 1px #bbd1ea;
 }
 
 .search-type-btn-panel {

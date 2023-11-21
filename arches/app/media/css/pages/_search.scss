@@ -59,7 +59,17 @@ article.main-search-container {
     }
     .search-map-container {
         flex-direction: column;
+        width: calc(100vw - 275px);
+        @include break-at(small-desktop-max) {
+            width: calc(100vw - 50px);
+        }
         .search-toolbar {
+            display: -webkit-flex;
+            display: flex;
+            width: 100%;
+            height: 51px;
+            background: #f4f4f4;
+            border-bottom: solid 1px #bbd1ea;
             @include break-at(small-desktop-max) {
                 border-top: solid 1px #bbd1ea;
                 height: auto;

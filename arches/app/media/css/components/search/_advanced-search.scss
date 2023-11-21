@@ -3,6 +3,8 @@
 .advanced-search-container {
 	@include break-at(small-desktop-max) {
 		flex-direction: column-reverse;
+        flex: 1;
+        width: calc(100vw - 50px);
 	}
     .facets-search-container {
         width: calc(100% - 275px);
