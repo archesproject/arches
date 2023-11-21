@@ -1029,8 +1029,13 @@ class IIIFAnnotationNodes(APIBase):
 
 class Manifest(APIBase):
     def get(self, request, id):
-        manifest = models.IIIFManifest.objects.get(id=id).manifest
-        return JSONResponse(manifest)
+        try:
+            uuid.UUID(id)
+            manifest = models.IIIFManifest.objects.get(globalid=id).manifest
+            return JSONResponse(manifest)
+        except:
+            manifest = models.IIIFManifest.objects.get(id=id).manifest
+            return JSONResponse(manifest)
 
 
 class OntologyProperty(APIBase):
