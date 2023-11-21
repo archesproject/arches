@@ -3,21 +3,121 @@ import json
 import logging
 import uuid
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
+from arches.app.models.models import TileModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
 import arches.app.tasks as tasks
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 
 logger = logging.getLogger(__name__)
 
 
 class BulkDataDeletion(BaseBulkEditor):
+    def get_number_of_deletions(self, graph_id, nodegroup_id, resourceids):
+        params = {
+            "nodegroup_id": nodegroup_id,
+            "graph_id": graph_id,
+            "resourceids": resourceids,
+            "language_code": settings.LANGUAGE_CODE,
+        }
+
+        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        tile_deletion_count = """
+            SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
+        """ + resourceids_query
+
+        resource_deletion_count = """
+            SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
+            FROM resource_instances r, graphs g
+            WHERE g.graphid = %(graph_id)s
+            AND r.graphid = g.graphid
+            GROUP BY g.name
+        """
+
+        search_url_deletion_count = """
+            SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
+            FROM resource_instances r, graphs g
+            WHERE r.graphid = g.graphid
+            AND r.resourceinstanceid IN %(resourceids)s
+            GROUP BY g.name
+        """
+
+        if nodegroup_id:
+            with connection.cursor() as cursor:
+                cursor.execute(tile_deletion_count, params)
+                row = cursor.fetchone()
+            number_of_resource, number_of_tiles = row
+        elif resourceids:
+            with connection.cursor() as cursor:
+                cursor.execute(search_url_deletion_count, params)
+                rows = cursor.fetchall()
+            number_of_resource = [{"name":i[0], "count":i[1]} for i in rows]
+            number_of_tiles = 0
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute(resource_deletion_count, params)
+                rows = cursor.fetchall()
+            number_of_resource = [{"name":i[0], "count":i[1]} for i in rows]
+            number_of_tiles = 0
+
+        return number_of_resource, number_of_tiles
+
+    def get_sample_data(self, nodegroup_id, resourceids):
+        params = {
+            "nodegroup_id": nodegroup_id,
+            "resourceids": resourceids,
+        }
+
+        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        get_sample_resource_ids = """
+            SELECT DISTINCT resourceinstanceid
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
+        """ + resourceids_query + """
+            LIMIT 5
+        """
+
+        get_sample_tiledata = """
+            SELECT tiledata
+            FROM tiles
+            WHERE nodegroupid = %(nodegroup_id)s
+        """ + resourceids_query + """
+            LIMIT 5
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(get_sample_resource_ids, params)
+            rows = cursor.fetchall()
+        smaple_resource_ids = [row[0] for row in rows]
+        sample_data = []
+        for resourceid in smaple_resource_ids:
+            resource = Resource.objects.get(pk=resourceid)
+            resource.tiles = list(TileModel.objects.filter(resourceinstance=resourceid).filter(nodegroup_id=nodegroup_id))
+            lbg = LabelBasedGraphV2.from_resource(
+                resource=resource,
+                compact=True,
+                hide_empty_nodes=True,
+                hide_hidden_nodes=True
+            )
+            for data in lbg["resource"].values():
+                for datum in data:
+                    tile_values = {k: v["@display_value"] for k, v in datum.items()}
+                    sample_data.append(tile_values)
+            if len(sample_data) >= 5:
+                break
+
+        return sample_data[0:5]
+
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}
         user = User.objects.get(id=userid)
@@ -57,7 +157,54 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return result
 
-    def write(self, request):
+    def index_resource_deletion(self, loadid, resourceids):
+        if not resourceids:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """SELECT DISTINCT resourceinstanceid
+                        FROM edit_log
+                        WHERE transactionid = %s::uuid;
+                    """, [loadid]
+                )
+                rows = cursor.fetchall()
+                resourceids = [ row[0] for row in rows ]
+
+        resource = Resource()
+        for resourceid in resourceids:
+            resource.delete_index(resourceid)
+
+    def index_tile_deletion(self, loadid):
+        index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+
+    def preview(self, request):
+        graph_id = request.POST.get("graph_id", None)
+        nodegroup_id = request.POST.get("nodegroup_id", None)
+        resourceids = request.POST.get("resourceids", None)
+        search_url = request.POST.get("search_url", None)
+
+        if resourceids:
+            resourceids = json.loads(resourceids)
+        if search_url:
+            try:
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            except ValidationError:
+                return {
+                    "success": False,
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                }
+        if resourceids:
+            resourceids = tuple(resourceids)
+
+        number_of_resource, number_of_tiles = self.get_number_of_deletions(graph_id, nodegroup_id, resourceids)
+        result = { "resource": number_of_resource, "tile": number_of_tiles }
+
+        if nodegroup_id:
+            sample_data = self.get_sample_data(nodegroup_id, resourceids)
+            result["preview"] = sample_data
+
+        return { "success": True, "data": result }
+
+    def delete(self, request):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         nodegroup_id = request.POST.get("nodegroup_id", None)
@@ -70,7 +217,13 @@ class BulkDataDeletion(BaseBulkEditor):
         if resourceids:
             resourceids = tuple(resourceids)
         if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            try:
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            except ValidationError:
+                return {
+                    "success": False,
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                }
 
         use_celery_bulk_delete = True
 
@@ -171,7 +324,10 @@ class BulkDataDeletion(BaseBulkEditor):
             )
 
         try:
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)            
+            if nodegroup_id:
+                self.index_tile_deletion(loadid)
+            else:
+                self.index_resource_deletion(loadid, resourceids)
         except Exception as e:
             logger.exception(e)
             with connection.cursor() as cursor:

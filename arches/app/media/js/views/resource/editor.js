@@ -26,7 +26,7 @@ define([
     var selection = ko.observable('root');
     var scrollTo = ko.observable();
     let parsedDisplayName = undefined;
-    try { 
+    try {
         if(typeof data.displayname == 'string') {
             parsedDisplayName = JSON.parse(data.displayname);
         }
@@ -90,8 +90,8 @@ define([
     };
 
     var graphModel = new GraphModel({
-        data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: []},
-        datatypes: data.datatypes
+        data: {nodes: data.nodes, nodegroups: data.nodegroups, edges: [], name: data.graph.name, slug: data.graph.slug},
+        datatypes: data.datatypes,
     });
 
     var topCards = _.filter(data.cards, function(card) {
@@ -160,6 +160,7 @@ define([
         nodeLookup: createLookup(graphModel.get('nodes')(), 'nodeid'),
         graphid: data.graphid,
         graphname: data.graphname,
+        graphslug: data.graph.slug,
         issystemsettings: data.issystemsettings,
         reviewer: data.userisreviewer,
         graphiconclass: data.graphiconclass,
@@ -171,6 +172,7 @@ define([
         graph: {
             graphid: data.graphid,
             name: data.graphname,
+            slug: data.graph.slug,
             iconclass: data.graphiconclass,
             ontologyclass: data.ontologyclass
         },
@@ -231,10 +233,10 @@ define([
                     url: arches.urls.resource_copy.replace('//', '/' + resourceId() + '/'),
                     success: function(data) {
                         vm.alert(new AlertViewModel(
-                            'ep-alert-blue', 
-                            arches.translations.resourceCopySuccess.title, 
-                            "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.translations.resourceCopySuccess.text + "</a>", 
-                            null, 
+                            'ep-alert-blue',
+                            arches.translations.resourceCopySuccess.title,
+                            "<a style='color: #fff; font-weight: 700;' target='_blank' href=" + arches.urls.resource_editor + data.resourceid + ">" + arches.translations.resourceCopySuccess.text + "</a>",
+                            null,
                             function(){}
                         ));
                     },
@@ -248,10 +250,10 @@ define([
             }
             else {
                 vm.alert(new AlertViewModel(
-                    'ep-alert-red', 
-                    arches.translations.resourceCopyFailed.title, 
-                    arches.translations.resourceCopyFailed.text, 
-                    null, 
+                    'ep-alert-red',
+                    arches.translations.resourceCopyFailed.title,
+                    arches.translations.resourceCopyFailed.text,
+                    null,
                     function(){}
                 ));
             }
@@ -259,12 +261,12 @@ define([
         deleteResource: function() {
             if (resourceId()) {
                 vm.menuActive(false);
-                vm.alert(new AlertViewModel('ep-alert-red', 
-                    arches.translations.confirmResourceDelete.title, 
-                    arches.translations.confirmResourceDelete.text, 
+                vm.alert(new AlertViewModel('ep-alert-red',
+                    arches.translations.confirmResourceDelete.title,
+                    arches.translations.confirmResourceDelete.text,
                     function() {
                         return;
-                    }, 
+                    },
                     function(){
                         loading(true);
                         $.ajax({

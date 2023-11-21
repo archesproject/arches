@@ -32,6 +32,7 @@ from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils.i18n import LanguageSynchronizer
 from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
@@ -1704,11 +1705,45 @@ class Graph(models.GraphModel):
                 else:
                     raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
+    def update_published_graphs(self):
+        """
+        Changes information in in GraphPublication models without creating
+        a new entry in graphs_x_published_graphs table
+        """
+        with transaction.atomic():
+            LanguageSynchronizer.synchronize_settings_with_db()
+            published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+
+            for language_tuple in settings.LANGUAGES:
+                translation.activate(language=language_tuple[0])
+
+                serialized_graph = JSONDeserializer().deserialize(
+                    JSONSerializer().serialize(self, force_recalculation=True)
+                )
+
+                published_graph_query = published_graphs.filter(language=language_tuple[0])
+                if not len(published_graph_query):
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication=self.publication,
+                        serialized_graph=serialized_graph,
+                        language=models.Language.objects.get(code=language_tuple[0]),
+                    )
+                elif len(published_graph_query) == 1:
+                    published_graph = published_graph_query[0]
+                    published_graph.serialized_graph = serialized_graph
+                else:
+                    raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
+
+                published_graph.save()
+                translation.deactivate()
+
     def create_editable_future_graph(self):
         """
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
         with transaction.atomic():
+            LanguageSynchronizer.synchronize_settings_with_db()
+
             try:
                 previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)
                 previous_editable_future_graph.delete()
@@ -2063,6 +2098,15 @@ class Graph(models.GraphModel):
 
             translation.deactivate()
 
+
+class GraphPublicationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Graph Publication Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):

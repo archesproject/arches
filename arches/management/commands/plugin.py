@@ -77,6 +77,7 @@ class Command(BaseCommand):
             config=details["config"],
             slug=details["slug"],
             sortorder=details["sortorder"],
+            helptemplate=details.get('helptemplate'),
         )
 
         instance.save()
