@@ -241,7 +241,9 @@ urlpatterns = [
     re_path(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
     re_path(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     re_path(r"^graphs", api.Graphs.as_view(action="get_graph_models"), name="get_graph_models_api"),
-    re_path(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
+    re_path(
+        r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"
+    ),
     re_path(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     re_path(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     re_path(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
@@ -303,7 +305,9 @@ urlpatterns = [
     re_path(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     re_path(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     re_path(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
-    re_path(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
+    re_path(
+        r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"
+    ),
     re_path(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
     re_path(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
     re_path(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
