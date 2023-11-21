@@ -59,7 +59,6 @@ article.main-search-container {
     }
     .search-map-container {
         flex-direction: column;
-        width: calc(100vw - 275px);
         @include break-at(small-desktop-max) {
             width: calc(100vw - 50px);
         }
