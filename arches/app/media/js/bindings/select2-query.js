@@ -47,7 +47,10 @@ define([
             if (ko.isObservable(disabled)) {
                 disabled.subscribe(function(isdisabled) {
                     select2Config.disabled = isdisabled;
-                    $(el).selectWoo("destroy").selectWoo(select2Config);
+                    try{
+                        $(el).selectWoo("destroy");
+                    }catch(e){}
+                    $(el).selectWoo(select2Config);
                 });
                 select2Config.disabled = select2Config.disabled();
             }
