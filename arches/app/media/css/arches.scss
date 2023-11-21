@@ -23,6 +23,7 @@
 @import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
+@import "css/abstracts";
 @import "sidenav.scss";
 @import "edit-history.scss";
 @import "tree.scss";
@@ -1991,9 +1992,9 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-sidebar {
     position: absolute;
+    height: 100%;
     right: 0px;
     top: 0px;
-    height: 100%;
     width: 75px;
     background-color: #f1f1f1;
     border-left: 1px solid #ddd;
@@ -2129,9 +2130,10 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-wrapper {
     flex: 1;
-    height: 100%;
+    height: calc(100vh - 101px);
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
 }
@@ -2155,6 +2157,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
+    width: calc(100% - 75px);
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
@@ -2186,7 +2189,6 @@ div.final-cons-step-separator>h4 {
     height: 100%;
     background: white;
     border-left: 1px solid rgb(216, 216, 216);
-    overflow-y: hidden;
     display: flex;
     flex-direction: column;
     align-items: normal;
@@ -4253,7 +4255,6 @@ div.dropdown-menu.open {
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
-    height: calc(100vh - 50px);
     position: relative;
 }
 
@@ -7765,7 +7766,7 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .report-toolbar-title {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-weight: 500;
     margin-top: 0px;
     padding: 14px 0 5px 25px;
@@ -8618,10 +8619,15 @@ a.clear-geojson-button:hover {
 
 .mapboxgl-ctrl-geocoder--input {
     font-size: 1.3rem;
+    @include break-at(mobile) {
+        height: 30px;
+    }
 }
 
-.workbench-card-container .mapboxgl-ctrl-geocoder {
-    margin-right: 90px;
+.mapboxgl-ctrl-geocoder--icon-search {
+    @include break-at(mobile) {
+        top: 5px;
+    }
 }
 
 .workbench-card-wrapper .mapboxgl-ctrl-top-left .mapboxgl-ctrl {
@@ -9309,7 +9315,7 @@ a.search-query-link-captions:focus {
     margin-bottom: 0px;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     transition: all .5s;
     margin-top: inherit;
