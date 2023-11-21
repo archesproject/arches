@@ -66,6 +66,22 @@
             <!-- /ko -->
             <span class="spacer"></span>
             <!-- ko ifnot: graph.attributes.isresource && ( node.is_immutable || !graph.attributes.source_identifier_id ) -->
+                <i 
+                    class="jstree-node-action-icon ion-ios-copy-outline" 
+                    role="presentation" 
+                    data-bind="
+                        visible: graphTree.showIds(), 
+                        clipboard: {
+                            value: node.nodeid, 
+                            tooltip: true, 
+                            beforeCopiedText: graphTree.translations.copyNodeIdToClipboard, 
+                            afterCopiedText: graphTree.translations.copiedNodeIdToClipboard
+                        }
+                    " 
+                    data-toggle="tooltip" 
+                    data-placement="auto" 
+                    data-container="body"
+                ></i>
                 <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
                 <i 
                     class="jstree-node-action-icon fa fa-plus-circle" 

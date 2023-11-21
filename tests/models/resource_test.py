@@ -52,7 +52,7 @@ class ResourceTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
 

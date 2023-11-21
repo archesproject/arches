@@ -3,6 +3,8 @@ import json
 import logging
 from urllib.parse import urlsplit, parse_qs
 import uuid
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.decorators import method_decorator
@@ -104,13 +106,23 @@ class BaseBulkEditor:
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT ng.nodegroupid, n.name
-                FROM node_groups ng JOIN nodes n
-                ON n.nodeid = ng.nodegroupid
-                WHERE n.graphid = %s
-                ORDER BY n.name;
+                WITH RECURSIVE card_tree(nodegroupid, parentnodegroupid, name) AS (
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, c.name ->> %s name
+                    FROM node_groups ng, cards c
+                    WHERE c.nodegroupid = ng.nodegroupid
+                    AND c.graphid = %s
+                    AND ng.parentnodegroupid IS null
+                    AND c.visible = true
+                UNION
+                    SELECT ng.nodegroupid, ng.parentnodegroupid, (ct.name || ' > ' || (c.name ->> %s)) name
+                    FROM node_groups ng, cards c, card_tree ct
+                    WHERE ng.parentnodegroupid = ct.nodegroupid
+                    AND c.nodegroupid = ng.nodegroupid
+                    AND c.visible = true
+                )
+                SELECT nodegroupid, name FROM card_tree ORDER BY name
             """,
-                [graphid],
+                [settings.LANGUAGE_CODE, graphid, settings.LANGUAGE_CODE],
             )
             nodegroups = dictfetchall(cursor)
         return {"success": True, "data": nodegroups}
@@ -119,9 +131,10 @@ class BaseBulkEditor:
         result = {"success": False}
         load_details_json = json.dumps(load_details)
         try:
+            load_description = 'Preparing the load...'
             cursor.execute(
-                """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, self.moduleid, load_details_json, False, "running", datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_description, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, self.moduleid, load_details_json, False, "running", load_description, datetime.now(), self.userid),
             )
             result["success"] = True
         except Exception as e:
@@ -151,11 +164,22 @@ class BaseBulkEditor:
             (status, datetime.now(), self.loadid),
         )
 
+    def log_event_details(self, cursor, details):
+        cursor.execute(
+            """UPDATE load_event SET load_description = concat(load_description, %s) WHERE loadid = %s""",
+            (details, self.loadid),
+        )
+
     def get_resourceids_from_search_url(self, search_url):
         request = HttpRequest()
         request.user = self.request.user
         request.method = "GET"
         request.GET["export"] = True
+        validate = URLValidator()
+        try:
+            validate(search_url)
+        except:
+            raise
         params = parse_qs(urlsplit(search_url).query)
         for k, v in params.items():
             request.GET.__setitem__(k, v[0])
@@ -192,6 +216,12 @@ class BulkStringEditor(BaseBulkEditor):
             language_code = "en"
 
         if search_url:
+            validate = URLValidator()
+            try:
+                validate(search_url)
+            except:
+                raise
+
             params = parse_qs(urlsplit(search_url).query)
             for k, v in params.items():
                 request.GET.__setitem__(k, v[0])
@@ -290,7 +320,13 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            try:
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            except ValidationError:
+                return {
+                    "success": False,
+                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                }
         if resourceids:
             resourceids = tuple(resourceids)
 
@@ -304,9 +340,16 @@ class BulkStringEditor(BaseBulkEditor):
         if also_trim == "true":
             operation = operation + "_trim"
 
-        first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-            node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word
-        )
+        try:
+            first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
+                node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word
+            )
+        except TypeError:
+            return {
+                "success": False,
+                "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+            }
+
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
@@ -378,18 +421,19 @@ class BulkStringEditor(BaseBulkEditor):
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
 
-        if resourceids:
-            resourceids = json.loads(resourceids)
-        if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
-        if resourceids:
-            resourceids = tuple(resourceids)
-
         use_celery_bulk_edit = True
 
         if use_celery_bulk_edit:
             response = self.run_load_task_async(request, self.loadid)
         else:
+            if resourceids:
+                resourceids = json.loads(resourceids)
+            if search_url:
+                with connection.cursor() as cursor:
+                    self.log_event_details(cursor, "done|Getting resources from search url...")
+                resourceids = self.get_resourceids_from_search_url(search_url)
+            if resourceids:
+                resourceids = tuple(resourceids)
             response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, pattern, new_text, resourceids)
 
         return response
@@ -411,6 +455,8 @@ class BulkStringEditor(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
+            with connection.cursor() as cursor:
+                self.log_event_details(cursor, "done|Getting resources from search url...")
             resourceids = self.get_resourceids_from_search_url(search_url)
 
         pattern = old_text
@@ -440,19 +486,20 @@ class BulkStringEditor(BaseBulkEditor):
             case_insensitive = True
 
         with connection.cursor() as cursor:
+            self.log_event_details(cursor, "done|Staging the data for edit...")
             data_staged = self.stage_data(cursor, module_id, graph_id, node_id, resourceids, operation, pattern, new_text, language_code, case_insensitive)
 
             if data_staged["success"]:
+                self.log_event_details(cursor, "done|Editing the data...")
                 data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, pattern, new_text)
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
 
-        if data_updated["success"]:
-            self.loadid = loadid  # currently redundant, but be certain
-            data_updated = save_to_tiles(userid, loadid, finalize_import=False)
-            return {"success": True, "data": "done"}
-        else:
-            with connection.cursor() as cursor:
+            if data_updated["success"]:
+                self.loadid = loadid  # currently redundant, but be certain
+                save_to_tiles(userid, loadid)
+                return {"success": True, "data": "done"}
+            else:
                 self.log_event(cursor, "failed")
-            return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}
+                return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}
