@@ -147,10 +147,6 @@ class ManifestManagerView(View):
 
             return image_json, new_image_id, file_url
 
-        def get_image_count(manifest):
-            manifest = models.IIIFManifest.objects.get(url=manifest)
-            return len(manifest.manifest["sequences"][0]["canvases"])
-
         def change_manifest_info(manifest, name, desc, attribution, logo):
             if name is not None and name != "":
                 manifest.label = name
@@ -219,15 +215,18 @@ class ManifestManagerView(View):
                     logger.warning("filetype unacceptable: " + f.name)
 
             pres_dict = create_manifest(name=name, canvases=canvases)
-            manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
-            manifest_id = manifest.id
+            manifest_global_id = str(uuid.uuid4())
+            json_url = f"/manifest/{manifest_global_id}"
+            pres_dict["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
 
-            json_url = f"/manifest/{manifest_id}"
-            manifest.url = json_url
-            manifest.manifest["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
-            manifest.transactionid = transaction_id
-
-            manifest.save()
+            manifest = models.IIIFManifest.objects.create(
+                label=name,
+                description=desc,
+                manifest=pres_dict,
+                url=json_url,
+                globalid=manifest_global_id,
+                transactionid=transaction_id
+            )
 
             return JSONResponse(manifest)
         else:

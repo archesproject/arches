@@ -31,6 +31,14 @@ class TileExcelExporter(BaseExcelExporter):
                 resource_ids = [ row[0] for row in rows ]
 
         with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET load_details = %s WHERE  loadid = (%s)""",
+                (json.dumps({
+                    "graph": graph_name,
+                    "number_of_resources": len(resource_ids),
+                }), load_id),
+            )
+
             nodes = Node.objects.filter(graph_id=graph_id)
             node_lookup_by_id = self.get_node_lookup_by_id(nodes)
             tiles_to_export = {}

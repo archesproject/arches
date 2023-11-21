@@ -54,6 +54,14 @@ class BranchExcelExporter(BaseExcelExporter):
                 resource_ids = [ row[0] for row in rows ]
 
         with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET load_details = %s WHERE  loadid = (%s)""",
+                (json.dumps({
+                    "graph": graph_name,
+                    "number_of_resources": len(resource_ids),
+                }), load_id),
+            )
+
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graph_id,))
             nodegroup_lookup = dictfetchall(cursor)
 
