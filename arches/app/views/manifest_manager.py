@@ -218,7 +218,7 @@ class ManifestManagerView(View):
                 else:
                     logger.warning("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest(name=name, canvases=canvases, file_url=canvases[0]['thumbnail']['service']['@id'])
+            pres_dict = create_manifest(name=name, canvases=canvases, file_url=canvases[0]["thumbnail"]["service"]["@id"])
             manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
             manifest_id = manifest.id
 
