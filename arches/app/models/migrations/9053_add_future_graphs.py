@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9944_improve_refresh_relationship_function"),
+        ("models", "10260_add_iiifmanifest_globalid"),
     ]
 
     operations = [
