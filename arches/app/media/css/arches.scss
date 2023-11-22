@@ -2130,7 +2130,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-wrapper {
     flex: 1;
-    height: calc(100vh - 101px);
+    height: 100%;
     position: relative;
     overflow-x: hidden;
     overflow-y: auto;
@@ -2157,7 +2157,6 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
-    width: calc(100% - 75px);
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
