@@ -1,4 +1,6 @@
+import importlib.util
 import os
+import sys
 import codecs
 
 
@@ -60,3 +62,13 @@ def get_valid_path(path):
 def print_message(message):
     border = "*" * 80
     print("{1}\n{0}\n{1}".format(message, border))
+
+
+def load_source(module_name, file_path):
+    """Replacement for deprecated imp.load_source(). Recipe from
+    https://docs.python.org/3.12/library/importlib.html#importlib.abc.Loader.exec_module"""
+
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)

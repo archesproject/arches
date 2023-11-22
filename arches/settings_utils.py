@@ -24,7 +24,7 @@ def build_staticfiles_dirs(root_dir, app_root=None, arches_applications=None, ad
     if additional_directories:
         for additional_directory in additional_directories:
             directories.append(additional_directory)
-    
+
     if app_root:
         directories.append(os.path.join(app_root, "media", "build"))
         directories.append(os.path.join(app_root, "media"))
@@ -55,7 +55,7 @@ def build_templates_config(root_dir, debug, app_root=None, arches_applications=N
     context_processors -- list of strings representing desired context processors
     """
     directories = []
-    
+
     if additional_directories:
         for additional_directory in additional_directories:
             directories.append(additional_directory)
@@ -111,12 +111,12 @@ def transmit_webpack_django_config(
     print(
         json.dumps(
             {
-                "APP_ROOT": app_root,
+                "APP_ROOT": os.path.realpath(app_root),
                 "ARCHES_APPLICATIONS": list(arches_applications) if arches_applications else [],
                 "ARCHES_APPLICATIONS_PATHS": arches_applications_paths,
                 "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
                 "PUBLIC_SERVER_ADDRESS": public_server_address,
-                "ROOT_DIR": root_dir,
+                "ROOT_DIR": os.path.realpath(root_dir),
                 "STATIC_URL": static_url,
                 "WEBPACK_DEVELOPMENT_SERVER_PORT": webpack_development_server_port,
             }

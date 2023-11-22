@@ -2,20 +2,15 @@ import json
 import logging
 import os
 import requests
-import shutil
 import uuid
 from revproxy.views import ProxyView
-from django.core.files.storage import default_storage
 from django.http.response import Http404
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models
-from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.search import search_results
-
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 logger = logging.getLogger(__name__)
 
@@ -147,10 +142,6 @@ class ManifestManagerView(View):
 
             return image_json, new_image_id, file_url
 
-        def get_image_count(manifest):
-            manifest = models.IIIFManifest.objects.get(url=manifest)
-            return len(manifest.manifest["sequences"][0]["canvases"])
-
         def change_manifest_info(manifest, name, desc, attribution, logo):
             if name is not None and name != "":
                 manifest.label = name
@@ -219,15 +210,13 @@ class ManifestManagerView(View):
                     logger.warning("filetype unacceptable: " + f.name)
 
             pres_dict = create_manifest(name=name, canvases=canvases, file_url=canvases[0]["thumbnail"]["service"]["@id"])
-            manifest = models.IIIFManifest.objects.create(label=name, description=desc, manifest=pres_dict)
-            manifest_id = manifest.id
+            manifest_global_id = str(uuid.uuid4())
+            json_url = f"/manifest/{manifest_global_id}"
+            pres_dict["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
 
-            json_url = f"/manifest/{manifest_id}"
-            manifest.url = json_url
-            manifest.manifest["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
-            manifest.transactionid = transaction_id
-
-            manifest.save()
+            manifest = models.IIIFManifest.objects.create(
+                label=name, description=desc, manifest=pres_dict, url=json_url, globalid=manifest_global_id, transactionid=transaction_id
+            )
 
             return JSONResponse(manifest)
         else:

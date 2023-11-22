@@ -872,6 +872,18 @@ class Card(APIBase):
         return JSONResponse(context, indent=4)
 
 
+class Plugins(View):
+    def get(self, request, plugin_id=None):
+        if plugin_id:
+            plugins = models.Plugin.objects.filter(pk=plugin_id)
+        else:
+            plugins = models.Plugin.objects.all()
+        
+        plugins = [plugin for plugin in plugins if self.request.user.has_perm("view_plugin", plugin)]
+
+        return JSONResponse(plugins)
+            
+
 class SearchExport(View):
     def get(self, request):
         from arches.app.search.search_export import SearchResultsExporter  # avoids circular import
@@ -1015,8 +1027,13 @@ class IIIFAnnotationNodes(APIBase):
 
 class Manifest(APIBase):
     def get(self, request, id):
-        manifest = models.IIIFManifest.objects.get(id=id).manifest
-        return JSONResponse(manifest)
+        try:
+            uuid.UUID(id)
+            manifest = models.IIIFManifest.objects.get(globalid=id).manifest
+            return JSONResponse(manifest)
+        except:
+            manifest = models.IIIFManifest.objects.get(id=id).manifest
+            return JSONResponse(manifest)
 
 
 class OntologyProperty(APIBase):
@@ -1440,10 +1457,35 @@ class UserIncompleteWorkflows(APIBase):
         if not user_is_resource_editor(request.user):
             return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
         
-        return JSONResponse({
-            "incomplete_workflows": models.WorkflowHistory.objects.filter(
-                user=request.user, completed=False
+        if request.user.is_superuser:
+            incomplete_workflows = models.WorkflowHistory.objects.filter(
+                completed=False
             ).exclude(componentdata__iexact='{}').order_by('created')
+        else:
+            incomplete_workflows = models.WorkflowHistory.objects.filter(
+                user=request.user, 
+                completed=False
+            ).exclude(componentdata__iexact='{}').order_by('created')
+
+        incomplete_workflows_user_ids = [
+            incomplete_workflow.user_id for incomplete_workflow in incomplete_workflows
+        ]
+
+        incomplete_workflows_users = models.User.objects.filter(pk__in=set(incomplete_workflows_user_ids))
+
+        user_ids_to_usernames = {
+            incomplete_workflows_user.pk: incomplete_workflows_user.username
+            for incomplete_workflows_user in incomplete_workflows_users
+        }
+
+        incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
+
+        for incomplete_workflow in incomplete_workflows_json:
+            incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+
+        return JSONResponse({
+            "incomplete_workflows": incomplete_workflows_json,
+            "requesting_user_is_superuser": request.user.is_superuser,
         })
 
 
