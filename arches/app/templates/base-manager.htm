@@ -344,22 +344,18 @@
 
                     <ul class="top-right-nav" aria-label="{% trans 'User and User Actions Navigation' %}">
                         
-                        <!-- Login -->
-                        {% if nav.login %}
-                        <li>
-                            <a href="{% if user.username != 'anonymous' %}{% url 'user_profile_manager' %}{% else %}{% url 'auth' %}?next={{ request.get_full_path }}{% endif %}"
+                        <!-- Welcome -->
+                        {% if nav.login and user.username != 'anonymous' %}
+                        <li class="hidden-xs">
+                            <a href="{% url 'user_profile_manager' %}"
                                 class="ep-tools ep-tools-login">
                                 <div data-placement="bottom"
                                     data-toggle="tooltip"
-                                    data-original-title="{% if user.username != 'anonymous' %}{% trans 'Profile' %}{% else %}{% trans 'Login' %}{% endif %}">
-                                    {% if user.username == 'anonymous' %}
-                                        <span class="hidden-xs h5">{% trans "Login" %}</span>
-                                    {% else %}
-                                        <!-- ko let: {user: '{{ user.first_name|default:user.username }}' }  -->
-                                        <span class="hidden-xs h5" data-bind="attr: {'aria-label': $root.translations.welcomeUserEditProfile(user) }"
-                                        >{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</span>
-                                        <!-- /ko -->
-                                    {% endif %}
+                                    data-original-title="{% trans 'Profile' %}">
+                                    <!-- ko let: {user: '{{ user.first_name|default:user.username }}' }  -->
+                                    <span class="hidden-xs h5" data-bind="attr: {'aria-label': $root.translations.welcomeUserEditProfile(user) }"
+                                    >{% trans "Welcome" %}, {{ user.first_name|default:user.username }}</span>
+                                    <!-- /ko -->
                                 </div>
                             </a>
                         </li>
@@ -474,10 +470,21 @@
                         </li>
                         {% endif %}
 
-                        <!-- Logout -->
-                        {% if user.username != 'anonymous' %}
+                        <!-- Login / Logout -->
                         <li>
-                            <a  href="{% url 'auth' %}?next={{ request.get_full_path }}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
+                            <!-- Login -->
+                            {% if user.username == 'anonymous' %}
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}"
+                                class="ep-help-toggle ep-tools ep-tools-right"
+                                aria-label="{% trans 'Logout' %}"
+                            >
+                                <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans 'Login' %}">
+                                    <i class="ion-log-in"></i>
+                                </div>
+                            </a>
+                            <!-- Logout -->
+                            {% else %}
+                            <a href="{% url 'auth' %}?next={{ request.get_full_path }}&logout=true"
                                 class="ep-help-toggle ep-tools ep-tools-right"
                                 aria-label="{% trans 'Logout' %}"
                             >
@@ -485,9 +492,8 @@
                                     <i class="ion-log-out"></i>
                                 </div>
                             </a>
+                            {% endif %}
                         </li>
-                        {% endif %}
-
 
                     </ul>
 
