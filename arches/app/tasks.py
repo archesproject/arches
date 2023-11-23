@@ -90,17 +90,15 @@ def export_search_results(self, userid, request_values, format, report_link):
         user = _user.username
 
     context = return_message_context(
-        _(f"Hello,\nYour request to download a set of search results is now ready. You have until {formatted_expiration_date} to access this download, after which time it'll be deleted."),
+        _("Hello,\nYour request to download a set of search results is now ready. You have until {} to access this download, after which time it'll be deleted.".format(formatted_expiration_date)),
         _("Thank you"),
         email,
-        {"link":str(exportid),"button_text":_("Download Now"),"name":export_name,"email_link":str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),"username":user},
+        {"link":str(exportid),"button_text":_("Download Now"),"name":export_name,"email_link":str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),"username":user},
         )
 
     return {
         "taskid": self.request.id,
-        "msg": _(
-            f"Your search '{export_name}' is ready for download. You have until {formatted_expiration_date} to access this file, after which we'll automatically remove it."
-        ),
+        "msg": _("Your search '{}' is ready for download. You have until {} to access this file, after which we'll automatically remove it.".format(export_name, formatted_expiration_date)),
         "notiftype_name": "Search Export Download Ready",
         "context":context}
 
