@@ -166,7 +166,7 @@ class UserManagerView(BaseManagerView):
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else None
                     email_username = user.username
                     # Use firstname for email if we have it.
-                    if user.first_name != "" and user.first_name is not None:
+                    if user.first_name:
                         email_username = user.first_name
 
                     message = (
