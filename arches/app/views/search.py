@@ -260,10 +260,10 @@ def export_results(request):
     elif format == "tilexl":
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
-        wb = export_files[0]["outputfile"]
-        
+        wb = export_files[0]["outputfile"]  
+
         if sys.platform == "win32":
-            tmp = NamedTemporaryFile(dir=settings.TILE_EXCEL_EXPORT_TEMP_DIRECTORY, delete=settings.TILE_EXCEL_EXPORT_TEMP_FILE_DELETE)
+            tmp = NamedTemporaryFile(dir=settings.TEMP_DIRECTORY, delete=False)
         else:
             tmp = NamedTemporaryFile()
                     
@@ -273,6 +273,7 @@ def export_results(request):
             stream = tmp.read()
             export_files[0]["outputfile"] = tmp
             return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
