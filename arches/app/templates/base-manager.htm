@@ -476,7 +476,7 @@
                             {% if user.username == 'anonymous' %}
                             <a href="{% url 'auth' %}?next={{ request.get_full_path }}"
                                 class="ep-help-toggle ep-tools ep-tools-right"
-                                aria-label="{% trans 'Logout' %}"
+                                aria-label="{% trans 'Login' %}"
                             >
                                 <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans 'Login' %}">
                                     <i class="ion-log-in"></i>
