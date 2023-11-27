@@ -23,10 +23,12 @@ class SearchThumbnailFetcherFactory(object):
     @classmethod
     def create_thumbnail_fetcher(cls, resource_id: str, **kwargs) -> SearchThumbnailFetcher:
         """Factory command to create the template engine"""
-        resource = Resource.objects.get(resourceinstanceid=resource_id)
         try:
+            resource = Resource.objects.get(resourceinstanceid=resource_id)
             search_thumbnail_fetcher_class = cls.registry[str(resource.graph_id)]
             search_thumbnail_fetcher = search_thumbnail_fetcher_class(resource, **kwargs)
             return search_thumbnail_fetcher
         except KeyError:
             return None  # there is no thumbnail fetcher registered for the graph requested
+        except Resource.DoesNotExist:
+            return None  # there is no resource with this ID.  This is rare, but can happen if there are issues with the index.
