@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import pypdfium2 as pdfium
-from thumbnail import generate_thumbnail
+from thumbnail import generate_thumbnail, close_unoserver
 from tempfile import NamedTemporaryFile
 
 
@@ -47,11 +47,13 @@ class ThumbnailGenerator(object):
                 'height': 300,
                 'width': 300,
                 'quality': 85,
-                'thumbnail': False
+                'thumbnail': False,
+                'verbose': False
             }
 
             options = {**options, **kwargs}
             generate_thumbnail(inputfile_path, outputfile_path, options)
+            close_unoserver()
 
     def get_thumbnail_data(self, uploadedfile):
         """
