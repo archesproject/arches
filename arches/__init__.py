@@ -13,4 +13,3 @@ except Exception as e:
 VERSION = (7, 4, 3, "beta", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
 
 __version__ = get_version(VERSION)
-
