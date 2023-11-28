@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "7.4.2",
+    "version": "7.4.3",
     "scripts": {
         "build_production": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
         "build_development": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
