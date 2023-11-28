@@ -66,6 +66,7 @@ ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
+SEARCH_THUMBNAILS = False
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 
@@ -743,6 +744,7 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
+
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
