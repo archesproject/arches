@@ -171,7 +171,7 @@ class Resource(models.ResourceInstance):
             if len(self.descriptor_function) == 1:
                 module = self.descriptor_function[0].function.get_class_module()()
                 self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
+                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context, descriptor
                 )
                 if descriptor == "name" and self.descriptors[language][descriptor] is not None:
                     self.name[language] = self.descriptors[language][descriptor]

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractPrimaryDescriptorsFunction(BaseFunction):
-    def get_primary_descriptor_from_nodes(self, resource, config, context=None):
+    def get_primary_descriptor_from_nodes(self, resource, config, context=None, descriptor=None):
         """
         Arguments:
         resource -- the resource instance to which the primary decriptor will be assigned
@@ -18,13 +18,14 @@ class AbstractPrimaryDescriptorsFunction(BaseFunction):
 
         Keyword Arguments:
         context -- string such as "copy" to indicate conditions under which a resource participates in a function.
+        descriptor -- type of descriptor, e.g. "name", "map_popup", or "description"
         """
 
         pass
 
 
 class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
-    def get_primary_descriptor_from_nodes(self, resource, config, context=None):
+    def get_primary_descriptor_from_nodes(self, resource, config, context=None, descriptor=None):
         """
         Arguments:
         resource -- the resource instance to which the primary decriptor will be assigned
@@ -32,6 +33,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
 
         Keyword Arguments:
         context -- string such as "copy" to indicate conditions under which a resource participates in a function.
+        descriptor -- type of descriptor, e.g. "name", "map_popup", or "description"
         """
 
         datatype_factory = None
