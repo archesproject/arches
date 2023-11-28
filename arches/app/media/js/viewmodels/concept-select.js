@@ -125,6 +125,7 @@ define([
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();
             }),
+            initComplete: false,
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
                 
@@ -161,10 +162,13 @@ define([
                             text: NAME_LOOKUP[data],
                         }];
                     }
-                    valueData.forEach(function(data) {
-                        var option = new Option(data.text, data.id, true, true);
-                        $(el).append(option);
-                    });
+                    if(!self.select2Config.initComplete){
+                        valueData.forEach(function(data) {
+                            var option = new Option(data.text, data.id, true, true);
+                            $(el).append(option);
+                        });
+                        self.select2Config.initComplete = true;
+                    }
                     callback(valueData);
                 };
 
