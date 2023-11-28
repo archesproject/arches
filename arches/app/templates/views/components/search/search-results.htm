@@ -7,21 +7,26 @@
 ">
 
     <div class="search-listing" role="listitem" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
-        <p 
-            class="search-listing-title" 
-            data-bind="css: {'i18n-alt': $parent.alternativelanguage}"
-        >
-            <a class="search-candidate-title" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.viewReport.bind($parent),
-                attr: {'aria-label': $root.translations.viewResourceReport(displayname)},
-            ">
-                <i class="search-listing-icon" data-bind="css: iconclass"></i> 
-                <span data-bind="text: displayname"></span>
-            </a>
-        </p>
+        <div style="display: flex">
+            <div style="flex: 1">
+                <p 
+                    class="search-listing-title" 
+                    data-bind="css: {'i18n-alt': $parent.alternativelanguage}"
+                >
+                    <a class="search-candidate-title" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.viewReport.bind($parent),
+                        attr: {'aria-label': $root.translations.viewResourceReport(displayname)},
+                    ">
+                        <i class="search-listing-icon" data-bind="css: iconclass"></i> 
+                        <span data-bind="text: displayname"></span>
+                    </a>
+                </p>
 
-        <div class="search-listing-body" data-bind="html: displaydescription">
+                <div class="search-listing-body" data-bind="html: displaydescription">
+                    
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; margin: 10px;" data-bind="visible: thumbnail"><img style="max-width: 60px;" data-bind="attr:{src: thumbnail}"></div>
         </div>
-
         <div class="search-listing-footer">
             <div style="flex-grow: 1;">
                 <!--ko if: provisional_resource == 'true' -->

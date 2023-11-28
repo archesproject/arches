@@ -194,7 +194,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         return acc;
                     }, []);
 
-                    this.searchResults.results.hits.hits.forEach(function(result){
+                    this.searchResults.results.hits.hits.forEach(async function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
                         });
@@ -202,8 +202,14 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         if (result._source.points.length > 0) {
                             point = result._source.points[0].point;
                         }
+
+                        const thumbnailUrl = `/thumbnail/${result._source.resourceinstanceid}`;
+                        const thumbnailResponse = arches.searchThumbnails == 'True' ? await fetch(thumbnailUrl, {method: 'HEAD'}): undefined;
+                        const thumbnail = thumbnailResponse && thumbnailResponse.ok ? thumbnailUrl: undefined;
+
                         this.results.push({
                             displayname: result._source.displayname,
+                            thumbnail: thumbnail,
                             resourceinstanceid: result._source.resourceinstanceid,
                             displaydescription: result._source.displaydescription,
                             alternativelanguage: result._source.displayname_language != arches.activeLanguage,
