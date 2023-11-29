@@ -556,7 +556,9 @@ class EDTFDataType(BaseDataType):
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
                     raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                query.should(Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix"))
+                else:
+                    operators = {"gte": edtf.lower, "lte": edtf.lower}
+                    query.must(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
             else:
                 if value["op"] == "overlaps":
                     operators = {"gte": edtf.lower, "lte": edtf.upper}
