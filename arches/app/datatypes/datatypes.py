@@ -553,9 +553,16 @@ class EDTFDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         def add_date_to_doc(query, edtf):
+            invalid_filter_exception = Exception(
+                _(
+                    'Only dates that specify an exact year, month, \
+                        and day can be used with the "=", ">", "<", ">=", and "<=" operators'
+                )
+            )
+
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
-                    raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
+                    raise invalid_filter_exception
                 else:
                     operators = {"gte": edtf.lower, "lte": edtf.lower}
                     query.must(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
@@ -564,12 +571,7 @@ class EDTFDataType(BaseDataType):
                     operators = {"gte": edtf.lower, "lte": edtf.upper}
                 else:
                     if edtf.lower != edtf.upper:
-                        raise Exception(
-                            _(
-                                'Only dates that specify an exact year, month, \
-                                    and day can be used with the ">", "<", ">=", and "<=" operators'
-                            )
-                        )
+                        raise invalid_filter_exception
 
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
@@ -582,7 +584,9 @@ class EDTFDataType(BaseDataType):
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
-        if value["op"] == "null" or value["op"] == "not_null":
+        if not value.get('op'):
+            pass
+        elif value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
         elif value["val"] != "" and value["val"] is not None:
             edtf = ExtendedDateFormat(value["val"])
