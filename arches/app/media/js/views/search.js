@@ -163,8 +163,9 @@ define([
                     this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {
+                    const alert = new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseJSON?.message);
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.requestFailed.title, response.responseText));
+                        this.viewModel.alert(alert);
                     }
                 },
                 complete: function(request, status) {
