@@ -438,6 +438,7 @@ define([
                                 queryString.set('term-filter', JSON.stringify(termFilter));
                             }
                         }
+                        queryString.set('sort-results', 'asc')
                         return queryString.toString();
                     }
                 },
