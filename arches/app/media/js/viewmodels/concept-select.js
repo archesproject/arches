@@ -123,9 +123,6 @@ define([
                 return item.text;
             },
             escapeMarkup: function(m) { return m; },
-            isEmpty: ko.computed(function() {
-                return self.value() === '' || !self.value();
-            }),
             initComplete: false,
             initSelection: function(el, callback) {
                 var valueList = self.valueList();
