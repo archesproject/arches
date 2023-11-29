@@ -392,7 +392,6 @@ def paged_dropdown(request):
         for d in data
     ]
 
-
     return JSONResponse({"results": data, "more": offset + limit < total_count})
 
 
