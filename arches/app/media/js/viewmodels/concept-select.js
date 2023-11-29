@@ -122,6 +122,7 @@ define([
             templateSelection: function(item) {
                 return item.text;
             },
+            escapeMarkup: function(m) { return m; },
             isEmpty: ko.computed(function() {
                 return self.value() === '' || !self.value();
             }),
