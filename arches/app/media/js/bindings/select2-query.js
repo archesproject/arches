@@ -45,14 +45,30 @@ define([
 
             var disabled = select2Config.disabled;
             if (ko.isObservable(disabled)) {
-                disabled.subscribe(function(isdisabled) {
-                    select2Config.disabled = isdisabled;
-                    try{
-                        $(el).selectWoo("destroy");
-                    }catch(e){}
-                    $(el).selectWoo(select2Config);
+                disabled.subscribe(function(val) {
+                    $(el).prop("disabled", !!val);
                 });
                 select2Config.disabled = select2Config.disabled();
+            }
+
+            var data = select2Config.data;
+            if (ko.isObservable(data)) {
+                data.subscribe(function(data) {
+                    var currentSelection = $(el).select2('data').map(selected => selected.id);
+                    $(el).find("option").remove();
+                    data.forEach(data => {
+                        // add new options to the dropdown
+                        if ($(el).find("option[value='" + data.id + "']").length === 0) {
+                            // Create a DOM Option and pre-select by default
+                            var newOption = new Option(data.text, data.id, false, false);
+                            // Append it to the select
+                            $(el).append(newOption);
+                        } 
+                    });
+                    // maintain the current selection after adding new dropdown options
+                    $(el).val(currentSelection).trigger('change');
+                });
+                select2Config.data = select2Config.data();
             }
 
             // this initializes the placeholder for the single select element
@@ -72,7 +88,6 @@ define([
             };
 
             $(document).ready(function() {
-                select2Config.data = ko.unwrap(select2Config.data);
                 $(el).selectWoo(select2Config);
                 
                 if (value) {
