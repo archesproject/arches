@@ -6,6 +6,23 @@
 
     <div class="search-listing" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
         <div style="display: flex">
+            <div style="display: flex;">
+                <div 
+                    style="display: flex; align-items: center; padding: 10px;" 
+                    data-bind="
+                        visible: thumbnail,
+                        event: { 
+                            mouseover: mouseoverThumbnail,
+                            mouseout: mouseoutThumbnail,
+                        }
+                    "
+                >
+                    <img style="max-width: 70px;" data-bind="attr:{src: thumbnail}">
+                </div>
+
+                <img style="position: absolute; left: 380px; display: none;" data-bind="attr:{src: thumbnail}">
+            </div>
+
             <div style="flex: 1">
                 <h3 
                     class="search-listing-title" 
@@ -21,7 +38,6 @@
                     
                 </div>
             </div>
-            <div style="display: flex; align-items: center; margin: 10px;" data-bind="visible: thumbnail"><img style="max-width: 60px;" data-bind="attr:{src: thumbnail}"></div>
         </div>
         <div class="search-listing-footer">
             <div style="flex-grow: 1;">

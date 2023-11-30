@@ -73,6 +73,20 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                 };
             },
 
+            mouseoverThumbnail: function(_data, event) {
+                const largeThumbnail = event.currentTarget.nextElementSibling;
+                largeThumbnail.style.display = 'block'; 
+
+                const rect = largeThumbnail.getBoundingClientRect();
+                if (rect.bottom > window.innerHeight) {
+                    largeThumbnail.style.top = (window.innerHeight - rect.height - 60) + 'px';
+                }
+            },
+
+            mouseoutThumbnail: function(_data, event) {
+                event.currentTarget.nextElementSibling.style.display = 'none' ;
+            },
+
             showRelatedResources: function() {
                 var self = this;
                 return function(resourceinstance){
@@ -215,6 +229,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                             showDetails: this.showResourceSummaryReport(result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
+                            mouseoverThumbnail: this.mouseoverThumbnail,
+                            mouseoutThumbnail: this.mouseoutThumbnail,
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
                             relatable: this.isResourceRelatable(result._source.graph_id),
