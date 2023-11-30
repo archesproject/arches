@@ -12,6 +12,7 @@ define(['jquery', 'underscore', 'backbone', 'select-woo', 'arches'], function($,
                 multiple: false,
                 maximumselectionsize: 1,
                 minimumInputLength: 2,
+                placeholder: arches.translations.searchForAConcept,
                 ajax: {
                     url: this.getUrl,
                     dataType: 'json',
