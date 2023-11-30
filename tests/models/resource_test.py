@@ -23,8 +23,10 @@ import time
 from tests import test_settings
 from django.contrib.auth.models import User, Group
 from django.core import management
+from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
 from arches.app.models.graph import Graph
@@ -34,7 +36,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.index_database import index_resources_by_type
+from arches.app.utils.index_database import index_resources_by_type, index_resources_using_singleprocessing
 from tests.base_test import ArchesTestCase
 
 
@@ -124,7 +126,7 @@ class ResourceTests(ArchesTestCase):
         tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
         cls.test_resource.tiles.append(tile)
 
-        # Add Gometry
+        # Add Geometry
         cls.geom = {
             "type": "FeatureCollection",
             "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
@@ -230,3 +232,40 @@ class ResourceTests(ArchesTestCase):
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
         self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
+
+    def test_recalculate_descriptors_one_query_for_descriptor_function(self):
+        r1 = Resource(graph_id=self.search_model_graphid)
+        r2 = Resource(graph_id=self.search_model_graphid)
+        r1.save()
+        r2.save()
+        self.addCleanup(r1.delete)
+        self.addCleanup(r2.delete)
+
+        # Add a primary descriptor to the graph
+        fn = models.Function.objects.filter(functiontype="primarydescriptors").first()
+        new_function_x_graph = models.FunctionXGraph(
+            function_id=fn.pk,
+            config=fn.defaultconfig,
+            graph=r1.graph,
+        )
+        new_function_x_graph.save()
+        self.addCleanup(new_function_x_graph.delete)
+
+        # Instead of asserting an exact number of queries, which would be brittle,
+        # we just want to test that we don't do unnecessary fetching of the descriptor
+        # function against a baseline. Although the baseline will have already been
+        # "fixed" in this pull request, we can still simulate the problem by repeating
+        # the action and ensuring the first query for the first resource goes away.
+        # Thus, this test will still have an opportunity to fail on the target branch.
+
+        # Ensure we start from scratch
+        r1.descriptor_function = None
+        r2.descriptor_function = None
+
+        # Get a baseline number of queries, already optimized to fetch the descriptor just once.
+        with CaptureQueriesContext(connection) as baseline:
+            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+
+        # One query saved on the first resource.
+        with self.assertNumQueries(len(baseline) - 1):
+            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)

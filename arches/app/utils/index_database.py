@@ -193,10 +193,14 @@ def index_resources_using_singleprocessing(
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
+            last_resource = None
             for resource in resources:
                 resource.set_node_datatypes(node_datatypes)
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if recalculate_descriptors:
+                    # Reuse the queryset for FunctionXGraph rows if the graph is the same.
+                    if last_resource and (resource.graph_id == last_resource.graph_id):
+                        resource.descriptor_function = last_resource.descriptor_function
                     resource.calculate_descriptors()
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
@@ -207,6 +211,8 @@ def index_resources_using_singleprocessing(
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+
+                last_resource = resource
 
     return os.getpid()
 

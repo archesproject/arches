@@ -162,7 +162,7 @@ class Resource(models.ResourceInstance):
 
         language = self.get_descriptor_language(context)
 
-        if not self.descriptor_function:
+        if self.descriptor_function is None:  # might be empty queryset
             self.descriptor_function = models.FunctionXGraph.objects.filter(
                 graph_id=self.graph_id, function__functiontype="primarydescriptors"
             ).select_related("function")
