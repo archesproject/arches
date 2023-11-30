@@ -79,7 +79,6 @@
         "webpack-bundle-tracker": "^1.4.0"
     },
     "nodeModulesPaths": {
-        "plugins/knockout-select2": "plugins/knockout-select2.js",
         "nifty": "plugins/nifty",
         "leaflet-side-by-side": "plugins/leaflet-side-by-side/index",
         "themepunch-tools": "plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min",

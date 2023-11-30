@@ -11,8 +11,7 @@ define([
     'view-data',
     'templates/views/components/search/search-results.htm',
     'utils/aria',
-    'bootstrap-datetimepicker',
-    'plugins/knockout-select2'],
+    'bootstrap-datetimepicker'],
 function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate, ariaUtils) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {

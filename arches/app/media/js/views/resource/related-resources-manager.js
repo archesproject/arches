@@ -10,7 +10,6 @@ define([
     'utils/ontology',
     'templates/views/resource/related-resources/related-resources-manager.htm',
     'views/components/related-resources-graph',
-    'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
 ], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils, relatedResourcesManagerTemplate) {
