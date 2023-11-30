@@ -304,6 +304,9 @@ def check_resource_instance_permissions(user, resourceid, permission):
     """
     result = {}
     try:
+        if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+            if not bool(user.groups.filter(name__in=["System Administrator"])):
+                return False
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         result["resource"] = resource
 
