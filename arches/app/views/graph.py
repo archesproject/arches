@@ -173,7 +173,7 @@ class GraphDesignerView(GraphBaseView):
     def get(self, request, graphid):
         
         if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            if not bool(request.user.groups.filter(name__in=["System Administrator"])):
+            if not request.user.groups.filter(name="System Administrator").exists():
                 raise PermissionDenied
 
         self.graph = Graph.objects.get(graphid=graphid)
