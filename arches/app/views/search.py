@@ -42,6 +42,7 @@ from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
+from arches.app.views.resource import ResourceDescriptors
 from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer, user_is_resource_exporter
 from arches.app.utils.decorators import group_required
@@ -134,72 +135,109 @@ def search_terms(request):
 
     i = 0
     ret = {}
-    for index in ["terms", "concepts"]:
-        query = Query(se, start=0, limit=0)
+    for index in ["terms", "concepts", "resources"]:
         boolquery = Bool()
 
-        if lang != "*":
+        if lang != "*" and index != "resources":
             boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
 
-        boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
-        boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
-        boolquery.should(
-            Match(field="value.folded", query=searchString.lower(), fuzziness="AUTO", prefix_length=settings.SEARCH_TERM_SENSITIVITY)
-        )
+        if index == "resources":
+            bool_subquery = Bool()
+            bool_subquery.must(
+                Match(field="displayname.value", query=searchString.lower(), fuzziness=2)
+            )
+            if lang != "*":
+                bool_subquery.must(Match(field="displayname.language", query=lang, type="phrase_prefix"))
+            nested_query = Nested( 
+                path="displayname",
+                query=bool_subquery
+            )
+            boolquery.must(nested_query)
+            query = Query(se, start=0, limit=10, min_score=20, size=10)
+            query.include("graph_id")
+            query.include("displayname")
+        else:
+            query = Query(se, start=0, limit=0)
+            boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
+            boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
+            boolquery.should(
+                Match(field="value.folded", query=searchString.lower(), fuzziness="AUTO", prefix_length=settings.SEARCH_TERM_SENSITIVITY)
+            )
 
         if user_is_reviewer is False and index == "terms":
             boolquery.filter(Terms(field="provisional", terms=["false"]))
 
         query.add_query(boolquery)
-        base_agg = Aggregation(
-            name="value_agg", type="terms", field="value.raw", size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"}
-        )
-        nodegroupid_agg = Aggregation(name="nodegroupid", type="terms", field="nodegroupid")
-        top_concept_agg = Aggregation(name="top_concept", type="terms", field="top_concept")
-        conceptid_agg = Aggregation(name="conceptid", type="terms", field="conceptid")
-        max_score_agg = MaxAgg(name="max_score", script="_score")
 
-        top_concept_agg.add_aggregation(conceptid_agg)
-        base_agg.add_aggregation(max_score_agg)
-        base_agg.add_aggregation(top_concept_agg)
-        base_agg.add_aggregation(nodegroupid_agg)
-        query.add_aggregation(base_agg)
+        if index != "resources":
+            base_agg = Aggregation(
+                name="value_agg", type="terms", field="value.raw", size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"}
+            )
+            nodegroupid_agg = Aggregation(name="nodegroupid", type="terms", field="nodegroupid")
+            top_concept_agg = Aggregation(name="top_concept", type="terms", field="top_concept")
+            conceptid_agg = Aggregation(name="conceptid", type="terms", field="conceptid")
+            max_score_agg = MaxAgg(name="max_score", script="_score")
+
+            top_concept_agg.add_aggregation(conceptid_agg)
+            base_agg.add_aggregation(max_score_agg)
+            base_agg.add_aggregation(top_concept_agg)
+            base_agg.add_aggregation(nodegroupid_agg)
+            query.add_aggregation(base_agg)
 
         ret[index] = []
-        results = query.search(index=index)
+        if index == "resources":
+            results = query.search(index=index, limit=10, scroll="1m")
+        else:
+            results = query.search(index=index)
         if results is not None:
-            for result in results["aggregations"]["value_agg"]["buckets"]:
-                if len(result["top_concept"]["buckets"]) > 0:
-                    for top_concept in result["top_concept"]["buckets"]:
-                        top_concept_id = top_concept["key"]
-                        top_concept_label = get_preflabel_from_conceptid(
-                            top_concept["key"],
-                            lang=lang if lang != "*" else None
-                        )["value"]
-                        for concept in top_concept["conceptid"]["buckets"]:
-                            ret[index].append(
-                                {
-                                    "type": "concept",
-                                    "context": top_concept_id,
-                                    "context_label": top_concept_label,
-                                    "id": i,
-                                    "text": result["key"],
-                                    "value": concept["key"],
-                                }
-                            )
-                        i = i + 1
-                else:
+            if index == "resources" and results["hits"]["total"]["value"]:
+                for i, doc in enumerate(results["hits"]["hits"]):
+                    displayname_localized = ResourceDescriptors.get_localized_descriptor_static(doc, "displayname")
                     ret[index].append(
                         {
-                            "type": "term",
+                            "type": "exactmatch",
                             "context": "",
-                            "context_label": get_resource_model_label(result),
+                            "context_label": f"{displayname_localized} - {_('Exact Match')}",
+                            "resourceinstanceid": doc['_id'],
+                            "graph_id": doc['_source']['graph_id'],
                             "id": i,
-                            "text": result["key"],
-                            "value": result["key"],
+                            "text": displayname_localized,
+                            "value": doc['_id'],
                         }
                     )
-                    i = i + 1
+            elif index != "resources":
+                for result in results["aggregations"]["value_agg"]["buckets"]:
+                    if len(result["top_concept"]["buckets"]) > 0:
+                        for top_concept in result["top_concept"]["buckets"]:
+                            top_concept_id = top_concept["key"]
+                            top_concept_label = get_preflabel_from_conceptid(
+                                top_concept["key"],
+                                lang=lang if lang != "*" else None
+                            )["value"]
+                            for concept in top_concept["conceptid"]["buckets"]:
+                                ret[index].append(
+                                    {
+                                        "type": "concept",
+                                        "context": top_concept_id,
+                                        "context_label": top_concept_label,
+                                        "id": i,
+                                        "text": result["key"],
+                                        "value": concept["key"],
+                                    }
+                                )
+                            i = i + 1
+                    else:
+                        ret[index].append(
+                            {
+                                "type": "term",
+                                "context": "",
+                                "context_label": get_resource_model_label(result),
+                                "id": i,
+                                "text": result["key"],
+                                "value": result["key"],
+                            }
+                        )
+                        i = i + 1
 
     return JSONResponse(ret)
 

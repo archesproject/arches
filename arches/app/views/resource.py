@@ -748,6 +748,18 @@ class ResourceCards(View):
 
 
 class ResourceDescriptors(View):
+    @staticmethod
+    def get_localized_descriptor_static(document, descriptor_type, language_codes=None):
+        if language_codes is None:
+            language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
+        descriptor = document["_source"][descriptor_type]
+        result = descriptor[0] if len(descriptor) > 0 else {"value": _("Undefined")}
+        for language_code in language_codes:
+            for entry in descriptor:
+                if entry["language"] == language_code and entry["value"] != "":
+                    return entry["value"]
+        return result["value"]
+
     def get_localized_descriptor(self, document, descriptor_type):
         language_codes = (translation.get_language(), settings.LANGUAGE_CODE)
         descriptor = document["_source"][descriptor_type]
