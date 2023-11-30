@@ -241,16 +241,6 @@ class ResourceTests(ArchesTestCase):
         self.addCleanup(r1.delete)
         self.addCleanup(r2.delete)
 
-        # Add a primary descriptor to the graph
-        fn = models.Function.objects.filter(functiontype="primarydescriptors").first()
-        new_function_x_graph = models.FunctionXGraph(
-            function_id=fn.pk,
-            config=fn.defaultconfig,
-            graph=r1.graph,
-        )
-        new_function_x_graph.save()
-        self.addCleanup(new_function_x_graph.delete)
-
         # Ensure we start from scratch
         r1.descriptor_function = None
         r2.descriptor_function = None
