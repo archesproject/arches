@@ -19,6 +19,7 @@ from arches import __version__
 from arches.app.models.system_settings import settings
 from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponse
+from arches.app.utils.mobile import mobile
 
 
 def index(request):
@@ -32,6 +33,7 @@ def index(request):
             "copyright_text": settings.COPYRIGHT_TEXT,
             "copyright_year": settings.COPYRIGHT_YEAR,
             "version": __version__,
+            "mobile": mobile(request),
             "show_language_swtich": settings.SHOW_LANGUAGE_SWITCH,
         },
     )

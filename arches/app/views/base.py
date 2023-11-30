@@ -27,6 +27,7 @@ from arches.app.utils.permission_backend import (
     get_resource_types_by_perm,
 )
 from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
+from arches.app.utils.mobile import mobile
 from arches import __version__
 
 class BaseManagerView(TemplateView):
@@ -86,6 +87,7 @@ class BaseManagerView(TemplateView):
         context["app_name"] = settings.APP_NAME
         context["show_language_swtich"] = settings.SHOW_LANGUAGE_SWITCH
         context["version"] = __version__
+        context["mobile"] = mobile(self.request)
         return context
 
 
