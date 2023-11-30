@@ -10,7 +10,6 @@ define([
     'bindings/chosen',
     'bindings/codemirror',
     'select-woo',
-    'bindings/select2v4',
     'bindings/fadeVisible',
     'bindings/mapbox-gl',
     'bindings/color-picker',
