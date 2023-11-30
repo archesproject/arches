@@ -251,21 +251,14 @@ class ResourceTests(ArchesTestCase):
         new_function_x_graph.save()
         self.addCleanup(new_function_x_graph.delete)
 
-        # Instead of asserting an exact number of queries, which would be brittle,
-        # we just want to test that we don't do unnecessary fetching of the descriptor
-        # function against a baseline. Although the baseline will have already been
-        # "fixed" in this pull request, we can still simulate the problem by repeating
-        # the action and ensuring the first query for the first resource goes away.
-        # Thus, this test will still have an opportunity to fail on the target branch.
-
         # Ensure we start from scratch
         r1.descriptor_function = None
         r2.descriptor_function = None
 
-        # Get a baseline number of queries, already optimized to fetch the descriptor just once.
-        with CaptureQueriesContext(connection) as baseline:
+        with CaptureQueriesContext(connection) as queries:
             index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
 
-        # One query saved on the first resource.
-        with self.assertNumQueries(len(baseline) - 1):
-            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+        function_x_graph_selects = [
+            q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
+        ]
+        self.assertEqual(len(function_x_graph_selects), 1)
