@@ -22,8 +22,7 @@ class FileView(View):
 
         def get_file():
             if file.thumbnail_data is None and settings.GENERATE_THUMBNAILS_ON_DEMAND:
-                file.make_thumbnail()
-                file.save()
+                file.save() # simply resaving the file will attempt to regenerate the thumbnail
             if get_thumbnail and file.thumbnail_data:
                 return HttpResponse(file.thumbnail_data, content_type="image/png")
             else:

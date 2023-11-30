@@ -21,6 +21,8 @@ import pypdfium2 as pdfium
 from thumbnail import generate_thumbnail, close_unoserver
 from tempfile import NamedTemporaryFile
 
+from django.utils.translation import gettext as _
+
 
 class ThumbnailGenerator(object):
 
@@ -33,27 +35,8 @@ class ThumbnailGenerator(object):
         Returns: 
             None
         """
-        if ".pdf" in inputfile_path:
-            # Load a document
-            pdf = pdfium.PdfDocument(inputfile_path)
 
-            # render a single page (in this case: the first one)
-            page = pdf[0]
-            pil_image = page.render(scale=4).to_pil()
-            pil_image.save(outputfile_path)
-        else:
-            options = {
-                'trim': False,
-                'height': 300,
-                'width': 300,
-                'quality': 85,
-                'thumbnail': False,
-                'verbose': False
-            }
-
-            options = {**options, **kwargs}
-            generate_thumbnail(inputfile_path, outputfile_path, options)
-            close_unoserver()
+        raise NotImplementedError # subclasses should implement this method
 
     def get_thumbnail_data(self, uploadedfile):
         """
@@ -63,6 +46,7 @@ class ThumbnailGenerator(object):
         Returns: 
             binary representation of that file as a thumbnail
         """
+
         binary_data = None
 
         with NamedTemporaryFile(suffix=".png") as thumbnail:
@@ -70,7 +54,7 @@ class ThumbnailGenerator(object):
                 # uploaded files that are large enough get written to a TemporaryUploadedFile 
                 # and have a temporary_file_path
                 self.make_thumbnail(uploadedfile.temporary_file_path(), thumbnail.name)
-            except:
+            except AttributeError as e:
                 # small files are uploaded to an InMemoryUploadedFile 
                 # and don't have a temporary_file_path hence the except clause
                 # because there's not file written to disk when initially uploaded, we need to make one
@@ -80,6 +64,7 @@ class ThumbnailGenerator(object):
                         tempfile.write(chunk)
                     tempfile.seek(0)
                     self.make_thumbnail(tempfile.name, thumbnail.name)
+
             
             # for some reason thumbnails of video files can still end up being very large
             # this tries to take care of that by making a thumbnail of the "large" thumbnail
@@ -91,3 +76,14 @@ class ThumbnailGenerator(object):
                 binary_data = thumbnail.read()
 
         return binary_data
+
+
+class ThumbnailGenerationError(Exception):
+    def __init__(self, message=_("Unable to generate a thumbnail from the supplied file."), code=None):
+        self.title = _("Thumbnail Generation Error")
+        self.message = message
+        self.code = code
+        super().__init__(self.message)
+
+    def __str__(self):
+        return repr(self.message)

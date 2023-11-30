@@ -16,15 +16,27 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
+import importlib
+
 from arches.app.models.system_settings import settings
+            
+logger = logging.getLogger(__name__)
 
 class ThumbnailFactory(object):
     def create(self):
-        backend = settings.THUMBNAIL_GENERATOR
-        components = backend.split(".")
-        classname = components[len(components) - 1]
-        modulename = (".").join(components[0 : len(components) - 1])
-        _temp = __import__(modulename, globals(), locals(), [classname])  # in py3, level must be >= 0
-        return getattr(_temp, classname)()
+        if settings.THUMBNAIL_GENERATOR:
+            try:
+                backend = settings.THUMBNAIL_GENERATOR
+                components = backend.split(".")
+                classname = components[len(components) - 1]
+                modulename = (".").join(components[0 : len(components) - 1])
+                return getattr(importlib.import_module(modulename), classname)()
+            except:
+                logger.warn(f"A 'THUMBNAIL_GENERATOR' in settings.py is specified but can't be found or instantiated.  Thumbnails for uploaded files won't be created")
+                return None
+        else:
+            logger.info(f"A thumbnail generator isn't specified.  Set 'THUMBNAIL_GENERATOR' in settings.py to enable generation of thumbnails for uploded files.")
+            return None
 
 ThumbnailGeneratorInstance = ThumbnailFactory().create()

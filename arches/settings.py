@@ -103,8 +103,9 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
-THUMBNAIL_GENERATOR = "arches.app.utils.thumbnail_generator.ThumbnailGenerator"
-GENERATE_THUMBNAILS_ON_DEMAND = False
+THUMBNAIL_GENERATOR = None #"arches.app.utils.thumbnail_generator.ThumbnailGenerator"
+GENERATE_THUMBNAILS_ON_DEMAND = False # True to generate a thumnail on request if it doens't exist
+MIN_FILE_SIZE_T0_GENERATE_THUMBNAIL = 150000 # yet to be implemented, in bytes eg: 150000 = 150kb
 
 # This should point to the url where you host your site
 # Make sure to use a trailing slash
