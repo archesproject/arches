@@ -30,6 +30,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -170,6 +171,11 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
+        
+        if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            if not bool(request.user.groups.filter(name__in=["System Administrator"])):
+                raise PermissionDenied
+
         self.graph = Graph.objects.get(graphid=graphid)
         ontologies = models.Ontology.objects.filter(parentontology=None)
         ontology_classes = models.OntologyClass.objects.values("source", "ontology_id")
