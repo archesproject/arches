@@ -321,7 +321,7 @@ def search_results(request, returnDsl=False):
         append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
         logger.exception(err)
-        return JSONErrorResponse(message=err)
+        return JSONErrorResponse(message=str(err))
 
     dsl = search_results_object.pop("query", None)
     if returnDsl:
