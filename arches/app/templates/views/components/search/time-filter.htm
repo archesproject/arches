@@ -65,7 +65,7 @@
     </div>
 
     <h3 class="time-wheel-title">{% trans "Time Wheel" %}</h3>
-    <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter, double-click to zoom in, double-click center to zoom out)" %}</div>
+    <div class="time-wheel-instructions">{% trans "(Click on a block to set a filter)" %}</div>
     <hr class="title-underline"><div class="sequence" data-bind="visible: loading">{% trans 'Loading time wheel...' %}</div>
     <div class="time-wheel-wrap relative" data-bind="timeWheel: { config: wheelConfig, selectedPeriod: selectedPeriod, breadCrumb: breadCrumb}, css:{'time-wheel-loading-mask': loading}">
         <div class="sequence" data-bind="text: breadCrumb"></div>
