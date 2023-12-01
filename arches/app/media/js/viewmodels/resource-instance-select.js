@@ -70,16 +70,10 @@ define([
             ie: allowInstanceCreation, or displayOntologyTable
             the following bits of code are just for backward compatibility
         */
-        if (params.renderContext === 'workflow') {
-            self.allowInstanceCreation = true;
-            self.displayOntologyTable = false;
-            self.onlyManageResourceIds = true;
-        }
-
-        if (params.renderContext === 'search') {
-            self.allowInstanceCreation = false;
-            self.displayOntologyTable = false;
-            self.onlyManageResourceIds = true;
+        if (params.renderContext === 'search' || params.renderContext === 'workflow') {
+            self.allowInstanceCreation = params.allowInstanceCreation ?? false;
+            self.displayOntologyTable = params.displayOntologyTable ?? false;
+            self.onlyManageResourceIds = params.onlyManageResourceIds ?? true;
         }
 
         this.waitingForGraphToDownload = ko.computed(function(){
@@ -318,9 +312,9 @@ define([
 
         // this is a hack to get the dropdown to clear properly
         // for some reason setting self.resourceToAdd("") didn't work
-        var select2ele = null;
+        self.select2ele = null;
         this.clearDropDown = function(){
-            select2ele.val(null).trigger('change');
+            self.select2ele.val(null).trigger('change');
         };
         
         this.select2Config = {
@@ -355,12 +349,12 @@ define([
                             tileid: ko.observable()
                         };
                         self.newResourceInstance(params);
-                        select2ele.prop("disabled", "disabled");
+                        self.select2ele.prop("disabled", "disabled");
 
                         let resourceCreatorPanel = document.querySelector('#resource-creator-panel');
                         resourceCreatorPanel.addEventListener("transitionend", () => $(resourceCreatorPanel).find('.resource-instance-card-menu-item.selected').focus()); // focus on the resource creator panel for keyboard readers
                         params.complete.subscribe(function() {
-                            select2ele.prop("disabled", "");
+                            self.select2ele.prop("disabled", "");
                             if (params.resourceid()) {
                                 window.fetch(arches.urls.search_results + "?id=" + params.resourceid())
                                     .then(function(response){
@@ -376,7 +370,7 @@ define([
                                             self.setValue(ret);
                                         } else {
                                             var newOption = new Option(item._source.displayname, params.resourceid(), true, true);
-                                            $(select2ele).append(newOption);
+                                            $(self.select2ele).append(newOption);
                                             self.value(params.resourceid());
                                         }
                                     })
@@ -511,7 +505,7 @@ define([
                 }
             },
             initSelection: function(ele, callback) {
-                select2ele = ele;
+                self.select2ele = ele;
                 if(!self.displayOntologyTable && !!self.value() && !self.graphIds().includes(self.value())) {
                     var values = self.value();
                     if(!Array.isArray(self.value())){
