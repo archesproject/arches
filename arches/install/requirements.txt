@@ -37,5 +37,3 @@ pyjwt[crypto]
 semantic-version==2.10.0
 tzdata==2023.3
 pytz==2023.3
-thumbnail @ git+https://github.com/chrisb09/thumbnail@main
-unoserver==2.0
