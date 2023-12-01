@@ -2157,6 +2157,7 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container {
     height: 100%;
+    width: calc(100% - 75px);
 }
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
