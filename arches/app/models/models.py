@@ -1625,6 +1625,7 @@ class IIIFManifest(models.Model):
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
+    globalid = models.UUIDField(default=uuid.uuid4, unique=True)
     transactionid = models.UUIDField(default=uuid.uuid4, null=True)
 
     def __str__(self):

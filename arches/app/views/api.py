@@ -118,7 +118,7 @@ class GeoJSON(APIBase):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"], descriptor="name")
         else:
             return _("Unnamed Resource")
 
@@ -1027,8 +1027,13 @@ class IIIFAnnotationNodes(APIBase):
 
 class Manifest(APIBase):
     def get(self, request, id):
-        manifest = models.IIIFManifest.objects.get(id=id).manifest
-        return JSONResponse(manifest)
+        try:
+            uuid.UUID(id)
+            manifest = models.IIIFManifest.objects.get(globalid=id).manifest
+            return JSONResponse(manifest)
+        except:
+            manifest = models.IIIFManifest.objects.get(id=id).manifest
+            return JSONResponse(manifest)
 
 
 class OntologyProperty(APIBase):
