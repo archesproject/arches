@@ -292,11 +292,11 @@
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column; width: 300px">
             <div class="manifest-editor-input">
-                <input class="form-control input-lg widget-input"
-                    data-bind="value: manifest,
-                    select2Query: {
+                <select class="form-control input-lg widget-input"
+                    data-bind="select2Query: {
                         select2Config: manifestSelectConfig
                     }">
+                </select>
             </div>
         </div>
         <h5 class="rr-splash-description">

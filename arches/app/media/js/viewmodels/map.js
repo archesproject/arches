@@ -5,8 +5,9 @@ define([
     'knockout',
     'knockout-mapping',
     'utils/map-popup-provider',
+    'utils/aria',
     'templates/views/components/map-popup.htm'
-], function($, _, arches, ko, koMapping, mapPopupProvider) {
+], function($, _, arches, ko, koMapping, mapPopupProvider, ariaUtils) {
     const viewModel = function(params) {
         var self = this;
          
@@ -307,8 +308,11 @@ define([
             this.mapOptions.fitBoundsOptions = params.fitBoundsOptions;
         }
 
-        this.hideSidePanel = function() {
+        this.hideSidePanel = function(focusElement) {
             self.activeTab(undefined);
+            if(focusElement){
+                ariaUtils.shiftFocus(focusElement);
+            }
         };
 
         this.toggleTab = function(tabName) {
@@ -316,6 +320,7 @@ define([
                 self.activeTab(null);
             } else {
                 self.activeTab(tabName);
+                ariaUtils.shiftFocus('#side-panel');
             }
         };
 
