@@ -181,7 +181,7 @@ class UserManagerView(BaseManagerView):
                     text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
                     # create the email, and attach the HTML version as well.
-                    msg = EmailMultiAlternatives(_("Your " + settings.APP_NAME + " Profile Has Changed!"), text_content, admin_info, [form.cleaned_data["email"]])
+                    msg = EmailMultiAlternatives(_("Your {settings.APP_NAME} Profile Has Changed!"), text_content, admin_info, [form.cleaned_data["email"]])
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
                 except:
