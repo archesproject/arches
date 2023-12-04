@@ -799,7 +799,7 @@ class Command(BaseCommand):
 
                 modules = []
                 if not os.path.isdir(extension):
-                    modules.extend(extension)
+                    modules.append(extension)
                 modules.extend(glob.glob(os.path.join(extension, "*.json")))
                 modules.extend(glob.glob(os.path.join(extension, "*.py")))
 

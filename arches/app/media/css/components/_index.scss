@@ -1,6 +1,303 @@
 @import "buttons";
+@import "dropdown";
 @import "datatypes";
 @import "icon-selector";
 @import "links";
 @import "search";
 @import "widgets";
+@import "map";
+
+.workbench-card-sidepanel .install-buttons {
+    background: #f9f9f9;
+    position: fixed;
+    margin-right: 75px;
+    bottom: 0px;
+    border-top: 1px solid #ddd;
+    padding: 10px 35px;
+    right: 0;
+    width: 399px;
+    display: flex;
+}
+
+.workbench-card-sidepanel .resource-instance-card-component-content .install-buttons {
+    bottom: auto;
+    border: none;
+    background: white;
+    padding: unset;
+}
+
+.graph-designer .workbench-card-sidepanel .install-buttons {
+    margin-right: 375px;
+}
+
+.workbench-card-sidepanel.expanded .install-buttons {
+    width: 599px;
+}
+
+.workbench-card-sidepanel div .new-provisional-edit-card-container {
+    padding-left: 10px;
+}
+
+.workbench-card-sidepanel .new-provisional-edit-card-container {
+    padding-bottom: 40px;
+}
+
+.workbench-card-sidepanel-header-container {
+    padding: 14px;
+    margin-left: 0px;
+    background: #fff;
+    z-index: 20;
+    width: 400px;
+}
+
+.workbench-card-sidepanel-border {
+    border-bottom: 1px solid #ddd;
+    margin: 0px 12px;
+}
+
+.workbench-card-sidepanel-body {
+    overflow-y: auto;
+    width: inherit;
+    height: -moz-available;
+    height: -webkit-fill-available;
+    height: fill-available;
+    padding: 10px;
+}
+
+.expanded .workbench-card-sidepanel-header-container {
+    width: 599px;
+    margin-left: -16px;
+    padding-left: 15px;
+}
+
+.workbench-card-sidepanel-header {
+    position: relative;
+    cursor: pointer;
+    color: rgb(33, 62, 95);
+    font-size: 1.6rem;
+}
+
+.workbench-card-sidepanel-header:before {
+    content: "\f00d";
+    font-family: FontAwesome;
+    margin-right: 6px;
+    color: rgb(158, 158, 158);
+    font-weight: lighter;
+    line-height: 1.8em;
+}
+
+.workbench-card-sidepanel-header:hover:before {
+    color: rgb(33, 62, 95);
+}
+
+.basemap-listing,
+.overlay-listing,
+.legend-listing {
+    padding: 16px 20px;
+    min-height: 60px;
+    border-bottom: 1px solid rgb(216, 216, 216);
+    font-size: 1.4rem;
+    color: rgb(158, 158, 158);
+    display: flex;
+
+    span {
+        padding-top: 3px;
+    }
+}
+
+.basemap-listing,
+.overlay-listing .overlay-opacity-control,
+.overlay-listing .overlay-name {
+    cursor: pointer;
+}
+
+.overlay-listing,
+.legend-listing {
+    cursor: grab;
+}
+
+.basemap-listing-container,
+.overlays-listing-container,
+.legend-listing-container{
+    padding: 0px 16px 16px 16px;
+}
+
+.basemap-listing.active-basemap,
+.basemap-listing:hover,
+.overlay-listing.active-overlay,
+.overlay-listing:hover,
+.legend-listing .legend-name {
+    color: rgb(33, 62, 95);
+}
+
+.basemap-listing.active-basemap,
+.basemap-listing:hover,
+.overlay-listing:hover {
+    background-color: rgb(247, 247, 247);
+}
+
+.basemap-listing:before,
+.overlay-listing .overlay-name:before {
+    margin: 0px 8px;
+    font-family: FontAwesome;
+    padding-top: 3px;
+}
+
+.basemap-listing:before {
+    content: "\f10c";
+}
+
+.overlay-listing .overlay-name:before {
+    content: "\f204";
+}
+
+.basemap-listing.active-basemap:before {
+    content: "\f05d";
+}
+
+.overlay-listing.active-overlay .overlay-name:before {
+    content: "\f205";
+}
+
+.overlay-listing .overlay-name {
+    display: flex;
+    width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    top: 4px;
+}
+
+.overlay-opacity-control .overlay-opacity-slider,
+.overlay-opacity-control i {
+    display: inline-block;
+}
+
+.overlay-opacity-control .overlay-opacity-slider {
+    transition-property: width, opacity;
+    transition-delay: 0ms;
+    transition: 0ms;
+    -webkit-transition-delay: 0ms;
+    width: 0px;
+    opacity: 0;
+    position: relative;
+    top: 2px;
+    right: -8px;
+}
+
+.overlay-opacity-control .overlay-opacity-slider input {
+    width: 0px;
+    height: 0px;
+}
+
+.overlay-opacity-control:hover .overlay-opacity-slider input,
+.overlay-opacity-control:focus .overlay-opacity-slider input,
+.overlay-opacity-control:focus-within .overlay-opacity-slider input {
+    width: 150px;
+    height: 20px;
+}
+
+.overlay-listing .overlay-opacity-control {
+    transition: 300ms;
+    transition-property: all;
+    transition-delay: 100ms;
+    position: absolute;
+    padding: 6px 6px 6px 8px;
+    right: 6px;
+    width: 30px;
+    height: 38px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+.overlay-listing .overlay-opacity-control:hover,
+.overlay-listing .overlay-opacity-control:focus,
+.overlay-listing .overlay-opacity-control:focus-within {
+    border: 1px solid rgb(217, 217, 217);
+    background-color: white;
+    width: 200px;
+}
+
+.overlay-listing .overlay-opacity-control:hover .overlay-opacity-slider,
+.overlay-listing .overlay-opacity-control:focus .overlay-opacity-slider,
+.overlay-listing .overlay-opacity-control:focus-within .overlay-opacity-slider {
+    transition-delay: 400ms;
+    transition: 200ms;
+    -webkit-transition-delay: 400ms;
+    width: 150px;
+    opacity: 1;
+}
+
+.layer-listing-icon {
+    display: inline-block;
+    padding-inline-end: 4px;
+}
+
+.layer-listing-icon::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: solid 1px rgb(216, 216, 216);
+    border-radius: 100%;
+    background-color: rgb(247, 247, 247);
+}
+
+.map-card-feature-item {
+    cursor: zoom-in;
+}
+
+.map-card-feature-item:hover {
+    background-color: rgb(250, 250, 250);
+}
+
+.map-card-feature-item.active .map-card-feature-name {
+    font-weight: 600;
+}
+
+.map-card-feature-list .table {
+    margin-bottom: 0;
+}
+
+.map-card-feature-tool {
+    width: 65px;
+}
+
+.map-card-feature-tool.intersect {
+    width: 80px;
+}
+
+.map-card-zoom-tool,
+.map-card-feature-tool {
+    font-size: 0.9em;
+}
+
+.map-card-zoom-tool a,
+.map-card-feature-tool a,
+.map-card-zoom-tool button,
+.map-card-feature-tool button {
+    color: #2f527a;
+}
+
+.map-card-zoom-tool button,
+.map-card-feature-tool button {
+    border: 2px;
+    background-color: rgba(0,0,0,0);
+}
+
+.map-card-zoom-tool button.inactive {
+    color: #454545;
+    cursor: default;
+}
+
+.map-card-zoom-tool {
+    float: right;
+    padding: 10px;
+}
+
+.map-card-zoom-tool a {
+    display: inline-block;
+    padding: 0px 3px;
+}

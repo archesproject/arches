@@ -23,16 +23,17 @@
                     <div style="width: 250px; display:flex; flex-direction: column;">
                         <div>
                             <!-- ko if: templates().length -->
-                            <input style="display:inline-block;" data-bind="select2Query: {
+                            <select style="display:inline-block;" data-bind="select2Query: {
                                 select2Config: {
                                     clickBubble: true,
                                     disabled: false,
-                                    data: {results: templates()},
+                                    data: templates(),
                                     value: selectedTemplate,
                                     allowClear: true,
                                     multiple: false,
                                     placeholder: $root.translations.selectTemplate
                                 }}">
+                            </select>
                             <!--/ko-->
                         </div>
                     </div>

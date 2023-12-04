@@ -229,7 +229,6 @@ define([
                 self.submitToManifest();
             };
 
-            this.manifestSelectConfig.placeholder = 'Select an Image Service';
             this.manifest.subscribe(function(val){
                 self.getManifestData(val);
                 self.mainMenu(false);
