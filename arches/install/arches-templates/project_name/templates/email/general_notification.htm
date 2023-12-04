@@ -14,7 +14,7 @@
         {% include 'custom_email_header.htm' %}
 
         {% if username != "" %}
-            <p>Dear {{username}},</p>
+            <p>{{salutation}} {{username}},</p>
         {% endif %}
         <p>
             {{greeting}}

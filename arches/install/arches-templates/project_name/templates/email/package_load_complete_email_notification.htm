@@ -14,13 +14,25 @@
         {% include 'custom_email_header.htm' %}
 
         {% if username != "" %}
-            <p>Dear {{username}},</p>
+            <p>
+                {% blocktrans %}
+                    {{salutation}} {{username}},
+                {% endblocktrans %}
+            </p>
         {% endif %}
         <p>
-            {{greeting}}
+            {% blocktrans %}
+                {{greeting}}
+            {% endblocktrans %}
         </p>
         {% if link != "" %}
-            <p><a href="{{link}}">{{link_text}}</a></p>
+            <p>
+                <a href="{{link}}">
+                    {% blocktrans %}
+                        {{link_text}}
+                    {% endblocktrans %}
+                </a>
+            </p>
         {% endif %}
 
         {% include 'custom_email_footer.htm' %}
