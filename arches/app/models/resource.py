@@ -155,16 +155,17 @@ class Resource(models.ResourceInstance):
 
         """
 
+        if not self.descriptor_function:
+            self.descriptor_function = models.FunctionXGraph.objects.filter(
+                graph_id=self.graph_id, function__functiontype="primarydescriptors"
+            ).select_related("function")
+
         for lang in settings.LANGUAGES:
             language = self.get_descriptor_language({"language":lang[0]})
             if context:
                 context["language"] = language
             else:
                 context = {"language":language}
-            if not self.descriptor_function:
-                self.descriptor_function = models.FunctionXGraph.objects.filter(
-                    graph_id=self.graph_id, function__functiontype="primarydescriptors"
-                ).select_related("function")
 
             for descriptor in descriptors:
                 if len(self.descriptor_function) == 1:
