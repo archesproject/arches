@@ -403,4 +403,4 @@ class SearchResultsExporter(object):
 
 
 def sanitize_csv_value(value):
-    return re.sub(r"^([@]|[=]|[+]|[-])", "'\g<1>", value)
+    return re.sub(r"^([@]|[=]|[+]|[-])", r"'\g<1>", value)
