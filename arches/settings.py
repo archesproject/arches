@@ -426,6 +426,10 @@ LOGGING = {
 }
 
 LOGIN_URL = "auth"
+# Rate limit for authentication views
+# See options (including None or python callables):
+# https://django-ratelimit.readthedocs.io/en/stable/rates.html#rates-chapter
+RATE_LIMIT = "5/m"
 
 PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 

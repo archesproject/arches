@@ -131,10 +131,7 @@ define([
             var clickmanager = d3ClickManager();
             clickmanager.on("click", function(event, d) {
                 selectedPeriod(d);
-            })
-                .on("dblclick", function(event, d) {
-                    dblclick(d); // eslint-disable-line no-undef
-                });
+            });
 
             function highlightPeriod(event, d) {
                 let count = d.data.size;
@@ -230,35 +227,7 @@ define([
                     .attr("fill", "none")
                     .attr("pointer-events", "all")
                     .call(clickmanager);
-                /* eslint-disable no-inner-declarations */
-                function dblclick(p) {
-                    parent.datum(p.parent || root);
-    
-                    root.each(d => d.target = {
-                        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-                        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-                        y0: Math.max(0, d.y0 - p.depth),
-                        y1: Math.max(0, d.y1 - p.depth)
-                    });
-    
-                    var t = g.transition().duration(750);
-    
-                    // Transition the data on all arcs, even the ones that aren’t visible,
-                    // so that if this transition is interrupted, entering arcs will start
-                    // the next transition from the desired position.
-                    path.transition(t)
-                        .tween("data", d => {
-                            var i = d3.interpolate(d.current, d.target);
-                            return t => d.current = i(t);
-                        })
-                        .filter(function(d) {
-                            return +this.getAttribute("fill-opacity") || arcVisible(d.target);
-                        })
-                        .attr("fill-opacity", d => arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0)
-                        .attrTween("d", d => () => arc(d.current));
-    
-                }
-                
+
                 function arcVisible(d) {
                     return d.y1 <= depth && d.y0 >= 1 && d.x1 > d.x0;
                 }
