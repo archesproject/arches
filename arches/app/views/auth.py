@@ -188,15 +188,15 @@ class SignupView(View):
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
             email_context = return_message_context(
                  _(
-                    "Thanks for your interest in {settings.APP_NAME}. Click on link below \
+                    "Thanks for your interest in {}. Click on link below \
                     to confirm your email address! Use your email address to login."
-                ),
+                ).format(settings.APP_NAME),
                  _(
                     "This link expires in 24 hours.  If you can't get to it before then, \
                     don't worry, you can always try again with the same email address."
                 ),
                  None,
-                {"button_text": _("Signup for {settings.APP_NAME}"),
+                {"button_text": _("Signup for {}").format(settings.APP_NAME),
                                     "link": confirmation_link}
             )
             
