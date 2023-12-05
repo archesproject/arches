@@ -46,6 +46,7 @@ from django.contrib.sessions.models import Session
 from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 import django.contrib.auth.password_validation as validation
+from django_ratelimit.decorators import ratelimit
 from arches import __version__
 from arches.app.utils.response import JSONResponse, Http401Response
 from arches.app.utils.forms import ArchesUserCreationForm, ArchesPasswordResetForm, ArchesSetPasswordForm
@@ -80,11 +81,21 @@ class LoginView(View):
                 },
             )
 
+    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT, block=False))
     def post(self, request):
         # POST request is taken to mean user is logging in
-        username = request.POST.get("username", None)  # user-input value, NOT source of truth
-        password = request.POST.get("password", None)  # user-input value, NOT source of truth
         next = request.POST.get("next", reverse("home"))
+
+        if getattr(request, "limited", False):
+            return render(
+                request,
+                "login.htm",
+                {"auth_failed": True, "rate_limited": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP},
+                status=429,
+            )
+
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
 
         if username is not None and password is None:
             try:
@@ -262,8 +273,13 @@ class ChangePasswordView(View):
         messages = {"invalid_password": None, "password_validations": None, "success": None, "other": None, "mismatched": None}
         return JSONResponse(messages)
 
+    @method_decorator(ratelimit(key="user", rate=settings.RATE_LIMIT, block=False))
     def post(self, request):
         messages = {"invalid_password": None, "password_validations": None, "success": None, "other": None, "mismatched": None}
+
+        if getattr(request, "limited", False):
+            messages["invalid_password"] = _("Too many requests")
+            return JSONResponse(messages)
         try:
             user = request.user
             old_password = request.POST.get("old_password")
@@ -301,6 +317,7 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class UserProfileView(View):
+    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT))
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
@@ -321,6 +338,7 @@ class UserProfileView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class GetClientIdView(View):
+    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT))
     def post(self, request):
         if settings.OAUTH_CLIENT_ID == "":
             message = _("Make sure to set your OAUTH_CLIENT_ID in settings.py")
@@ -339,6 +357,7 @@ class GetClientIdView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class ServerSettingView(View):
+    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT))
     def post(self, request):
         if settings.OAUTH_CLIENT_ID == "":
             message = _("Make sure to set your OAUTH_CLIENT_ID in settings.py")
