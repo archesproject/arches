@@ -260,12 +260,18 @@ def export_results(request):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
-        with NamedTemporaryFile() as tmp:
-            wb.save(tmp.name)
-            tmp.seek(0)
-            stream = tmp.read()
-            export_files[0]["outputfile"] = tmp
-            return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+        try:
+            with NamedTemporaryFile(delete=False) as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                stream = tmp.read()
+                export_files[0]["outputfile"] = tmp
+                result = zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+        except OSError:
+            logger.error("Temp file could not be created.")
+            raise
+        os.unlink(tmp.name)
+        return result
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
