@@ -12426,6 +12426,10 @@ ul.select2-choices:after {
     border: 1px solid #5b9bd7;
 }
 
+.iiif-image-tools .btn.disabled {
+    cursor: not-allowed;
+}
+
 .iiif-leaflet .split-controls .button {
     width: 38px;
     height: 38px;
