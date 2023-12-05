@@ -55,6 +55,14 @@ DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE applica
 
 
 class ArchesTestRunner(DiscoverRunner):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs["debug_mode"] = True
+        # Unless the user has something other than the Django default, give them
+        # what they probably want.
+        if kwargs["pattern"] == "test*.py":
+            kwargs["pattern"] = "*.py"
+        super().__init__(*args, **kwargs)
+
     def setup_databases(self, **kwargs):
         ret = super().setup_databases(**kwargs)
 
