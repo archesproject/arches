@@ -4,15 +4,15 @@ define([
     'views/components/search/base-filter',
     'bootstrap',
     'arches',
-    'select2',
+    'select-woo',
     'knockout',
     'knockout-mapping',
     'models/graph',
     'view-data',
     'templates/views/components/search/search-results.htm',
-    'bootstrap-datetimepicker',
-    'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate) {
+    'utils/aria',
+    'bootstrap-datetimepicker'],
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate, ariaUtils) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -63,6 +63,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
                 this.bulkResourceReportCache = ko.observable({});
                 this.bulkDisambiguatedResourceInstanceCache = ko.observable({});
+                this.shiftFocus = ariaUtils.shiftFocus;
             },
 
             mouseoverInstance: function() {
@@ -86,6 +87,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     if (self.selectedTab() !== 'related-resources-filter') {
                         self.selectedTab('related-resources-filter');
                     }
+                    self.shiftFocus('#related-resources-filter-tabpanel');
                 };
             },
 
@@ -110,11 +112,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             });
 
                             reportDataLoaded(true);
+                            self.shiftFocus('.resource-report');
                             self.bulkDisambiguatedResourceInstanceCache(instanceCache);
                         });
                     }
                     else {
                         reportDataLoaded(true);
+                        self.shiftFocus('.resource-report');
                     }
                     
                     reportDataLoaded.subscribe(loaded => {
@@ -225,6 +229,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                                     self.selectedTab('map-filter');
                                 }
                                 self.mapLinkData({'properties':result._source});
+                                self.shiftFocus('canvas.mapboxgl-canvas');
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);

@@ -201,13 +201,12 @@ def index_resources_using_singleprocessing(
                     # Reuse the queryset for FunctionXGraph rows if the graph is the same.
                     if last_resource and (resource.graph_id == last_resource.graph_id):
                         resource.descriptor_function = last_resource.descriptor_function
-                    resource.calculate_descriptors()
+                    resource.save_descriptors()
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
-                resource.save(index=False)
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
@@ -249,7 +248,6 @@ def index_resources_by_type(
             resource_types = resource_types.split(",")
         except:
             pass
-        # resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()

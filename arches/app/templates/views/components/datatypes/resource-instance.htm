@@ -30,7 +30,7 @@
                             data-bind="
                                 click: function(){if ($parent.isEditable !== false) {$data.removeRelationship($data)}}, 
                                 clickBubble: false, 
-                                attr: {'disabled': $parent.isEditable === false, 'aria-label': $root.translations.remove + ' ' + $data.name}, 
+                                attr: {'disabled': $parent.isEditable === false, 'aria-label': $root.translations.removeRelatedResourceModel($data.name)}, 
                                 style: {color: $parent.isEditable === true || '#aaa'}">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -69,7 +69,7 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <input 
+                                    <select 
                                         style="width:100%; display:inline-block; margin: 3px 0px;" 
                                         data-bind="
                                             select2Query: {
@@ -81,9 +81,9 @@
                                                     true
                                                 )
                                             }, 
-                                            attr: {'aria-label': $root.translations.defaultRelationshipTo + ' ' + $data.name}
+                                            attr: {'aria-label': $root.translations.defaultRelationshipToResource($data.name)}
                                         "
-                                    >
+                                    ></select>
                                 </span>
 
                                 <span class="col-xs-12" data-bind="text: $data.name + ' (' + self.makeFriendly($data.ontologyClass) + ')'">
@@ -104,7 +104,7 @@
                                 </span>
 
                                 <span class="col-xs-12">
-                                    <input style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
+                                    <select style="width:100%; display:inline-block; margin: 3px 0px;" data-bind="
                                         select2Query: {
                                             select2Config: self.getSelect2ConfigForOntologyProperties(
                                                 $data.inverseOntologyProperty, 
@@ -114,8 +114,8 @@
                                                 true
                                             )
                                         },
-                                        attr: {'aria-label': $root.translations.defaultInverseRelationshipTo + ' ' + $data.name}
-                                    ">
+                                        attr: {'aria-label': $root.translations.defaultInverseRelationshipToResource($data.name)}
+                                    "></select>
                                 </span>
 
                                 <span class="col-xs-12" data-bind="text: self.graphName + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
@@ -178,7 +178,6 @@
                 class="fa fa-eye" 
                 style="cursor: pointer;"
                 tabindex="0"
-                role=""
                 data-bind="
                     attr: {title: $root.translations.viewSearchString,
                         'aria-label': $root.translations.viewSearchString
@@ -209,22 +208,19 @@
 
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select 
-        class="resources" 
-        data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: $root.translations.references, value: '' },
-                { text: $root.translations.doesNotReference, value: '!' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            attr: {'aria-label': $root.translations.searchCriteria}
-        "
-    ></select>
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: $root.translations.references, id: '' },
+                    { text: $root.translations.doesNotReference, id: '!' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op
+        }}">
+    </select>
 </div>
 <div class="col-md-8 col-lg-9 resource-instance-search" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <!-- ko component: {
@@ -232,8 +228,9 @@
         params: {
             config: {
                 placeholder: $root.translations.selectAResource,
+                label: node.label,
             },
-            label: '',
+            allowInstanceCreation: false,
             value: searchValue,
             node: node,
             disabled: false,
