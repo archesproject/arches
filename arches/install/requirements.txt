@@ -1,5 +1,5 @@
 Django==4.2.4
-psycopg2==2.9.6
+psycopg2==2.9.9
 urllib3<2
 elasticsearch>=8.3.1,<9.0.0
 rdflib==4.2.2
@@ -11,7 +11,7 @@ mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.5
 django-recaptcha==3.0.0
 edtf==4.0.1
-arches-django-revproxy==0.10.0
+django-revproxy==0.12.0
 django-cors-headers==4.2.0
 django-oauth-toolkit==1.7.0
 polib==1.1.1
