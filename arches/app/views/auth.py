@@ -60,6 +60,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class LoginView(View):
     def get(self, request):
         next = request.GET.get("next", reverse("home"))
@@ -81,7 +82,17 @@ class LoginView(View):
                 },
             )
 
-    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT, block=False))
+    @method_decorator(
+        ratelimit(
+            key="post:username",
+            rate=(
+                ("{}/{}".format(int(settings.RATE_LIMIT.split("/")[0]) * 2, settings.RATE_LIMIT.split("/")[1]))
+                if isinstance(settings.RATE_LIMIT, str)
+                else settings.RATE_LIMIT
+            ),
+            block=False,
+        )
+    )
     def post(self, request):
         # POST request is taken to mean user is logging in
         next = request.POST.get("next", reverse("home"))
