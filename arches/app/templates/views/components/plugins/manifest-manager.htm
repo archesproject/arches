@@ -194,7 +194,7 @@
     </label>
     <div>
         <input type="text" class="form-control input-lg" style="height: 36px;" 
-        data-bind="attr:{placeholder: $root.translations.imageCaption}, textInput: self.canvasLabel, valueUpdate: 'keyup'">
+        data-bind="attr:{placeholder: $root.translations.imageCaption, disabled: compareMode }, textInput: self.canvasLabel, valueUpdate: 'keyup'">
     </div>
     <!--/ko-->
     
@@ -202,10 +202,10 @@
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
-            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">
+            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty(), css: {disabled: !isCanvasDirty()}">
                 <span data-bind="text: $root.translations.save"></span>
             </button>
-            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">
+            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty(), css: {disabled: !isCanvasDirty()}">
                 <span data-bind="text: $root.translations.cancel"></span>
             </button>
         </div>
