@@ -85,7 +85,11 @@ class LoginView(View):
     @method_decorator(
         ratelimit(
             key="post:username",
-            rate=("{}/{}".format(int(settings.RATE_LIMIT.split("/")[0]) * 2, settings.RATE_LIMIT.split("/")[1])),
+            rate=(
+                ("{}/{}".format(int(settings.RATE_LIMIT.split("/")[0]) * 2, settings.RATE_LIMIT.split("/")[1]))
+                if isinstance(settings.RATE_LIMIT, str)
+                else settings.RATE_LIMIT
+            ),
             block=False,
         )
     )
