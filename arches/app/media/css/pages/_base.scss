@@ -1,0 +1,16 @@
+.lang_switcher {
+    .select2-container--default .select2-selection--single {
+        border: none;
+        font-size: 1.2rem;
+        margin-top: 4px;
+    }
+    .select2-selection__arrow {
+        margin-top: 3px;
+    }
+}
+
+.lang_switcher_dd {
+    .select2-results__option {
+        font-size: 1.2rem;
+    }
+}

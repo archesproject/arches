@@ -222,14 +222,13 @@ define([
                 self.formData.append("manifest_attribution", ko.unwrap(self.manifestAttribution));
                 self.formData.append("manifest_logo", ko.unwrap(self.manifestLogo));
                 self.formData.append("manifest", ko.unwrap(self.manifest));
-                self.formData.append("canvas_label", ko.unwrap(self.canvasLabel)); //new label for canvas
+                self.formData.append("canvas_label", ko.unwrap(self.canvasLabel) ?? ''); //new label for canvas
                 self.formData.append("canvas_id", ko.unwrap(self.canvas)); //canvas id for label change
                 self.formData.append("metadata", JSON.stringify(koMapping.toJS(self.manifestMetadata)));
                 self.updateCanvas = false;
                 self.submitToManifest();
             };
 
-            this.manifestSelectConfig.placeholder = 'Select an Image Service';
             this.manifest.subscribe(function(val){
                 self.getManifestData(val);
                 self.mainMenu(false);

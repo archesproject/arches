@@ -16,7 +16,9 @@ define(['jquery', 'backbone', 'arches', 'models/value'], function($, Backbone, a
 
             // test to see if select2 has already been applied to the dom
             if (! this.$el.find('.select2').attr('id')){
-                this.schemedropdown = this.$el.find('.select2').select2();                
+                this.schemedropdown = this.$el.find('.select2').select2({
+                    placeholder: arches.translations.selectAnOption
+                });                
             }
 
             this.modal.validate({

@@ -106,14 +106,18 @@ class Tile(models.TileModel):
                         tile = Tile(tile_obj)
                         tile.parenttile = self
                         self.tiles.append(tile)
+
+        self.serialized_graph = None
         self.load_serialized_graph()
 
-    def load_serialized_graph(self):
+    def load_serialized_graph(self, raise_if_missing=False):
         try:
-            published_graph = self.resourceinstance.graph.get_published_graph()
+            resource = self.resourceinstance
+        except models.ResourceInstance.DoesNotExist:
+            return
+        published_graph = resource.graph.get_published_graph(raise_if_missing=raise_if_missing)
+        if published_graph:
             self.serialized_graph = published_graph.serialized_graph
-        except Exception as e:
-            self.serialized_graph = None
 
     def save_edit(
         self,
@@ -398,7 +402,7 @@ class Tile(models.TileModel):
         oldprovisionalvalue = None
 
         if not self.serialized_graph:
-            self.load_serialized_graph()
+            self.load_serialized_graph(raise_if_missing=True)
         try:
             if user is None and request is not None:
                 user = request.user
