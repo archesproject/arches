@@ -61,11 +61,14 @@ define([
         const layers = [];
         const secondaryLayers = [];
         const cachedAnnotations = {};
+        this.origCanvasLabel = ko.observable();
 
         this.selectPrimaryPanel.subscribe((value) => {
             // if true, primary panel is being selected
             if(value){
                 this.imageToolSelector(this.canvas());
+                self.origCanvasLabel(self.canvasObject().label);
+                self.canvasLabel(self.canvasObject().label);
                 // preserve state of secondary filters, if secondaryCanvas is set
                 if(self.secondaryCanvas()) {
                     secondaryPanelFilters = self.canvasFilterObject();
@@ -79,6 +82,8 @@ define([
             } else {
                 this.imageToolSelector(this.secondaryCanvas());
                 primaryPanelFilters = self.canvasFilterObject();
+                self.origCanvasLabel(self.secondaryCanvasObject()?.label);
+                self.canvasLabel(self.secondaryCanvasObject()?.label);
                 if(secondaryPanelFilters) {
                     self.brightness(secondaryPanelFilters.brightness);
                     self.saturation(secondaryPanelFilters.saturation);
@@ -687,6 +692,7 @@ define([
                 self.secondaryCanvasObject(canvas);
                 self.canvasLabel(self.getManifestDataValue(canvas, 'label', true));
             }
+            self.origCanvasLabel(self.canvasLabel());
         };
 
         this.canvasClick = function(canvas) {
