@@ -10,13 +10,16 @@
 
 
 import os
+import sys
 import json
 import uuid
 import datetime
 import logging
-
+import traceback
 import django.utils.timezone
+
 from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
@@ -40,6 +43,9 @@ from guardian.shortcuts import assign_perm
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class BulkIndexQueue(models.Model):
@@ -329,11 +335,24 @@ class File(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to=import_class_from_string(settings.FILENAME_GENERATOR))
     tile = models.ForeignKey("TileModel", db_column="tileid", null=True, on_delete=models.CASCADE)
+    thumbnail_data = models.BinaryField(null=True)
 
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         if not self.fileid:
             self.fileid = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        self.make_thumbnail()
+        super(File, self).save()
+
+    def make_thumbnail(self, force=False):
+        try:
+            if ThumbnailGeneratorInstance and (force or self.thumbnail_data is None):
+                self.thumbnail_data = ThumbnailGeneratorInstance.get_thumbnail_data(self.path.file)
+        except Exception as e:
+            logger.error(f"Thumbnail not generated for {self.path}: {e}")
+            traceback.print_exc(file=sys.stdout)
 
     class Meta:
         managed = True
@@ -1533,7 +1552,6 @@ def send_email_on_save(sender, instance, **kwargs):
                 instance.isread = True
                 instance.save()
         except Exception as e:
-            logger = logging.getLogger(__name__)
             logger.warning(e)
             logger.warning("Error occurred sending email.  See previous stack trace and check email configuration in settings.py.")
 

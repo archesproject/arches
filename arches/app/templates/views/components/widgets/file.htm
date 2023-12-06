@@ -237,6 +237,8 @@
     <a data-bind="attr: {href: $parent.getFileUrl(url)}" target="_blank">
         <i class="ion ion-forward"></i>
         <span data-bind="text: name"></span>
+        <img class="img-responsive" data-bind="attr: {src:$parent.getFileUrl(url)+'?thumbnail=true',
+            alt: $data.altText[$parent.activeLanguage].value ?? name}">
     </a>
 </dd>
 <!-- ko if: title[$parent.activeLanguage].value -->
@@ -258,7 +260,7 @@
 <dd class="first" data-bind="class: $parent.nodeCssClasses">
     <div class="rp-image-grid-item">
         <a target="_blank" data-bind="attr: {href: $parent.getFileUrl(url)}">
-            <img class="img-responsive" data-bind="attr: {src: $parent.getFileUrl(url),
+            <img class="img-responsive" data-bind="attr: {src:$parent.getFileUrl(url)+'?thumbnail=true',
             alt: $data.altText[$parent.activeLanguage].value ?? name}">
         </a>
     </div>
