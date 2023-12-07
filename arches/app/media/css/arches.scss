@@ -7301,7 +7301,6 @@ a.mega-dropdown-toggle.disabled {
 }
 
 .rr-table-column {
-    padding-top: 8px;
     padding-right: 10px;
     border-left: solid 1px #ddd;
 }
@@ -7324,7 +7323,7 @@ a.mega-dropdown-toggle.disabled {
 
 .rr-table-column button i {
     margin-left: 0px;
-    padding: 12px;
+    padding: 10px;
 }
 
 .rr-table-column.icon-column {
@@ -7350,6 +7349,7 @@ a.mega-dropdown-toggle.disabled {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding: 5px 10px;
 }
 
 .create-resource-instance-card-component {

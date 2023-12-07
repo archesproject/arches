@@ -139,7 +139,7 @@
                                 </button>
                             </div>
                             <div class="rr-table-column" style="flex-grow: 1;" data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
-                                <div class="rr-table-instance-label" style="padding-left: 10px;" data-bind="text: resource.displayname"></div>
+                                <div class="rr-table-instance-label" data-bind="text: resource.displayname"></div>
                             </div>
                         </div>
                         <div class="rr-table-row-panel" data-bind="if: self.selectedResourceRelationship() === relationship, visible:  self.selectedResourceRelationship() === relationship, css: { 'rr-table-border': self.selectedResourceRelationship() === relationship} ">
