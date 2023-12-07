@@ -47,7 +47,7 @@ define([
                         let term = requestParams.term || '';
                         return {
                             q: term, // search term
-                            lang: language().code
+                            lang: language()
                         };
                     },
                     processResults: function(data, params) {
