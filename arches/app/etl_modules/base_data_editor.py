@@ -10,7 +10,7 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, ETLModule
+from arches.app.models.models import GraphModel, Node, ETLModule, LoadStaging
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, FiltersAgg, Match, Nested, NestedAgg, Query, Terms, Wildcard, Regex
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -151,6 +151,8 @@ class BaseBulkEditor:
                 """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, pattern, new_text, language_code, case_insensitive, update_limit),
             )
+            count_of_tiles_staged = LoadStaging.objects.filter(load_event=self.loadid).count()
+            self.log_event_details(cursor, f"done|{count_of_tiles_staged} tiles staged...")
             result["success"] = True
         except Exception as e:
             logger.error(e)
