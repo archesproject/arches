@@ -306,7 +306,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
     def get_users_for_object(self, perm, obj):
         """
-        returns a list of user objects that have the given permission on the given object
+        Returns a list of user objects that have the given permission on the given object
 
         Arguments:
         perm -- the permssion string eg: "read_nodegroup"
@@ -353,6 +353,18 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     results["hits"]["hits"] += results_scrolled["hits"]["hits"]
             restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
             return restricted_ids
+
+    def update_groups_for_user(self, user):
+        """Hook for spotting group updates on a user."""
+        ...
+
+    def update_permissions_for_user(self, user):
+        """Hook for spotting permission updates on a user."""
+        ...
+
+    def update_permissions_for_group(self, group):
+        """Hook for spotting permission updates on a group."""
+        ...
 
 
 
