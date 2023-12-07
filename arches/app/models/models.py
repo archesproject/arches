@@ -956,9 +956,13 @@ class ResourceXResource(models.Model):
 
         if not self.created:
             self.created = datetime.datetime.now()
+            if (update_fields := kwargs.get("update_fields")) is not None:
+                update_fields.add("created")
         self.modified = datetime.datetime.now()
+        if (update_fields := kwargs.get("update_fields")) is not None:
+            update_fields.add("modified")
 
-        super(ResourceXResource, self).save()
+        super(ResourceXResource, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ResourceXResource, self).__init__(*args, **kwargs)
@@ -984,7 +988,9 @@ class ResourceInstance(models.Model):
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
-        super(ResourceInstance, self).save()
+        if (update_fields := kwargs.get("update_fields")) is not None:
+            update_fields.add("graph_publication")
+        super(ResourceInstance, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ResourceInstance, self).__init__(*args, **kwargs)
@@ -1141,8 +1147,12 @@ class TileModel(models.Model):  # Tile
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
+            if (update_fields := kwargs.get("update_fields")) is not None:
+                update_fields.add("sortorder")
         if not self.tileid:
             self.tileid = uuid.uuid4()
+            if (update_fields := kwargs.get("update_fields")) is not None:
+                update_fields.add("tileid")
         super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 

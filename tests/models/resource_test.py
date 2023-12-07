@@ -23,6 +23,7 @@ import time
 from tests import test_settings
 from django.contrib.auth.models import User, Group
 from django.core import management
+from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
 from guardian.shortcuts import assign_perm, get_perms
@@ -216,6 +217,36 @@ class ResourceTests(ArchesTestCase):
         result = index_resources_by_type([self.search_model_graphid], clear_index=True, batch_size=4000)
 
         self.assertEqual(result, "Passed")
+
+    def test_publication_restored_on_save(self):
+        """
+        If a resource lacks a graph publication, it is restored by a call to save().
+        """
+
+        publication = self.test_resource.graph_publication
+        cursor = connection.cursor()
+        # Hack out the graph publication
+        sql = """
+            UPDATE resource_instances
+            SET graphpublicationid = NULL
+            WHERE resourceinstanceid = '{resource_pk}';
+        """.format(
+            resource_pk=self.test_resource.pk
+        )
+        cursor.execute(sql)
+        self.addCleanup(setattr, self.test_resource, "graph_publication", publication)
+        self.addCleanup(self.test_resource.save)
+        self.test_resource.refresh_from_db()
+        self.assertIsNone(self.test_resource.graph_publication)  # ensure test setup is good
+
+        # update_or_create() delegates to save()
+        obj, created = models.ResourceInstance.objects.filter(pk=self.test_resource.pk).update_or_create(
+            pk=self.test_resource.pk,
+            graph=self.test_resource.graph,
+        )
+        obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
+
+        self.assertIsNotNone(obj.graph_publication)
 
     def test_creator_has_permissions(self):
         """
