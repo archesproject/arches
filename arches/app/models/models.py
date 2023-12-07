@@ -47,6 +47,21 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+def add_to_update_fields(kwargs, field_name):
+    """
+    Update the `update_field` arg inside `kwargs` (if present) in-place
+    with `field_name`.
+    """
+    if (update_fields := kwargs.get("update_fields")) is not None:
+        # Django sends a set from update_or_create()
+        if isinstance(update_fields, set):
+            update_fields.add(field_name)
+        # Arches sends a list from tile POST view
+        else:
+            new = set(update_fields)
+            new.add(field_name)
+            kwargs["update_fields"] = new
+
 
 class BulkIndexQueue(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True, unique=True)
@@ -956,11 +971,9 @@ class ResourceXResource(models.Model):
 
         if not self.created:
             self.created = datetime.datetime.now()
-            if (update_fields := kwargs.get("update_fields")) is not None:
-                update_fields.add("created")
+            add_to_update_fields(kwargs, "created")
         self.modified = datetime.datetime.now()
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields.add("modified")
+        add_to_update_fields(kwargs, "modified")
 
         super(ResourceXResource, self).save(*args, **kwargs)
 
@@ -988,8 +1001,7 @@ class ResourceInstance(models.Model):
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
-        if (update_fields := kwargs.get("update_fields")) is not None:
-            update_fields.add("graph_publication")
+        add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
@@ -1147,12 +1159,10 @@ class TileModel(models.Model):  # Tile
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
-            if (update_fields := kwargs.get("update_fields")) is not None:
-                update_fields.add("sortorder")
+            add_to_update_fields(kwargs, "sortorder")
         if not self.tileid:
             self.tileid = uuid.uuid4()
-            if (update_fields := kwargs.get("update_fields")) is not None:
-                update_fields.add("tileid")
+            add_to_update_fields(kwargs, "tileid")
         super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
