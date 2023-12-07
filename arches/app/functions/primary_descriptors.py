@@ -39,16 +39,19 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
         datatype_factory = None
         language = None
         result = config["string_template"]
+
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
-                tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"]), sortorder=0).filter(
-                    resourceinstance_id=resource.resourceinstanceid
-                )
-                if len(tiles) == 0:
-                    tiles = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])).filter(
+                tile = context.get('tile')
+
+                if not tile or tile.sortorder:
+                    tile = models.TileModel.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])).filter(
                         resourceinstance_id=resource.resourceinstanceid
-                    )
-                for tile in tiles:
+                    ).order_by('sortorder').first()
+
+                if not tile:  # tile has been deleted 
+                    result = ""
+                else:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])):
                         data = {}
                         if len(list(tile.data.keys())) > 0:

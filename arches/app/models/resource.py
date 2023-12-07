@@ -74,6 +74,7 @@ class Resource(models.ResourceInstance):
         self.serialized_graph = None
         self.node_datatypes = None
 
+
     def get_serialized_graph(self):
         if not self.serialized_graph:
             try:
@@ -120,6 +121,7 @@ class Resource(models.ResourceInstance):
             self.name = {}
 
         requested_language = None
+
         if context and "language" in context:
             requested_language = context["language"]
         language = requested_language or get_language()
@@ -147,36 +149,37 @@ class Resource(models.ResourceInstance):
             except KeyError:
                 pass
 
-        self.calculate_descriptors(context=context)
-        return self.descriptors[language][descriptor]
-
-    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+    def save_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
         """
         descriptors -- iterator with descriptors to be calculated
-        context -- Dictionary which may have:
-            language -- Language code in which the descriptor should be returned (e.g. 'en').
-                This occurs when handling concept values.
-            any key:value pairs needed to control the behavior of a custom descriptor function
+        context -- Dictionary with any key:value pairs needed to control the behavior of a custom descriptor function
 
         """
-
-        language = self.get_descriptor_language(context)
 
         if not self.descriptor_function:
             self.descriptor_function = models.FunctionXGraph.objects.filter(
                 graph_id=self.graph_id, function__functiontype="primarydescriptors"
             ).select_related("function")
 
-        for descriptor in descriptors:
-            if len(self.descriptor_function) == 1:
-                module = self.descriptor_function[0].function.get_class_module()()
-                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context, descriptor
-                )
-                if descriptor == "name" and self.descriptors[language][descriptor] is not None:
-                    self.name[language] = self.descriptors[language][descriptor]
+        for lang in settings.LANGUAGES:
+            language = self.get_descriptor_language({"language":lang[0]})
+            if context:
+                context["language"] = language
             else:
-                self.descriptors[language][descriptor] = None
+                context = {"language": language}
+
+            for descriptor in descriptors:
+                if len(self.descriptor_function) == 1:
+                    module = self.descriptor_function[0].function.get_class_module()()
+                    self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                        self, self.descriptor_function[0].config["descriptor_types"][descriptor], context, descriptor
+                    )
+                    if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                        self.name[language] = self.descriptors[language][descriptor]
+                else:
+                    self.descriptors[language][descriptor] = None
+        
+        super(Resource, self).save()
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -323,12 +326,6 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            for lang in settings.LANGUAGES:
-                if context is None:
-                    context = {}
-                context["language"] = lang[0]
-                self.calculate_descriptors(context=context)
-
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
@@ -351,8 +348,6 @@ class Resource(models.ResourceInstance):
                         es_index = import_class_from_string(index["module"])(index["name"])
                         doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                         es_index.index_document(document=doc, id=doc_id)
-
-            super(Resource, self).save()
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """

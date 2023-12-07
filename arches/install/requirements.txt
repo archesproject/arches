@@ -5,7 +5,7 @@ elasticsearch>=8.3.1,<9.0.0
 rdflib==4.2.2
 django-guardian==2.4.0
 python-memcached==1.59
-celery==5.2.7
+celery==5.3.6
 django-celery-results==2.5.1
 mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.5
