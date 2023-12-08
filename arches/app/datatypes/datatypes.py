@@ -553,32 +553,40 @@ class EDTFDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         def add_date_to_doc(query, edtf):
+            invalid_filter_exception = Exception(
+                _(
+                    'Only dates that specify an exact year, month, \
+                        and day can be used with the "=", ">", "<", ">=", and "<=" operators'
+                )
+            )
+
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
-                    raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                query.should(Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix"))
+                    raise invalid_filter_exception
+                else:
+                    operators = {"gte": edtf.lower, "lte": edtf.lower}
+                    query.must(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
             else:
                 if value["op"] == "overlaps":
                     operators = {"gte": edtf.lower, "lte": edtf.upper}
                 else:
                     if edtf.lower != edtf.upper:
-                        raise Exception(
-                            _(
-                                'Only dates that specify an exact year, month, \
-                                    and day can be used with the ">", "<", ">=", and "<=" operators'
-                            )
-                        )
+                        raise invalid_filter_exception
 
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    group_query = Bool()
+                    group_query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
+                    group_query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    query.must(group_query)
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
-        if value["op"] == "null" or value["op"] == "not_null":
+        if not value.get('op'):
+            pass
+        elif value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
         elif value["val"] != "" and value["val"] is not None:
             edtf = ExtendedDateFormat(value["val"])
@@ -1289,6 +1297,11 @@ class FileListDataType(BaseDataType):
             errors.append({"type": "ERROR", "message": message})
         return errors
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
             for f in tile.data[str(nodeid)]:
@@ -1796,6 +1809,11 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         for tile in document["tiles"]:
@@ -1924,6 +1942,11 @@ class ResourceInstanceDataType(BaseDataType):
                     error_type = "ERROR"
                     errors.append({"type": error_type, "message": message})
         return errors
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False

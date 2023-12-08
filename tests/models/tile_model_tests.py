@@ -31,9 +31,9 @@ from django.core import management
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
-from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
-from arches.app.models.models import ResourceXResource
+from arches.app.models.models import Node, NodeGroup, ResourceXResource
 
 
 
@@ -62,6 +62,9 @@ class TileTests(ArchesTestCase):
 
         INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
             VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
+
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+            VALUES ('41111111-0000-0000-0000-000000000000', '', 'n');
         """
 
         cursor = connection.cursor()
@@ -74,7 +77,8 @@ class TileTests(ArchesTestCase):
         WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR
         nodegroupid = '32999999-0000-0000-0000-000000000000' OR
         nodegroupid = '19999999-0000-0000-0000-000000000000' OR
-        nodegroupid = '21111111-0000-0000-0000-000000000000';
+        nodegroupid = '21111111-0000-0000-0000-000000000000' OR
+        nodegroupid = '42999999-0000-0000-0000-000000000000';
 
         DELETE FROM public.resource_instances
         WHERE resourceinstanceid = '40000000-0000-0000-0000-000000000000';
@@ -565,3 +569,27 @@ class TileTests(ArchesTestCase):
 
         #     t2 = Tile(json)
         #     self.assertFalse(t2.validate()['is_valid'])
+
+    def test_check_for_missing_nodes(self):
+        # Required file list node.
+        node_group = NodeGroup.objects.get(pk=UUID("41111111-0000-0000-0000-000000000000"))
+        required_file_list_node = Node(
+            name="Required file list",
+            datatype="file-list",
+            nodegroup=node_group,
+            isrequired=True,
+            istopnode=False,
+        )
+        required_file_list_node.save()
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": str(node_group.pk),
+            "tileid": "",
+            "data": {required_file_list_node.nodeid: []},
+        }
+        tile = Tile(json)
+
+        with self.assertRaises(TileValidationError):
+            tile.check_for_missing_nodes()
