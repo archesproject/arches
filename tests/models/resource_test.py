@@ -26,6 +26,7 @@ from django.core import management
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
 from arches.app.models.graph import Graph
@@ -35,7 +36,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.index_database import index_resources_by_type
+from arches.app.utils.index_database import index_resources_by_type, index_resources_using_singleprocessing
 from tests.base_test import ArchesTestCase
 
 
@@ -125,7 +126,7 @@ class ResourceTests(ArchesTestCase):
         tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
         cls.test_resource.tiles.append(tile)
 
-        # Add Gometry
+        # Add Geometry
         cls.geom = {
             "type": "FeatureCollection",
             "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
@@ -261,3 +262,23 @@ class ResourceTests(ArchesTestCase):
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
         self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
+
+    def test_recalculate_descriptors_one_query_for_descriptor_function(self):
+        r1 = Resource(graph_id=self.search_model_graphid)
+        r2 = Resource(graph_id=self.search_model_graphid)
+        r1.save()
+        r2.save()
+        self.addCleanup(r1.delete)
+        self.addCleanup(r2.delete)
+
+        # Ensure we start from scratch
+        r1.descriptor_function = None
+        r2.descriptor_function = None
+
+        with CaptureQueriesContext(connection) as queries:
+            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+
+        function_x_graph_selects = [
+            q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
+        ]
+        self.assertEqual(len(function_x_graph_selects), 1)
