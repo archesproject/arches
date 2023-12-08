@@ -1,4 +1,74 @@
-.resource-filter .resource-selector-button div .btn,
-.qa-filter .resource-selector-button div .btn {
-    padding: 2px 10px;
+.resource-filter {
+	.resource-selector-button {
+		div {
+			.btn {
+				padding: 2px 10px;
+			}
+		}
+	}
+}
+
+.qa-filter {
+	.resource-selector-button {
+		div {
+			.btn {
+				padding: 2px 10px;
+			}
+		}
+	}
+}
+
+.ep-toolbar {
+    .top-right-nav {
+        .ep-tools-login {
+            p {
+				@include break-at(tablet-max) {
+					display: none;
+				}
+			}
+			i {
+				display: inline-block;
+				font-size: 1.7rem;
+    			margin-top: 2px;
+				@include break-at(small-desktop) {
+					display: none;
+				}
+			}
+			.h5 {
+				font-size: 1.2rem;
+			}
+        }
+    }
+}
+
+#backToTopBtn {
+	background-color: #404449;
+    color: #fff;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    font-size: 20px;
+    right: 20px;
+    border-radius: 2px;
+    opacity: 0;
+    z-index: 1100;
+    -webkit-transition: opacity .3s;
+    transition: opacity .3s;
+	&:hover {
+		opacity: 1!important;
+    	-webkit-transition: opacity .3s!important;
+    	transition: opacity .3s!important;
+	}
+	@include break-at(mobile) {
+        bottom: 5px;
+		right: 35px
+    }
+}
+
+.btn-sm, .btn-icon.btn-sm {
+    font-size: 1.1rem;
+}
+
+.btn-group-sm>.btn {
+	font-size: 1.2rem;	
 }

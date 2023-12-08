@@ -7,7 +7,7 @@ from django.test.client import RequestFactory, Client
 from django.urls import reverse
 from django.db import connection
 from arches.app.utils.i18n import LanguageSynchronizer
-from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL
+from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL, DELETE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
@@ -20,12 +20,14 @@ from arches.app.utils.data_management.resources.formats.rdffile import JsonLdRea
 from pyld.jsonld import expand
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/jsonld_import_tests.py --settings="tests.test_settings"
+# python manage.py test tests/importer/jsonld_import_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
 class JsonLDImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         # This runs once per instantiation
         cls.loadOntology()
         cls.factory = RequestFactory()
@@ -54,15 +56,15 @@ class JsonLDImportTests(ArchesTestCase):
         ret = skos.save_concepts_from_skos(rdf)
 
         # Load up the models and data only once
-        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object_cardinality_n.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object_cardinality_n.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/test_2_complex_object.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/test_2_complex_object.json"), "r") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
@@ -74,17 +76,17 @@ class JsonLDImportTests(ArchesTestCase):
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-collections.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5098_concept_list.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5098_concept_list.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
         management.call_command("datatype", "register", source="tests/fixtures/datatypes/color.py")
         management.call_command("datatype", "register", source="tests/fixtures/datatypes/semantic_like.py")
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5299-basic.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5299-basic.json"), "r") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5299_complex.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5299_complex.json"), "r") as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
@@ -97,27 +99,27 @@ class JsonLDImportTests(ArchesTestCase):
         ret = skos.save_concepts_from_skos(rdf)
 
         # Load up the models and data only once
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5121_false_ambiguity.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5121_false_ambiguity.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5121_external_model.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5121_external_model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/6235_parenttile_id.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/6235_parenttile_id.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/Person.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/Person.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/nest_test.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/nest_test.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/required_ambiguous_nodes.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/required_ambiguous_nodes.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -128,6 +130,13 @@ class JsonLDImportTests(ArchesTestCase):
         ]:
             graph = Graph.objects.get(pk=graph_id)
             graph.publish(user=User.objects.get(pk=1))
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = connection.cursor()
+        cursor.execute(DELETE_TOKEN_SQL)
+
+        super().tearDownClass()
 
     def setUp(self):
         pass
@@ -651,7 +660,7 @@ class JsonLDImportTests(ArchesTestCase):
         """
 
         # Load up the models and data only once
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5098_b_resinst.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5098_b_resinst.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -688,7 +697,7 @@ class JsonLDImportTests(ArchesTestCase):
         ret = skos.save_concepts_from_skos(rdf)
 
         # Load up the models and data only once
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5126_collection_ambiguity.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5126_collection_ambiguity.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -825,13 +834,13 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_8_4564_resinst_models(self):
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-person.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-person.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
-        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-group.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-group.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
-        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-referenced.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/4564-referenced.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -989,7 +998,7 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_b_5600_concept_label(self):
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/5600-external-label.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/5600-external-label.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -1033,7 +1042,7 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_c_path_with_array(self):
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/string_to_path_basic.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/jsonld_base/models/string_to_path_basic.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 

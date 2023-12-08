@@ -34,7 +34,7 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.views.generic import View
 from django.db import transaction
@@ -198,7 +198,6 @@ class TileData(View):
                                 t.sortorder = sortorder
                                 t.save(update_fields=["sortorder"], request=request)
                                 sortorder = sortorder + 1
-
                     return JSONResponse(data)
 
         if self.action == "delete_provisional_tile":

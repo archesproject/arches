@@ -9,10 +9,9 @@ define([
     'viewmodels/provisional-tile',
     'viewmodels/alert',
     'uuid',
+    'js-cookie',
     'templates/views/components/workflows/workflow-component-abstract.htm',
-], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, workflowComponentAbstractTemplate) {
-    const WORKFLOW_COMPONENT_ABSTRACTS_LABEL = 'workflow-component-abstracts';
-
+], function(_, $, ko, koMapping, arches, GraphModel, CardViewModel, ProvisionalTileViewModel, AlertViewModel, uuid, Cookies, workflowComponentAbstractTemplate) {
     function NonTileBasedComponent() {
         var self = this;
          
@@ -25,10 +24,11 @@ define([
             self.complete(false);
             self.saving(true);
 
-            self.savedData(self.value());
-            
-            self.complete(true);
-            self.saving(false);
+            self.setToWorkflowHistory('value', self.value()).then(() => {
+                self.savedData(self.value());
+                self.complete(true);
+                self.saving(false);
+            });
         };
 
         this.reset = function() {
@@ -284,13 +284,11 @@ define([
 
     function AbstractCardAdapter() {  // CURRENTLY IN DEVLEOPMENT, USE AT YOUR OWN RISK!
         var self = this;
-         
-
         this.cardinality = ko.observable();
 
         this.initialize = function() {
             self.loading(true);
-
+            
             $.getJSON(( arches.urls.api_nodegroup(self.componentData.parameters['nodegroupid']) ), function(nodegroupData) {
                 self.cardinality(nodegroupData.cardinality);
 
@@ -333,22 +331,38 @@ define([
                         self.onSaveSuccess = function(savedData) {  // LEGACY -- DO NOT USE
                             if (!(savedData instanceof Array)) { savedData = [savedData]; }
 
-                            self.card().getNewTile();
-            
-                            self.savedData(savedData.map(function(savedDatum) {
-                                return {
-                                    tileData: savedDatum._tileData(),
-                                    tileId: savedDatum.tileid,
-                                    nodegroupId: savedDatum.nodegroup_id,
-                                    resourceInstanceId: savedDatum.resourceinstance_id,
-                                };
-                            }));
+                            let previouslySavedData = self.savedData();
+                            if (!previouslySavedData) {
+                                previouslySavedData = [];
+                            }
+
+                            self.savedData(
+                                previouslySavedData.concat(
+                                    savedData.map(function(savedDatum) {
+                                        return {
+                                            tileData: savedDatum._tileData(),
+                                            tileId: savedDatum.tileid,
+                                            nodegroupId: savedDatum.nodegroup_id,
+                                            resourceInstanceId: savedDatum.resourceinstance_id,
+                                        };
+                                    })
+                                )
+                            );
+
+                            self.value(self.savedData());
 
                             self.componentData.parameters.dirty(false);
+                            self.card().getNewTile(true);  // `true` is forceNewTile
                             self.card().selected(true);
                             self.dirty(false);
                             self.saving(false);
                             self.complete(true);
+
+                            /**
+                             * TODO: this is a hack to get around previous data autofilling forms when creating a new tile in cardinality n cards
+                             * It should be removed when we're able to figure out how to prevent that logic
+                             * */ 
+                            window.location.reload();  
                         };
                     }
                 });
@@ -608,10 +622,11 @@ define([
 
     function WorkflowComponentAbstract(params) {
         var self = this;
-         
 
         this.workflowId = params.workflowId;
+        this.workflowName = params.workflowName;
         this.componentData = params.componentData;
+        this.workflowHistory = params.workflowHistory;
         this.alert = params.alert;
         
         this.locked = params.locked;
@@ -644,7 +659,7 @@ define([
 
         this.savedData = ko.observable();
         this.savedData.subscribe(function(savedData) {
-            self.setToLocalStorage('value', savedData);
+            self.setToWorkflowHistory('value', savedData);
         });
 
         this.multiTileUpdated = ko.observable();
@@ -676,8 +691,10 @@ define([
                 self.id(uuid.generate());
             }
 
-            if (self.getFromLocalStorage('value')) {
-                self.savedData( self.getFromLocalStorage('value') );
+            const savedValue = self.getSavedValue();
+            if (savedValue) {
+                self.savedData(savedValue);
+                self.value(savedValue);
                 self.complete(true);
             }
         };
@@ -714,15 +731,15 @@ define([
             }
 
             if (self.componentData.componentType === 'card') {
-                const previouslySavedValue = self.getFromLocalStorage('value');
+                let previouslySavedValue = self.getSavedValue();
                 let previouslySavedResourceInstanceId;
-    
+
                 if (previouslySavedValue) {
                     if (!(previouslySavedValue instanceof Array)) { previouslySavedValue = [previouslySavedValue]; }
     
                     if (previouslySavedValue[0]['resourceInstanceId']) {
                         previouslySavedResourceInstanceId = previouslySavedValue[0]['resourceInstanceId'];
-                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId
+                        params['componentData']['parameters']['resourceid'] =  previouslySavedResourceInstanceId;
                     }
                 }
 
@@ -740,26 +757,37 @@ define([
             }
         };
 
-        this.setToLocalStorage = function(key, value) {
-            var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
+        this.setToWorkflowHistory = async function(key, value) {
+            const workflowid = self.workflowId;
+            const workflowname = self.workflowName;
+            
+            const workflowHistory = {
+                workflowid,
+                workflowname,
+                completed: false,
+                componentdata: {
+                    // Django view will patch in this key, keeping existing keys
+                    [self.id()]: {
+                        [key]: value,
+                    },
+                },
+            };
 
-            if (!allComponentsLocalStorageData[self.id()]) {
-                allComponentsLocalStorageData[self.id()] = {};
-            }
+            await fetch(arches.urls.workflow_history + workflowid, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": Cookies.get('csrftoken')
+                },
+                body: JSON.stringify(workflowHistory),
+            });
 
-            allComponentsLocalStorageData[self.id()][key] = value ? koMapping.toJSON(value) : value;
-
-            localStorage.setItem(
-                WORKFLOW_COMPONENT_ABSTRACTS_LABEL, 
-                JSON.stringify(allComponentsLocalStorageData)
-            );
         };
 
-        this.getFromLocalStorage = function(key) {
-            var allComponentsLocalStorageData = JSON.parse(localStorage.getItem(WORKFLOW_COMPONENT_ABSTRACTS_LABEL)) || {};
-
-            if (allComponentsLocalStorageData[self.id()] && typeof allComponentsLocalStorageData[self.id()][key] !== "undefined") {
-                return JSON.parse(allComponentsLocalStorageData[self.id()][key]);
+        this.getSavedValue = function() {
+            const savedValue = this.workflowHistory.componentdata?.[self.id()];
+            if (savedValue) {
+                return savedValue['value'];
             }
         };
 

@@ -3,16 +3,20 @@ define([
     'underscore',
     'knockout',
     'templates/views/components/workbench.htm',
+    'utils/aria',
     'bindings/sortable',
-], function($, _, ko, workbenchTemplate) {
+], function($, _, ko, workbenchTemplate, ariaUtils) {
     var viewModel = function(params) {
         var self = this;
 
          
         this.activeTab = ko.observable(params.activeTab);
         this.showTabs = ko.observable(true);
-        this.hideSidePanel = function() {
+        this.hideSidePanel = function(focusElement) {
             self.activeTab(undefined);
+            if(focusElement){
+                ariaUtils.shiftFocus(focusElement);
+            }
         };
 
         if (this.card) {

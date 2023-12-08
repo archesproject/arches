@@ -62,6 +62,13 @@ define([
             this.config = ko.observable(this.config);
         }
 
+        this.nodeCssClasses = ko.pureComputed(function() {
+            return [ko.unwrap(self.node?.alias),
+                self.node?.graph?.attributes?.slug,
+                self.widget?.widgetLookup[ko.unwrap(self.widget?.widget_id)].name
+                ].join(" ").trim();
+        });
+
         this.disposables = [];
 
         var subscribeConfigObservable = function(obs, key) {
@@ -87,7 +94,7 @@ define([
             subscribeConfigObservable(obs, key);
         });
 
-        if (ko.isObservable(this.defaultValue)) {
+        if (ko.isObservable(this.value) && ko.isObservable(this.defaultValue)) {
             var defaultValue = this.defaultValue();
             if (this.tile && !this.tile.noDefaults && ko.unwrap(this.tile.tileid) == "" && defaultValue != null && defaultValue != "") {
                 this.value(defaultValue);

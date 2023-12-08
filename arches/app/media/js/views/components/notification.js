@@ -23,6 +23,7 @@ define([
         this.link = params.link;
         this.message = params.message;
         this.files = params.files;
+        this.translations = arches.translations;
 
         this.dismiss = function(parent) {
             $.ajax({

@@ -10,13 +10,16 @@
         <select 
             data-bind="
                 disable: isEditable === false, 
-                placeholder: $root.translations.selectAConceptCollection, 
-                value: topConcept, 
                 options: conceptCollections, 
                 optionsText: 'label', 
                 optionsValue: 'id', 
-                chosen: {width: '100%', allow_single_deselect: true},
-                attr: {'aria-label': $root.translations.conceptCollection}
+                select2Query: {
+                    select2Config:{
+                        value: topConcept,
+                        allowClear: true,
+                        placeholder: $root.translations.selectAConceptCollection, 
+                }},
+                attr: {'data-label': $root.translations.conceptCollection}
             "
         ></select>
     </div>
@@ -25,32 +28,29 @@
 
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select 
-        class="resources" 
-        data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: $root.translations.equals, value: 'eq' },
-                { text: $root.translations.not, value: '!eq' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            attr: {'aria-label': $root.translations.searchCriteria},
-        "
-    ></select>
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: $root.translations.equals, id: 'eq' },
+                    { text: $root.translations.not, id: '!eq' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op
+        }}">
+    </select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
-    <input style="display:inline-block;"
+    <select style="display:inline-block;"
         data-bind="
-            value: searchValue,
+            attr: {'data-label': node.label},
             select2Query: {
                 select2Config: select2Config
             }
         ">
-    <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}, onEnterkeyClick, onSpaceClick" tabindex="0"><i class="fa fa-times-circle fa-lg"></i></span>
+    </select>
 </div>
 <!-- /ko -->

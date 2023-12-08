@@ -7,6 +7,7 @@ define([
     'views/components/search/base-filter',
     'templates/views/components/search/advanced-search.htm',
     'bindings/let',
+    'bindings/key-events-click',
 ], function($, _, ko, koMapping, arches, BaseFilter, advancedSearchTemplate) {
     var componentName = 'advanced-search';
     const viewModel = BaseFilter.extend({
@@ -32,6 +33,18 @@ define([
             };
             self.widgetLookup = null;
 
+            this.filter.facets.subscribe(function(facets){
+                if(facets.length === 0){
+                    $('.facets-container .list-filter input').focus();
+                }else{
+                    $('#facet-filter-'+(facets.length-1)).focus();
+                }
+            });
+
+            this.removeFacet = function(facet){
+                self.filter.facets.remove(facet);
+            };
+
             $.ajax({
                 type: "GET",
                 url: arches.urls.api_search_component_data + componentName,
@@ -50,6 +63,7 @@ define([
                     card.nodes = _.filter(response.nodes, function(node) {
                         return node.nodegroup_id === card.nodegroup_id;
                     });
+                    card.nodeNamesConcatenated = card.nodes.map(node => node.name).join(' ');
                     card.addFacet = function() {
                         _.each(card.nodes, function(node) {
                             if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
@@ -63,6 +77,7 @@ define([
                             }
                         }).sort((a, b) => a.sortorder - b.sortorder);
                         self.newFacet(card);
+                        $('#facet-filter-'+(self.filter.facets().length-1)).focus();
                     };
                 }, this);
                 var graphs = response.graphs.sort(function(a,b) {
@@ -89,7 +104,7 @@ define([
                                 if (facetFilterText) {
                                     graph.collapsed(false);
                                     return _.filter(graphCards, function(card) {
-                                        return card.name.toLowerCase().indexOf(facetFilterText) > -1;
+                                        return card.name.toLowerCase().indexOf(facetFilterText) > -1 || card.nodeNamesConcatenated.toLowerCase().indexOf(facetFilterText) > -1;
                                     });
                                 } else {
                                     return graphCards;

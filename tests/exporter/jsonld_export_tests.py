@@ -14,7 +14,7 @@ from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
 
 # these tests can be run from the command line via
-# python manage.py test tests/exporter/jsonld_export_tests.py --settings="tests.test_settings"
+# python manage.py test tests/exporter/jsonld_export_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 class JsonLDExportTests(ArchesTestCase):
     @classmethod
@@ -38,35 +38,35 @@ class JsonLDExportTests(ArchesTestCase):
         ret = skos.save_concepts_from_skos(rdf)
 
         # Load up the models and data only once
-        with open(os.path.join('tests/fixtures/jsonld_base/models/test_1_basic_object.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/test_1_basic_object.json'), 'r') as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_1_instance.json').import_business_data()
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/test_2_complex_object.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/test_2_complex_object.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5136_res_inst_plus_res_inst.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5136_res_inst_plus_res_inst.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_3_instances.json').import_business_data()  
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/nesting_test.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/nesting_test.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_nest_instances.json').import_business_data()  
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])        
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-group.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-group.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-referenced.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/4564-referenced.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_group.json').import_business_data()
@@ -75,12 +75,12 @@ class JsonLDExportTests(ArchesTestCase):
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5299-basic.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5299-basic.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_instances.json').import_business_data()        
 
-        with open(os.path.join('tests/fixtures/jsonld_base/models/5299_complex.json'), 'rU') as f:
+        with open(os.path.join('tests/fixtures/jsonld_base/models/5299_complex.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
         BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_complex.json').import_business_data()       

@@ -10,6 +10,9 @@
                 <div class="manifest-manager-main-menu-circle loader-button">
                     <span><i style="color: #000" class="fa fa-file-text-o r-select-icon"></i></span>
                 </div> 
+                <h3>
+                    <span data-bind="text: $root.translations.branchExcel"></span>
+                </h3>
                 <h2>
                     <span data-bind="text: $root.translations.downloadTemplates"></span>
                 </h2>
@@ -20,16 +23,17 @@
                     <div style="width: 250px; display:flex; flex-direction: column;">
                         <div>
                             <!-- ko if: templates().length -->
-                            <input style="display:inline-block;" data-bind="select2Query: {
+                            <select style="display:inline-block;" data-bind="select2Query: {
                                 select2Config: {
                                     clickBubble: true,
                                     disabled: false,
-                                    data: {results: templates()},
+                                    data: templates(),
                                     value: selectedTemplate,
                                     allowClear: true,
                                     multiple: false,
                                     placeholder: $root.translations.selectTemplate
                                 }}">
+                            </select>
                             <!--/ko-->
                         </div>
                     </div>
@@ -49,6 +53,9 @@
                 <div class="manifest-manager-main-menu-circle loader-button">
                     <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
                 </div> 
+                <h3>
+                    <span data-bind="text: $root.translations.branchExcel"></span>
+                </h3>
                 <h2>
                     <span data-bind="text: $root.translations.uploadYourXlsxZipFile"></span>
                 </h2>
@@ -184,4 +191,3 @@
     <!--/ko-->
 </div>
 {% endblock etl_status %}
-

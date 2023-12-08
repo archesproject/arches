@@ -50,11 +50,11 @@ class mappedCSVFileImportTests(ArchesTestCase):
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_collection.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
-        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/file-list.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/file-list.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 

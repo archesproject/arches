@@ -15,6 +15,7 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from collections import OrderedDict
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
@@ -26,7 +27,7 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -40,7 +41,7 @@ from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
 from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
@@ -57,6 +58,7 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
 )
 from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -116,7 +118,7 @@ class GeoJSON(APIBase):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"], descriptor="name")
         else:
             return _("Unnamed Resource")
 
@@ -870,6 +872,18 @@ class Card(APIBase):
         return JSONResponse(context, indent=4)
 
 
+class Plugins(View):
+    def get(self, request, plugin_id=None):
+        if plugin_id:
+            plugins = models.Plugin.objects.filter(pk=plugin_id)
+        else:
+            plugins = models.Plugin.objects.all()
+        
+        plugins = [plugin for plugin in plugins if self.request.user.has_perm("view_plugin", plugin)]
+
+        return JSONResponse(plugins)
+            
+
 class SearchExport(View):
     def get(self, request):
         from arches.app.search.search_export import SearchResultsExporter  # avoids circular import
@@ -945,6 +959,7 @@ class IIIFManifest(APIBase):
         query = request.GET.get("query", None)
         start = int(request.GET.get("start", 0))
         limit = request.GET.get("limit", None)
+        more = False
 
         manifests = models.IIIFManifest.objects.all()
         if query is not None:
@@ -952,8 +967,9 @@ class IIIFManifest(APIBase):
         count = manifests.count()
         if limit is not None:
             manifests = manifests[start : start + int(limit)]
+            more = start + int(limit) < count
 
-        response = JSONResponse({"results": manifests, "count": count})
+        response = JSONResponse({"results": manifests, "count": count, "more": more})
         return response
 
 
@@ -1013,8 +1029,13 @@ class IIIFAnnotationNodes(APIBase):
 
 class Manifest(APIBase):
     def get(self, request, id):
-        manifest = models.IIIFManifest.objects.get(id=id).manifest
-        return JSONResponse(manifest)
+        try:
+            uuid.UUID(id)
+            manifest = models.IIIFManifest.objects.get(globalid=id).manifest
+            return JSONResponse(manifest)
+        except:
+            manifest = models.IIIFManifest.objects.get(id=id).manifest
+            return JSONResponse(manifest)
 
 
 class OntologyProperty(APIBase):
@@ -1257,12 +1278,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
         user = request.user
         perm = "read_nodegroup"
 
-        return JSONResponse(
-            {
-                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm)
-                for resource in Resource.objects.filter(pk__in=resource_ids)
-            }
-        )
+        disambiguated_resource_instances = OrderedDict().fromkeys(resource_ids)
+        for resource in Resource.objects.filter(pk__in=resource_ids):
+            disambiguated_resource_instances[str(resource.pk)] = resource.to_json(
+                compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm
+            )
+
+        return JSONResponse(disambiguated_resource_instances, sort_keys=False)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1430,6 +1452,43 @@ class NodeValue(APIBase):
             response = JSONResponse(_("User does not have permission to edit this node."), status=403)
 
         return response
+
+
+class UserIncompleteWorkflows(APIBase):
+    def get(self, request):
+        if not user_is_resource_editor(request.user):
+            return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
+        
+        if request.user.is_superuser:
+            incomplete_workflows = models.WorkflowHistory.objects.filter(
+                completed=False
+            ).exclude(componentdata__iexact='{}').order_by('created')
+        else:
+            incomplete_workflows = models.WorkflowHistory.objects.filter(
+                user=request.user, 
+                completed=False
+            ).exclude(componentdata__iexact='{}').order_by('created')
+
+        incomplete_workflows_user_ids = [
+            incomplete_workflow.user_id for incomplete_workflow in incomplete_workflows
+        ]
+
+        incomplete_workflows_users = models.User.objects.filter(pk__in=set(incomplete_workflows_user_ids))
+
+        user_ids_to_usernames = {
+            incomplete_workflows_user.pk: incomplete_workflows_user.username
+            for incomplete_workflows_user in incomplete_workflows_users
+        }
+
+        incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
+
+        for incomplete_workflow in incomplete_workflows_json:
+            incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+
+        return JSONResponse({
+            "incomplete_workflows": incomplete_workflows_json,
+            "requesting_user_is_superuser": request.user.is_superuser,
+        })
 
 
 @method_decorator(csrf_exempt, name="dispatch")
