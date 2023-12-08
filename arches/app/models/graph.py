@@ -1772,7 +1772,7 @@ class Graph(models.GraphModel):
         a new entry in graphs_x_published_graphs table
         """
         with transaction.atomic():
-            LanguageSynchronizer.synchronize_settings_with_db()
+            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
             published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 
             for language_tuple in settings.LANGUAGES:
@@ -1804,7 +1804,7 @@ class Graph(models.GraphModel):
         Assigns GraphXPublishedGraph id to Graph
         """
         with transaction.atomic():
-            LanguageSynchronizer.synchronize_settings_with_db()
+            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
 
             try:
                 publication = models.GraphXPublishedGraph.objects.create(
