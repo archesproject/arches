@@ -5,7 +5,7 @@
     <input name="next" type="hidden" value="{{ redirect_to }}">
     <select name="language" data-bind="
         select2Query: {
-            select2Config: {value: value, dropdownCssClass: 'lang_switcher_dd'}
+            select2Config: {value: value, dropdownCssClass: 'lang_switcher_dd', minimumResultsForSearch: -1}
         }, attr:{'data-label': $root.translations.pageLanguage}">
         {% get_current_language as LANGUAGE_CODE %}
         {% get_available_languages as LANGUAGES %}
