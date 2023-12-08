@@ -150,7 +150,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         csv_size = default_storage.size(csv_file_path)  # file size in byte
-        use_celery_threshold = 500  # 500 bytes
+        use_celery_threshold = settings.CELERY_FILE_SIZE_THRESHOLD
 
         if csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
