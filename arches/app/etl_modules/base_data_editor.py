@@ -204,15 +204,18 @@ class BulkStringEditor(BaseBulkEditor):
 
     def validate_inputs(self, request):
         operation = request.POST.get("operation", None)
-        required_inputs = [
-            "graph_id", "node_id","operation","language_code"
-        ]
+        required_inputs = {
+            "graph_id": _("Resource Model"),
+            "node_id": _("Node"),
+            "operation": _("Edit Operation"), 
+            "language_code": _("Language")
+        }
         if operation == "replace":
-            required_inputs = required_inputs + ["old_text","new_text"]
+            required_inputs = required_inputs | {"old_text": _("Old Text"),"new_text": _("New Text")}
 
-        for required_input in required_inputs:
+        for required_input, display_value in required_inputs.items():
             if request.POST.get(required_input, None) is None:
-                ret = _("Missing required value: {required_input}").format(required_input=required_input)
+                ret = _("Missing required value: {required_input}").format(required_input=display_value)
                 raise MissingRequiredInputError(ret)
 
     def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, pattern, new_text):
