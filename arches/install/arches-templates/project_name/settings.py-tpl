@@ -8,6 +8,7 @@ import sys
 import arches
 import inspect
 import semantic_version
+from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -281,6 +282,10 @@ EMAIL_HOST_USER = "xxxx@xxx.com"
 # EMAIL_PORT = 587
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+EXTRA_EMAIL_CONTEXT = {"salutation": "Hi",
+                 "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+}
 
 CELERY_BROKER_URL = "" # RabbitMQ --> "amqp://guest:guest@localhost",  Redis --> "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ['json']
