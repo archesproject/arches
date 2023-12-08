@@ -2,7 +2,6 @@ define(['arches',], function(arches) {
     return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
         color = color || "#F0C200";
         var strokecolor = "#fff";
-        var overviewzoom = 11;
         var minzoom = arches.mapDefaultMinZoom;
         if (selectedResourceIds && selectedResourceIds.length > 0) {
             color = [
@@ -16,7 +15,7 @@ define(['arches',], function(arches) {
         var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
-            "minzoom": overviewzoom,
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
@@ -51,7 +50,7 @@ define(['arches',], function(arches) {
         }, {
             "id": "select-feature-polygon-stroke",
             "type": "line",
-            "minzoom": overviewzoom,
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
