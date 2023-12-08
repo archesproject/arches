@@ -1,30 +1,29 @@
-define([], function() {
-    return function(resourceId, source, sourceLayer, selectedResourceIds, visible, color) {
-        color = color || "#F0C200";
+define(['arches',], function(arches) {
+    return function(resourceId,  source, sourceLayer, selectedResourceIds, visible, fillColor) {
+        fillColor = fillColor || "#F0C200";
         var strokecolor = "#fff";
-        var overviewzoom = 11;
-        var minzoom = 15;
+        var minzoom = arches.mapDefaultMinZoom;
         if (selectedResourceIds && selectedResourceIds.length > 0) {
-            color = [
+            fillColor = [
                 'match',
                 ['get', 'resourceinstanceid'],
                 selectedResourceIds, "#2F14A6",
-                color
+                fillColor
             ];
         }
         if (!source) return [];
         var layers = [{
             "id": "select-feature-polygon-fill",
             "type": "fill",
-            "minzoom": overviewzoom,
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
                 "!=", "resourceinstanceid", resourceId
             ]],
             "paint": {
-                "fill-color": color,
-                "fill-outline-color": color,
+                "fill-color": fillColor,
+                "fill-outline-color": fillColor,
                 "fill-opacity": 0.2
             },
             "layout": {
@@ -51,7 +50,7 @@ define([], function() {
         }, {
             "id": "select-feature-polygon-stroke",
             "type": "line",
-            "minzoom": overviewzoom,
+            "minzoom": minzoom,
             "filter": ['all',[
                 "==", "$type", "Polygon"
             ], [
@@ -63,7 +62,7 @@ define([], function() {
                 "visibility": visible ? "visible": "none"
             },
             "paint": {
-                "line-color": color,
+                "line-color": fillColor,
                 "line-width": 2
             }
         }, {
@@ -81,7 +80,7 @@ define([], function() {
                 "visibility": visible ? "visible": "none"
             },
             "paint": {
-                "line-color": color,
+                "line-color": fillColor,
                 "line-width": 2
             }
         }, {
@@ -112,7 +111,7 @@ define([], function() {
             ]],
             "paint": {
                 "circle-radius": 4,
-                "circle-color": color
+                "circle-color": fillColor
             },
             "layout": {
                 "visibility": visible ? "visible": "none"
