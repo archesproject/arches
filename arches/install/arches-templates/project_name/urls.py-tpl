@@ -6,10 +6,6 @@ from arches.app.views.auth import PasswordResetView
 
 urlpatterns = [
     path('', include('arches.urls')),
-    path(
-    r"^password_reset/$",
-    PasswordResetView.as_view(html_email_template_name="registration/password_reset_html_email.html",extra_email_context={'app_title':settings.APP_TITLE,}),
-    name="password_reset",),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.SHOW_LANGUAGE_SWITCH is True:

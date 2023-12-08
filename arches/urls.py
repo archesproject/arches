@@ -283,10 +283,9 @@ urlpatterns = [
     re_path(r"^admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     re_path(
-        r"^password_reset/$",
-        PasswordResetView.as_view(),
-        name="password_reset",
-    ),
+    r"^password_reset/$",
+    PasswordResetView.as_view(html_email_template_name="registration/password_reset_html_email.html",extra_email_context={'app_title':settings.APP_TITLE,}),
+    name="password_reset",),
     re_path(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path(
         "reset/<uidb64>/<token>/",
