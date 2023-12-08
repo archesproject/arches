@@ -5,12 +5,13 @@ define([
     'knockout',
     'knockout-mapping',
     'utils/map-popup-provider',
+    'utils/map-configurator',
     'utils/aria',
     'templates/views/components/map-popup.htm'
-], function($, _, arches, ko, koMapping, mapPopupProvider, ariaUtils) {
+], function($, _, arches, ko, koMapping, mapPopupProvider, mapConfigurator, ariaUtils) {
     const viewModel = function(params) {
         var self = this;
-         
+
 
         var geojsonSourceFactory = function() {
             return {
@@ -115,7 +116,7 @@ define([
                 params.overlayConfigs(overlayConfigs);
             }
         });
-        
+
         this.activeBasemap = ko.observable();  // params.basemap is a string, activeBasemap is a map. Cannot initialize from params.
         this.activeBasemap.subscribe(function(basemap) {
             if (ko.isObservable(params.basemap) && params.basemap() !== basemap.name) {
@@ -467,6 +468,7 @@ define([
         this.setupMap = function(map) {
             map.on('load', function() {
                 require(['mapbox-gl', 'mapbox-gl-geocoder'], function(MapboxGl, MapboxGeocoder) {
+                    mapConfigurator.preConfig(map);
                     map.addControl(new MapboxGl.NavigationControl(), 'top-left');
                     map.addControl(new MapboxGl.FullscreenControl({
                         container: $(map.getContainer()).closest('.workbench-card-wrapper')[0]
@@ -529,6 +531,7 @@ define([
                         self.centerY(parseFloat(center.lat));
                     });
 
+                    mapConfigurator.postConfig(map);
                     self.map(map);
                 });
             });
