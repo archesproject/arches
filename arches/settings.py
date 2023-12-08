@@ -663,6 +663,7 @@ CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use you
 CELERY_TASK_SERIALIZER = "json"
 CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
 CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
+CELERY_FILE_SIZE_THRESHOLD = 500  # bytes
 
 CELERY_BEAT_SCHEDULE = {
     "delete-expired-search-export": {"task": "arches.app.tasks.delete_file", "schedule": CELERY_SEARCH_EXPORT_CHECK},
