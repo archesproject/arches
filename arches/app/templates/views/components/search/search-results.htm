@@ -8,7 +8,7 @@
 
     <div class="search-listing" role="listitem" data-bind="event: { mouseover: mouseoverInstance, mouseout: mouseoverInstance('')}, css: {'selected': selected()}">
         <div style="display: flex">
-            <div style="display: flex; position: relative;">
+            <div class="search-thumbnail-container">
                 <div 
                     style="display: flex; align-items: center; margin: 10px; background-color: lightgrey;" 
                     data-bind="
@@ -19,9 +19,9 @@
                         }
                     "
                 >
-                    <img style="max-width: 70px;" data-bind="attr:{src: thumbnail}" alt="">
+                    <img class="search-thumbnail-image" data-bind="attr:{src: thumbnail}" alt="">
                 </div>
-                <img style="position: absolute; left: 90px; bottom: 10px; height:250px; display: none;" data-bind="attr:{src: thumbnail}" alt="">
+                <img class="search-hover-image" data-bind="attr:{src: thumbnail}" alt="">
             </div>
 
             <div style="flex: 1">
