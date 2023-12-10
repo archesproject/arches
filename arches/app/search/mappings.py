@@ -172,6 +172,10 @@ def prepare_search_index(create=False):
                     "type": "nested",
                     "properties": {"id": {"type": "keyword"}, "nodegroup_id": {"type": "keyword"}, "provisional": {"type": "boolean"}},
                 },
+                "sets": {
+                    "type": "nested",
+                    "properties": {"id": {"type": "keyword"}},
+                },
                 "domains": {
                     "type": "nested",
                     "properties": {

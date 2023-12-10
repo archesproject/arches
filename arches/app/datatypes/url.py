@@ -160,7 +160,7 @@ class URLDataType(BaseDataType):
             # terms.append(nodevalue['url'])       FIXME: URLs searchable?
         return terms
 
-    def append_search_filters(self, value, node, query, request):
+    def append_search_filters(self, value, node, query, parameters):
         # Match the label in the same manner as a String datatype
         try:
             if value["val"] != "":

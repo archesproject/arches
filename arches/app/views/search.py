@@ -57,6 +57,10 @@ from arches.app.models.system_settings import settings
 logger = logging.getLogger(__name__)
 
 
+class SearchError(Exception):
+    ...
+
+
 class SearchView(MapBaseManagerView):
     def get(self, request):
         map_markers = models.MapMarker.objects.all()
@@ -288,10 +292,10 @@ def export_results(request):
         return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
 
 
-def append_instance_permission_filter_dsl(request, search_results_object):
-    if request.user.is_superuser is False:
+def append_instance_permission_filter_dsl(user, search_results_object):
+    if user.is_superuser is False:
         has_access = Bool()
-        terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
         nested_term_filter = Nested(path="permissions", query=terms)
         has_access.must_not(nested_term_filter)
         search_results_object["query"].add_query(has_access)
@@ -313,25 +317,85 @@ def search_results(request, returnDsl=False):
             load_tiles = json.loads(load_tiles)
         except TypeError:
             pass
+    user = request.user
+    provisional_filter = JSONDeserializer().deserialize(request.GET.get("provisional-filter", "[]"))
+    parameters = {}
+    for bag in (request.GET, request.POST):
+        for key in bag:
+            parameters[key] = bag[key]
+    if user is not True:
+        permitted_nodegroups = get_permitted_nodegroups(user)
+    else:
+        permitted_nodegroups = True
+    try:
+        search_filter_factory, search_results_object, dsl =  build_search(
+            for_export,
+            pages,
+            total,
+            resourceinstanceid,
+            load_tiles,
+            user,
+            provisional_filter,
+            parameters,
+            permitted_nodegroups
+        )
+        if returnDsl:
+            return dsl
+        search_results_object, count, results = retrieve_search_results(
+            search_filter_factory,
+            search_results_object,
+            dsl,
+            load_tiles,
+            for_export,
+            pages,
+            total,
+            resourceinstanceid,
+            parameters,
+            permitted_nodegroups
+        )
+    except SearchError as err:
+        return JSONErrorResponse(message=err)
+
+    ret = {}
+
+    if results is not None:
+        ret["results"] = results
+
+        for key, value in list(search_results_object.items()):
+            ret[key] = value
+
+        ret["reviewer"] = user_is_resource_reviewer(user)
+        ret["timestamp"] = datetime.now()
+        ret["total_results"] = count
+        ret["userid"] = user.id
+        return JSONResponse(ret)
+
+    else:
+        ret = {"message": _("There was an error retrieving the search results")}
+        return JSONResponse(ret, status=500)
+
+def build_search(for_export, pages, total, resourceinstanceid, load_tiles, user, provisional_filter, parameters, permitted_nodegroups, returnDsl=False):
     se = SearchEngineFactory().create()
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-    include_provisional = get_provisional_type(request)
-    search_filter_factory = SearchFilterFactory(request)
+    include_provisional = get_provisional_type(provisional_filter, user)
+    search_filter_factory = SearchFilterFactory(parameters, user)
     search_results_object = {"query": Query(se)}
 
     try:
-        for filter_type, querystring in list(request.GET.items()) + list(request.POST.items()) + [("search-results", "")]:
+        for filter_type, querystring in list(parameters.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
-        append_instance_permission_filter_dsl(request, search_results_object)
+        if user is not True:
+            append_instance_permission_filter_dsl(user, search_results_object)
     except Exception as err:
         logger.exception(err)
         return JSONErrorResponse(message=str(err))
 
     dsl = search_results_object.pop("query", None)
-    if returnDsl:
-        return dsl
+
+    return search_filter_factory, search_results_object, dsl
+
+def retrieve_search_results(search_filter_factory, search_results_object, dsl, load_tiles, for_export, pages, total, resourceinstanceid, parameters, permitted_nodegroups):
     dsl.include("graph_id")
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
@@ -345,6 +409,7 @@ def search_results(request, returnDsl=False):
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
+    dsl.include("sets")
     if load_tiles:
         dsl.include("tiles")
     if for_export or pages:
@@ -361,7 +426,7 @@ def search_results(request, returnDsl=False):
     else:
         results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
 
-    ret = {}
+    count = 0
     if results is not None:
         if "hits" not in results:
             if "docs" in results:
@@ -370,7 +435,7 @@ def search_results(request, returnDsl=False):
                 results = {"hits": {"hits": [results]}}
 
         # allow filters to modify the results
-        for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
+        for filter_type, querystring in list(parameters.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
@@ -396,24 +461,14 @@ def search_results(request, returnDsl=False):
                         resource["_source"]["displayname_language"] = descriptor["language"]
                 else:
                     resource["_source"][descriptor_type] = _("Undefined")
+        count = dsl.count(index=RESOURCES_INDEX)
 
-        ret["results"] = results
+    return search_results_object, count, results
 
         for key, value in list(search_results_object.items()):
             ret[key] = value
 
-        ret["reviewer"] = user_is_resource_reviewer(request.user)
-        ret["timestamp"] = datetime.now()
-        ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
-        ret["userid"] = request.user.id
-        return JSONResponse(ret)
-
-    else:
-        ret = {"message": _("There was an error retrieving the search results")}
-        return JSONResponse(ret, status=500)
-
-
-def get_provisional_type(request):
+def get_provisional_type(provisional_filter, user):
     """
     Parses the provisional filter data to determine if a search results will
     include provisional (True) exclude provisional (False) or inlude only
@@ -421,8 +476,7 @@ def get_provisional_type(request):
     """
 
     result = False
-    provisional_filter = JSONDeserializer().deserialize(request.GET.get("provisional-filter", "[]"))
-    user_is_reviewer = user_is_resource_reviewer(request.user)
+    user_is_reviewer = user is True or user_is_resource_reviewer(user)
     if user_is_reviewer is not False:
         if len(provisional_filter) == 0:
             result = True

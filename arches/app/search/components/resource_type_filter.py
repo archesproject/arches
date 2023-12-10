@@ -28,11 +28,17 @@ def get_permitted_graphids(permitted_nodegroups):
 class ResourceTypeFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
-        querystring_params = self.request.GET.get(details["componentname"], "")
+        querystring_params = self.parameters.get(details["componentname"], "")
         graph_ids = []
-        permitted_graphids = get_permitted_graphids(permitted_nodegroups)
+        resourceTypeFilters = JSONDeserializer().deserialize(querystring_params)
+        if self.user is True:
+            permitted_graphids = [
+                str(resourceTypeFilter["graphid"]) for resourceTypeFilter in resourceTypeFilters
+            ]
+        else:
+            permitted_graphids = get_permitted_graphids(permitted_nodegroups)
 
-        for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
+        for resourceTypeFilter in resourceTypeFilters:
             graphid = str(resourceTypeFilter["graphid"])
             if resourceTypeFilter["inverted"] is True:
                 try:
@@ -53,4 +59,4 @@ class ResourceTypeFilter(BaseSearchFilter):
         search_results_object["query"].add_query(search_query)
 
     def view_data(self):
-        return {"resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")}
+        return {"resources": get_resource_types_by_perm(self.user, "read_nodegroup")}

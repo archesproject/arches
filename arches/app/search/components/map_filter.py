@@ -26,7 +26,7 @@ details = {
 class MapFilter(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querysting_params = self.parameters.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
@@ -54,7 +54,8 @@ class MapFilter(BaseSearchFilter):
                     spatial_query.filter(geoshape)
 
                 # get the nodegroup_ids that the user has permission to search
-                spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
+                if self.user is not True:
+                    spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
 
                 if include_provisional is False:
                     spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))

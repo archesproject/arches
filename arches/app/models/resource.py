@@ -375,6 +375,7 @@ class Resource(models.ResourceInstance):
 
         document["displayname"] = []
         document["displaydescription"] = []
+        document["sets"] = []
         document["map_popup"] = []
         for lang in settings.LANGUAGES:
             if context is None:
@@ -526,6 +527,31 @@ class Resource(models.ResourceInstance):
             super(Resource, self).delete()
 
         return permit_deletion
+
+    def get_index(self, resourceinstanceid=None):
+        """
+        Gets the indexed document for a resource
+
+        Keyword Arguments:
+        resourceinstanceid -- the resource instance id to delete from related indexes, if supplied will use this over self.resourceinstanceid
+        """
+
+        if resourceinstanceid is None:
+            resourceinstanceid = self.resourceinstanceid
+        resourceinstanceid = str(resourceinstanceid)
+
+        # delete any related terms
+        query = Query(se)
+        bool_query = Bool()
+        bool_query.must(Terms(field="_id", terms=[resourceinstanceid]))
+        query.add_query(bool_query)
+        query.include("sets")
+        results = query.search(index=RESOURCES_INDEX)
+        if len(results["hits"]["hits"]) < 1:
+            raise UnindexedError("This resource is not (yet) indexed")
+        if len(results["hits"]["hits"]) > 1:
+            raise RuntimeError("Resource instance ID exists multiple times in search index")
+        return results["hits"]["hits"][0]
 
     def delete_index(self, resourceinstanceid=None):
         """
@@ -875,6 +901,15 @@ class PublishedModelError(Exception):
 class UnpublishedModelError(Exception):
     def __init__(self, message, code=None):
         self.title = _("Unpublished Model Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
+
+class UnindexedError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Unindexed Error")
         self.message = message
         self.code = code
 

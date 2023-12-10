@@ -124,10 +124,10 @@ class BaseConceptDataType(BaseDataType):
             )
             document["strings"].append({"string": value.value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
 
-    def append_search_filters(self, value, node, query, request):
+    def append_search_filters(self, value, node, query, parameters):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
-                self.append_null_search_filters(value, node, query, request)
+                self.append_null_search_filters(value, node, query, parameters)
             elif value["op"] == "in_list_any":
                 self.append_in_list_search_filters(value, node, query, match_any=True)
             elif value["op"] == "in_list_all":

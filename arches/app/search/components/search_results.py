@@ -30,11 +30,12 @@ class SearchResultsFilter(BaseSearchFilter):
                 "graph_id"
             ]  # check if resource_type filter is already applied
         except (KeyError, IndexError):
-            resource_model_filter = Bool()
-            permitted_graphids = get_permitted_graphids(permitted_nodegroups)
-            terms = Terms(field="graph_id", terms=list(permitted_graphids))
-            resource_model_filter.filter(terms)
-            search_results_object["query"].add_query(resource_model_filter)
+            if self.user is not True:
+                resource_model_filter = Bool()
+                permitted_graphids = get_permitted_graphids(permitted_nodegroups)
+                terms = Terms(field="graph_id", terms=list(permitted_graphids))
+                resource_model_filter.filter(terms)
+                search_results_object["query"].add_query(resource_model_filter)
 
         if include_provisional is True:
             geo_agg_filter.filter(Terms(field="points.provisional", terms=["false", "true"]))
@@ -46,7 +47,8 @@ class SearchResultsFilter(BaseSearchFilter):
             elif include_provisional == "only provisional":
                 geo_agg_filter.filter(Terms(field="points.provisional", terms=["true"]))
 
-        geo_agg_filter.filter(Terms(field="points.nodegroup_id", terms=permitted_nodegroups))
+        if self.user is not True:
+            geo_agg_filter.filter(Terms(field="points.nodegroup_id", terms=permitted_nodegroups))
         nested_agg_filter.add_filter(geo_agg_filter)
         nested_agg_filter.add_aggregation(GeoHashGridAgg(field="points.point", name="grid", precision=settings.HEX_BIN_PRECISION))
         nested_agg_filter.add_aggregation(GeoBoundsAgg(field="points.point", name="bounds"))
@@ -54,10 +56,10 @@ class SearchResultsFilter(BaseSearchFilter):
         search_results_object["query"].add_aggregation(nested_agg)
 
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):
-        user_is_reviewer = user_is_resource_reviewer(self.request.user)
+        user_is_reviewer = user_is_resource_reviewer(self.user)
 
         # only reuturn points and geometries a user is allowed to view
-        geojson_nodes = get_nodegroups_by_datatype_and_perm(self.request, "geojson-feature-collection", "read_nodegroup")
+        geojson_nodes = get_nodegroups_by_datatype_and_perm(self.user, "geojson-feature-collection", "read_nodegroup")
 
         for result in results["hits"]["hits"]:
             result["_source"]["points"] = select_geoms_for_results(result["_source"]["points"], geojson_nodes, user_is_reviewer)
@@ -65,17 +67,17 @@ class SearchResultsFilter(BaseSearchFilter):
             try:
                 permitted_tiles = []
                 for tile in result["_source"]["tiles"]:
-                    if tile["nodegroup_id"] in permitted_nodegroups:
+                    if tile["nodegroup_id"] in permitted_nodegroups or self.user is True:
                         permitted_tiles.append(tile)
                 result["_source"]["tiles"] = permitted_tiles
             except KeyError:
                 pass
 
 
-def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
+def get_nodegroups_by_datatype_and_perm(user, datatype, permission):
     nodes = []
     for node in models.Node.objects.filter(datatype=datatype):
-        if request.user.has_perm(permission, node.nodegroup):
+        if user.has_perm(permission, node.nodegroup):
             nodes.append(str(node.nodegroup_id))
     return nodes
 

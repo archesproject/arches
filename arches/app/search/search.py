@@ -117,6 +117,30 @@ class SearchEngine(object):
         print("deleting index : %s" % kwargs.get("index"))
         return self.es.options(ignore_status=[400, 404]).indices.delete(**kwargs)
 
+    def update_by_query(self, **kwargs):
+        """
+        Update items by a search in the index.
+        Pass an index and id (or list of ids) to get a specific document(s)
+        Pass a query with a query dsl to perform a search
+
+        """
+
+        kwargs = self._add_prefix(**kwargs)
+        query = kwargs.get("query", None)
+        script = kwargs.get("script", None)
+
+        if query is None or script is None:
+            message = "%s: WARNING: update-by-query missing query or script" % (datetime.now())
+            self.logger.exception(message)
+            raise RuntimeError(message)
+
+        ret = None
+        try:
+            ret = self.es.update_by_query(**kwargs).body
+        except RequestError as detail:
+            self.logger.exception("%s: WARNING: update-by-query failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail.info))
+        return ret
+
     def search(self, **kwargs):
         """
         Search for an item in the index.

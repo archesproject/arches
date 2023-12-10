@@ -21,7 +21,7 @@ details = {
 
 class AdvancedSearch(BaseSearchFilter):
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querysting_params = self.parameters.get(details["componentname"], "")
         advanced_filters = JSONDeserializer().deserialize(querysting_params)
         datatype_factory = DataTypeFactory()
         search_query = Bool()
@@ -34,7 +34,7 @@ class AdvancedSearch(BaseSearchFilter):
             for key, val in advanced_filter.items():
                 if key != "op":
                     node = models.Node.objects.get(pk=key)
-                    if self.request.user.has_perm("read_nodegroup", node.nodegroup):
+                    if self.user.has_perm("read_nodegroup", node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
                         try:
                             val["val"] = "" if val["val"] == None else val["val"]
@@ -45,9 +45,9 @@ class AdvancedSearch(BaseSearchFilter):
                             "val" in val and (val["val"] == "null" or val["val"] == "not_null")
                         ):
                             # don't use a nested query with the null/not null search
-                            datatype.append_search_filters(val, node, null_query, self.request)
+                            datatype.append_search_filters(val, node, null_query, self.parameters)
                         else:
-                            datatype.append_search_filters(val, node, tile_query, self.request)
+                            datatype.append_search_filters(val, node, tile_query, self.parameters)
             nested_query = Nested(path="tiles", query=tile_query)
             if advanced_filter["op"] == "or" and index != 0:
                 grouped_query = Bool()
@@ -83,7 +83,7 @@ class AdvancedSearch(BaseSearchFilter):
         # only allow cards that the user has permission to read
         searchable_cards = []
         for card in resource_cards:
-            if self.request.user.has_perm("read_nodegroup", card.nodegroup):
+            if self.user.has_perm("read_nodegroup", card.nodegroup):
                 searchable_cards.append(card)
 
         ret["graphs"] = resource_graphs

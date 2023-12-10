@@ -385,7 +385,7 @@ class Tile(models.TileModel):
             except:
                 node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            datatype.post_tile_save(self, nodeid, request)
+            datatype.post_tile_save(self, nodeid, request.GET if request else request)
 
     def save(self, *args, **kwargs):
         request = kwargs.pop("request", None)
