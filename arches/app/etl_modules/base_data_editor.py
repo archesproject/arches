@@ -10,7 +10,7 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, ETLModule
+from arches.app.models.models import GraphModel, Node, ETLModule, LoadStaging
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import Bool, FiltersAgg, Match, Nested, NestedAgg, Query, Terms, Wildcard, Regex
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -26,6 +26,8 @@ from arches.app.views.search import search_results
 
 logger = logging.getLogger(__name__)
 
+class MissingRequiredInputError(Exception):
+    pass
 
 class BaseBulkEditor:
     def __init__(self, request=None, loadid=None):
@@ -151,6 +153,8 @@ class BaseBulkEditor:
                 """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, pattern, new_text, language_code, case_insensitive, update_limit),
             )
+            count_of_tiles_staged = LoadStaging.objects.filter(load_event=self.loadid).count()
+            self.log_event_details(cursor, f"done|{count_of_tiles_staged} tiles staged...")
             result["success"] = True
         except Exception as e:
             logger.error(e)
@@ -188,10 +192,32 @@ class BaseBulkEditor:
         return [result["_source"]["resourceinstanceid"] for result in results]
 
     def validate(self, request):
-        return {"success": True, "data": {}}
+        raise NotImplementedError
+
+    def validate_inputs(self, request):
+        raise NotImplementedError
 
 
 class BulkStringEditor(BaseBulkEditor):
+    def validate(self, request):
+        return {"success": True, "data": {}}
+
+    def validate_inputs(self, request):
+        operation = request.POST.get("operation", None)
+        required_inputs = {
+            "graph_id": _("Resource Model"),
+            "node_id": _("Node"),
+            "operation": _("Edit Operation"), 
+            "language_code": _("Language")
+        }
+        if operation == "replace":
+            required_inputs = required_inputs | {"old_text": _("Old Text"),"new_text": _("New Text")}
+
+        for required_input, display_value in required_inputs.items():
+            if request.POST.get(required_input, None) is None:
+                ret = _("Missing required value: {required_input}").format(required_input=display_value)
+                raise MissingRequiredInputError(ret)
+
     def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, pattern, new_text):
         result = {"success": False}
         try:
@@ -212,8 +238,6 @@ class BulkStringEditor(BaseBulkEditor):
         request.GET["paging-filter"] = 1
         request.GET["tiles"] = True
 
-        if language_code is None:
-            language_code = "en"
 
         if search_url:
             validate = URLValidator()
@@ -317,6 +341,14 @@ class BulkStringEditor(BaseBulkEditor):
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
+        try:
+            self.validate_inputs(request)
+        except MissingRequiredInputError as e:
+            return {
+                "success": False,
+                "data": {"title": _("Missing input error"), "message": str(e)}
+            }
+
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
@@ -392,6 +424,14 @@ class BulkStringEditor(BaseBulkEditor):
         whole_word = request.POST.get("whole_word", 'false')
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
+
+        try:
+            self.validate_inputs(request)
+        except MissingRequiredInputError as e:
+            return {
+                "success": False,
+                "data": {"title": _("Missing input error"), "message": str(e)}
+            }
 
         pattern = old_text
         if operation == "replace":

@@ -58,7 +58,7 @@
 
 {% block etl_status %}
 <div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
-    <h4 class="summary-title">
+    <h4 class="summary-title" style="padding-bottom: 20px;">
         <span data-bind="text: $root.translations.exportBranchExcelSummary"></span>
     </h4>
     <!-- ko if: ko.unwrap(loadDetails) -->
@@ -82,9 +82,14 @@
         <div class="summary-header">
             <span data-bind="text: $root.translations.downloadExportedZipFile"></span>
         </div>
-        <div class="summary-contents">
+        <div class="summary-contents" style="padding-bottom: 20px;">
             <div class="etl-loading-metadata-value">
-                <a class="file-listing-link" download data-bind="text: loadDetails.zipfile.name, attr: { href: '/temp_file/'+loadDetails.zipfile.fileid }"></a>
+                <a 
+                    class="file-listing-link" 
+                    style="color: blue;"
+                    download 
+                    data-bind="text: loadDetails.zipfile.name, attr: { href: '/temp_file/'+loadDetails.zipfile.fileid }"
+                ></a>
             </div>
         </div>
 
@@ -92,10 +97,27 @@
         <div class="summary-header">
             <span data-bind="text: $root.translations.downloadAdditionalFiles"></span>
         </div>
-        <div class="summary-contents">
+        <div class="summary-contents" style="padding-bottom: 20px;">
             <!-- ko foreach: { data: loadDetails.skipped_files, as: 'file' } -->
             <div class="etl-loading-metadata-value">
-                <a class="file-listing-link" data-bind="text: file.name, attr: { download: file.name, href: file.url }"></a>
+                <a 
+                    class="file-listing-link" 
+                    style="color: blue;"
+                    data-bind="text: file.name, attr: { download: file.name, href: file.url }"
+                ></a>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: loadDetails.files_not_found.length > 0 -->
+        <div class="summary-header">
+            <span>{% trans "These files were not found and could not be exported"%}</span>
+        </div>
+        <div class="summary-contents" style="padding-bottom: 20px;">
+            <!-- ko foreach: { data: loadDetails.files_not_found, as: 'file' } -->
+            <div class="etl-loading-metadata-value">
+                <a class="file-listing-link" data-bind="text: file.name"></a>
             </div>
             <!-- /ko -->
         </div>

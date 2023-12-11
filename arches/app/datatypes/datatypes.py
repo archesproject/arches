@@ -1606,7 +1606,7 @@ class FileListDataType(BaseDataType):
             current_tile_data = self.get_tile_data(tile)
             if previously_saved_tile.count() == 1:
                 previously_saved_tile_data = self.get_tile_data(previously_saved_tile[0])
-                if previously_saved_tile_data[nodeid] is not None:
+                if previously_saved_tile_data and previously_saved_tile_data[nodeid] is not None:
                     for previously_saved_file in previously_saved_tile_data[nodeid]:
                         previously_saved_file_has_been_removed = True
                         for incoming_file in current_tile_data[nodeid]:

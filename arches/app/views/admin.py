@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from django.views.generic import View
 from django.utils.decorators import method_decorator
+from arches.app.models.resource import Resource
 from arches.app.utils.decorators import group_required
 from arches.app.utils.index_database import index_resources_by_type
 from arches.app.utils.response import JSONResponse
@@ -29,7 +30,8 @@ from django.core.cache import caches
 class ReIndexResources(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        index_resources_by_type(data["graphids"], clear_index=False, batch_size=4000, quiet=True)
+        index_resources_by_type(data["graphids"], clear_index=False, batch_size=4000, quiet=True, recalculate_descriptors=True)
+        
         return JSONResponse(data)
 
 

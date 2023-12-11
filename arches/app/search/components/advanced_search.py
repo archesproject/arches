@@ -36,6 +36,11 @@ class AdvancedSearch(BaseSearchFilter):
                     node = models.Node.objects.get(pk=key)
                     if self.request.user.has_perm("read_nodegroup", node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
+                        try:
+                            val["val"] = "" if val["val"] == None else val["val"]
+                        except:
+                            pass
+
                         if ("op" in val and (val["op"] == "null" or val["op"] == "not_null")) or (
                             "val" in val and (val["val"] == "null" or val["val"] == "not_null")
                         ):

@@ -25,6 +25,7 @@ from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
+from arches.app.views.thumbnail import ThumbnailView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -298,6 +299,7 @@ urlpatterns = [
     re_path(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     re_path(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),
     re_path(r"^icons$", IconDataView.as_view(), name="icons"),
+    re_path(r"^thumbnail/(?P<resource_id>%s)$" % uuid_regex, ThumbnailView.as_view(), name="thumbnail"),
     # Uncomment the admin/doc line below to enable admin documentation:
     # re_path(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
@@ -323,7 +325,9 @@ urlpatterns = [
     re_path(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
     re_path(r"^manifest/(?P<id>%s)$" % uuid_regex, api.Manifest.as_view(), name="manifest"),
     re_path(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
-    re_path(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
+    re_path(
+        r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"
+    ),
     re_path(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
     re_path(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
     re_path(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
