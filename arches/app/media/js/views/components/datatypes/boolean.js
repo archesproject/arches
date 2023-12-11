@@ -13,6 +13,7 @@ define(['knockout', 'templates/views/components/datatypes/boolean.htm'], functio
 
         if (this.search) {
             var filter = params.filterValue();
+            this.node = params.node;
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
                 return {

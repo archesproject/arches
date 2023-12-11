@@ -163,6 +163,22 @@ define([
             params.dirty(true);
         };
 
+        // ctrl+S to save any edited/dirty tiles in resource view 
+        var keyListener = function(e) {
+            if (e.ctrlKey && e.key === "s") {
+                e.preventDefault();
+                if (self?.tile?.dirty() == true && 
+                    self?.tile?.parent?.isWritable === true) {
+                        self.saveTile();
+                }
+            }
+        };
+        document.addEventListener("keydown", keyListener)
+        // dispose of eventlistener
+        this.dispose = function(){
+            document.removeEventListener("keydown", keyListener);
+        };
+
         this.saveTile = function(callback) {
             self.loading(true);
             self.tile.transactionId = params.form?.workflowId || undefined;
@@ -173,7 +189,6 @@ define([
             else if (ko.unwrap(params.form?.resourceId)){
                 self.tile.resourceinstance_id = ko.unwrap(params.form.resourceId);
             }
-
             self.tile.save(function(response) {
                 self.loading(false);
                 if(params?.form?.error){

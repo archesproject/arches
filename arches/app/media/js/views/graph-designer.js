@@ -27,7 +27,6 @@ define([
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
-
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
@@ -333,6 +332,21 @@ define([
 
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
             viewModel.updatedCardinalityData = ko.observable();
+
+            // ctrl+S to save any edited/dirty nodes 
+            var keyListener = function(e) {
+                if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    if (viewModel.isNodeDirty() || viewModel.graphSettingsViewModel.dirty()) {
+                        viewModel.saveSelectedNode();
+                    }
+                }
+            };
+            document.addEventListener("keydown", keyListener)
+            // dispose of eventlistener
+            this.dispose = function(){
+                document.removeEventListener("keydown", keyListener);
+            };
 
             viewModel.saveNode = function(node) {
                 if (node) {

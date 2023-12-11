@@ -1804,7 +1804,7 @@ class Graph(models.GraphModel):
         a new entry in graphs_x_published_graphs table
         """
         with transaction.atomic():
-            LanguageSynchronizer.synchronize_settings_with_db()
+            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
             published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
 
             for language_tuple in settings.LANGUAGES:
@@ -1835,7 +1835,7 @@ class Graph(models.GraphModel):
         Creates an additional entry in the Graphs table that represents an editable version of the current graph
         """
         with transaction.atomic():
-            LanguageSynchronizer.synchronize_settings_with_db()
+            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
 
             try:
                 previous_editable_future_graph = models.GraphModel.objects.get(source_identifier_id=self.graphid)

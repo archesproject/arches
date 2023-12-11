@@ -613,7 +613,7 @@ define([
                     maxZoom: maxZoom
                 }, forceFitBounds);
             }
-        }
+        },  
     });
 
     return ko.components.register(componentName, {

@@ -11,6 +11,7 @@ define([
 
          
         self.urls = arches.urls;
+        self.selectedPopup = params.selectedPopup;
         self.items = ko.observableArray([]);
         $.ajax({
             type: "GET",

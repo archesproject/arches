@@ -1,0 +1,242 @@
+#user-profile {
+    .account-wrapper
+    {
+        flex: 1;
+        > .row {
+            display: flex;
+
+            .row-content {
+                flex: 1;
+
+                .row {
+                    display: flex;
+                }
+            }
+        }
+    }
+
+    .notif-table {
+        width: 100%;
+
+    }
+    .widget-input-label-notif {
+        padding: 0 20px;
+        font-size: 1.2rem;
+        margin-top: 2px;
+        font-weight: 500;
+        color: #666;
+    }
+
+    .widget-input-label-notif .arches-switch {
+        margin: 0 5px;
+    }
+
+    .notif-table th {
+        font-size: 1.05em;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+        color: #4d627b;
+    }
+
+    .profile-header {
+        padding: 0 10px;
+    }
+
+    .profile-listt {
+        display: flex;
+        width: 100%;
+        padding: 40px 100px;
+        min-height: 170px;
+        border-bottom: 1px solid #ccc;
+
+        .profile-notif-settings{
+            margin: 0 20px;
+            padding: 0;
+            width: 100%;
+            float: none;
+        }
+
+        th {
+            text-align: start;
+        }
+    }
+}
+
+#container #profile-table td {
+    border-top: 1px solid rgba(0, 0, 0, 0.0);
+}
+
+.profile-summary-page {
+    width: 100%;
+    background: #fff;
+}
+
+.profile-summary-page .img-responsive {
+    max-height: 249px;
+}
+
+.profile-report {
+    height: 150px;
+    background: #102F4F;
+    width: 100%;
+    padding: 40px 100px 0px 100px;
+    border-bottom: 1px solid #520008;
+}
+
+.profile-sections {
+    padding: 60px 30px;
+    min-height: 450px;
+}
+
+div.profile-notif-settings {
+    padding-top: 12px;
+    float: none;
+    margin: 0px 25%;
+}
+
+th.notif-type {
+    width: 150px;
+}
+
+.profile-notif-settings td {
+    padding: 8px 10px;
+    color: #666;
+}
+
+.profile-notif-settings th {
+    padding: 4px 6px 4px 6px;
+}
+
+.profile-projects {
+    height: 100vh;
+}
+
+.btn-profile {
+    width: 65px;
+}
+
+.profile-full-name {
+    color: #fff;
+    font-size: 2.6em;
+}
+
+.profile-e-mail {
+    color: #fff;
+    font-size: 1.6rem;
+    color: #ddd;
+    font-weight: 500;
+}
+
+.profile-header {
+    font-size: 2.1rem;
+}
+
+.account-summary {
+    margin-top: -30px;
+    height: 200px;
+    background: #a1f1f1;
+}
+
+.profile-label-shim {
+    font-size: 1.3rem;
+    margin-top: -5px;
+    color: #777;
+}
+
+.btn-profile-password {
+    background: #fff;
+    border-width: 0px;
+    margin-top: -20px;
+    margin-left: -12px;
+    color: #579ddb;
+}
+
+.account-tips {
+    margin-top: 10px;
+    font-size: 1.3rem;
+    color: #888;
+}
+
+.account-input {
+    max-width: 300px;
+}
+
+.account-label {
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.btn-profile-password:hover {
+    background: #fff;
+    color: #579ddb;
+}
+
+.btn-profile-password:focus {
+    background: #fff;
+    color: #579ddb;
+}
+
+.btn-profile-password.btn-default:active {
+    background-color: #fff;
+    border-width: 0px;
+    color: #579ddb;
+}
+
+.btn-profile-password.btn:not(.disabled):not(:disabled):active,
+.btn:not(.disabled):not(:disabled).active {
+    box-shadow: none;
+}
+
+.device-summary {
+    font-size: 1.3rem;
+    margin-bottom: -5px;
+}
+
+.device-listing {
+    float: left;
+    margin-top: -20px;
+    padding-left: 0px;
+}
+
+.device-listing li:not(:first-child) {
+    margin-left: 20px;
+}
+
+.device-list-item {
+    display: inline-block;
+    padding: 10px;
+}
+
+.project-search-widget {
+    position: absolute;
+    top: -40px;
+    width: 250px;
+}
+
+.profile-default-message-panel {
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-size: 1.7rem;
+    color: #888;
+}
+
+.apple_app_store_icon {
+    height: 50px;
+    padding-top: 10px;
+}
+
+.android_app_store_icon {
+    height: 58px;
+    margin-top: 11px;
+}
+
+.account-wrapper {
+    padding-top: 0px;
+}
+
+.account-content-heading {
+    font-weight: 500;
+    font-size: 1.6rem;
+    margin: 0.625em auto 0.625em auto;
+}
