@@ -3,14 +3,24 @@
 
 <div data-bind="css: {'print-hide': !reportExpanded()}">
     <!-- ko if: showHeaderLine--><hr class="rp-tile-separator"><!-- /ko -->
-    <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional'">
+    <div class="rp-card-section" data-bind="css: card.model.cssclass, visible: card.fullyProvisional() !== 'fullyprovisional', let: {uid: Math.random().toString()}">
         <span class="rp-tile-title" data-bind="text: card.model.get('name')"></span>
         <!-- ko if: card.tiles().length > 0 -->
-        <i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, click: function () { reportExpanded(!reportExpanded()) }"></i>
+        <i class="fa report-expander print-hide" tabindex="0" role="button" 
+            data-bind="onEnterkeyClick, onSpaceClick,
+                css: {'fa-angle-down': reportExpanded(), 'fa-angle-right': !reportExpanded()}, 
+                click: function () { reportExpanded(!reportExpanded()) },
+                attr: {
+                    'aria-expanded': reportExpanded().toString(),
+                    'aria-controls': uid,
+                    'aria-label': $root.translations.toggleCardReport( card.model.get('name')() ),
+                }
+            "
+        ></i>
         <!-- ko if: reportExpanded() -->
         <!-- ko foreach: { data: self.preview ? [card.newTile] : card.tiles, as: 'tile' } -->
 
-        <div class="rp-card-section" data-bind="event : { dblclick: function(){tile.selected(true) }}, css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: tile.tileid}">
+        <div class="rp-card-section" data-bind="event : { dblclick: function(){tile.selected(true) }}, css: {'provisional': ko.unwrap(tile.provisionaledits) !== null && tile.userisreviewer === false, 'fullyprovisional': tile.isfullyprovisional()}, attr: {id: uid}">
             <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
             <div style="display: inline-flex; width: 100%; justify-content: space-between;">
                 <span data-bind="visible: tile.parent.model.get('widgets')().length === 0"></span>

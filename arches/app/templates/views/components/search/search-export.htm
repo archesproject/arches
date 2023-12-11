@@ -1,44 +1,98 @@
 {% load template_tags %}
 {% load i18n %}
 
-<div class="search-container time-search-container relative" style="overflow-y: scroll;">
-    <div class="filter-title">
-        <span data-bind="text: $root.translations.exportSearchResults"></span>
+<div class="relative" style="overflow-y: scroll;">
+    <div class="close-popup-panel-container">
+        <span class="close-popup-panel" tabindex="0" role="button" id="search-export-close-btn" 
+            data-bind="onEnterkeyClick, onSpaceClick, 
+            click: function(){selectedPopup(''); $root.shiftFocus('#search-export-open-btn');},
+            attr: {'aria-label': $root.translations.closeExportSearchResults},
+            text: $root.translations.exportSearchResults">
+        </span>
     </div>
     <hr class="title-underline">
 
     <div class="search-export">
+        <!-- 1. Format -->
         <div class="instruction">
-            <h2 class="">
-                <span data-bind="text: $root.translations.listItemOneFormat"></span>
-            </h2>
-            <h4 class="">
-                <span data-bind="text: $root.translations.listItemOneFormatText"></span>
-            </h4>
+            <div class="search-export-instruction-h2 h2">
+                <span data-bind="text: $root.translations.listItemOneFormat" id="format-instruction-header"></span>
+            </div>
+            <div class="search-export-instruction-h4 h4">
+                <span data-bind="text: $root.translations.listItemOneFormatText" id="format-instruction-text"></span>
+            </div>
         </div>
         <div class="parameter">
-            <div>
-                <label data-bind="css: { 'active': format() === 'tilecsv' }, click: function () { format('tilecsv') }" class="form-radio form-normal form-text">
+            <div role="radiogroup" style="display: grid;" aria-label="{% trans '1. Export Format' %}">
+                <label role="radio" tabindex="0" class="form-radio form-normal form-text" 
+                    data-bind="
+                        css: { 'active': format() === 'tilecsv' }, 
+                        click: function () { format('tilecsv') },
+                        onSpaceClick, 
+                        attr: {
+                            'aria-checked': format() === 'tilecsv',
+                            'aria-describedby': 'format-instruction-text'
+                        },
+                    ">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilecsv'" value="true">
                     <span data-bind="text: $root.translations.csv"></span>
                 </label>
                 <!-- ko if: hasExportHtmlTemplates() -->
-                <label data-bind="css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} }" class="form-radio form-normal form-text">
+                <label role="radio" tabindex="0" class="form-radio form-normal form-text" 
+                    data-bind="
+                        css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, 
+                        click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} },
+                        onSpaceClick, 
+                        attr: {
+                            'aria-checked': format() === 'html', 
+                            'aria-disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}), 
+                            'aria-describedby': 'format-instruction-text'
+                        },
+                    ">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'html'" value="false">
                     <span data-bind="text: $root.translations.html"></span>
                 </label>
                 <!-- /ko -->
-                <label data-bind="css: { 'active': format() === 'shp' }, click: function () { format('shp') }" class="form-radio form-normal form-text">
+                <label role="radio" tabindex="0" class="form-radio form-normal form-text" 
+                    data-bind="
+                        css: { 'active': format() === 'shp' }, 
+                        click: function () { format('shp') },
+                        onSpaceClick, 
+                        attr: {
+                            'aria-checked': format() === 'shp', 
+                            'aria-describedby': 'format-instruction-text'
+                        },
+                    ">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'shp'" value="false">
                     <span data-bind="text: $root.translations.shapefile"></span>
                 </label>
 
-                <label data-bind="css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, click: function () { if (hasResourceTypeFilter()) {format('tilexl')} }" class="form-radio form-normal form-text">
+                <label role="radio" tabindex="0" class="form-radio form-normal form-text" 
+                    data-bind="
+                        css: { 'active': format() === 'tilexl', 'disabled': !hasResourceTypeFilter() }, 
+                        click: function () { if (hasResourceTypeFilter()) {format('tilexl')} },
+                        onSpaceClick, 
+                        attr: {
+                            'aria-checked': format() === 'tilexl', 
+                            'aria-disabled': !hasResourceTypeFilter(), 
+                            'aria-describedby': 'format-instruction-text'
+                        },
+                    ">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'tilexl'" value="false">
                     <span data-bind="text: $root.translations.tileExcel"></span>
                 </label>
                 <!-- ko if: total() < {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} -->
-                <label data-bind="css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, click: function () { if (hasResourceTypeFilter()) {format('geojson')} }" class="form-radio form-normal form-text">
+                <label role="radio" tabindex="0" class="form-radio form-normal form-text" 
+                    data-bind="
+                        css: { 'active': format() === 'geojson', 'disabled': !hasResourceTypeFilter()}, 
+                        click: function () { if (hasResourceTypeFilter()) {format('geojson')} },
+                        onSpaceClick, 
+                        attr: {
+                            'aria-checked': format() === 'geojson', 
+                            'aria-disabled': !hasResourceTypeFilter(), 
+                            'aria-describedby': 'format-instruction-text'
+                        },
+                    ">
                     <input type="radio" name="stat-w-label" data-bind="checked: format() === 'geojson'" value="false">
                     <span data-bind="text: $root.translations.geojsonUrl"></span>
                 </label>
@@ -54,25 +108,35 @@
             </div>
         </div>
 
+        <!-- 2. Coordinate Precision -->
         <div class="instruction">
-                <h2 class="">
+                <div class="search-export-instruction-h2 h2">
                     <span data-bind="text: $root.translations.listItemTwoCoordinatePrecision"></span>
-                </h2>
-                <h4 class="">
+                </div>
+                <div class="search-export-instruction-h4 h4">
                     <span data-bind="text: $root.translations.listItemTwoCoordinatePrecisionText"></span>
-                </h4>
+                </div>
         </div>
         <div class="parameter">
-            <input type="number" class="form-control input-md widget-input precision" data-bind="textInput: precision"></input>
+            <input type="number" class="form-control input-md widget-input precision" 
+                data-bind="
+                    textInput: precision,
+                    attr: {
+                        'aria-label': $root.translations.listItemTwoCoordinatePrecision, 
+                        'aria-description': $root.translations.listItemTwoCoordinatePrecisionText
+                    },
+                "
+            ></input>
         </div>
         
+        <!-- 3. Report link -->
         <div class="instruction">
-            <h2 class="">
-                <span data-bind="text: $root.translations.listItemThreeReportLink"></span>
-            </h2>
-            <h4 class="">
-                <span data-bind="text: $root.translations.listItemThreeReportLinkText"></span>
-            </h4>
+            <div class="search-export-instruction-h2 h2">
+                <span data-bind="text: $root.translations.listItemThreeReportLink" id="report-link-header"></span>
+            </div>
+            <!-- <div class="search-export-instruction-h4 h4">
+                <span data-bind="text: $root.translations.listItemThreeReportLinkText" id="report-link-text"></span>
+            </div> -->
         </div>
         <div class="parameter">
             <div 
@@ -83,46 +147,53 @@
                                 value: reportlink, 
                                 config:{ 
                                     label: $root.translations.includeReportLinkInExport,
-                                    subtitle: ''
+                                    subtitle: $root.translations.listItemThreeReportLinkText
                                 }
                             }
                         }
                     "
             ></div>
         </div>
+
+        <!-- Options if Celery is running -->
         <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>
             <div class="instruction">
-                <h2>
+                <div class="search-export-instruction-h2 h2">
                     <span data-bind="text: $root.translations.listItemFourNameThisExport"></span>
-                </h2>
+                </div>
             </div>
             <div class="parameter">
-                <input 
-                    type="" 
+                <input
                     class="form-control input-md widget-input" 
                     data-bind="
-                        attr: {placeholder: $root.translations.archesExport},
+                        attr: {
+                            placeholder: $root.translations.archesExport, 
+                            'aria-label': $root.translations.listItemFourNameThisExport
+                        },
                         textInput: exportName
                     " 
                 ></input>
             </div>
         </div>
-        <div class="">
+        <div>
             <div class="instruction">
-                    <h2 class="">
+                    <div class="search-export-instruction-h2 h2">
                         <span data-bind="text: $root.translations.listItemFiveEmailAddress"></span>
-                    </h2>
-                    <h4 class="">
+                    </div>
+                    <div class="search-export-instruction-h4 h4">
                         <span data-bind="text: $root.translations.listItemFiveEmailAddressText"></span>
-                    </h4>
+                    </div>
             </div>
             <div class="parameter">
                 <input 
-                    type="" 
                     class="form-control input-md widget-input" 
                     data-bind="
-                        attr: {placeholder: $root.translations.noEmailSavedForUser},
+                        attr: {
+                            placeholder: $root.translations.noEmailSavedForUser, 
+                            'aria-label': $root.translations.listItemFiveEmailAddress, 
+                            'aria-description': $root.translations.listItemFiveEmailAddressText
+                        },
                         textInput: emailInput
                     "
                 ></input>
@@ -131,16 +202,36 @@
         <!-- /ko -->
     </div>
 
-    <div data-bind="visible: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True')), text: $root.translations.celeryNotRunningWarning( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}, {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} )"></div>
-    <div class="search-export download" data-bind="">
+    <!-- Celery Warning -->
+    <!-- ko let: {show_celery_warning: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True'))} -->
+    <div 
+        id="export-warning"
+        data-bind="
+            visible: show_celery_warning,
+            text: $root.translations.celeryNotRunningWarning( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}, {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ),
+        "
+    ></div>
+
+    <!-- Download -->
+    <div class="search-export download">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
-            aria-expanded="true"
-            data-bind="css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }}"> 
+            data-bind="
+                css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },
+                click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }},
+                attr: {
+                    'aria-disabled': (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True'),
+                    'aria-describedby': show_celery_warning ? 'export-warning':'',
+                    'aria-busy': downloadPending(),
+                },
+            "
+        > 
             <span data-bind="text: $root.translations.download"></span>
             <i class="fa fa-spin fa-spinner" data-bind="visible: downloadPending() === true"></i>
         </button>
     </div>
-    <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600">
+    <!-- /ko --> <!-- Closes show_celery_warning scope -->
+
+    <div class="download-message" data-bind="text: result, fadeVisible: downloadStarted, delay:0, fade: 600, attr: {'aria-live': 'polite'}">
     </div>
 </div>

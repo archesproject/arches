@@ -43,6 +43,7 @@ def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
 
+    logger = logging.getLogger(__name__)
     settings.update_from_db()
 
     create_user_task_record(self.request.id, self.name, userid)
@@ -65,12 +66,17 @@ def export_search_results(self, userid, request_values, format, report_link):
         exporter = SearchResultsExporter(search_request=new_request)
         export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
-        with NamedTemporaryFile() as tmp:
-            wb.save(tmp.name)
-            tmp.seek(0)
-            stream = tmp.read()
-            export_files[0]["outputfile"] = tmp
-            exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
+        try:
+            with NamedTemporaryFile(delete=False) as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                stream = tmp.read()
+                export_files[0]["outputfile"] = tmp
+                exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
+        except OSError:
+            logger.error("Temp file could not be created.")
+            raise
+        os.unlink(tmp.name)
     else:
         exporter = SearchResultsExporter(search_request=new_request)
         files, export_info = exporter.export(format, report_link)

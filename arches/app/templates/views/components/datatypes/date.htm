@@ -1,34 +1,29 @@
 {% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select 
-        class="resources" 
-        tabindex="-1" 
-        style="display: none;" 
-        data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: '=', value: 'eq' },
-                { text: '&gt;', value: 'gt' },
-                { text: '&lt;', value: 'lt' },
-                { text: '&ge;', value: 'gte' },
-                { text: '&le;', value: 'lte' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            attr: {'aria-label': $root.translations.searchCriteria},
-        "
-    ></select>
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: '=', id: 'eq' },
+                    { text: '&gt;', id: 'gt' },
+                    { text: '&lt;', id: 'lt' },
+                    { text: '&ge;', id: 'gte' },
+                    { text: '&le;', id: 'lte' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op
+            }}">
+    </select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input 
-        class="form-control input-md widget-input" 
+        class="form-control input-lg widget-input" 
         data-bind="
-            attr: {placeholder: $root.translations.date, 'aria-label': $root.translations.date},
+            attr: {placeholder: $root.translations.date, 'aria-label': node.label},
             value: searchValue, 
             datepicker: {format: dateFormat, viewMode: 'days', minDate: false, maxDate: false}
         "
@@ -42,16 +37,16 @@
     <span data-bind="text: $root.translations.dateFormat"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select
-        data-bind="
-            attr: {placeholder: $root.translations.dateFormat, 'aria-label': $root.translations.dateFormat},
-            options:dateFormatOptions, 
-            optionsText:'name', 
-            optionsValue:'id', 
-            event: {change: onDateFormatSelection},
-            value: dateFormat, 
-            chosen: {width: '100%', disable_search: true}
-        "
-    ></select>
+    <select data-bind="
+        attr: {'data-label': $root.translations.dateFormat},
+        select2Query: {
+            select2Config:{
+                value: dateFormat,
+                data: dateFormatOptions,
+                allowClear: false,
+                minimumResultsForSearch: -1,
+                placeholder: $root.translations.dateFormat
+        }}">
+    </select>
 </div>
 <!-- /ko -->

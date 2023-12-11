@@ -31,9 +31,16 @@ class BaseExcelExporter:
                     file["file"] = file_object.path
         download_files = []
         skipped_files = []
+        files_not_found = []
         size_limit = 104857600  # 100MByte
         for file in files:
-            if file["file"].size >= size_limit:
+            if not file['file'].storage.exists(file['file'].name):
+                files_not_found.append({
+                    "name": file["name"],
+                    "url": settings.MEDIA_URL + file['file'].name,
+                    "fileid": file["file_id"]
+                })
+            elif file["file"].size >= size_limit:
                 skipped_files.append({
                     "name": file["name"],
                     "url": settings.MEDIA_URL + file['file'].name,
@@ -67,7 +74,7 @@ class BaseExcelExporter:
         zip_file.source = "branch-excel-exporter"
         zip_file.path.save(name, download)
 
-        return zip_file, download_files, skipped_files
+        return zip_file, download_files, skipped_files, files_not_found
 
     def export(self, request):
         self.loadid = request.POST.get("load_id")

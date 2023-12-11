@@ -208,6 +208,10 @@
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.searchUrl + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: load_details.search_url"></span>      
     </div>
+    <div data-bind="if: load_details.language_code">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.language + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.language_code"></span>
+    </div>
     <div data-bind="if: load_details.operation">
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: operationLabel[load_details.operation]"></span>

@@ -33,8 +33,7 @@ from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, ResourceXResource
-
+from arches.app.models.models import Node, NodeGroup, ResourceXResource, TileModel
 
 
 # these tests can be run from the command line via
@@ -299,6 +298,26 @@ class TileTests(ArchesTestCase):
         self.assertEqual(provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"]["en"]["value"], "AUTHORITATIVE")
         self.assertEqual(provisionaledits[str(self.user.id)]["action"], "update")
         self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
+
+    def test_update_sortorder_provisional_tile(self):
+        self.user = User.objects.create_user(username="testuser", password="TestingTesting123!")
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": {"en": {"value": "PROVISIONAL", "direction": "ltr"}}},
+        }
+        provisional_tile = Tile(json)
+        request = HttpRequest()
+        request.user = self.user
+        provisional_tile.save(index=False, request=request)
+        self.assertEqual(provisional_tile.sortorder, 0)
+
+        obj, _ = TileModel.objects.update_or_create(pk=provisional_tile.pk, nodegroup=provisional_tile.nodegroup)
+        obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
+
+        self.assertEqual(obj.sortorder, 1)
 
     def test_tile_cardinality(self):
         """

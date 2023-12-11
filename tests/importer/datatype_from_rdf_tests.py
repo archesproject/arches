@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest.mock import Mock
 from tests import test_settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -28,7 +29,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from rdflib import Namespace, URIRef, Literal, Graph
 from rdflib.namespace import RDF, RDFS, XSD
 from arches.app.utils.data_management.resources.formats.rdffile import RdfWriter
-from mock import Mock
 
 # these tests can be run from the command line via
 # python manage.py test tests/importer/datatype_from_rdf_tests.py --pattern="*.py" --settings="tests.test_settings"
