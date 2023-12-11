@@ -1,8 +1,7 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'templates/views/components/widgets/select.htm',
-    'plugins/knockout-select2',
+    'templates/views/components/widgets/select.htm'
 ], function(ko, DomainWidgetViewModel, selectTemplate) {
     /**
      * registers a select-widget component for use in forms
