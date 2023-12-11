@@ -59,7 +59,7 @@ define([
                 );});
 
             this.isCanvasDirty = ko.computed(function() {
-                return (ko.unwrap(self.canvasLabel) !== self.origCanvasLabel);
+                return !self.compareMode() && (self.canvasLabel() !== self.origCanvasLabel());
             });
 
             this.uniqueId = uuid.generate();
@@ -109,7 +109,7 @@ define([
                 self.manifestAttribution(self.origManifestAttribution);
                 self.manifestLogo(self.origManifestLogo);
                 self.manifestDescription(self.origManifestDescription);
-                self.canvasLabel(self.origCanvasLabel);
+                self.canvasLabel(self.origCanvasLabel());
                 if (self.origManifestMetadata) {
                     self.manifestMetadata.removeAll();
                     JSON.parse(self.origManifestMetadata).forEach(function(entry){
@@ -229,13 +229,15 @@ define([
                 self.submitToManifest();
             };
 
-            this.manifestSelectConfig.placeholder = 'Select an Image Service';
             this.manifest.subscribe(function(val){
                 self.getManifestData(val);
                 self.mainMenu(false);
             });
 
             this.manifestData.subscribe(function(manifestData) {
+                if (manifestData) {
+                    self.selectCanvas(manifestData.sequences[0].canvases[0]);
+                }
                 if (params.manifestData && ko.isObservable(params.manifestData)) {
                     params.manifestData(manifestData);
                 }

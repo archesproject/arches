@@ -797,7 +797,10 @@ class Command(BaseCommand):
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(components[0]))
 
-                modules = glob.glob(os.path.join(extension, "*.json"))
+                modules = []
+                if not os.path.isdir(extension):
+                    modules.append(extension)
+                modules.extend(glob.glob(os.path.join(extension, "*.json")))
                 modules.extend(glob.glob(os.path.join(extension, "*.py")))
 
                 if len(modules) > 0:

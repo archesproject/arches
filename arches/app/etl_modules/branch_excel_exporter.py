@@ -107,7 +107,7 @@ class BranchExcelExporter(BaseExcelExporter):
         wb = create_workbook(graph_id, tiles_to_export)
 
         user_generated_filename = self.filename or kwargs.get('filename')
-        zip_file, download_files, skipped_files = self.get_files_in_zip_file(files_to_download, graph_name, wb, user_generated_filename=user_generated_filename)
+        zip_file, download_files, skipped_files, files_not_found = self.get_files_in_zip_file(files_to_download, graph_name, wb, user_generated_filename=user_generated_filename)
         
         zip_file_name = os.path.basename(zip_file.path.name)
         zip_file_url = settings.MEDIA_URL + zip_file.path.name
@@ -117,6 +117,7 @@ class BranchExcelExporter(BaseExcelExporter):
             "number_of_resources": len(resource_ids),
             "number_of_files": len(download_files),
             "skipped_files": skipped_files,
+            "files_not_found": files_not_found,
             "zipfile": {
                 "name": zip_file_name,
                 "url": zip_file_url,

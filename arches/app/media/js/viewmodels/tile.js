@@ -262,6 +262,7 @@ define([
                 }).done(function(response) {
                     params.card.tiles.remove(self);
                     selection(params.card);
+                    updateDisplayName(params.resourceId, params.displayname);
                     if (typeof onSuccess === 'function') {
                         onSuccess(response);
                     }

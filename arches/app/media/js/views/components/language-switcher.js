@@ -1,4 +1,4 @@
-define(['knockout', 'templates/views/components/language-switcher.htm', 'js-cookie'], function(ko, languageSwitcherTemplate, Cookies) {
+define(['knockout', 'templates/views/components/language-switcher.htm', 'js-cookie', 'bindings/select2-query'], function(ko, languageSwitcherTemplate, Cookies) {
     /**
     * knockout components namespace used in arches
     * @external "ko.components"
