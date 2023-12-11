@@ -2,20 +2,15 @@ import json
 import logging
 import os
 import requests
-import shutil
 import uuid
 from revproxy.views import ProxyView
-from django.core.files.storage import default_storage
 from django.http.response import Http404
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models
-from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.views.search import search_results
-
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 logger = logging.getLogger(__name__)
 
@@ -214,18 +209,13 @@ class ManifestManagerView(View):
                 else:
                     logger.warning("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest(name=name, canvases=canvases)
+            pres_dict = create_manifest(name=name, canvases=canvases, file_url=canvases[0]["thumbnail"]["service"]["@id"])
             manifest_global_id = str(uuid.uuid4())
             json_url = f"/manifest/{manifest_global_id}"
             pres_dict["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
 
             manifest = models.IIIFManifest.objects.create(
-                label=name,
-                description=desc,
-                manifest=pres_dict,
-                url=json_url,
-                globalid=manifest_global_id,
-                transactionid=transaction_id
+                label=name, description=desc, manifest=pres_dict, url=json_url, globalid=manifest_global_id, transactionid=transaction_id
             )
 
             return JSONResponse(manifest)

@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10260_add_iiifmanifest_globalid"),
+        ("models", "9945_file_thumbnail_bin_file_thumbnail_text"),
     ]
 
     operations = [
