@@ -7,7 +7,6 @@ define([
     'views/components/search/base-filter',
     'templates/views/components/search/time-filter.htm',
     'bindings/datepicker',
-    'bindings/chosen',
     'bindings/time-wheel',
 ], function($, _, ko, moment, arches, BaseFilter, timeFilterTemplate) {
     var componentName = 'time-filter';
@@ -15,13 +14,13 @@ define([
         initialize: function(options) {
             options.name = 'Time Filter';
 
-             
+            this.selectedPopup = options.selectedPopup;
             this.dateDropdownEleId = 'dateDropdownEleId' + _.random(2000, 3000000);
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = {
                 fromDate: ko.observable(null),
                 toDate: ko.observable(null),
-                dateNodeId: ko.observable(null),
+                dateNodeId: ko.observable(),
                 inverted: ko.observable(false)
             };
             this.filter.fromDate.subscribe(function(fromDate) {
@@ -43,8 +42,8 @@ define([
             this.wheelConfig = ko.observable();
             this.loading = ko.observable(false);
             this.getTimeWheelConfig();
-            this.date_nodes = ko.observableArray();
-            this.graph_models = ko.observableArray();
+            this.dateNodes = ko.observableArray();
+            this.graphModels = ko.observableArray();
             this.selectedPeriod.subscribe(function(d) {
                 if (d) {
                     var start = moment(0, 'YYYY').add(d.data.start, 'years').format(this.format);
@@ -93,36 +92,34 @@ define([
                 this.filter.fromDate(from);
             }, this);
 
-
             $.ajax({
                 type: "GET",
                 url: arches.urls.api_search_component_data + componentName,
                 context: this
             }).done(function(response) {
-                this.date_nodes(response.date_nodes);
-                this.graph_models(response.graph_models);
+                this.dateNodes(response.date_nodes);
+                this.graphModels(response.graph_models);
                 this.restoreState();
-                $("#" + this.dateDropdownEleId).trigger("chosen:updated");
-
-                this.filterChanged = ko.computed(function(){
-                    if(!!this.filter.fromDate() || !!this.filter.toDate()){
-                        this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
-                    }
-                    return ko.toJSON(this.filter);
-                }, this).extend({ deferred: true });
-
-                this.filterChanged.subscribe(function() {
-                    this.updateQuery();
-                }, this);
+                $("#" + this.dateDropdownEleId).trigger("change.select2");
             });
+            
+            this.filterChanged = ko.computed(function(){
+                if(!!this.filter.fromDate() || !!this.filter.toDate()){
+                    this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
+                }
+                return ko.toJSON(this.filter);
+            }, this).extend({ deferred: true });
 
+            this.filterChanged.subscribe(function() {
+                this.updateQuery();
+            }, this);
             this.filters[componentName](this);
         },
 
         updateQuery: function() {
             var queryObj = this.query();
-            var filters_applied = !!this.filter.fromDate() || !!this.filter.toDate();
-            if(filters_applied){
+            var filtersApplied = !!this.filter.fromDate() || !!this.filter.toDate();
+            if(filtersApplied){
                 queryObj[componentName] = ko.toJSON(this.filter);
             } else {
                 delete queryObj[componentName];

@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from mock import Mock
+from unittest.mock import Mock
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
