@@ -1088,9 +1088,6 @@ class Graph(models.GraphModel):
                     break
 
             if not found:
-                import pdb
-
-                pdb.set_trace()
                 raise GraphValidationError(_("Ontology rules don't allow this graph to be appended"))
         return True
 
@@ -1704,37 +1701,49 @@ class Graph(models.GraphModel):
                 else:
                     raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def update_published_graphs(self):
+    def update_published_graphs(self, user=None, notes=None):
         """
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
         """
-        with transaction.atomic():
-            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
-            published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+        if self.source_identifier:  # don't update future graphs
+            raise Exception("Cannot update graphs with a source_identifier. Please apply updates to the source graph.")
+        else:  
+            with transaction.atomic():
+                LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
 
-            for language_tuple in settings.LANGUAGES:
-                translation.activate(language=language_tuple[0])
+                if self.has_unpublished_changes:
+                    self.has_unpublished_changes = False
+                    self.save()
+                    self.create_editable_future_graph()
 
-                serialized_graph = JSONDeserializer().deserialize(
-                    JSONSerializer().serialize(self, force_recalculation=True)
-                )
+                published_graph_edit = models.PublishedGraphEdit.objects.create(publication=self.publication, user=user, notes=notes)
+                published_graph_edit.save()
 
-                published_graph_query = published_graphs.filter(language=language_tuple[0])
-                if not len(published_graph_query):
-                    published_graph = models.PublishedGraph.objects.create(
-                        publication=self.publication,
-                        serialized_graph=serialized_graph,
-                        language=models.Language.objects.get(code=language_tuple[0]),
+                published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+
+                for language_tuple in settings.LANGUAGES:
+                    translation.activate(language=language_tuple[0])
+
+                    serialized_graph = JSONDeserializer().deserialize(
+                        JSONSerializer().serialize(self, force_recalculation=True)
                     )
-                elif len(published_graph_query) == 1:
-                    published_graph = published_graph_query[0]
-                    published_graph.serialized_graph = serialized_graph
-                else:
-                    raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
 
-                published_graph.save()
-                translation.deactivate()
+                    published_graph_query = published_graphs.filter(language=language_tuple[0])
+                    if not len(published_graph_query):
+                        published_graph = models.PublishedGraph.objects.create(
+                            publication=self.publication,
+                            serialized_graph=serialized_graph,
+                            language=models.Language.objects.get(code=language_tuple[0]),
+                        )
+                    elif len(published_graph_query) == 1:
+                        published_graph = published_graph_query[0]
+                        published_graph.serialized_graph = serialized_graph
+                    else:
+                        raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
+
+                    published_graph.save()
+                    translation.deactivate()
 
     def create_editable_future_graph(self):
         """
@@ -2140,34 +2149,6 @@ class Graph(models.GraphModel):
         updated_graph.create_editable_future_graph()
 
         return updated_graph
-
-    def update_published_graphs(self, user=None, notes=None):
-        """
-        Changes information in in GraphPublication models without creating
-        a new entry in graphs_x_published_graphs table
-        """
-        self.has_unpublished_changes = False
-        self.save()
-        self.create_editable_future_graph()
-
-        published_graph_edit = models.PublishedGraphEdit.objects.create(publication=self.publication, user=user, notes=notes)
-        published_graph_edit.save()
-
-        published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
-
-        for language_tuple in settings.LANGUAGES:
-            translation.activate(language=language_tuple[0])
-
-            published_graph_query = published_graphs.filter(language=language_tuple[0])
-
-            if len(published_graph_query) == 1:
-                published_graph = published_graph_query[0]
-                published_graph.serialized_graph = JSONDeserializer().deserialize(
-                    JSONSerializer().serialize(self, force_recalculation=True)
-                )
-                published_graph.save()
-
-        translation.deactivate()
 
     def publish(self, user=None, notes=None):
         """
