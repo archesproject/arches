@@ -279,7 +279,9 @@ class StringDataType(BaseDataType):
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             for key in edge_info["range_tile_data"].keys():
                 if edge_info["range_tile_data"][key]["value"]:
-                    g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
+                    g.add(
+                        (edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key))
+                    )
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -809,7 +811,9 @@ class EDTFDataType(BaseDataType):
                 try:
                     group_query = Bool()
                     group_query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    group_query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    group_query.should(
+                        Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators)
+                    )
                     query.must(group_query)
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
@@ -1505,7 +1509,7 @@ class FileListDataType(BaseDataType):
 
         def format_bytes(size):
             # 2**10 = 1024
-            power = 2 ** 10
+            power = 2**10
             n = 0
             power_labels = {0: "", 1: "kilo", 2: "mega", 3: "giga", 4: "tera"}
             while size > power:
@@ -1522,11 +1526,13 @@ class FileListDataType(BaseDataType):
             if images_only and request:
                 for metadata in value:
                     if not any(localizedString["value"] for localizedString in metadata.get("altText", {}).values()):
-                        errors.append({
-                            "type": "ERROR",
-                            "title": _("Missing alt text"),
-                            "message": _("The image '{0}' is missing an alternative text.").format(metadata["name"]),
-                        })
+                        errors.append(
+                            {
+                                "type": "ERROR",
+                                "title": _("Missing alt text"),
+                                "message": _("The image '{0}' is missing an alternative text.").format(metadata["name"]),
+                            }
+                        )
                 files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
                 for file in files:
                     width, height = get_image_dimensions(file.file)
@@ -1553,7 +1559,7 @@ class FileListDataType(BaseDataType):
             if path:
                 for file in value:
                     if not default_storage.exists(os.path.join(path, file["name"])):
-                        message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], default_storage.path(path)))
+                        message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], path))
                         title = _("File Not Found")
                         errors.append({"type": "ERROR", "message": message, "title": title})
         except Exception as e:
