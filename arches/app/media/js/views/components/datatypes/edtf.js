@@ -7,7 +7,8 @@ define(['knockout', 'templates/views/components/datatypes/edtf.htm'], function(k
         this.search = params.search;
         if (this.search) {
             var filter = params.filterValue();
-            this.op = ko.observable(filter.op || '');
+            this.node = params.node;
+            this.op = ko.observable(filter.op || 'overlaps');
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function() {
                 return {

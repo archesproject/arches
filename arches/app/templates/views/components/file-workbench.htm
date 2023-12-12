@@ -288,16 +288,18 @@
     <h2 class="file-workbench-filter-header">
         <span data-bind="text: $root.translations.loader"></span>
     </h2>
-    <input style="display:inline-block;"
-    data-bind="select2Query: {
-        select2Config: {
-            clickBubble: true,
-            disabled: false,
-            data: fileFormatRenderers,
-            value: managerRenderer,
-            allowClear: false,
-            multiple: false,
-            placeholder: $root.translations.fileRenderer}}">
+    <select style="display:inline-block;"
+        data-bind="select2Query: {
+            select2Config: {
+                clickBubble: true,
+                disabled: false,
+                data: fileFormatRenderers,
+                value: managerRenderer,
+                allowClear: false,
+                multiple: false,
+                placeholder: $root.translations.fileRenderer
+            }}">
+        </select>
     <div style="padding-top: 10px">
         <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i>
             <span data-bind="text: $root.translations.applyToSelectedFiles"></span>
