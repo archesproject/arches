@@ -318,6 +318,10 @@ define([
                     complete: function() {
                         loading(false);
                         updateDisplayName(params.resourceId, params.displayname);
+                        // update the index on the tiles themselves
+                        self.tiles().forEach((tile, index) => {
+                            tile.sortorder = index;
+                        });
                     }
                 });
             },
