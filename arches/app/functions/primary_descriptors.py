@@ -38,8 +38,8 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
 
         datatype_factory = None
         language = context['language'] if (context is not None and 'language' in context) else None
-        template = config["string_template"]
-        result = resource.descriptors[language][descriptor]
+        result = config["string_template"]
+        updated = False
 
         try:
             if "nodegroup_id" in config and config["nodegroup_id"] != "" and config["nodegroup_id"] is not None:
@@ -52,6 +52,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
 
                 if not tile:  # tile has been deleted 
                     result = ""
+                    updated = True
                 else:
                     for node in models.Node.objects.filter(nodegroup_id=uuid.UUID(config["nodegroup_id"])):
                         data = {}
@@ -67,9 +68,16 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                             value = datatype.get_display_value(tile, node, language=language)
                             if value is None:
                                 value = ""
-                            result = template.replace("<%s>" % node.name, str(value))
+                            result = result.replace("<%s>" % node.name, str(value))
+                            updated = True
         except ValueError:
             logger.error(_("Invalid nodegroupid, {0}, participating in descriptor function.").format(config["nodegroup_id"]))
         if result.strip() == "":
             result = _("Undefined")
+        if not updated:
+            try:
+                result = resource.descriptors[language][descriptor]
+            except KeyError:
+                pass
+
         return result
