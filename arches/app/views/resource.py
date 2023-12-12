@@ -715,7 +715,7 @@ class ResourceTiles(View):
         tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
         if nodeid is not None:
             node = models.Node.objects.get(pk=nodeid)
-            tiles = tiles.filter(nodegroup=node.nodegroup)
+            tiles = tiles.filter(nodegroup_id=node.nodegroup_id)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
