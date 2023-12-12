@@ -843,7 +843,7 @@ class PublishedGraphEdit(models.Model):
     edit_time = models.DateTimeField(default=datetime.datetime.now, null=False)
     publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
     notes = models.TextField(blank=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, null=True, on_delete=models.DO_NOTHING)
 
     class Meta:
         managed = True
