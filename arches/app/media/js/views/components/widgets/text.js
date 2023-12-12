@@ -82,7 +82,7 @@ define([
                 self.currentDefaultDirection('ltr');
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
             }
-            if (typeof ko.unwrap(self.placeholder) !== "string") {
+            if (ko.unwrap(self.placeholder) && (typeof ko.unwrap(self.placeholder) !== "string")) {
                 self.placeholder(self.placeholder()[self.currentLanguage().code]);
             }
         };
