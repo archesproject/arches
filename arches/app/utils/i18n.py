@@ -322,5 +322,5 @@ class LanguageSynchronizer:
 
             if update_published_graphs:
                 for graph in Graph.objects.all():
-                    if graph.publication:
+                    if graph.publication_id:
                         graph.update_published_graphs()
