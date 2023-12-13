@@ -1,4 +1,6 @@
 from arches.app.models.system_settings import settings
+from django.utils.translation import gettext as _
+
 import logging
 
 def return_message_context(greeting="",closing_text="",email=None,additional_context={}):
@@ -23,6 +25,6 @@ def return_message_context(greeting="",closing_text="",email=None,additional_con
 
     except Exception as e:
         logger = logging.getLogger(__name__)
-        logger.error('Setting email context failed',str(e))
+        logger.error(_('Setting email context failed'),str(e))
 
         return {}

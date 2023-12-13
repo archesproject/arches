@@ -53,9 +53,11 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.message_contexts import return_message_context
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from django.core.exceptions import ValidationError
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -162,10 +164,7 @@ class SignupView(View):
             },
         )
 
-    def post(self, request):
-        
-        from arches.app.utils.message_contexts import return_message_context
-        
+    def post(self, request):        
         showform = True
         confirmation_message = ""
         postdata = request.POST.copy()
@@ -187,24 +186,25 @@ class SignupView(View):
 
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
             email_context = return_message_context(
-                 _(
+                greeting=_(
                     "Thanks for your interest in {}. Click on link below \
                     to confirm your email address! Use your email address to login."
                 ).format(settings.APP_NAME),
-                 _(
+                closing_text=_(
                     "This link expires in 24 hours.  If you can't get to it before then, \
                     don't worry, you can always try again with the same email address."
                 ),
-                 None,
-                {"button_text": _("Signup for {}").format(settings.APP_NAME),
-                                    "link": confirmation_link}
+                additional_context={
+                    "button_text": _("Signup for {}").format(settings.APP_NAME),
+                    "link": confirmation_link
+                }
             )
             
             html_content = render_to_string("email/general_notification.htm", email_context)  # ...
             text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_("Welcome to {settings.APP_NAME}!"), text_content, admin_email, [form.cleaned_data["email"]])
+            msg = EmailMultiAlternatives(_("Welcome to {}!").format(settings.APP_NAME), text_content, admin_email, [form.cleaned_data["email"]])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 

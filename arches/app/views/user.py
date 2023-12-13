@@ -35,8 +35,10 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
+from arches.app.utils.message_contexts import return_message_context
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+
 import logging
 
 
@@ -128,9 +130,6 @@ class UserManagerView(BaseManagerView):
             return render(request, "views/user-profile-manager.htm", context)
 
     def post(self, request):
-        
-        from arches.app.utils.message_contexts import return_message_context
-
         if self.action == "get_user_names":
             data = {}
             if self.request.user.is_authenticated and user_is_resource_reviewer(request.user):
@@ -169,19 +168,21 @@ class UserManagerView(BaseManagerView):
                     if user.first_name:
                         email_username = user.first_name
 
-                    message = (
-                        f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your "
-                        f"{settings.APP_NAME} administrator{f' at {admin_info}.' if (admin_info and not str.isspace(admin_info)) else '.'}"
-                    )
-                    message = _(message)
+                    if admin_info and not str.isspace(admin_info):
+                        message = _("Your {} profile was just changed. If this was unexpected, please contact your administrator at {}").format(settings.APP_NAME, admin_info)
+                    else:
+                        message = _("Your {} profile was just changed. If this was unexpected, please contact your administrator.").format(settings.APP_NAME)
 
-                    email_context = return_message_context(message,"",None,{"username":email_username})
+                    email_context = return_message_context(
+                        greeting=message,
+                        additional_context={"username":email_username}
+                    )
 
                     html_content = render_to_string("email/general_notification.htm", email_context)  # ...
                     text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
                     # create the email, and attach the HTML version as well.
-                    msg = EmailMultiAlternatives(_("Your {settings.APP_NAME} Profile Has Changed!"), text_content, admin_info, [form.cleaned_data["email"]])
+                    msg = EmailMultiAlternatives(_("Your {} Profile Has Changed!").format(settings.APP_NAME), text_content, admin_info, [form.cleaned_data["email"]])
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
                 except:

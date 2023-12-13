@@ -20,6 +20,8 @@ import inspect
 import json
 import os
 import sys
+from datetime import datetime, timedelta
+
 
 try:
     from settings_utils import *
@@ -519,10 +521,6 @@ UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-
 
 OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
-# Dictionary containing any additional context items for customising email templates
-
-EXTRA_EMAIL_CONTEXT = {"salutation":"Hi"}
-
 #######################################
 ###       END STATIC SETTINGS       ###
 #######################################
@@ -682,6 +680,12 @@ CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 ACCESSIBILITY_MODE = False
 
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
+
+# Dictionary containing any additional context items for customising email templates
+EXTRA_EMAIL_CONTEXT = {
+    "salutation": _("Hi"),
+    "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+}
 
 RENDERERS = [
     {

@@ -12,6 +12,7 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
+from arches.app.utils.message_contexts import return_message_context
 from tempfile import NamedTemporaryFile
 
 
@@ -42,7 +43,6 @@ def message(arg):
 def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
-    from arches.app.utils.message_contexts import return_message_context
 
     settings.update_from_db()
 
@@ -90,11 +90,17 @@ def export_search_results(self, userid, request_values, format, report_link):
         user = _user.username
 
     context = return_message_context(
-        _("Hello,\nYour request to download a set of search results is now ready. You have until {} to access this download, after which time it'll be deleted.".format(formatted_expiration_date)),
-        _("Thank you"),
-        email,
-        {"link":str(exportid),"button_text":_("Download Now"),"name":export_name,"email_link":str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),"username":user},
-        )
+        greeting=_("Hello,\nYour request to download a set of search results is now ready. You have until {} to access this download, after which time it'll be deleted.".format(formatted_expiration_date)),
+        closing_text=_("Thank you"),
+        email=email,
+        additional_context={
+            "link":str(exportid),
+            "button_text":_("Download Now"),
+            "name":export_name,
+            "email_link":str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
+            "username":user
+        },
+    )
 
     return {
         "taskid": self.request.id,
@@ -141,17 +147,18 @@ def index_resource(self, module, index_name, resource_id, tile_ids):
 
 
 @shared_task
-def package_load_complete(*args, **kwargs):
-    from arches.app.utils.message_contexts import return_message_context
-    
+def package_load_complete(*args, **kwargs):    
     valid_resource_paths = kwargs.get("valid_resource_paths")
     
     context = return_message_context(
-        _("Hello,\nYour package has successfully loaded into your Arches project."),
-          _("Thank you"),
-          "",
-          {"link":"","loaded_resource":[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],"link_text":_("Log me in")}
-          )
+        greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
+        closing_text=_("Thank you"),
+        additional_context={
+            "link":"",
+            "loaded_resource":[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
+            "link_text":_("Log me in")
+        }
+    )
 
     msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
