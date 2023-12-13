@@ -208,10 +208,6 @@ class GraphDesignerView(GraphBaseView):
             function__functiontype="primarydescriptors"
         )
 
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-
         datatypes = models.DDataType.objects.all()
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
@@ -429,6 +425,10 @@ class GraphDataView(View):
                 elif self.action == "export_branch":
                     if graph.source_identifier:
                         graph = Graph.objects.get(pk=graph.source_identifier_id)
+
+                    if data['source_identifier_id']:
+                        node = models.Node.objects.get(pk=data['source_identifier_id'])
+                        data = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
 
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None

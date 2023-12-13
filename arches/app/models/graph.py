@@ -822,7 +822,7 @@ class Graph(models.GraphModel):
         if root is not None:
             root["nodegroup_id"] = root["nodeid"]
             root["istopnode"] = True
-            root["is_immutable"] = bool(root.is_immutable or self.is_copy_immutable)
+            root["is_immutable"] = bool(root["is_immutable"] or self.is_copy_immutable)
             updated_values = copy_of_self.update_node(root)
             root_node = updated_values["node"]
             root_card = updated_values["card"]
