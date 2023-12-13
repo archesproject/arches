@@ -21,6 +21,7 @@ import json
 import os
 import sys
 from datetime import datetime, timedelta
+from contextlib import suppress
 
 
 try:
@@ -682,10 +683,11 @@ ACCESSIBILITY_MODE = False
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
 
 # Dictionary containing any additional context items for customising email templates
-EXTRA_EMAIL_CONTEXT = {
-    "salutation": _("Hi") if _ else "Hi",
-    "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
-}
+with suppress(NameError):  # need to suppress i18n NameError for test runner
+    EXTRA_EMAIL_CONTEXT = {
+        "salutation": _("Hi"),
+        "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+    }
 
 RENDERERS = [
     {
