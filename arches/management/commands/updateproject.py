@@ -69,4 +69,4 @@ class Command(BaseCommand):
     def update_to_v7_5(self):
         # Republish to pick up CardsXNodeXWidget changes from
         # migration 10150_add_default_value_file_list.py
-        management.call_command("graph", operation="publish")
+        management.call_command("graph", operation="publish", update=True)
