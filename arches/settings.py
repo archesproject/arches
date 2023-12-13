@@ -33,6 +33,10 @@ except ModuleNotFoundError:
 
 try:
     from django.utils.translation import gettext_lazy as _
+except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+    pass
+
+try:
     from corsheaders.defaults import default_headers
 except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass

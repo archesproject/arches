@@ -82,13 +82,6 @@ def export_search_results(self, userid, request_values, format, report_link):
     expiration_date = datetime.now() + timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
     formatted_expiration_date = expiration_date.strftime("%A, %d %B %Y")
 
-    user = ""
-
-    if _user.first_name != "":
-        user = _user.first_name
-    else:
-        user = _user.username
-
     context = return_message_context(
         greeting=_("Hello,\nYour request to download a set of search results is now ready. You have until {} to access this download, after which time it'll be deleted.".format(formatted_expiration_date)),
         closing_text=_("Thank you"),
@@ -98,7 +91,7 @@ def export_search_results(self, userid, request_values, format, report_link):
             "button_text":_("Download Now"),
             "name":export_name,
             "email_link":str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
-            "username":user
+            "username":_user.first_name or _user.username
         },
     )
 
