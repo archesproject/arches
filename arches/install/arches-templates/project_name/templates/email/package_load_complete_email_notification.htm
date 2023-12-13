@@ -10,27 +10,20 @@
     </head>
 
     <body>
-
         {% include 'custom_email_header.htm' %}
 
         {% if username != "" %}
             <p>
-                {% blocktrans %}
-                    {{salutation}} {{username}},
-                {% endblocktrans %}
+                {{salutation}} {{username}},
             </p>
         {% endif %}
         <p>
-            {% blocktrans %}
-                {{greeting}}
-            {% endblocktrans %}
+            {{greeting}}
         </p>
         {% if link != "" %}
             <p>
                 <a href="{{link}}">
-                    {% blocktrans %}
-                        {{link_text}}
-                    {% endblocktrans %}
+                    {{link_text}}
                 </a>
             </p>
         {% endif %}

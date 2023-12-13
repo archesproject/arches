@@ -143,6 +143,9 @@ def index_resource(self, module, index_name, resource_id, tile_ids):
 def package_load_complete(*args, **kwargs):    
     valid_resource_paths = kwargs.get("valid_resource_paths")
     
+    msg = _("Resources have completed loading.")
+    notifytype_name = "Package Load Complete"
+    user = User.objects.get(id=1)
     context = return_message_context(
         greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
         closing_text=_("Thank you"),
@@ -152,11 +155,6 @@ def package_load_complete(*args, **kwargs):
             "link_text":_("Log me in")
         }
     )
-
-    msg = _("Resources have completed loading.")
-    notifytype_name = "Package Load Complete"
-    user = User.objects.get(id=1)
-    context = context
     notify_completion(msg, user, notifytype_name, context)
 
 
