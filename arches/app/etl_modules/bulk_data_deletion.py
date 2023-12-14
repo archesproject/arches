@@ -210,8 +210,11 @@ class BulkDataDeletion(BaseBulkEditor):
         result = { "resource": number_of_resource, "tile": number_of_tiles }
 
         if nodegroup_id:
-            sample_data = self.get_sample_data(nodegroup_id, resourceids)
-            result["preview"] = sample_data
+            try:
+                sample_data = self.get_sample_data(nodegroup_id, resourceids)
+                result["preview"] = sample_data
+            except Exception as e:
+                logger.exception(e)
 
         return { "success": True, "data": result }
 
