@@ -69,6 +69,7 @@ ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
+SEARCH_THUMBNAILS = False
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 
@@ -105,6 +106,10 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index',
 #     'should_update_asynchronously': False
 # }]
+
+THUMBNAIL_GENERATOR = None #"arches.app.utils.thumbnail_generator.ThumbnailGenerator"
+GENERATE_THUMBNAILS_ON_DEMAND = False # True to generate a thumnail on request if it doens't exist
+MIN_FILE_SIZE_T0_GENERATE_THUMBNAIL = 150000 # yet to be implemented, in bytes eg: 150000 = 150kb
 
 # This should point to the url where you host your site
 # Make sure to use a trailing slash
@@ -412,6 +417,10 @@ LOGGING = {
 }
 
 LOGIN_URL = "auth"
+# Rate limit for authentication views
+# See options (including None or python callables):
+# https://django-ratelimit.readthedocs.io/en/stable/rates.html#rates-chapter
+RATE_LIMIT = "5/m"
 
 PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
@@ -614,6 +623,9 @@ DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
 
+# Map filter auto adjusts map extent to fit results. If False, map extent will not change when filtering results.
+MAP_FILTER_AUTO_ZOOM_ENABLED = True
+
 # If True, users can make edits to graphs that are locked
 # (generally because they have resource intances saved against them)
 # Changing this setting to True and making graph modifications may result in
@@ -750,6 +762,7 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
+
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

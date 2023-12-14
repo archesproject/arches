@@ -54,6 +54,14 @@ class BranchExcelExporter(BaseExcelExporter):
                 resource_ids = [ row[0] for row in rows ]
 
         with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET load_details = %s WHERE  loadid = (%s)""",
+                (json.dumps({
+                    "graph": graph_name,
+                    "number_of_resources": len(resource_ids),
+                }), load_id),
+            )
+
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graph_id,))
             nodegroup_lookup = dictfetchall(cursor)
 
@@ -80,10 +88,13 @@ class BranchExcelExporter(BaseExcelExporter):
                             alias = node_lookup_by_id[key]["alias"]
                             if node_lookup_by_id[key]["datatype"] == "file-list":
                                 file_names_to_export = []
-                                for file in value:
-                                    files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
-                                    file_names_to_export.append(file["name"])
-                                tile[alias] = ",".join(file_names_to_export)
+                                if value is not None:
+                                    for file in value:
+                                        files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
+                                        file_names_to_export.append(file["name"])
+                                    tile[alias] = ",".join(file_names_to_export)
+                                else:
+                                    tile[alias] = value
                             elif node_lookup_by_id[key]["datatype"] in ["concept-list", "domain-value-list"]:
                                 if type(value) == list:
                                     value = ",".join(value)
@@ -99,7 +110,7 @@ class BranchExcelExporter(BaseExcelExporter):
         wb = create_workbook(graph_id, tiles_to_export)
 
         user_generated_filename = self.filename or kwargs.get('filename')
-        zip_file, download_files, skipped_files = self.get_files_in_zip_file(files_to_download, graph_name, wb, user_generated_filename=user_generated_filename)
+        zip_file, download_files, skipped_files, files_not_found = self.get_files_in_zip_file(files_to_download, graph_name, wb, user_generated_filename=user_generated_filename)
         
         zip_file_name = os.path.basename(zip_file.path.name)
         zip_file_url = settings.MEDIA_URL + zip_file.path.name
@@ -109,6 +120,7 @@ class BranchExcelExporter(BaseExcelExporter):
             "number_of_resources": len(resource_ids),
             "number_of_files": len(download_files),
             "skipped_files": skipped_files,
+            "files_not_found": files_not_found,
             "zipfile": {
                 "name": zip_file_name,
                 "url": zip_file_url,

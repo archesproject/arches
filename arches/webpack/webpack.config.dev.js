@@ -20,16 +20,7 @@ module.exports = () => {
                 devServer: {
                     historyApiFallback: true,
                     client: {
-                        overlay: {
-                            errors: true,
-                            warnings: false,
-                            runtimeErrors: (error) => {
-                                if (error.message === "ResizeObserver loop limit exceeded") {
-                                  return false;
-                                }
-                                return true;
-                            },
-                        },
+                        overlay: false,
                     },
                     hot: true,
                     host: '0.0.0.0',

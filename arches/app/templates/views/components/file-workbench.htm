@@ -8,7 +8,7 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
         toggleTab('manage');
     }
-}, css: {'disabled': self.card.tiles().length === 0, 
+}, css: {'disabled': self.card.tiles().length === 0,
     'active': activeTab() === 'manage'
 }">
     <i class="fa fa-pencil"></i>
@@ -17,7 +17,7 @@
 <div class="workbench-card-sidebar-tab" data-bind="click: function(){ if (self.card.tiles().length) {
     toggleTab('edit');
 }
-}, css: {'disabled': self.card.tiles().length === 0, 
+}, css: {'disabled': self.card.tiles().length === 0,
     'active': activeTab() === 'edit'
 }">
     <i class="fa fa-pencil"></i>
@@ -62,7 +62,7 @@
                                         context: 'render',
                                         loading: $parent.loading
                                         }
-                                    } --> 
+                                    } -->
                                 <!-- /ko -->
                             <!--/ko-->
                         <!--/ko-->
@@ -100,7 +100,7 @@
                                         </h3>
                                     </div>
                                     <!--/ko-->
-                                    
+
                                     <!--ko if: $parent.displayContent().availableRenderers.length > 0 -->
                                     <div class="bord-top file-select loader-select">
                                         <div class="">
@@ -111,7 +111,7 @@
                                                 <span data-bind="text: ' ' + $root.translations.loaderLowercase"></span>
                                             </h4>
                                             <!--/ko-->
-                                            
+
                                             <h2>
                                                 <span data-bind="text: $root.translations.selectFileLoader"></span>
                                             </h2>
@@ -132,11 +132,11 @@
                                                                 <span><i data-bind="attr:{class: ($data.iconclass +' r-select-icon')}" class="fa fa fa-user r-select-icon"></i></span>
                                                             </div>
                                                             <div class="r-desc-container">
-                                                                <p data-bind="text: $data.description" style="color: #30517a; background-color: #fdfdfd" class="r-select-desc"></p> 
-                                                            </div>  
+                                                                <p data-bind="text: $data.description" style="color: #30517a; background-color: #fdfdfd" class="r-select-desc"></p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                    
+
                                                     <!-- card Tools -->
                                                     <div class="r-select-card-footer">
                                                         <div class="">
@@ -150,17 +150,17 @@
                                             <!--/ko-->
                                         </div>
                                     </div>
-                                    <br>  
+                                    <br>
                                 </div>
                                 <div class="file-upload-footer">
                                     <span class="loader-selector" data-bind="component: { name: 'views/components/simple-switch', params: {value: applyToAll, config:{label: $root.translations.applySameLoaderToAll}}}"></span>
                                 </div>
                                 <!--/ko-->
                                </div>
-                    
+
                             </div>
                         </div>
-                    
+
                     </div>
 
                         <!--/ko-->
@@ -229,12 +229,12 @@
     <h2 class="file-workbench-filter-header">
         <span data-bind="text: $root.translations.fileFilter"></span>
     </h2>
-    <input 
-        type="text" 
-        class="form-control" 
-        style="width: 100%; height:initial" 
+    <input
+        type="text"
+        class="form-control"
+        style="width: 100%; height:initial"
         data-bind="
-            attr: { placeholder: $root.translations.egText }, 
+            attr: { placeholder: $root.translations.egText },
             textInput: filter
         "
     ></input>
@@ -288,16 +288,18 @@
     <h2 class="file-workbench-filter-header">
         <span data-bind="text: $root.translations.loader"></span>
     </h2>
-    <input style="display:inline-block;"
-    data-bind="select2Query: {
-        select2Config: {
-            clickBubble: true,
-            disabled: false,
-            data: fileFormatRenderers,
-            value: managerRenderer,
-            allowClear: false,
-            multiple: false,
-            placeholder: $root.translations.fileRenderer}}">
+    <select style="display:inline-block;"
+        data-bind="select2Query: {
+            select2Config: {
+                clickBubble: true,
+                disabled: false,
+                data: fileFormatRenderers,
+                value: managerRenderer,
+                allowClear: false,
+                multiple: false,
+                placeholder: $root.translations.fileRenderer
+            }}">
+        </select>
     <div style="padding-top: 10px">
         <button style="margin-right: 3px;" class="btn btn-lg btn-workbench btn-primary" data-bind="click: function(){$parent.applyRendererToStaged($parent.getFileFormatRenderer(managerRenderer()))}"><i class="fa fa-gears"></i>
             <span data-bind="text: $root.translations.applyToSelectedFiles"></span>
@@ -318,12 +320,12 @@
     <h2 class="file-workbench-filter-header">
         <span data-bind="text: $root.translations.fileFilter"></span>
     </h2>
-    <input 
-        type="text" 
-        class="form-control" 
-        style="width: 100%; height:initial" 
+    <input
+        type="text"
+        class="form-control"
+        style="width: 100%; height:initial"
         data-bind="
-            attr: { placeholder: $root.translations.egText }, 
+            attr: { placeholder: $root.translations.egText },
             textInput: filter
         "
     ></input>
@@ -441,7 +443,8 @@
                         "active": widget.selected,
                         "hover": widget.hovered,
                         "widget-preview": self.preview
-                    }, click: function(data, e) {
+                    }, class: self.componentCssClasses(widget),
+                    click: function(data, e) {
                         if (!widget.selected() && self.preview) widget.selected(true);
                     }, event: {
                         mouseover: function(){

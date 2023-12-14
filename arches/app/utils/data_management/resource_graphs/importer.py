@@ -92,7 +92,7 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                 ]:
                     errors.append("The ontologyid of the graph you're trying to load does not exist in Arches.")
             else:
-                errors.append("No ontologies have been loaded. Any GraphModel that depends on an ontology cannot be loaded.")
+                logger.warning("No ontologies have been loaded. Any GraphModel that depends on an ontology cannot be loaded.")
 
             reporter.name = resource["name"]
             reporter.resource_model = resource["isresource"]

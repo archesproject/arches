@@ -11,7 +11,7 @@ define([
             return {
                 clickBubble: true,
                 disabled: false,
-                data: {results: nodeOptions},
+                data: nodeOptions,
                 value: this.constraint.nodes,
                 multiple: params.multiple || true,
                 closeOnSelect: false,

@@ -11,7 +11,7 @@
         <section class="etl-module-component">
             <!-- <div class="etl-module-component-block">
                 <h3>
-                    <label for="search-url-input" data-bind="text: $root.translations.useSearchUrl"></label>
+                    <label for="search-url-input" data-bind="text: $root.translations.useSearchUrlOptional"></label>
                 </h3>
                 <textarea id="search-url-input"
                     style="min-height: 100px; width: 80%;"
@@ -58,17 +58,38 @@
 
 {% block etl_status %}
 <div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
-    <h4 class="summary-title">
+    <h4 class="summary-title" style="padding-bottom: 20px;">
         <span data-bind="text: $root.translations.exportBranchExcelSummary"></span>
     </h4>
     <!-- ko if: ko.unwrap(loadDetails) -->
     <div class="branch-csv-etl-load-summmary">
+        <!-- ko ifnot: ['failed','indexed'].includes(selectedLoadEvent().status) -->
+        <!-- ko if: loadDetails.graph && !loadDetails.number_of_resources -->
+        <div class="etl-loading-metadata-value">
+            <span  data-bind="text: loadDetails.graph + ' ' + $root.translations.isBeingPrepared"></span>
+            <i class="fa fa-spin fa-spinner"></i>    
+        </div>
+        <!-- /ko -->
+        <!-- ko if: loadDetails.number_of_resources -->
+        <div class="etl-loading-metadata-value">
+            <span  data-bind="text: loadDetails.number_of_resources + ' ' + loadDetails.graph + ' ' + $root.translations.resourcesAreBeingExported"></span>
+            <i class="fa fa-spin fa-spinner"></i>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: loadDetails.zipfile -->
         <div class="summary-header">
             <span data-bind="text: $root.translations.downloadExportedZipFile"></span>
         </div>
-        <div class="summary-contents">
+        <div class="summary-contents" style="padding-bottom: 20px;">
             <div class="etl-loading-metadata-value">
-                <a class="file-listing-link" download data-bind="text: loadDetails.zipfile.name, attr: { href: '/temp_file/'+loadDetails.zipfile.fileid }"></a>
+                <a 
+                    class="file-listing-link" 
+                    style="color: blue;"
+                    download 
+                    data-bind="text: loadDetails.zipfile.name, attr: { href: '/temp_file/'+loadDetails.zipfile.fileid }"
+                ></a>
             </div>
         </div>
 
@@ -76,10 +97,27 @@
         <div class="summary-header">
             <span data-bind="text: $root.translations.downloadAdditionalFiles"></span>
         </div>
-        <div class="summary-contents">
+        <div class="summary-contents" style="padding-bottom: 20px;">
             <!-- ko foreach: { data: loadDetails.skipped_files, as: 'file' } -->
             <div class="etl-loading-metadata-value">
-                <a class="file-listing-link" data-bind="text: file.name, attr: { download: file.name, href: file.url }"></a>
+                <a 
+                    class="file-listing-link" 
+                    style="color: blue;"
+                    data-bind="text: file.name, attr: { download: file.name, href: file.url }"
+                ></a>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: loadDetails.files_not_found.length > 0 -->
+        <div class="summary-header">
+            <span>{% trans "These files were not found and could not be exported"%}</span>
+        </div>
+        <div class="summary-contents" style="padding-bottom: 20px;">
+            <!-- ko foreach: { data: loadDetails.files_not_found, as: 'file' } -->
+            <div class="etl-loading-metadata-value">
+                <a class="file-listing-link" data-bind="text: file.name"></a>
             </div>
             <!-- /ko -->
         </div>
@@ -104,8 +142,9 @@
             <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfRelatedFilesInZip + ':'"></span>
             <span class="etl-loading-metadata-value" data-bind="text: loadDetails.number_of_files"></span>
         </div>
+        <!-- /ko -->
     </div>
-    <!--/ko-->
+    <!-- /ko-->
 </div>
 {% endblock etl_status %}
 
