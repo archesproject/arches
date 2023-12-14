@@ -13,10 +13,6 @@
         {% include 'custom_email_header.htm' %}
 
         <p>{{greeting}}</p>
-        {% if link != "" %}
-        <a class="btn" href="{{email_link}}"><button
-                class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>
-        {% endif %}
         {% if files %}
             <!-- ko foreach: { data: files, as: 'file' } -->
             <div class='entry'>

@@ -195,7 +195,8 @@ class SignupView(View):
                 ),
                 additional_context={
                     "button_text": _("Signup for {}").format(settings.APP_NAME),
-                    "link": confirmation_link
+                    "link": confirmation_link,
+                    "username": form.cleaned_data['username']
                 }
             )
             
@@ -389,15 +390,19 @@ class TwoFactorAuthenticationResetView(View):
                 encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
 
                 admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-                email_context = {
-                    "button_text": _("Update Two-Factor Authentication Settings"),
-                    "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
-                    "greeting": _("Click on link below to update your two-factor authentication settings."),
-                    "closing": _(
+
+                email_context = return_message_context(
+                    greeting=_("Click on link below to update your two-factor authentication settings."),
+                    closing_text=_(
                         "This link expires in 15 minutes. If you did not request this change, \
                         contact your Administrator immediately."
                     ),
-                }
+                    additional_context={
+                        "button_text": _("Update Two-Factor Authentication Settings"),
+                        "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
+                        "username": user.username
+                    }
+                )
 
                 html_content = render_to_string("email/general_notification.htm", email_context)  # ...
                 text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
