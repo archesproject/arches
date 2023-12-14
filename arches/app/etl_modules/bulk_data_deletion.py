@@ -112,15 +112,15 @@ class BulkDataDeletion(BaseBulkEditor):
             for data in lbg["resource"].values():
                 if type(data) == dict: # cardinality-1 card
                     try:
-                        samples = [data["@display_value"]] # 1-nodenodegroup
-                    except:
+                        samples = [data["@display_value"]] # 1-node nodegroup
+                    except KeyError:
                         samples = [{k: v["@display_value"] for k, v in data.items()}] # multi-node nodegroup
                 elif type(data) == list: # cardinality-n card
                     samples = []
                     for datum in data:
                         try:
-                            tile_values = datum["@display_value"] # 1-nodenodegroup
-                        except:
+                            tile_values = datum["@display_value"] # 1-node nodegroup
+                        except KeyError:
                             tile_values = {k: v["@display_value"] for k, v in datum.items()} # multi-node nodegroup
                         samples.append(tile_values)
                 sample_data.extend(samples)
