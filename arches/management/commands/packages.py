@@ -315,7 +315,7 @@ class Command(BaseCommand):
                 path = utils.get_valid_path(options["config_file"])
                 mapping = json.load(open(path, "r"))
                 graphid = mapping["resource_model_id"]
-                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
+                management.call_command("es", "index_resources_by_type", resource_types=[graphid], recalculate_descriptors=True)
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
