@@ -98,9 +98,9 @@ class BulkDataDeletion(BaseBulkEditor):
         with connection.cursor() as cursor:
             cursor.execute(get_sample_resource_ids, params)
             rows = cursor.fetchall()
-        smaple_resource_ids = [row[0] for row in rows]
+        sample_resource_ids = [row[0] for row in rows]
         sample_data = []
-        for resourceid in smaple_resource_ids:
+        for resourceid in sample_resource_ids:
             resource = Resource.objects.get(pk=resourceid)
             resource.tiles = list(TileModel.objects.filter(resourceinstance=resourceid).filter(nodegroup_id=nodegroup_id))
             lbg = LabelBasedGraphV2.from_resource(
@@ -110,9 +110,20 @@ class BulkDataDeletion(BaseBulkEditor):
                 hide_hidden_nodes=True
             )
             for data in lbg["resource"].values():
-                for datum in data:
-                    tile_values = {k: v["@display_value"] for k, v in datum.items()}
-                    sample_data.append(tile_values)
+                if type(data) == dict: # cardinality-1 card
+                    try:
+                        samples = [data["@display_value"]] # 1-nodenodegroup
+                    except:
+                        samples = [{k: v["@display_value"] for k, v in data.items()}] # multi-node nodegroup
+                elif type(data) == list: # cardinality-n card
+                    samples = []
+                    for datum in data:
+                        try:
+                            tile_values = datum["@display_value"] # 1-nodenodegroup
+                        except:
+                            tile_values = {k: v["@display_value"] for k, v in datum.items()} # multi-node nodegroup
+                        samples.append(tile_values)
+                sample_data.extend(samples)
             if len(sample_data) >= 5:
                 break
 
