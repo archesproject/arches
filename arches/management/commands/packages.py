@@ -982,7 +982,7 @@ class Command(BaseCommand):
         load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
-            management.call_command("es", "reindex_database")
+            management.call_command("es", "reindex_database", recalculate_descriptors=True)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:

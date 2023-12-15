@@ -202,7 +202,7 @@ class ArchesFileReader(Reader):
                         for tile in [k for k in resource["tiles"] if k["parenttile_id"] is None]:
                             update_or_create_tile(tile)
 
-                    resourceinstance.save(index=(not prevent_indexing))
+                    resourceinstance.save(index=False)
 
                     if not prevent_indexing:
                         last_resource = self.save_descriptors_and_index(
@@ -373,7 +373,7 @@ class ArchesFileReader(Reader):
                         createdtime=datetime.datetime.now(),
                     )
                     newresourceinstance.tiles = populated_tiles
-                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
+                    newresourceinstance.save(index=False, transaction_id=transaction_id)
 
                     if not prevent_indexing:
                         last_resource = self.save_descriptors_and_index(
