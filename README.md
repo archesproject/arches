@@ -72,7 +72,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Improved Bulk Data Manager data edting
 - Workflow history tracking
 - Image configuration of file-list datatype
-- Perfomance Improvements
+- Performance Improvements
 - Support for compiling Vue components
 - Display of file thumbnails for formats other than images
 
