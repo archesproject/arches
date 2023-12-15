@@ -361,7 +361,7 @@ class SearchResultsExporter(object):
     def to_tilexl(self, instances):
         resourceinstanceids = [instance["resourceid"] for instance in instances if "resourceid" in instance]
         tilexl_exporter = ResourceExporter(format="tilexl")
-        dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids)
+        dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids, user=self.search_request.user)
         return dest
 
     def to_html(self, instances, name, graph_id):
