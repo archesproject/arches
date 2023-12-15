@@ -416,10 +416,20 @@ class CsvReader(Reader):
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources, transaction_id=transaction_id)
+                    if not prevent_indexing:
+                        for resource in resources:
+                            resource.save_descriptors()
+                            # This is our last chance to index, so we are going to take it.
+                            # However, not only are we not using a bulk indexer here, we've
+                            # already bulk-indexed once above. TODO: improve this
+                            resource.index()
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
+                    newresourceinstance.save(index=False, transaction_id=transaction_id)
+                    if not prevent_indexing:
+                        newresourceinstance.save_descriptors()
+                        newresourceinstance.index()
 
                 except TransportError as e:
 
