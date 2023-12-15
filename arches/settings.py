@@ -20,6 +20,9 @@ import inspect
 import json
 import os
 import sys
+from datetime import datetime, timedelta
+from contextlib import suppress
+
 
 try:
     from settings_utils import *
@@ -690,6 +693,13 @@ CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 ACCESSIBILITY_MODE = False
 
 COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
+
+# Dictionary containing any additional context items for customising email templates
+with suppress(NameError):  # need to suppress i18n NameError for test runner
+    EXTRA_EMAIL_CONTEXT = {
+        "salutation": _("Hi"),
+        "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+    }
 
 RENDERERS = [
     {

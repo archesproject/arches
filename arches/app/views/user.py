@@ -19,10 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
+from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from arches.app.models import models
@@ -32,8 +35,10 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
+from arches.app.utils.message_contexts import return_message_context
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+
 import logging
 
 
@@ -125,7 +130,6 @@ class UserManagerView(BaseManagerView):
             return render(request, "views/user-profile-manager.htm", context)
 
     def post(self, request):
-
         if self.action == "get_user_names":
             data = {}
             if self.request.user.is_authenticated and user_is_resource_reviewer(request.user):
@@ -159,12 +163,28 @@ class UserManagerView(BaseManagerView):
                 user = form.save()
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else None
-                    message = (
-                        f"Your {settings.APP_NAME} profile was just changed.  If this was unexpected, please contact your "
-                        f"{settings.APP_NAME} administrator{f' at {admin_info}.' if (admin_info and not str.isspace(admin_info)) else '.'}"
+                    email_username = user.username
+                    # Use firstname for email if we have it.
+                    if user.first_name:
+                        email_username = user.first_name
+
+                    if admin_info and not str.isspace(admin_info):
+                        message = _("Your {} profile was just changed. If this was unexpected, please contact your administrator at {}").format(settings.APP_NAME, admin_info)
+                    else:
+                        message = _("Your {} profile was just changed. If this was unexpected, please contact your administrator.").format(settings.APP_NAME)
+
+                    email_context = return_message_context(
+                        greeting=message,
+                        additional_context={"username":email_username}
                     )
-                    message = _(message)
-                    user.email_user(_("Your " + settings.APP_NAME + " Profile Has Changed"), message)
+
+                    html_content = render_to_string("email/general_notification.htm", email_context)  # ...
+                    text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+                    # create the email, and attach the HTML version as well.
+                    msg = EmailMultiAlternatives(_("Your {} Profile Has Changed!").format(settings.APP_NAME), text_content, admin_info, [form.cleaned_data["email"]])
+                    msg.attach_alternative(html_content, "text/html")
+                    msg.send()
                 except:
                     logger.error("Error sending email", exc_info=True)
                 request.user = user
