@@ -188,6 +188,9 @@ class UserManagerView(BaseManagerView):
                 except:
                     logger.error("Error sending email", exc_info=True)
                 request.user = user
+            else:
+                logger.error(form.errors.as_data())
+
             context["form"] = form
 
             user_profile = models.UserProfile.objects.get(user_id=request.user.pk)
