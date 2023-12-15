@@ -284,10 +284,7 @@ class Writer(object):
             except:
                 self.graph_id = models.ResourceInstance.objects.get(resourceinstanceid=resourceinstanceids[0]).graph_id
 
-        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.graph_model = models.GraphModel.objects.get(graphid=self.graph_id)
-        self.file_prefix = self.graph_model.name.replace(" ", "_")
-        self.file_name = "{0}_{1}".format(self.file_prefix, iso_date)
+        self.set_file_name()
 
         for tile in self.tiles:
             try:
@@ -297,3 +294,9 @@ class Writer(object):
                 self.resourceinstances[tile.resourceinstance_id].append(tile)
 
         return self.resourceinstances
+
+    def set_file_name(self):
+        iso_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.graph_model = models.GraphModel.objects.get(graphid=self.graph_id)
+        self.file_prefix = self.graph_model.name.replace(" ", "_")
+        self.file_name = "{0}_{1}".format(self.file_prefix, iso_date)
