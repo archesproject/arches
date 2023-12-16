@@ -54,6 +54,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.message_contexts import return_message_context
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from django.core.exceptions import ValidationError
 import logging
@@ -184,7 +185,7 @@ class SignupView(View):
             },
         )
 
-    def post(self, request):
+    def post(self, request):        
         showform = True
         confirmation_message = ""
         postdata = request.POST.copy()
@@ -205,24 +206,27 @@ class SignupView(View):
                 return redirect(confirmation_link)
 
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-            email_context = {
-                "button_text": _("Signup for Arches"),
-                "link": confirmation_link,
-                "greeting": _(
-                    "Thanks for your interest in Arches. Click on link below \
+            email_context = return_message_context(
+                greeting=_(
+                    "Thanks for your interest in {}. Click on link below \
                     to confirm your email address! Use your email address to login."
-                ),
-                "closing": _(
+                ).format(settings.APP_NAME),
+                closing_text=_(
                     "This link expires in 24 hours.  If you can't get to it before then, \
                     don't worry, you can always try again with the same email address."
                 ),
-            }
-
+                additional_context={
+                    "button_text": _("Signup for {}").format(settings.APP_NAME),
+                    "link": confirmation_link,
+                    "username": form.cleaned_data['username']
+                }
+            )
+            
             html_content = render_to_string("email/general_notification.htm", email_context)  # ...
             text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_("Welcome to Arches!"), text_content, admin_email, [form.cleaned_data["email"]])
+            msg = EmailMultiAlternatives(_("Welcome to {}!").format(settings.APP_NAME), text_content, admin_email, [form.cleaned_data["email"]])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
@@ -416,15 +420,19 @@ class TwoFactorAuthenticationResetView(View):
                 encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
 
                 admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
-                email_context = {
-                    "button_text": _("Update Two-Factor Authentication Settings"),
-                    "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
-                    "greeting": _("Click on link below to update your two-factor authentication settings."),
-                    "closing": _(
+
+                email_context = return_message_context(
+                    greeting=_("Click on link below to update your two-factor authentication settings."),
+                    closing_text=_(
                         "This link expires in 15 minutes. If you did not request this change, \
                         contact your Administrator immediately."
                     ),
-                }
+                    additional_context={
+                        "button_text": _("Update Two-Factor Authentication Settings"),
+                        "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
+                        "username": user.username
+                    }
+                )
 
                 html_content = render_to_string("email/general_notification.htm", email_context)  # ...
                 text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.

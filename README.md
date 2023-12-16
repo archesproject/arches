@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.4.3 release notes](https://github.com/archesproject/arches/blob/dev/7.4.x/releases/7.4.3.md)
+[Version 7.5.0 release notes](https://github.com/archesproject/arches/blob/stable/7.5.0/releases/7.5.0.md)
 
 #### Quick Install
 
@@ -72,7 +72,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Improved Bulk Data Manager data edting
 - Workflow history tracking
 - Image configuration of file-list datatype
-- Perfomance Improvements
+- Performance Improvements
 - Support for compiling Vue components
 - Display of file thumbnails for formats other than images
 
