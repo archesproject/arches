@@ -423,17 +423,14 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == "export_branch":
-                    if graph.source_identifier:
-                        graph = Graph.objects.get(pk=graph.source_identifier_id)
-
-                    if data['source_identifier_id']:
-                        node = models.Node.objects.get(pk=data['source_identifier_id'])
-                        data = JSONDeserializer().deserialize(JSONSerializer().serialize(node))
-
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
                     clone_data["copy"].save()
-                    ret = {"success": True, "graphid": clone_data["copy"].pk}
+
+                    clone_data['copy'].create_editable_future_graph()
+                    clone_data['copy'].publish()
+
+                    ret = {"success": True, "graphid": clone_data['copy'].pk}
 
                 elif self.action == "clone_graph":
                     if graph.source_identifier:
