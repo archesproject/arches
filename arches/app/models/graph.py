@@ -1649,12 +1649,8 @@ class Graph(models.GraphModel):
                 ret["nodes"] = sorted(nodes, key=lambda k: (k["sortorder"], k["nodeid"]))
             else:
                 ret.pop("nodes", None)
-
-            # never serailize is_active state
-            ret.pop('is_active', None)
-            res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
-
-            return res
+                
+            return JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
     def _validate_node_name(self, node):
         """
