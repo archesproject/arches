@@ -55,11 +55,12 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg.add_aggregation(nested_agg_filter)
 
         # TODO: It would be preferable to inject this, but would require more changes elsewhere.
-        sets = get_sets_for_user(self.user, "view_resourceinstance")
-        if sets is not None: # Only None if no filtering should be done, but may be an empty set.
-            search_query = Bool()
-            search_query.must(Nested(path="sets", query=Terms(field="sets.id", terms=list(sets))))
-            search_results_object["query"].add_query(search_query)
+        if self.user is not True:
+            sets = get_sets_for_user(self.user, "view_resourceinstance")
+            if sets is not None: # Only None if no filtering should be done, but may be an empty set.
+                search_query = Bool()
+                search_query.must(Nested(path="sets", query=Terms(field="sets.id", terms=list(sets))))
+                search_results_object["query"].add_query(search_query)
         search_results_object["query"].add_aggregation(nested_agg)
 
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):

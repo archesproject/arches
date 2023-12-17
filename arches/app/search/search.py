@@ -26,6 +26,7 @@ from datetime import datetime
 from elasticsearch import Elasticsearch, helpers, ElasticsearchWarning
 from elasticsearch.exceptions import RequestError
 from elasticsearch.helpers import BulkIndexError
+from elasticsearch.client import TasksClient
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -254,6 +255,9 @@ class SearchEngine(object):
     def refresh(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
         self.es.indices.refresh(**kwargs)
+
+    def make_tasks_client(self):
+        return TasksClient(self.es)
 
     def BulkIndexer(outer_self, batch_size=500, **kwargs):
         class _BulkIndexer(object):
