@@ -1,9 +1,9 @@
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, FiltersAgg, GeoHashGridAgg, GeoBoundsAgg
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, NestedAgg, FiltersAgg, GeoHashGridAgg, GeoBoundsAgg, Nested
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_is_resource_reviewer, get_sets_for_user
 
 details = {
     "searchcomponentid": "",
@@ -53,6 +53,13 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg_filter.add_aggregation(GeoHashGridAgg(field="points.point", name="grid", precision=settings.HEX_BIN_PRECISION))
         nested_agg_filter.add_aggregation(GeoBoundsAgg(field="points.point", name="bounds"))
         nested_agg.add_aggregation(nested_agg_filter)
+
+        # TODO: It would be preferable to inject this, but would require more changes elsewhere.
+        sets = get_sets_for_user(self.user, "view_resourceinstance")
+        if sets is not None: # Only None if no filtering should be done, but may be an empty set.
+            search_query = Bool()
+            search_query.must(Nested(path="sets", query=Terms(field="sets.id", terms=list(sets))))
+            search_results_object["query"].add_query(search_query)
         search_results_object["query"].add_aggregation(nested_agg)
 
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):

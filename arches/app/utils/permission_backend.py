@@ -84,6 +84,10 @@ class PermissionFramework(metaclass=ABCMeta):
         ...
 
     @abstractmethod
+    def get_sets_for_user(self, user, perm):
+        ...
+
+    @abstractmethod
     def check_resource_instance_permissions(self, user, resourceid, permission):
         ...
 
@@ -208,6 +212,9 @@ def get_users_with_perms(obj, attach_perms=False, with_superusers=False, with_gr
 
 def get_groups_with_perms(obj, attach_perms=False):
     return _get_permission_framework().get_groups_with_perms(obj, attach_perms=attach_perms)
+
+def get_sets_for_user(user, perm):
+    return _get_permission_framework().get_sets_for_user(user, perm)
 
 def get_user_perms(user, obj):
     return _get_permission_framework().get_user_perms(user, obj)
