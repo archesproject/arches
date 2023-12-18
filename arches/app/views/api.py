@@ -31,6 +31,7 @@ from django.utils.translation import gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -936,6 +937,7 @@ class Plugins(View):
             
 
 class SearchExport(View):
+    @method_decorator(ratelimit(key="header:http-authorization", rate=settings.RATE_LIMIT, block=False))
     def get(self, request):
         from arches.app.search.search_export import SearchResultsExporter  # avoids circular import
 
@@ -943,7 +945,7 @@ class SearchExport(View):
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
         report_link = request.GET.get("reportlink", False)
-        if "HTTP_AUTHORIZATION" in request.META:
+        if "HTTP_AUTHORIZATION" in request.META and not request.get("limited", False):
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
                 user_cred = b64decode(request_auth[1]).decode().split(":")
