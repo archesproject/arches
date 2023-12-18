@@ -3,19 +3,13 @@
 from django.db import migrations
 
 
-def using_custom_file_widgets(apps, schema_editor):
-    CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
-    return (
-        CardXNodeXWidget.objects.filter(widget_id="10000000-0000-0000-0000-000000000019").values_list("node__graph", flat=True).distinct()
-    )
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ("models", "10149_add_workflow_name_to_workflow_history"),
     ]
 
     operations = [
+        # Note this won't actually appear to have an effect w/o republishing graphs.
         migrations.RunSQL(
             sql="""
             UPDATE widgets

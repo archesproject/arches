@@ -639,6 +639,13 @@ class Concept(object):
                             JOIN values ON(values.conceptid = c.conceptidto)
                             WHERE LOWER(values.value) like %(query)s
                             AND values.valuetype in ('prefLabel')
+                            AND LOWER(values.value) != %(match)s
+                                UNION
+                            SELECT c.conceptidfrom, c.conceptidto, '0' as row, c.depth, c.collector
+                            FROM children c
+                            JOIN values ON(values.conceptid = c.conceptidto)
+                            WHERE LOWER(values.value) = %(match)s
+                            AND values.valuetype in ('prefLabel')
                                 UNION
                             SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
                             FROM children c
@@ -662,6 +669,7 @@ class Concept(object):
                     "limit": limit,
                     "offset": offset,
                     "query": "%" + query.lower() + "%",
+                    "match": query.lower(),
                     "recursive_table": AsIs(recursive_table),
                     "languageid": languageid,
                     "short_languageid": languageid.split("-")[0] + "%",
