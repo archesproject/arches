@@ -617,7 +617,7 @@ class Resources(APIBase):
                         data = JSONDeserializer().deserialize(request.body)
                         reader = JsonLdReader()
                         if slug is not None:
-                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                            graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                         reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                         if reader.errors:
                             response = []
@@ -694,7 +694,7 @@ class Resources(APIBase):
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
                     if slug is not None:
-                        graphid = models.GraphModel.objects.get(slug=slug).pk
+                        graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                     reader.read_resource(data, graphid=graphid)
                     if reader.errors:
                         response = []

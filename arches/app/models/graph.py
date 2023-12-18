@@ -1696,7 +1696,7 @@ class Graph(models.GraphModel):
             - A node group can only have child node groups if the node group only contains semantic nodes
             - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
-
+            - The graph has a slug that unique only to it and its editable_future_graph
         """
         # validates that the top node of a resource graph is semantic and a collector
         if self.isresource is True:
@@ -1893,7 +1893,10 @@ class Graph(models.GraphModel):
             editable_future_graph = graph_copy["copy"]
             editable_future_graph.source_identifier_id = self.graphid
             editable_future_graph.has_unpublished_changes = False
-            editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
+
+            editable_future_graph.root.set_relatable_resources([
+                node.pk for node in self.root.get_relatable_resources()
+            ])
 
             editable_future_graph.save(validate=False)
 
@@ -1931,6 +1934,11 @@ class Graph(models.GraphModel):
 
             if nodegroup.parentnodegroup:
                 _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
+
+
+        self.root.set_relatable_resources([
+            node.pk for node in editable_future_graph.root.get_relatable_resources()
+        ])
 
         previous_card_ids = [str(card.pk) for card in self.cards.values()]
         previous_node_ids = [str(node.pk) for node in self.nodes.values()]
@@ -2085,7 +2093,6 @@ class Graph(models.GraphModel):
                 "edges",
                 "widgets",
                 "root",
-                "slug",
                 "source_identifier",
                 "source_identifier_id",
                 "publication_id",

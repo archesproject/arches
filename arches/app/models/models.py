@@ -506,7 +506,7 @@ class GraphModel(models.Model):
         "ReportTemplate", db_column="templateid", default="50000000-0000-0000-0000-000000000001", on_delete=models.SET_DEFAULT
     )
     config = JSONField(db_column="config", default=dict)
-    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    slug = models.TextField(validators=[validate_slug], null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
     source_identifier = models.ForeignKey(
         blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
