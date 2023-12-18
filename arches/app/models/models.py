@@ -366,13 +366,14 @@ class File(models.Model):
             self.fileid = uuid.uuid4()
 
     def save(self, *args, **kwargs):
-        self.make_thumbnail()
-        super(File, self).save()
+        self.make_thumbnail(kwargs)
+        super(File, self).save(*args, **kwargs)
 
-    def make_thumbnail(self, force=False):
+    def make_thumbnail(self, kwargs_from_save_call, force=False):
         try:
             if ThumbnailGeneratorInstance and (force or self.thumbnail_data is None):
                 self.thumbnail_data = ThumbnailGeneratorInstance.get_thumbnail_data(self.path.file)
+                add_to_update_fields(kwargs_from_save_call, "thumbnail_data")
         except Exception as e:
             logger.error(f"Thumbnail not generated for {self.path}: {e}")
             traceback.print_exc(file=sys.stdout)
