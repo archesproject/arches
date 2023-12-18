@@ -61,13 +61,18 @@ class SearchResultsExporter(object):
         self.output = {}
         self.set_precision = GeoUtils().set_precision
 
-    def insert_subcard_below_parent_card(self, main_card_list, sub_card_list):
-        for sub_card in sub_card_list:
-            parent_obj = sub_card.nodegroup.parentnodegroup_id
-            for main_card in main_card_list:
-                if main_card.nodegroup_id == parent_obj:
-                    index_number = main_card_list.index(main_card) + 1
-                    main_card_list.insert(index_number, sub_card)
+    def insert_subcard_below_parent_card(self, main_card_list, sub_card_list, subcards_added):
+        for main_card in main_card_list:
+            sub_cards_to_add = []
+            for sub_card in sub_card_list:
+                if main_card.nodegroup_id == sub_card.nodegroup.parentnodegroup_id:
+                    if sub_card not in main_card_list:
+                        sub_cards_to_add.append(sub_card)
+                        subcards_added = True
+            index_number = main_card_list.index(main_card) + 1
+            main_card_list[index_number:index_number] = sub_cards_to_add
+        return subcards_added    
+        
 
     def return_ordered_header(self, graphid, export_type):
 
@@ -93,11 +98,14 @@ class SearchResultsExporter(object):
 
         subcard_list_with_sort.sort(key=lambda x: x.sortorder, reverse=True)
 
-        self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort)
+        def order_cards(subcards_added=True):
+            if subcards_added == True:
+                subcards_added = False
+                unsorted_subcards_added = self.insert_subcard_below_parent_card(sorted_card_list, card_list_no_sort, subcards_added)
+                sorted_subcards_added = self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort, unsorted_subcards_added)
+                order_cards(sorted_subcards_added)
 
-        # Cards in subcard_list_with_sort are added after cards with no sort
-
-        self.insert_subcard_below_parent_card(sorted_card_list, subcard_list_with_sort)
+        order_cards()
 
         # Create a list of nodes within each card and order them according to sort
         # order then add them to the main list of
@@ -353,7 +361,7 @@ class SearchResultsExporter(object):
     def to_tilexl(self, instances):
         resourceinstanceids = [instance["resourceid"] for instance in instances if "resourceid" in instance]
         tilexl_exporter = ResourceExporter(format="tilexl")
-        dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids)
+        dest = tilexl_exporter.export(resourceinstanceids=resourceinstanceids, user=self.search_request.user)
         return dest
 
     def to_html(self, instances, name, graph_id):

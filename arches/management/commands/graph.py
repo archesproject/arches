@@ -99,10 +99,11 @@ class Command(BaseCommand):
                 print(graph.name)
                 
                 if self.update:
-                    graph.update_published_graphs()
+                    if graph.publication_id:
+                        graph.update_published_graphs()
                 else:
                     graph.publish(user)
-
+                    
             graphids.append(str(graph.pk))
         if self.update_instances:
             graphids = tuple(graphids)

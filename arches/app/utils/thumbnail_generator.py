@@ -17,8 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-import pypdfium2 as pdfium
-from thumbnail import generate_thumbnail, close_unoserver
 from tempfile import NamedTemporaryFile
 
 from django.utils.translation import gettext as _

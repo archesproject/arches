@@ -122,6 +122,7 @@
                 <i class="fa fa-info-circle"></i>
                 <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
             </p>
+            <!-- ko if: previewValue() -->
             <table class="table table-striped csv-mapping-table">
                 <thead>
                     <tr>
@@ -138,6 +139,12 @@
                     <!-- /ko -->
                 </tbody>
             </table>
+            <!-- /ko -->
+            <!-- ko ifnot: previewValue() -->
+            <p style="margin-top: 15px;">
+                <span data-bind="text: $root.translations.previewNotAvailable"></span>
+            </p>
+            <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: showPreview() && activeTab() !== "TileDeletion" -->
