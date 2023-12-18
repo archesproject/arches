@@ -54,10 +54,13 @@ class TileExcelExporter(BaseExcelExporter):
                         datatype = node_lookup_by_id[key]["datatype"]
                         if datatype == "file-list":
                             file_names_to_export = []
-                            for file in value:
-                                files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
-                                file_names_to_export.append(file["name"])
-                            tile[alias] = ",".join(file_names_to_export)
+                            if value is not None:
+                                for file in value:
+                                    files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
+                                    file_names_to_export.append(file["name"])
+                                tile[alias] = ",".join(file_names_to_export)
+                            else:
+                                tile[alias] = value    
                         else:
                             from arches.app.datatypes.datatypes import DataTypeFactory
                             self.datatype_factory = DataTypeFactory()
