@@ -14,6 +14,7 @@ require([
         graphPublicationIdFromDatabase: ko.observable(data['graph_publication_id']),
         graphPublicationId: ko.observable(data['graph_publication_id']),
         publishedGraphs: ko.observable(data['graphs_x_published_graphs']),
+        graphPublicationResourceInstanceCount: ko.observable(data['graph_publication_id_to_resource_instance_count']),
         selectPublication: function(data) {viewModel.graphPublicationId(data['publicationid']);},
         showUpdatePublicationAlert: showUpdatePublicationAlert,
         showDeletePublicationAlert: showDeletePublicationAlert,

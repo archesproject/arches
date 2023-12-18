@@ -113,6 +113,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </div>
 
+                <div style="justify-content: center; display: flex; padding-right: 40px;">
+                    <div>
+                        <span><strong>{% trans "Number of Resources:" %}</strong></span>
+                        <span data-bind="text: $parent['graphPublicationResourceInstanceCount']()[$data['publicationid']]"></span>
+                    </div>
+                </div>
+
                 <!-- ko ifnot: $data['publicationid'] === $parent.graphPublicationId() -->
                     <div style="display: flex; align-items: center; width: 100%; overflow-x: hidden; padding-right: 40px;">
                         <div style='width: 60px; flex: none;'>
@@ -182,6 +189,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "graphs_x_published_graphs": {{graphs_x_published_graphs}},
         "graph_publication_id": "{{graph_publication_id}}",
         "user_ids_to_user_data": {{user_ids_to_user_data}},
+        "graph_publication_id_to_resource_instance_count": {{graph_publication_id_to_resource_instance_count}},
     }'
 ></div>
 {% endblock pre_require_js %}

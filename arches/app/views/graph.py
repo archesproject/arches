@@ -625,8 +625,14 @@ class ModelHistoryView(GraphBaseView):
         )
 
         user_ids_to_user_data = {}
+        graph_publication_id_to_resource_instance_count = {}
 
         for graph_x_published_graph in graphs_x_published_graphs:
+
+            graph_publication_id_to_resource_instance_count[str(graph_x_published_graph.publicationid)] = models.ResourceInstance.objects.filter(
+                graph_publication_id=graph_x_published_graph.publicationid
+            ).count()
+
             # changes datetime to human-readable format with local timezone
             graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
                 "%Y-%m-%d | %I:%M %p %Z"
@@ -644,6 +650,7 @@ class ModelHistoryView(GraphBaseView):
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
             user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
+            graph_publication_id_to_resource_instance_count=JSONSerializer().serialize(graph_publication_id_to_resource_instance_count),
         )
         context["nav"]["title"] = self.graph.name
         context["nav"]["help"] = {"title": _("Managing Published Graphs"), "templates": ["graph-publications-help"]}
