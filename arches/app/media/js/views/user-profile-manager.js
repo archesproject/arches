@@ -121,7 +121,7 @@ define([
                                 )
                             );
                         })
-                        .error(function(e) {
+                        .fail(function(e) {
                             self.viewModel.alert(
                                 new AlertViewModel(
                                     'ep-alert-red',

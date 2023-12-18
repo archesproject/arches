@@ -1857,7 +1857,7 @@ class Graph(models.GraphModel):
                     published_graph_query = published_graphs.filter(language=language_tuple[0])
                     if not len(published_graph_query):
                         published_graph = models.PublishedGraph.objects.create(
-                            publication=self.publication,
+                            publication_id=self.publication_id,
                             serialized_graph=serialized_graph,
                             language=models.Language.objects.get(code=language_tuple[0]),
                         )
