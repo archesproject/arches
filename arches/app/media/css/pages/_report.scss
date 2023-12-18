@@ -1,5 +1,6 @@
 .resource-report-abstract-container {
     .resource-component-abstract {
+        height: calc(100vh - 100px);
         overflow-y: auto;
         .report-title-bar {
             .report-toolbar-title {

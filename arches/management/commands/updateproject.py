@@ -16,6 +16,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.update_to_v7()
+        self.update_to_v7_5()
 
     def update_to_v7(self):
         # copy webpack config files to project
@@ -64,3 +65,8 @@ class Command(BaseCommand):
                         graphs.append(graphid)
                 management.call_command("graph", operation="publish", update_instances=True, graphs=",".join(graphs))
                 cursor.execute("drop table if exists temp_graph_status")
+
+    def update_to_v7_5(self):
+        # Republish to pick up CardsXNodeXWidget changes from
+        # migration 10150_add_default_value_file_list.py
+        management.call_command("graph", operation="publish", update=True)
