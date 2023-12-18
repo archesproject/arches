@@ -35,7 +35,7 @@ html {
 }
 
 body {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
 }
 
 img {
@@ -1135,11 +1135,6 @@ div.wf-multi-tile-card-info div {
 
 .workflow-nav-controls .inactive {
     color: #ccc;
-}
-
-.resource-component-abstract {
-    overflow-y: scroll;
-    height: 100%;
 }
 
 .workflow-plugin {
@@ -9422,6 +9417,46 @@ a.search-query-link-captions:focus {
 .search-listing-icon {
     transform: translate(0, -2px);
     font-size: 1.2rem;
+}
+
+.search-thumbnail-container {
+    display: flex; 
+    position: relative;
+}
+
+.search-thumbnail-image {
+    max-width: 70px;
+}
+
+.search-thumbnail-image:hover {
+    cursor: pointer;
+}
+
+.search-hover-image {
+    position: absolute; 
+    left: 90px; 
+    right: 90px; 
+    bottom: 10px; 
+    height:260px; 
+    padding: 5px; 
+    background: #f4f4f4; 
+    border: 1px solid #ddd; 
+    border-radius: 2px; 
+    display: none;
+}
+
+.search-listing:first-child .search-hover-image {
+    position: absolute; 
+    left: 90px; 
+    right: 90px; 
+    top: 10px; 
+    height: 260px; 
+    padding: 5px; 
+    background: #f4f4f4; 
+    border: 1px solid #ddd; 
+    border-radius: 2px; 
+    z-index: 10;
+    display: none;
 }
 
 .search-footer {

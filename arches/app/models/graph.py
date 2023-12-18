@@ -822,7 +822,7 @@ class Graph(models.GraphModel):
         if root is not None:
             root["nodegroup_id"] = root["nodeid"]
             root["istopnode"] = True
-            root["is_immutable"] = bool(root.is_immutable or self.is_copy_immutable)
+            root["is_immutable"] = bool(root["is_immutable"] or self.is_copy_immutable)
             updated_values = copy_of_self.update_node(root)
             root_node = updated_values["node"]
             root_card = updated_values["card"]
@@ -1650,11 +1650,7 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("nodes", None)
 
-            # never serailize is_active state
-            ret.pop('is_active', None)
-            res = JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
-
-            return res
+            return JSONSerializer().serializeToPython(ret, use_raw_i18n_json=use_raw_i18n_json)
 
     def _validate_node_name(self, node):
         """
@@ -1700,7 +1696,7 @@ class Graph(models.GraphModel):
             - A node group can only have child node groups if the node group only contains semantic nodes
             - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
-
+            - The graph has a slug that unique only to it and its editable_future_graph
         """
         # validates that the top node of a resource graph is semantic and a collector
         if self.isresource is True:
@@ -1866,7 +1862,7 @@ class Graph(models.GraphModel):
                     published_graph_query = published_graphs.filter(language=language_tuple[0])
                     if not len(published_graph_query):
                         published_graph = models.PublishedGraph.objects.create(
-                            publication=self.publication,
+                            publication_id=self.publication_id,
                             serialized_graph=serialized_graph,
                             language=models.Language.objects.get(code=language_tuple[0]),
                         )
@@ -1897,7 +1893,10 @@ class Graph(models.GraphModel):
             editable_future_graph = graph_copy["copy"]
             editable_future_graph.source_identifier_id = self.graphid
             editable_future_graph.has_unpublished_changes = False
-            editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
+
+            editable_future_graph.root.set_relatable_resources([
+                node.pk for node in self.root.get_relatable_resources()
+            ])
 
             editable_future_graph.save(validate=False)
 
@@ -1935,6 +1934,11 @@ class Graph(models.GraphModel):
 
             if nodegroup.parentnodegroup:
                 _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
+
+
+        self.root.set_relatable_resources([
+            node.pk for node in editable_future_graph.root.get_relatable_resources()
+        ])
 
         previous_card_ids = [str(card.pk) for card in self.cards.values()]
         previous_node_ids = [str(node.pk) for node in self.nodes.values()]
@@ -2089,7 +2093,6 @@ class Graph(models.GraphModel):
                 "edges",
                 "widgets",
                 "root",
-                "slug",
                 "source_identifier",
                 "source_identifier_id",
                 "publication_id",

@@ -29,8 +29,9 @@
                             data-bind="
                                 click: function(){$data.removeRelationship($data)}, 
                                 clickBubble: false, 
-                                attr: {'disabled': $parent.isEditable === false, 'aria-label': $root.translations.removeRelatedResourceModel($data.name)}, 
-                                style: {color: $parent.isEditable === true || '#aaa'}">
+                                attr: {'aria-label': $root.translations.removeRelatedResourceModel($data.name)}, 
+                            "
+                        >
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>

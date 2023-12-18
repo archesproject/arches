@@ -37,3 +37,4 @@ pyjwt[crypto]
 semantic-version==2.10.0
 tzdata==2023.3
 pytz==2023.3
+django-ratelimit==4.1.0

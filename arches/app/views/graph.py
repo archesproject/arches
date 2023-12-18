@@ -32,6 +32,7 @@ from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.utils import translation
+from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -191,6 +192,10 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
+        if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            if not request.user.groups.filter(name="System Administrator").exists():
+                raise PermissionDenied
+            
         self.source_graph = Graph.objects.get(pk=graphid)
         self.editable_future_graph = None
 
@@ -207,10 +212,6 @@ class GraphDesignerView(GraphBaseView):
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
             function__functiontype="primarydescriptors"
         )
-
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
         datatypes = models.DDataType.objects.all()
         primary_descriptor_function = JSONSerializer().serialize(
@@ -427,13 +428,14 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == "export_branch":
-                    if graph.source_identifier:
-                        graph = Graph.objects.get(pk=graph.source_identifier_id)
-
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
                     clone_data["copy"].save()
-                    ret = {"success": True, "graphid": clone_data["copy"].pk}
+
+                    clone_data['copy'].create_editable_future_graph()
+                    clone_data['copy'].publish()
+
+                    ret = {"success": True, "graphid": clone_data['copy'].pk}
 
                 elif self.action == "clone_graph":
                     if graph.source_identifier:
@@ -628,8 +630,14 @@ class ModelHistoryView(GraphBaseView):
         )
 
         user_ids_to_user_data = {}
+        graph_publication_id_to_resource_instance_count = {}
 
         for graph_x_published_graph in graphs_x_published_graphs:
+
+            graph_publication_id_to_resource_instance_count[str(graph_x_published_graph.publicationid)] = models.ResourceInstance.objects.filter(
+                graph_publication_id=graph_x_published_graph.publicationid
+            ).count()
+
             # changes datetime to human-readable format with local timezone
             graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
                 "%Y-%m-%d | %I:%M %p %Z"
@@ -647,6 +655,7 @@ class ModelHistoryView(GraphBaseView):
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
             user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
+            graph_publication_id_to_resource_instance_count=JSONSerializer().serialize(graph_publication_id_to_resource_instance_count),
         )
         context["nav"]["title"] = self.graph.name
         context["nav"]["help"] = {"title": _("Managing Published Graphs"), "templates": ["graph-publications-help"]}

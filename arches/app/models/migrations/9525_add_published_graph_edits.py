@@ -5,6 +5,7 @@ import datetime
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import re
 import uuid
 
 
@@ -53,5 +54,10 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True, db_column="edit_id", null=True, on_delete=django.db.models.deletion.DO_NOTHING, to="models.publishedgraphedit"
             ),
+        ),
+        migrations.AlterField(
+            model_name='graphmodel',
+            name='slug',
+            field=models.TextField(null=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), 'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.', 'invalid')]),
         ),
     ]

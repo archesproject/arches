@@ -12,6 +12,7 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
+from arches.app.utils.message_contexts import return_message_context
 from tempfile import NamedTemporaryFile
 
 
@@ -84,22 +85,27 @@ def export_search_results(self, userid, request_values, format, report_link):
 
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
+    expiration_date = datetime.now() + timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
+    formatted_expiration_date = expiration_date.strftime("%A, %d %B %Y")
+
+    context = return_message_context(
+        greeting=_("Hello,\nYour request to download a set of search results is now ready. You have until {} to access this download, after which time it'll be deleted.".format(formatted_expiration_date)),
+        closing_text=_("Thank you"),
+        email=email,
+        additional_context={
+            "link":str(exportid),
+            "button_text":_("Download Now"),
+            "name":export_name,
+            "email_link":str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
+            "username":_user.first_name or _user.username
+        },
+    )
+
     return {
         "taskid": self.request.id,
-        "msg": _(
-            "Your search {} is ready for download. You have 24 hours to access this file, after which we'll automatically remove it."
-        ).format(export_name),
+        "msg": _("Your search '{}' is ready for download. You have until {} to access this file, after which we'll automatically remove it.".format(export_name, formatted_expiration_date)),
         "notiftype_name": "Search Export Download Ready",
-        "context": dict(
-            greeting=_("Hello,\nYour request to download a set of search results is now ready."),
-            link=str(exportid),
-            button_text=_("Download Now"),
-            closing=_("Thank you"),
-            email=email,
-            name=export_name,
-            email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
-        ),
-    }
+        "context":context}
 
 
 @shared_task(bind=True)
@@ -140,19 +146,20 @@ def index_resource(self, module, index_name, resource_id, tile_ids):
 
 
 @shared_task
-def package_load_complete(*args, **kwargs):
+def package_load_complete(*args, **kwargs):    
     valid_resource_paths = kwargs.get("valid_resource_paths")
-
+    
     msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
-    context = dict(
+    context = return_message_context(
         greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
-        loaded_resources=[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
-        link="",
-        link_text=_("Log me in"),
-        closing=_("Thank you"),
-        email="",
+        closing_text=_("Thank you"),
+        additional_context={
+            "link":"",
+            "loaded_resource":[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
+            "link_text":_("Log me in")
+        }
     )
     notify_completion(msg, user, notifytype_name, context)
 
