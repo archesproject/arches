@@ -120,9 +120,11 @@ class TimeWheel(object):
             for child in root.children:
                 root.size = root.size + child.size
 
+            key = "time_wheel_config_{0}".format(user.username)
             if user.username in settings.CACHE_BY_USER:
-                key = "time_wheel_config_{0}".format(user.username)
                 cache.set(key, root, settings.CACHE_BY_USER[user.username])
+            else:
+                cache.set(key, root, settings.CACHE_BY_USER['default'])
 
             return root
 
