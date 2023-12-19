@@ -151,34 +151,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
         """
-        if not isinstance(perms, list):
-            perms = [perms]
-
-        formatted_perms = []
-        # in some cases, `perms` can have a `model.` prefix
-        for perm in perms:
-            if len(perm.split(".")) > 1:
-                formatted_perms.append(perm.split(".")[1])
-            else:
-                formatted_perms.append(perm)
-
-        permitted_nodegroups = set()
-        NodegroupPermissionsChecker = CachedObjectPermissionChecker(user, NodeGroup)
-
-        for nodegroup in NodeGroup.objects.all():
-            explicit_perms = NodegroupPermissionsChecker.get_perms(nodegroup)
-
-            if len(explicit_perms):
-                if any_perm:
-                    if len(set(formatted_perms) & set(explicit_perms)):
-                        permitted_nodegroups.add(nodegroup)
-                else:
-                    if set(formatted_perms) == set(explicit_perms):
-                        permitted_nodegroups.add(nodegroup)
-            else:  # if no explicit permissions, object is considered accessible by all with group permissions
-                permitted_nodegroups.add(nodegroup)
-
-        return permitted_nodegroups
+        return set(get_nodegroups_by_perm_for_user_or_group(user, perms, any_perm=any_perm))
 
     def check_resource_instance_permissions(self, user, resourceid, permission):
         """
@@ -576,7 +549,8 @@ class CachedObjectPermissionChecker:
 
         user_permission_cache = caches["user_permission"]
 
-        current_user_cached_permissions = user_permission_cache.get(str(user.pk), {})
+        key = f"g:{user.pk}" if isinstance(user, Group) else str(user.pk)
+        current_user_cached_permissions = user_permission_cache.get(key, {})
 
         if current_user_cached_permissions.get(classname):
             checker = current_user_cached_permissions.get(classname)
@@ -585,6 +559,45 @@ class CachedObjectPermissionChecker:
             checker.prefetch_perms(globals()[classname].objects.all())
 
             current_user_cached_permissions[classname] = checker
-            user_permission_cache.set(str(user.pk), current_user_cached_permissions)
+            user_permission_cache.set(key, current_user_cached_permissions)
 
         return checker
+
+def get_nodegroups_by_perm_for_user_or_group(user_or_group, perms=None, any_perm=True, ignore_perms=False):
+    formatted_perms = []
+    if perms is None:
+        if not ignore_perms:
+            raise RuntimeError("Must provide perms or explicitly ignore")
+    else:
+        if not isinstance(perms, list):
+            perms = [perms]
+
+        # in some cases, `perms` can have a `model.` prefix
+        for perm in perms:
+            if len(perm.split(".")) > 1:
+                formatted_perms.append(perm.split(".")[1])
+            else:
+                formatted_perms.append(perm)
+
+    permitted_nodegroups = {}
+    NodegroupPermissionsChecker = CachedObjectPermissionChecker(
+        user_or_group,
+        NodeGroup,
+    )
+
+    for nodegroup in NodeGroup.objects.all():
+        explicit_perms = NodegroupPermissionsChecker.get_perms(nodegroup)
+
+        if len(explicit_perms):
+            if ignore_perms:
+                permitted_nodegroups[nodegroup] = explicit_perms
+            elif any_perm:
+                if len(set(formatted_perms) & set(explicit_perms)):
+                    permitted_nodegroups[nodegroup] = explicit_perms
+            else:
+                if set(formatted_perms) == set(explicit_perms):
+                    permitted_nodegroups[nodegroup] = explicit_perms
+        else:  # if no explicit permissions, object is considered accessible by all with group permissions
+            permitted_nodegroups[nodegroup] = set()
+
+    return permitted_nodegroups
