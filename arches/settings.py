@@ -332,7 +332,7 @@ AUTHENTICATION_BACKENDS = (
     "oauth2_provider.backends.OAuth2Backend",
     #"dauthz.backends.CasbinBackend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    #"arches.app.utils.permission_backend.PermissionBackend",
+    "arches.app.permissions.arches_standard.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
