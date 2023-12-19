@@ -285,7 +285,9 @@ class Graph(models.GraphModel):
         node -- a dictionary representing a Node instance or an actual models.Node instance
 
         """
-        if not isinstance(node, models.Node):
+        if isinstance(node, models.Node):
+            node.implode_domain_options()
+        else:
             nodeobj = node.copy()
             node = models.Node()
             node.nodeid = nodeobj.get("nodeid", None)
@@ -318,6 +320,8 @@ class Graph(models.GraphModel):
                     node.nodegroup.parentnodegroupid = nodegroups[str(node.nodegroup_id)]["parentnodegroup_id"]
             else:
                 node.nodegroup = None
+
+            node.explode_domain_options()
 
         node.graph = self
 

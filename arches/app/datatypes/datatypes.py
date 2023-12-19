@@ -1886,7 +1886,7 @@ class BaseDomainDataType(BaseDataType):
         for option in node.config["options"]:
             if option["id"] == option_id:
                 return get_localized_value(option["text"], return_lang=return_lang)
-        raise Exception(_("No domain option found for option id {0}, in node conifg: {1}".format(option_id, node.config["options"])))
+        raise Exception(_("No domain option found for option id {0}, in node config: {1}".format(option_id, node.config["options"])))
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
@@ -1931,7 +1931,7 @@ class DomainDataType(BaseDomainDataType):
         if value is not None:
             try:
                 uuid.UUID(str(value))
-                found_option = len(models.Node.objects.filter(config__contains={"options": [{"id": value}]})) > 0
+                found_option = models.Node.objects.filter(config__contains={"options": [{"id": value}]}).exists()
             except ValueError as e:
                 found_option = True if self.get_option_id_from_text(value) is not None else False
 

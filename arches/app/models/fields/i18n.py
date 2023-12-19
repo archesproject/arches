@@ -4,6 +4,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
+from django.db.models.expressions import BaseExpression
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
@@ -54,7 +55,7 @@ class I18n_String(NothingNode):
         """
         The "as_sql" method of this class is called by Django when the sql statement
         for each field in a model instance is being generated.
-        If we're inserting a new value then we can just set the localzed column to the json object.
+        If we're inserting a new value then we can just set the localized column to the json object.
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
@@ -246,6 +247,8 @@ class I18n_JSON(NothingNode):
             ret = value.raw_value
         elif isinstance(value, dict):
             ret = value
+        elif isinstance(value, BaseExpression):
+            raise NotImplementedError("Bulk updates are not supported for I18n_JSON fields.")
         self.raw_value = ret
 
         if "i18n_properties" in self.raw_value:
@@ -259,7 +262,7 @@ class I18n_JSON(NothingNode):
         """
         The "as_sql" method of this class is called by Django when the sql statement
         for each field in a model instance is being generated.
-        If we're inserting a new value then we can just set the localzed column to the json object.
+        If we're inserting a new value then we can just set the localized column to the json object.
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
@@ -317,7 +320,7 @@ class I18n_JSON(NothingNode):
     def __iter__(self):
         return self.raw_value.__iter__()
 
-    # Use this to call all the sting methods on our class so
+    # Use this to call all the string methods on our class so
     # this class can emulate the "string" type
     # see https://docs.python.org/3/reference/datamodel.html?emulating-container-types#emulating-container-types
     def __getattr__(self, name):

@@ -20,13 +20,14 @@ import django.utils.timezone
 
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
-from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.fields.i18n import I18n_TextField, I18n_JSON, I18n_JSONField
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template, render_to_string
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
@@ -197,6 +198,24 @@ class Concept(models.Model):
     class Meta:
         managed = True
         db_table = "concepts"
+
+
+class DomainValue(models.Model):
+    domainvalueid = models.UUIDField(primary_key=True)
+    node = models.ForeignKey("Node", on_delete=models.CASCADE, db_column="nodeid", related_name="domain_values")
+    text = I18n_JSONField()
+    selected = models.BooleanField()
+    fn = models.CharField(max_length=127, default="arches.app.datatypes.datatypes.DomainDataType")
+
+    class Meta:
+        managed = True
+        db_table = "domain_value"
+        indexes = [models.Index(fields=["node"])]
+
+    def clean(self):
+        fns_for_node = self.__class__.objects.filter(node_id=self.node_id).values_list("fn", flat=True)
+        if fns_for_node and self.fn not in fns_for_node:
+            raise ValidationError("Domain values for a node must share the same i18n function.")
 
 
 class DDataType(models.Model):
@@ -707,6 +726,39 @@ class Node(models.Model):
             if new_id not in old_ids:
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
+
+    def explode_domain_options(self):
+        if self.datatype not in ("domain-value", "domain-value-list"):
+            return
+
+        self.domain_values.all().delete()
+        for option in I18n_JSON(self.config).to_localized_object()["options"]:
+            val = DomainValue(
+                pk=option["id"],
+                node=self,
+                text=option["text"],
+                selected=option["selected"],
+                fn=self.config["i18n_config"]["fn"],
+            )
+            val.save()
+
+        self.config = {}
+        # cannot bulk_update(), raises NotImplementedError
+        self.save(update_fields=["config"])
+
+    def implode_domain_options(self):
+        if self.datatype not in ("domain-value", "domain-value-list"):
+            return
+        self.config["options"] = []
+        for option in self.domain_values.all():
+            self.config["i18n_config"] = {"fn": option.fn}
+            self.config["options"].append(
+                {
+                    "id": str(option.pk),
+                    "text": option.text.get(option.text.lang, "") if isinstance(option.text, I18n_JSON) else option.text,
+                    "selected": option.selected,
+                }
+            )
 
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)

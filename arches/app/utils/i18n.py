@@ -58,7 +58,7 @@ def get_localized_value(obj, lang=None, return_lang=False):
 
 
     If lang is specified it will return the value of the string with that language key
-    or th string
+    or the string
 
     Arguments:
     obj -- (required) a localized object or a simple string
@@ -71,7 +71,7 @@ def get_localized_value(obj, lang=None, return_lang=False):
 
     Returns:
         the value of the string in "obj" that was keyed to the requested language
-        or an obj with just a single languag
+        or an obj with just a single language
 
     Examples:
         if obj = {"en": "tree", "es": "arbol"} and lang is "es" then will reutrn "arbol"
