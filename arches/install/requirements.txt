@@ -1,17 +1,17 @@
-Django==4.2.4
-psycopg2==2.9.6
+Django==4.2.8
+psycopg2==2.9.9
 urllib3<2
 elasticsearch>=8.3.1,<9.0.0
 rdflib==4.2.2
 django-guardian==2.4.0
 python-memcached==1.59
-celery==5.2.7
+celery==5.3.6
 django-celery-results==2.5.1
 mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.5
 django-recaptcha==3.0.0
 edtf==4.0.1
-arches-django-revproxy==0.10.0
+django-revproxy==0.12.0
 django-cors-headers==4.2.0
 django-oauth-toolkit==1.7.0
 polib==1.1.1
@@ -37,3 +37,4 @@ pyjwt[crypto]
 semantic-version==2.10.0
 tzdata==2023.3
 pytz==2023.3
+django-ratelimit==4.1.0

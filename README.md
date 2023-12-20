@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.4.2 release notes](https://github.com/archesproject/arches/blob/dev/7.4.x/releases/7.4.2.md)
+[Version 7.5.0 release notes](https://github.com/archesproject/arches/blob/stable/7.5.0/releases/7.5.0.md)
 
 #### Quick Install
 
@@ -72,16 +72,15 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Improved Bulk Data Manager data edting
 - Workflow history tracking
 - Image configuration of file-list datatype
-- Perfomance Improvements
-- Support for component authoring in Vue Javascript framework
+- Performance Improvements
+- Support for compiling Vue components
+- Display of file thumbnails for formats other than images
 
-## 7.6 - Release date: June 15, 2024
+## 7.6 LTS - Release date: June 15, 2024
 - Activity stream edit logs
-- User specific saved searches
 - Security enhancements
 
 ## 8.0 - Release date: December 15, 2024
-- Migrate Arches UI Framework
 - Support for editing and publishing graphs (removing instance restrictions)
 - Support for viewing and restoring previous graph publications
 - Support for editing/localizing UI labels and permissions for published graphs

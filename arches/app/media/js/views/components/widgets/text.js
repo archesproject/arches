@@ -82,6 +82,9 @@ define([
                 self.currentDefaultDirection('ltr');
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
             }
+            if (ko.unwrap(self.placeholder) && (typeof ko.unwrap(self.placeholder) !== "string")) {
+                self.placeholder(self.placeholder()[self.currentLanguage().code]);
+            }
         };
 
         init();
@@ -138,6 +141,10 @@ define([
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
+
+            if(!currentValue?.[currentLanguage.code]){
+                currentValue[currentLanguage.code] = {};
+            }
             currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
             
             if (ko.isObservable(self.value)) {

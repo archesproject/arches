@@ -7,8 +7,9 @@ define([
     'viewmodels/alert',
     'search-components',
     'views/base-manager',
+    'utils/aria',
     'datatype-config-components'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView) {
+], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, ariaUtils) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -110,21 +111,23 @@ define([
             };
         };
     };
-
+    
     var SearchView = BaseManagerView.extend({
         initialize: function(options) {
             this.viewModel.sharedStateObject = new CommonSearchViewModel();
             this.viewModel.total = ko.observable();
+            this.viewModel.hits = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.viewModel.sharedStateObject.resources = this.viewModel.resources;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
+            this.shiftFocus = ariaUtils.shiftFocus;
             this.queryString = ko.computed(function() {
                 return JSON.stringify(this.query());
             }, this);
-
+            
             this.queryString.subscribe(function() {
                 this.doQuery();
             }, this);
@@ -161,11 +164,13 @@ define([
                     this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
                     this.viewModel.sharedStateObject.userid(response.userid);
                     this.viewModel.total(response.total_results);
+                    this.viewModel.hits(response.results.hits.hits.length);
                     this.viewModel.alert(false);
                 },
                 error: function(response, status, error) {
+                    const alert = new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseJSON?.message);
                     if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseText));
+                        this.viewModel.alert(alert);
                     }
                 },
                 complete: function(request, status) {

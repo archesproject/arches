@@ -7,7 +7,6 @@ import uuid
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
-import imp
 import logging
 from arches.setup import unzip_file
 from arches.management.commands import utils
@@ -316,7 +315,7 @@ class Command(BaseCommand):
                 path = utils.get_valid_path(options["config_file"])
                 mapping = json.load(open(path, "r"))
                 graphid = mapping["resource_model_id"]
-                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
+                management.call_command("es", "index_resources_by_type", resource_types=[graphid], recalculate_descriptors=True)
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
@@ -798,14 +797,19 @@ class Command(BaseCommand):
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(components[0]))
 
-                modules = glob.glob(os.path.join(extension, "*.json"))
+                modules = []
+                if not os.path.isdir(extension):
+                    modules.append(extension)
+                modules.extend(glob.glob(os.path.join(extension, "*.json")))
                 modules.extend(glob.glob(os.path.join(extension, "*.py")))
 
                 if len(modules) > 0:
+                    if os.path.exists(module_dir) is False:
+                        os.mkdir(module_dir)
                     dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
                     if os.path.exists(dest_path) is False:
                         module = modules[0]
-                        shutil.copy(module, module_dir)
+                        shutil.copy(module, dest_path)
                         management.call_command(cmd, "register", source=module)
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(modules[0]))
@@ -815,10 +819,14 @@ class Command(BaseCommand):
             root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
             dest_dir = os.path.join(root, "search_indexes")
 
+            if index_files:
+                module_name = "package_settings"
+                file_path = os.path.join(settings.APP_ROOT, "package_settings.py")
+                utils.load_source(module_name, file_path)
+
             for index_file in index_files:
                 shutil.copy(index_file, dest_dir)
-                package_settings = imp.load_source("", os.path.join(settings.APP_ROOT, "package_settings.py"))
-                for index in package_settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                for index in sys.modules[module_name].ELASTICSEARCH_CUSTOM_INDEXES:
                     es_index = import_class_from_string(index["module"])(index["name"])
                     es_index.prepare_index()
 
@@ -974,7 +982,7 @@ class Command(BaseCommand):
         load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
-            management.call_command("es", "reindex_database")
+            management.call_command("es", "reindex_database", recalculate_descriptors=True)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
@@ -1241,7 +1249,7 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 print(os.path.join(path))
-                with open(path, "rU") as f:
+                with open(path, "r") as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
                     errors.extend(errs)
@@ -1249,7 +1257,7 @@ class Command(BaseCommand):
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith(".json")]
                 for file_path in file_paths:
                     print(os.path.join(path, file_path))
-                    with open(os.path.join(path, file_path), "rU") as f:
+                    with open(os.path.join(path, file_path), "r") as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
                         errors.extend(errs)
@@ -1386,6 +1394,6 @@ class Command(BaseCommand):
 
         for path in source:
             if os.path.isfile(os.path.join(path)):
-                with open(path, "rU") as f:
+                with open(path, "r") as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)

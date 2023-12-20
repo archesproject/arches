@@ -153,9 +153,9 @@
 {% endblock task_details %}
 
 {% block etl_status %}
-<div style="margin-bottom: 20px;">
-    <h4>
-        <span data-bind="text: $root.translations.importSingleCsv"></span>
+<div class="bulk-load-status" style="margin-bottom: 20px;">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.singleCsvImportSummary"></span>
     </h4>
     <!-- ko if: loadDetails -->
     <!-- ko ifnot: loading() -->

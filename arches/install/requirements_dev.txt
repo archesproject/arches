@@ -2,5 +2,4 @@ livereload
 sst
 coverage
 sauceclient
-mock==2.0.0
 django-silk==4.2.0
