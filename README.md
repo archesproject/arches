@@ -1,4 +1,4 @@
-# Arches
+7# Arches
 
 Arches is a web-based, geospatial information system for cultural heritage inventory and management. Arches is purpose-built for the international cultural heritage field, and designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts. For more information and background on the Arches project, please visit [archesproject.org](http://archesproject.org/).
 
@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 6.2.6 release notes](https://github.com/archesproject/arches/blob/dev/6.2.x/releases/6.2.7.md)
+[Version 6.2.7 release notes](https://github.com/archesproject/arches/blob/dev/6.2.x/releases/6.2.7.md)
 
 #### Quick Install
 
