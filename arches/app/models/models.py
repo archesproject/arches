@@ -855,21 +855,21 @@ class Node(models.Model):
         )
 
     def get_relatable_resources(self):
-        relatable_resource_ids = [
-            r2r.resourceclassfrom
-            for r2r in Resource2ResourceConstraint.objects.filter(
-                resourceclassto_id=self.nodeid
+        return [
+            (
+                constraint.resourceclassto
+                if constraint.resourceclassfrom_id == self.pk
+                else constraint.resourceclassfrom
             )
-            if r2r.resourceclassfrom is not None
-        ]
-        relatable_resource_ids = relatable_resource_ids + [
-            r2r.resourceclassto
-            for r2r in Resource2ResourceConstraint.objects.filter(
-                resourceclassfrom_id=self.nodeid
+            for constraint in (
+                self.resxres_contstraint_classes_from.filter(
+                    resourceclassto__isnull=False
+                )
+                | self.resxres_contstraint_classes_to.filter(
+                    resourceclassfrom__isnull=False
+                )
             )
-            if r2r.resourceclassto is not None
         ]
-        return relatable_resource_ids
 
     def set_relatable_resources(self, new_ids):
         old_ids = [res.nodeid for res in self.get_relatable_resources()]
