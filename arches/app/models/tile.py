@@ -341,6 +341,10 @@ class Tile(models.TileModel):
             except TypeError: # will catch if serialized_graph is None
                 node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
+            parameters = {}
+            for bag in (request.GET, request.POST):
+                for key in bag:
+                    parameters[key] = bag[key]
             error = datatype.validate(value, node=node, strict=strict, request=request)
             tile_errors += error
             for error_instance in error:
@@ -385,7 +389,11 @@ class Tile(models.TileModel):
             except:
                 node = models.Node.objects.get(nodeid=nodeid)
             datatype = self.datatype_factory.get_instance(node.datatype)
-            datatype.post_tile_save(self, nodeid, request.GET if request else request)
+            datatype.post_tile_save(self, nodeid, {
+                "GET": request.GET if request else {},
+                "POST": request.POST if request else {},
+                "FILES": request.FILES if request else {}
+            }, request.user if request else None)
 
     def save(self, *args, **kwargs):
         request = kwargs.pop("request", None)
