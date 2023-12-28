@@ -432,6 +432,16 @@ class TileTests(ArchesTestCase):
 
         self.assertEqual(len(Tile.objects.all()), 0)
 
+    def test_delete_empty_tile(self):
+        tile = Tile({
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {},
+        })
+        tile.delete()
+
     def test_provisional_deletion(self):
         """
         Tests that a tile is NOT deleted if a user does not have the
