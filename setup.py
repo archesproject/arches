@@ -34,7 +34,7 @@ setup(
     scripts=["arches/install/arches-project", "arches/install/arches-admin"],
     cmdclass={"install": post_install},
     install_requires=requirements,
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -47,8 +47,6 @@ setup(
         "Intended Audience :: Information Technology",
         "Topic :: Software Development :: Build Tools",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Framework :: Django :: 4.2",
