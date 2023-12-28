@@ -18,11 +18,8 @@ details = {
 }
 
 
-def get_permitted_graphids(permitted_nodegroups):
-    permitted_graphids = set()
-    for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
-        permitted_graphids.add(str(node.graph_id))
-    return permitted_graphids
+def get_permitted_graphids(user, permitted_nodegroups):
+    return get_resource_types_by_perm(user, "read_nodegroup")
 
 
 class ResourceTypeFilter(BaseSearchFilter):
@@ -36,7 +33,7 @@ class ResourceTypeFilter(BaseSearchFilter):
                 str(resourceTypeFilter["graphid"]) for resourceTypeFilter in resourceTypeFilters
             ]
         else:
-            permitted_graphids = get_permitted_graphids(permitted_nodegroups)
+            permitted_graphids = get_permitted_graphids(self.user, permitted_nodegroups)
 
         for resourceTypeFilter in resourceTypeFilters:
             graphid = str(resourceTypeFilter["graphid"])

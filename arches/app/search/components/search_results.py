@@ -32,7 +32,7 @@ class SearchResultsFilter(BaseSearchFilter):
         except (KeyError, IndexError):
             if self.user is not True:
                 resource_model_filter = Bool()
-                permitted_graphids = get_permitted_graphids(permitted_nodegroups)
+                permitted_graphids = get_permitted_graphids(self.user, permitted_nodegroups)
                 terms = Terms(field="graph_id", terms=list(permitted_graphids))
                 resource_model_filter.filter(terms)
                 search_results_object["query"].add_query(resource_model_filter)
