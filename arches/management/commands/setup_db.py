@@ -188,6 +188,11 @@ To create it, use:
             self.drop_and_recreate_db(cursor)
         else:
             self.reset_db(cursor)
+
+        # ensure a fresh connection is created for anything that previously tried to use DB.
+        from django.db import connection
+        connection.close()
+
         # delete existing indexes
         management.call_command("es", operation="delete_indexes")
 
