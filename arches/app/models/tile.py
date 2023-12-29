@@ -545,8 +545,8 @@ class Tile(models.TileModel):
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid, index=index)
 
-                    resource = Resource.objects.get(pk=self.resourceinstance_id)
-                    resource.save_descriptors()
+                resource = Resource.objects.get(pk=self.resourceinstance_id)
+                resource.save_descriptors()
 
                 if index:
                     self.index(resource=resource)
