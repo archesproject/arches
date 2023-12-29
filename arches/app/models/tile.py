@@ -308,7 +308,7 @@ class Tile(models.TileModel):
 
                     first_card_x_node_x_widget = node.cardxnodexwidget_set.first()
                     if first_card_x_node_x_widget:
-                        missing_nodes.append(first_card_x_node_x_widget.label)
+                        missing_nodes.append(str(first_card_x_node_x_widget.label))
                     else:
                         missing_nodes.append(node.name)
             except Exception:
