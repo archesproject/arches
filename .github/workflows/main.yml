@@ -28,9 +28,9 @@ jobs:
       - name: Install Java, GDAL, and other system dependencies
         run: |
           sudo apt update
-          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev
+          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt
           echo Postgres and ES dependencies installed
-          
+
       - name: Install python packages
         run: |
           python -m pip install --upgrade pip
