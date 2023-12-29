@@ -33,7 +33,7 @@ from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, ResourceXResource, TileModel
+from arches.app.models.models import CardModel, CardXNodeXWidget, Node, NodeGroup, ResourceXResource, TileModel, Widget
 
 
 # these tests can be run from the command line via
@@ -627,5 +627,22 @@ class TileTests(ArchesTestCase):
         }
         tile = Tile(json)
 
-        with self.assertRaises(TileValidationError):
+        with self.assertRaisesMessage(TileValidationError, "Required file list"):  # node name
+            tile.check_for_missing_nodes()
+
+        # Add a widget label, should appear in error msg in lieu of node name
+        card = CardModel.objects.create(
+            nodegroup=node_group,
+            graph_id=UUID("2f7f8e40-adbc-11e6-ac7f-14109fd34195"),
+        )
+        self.addCleanup(card.delete)
+        x = CardXNodeXWidget.objects.create(
+            card=card,
+            node_id=required_file_list_node.nodeid,
+            widget=Widget.objects.first(),
+            label="Widget name",
+        )
+        self.addCleanup(x.delete)
+
+        with self.assertRaisesMessage(TileValidationError, "Widget name"):
             tile.check_for_missing_nodes()

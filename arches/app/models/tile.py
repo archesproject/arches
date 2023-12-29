@@ -303,14 +303,12 @@ class Tile(models.TileModel):
                 datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.clean(self, nodeid)
                 if self.data[nodeid] is None and node.isrequired is True:
-                    cardxnodexwidgets = None
-                    try:
-                        cardxnodexwidgets = node.cardxnodexwidget_set.all()
-                    except:
+                    if not isinstance(node, models.Node):
                         node = models.Node.objects.get(nodeid=nodeid)
 
-                    if cardxnodexwidgets is not None and len(cardxnodexwidgets) > 0:
-                        missing_nodes.append(cardxnodexwidgets[0].label)
+                    first_card_x_node_x_widget = node.cardxnodexwidget_set.first()
+                    if first_card_x_node_x_widget:
+                        missing_nodes.append(first_card_x_node_x_widget.label)
                     else:
                         missing_nodes.append(node.name)
             except Exception:
@@ -769,4 +767,4 @@ class TileValidationError(Exception):
 class TileCardinalityError(TileValidationError):
     def __init__(self, message, code=None):
         super(TileCardinalityError, self).__init__(message, code)
-        self.title = _("Tile Cardinaltiy Error")
+        self.title = _("Tile Cardinality Error")
