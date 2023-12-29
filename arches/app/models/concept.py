@@ -64,7 +64,7 @@ class Concept(object):
                 try:
                     uuid.UUID(args[0])
                     self.get(args[0])
-                except (ValueError):
+                except ValueError:
                     self.load(JSONDeserializer().deserialize(args[0]))
             elif isinstance(args[0], dict):
                 self.load(args[0])
@@ -123,7 +123,6 @@ class Concept(object):
         pathway_filter=None,
         **kwargs,
     ):
-
         if id != "":
             self.load(models.Concept.objects.get(pk=id))
         elif legacyoid != "":
@@ -509,8 +508,8 @@ class Concept(object):
 
         # this interpolation is safe because `relationtypes` is hardcoded in all calls, and not accessible via the API
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        offset_clause = " limit %(limit)s offset %(offset)s" if offset else ""
-        depth_clause = " and depth < %(depth_limit)s" if depth_limit else ""
+        offset_clause = " limit %(limit)s offset %(offset)s" if offset is not None else ""
+        depth_clause = " and depth < %(depth_limit)s" if depth_limit is not None else ""
 
         cursor = connection.cursor()
 
@@ -934,7 +933,10 @@ class Concept(object):
                 delete_concept_values_index(concepts_to_delete)
 
     def concept_tree(
-        self, top_concept="00000000-0000-0000-0000-000000000001", lang=settings.LANGUAGE_CODE, mode="semantic",
+        self,
+        top_concept="00000000-0000-0000-0000-000000000001",
+        lang=settings.LANGUAGE_CODE,
+        mode="semantic",
     ):
         class concept(object):
             def __init__(self, *args, **kwargs):
@@ -1091,7 +1093,11 @@ class Concept(object):
                         }
                     )
                     links.append(
-                        {"target": current_concept.id, "source": parent.id, "relationship": "broader", }
+                        {
+                            "target": current_concept.id,
+                            "source": parent.id,
+                            "relationship": "broader",
+                        }
                     )
                     get_parent_nodes_and_links(parent, _cache)
 
@@ -1107,13 +1113,21 @@ class Concept(object):
 
         for child in self.subconcepts:
             nodes.append(
-                {"concept_id": child.id, "name": child.get_preflabel(lang=lang).value, "type": "Descendant", }
+                {
+                    "concept_id": child.id,
+                    "name": child.get_preflabel(lang=lang).value,
+                    "type": "Descendant",
+                }
             )
             links.append({"source": self.id, "target": child.id, "relationship": "narrower"})
 
         for related in self.relatedconcepts:
             nodes.append(
-                {"concept_id": related.id, "name": related.get_preflabel(lang=lang).value, "type": "Related", }
+                {
+                    "concept_id": related.id,
+                    "name": related.get_preflabel(lang=lang).value,
+                    "type": "Related",
+                }
             )
             links.append({"source": self.id, "target": related.id, "relationship": "related"})
 
@@ -1321,7 +1335,7 @@ class ConceptValue(object):
                 try:
                     uuid.UUID(args[0])
                     self.get(args[0])
-                except (ValueError):
+                except ValueError:
                     self.load(JSONDeserializer().deserialize(args[0]))
             elif isinstance(args[0], object):
                 self.load(args[0])
@@ -1438,7 +1452,6 @@ def get_preflabel_from_conceptid(conceptid, lang):
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):
-
     def exact_val_match(val, conceptid=None):
         # exact term match, don't care about relevance ordering.
         # due to language formating issues, and with (hopefully) small result sets
@@ -1448,7 +1461,12 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
         else:
             return {
                 "query": {
-                    "bool": {"filter": [{"match_phrase": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}
+                    "bool": {
+                        "filter": [
+                            {"match_phrase": {"value": val}},
+                            {"term": {"conceptid": conceptid}},
+                        ]
+                    }
                 }
             }
 
