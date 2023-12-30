@@ -49,6 +49,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Framework :: Django :: 4.2",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
