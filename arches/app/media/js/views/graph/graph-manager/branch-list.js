@@ -3,9 +3,8 @@ define([
     'underscore',
     'knockout',
     'views/list',
-    'views/graph/graph-manager/graph-base',
     'models/graph',
-], function($, _, ko, ListView, GraphBase, GraphModel) {
+], function($, _, ko, ListView, GraphModel) {
     var BranchList = ListView.extend({
         /**
         * A backbone view to manage a list of branch graphs
@@ -38,8 +37,6 @@ define([
                 });
                 this.items.push(branch);
             }, this);
-            this.selectedBranch = ko.observable(null);
-            this.viewMetadata = ko.observable(false);
             this.loadingBranchDomains = ko.observable(false);
 
             this.filtered_items = ko.pureComputed(function() {
@@ -109,29 +106,6 @@ define([
             }, this);
         },
 
-        /**
-        * Sets the selected branch from the users selection
-        * @memberof BranchList.prototype
-        * @param {object} item - the branch object the user selected
-        * @param {object} evt - click event object
-        */
-        selectItem: function(item, evt){
-            ListView.prototype.selectItem.apply(this, arguments);
-            if (item.isactive) {
-
-                if(item.selected()){
-                    this.selectedBranch(item);
-                    this.graph = new GraphBase({
-                        el: $('#branch-preview'),
-                        graphModel: item.graphModel
-                    });
-                    this.viewMetadata(true);
-                }else{
-                    this.selectedBranch(null);
-                    this.viewMetadata(false);
-                }
-            }
-        },
 
         /**
         * Appends the currently selected branch onto the currently selected node in the graph
@@ -161,8 +135,6 @@ define([
         */
         closeForm: function(){
             this.clearSelection();
-            this.selectedBranch(null);
-            this.viewMetadata(false);
             this.trigger('close');
         },
 
