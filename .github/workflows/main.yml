@@ -51,6 +51,9 @@ jobs:
 
       - name: Webpack frontend files
         run: |
+          echo "Removing yarn.lock due to yarn v1 package resolution issues"
+          echo "https://github.com/iarna/wide-align/issues/63"
+          rm yarn.lock
           yarn && yarn build_test
 
       - name: Check for missing migrations
