@@ -26,6 +26,7 @@ from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
+from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
@@ -1481,7 +1482,7 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
     message = models.TextField(blank=True, null=True)
-    context = JSONField(blank=True, null=True, default=dict)
+    context = JSONField(blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
     # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
@@ -1548,7 +1549,12 @@ class UserXNotificationType(models.Model):
 def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if email server exists"""
 
-    if instance.notif.notiftype is not None and instance.isread is False:
+    if (
+        instance.notif.notiftype is not None
+        and instance.isread is False
+        and instance.notif.context is not None
+        and ("email" in instance.notif.context)
+    ):
         if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
             return False
 
