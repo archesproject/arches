@@ -71,12 +71,15 @@
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "~2.0.16",
-        "select2": "3.5.1",
         "select-woo": "jadu/selectWoo",
+        "select2": "3.5.1",
         "underscore": "~1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.3.4",
         "webpack-bundle-tracker": "^1.4.0"
+    },
+    "resolutions": {
+        "node-gyp": "^10.0.0"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
