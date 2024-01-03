@@ -19,11 +19,17 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python 3.8
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
+
+      - name: Install Java, GDAL, and other system dependencies
+        run: |
+          sudo apt update
+          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
+          echo Postgres and ES dependencies installed
 
       - name: Install python packages
         run: |
@@ -33,11 +39,6 @@ jobs:
           pip install -r arches/install/requirements_dev.txt
           echo Python packages installed
 
-      - name: Install Java, GDAL, and other system dependencies
-        run: |
-          sudo apt update
-          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev
-          echo Postgres and ES dependencies installed
 
       - uses: ankane/setup-elasticsearch@v1
         with:
