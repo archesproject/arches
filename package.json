@@ -66,6 +66,7 @@
         "moment-timezone": "~0.5.43",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
+        "primevue": "^3.45.0",
         "proj4": "^2.3.15",
         "regenerator-runtime": "^0.13.9",
         "requirejs": "~2.3.2",
