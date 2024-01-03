@@ -1670,7 +1670,7 @@ class IIIFManifest(models.Model):
             canvas_labels_in_use = [
                 item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
             ]
-            message = _("This manifest cannot be deleted because the following canvases have resource annotations: {}").format(
+            message = _("This image service cannot be deleted because the following canvases have resource annotations: {}").format(
                 ", ".join(canvas_labels_in_use)
             )
             raise IIIFManifestValidationError(message)
