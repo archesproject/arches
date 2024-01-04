@@ -173,6 +173,34 @@
     <div class="file-chart-upload-panel">
         <div class="gallery-controls new-tile">
             <div class="dropzone-photo-upload" data-bind="dropzone: dropzoneOptions">
+                <!-- ko if: card.model.helpenabled -->
+                <span>
+                    <a class="pull-right card-help help editable-help" data-bind="click: function () {
+                        card.model.get('helpactive')(true)
+                    }" style="cursor:pointer;">
+                        <span data-bind="text: $root.translations.help"></span>
+                        <i class="fa fa-question-circle"></i>
+                    </a>
+                </span>
+                <aside id="card-help-panel" class="card-help-panel" style="display: none;" data-bind="visible: card.model.get('helpactive')">
+                    <div class="relative">
+                        <a id="add-basemap-wizard-help-close" href="#" class="help-close fa fa-times fa-lg" style="" data-bind="click: function () {
+                            card.model.get('helpactive')(false);
+                        }"></a>
+                    </div>
+                    <div id="add-basemap-wizard-help-content">
+                        <div>
+                            <div class="panel-heading">
+                                <h3 class="panel-title help-panel-title">
+                                    <span data-bind="html: card.model.get('helptitle')"></span>
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="padding: 10px 10px 15px 10px;" data-bind="html: card.model.get('helptext')">
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <!-- /ko -->
                 <div class="file-select-window">
                    <div class="bord-top pad-ver file-select">
                        <div class="" style="padding: 5px">
