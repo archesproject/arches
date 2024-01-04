@@ -1,3 +1,4 @@
+import logging
 import math
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -23,6 +24,9 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.system_settings import settings
 from django.core.cache import cache
+from django.utils.translation import get_language, gettext as _
+
+logger = logging.getLogger(__name__)
 
 
 class TimeWheel(object):
@@ -120,9 +124,14 @@ class TimeWheel(object):
             for child in root.children:
                 root.size = root.size + child.size
 
+            key = "time_wheel_config_{0}".format(user.username)
             if user.username in settings.CACHE_BY_USER:
-                key = "time_wheel_config_{0}".format(user.username)
                 cache.set(key, root, settings.CACHE_BY_USER[user.username])
+            else:
+                try:
+                    cache.set(key, root, settings.CACHE_BY_USER['default'])
+                except KeyError:
+                    logger.warning(_("CACHE_BY_USER setting does not have a 'default'. Adding a default can improve search page performance."))
 
             return root
 
