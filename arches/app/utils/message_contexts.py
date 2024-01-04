@@ -19,7 +19,10 @@ def return_message_context(greeting="",closing_text="",email=None,additional_con
 
         if settings.EXTRA_EMAIL_CONTEXT != {}:
             for k,v in settings.EXTRA_EMAIL_CONTEXT.items():
-                message_context[k] = v
+                # The value for `salutation` is a lazy translation object
+                # and must be stringified before going to the database.
+                # https://code.djangoproject.com/ticket/35071
+                message_context[k] = str(v)
 
         return message_context
 
