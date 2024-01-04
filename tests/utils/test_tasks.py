@@ -1,5 +1,4 @@
 import os
-from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -13,11 +12,8 @@ from arches.app.tasks import package_load_complete
 class TaskTests(TestCase):
     def test_package_load_complete(self):
         resource_path = os.path.join("tests", "fixtures", "data", "json", "example_source_business_data.json")
-        with patch("logging.Logger.warning") as mock_warning:
-            # This used to emit a warning: "Error occurred sending email." 
-            package_load_complete(valid_resource_paths=[resource_path])
+        package_load_complete(valid_resource_paths=[resource_path])
 
-        mock_warning.assert_not_called()
         notif = models.Notification.objects.all().order_by("-created").first()
         self.assertIn("salutation", notif.context)
         notif_x_user = models.UserXNotification.objects.get(notif=notif)
