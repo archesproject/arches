@@ -1,0 +1,10 @@
+*.pyc
+*.log
+{{app_name}}/logs
+{{app_name}}/staticfiles
+{{app_name}}/media/packages
+{{app_name}}/media/node_modules
+{{app_name}}/media/build/*
+{{app_name}}/uploadedfiles/*
+.vscode/
+CACHE
