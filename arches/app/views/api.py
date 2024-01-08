@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import site
 import sys
 import uuid
 import traceback
@@ -27,7 +28,7 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -63,10 +64,6 @@ from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils import translation
-
-
-from arches.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +106,37 @@ class APIBase(View):
 
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
+
+class GetFrontendI18NData(APIBase):
+    def get(self, request):
+        origin_entity_name = request.GET.get('originEntityName')
+
+        user_language = get_language()
+        if user_language is None:
+            user_language = "en"
+
+        language_file_path = None
+
+        if origin_entity_name == os.path.split(settings.APP_ROOT)[1]:  # settings.APP_NAME is unreliable here, so deriving it from directory structure instead
+            language_file_path = os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
+        elif bool(origin_entity_name in settings.ARCHES_APPLICATIONS):
+            application_path = os.path.split(sys.modules[origin_entity_name].__spec__.origin)[0]
+            language_file_path = os.path.join(application_path, "locale", user_language + ".json")
+        elif origin_entity_name == os.path.split(settings.ROOT_DIR)[1]:
+            language_file_path = os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+
+        if not language_file_path or not os.path.isfile(language_file_path):
+            raise FileNotFoundError()
+        
+        return JSONResponse({
+            'enabled_languages': {
+                language_tuple[0]: str(language_tuple[1])
+                for language_tuple in settings.LANGUAGES
+            },
+            'translations': json.load(open(language_file_path)),
+            "language": user_language,
+        })
+    
 
 class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
