@@ -19,7 +19,7 @@
         <!-- /ko -->
 
         <!-- ko foreach: $data.filtered_items -->
-            <div class="library-card" style="display: flex; align-items: center;" data-bind="click: $parent.selectItem.bind($parent), css:{ 'selected selected-card': $data.selected() && $data.publication_id===true, disabled: $data.publication_id === false }"> 
+            <div class="library-card" style="display: flex; align-items: center;"> 
                 <div class="library-icon" style="margin: 5px;">
                     <!-- ko if: $data.publication_id -->
                     <span class="icon-wrap icon-wrap-sm icon-circle branch-icon bg-mint" style="cursor: pointer;" data-bind="click: $parent.appendBranch.bind($parent), clickBubble: false">

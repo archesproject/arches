@@ -2,7 +2,7 @@ define([
     'jquery',
     'knockout',
     'underscore',
-    'select2'
+    'select-woo'
 ], function($, ko, _) {
     ko.bindingHandlers.select2Query = {
         init: function(el, valueAccessor, allBindingsAccessor) {
@@ -12,71 +12,129 @@ define([
             select2Config = _.defaults(select2Config, {
                 clickBubble: true,
                 multiple: false,
-                allowClear: true,
+                allowClear: false,
+                minimumResultsForSearch: 5
             });
             var value = select2Config.value;
+            var attr = allBindingsAccessor()?.attr;
+            if(!!attr && Object.hasOwn(attr, 'data-label')){
+                el.setAttribute('aria-label', attr['data-label']);
+            }
 
             ko.utils.domNodeDisposal.addDisposeCallback(el, function() {
-                $(el).select2('destroy');
+                try{
+                    $(el).selectWoo('destroy');
+                }
+                catch(e){}
+                $(el).off("select2:selecting");
+                $(el).off("select2:opening");
+                $(el).off("change");
             });
 
             var placeholder = select2Config.placeholder;
             if (ko.isObservable(placeholder)) {
                 placeholder.subscribe(function(newItems) {
                     select2Config.placeholder = newItems;
-                    $(el).select2("destroy").select2(select2Config);
-                });
+                    $(el).selectWoo(select2Config);
+                }, this);
                 select2Config.placeholder = select2Config.placeholder();
                 if (select2Config.allowClear) {
                     select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
                 }
             }
 
-            //select2Config.value = value();
-            $(el).select2(select2Config);
-
-            if (value) {
-                $(el).select2("val", value());
-                value.subscribe(function(newVal) {
-                    select2Config.value = newVal;
-                    $(el).select2("val", newVal);
-                }, this);
-                $(el).on("change", function(val) {
-                    if (val.val === "") {
-                        val.val = null;
-                    }
-                    return value(val.val);
+            var disabled = select2Config.disabled;
+            if (ko.isObservable(disabled)) {
+                disabled.subscribe(function(val) {
+                    $(el).prop("disabled", !!val);
                 });
+                select2Config.disabled = select2Config.disabled();
             }
 
-            if (ko.unwrap(select2Config.disabled)) {
-                $(el).select2("disable");
-                select2Config.disabled.subscribe(function(val){
-                    if (val === false) {
-                        $(el).select2("enable");
-                    } else {
-                        $(el).select2("disable");
-                    }
+            var data = select2Config.data;
+            if (ko.isObservable(data)) {
+                data.subscribe(function(data) {
+                    var currentSelection = $(el).select2('data').map(selected => selected.id);
+                    $(el).find("option").remove();
+                    data.forEach(data => {
+                        // add new options to the dropdown
+                        if ($(el).find("option[value='" + data.id + "']").length === 0) {
+                            // Create a DOM Option and pre-select by default
+                            var newOption = new Option(data.text, data.id, false, false);
+                            // Append it to the select
+                            $(el).append(newOption);
+                        } 
+                    });
+                    // maintain the current selection after adding new dropdown options
+                    $(el).val(currentSelection).trigger('change');
                 });
+                select2Config.data = select2Config.data();
             }
 
-            $(el).on("select2-opening", function() {
+            // this initializes the placeholder for the single select element
+            // we shouldn't have to do this but there is some issue with selectwoo
+            // specifically rendering the placeholder for resource instance widgets in adv. search
+            var renderPlaceholder = function() {
+                var renderedEle = $(el).siblings().first().find('.select2-selection__rendered');
+                var placeholderEle = renderedEle.find('.select2-selection__placeholder');
+                if (placeholderEle[0]?.innerText === "" && !select2Config.multiple){
+                    placeholderEle.remove();
+                    var placeholderHtml = document.createElement("span");
+                    var placeholderText = document.createTextNode(select2Config.placeholder);
+                    placeholderHtml.classList.add('select2-selection__placeholder');
+                    placeholderHtml.appendChild(placeholderText);
+                    renderedEle.append(placeholderHtml);
+                }
+            };
+
+            $(document).ready(function() {
+                $(el).selectWoo(select2Config);
+                
+                if (value) {
+                    value.extend({ rateLimit: 100 });
+                    // initialize the dropdown with the value
+                    $(el).val(value());
+                    $(el).trigger('change.select2'); 
+    
+                    // update the dropdown if something else changes the value
+                    value.subscribe(function(newVal) {
+                        //console.log(newVal);
+                        // select2Config.value = newVal;
+                        $(el).val(newVal);
+                        $(el).trigger('change.select2');
+
+                        if(!newVal){
+                            window.setTimeout(function(){
+                                renderPlaceholder();
+                            },300);
+                        }
+                    }, this);
+                }
+                window.setTimeout(function(){
+                    renderPlaceholder();
+                },300);
+            });
+
+            
+            $(el).on("change", function(e) {
+                let val = $(el).val();
+                if (val === "") {
+                    val = null;
+                }
+                value(val);
+            });
+            
+            $(el).on("select2:opening", function() {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');
                 }
             });
-
+            
             if (typeof select2Config.onSelect === 'function') {
-                $(el).on("select2-selecting", function(e) {
-                    select2Config.onSelect(e.choice);
+                $(el).on("select2:selecting", function(e) {
+                    select2Config.onSelect(e.params.args.data);
                 });
             }
-            if (typeof select2Config.onClear === 'function') {
-                $(el).on("select2-clearing", function(e) {
-                    select2Config.onClear(e.choice);
-                });
-            }
-
         }
     };
 

@@ -45,13 +45,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
     {% block css %}
-        <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-        <link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/slick.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/accessible-slick-theme.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/index.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/index-slider.css' %}">
         {% if app_settings.ACCESSIBILITY_MODE %}
             {% compress css %}
-                <link type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+                <link rel="stylesheet" type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" media="screen">
             {% endcompress %}
         {% endif %}
     {% endblock css%}
@@ -133,13 +136,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- Intro Section -->
             <section id="info-block-0" class="app-info-block intro-section relative">
                 <!-- Vertical Nav -->
-                <div class="vertical-nav-container-background"></div>
-
                 <nav id="cd-vertical-nav" class="vertical-nav-container" aria-label="{% trans 'Page Navigation' %}">
                     <ul class="vertical-nav-list">
                         <li class="active">
                             <a class="vertical-nav-list-link" href="#info-block-0" data-number="1" aria-label="{% trans 'Go to the top of the page' %}"
-                                data-bind="click: function() { document.QuerySelector('#info-block-0').focus; }"
+                                data-bind="click: function() { document.querySelector('#info-block-0').focus; }"
                             >
                                 <span class="vertical-nav-list-ref">{% trans "Home" %}</span>
                             </a>
@@ -162,56 +163,41 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </ul>
                 </nav>
 
-                <!-- Splash Screen -->
-                <div class="fullscreenbanner-container">
-                    <div class="fullscreenbanner">
-                        <ul style="padding: 0px;" >
-                            <!-- SLIDE 1 -->
-                            <li data-transition="fade" data-slotamount="9" data-masterspeed="0" data-title="Slide 1">
-                                <!-- MAIN IMAGE -->
-                                <div>
-                                    <img 
-                                        src="{% webpack_static 'img/landing/landing-primary.jpg' %}" 
-                                        alt="slidebg1" 
-                                        data-bgfit="cover" 
-                                        data-bgposition="center center" 
-                                        data-bgrepeat="no-repeat"
-                                    >
-
-                                    <!-- LAYERS -->
-                                    <!-- NEW LAYER -->
-                                    <div 
-                                        class="tp-caption sft start text-bold v5-splash-caption" 
-                                        delay="4500" 
-                                        data-hoffset="0"
-                                        data-y="400" 
-                                        data-speed="800" 
-                                        data-start="100" 
-                                        data-easing="Back.easeInOut" 
-                                        data-endspeed="300" 
-                                        data-x="0"
-                                    >
-                                        <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
-                                        <p>{% trans "A web and mobile platform for" %}</p>
-                                        <p style="padding-bottom: 15px;">{% trans "managing your most important resource information" %}</p>
-                                    </div>
-    
-                                    <!-- Gradient -->
-                                    <div class="image-gradient"></div>
-    
-                                    <!-- Attribution -->
-                                    <div class="image-attribution">
-                                        <span>{% trans "Image courtesy of Luis Alfonso Orellana" %}</span>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                        <div class="tp-bannertimer tp-bottom"></div>
+                <!-- Slider - Start -->
+                <div class="home-slider">
+                    <div class="slide-img-container">
+                        <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="" aria-describedby="slide1-attribution">
+                        <div class="slide-caption">
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <p>{% trans "A web and mobile platform for" %}</p>
+                            <p>{% trans "managing your most important resource information" %}</p>
+                        </div>
+                        <div id="slide1-attribution" class="slide-img-attribution">{% trans "Image courtesy of Luis Alfonso Orellana" %}</div>
                     </div>
-
-                    <!-- Down button -->
-                    <a href="#info-block-1" class="down-button" tabindex="-1"><i class="fa fa-angle-down down-button-icon"></i></a>
+                    <div class="slide-img-container">
+                        <img src="{% webpack_static 'img/landing/bhutan_tigersnest_lr.jpg' %}" alt="" aria-describedby="slide2-attribution">
+                        <div class="slide-caption">
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <p>{% trans "A web and mobile platform for" %}</p>
+                            <p>{% trans "managing your most important resource information" %}</p>
+                        </div>
+                        <div id="slide2-attribution" class="slide-img-attribution">{% trans "Taktsang Palphug Monastery (also known as Paro Takstang or Tiger's Nest Monastery), Bhutan" %}</div>
+                    </div>
+                    <div class="slide-img-container">
+                        <img src="{% webpack_static 'img/landing/potala_palace.jpg' %}" alt="" aria-describedby="slide3-attribution">
+                        <div class="slide-caption">
+                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <p>{% trans "A web and mobile platform for" %}</p>
+                            <p>{% trans "managing your most important resource information" %}</p>
+                        </div>
+                        <div id="slide3-attribution" class="slide-img-attribution">{% trans "Potala Palace in Lhasa, Tibet" %}</div>
+                    </div>
                 </div>
+                <!-- Slider - End -->
+
+                <!-- Down button -->
+                <a href="#info-block-1" class="down-button" aria-label="{% trans 'Go to content' %}"><i class="fa fa-angle-down down-button-icon"></i></a>
+
             </section>
             <!-- End Intro Section -->
 
@@ -449,10 +435,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'chosen': "{% webpack_static 'node_modules/chosen-js/chosen.jquery.min' %}",
             'knockout': "{% webpack_static 'node_modules/knockout/build/output/knockout-latest' %}",
             'bootstrap': "{% webpack_static 'node_modules/bootstrap/dist/js/bootstrap.min' %}",
+            'one-app': "{% webpack_static 'plugins/one.app' %}",
             'themepunch-tools': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min' %}",
             'themepunch-revolution': "{% webpack_static 'plugins/revolution-slider/rs-plugin/js/jquery.themepunch.revolution' %}",
             'revolution-slider': "{% webpack_static 'plugins/revolution-slider' %}",
-            'one-app': "{% webpack_static 'plugins/one.app' %}",
+            'slick': "{% webpack_static 'plugins/slick/slick.min' %}",
         },
         shim: {
             'jquery': {
@@ -464,6 +451,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'chosen': {
                 deps: ['jquery'],
             },
+            'one-app': {
+                deps: ['jquery'],
+            },
             'themepunch-tools': {
                 deps: ['jquery'],
             },
@@ -473,7 +463,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'revolution-slider': {
                 deps: ['jquery'],
             },
-            'one-app': {
+            'slick': {
                 deps: ['jquery'],
             }
         }
@@ -483,18 +473,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             'jquery',
             'knockout',
             'bootstrap',
+            'one-app',
             'themepunch-tools',
             'themepunch-revolution',
             'revolution-slider',
-            'one-app',
+            'slick',
             'bindings/chosen',
             'bindings/key-events-click',
             'views/components/language-switcher'
         ], function ($, ko) {
             $(document).ready(function () {
                 App.init();
-                RevolutionSlider.initRSfullScreen();
-
+                
                 var contentSections = $('.app-info-block'),
                     navigationItems = $('#cd-vertical-nav a');
 
@@ -528,6 +518,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         600
                     );
                 }
+
+                //slider
+                $('.home-slider').slick({
+                    arrowsPlacement: 'split',
+                    dots: true,
+                    autoplay: true,
+                    autoplaySpeed: 6000,
+                    prevArrow:`<button type='button' class='slick-prev pull-left' aria-label="{% trans 'Go to previous slide' %}"><i class='fa fa-chevron-left' aria-hidden='true'></i></button>`,
+                    nextArrow:`<button type='button' class='slick-next pull-right' aria-label="{% trans 'Go to next slide' %}"><i class='fa fa-chevron-right' aria-hidden='true'></i></button>`
+                });
 
                 var ViewModel = function () {
                      // place observables here

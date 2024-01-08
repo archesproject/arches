@@ -42,8 +42,8 @@
     </div>
 
     <div class='entry relative'>
-        <a href="javascript:void(0);" data-bind="click: function() { dismiss($parents[1]) }" class="ep-notifs-toggle ep-notifs-close">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="$root.translations.dismiss">
+        <a href="javascript:void(0);" data-bind="click: function() { dismiss($parents[1]) }, attr:{'aria-label':translations.dismiss}" role="button" class="ep-notifs-toggle ep-notifs-close">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-bind="attr:{title:translations.dismiss}">
                 <i class="fa fa-times-circle fa-sm"></i>
             </div>
         </a>

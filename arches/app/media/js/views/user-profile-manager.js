@@ -7,7 +7,8 @@ define([
     'viewmodels/alert',
     'views/base-manager',
     'views/profile-manager-data',
-    'utils/set-csrf-token'
+    'utils/set-csrf-token',
+    'bindings/key-events-click',
 ], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView, data) {
 
     var UserProfileManager = BaseManagerView.extend({
@@ -120,7 +121,7 @@ define([
                                 )
                             );
                         })
-                        .error(function(e) {
+                        .fail(function(e) {
                             self.viewModel.alert(
                                 new AlertViewModel(
                                     'ep-alert-red',

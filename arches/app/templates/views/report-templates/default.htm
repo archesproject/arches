@@ -10,7 +10,7 @@
 
     <!-- Title Block -->
     <div class="report-toolbar-preview ep-form-toolbar">
-        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
+        <div class="h4 report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></div>
 
         <!-- Tools -->
         <div class="ep-form-toolbar-tools mar-no flex">
@@ -55,7 +55,7 @@
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
             <!-- ko foreach: { data: report.cards, as: 'card' } -->
-                <!-- ko if: $parent.hideEmptyNodes() === false || card.tiles().length > 0 -->
+                <!-- ko if: ($parent.hideEmptyNodes() === false || card.tiles().length > 0) && ko.unwrap(card.model.visible) -->
                 <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
                 <div class="rp-card-section">
                     <!-- ko component: {
@@ -79,14 +79,14 @@
     {% block related_resources %}
     <div class="rp-report-section relative report-related-resources">
         <div class="rp-report-section-title">
-            <h4 class="rp-section-title"><span data-bind="text: $root.translations.relatedResources" ></span></h4>
+            <div class="h4 rp-section-title"><span data-bind="text: $root.translations.relatedResources"></span></div>
         </div>
         
         <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
         <!-- ko if: resourceData.totalRelatedResources > 0 || !$parent.hideEmptyNodes() -->
-        <h5 class="rp-tile-title">
+        <div class="h5 rp-tile-title">
             <span class="rp-tile-title-float" data-bind="text: resourceData.name"></span>
-        </h5>
+        </div>
 
         <div class="rp-card-section">
             <!-- ko foreach: { data: resourceData.loadedRelatedResources(), as: 'relatedResource' } -->

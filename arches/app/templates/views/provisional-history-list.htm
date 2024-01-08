@@ -1,11 +1,12 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
-{% block header %}
+
+{% if user_is_reviewer == False and user_can_edit %}
 
 <!-- Title -->
 <span>
-
+    {% block header %}
     <!--ko with: provisionalHistoryList -->
 
     <!-- Date Selector -->
@@ -98,3 +99,5 @@
     </div>
 </div>
 {% endblock list_wrapper %}
+
+{% endif %}

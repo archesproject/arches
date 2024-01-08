@@ -198,7 +198,6 @@ class TileData(View):
                                 t.sortorder = sortorder
                                 t.save(update_fields=["sortorder"], request=request)
                                 sortorder = sortorder + 1
-
                     return JSONResponse(data)
 
         if self.action == "delete_provisional_tile":

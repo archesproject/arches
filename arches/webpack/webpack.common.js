@@ -20,6 +20,16 @@ const { buildVueFilePathLookup } = require('./webpack-utils/build-vue-filepath-l
 module.exports = () => {
     return new Promise((resolve, _reject) => {
         const createWebpackConfig = function(data) {  // reads from application's settings.py
+            if (!data) {
+                console.error(
+                    '\x1b[31m%s\x1b[0m',  // red
+                    "Webpack did not receive application data! Aborting..."
+                )
+                return;
+            }
+            // prevents subsequent builds, this usually happens when using application containers.
+            projectSettings.stdout.removeAllListeners()
+
             const parsedData = JSON.parse(data);
             console.log('Data imported from settings.py:', parsedData)
             
