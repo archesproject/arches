@@ -42,4 +42,5 @@ pip-wheel-metadata
 *.code-workspace
 coverage.xml
 webpack-stats.json
+.DS_STORE
 CACHE

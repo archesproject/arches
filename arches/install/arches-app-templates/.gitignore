@@ -7,4 +7,6 @@
 {{app_name}}/media/build/*
 {{app_name}}/uploadedfiles/*
 .vscode/
+*.egg-info
+.DS_STORE
 CACHE
