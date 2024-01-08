@@ -55,6 +55,14 @@ DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE applica
 
 
 class ArchesTestRunner(DiscoverRunner):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs["debug_mode"] = True
+        # Unless the user has something other than the Django default, give them
+        # what they probably want.
+        if kwargs["pattern"] == "test*.py":
+            kwargs["pattern"] = "*.py"
+        super().__init__(*args, **kwargs)
+
     def setup_databases(self, **kwargs):
         ret = super().setup_databases(**kwargs)
 
@@ -77,7 +85,7 @@ class ArchesTestCase(TestCase):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
-            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "rU") as f:
+            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"], True)
             BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()

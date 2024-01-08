@@ -28,7 +28,7 @@ define([
                     self.selectedModule(val.etl_module);
                     self.fetchValidation(val.loadid);
                 } else {
-                    if (self.loadEvents().length) {
+                    if (self.loadEvents() && self.loadEvents().length) {
                         self.selectedLoadEvent(self.loadEvents()[0]);
                     }
                 }
@@ -53,7 +53,11 @@ define([
 
             this.activeTab.subscribe(val => {
                 if (val == "import") {
-                    setTimeout(this.fetchLoadEvent, 500);
+                    self.loadEvents(null);
+                    self.selectedLoadEvent(null);
+                    setTimeout(function() {
+                        self.fetchLoadEvent(1);
+                    }, 300);
                 }
             });
 
@@ -68,7 +72,10 @@ define([
                             return response.json();
                         }
                     }).then(function(data){
-                        data.events.map((event)=> { event.loading = ko.observable(false); });
+                        data.events.map((event)=> {
+                            event.loading = ko.observable(false);
+                        });
+                        
                         self.loadEvents(data.events);
                         self.paginator(data.paginator);
                         const newSelectedEventData = data.events.find(item => item.loadid === self.selectedLoadEvent().loadid);
@@ -80,9 +87,11 @@ define([
             };
 
             this.loadEvents.subscribe(function(loadEvents) {
-                const loadEventIds = loadEvents.map(loadEvent => loadEvent.loadid);
-                if (!loadEventIds.includes(self.selectedLoadEvent()?.loadid)) {
-                    self.selectedLoadEvent(loadEvents[0]);
+                if (loadEvents) {
+                    const loadEventIds = loadEvents.map(loadEvent => loadEvent.loadid);
+                    if (!loadEventIds.includes(self.selectedLoadEvent()?.loadid)) {
+                        self.selectedLoadEvent(loadEvents[0]);
+                    }    
                 }
             });
 

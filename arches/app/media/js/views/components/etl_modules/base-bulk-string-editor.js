@@ -28,19 +28,21 @@ define([
         };
 
         this.load_details = params.load_details;
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.statusDetails = this.selectedLoadEvent()?.load_description?.split("|");
+        this.showStatusDetails = ko.observable(false);
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
-        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
         this.formatTime = params.formatTime;
         this.timeDifference = params.timeDifference;
         this.config = params.config;
         this.loading(true);
         this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
-        this.selectedLanguage = ko.observable();
+        this.selectedLanguage = ko.observable(this.languages().find(lang => lang.code === arches.activeLanguage));
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
@@ -203,7 +205,14 @@ define([
                 self.numberOfResources(data.result.number_of_resources);
                 self.numberOfTiles(data.result.number_of_tiles);
             }).fail(function(err) {
-                console.log(err);
+                self.alert(
+                    new JsonErrorAlertViewModel(
+                        'ep-alert-red',
+                        err.responseJSON["data"],
+                        null,
+                        function(){}
+                    )
+                );
             }).always(function() {
                 self.previewing(false);
                 self.deleteAllFormData();

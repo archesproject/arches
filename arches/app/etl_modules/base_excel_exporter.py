@@ -1,5 +1,6 @@
 from datetime import datetime
 from io import BytesIO
+import json
 import zipfile
 from openpyxl.writer.excel import save_virtual_workbook
 from django.core.files import File as DjangoFile
@@ -30,9 +31,16 @@ class BaseExcelExporter:
                     file["file"] = file_object.path
         download_files = []
         skipped_files = []
+        files_not_found = []
         size_limit = 104857600  # 100MByte
         for file in files:
-            if file["file"].size >= size_limit:
+            if not file['file'].storage.exists(file['file'].name):
+                files_not_found.append({
+                    "name": file["name"],
+                    "url": settings.MEDIA_URL + file['file'].name,
+                    "fileid": file["file_id"]
+                })
+            elif file["file"].size >= size_limit:
                 skipped_files.append({
                     "name": file["name"],
                     "url": settings.MEDIA_URL + file['file'].name,
@@ -66,7 +74,7 @@ class BaseExcelExporter:
         zip_file.source = "branch-excel-exporter"
         zip_file.path.save(name, download)
 
-        return zip_file, download_files, skipped_files
+        return zip_file, download_files, skipped_files, files_not_found
 
     def export(self, request):
         self.loadid = request.POST.get("load_id")
@@ -78,8 +86,8 @@ class BaseExcelExporter:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "validated", self.moduleid, datetime.now(), self.userid),
+                """INSERT INTO load_event (loadid, complete, status, load_details, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, "validated", json.dumps({"graph": graph_name}), self.moduleid, datetime.now(), self.userid),
             )
 
         if use_celery:

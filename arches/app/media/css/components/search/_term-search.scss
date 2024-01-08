@@ -1,0 +1,31 @@
+.term-search-filter .select2-container--default .select2-selection--multiple {
+    .select2-selection__rendered {
+        line-height: 24px;
+    }
+
+    .select2-selection__choice {
+        line-height: 24px;
+
+        .filter-flag {
+            background-color: #30ad24;
+        }
+        
+        button.search-tag {
+            border: none;
+            background: transparent;
+            color: white;
+            vertical-align: top;
+            height: 26px;
+        
+            .fa-minus {
+                margin: 0px 2px 0px 7px;
+            }
+        }
+
+        &__remove {
+            margin: 6px 0px;
+        }
+
+
+    }
+}
