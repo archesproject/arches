@@ -12,4 +12,5 @@
 {{project_name}}/webpack/webpack-stats.json
 {{project_name}}/webpack/webpack-user-config.js
 .vscode/
+.DS_STORE
 CACHE
