@@ -47,6 +47,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
 def add_to_update_fields(kwargs, field_name):
     """
     Update the `update_field` arg inside `kwargs` (if present) in-place
@@ -390,6 +391,7 @@ class TempFile(models.Model):
         managed = True
         db_table = "files_temporary"
 
+
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
 @receiver(post_delete, sender=File)
@@ -475,6 +477,7 @@ class FunctionXGraph(models.Model):
         managed = True
         db_table = "functions_x_graphs"
         unique_together = ("function", "graph")
+
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True)
@@ -1597,11 +1600,11 @@ class MapMarker(models.Model):
 
 class Plugin(models.Model):
     pluginid = models.UUIDField(primary_key=True)
-    name = models.TextField()
+    name = I18n_TextField()
     icon = models.TextField(default=None)
     component = models.TextField()
     componentname = models.TextField()
-    config = JSONField(blank=True, null=True, db_column="config")
+    config = I18n_JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     helptemplate = models.TextField(blank=True, null=True)
@@ -1625,7 +1628,7 @@ class WorkflowHistory(models.Model):
     stepdata = JSONField(null=False, default=dict)
     componentdata = JSONField(null=False, default=dict)
     # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
-    created = models.DateTimeField(default=django.utils.timezone.now, null=False)  
+    created = models.DateTimeField(default=django.utils.timezone.now, null=False)
     user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
     completed = models.BooleanField(default=False)
 
@@ -1642,6 +1645,7 @@ class IIIFManifestValidationError(Exception):
 
     def __str__(self):
         return repr(self)
+
 
 class IIIFManifest(models.Model):
     label = models.TextField()
@@ -1782,7 +1786,7 @@ class LoadStaging(models.Model):
     nodegroup_depth = models.IntegerField(default=1)
     source_description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
-    operation = models.TextField(default='insert')
+    operation = models.TextField(default="insert")
 
     class Meta:
         managed = True
@@ -1803,6 +1807,7 @@ class LoadErrors(models.Model):
     class Meta:
         managed = True
         db_table = "load_errors"
+
 
 class SpatialView(models.Model):
     spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
