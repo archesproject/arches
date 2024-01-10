@@ -4,7 +4,7 @@
 {{app_name}}/export_deliverables
 {{app_name}}/staticfiles
 {{app_name}}/media/node_modules
-{{app_name}}/media/build/*
+{{app_name}}/media/build/
 {{app_name}}/uploadedfiles/*
 .vscode/
 *.egg-info
