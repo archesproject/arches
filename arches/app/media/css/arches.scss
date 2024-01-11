@@ -1993,7 +1993,7 @@ div.final-cons-step-separator>h4 {
     width: 75px;
     background-color: #f1f1f1;
     border-left: 1px solid #ddd;
-    z-index: 1000;
+    z-index: 500;
 }
 
 .workbench-card-sidebar-tab.disabled {
@@ -2156,10 +2156,6 @@ div.final-cons-step-separator>h4 {
 
 .workbench-card-container.workbench-card-container-sidepanel-active {
     margin-right: 400px;
-}
-
-.workbench-card-container-wrapper.workbench-card-container-sidepanel-active {
-    z-index: 249;
 }
 
 .workbench-card-sidebar-tab {
@@ -3084,14 +3080,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-bottom: 1px solid transparent;
     background-color: #37495b;
     color: inherit !important;
-}
-
-.branch-preview {
-    height: 280px;
-    width: 280px;
-    background: #fff;
-    border: 1px solid #ddd;
-    color: #123;
 }
 
 .branch-icon {
