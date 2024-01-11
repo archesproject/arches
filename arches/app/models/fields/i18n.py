@@ -15,11 +15,12 @@ class I18n_String(NothingNode):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
+        self.use_nulls = use_nulls
         self.raw_value = {}
         self.value_is_primitive = False
         self.lang = get_language() if lang is None else lang
 
-        self._parse(self.value, self.lang, use_nulls)
+        self._parse(self.value, self.lang, self.use_nulls)
 
     def _parse(self, value, lang, use_nulls):
         ret = {}
@@ -67,6 +68,22 @@ class I18n_String(NothingNode):
             self.sql = "%s"
 
         return self.sql, params
+    
+    def deconstruct(self):
+        """
+        Return enough information to recreate the field as a 4-tuple
+        see the deconstruct method on the Field type here:
+        https://github.com/django/django/blob/main/django/db/models/fields/__init__
+        """
+
+        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
+        kwargs = {
+            "value": self.value, 
+            "lang": self.lang, 
+            "use_nulls": self.use_nulls, 
+            "attname": self.attname
+        }
+        return path, (), kwargs
 
     # need this to avoid a Django error when setting
     # the default value on the i18n_TextField
