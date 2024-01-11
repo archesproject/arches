@@ -3,6 +3,7 @@ import copy
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
+from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
@@ -68,22 +69,6 @@ class I18n_String(NothingNode):
             self.sql = "%s"
 
         return self.sql, params
-    
-    def deconstruct(self):
-        """
-        Return enough information to recreate the field as a 4-tuple
-        see the deconstruct method on the Field type here:
-        https://github.com/django/django/blob/main/django/db/models/fields/__init__
-        """
-
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
-        kwargs = {
-            "value": self.value, 
-            "lang": self.lang, 
-            "use_nulls": self.use_nulls, 
-            "attname": self.attname
-        }
-        return path, (), kwargs
 
     # need this to avoid a Django error when setting
     # the default value on the i18n_TextField
@@ -427,3 +412,15 @@ class I18n_JSONField(JSONField):
         """Override to avoid the optimization from Django 4.2 that
         immediately returns `value` if it is None."""
         return self.get_db_prep_value(value, connection)
+
+
+# Register a lighter-weight serializer sufficient for generating migrations.
+class I18NFieldMigrationSerializer(BaseSerializer):
+    def serialize(self):
+        if isinstance(self.value, (I18n_String, I18n_JSONField)):
+            return f'"{self.value.serialize()}"', set()
+        return super.serialize()
+
+
+Serializer.register(I18n_String, I18NFieldMigrationSerializer)
+Serializer.register(I18n_JSONField, I18NFieldMigrationSerializer)
