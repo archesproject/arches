@@ -419,7 +419,7 @@ class I18NFieldMigrationSerializer(BaseSerializer):
     def serialize(self):
         if isinstance(self.value, (I18n_String, I18n_JSONField)):
             return f'"{self.value.serialize()}"', set()
-        return super.serialize()
+        return super().serialize()
 
 
 Serializer.register(I18n_String, I18NFieldMigrationSerializer)
