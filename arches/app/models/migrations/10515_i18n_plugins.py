@@ -8,7 +8,7 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("models", "9945_file_thumbnail_bin_file_thumbnail_text"),
+        ("models", "9946_alter_notification_context"),
     ]
 
     sql = """
