@@ -1609,3 +1609,15 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+    
+class GetNodegroupTree(APIBase):
+    """
+    Returns the path to a nodegroup from the root node. Transforms node alias to node name.
+    """
+    def get(self,request):
+        graphid = request.GET.get('graphid')
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+            result = cursor.fetchall()
+        
+        return JSONResponse({"path": result})
