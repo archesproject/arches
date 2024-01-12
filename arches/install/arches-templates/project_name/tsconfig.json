@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "jsx": "preserve",
+    "target": "ES5",
+    "lib": ["ES6", "DOM"],
+    "baseUrl": "./src/",
+    "paths": {
+      "@/*": [
+        "*.ts",
+        "*.vue",
+      ],
+    },
+    "strict": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.vue",
+  ],
+}

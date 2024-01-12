@@ -2,14 +2,18 @@
     "name": "{{ app_name }}",
     "version": "0.0.1",
     "scripts": {
+        "eslint:check": "./{{ app_name }}/media/node_modules/.bin/eslint ./src --resolve-plugins-relative-to ./media --ext .vue,.ts --parser ./{{ app_name }}/media/node_modules/vue-eslint-parser/index.js",
         "gettext:extract": "./{{ app_name }}/media/node_modules/.bin/vue-gettext-extract",
-        "gettext:compile": "./{{ app_name }}/media/node_modules/.bin/vue-gettext-compile"
+        "gettext:compile": "./{{ app_name }}/media/node_modules/.bin/vue-gettext-compile",
+        "typescript:check": "./{{ app_name }}/media/node_modules/.bin/vue-tsc --noEmit",
+        "typescript:watch": "./{{ app_name }}/media/node_modules/.bin/vue-tsc --watch --noEmit"
     },
     "dependencies": {
         "vue": "^3.3.4",
         "vue3-gettext": "^3.0.0-beta.4"
     },
     "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
     },
     "nodeModulesPaths": {
     }

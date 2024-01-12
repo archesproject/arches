@@ -2,8 +2,11 @@
     "name": "arches",
     "version": "7.6.0",
     "scripts": {
-        "gettext:extract": "./arches/app/media/node_modules/.bin/vue-gettext-extract",
-        "gettext:compile": "./arches/app/media/node_modules/.bin/vue-gettext-compile",
+        "eslint:check": ".arches/app/media/node_modules/.bin/eslint ./src --resolve-plugins-relative-to ./media --ext .vue,.ts --parser .arches/app/media/node_modules/vue-eslint-parser/index.js",
+        "gettext:extract": ".arches/app/media/node_modules/.bin/vue-gettext-extract",
+        "gettext:compile": ".arches/app/media/node_modules/.bin/vue-gettext-compile",
+        "typescript:check": ".arches/app/media/node_modules/.bin/vue-tsc --noEmit",
+        "typescript:watch": ".arches/app/media/node_modules/.bin/vue-tsc --watch --noEmit",
         "build_production": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
         "build_development": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
         "build_test": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js --env test=true",

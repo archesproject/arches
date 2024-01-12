@@ -6,6 +6,7 @@ const Path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { spawn } = require("child_process");
@@ -88,6 +89,7 @@ module.exports = () => {
 
             const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
             parsedPackageJSONFilepaths[Path.join(archesCorePackageJSON.name, 'package.json').replace(/\\/g, '/')] = archesCorePackageJSONFilepath;
+
             const parsedArchesCoreNodeModulesAliases = Object.entries(archesCorePackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
                 if (subPath.slice(0, 7) === 'plugins') {  // handles for node_modules -esque plugins in arches core
                     acc[alias] = Path.resolve(__dirname, ROOT_DIR, 'app', 'media', subPath);
@@ -99,9 +101,11 @@ module.exports = () => {
             }, {});
 
             let parsedProjectNodeModulesAliases = {};
+            let projectPackageJSON;
+
             const projectJSONFilepath = Path.resolve(__dirname, APP_ROOT, 'package.json');
             if (fs.existsSync(projectJSONFilepath)) {  // handles running Arches without a project
-                const projectPackageJSON = require(projectJSONFilepath);
+                projectPackageJSON = require(projectJSONFilepath);
                 parsedPackageJSONFilepaths[Path.join(projectPackageJSON.name, 'package.json').replace(/\\/g, '/')] = projectJSONFilepath;
 
                 parsedProjectNodeModulesAliases = Object.entries(projectPackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
@@ -118,7 +122,7 @@ module.exports = () => {
                 }, {});
             }
 
-            const parsedArchesApplicationsNodeModulesAliases = {};
+            let parsedArchesApplicationsNodeModulesAliases = {};
             for (const archesApplication of ARCHES_APPLICATIONS) {
                 try {
                     let archesApplicationJSONFilepath;
@@ -278,24 +282,9 @@ module.exports = () => {
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
                     new VueLoaderPlugin(),
-                    {
-                        apply: (compiler) => {
-                            compiler.hooks.afterEmit.tap("webpack", () => {
-                                fs.writeFile(
-                                    Path.resolve(__dirname, APP_ROOT, 'media', 'build', '.gitignore'), 
-                                    "# Ignore everything in this directory\n*\n# Except this file\n!.gitignore\n",
-                                     err => {
-                                        if (err) {
-                                            console.error(
-                                                '\x1b[31m%s\x1b[0m',  // red
-                                                err
-                                            );
-                                        }
-                                    }
-                                );
-                            });
-                        },
-                    },
+                    new ESLintPlugin({
+                        extensions: ['vue', 'ts'],
+                    }),
                 ],
                 resolveLoader: {
                     alias: {
@@ -317,8 +306,18 @@ module.exports = () => {
                 module: {
                     rules: [
                         {
+                            test: /\.tsx?$/,
+                            exclude: /node_modules/,
+                            loader: Path.join(APP_ROOT, 'media', 'node_modules', 'ts-loader'),
+                            options: { 
+                                appendTsSuffixTo: [/\.vue$/],
+                                transpileOnly: true
+                            }
+                        },
+                        {
                             test: /\.vue$/,
-                            loader: Path.join(APP_ROOT, 'media', 'node_modules', 'vue-loader'),
+                            exclude: /node_modules/,
+                            loader:Path.join(APP_ROOT, 'media', 'node_modules', 'vue-loader'),
                         },
                         {
                             test: /\.mjs$/,
@@ -336,6 +335,7 @@ module.exports = () => {
                         },
                         {
                             test: /\.css$/,
+                            exclude: /node_modules/,
                             use: [
                                 {
                                     'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'style-loader'),
@@ -347,6 +347,7 @@ module.exports = () => {
                         },
                         {
                             test: /\.scss$/i,
+                            exclude: /node_modules/,
                             use: [
                                 {
                                     'loader': MiniCssExtractPlugin.loader,
@@ -364,6 +365,7 @@ module.exports = () => {
                         },
                         {
                             test: /\.html?$/i,
+                            exclude: /node_modules/,
                             loader: Path.join(APP_ROOT, 'media', 'node_modules', 'html-loader'),
                             options: {
                                 esModule: false,
@@ -453,10 +455,12 @@ module.exports = () => {
                         },
                         {
                             test: /\.(txt|DS_Store)$/i,
+                            exclude: /node_modules/,
                             use: Path.join(APP_ROOT, 'media', 'node_modules', 'raw-loader'),
                         },
                         {
                             test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                            exclude: /node_modules/,
                             type: 'asset/resource',
                         },
                     ],
