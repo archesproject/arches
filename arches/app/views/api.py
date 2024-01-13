@@ -1482,10 +1482,18 @@ class UserIncompleteWorkflows(APIBase):
             for incomplete_workflows_user in incomplete_workflows_users
         }
 
+        plugins = models.Plugin.objects.all()
+
+        workflow_slug_to_workflow_name = {
+            plugin.slug: plugin.name 
+            for plugin in plugins
+        }
+
         incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
 
         for incomplete_workflow in incomplete_workflows_json:
             incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+            incomplete_workflow['workflowname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
 
         return JSONResponse({
             "incomplete_workflows": incomplete_workflows_json,
