@@ -116,16 +116,16 @@
                 <!-- ko if: cards().length > 0  -->
                 <!-- ko let: {uid: Math.random().toString()} -->
                 <div tabindex="0" role="button" class="search-facet-item disabled" data-bind="onEnterkeyClick, onSpaceClick, 
-                click: function () { collapsed(!collapsed()) },
-                attr: {
-                    'aria-expanded': (!collapsed()).toString(),
-                    'aria-controls': uid,
-                    'aria-label': $root.translations.resourceTypeSearchFacets(name),
-                }
-                ">
-                <div class="search-facet-item-heading">
-                    <strong data-bind="text: name"></strong>
-                    <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
+                    click: function () { collapsed(!collapsed()) },
+                    attr: {
+                        'aria-expanded': (!collapsed()).toString(),
+                        'aria-controls': uid,
+                        'aria-label': $root.translations.resourceTypeSearchFacets(name),
+                    }
+                    ">
+                    <div class="search-facet-item-heading">
+                        <strong data-bind="text: name"></strong>
+                        <span><i class="fa report-expander print-hide" data-bind="css: {'fa-angle-down': !collapsed(), 'fa-angle-right': collapsed()}"></i></span>
                     </div>
                 </div>
                 <div data-bind="visible: !collapsed()" role="list">
@@ -142,7 +142,7 @@
                                         <!-- ko foreach: { data: self.cardPath(), as: 'val' } -->
                                         <div style="display:flex;">
                                             <div data-bind="style: { 'border-bottom': '10px', 'width': function() { return ($index() * 12) + 'px'}}"></div>
-                                            <div style="width: max-content;" data-bind="text: val"></div>
+                                            <div style="width: max-content;color: #777; font-size: 1.3rem;" data-bind="text: val"></div>
                                         </div>
                                         <!-- /ko -->
                                     <!-- /ko -->
