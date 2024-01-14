@@ -3,15 +3,16 @@
     "version": "7.6.0",
     "license": "AGPL-3.0-only",
     "scripts": {
-        "eslint:check": ".arches/app/media/node_modules/.bin/eslint ./src --resolve-plugins-relative-to ./media --ext .vue,.ts --parser .arches/app/media/node_modules/vue-eslint-parser/index.js",
-        "gettext:extract": ".arches/app/media/node_modules/.bin/vue-gettext-extract",
-        "gettext:compile": ".arches/app/media/node_modules/.bin/vue-gettext-compile",
-        "typescript:check": ".arches/app/media/node_modules/.bin/vue-tsc --noEmit",
-        "typescript:watch": ".arches/app/media/node_modules/.bin/vue-tsc --watch --noEmit",
-        "build_production": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
-        "build_development": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
-        "build_test": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js --env test=true",
-        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config arches/webpack/webpack.config.dev.js"
+        "build_development": "yarn eslint:check && yarn typescript:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
+        "build_production": "yarn eslint:check && yarn typescript:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
+        "build_test": "yarn eslint:check && yarn typescript:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js --env test=true",
+        "eslint:check": "./arches/app/media/node_modules/.bin/eslint ./src --resolve-plugins-relative-to ./media --ext .vue,.ts --parser ./media/node_modules/vue-eslint-parser/index.js",
+        "eslint:watch": "./arches/app/media/node_modules/.bin/nodemon --watch ./src --ext ts,vue --exec yarn --silent eslint:check",
+        "gettext:extract": "./arches/app/media/node_modules/.bin/vue-gettext-extract",
+        "gettext:compile": "./arches/app/media/node_modules/.bin/vue-gettext-compile",
+        "typescript:check": "./arches/app/media/node_modules/.bin/vue-tsc --noEmit",
+        "typescript:watch": "./arches/app/media/node_modules/.bin/vue-tsc --watch --noEmit",
+        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config webpack/webpack.config.dev.js"
     },
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
