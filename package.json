@@ -1,6 +1,7 @@
 {
     "name": "arches",
     "version": "7.6.0",
+    "license": "AGPL-3.0-only",
     "scripts": {
         "eslint:check": ".arches/app/media/node_modules/.bin/eslint ./src --resolve-plugins-relative-to ./media --ext .vue,.ts --parser .arches/app/media/node_modules/vue-eslint-parser/index.js",
         "gettext:extract": ".arches/app/media/node_modules/.bin/vue-gettext-extract",

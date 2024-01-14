@@ -1,9 +1,19 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "jsx": "preserve",
-    "target": "ES5",
-    "lib": ["ES6", "DOM"],
+    "jsxImportSource": "vue",
+    "noImplicitThis": true,
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "baseUrl": "./src/",
     "paths": {
       "@/*": [
@@ -11,7 +21,6 @@
         "*.vue",
       ],
     },
-    "strict": true
   },
   "include": [
     "**/*.ts",

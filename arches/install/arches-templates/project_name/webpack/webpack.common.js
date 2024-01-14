@@ -6,7 +6,6 @@ const Path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
-const ESLintPlugin = require('eslint-webpack-plugin');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { spawn } = require("child_process");
@@ -15,8 +14,6 @@ const { VueLoaderPlugin } = require("vue-loader");
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
-const { buildVueFilePathLookup } = require('./webpack-utils/build-vue-filepath-lookup');
-
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
@@ -208,26 +205,12 @@ module.exports = () => {
             // END create image filepath lookup
             // BEGIN create vue filepath lookup
 
-            const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'src'), {});
-            const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'src'), {});
-
-            const archesApplicationsVuePaths = []
-            const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
+            const archesApplicationsVuePaths = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
                 const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'src');
-                archesApplicationsVuePaths.push(path);
-
-                return {
-                    ...acc,
-                    ...buildVueFilePathLookup(path, {})
-                };
-            }, {});
-
-            // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
-            const vueFilepathLookup = { 
-                ...coreArchesVuePathConfiguration,
-                ...archesApplicationsVuePathConfiguration,
-                ...projectVuePathConfiguration,
-            };
+                acc.push(path);
+                
+                return acc;
+            }, []);
 
             // END create vue filepath lookup
             // BEGIN create universal constants
@@ -282,9 +265,6 @@ module.exports = () => {
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
                     new VueLoaderPlugin(),
-                    new ESLintPlugin({
-                        extensions: ['vue', 'ts'],
-                    }),
                 ],
                 resolveLoader: {
                     alias: {
@@ -297,7 +277,6 @@ module.exports = () => {
                         ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                         ...templateFilepathLookup,
                         ...imageFilepathLookup,
-                        ...vueFilepathLookup,
                         ...nodeModulesAliases,
                         ...parsedPackageJSONFilepaths,
                         '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')]
