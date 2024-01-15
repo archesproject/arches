@@ -1485,7 +1485,7 @@ class UserIncompleteWorkflows(APIBase):
         plugins = models.Plugin.objects.all()
 
         workflow_slug_to_workflow_name = {
-            plugin.slug: plugin.name 
+            plugin.componentname: plugin.name 
             for plugin in plugins
         }
 
