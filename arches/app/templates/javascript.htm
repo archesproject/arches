@@ -928,6 +928,8 @@
         go-to-top='{% trans "Go to top of page" as goToTop %} "{{ goToTop|escapejs }}"'
         copy-node-id-to-clipboard='{% trans "Copy Node ID to Clipboard" as copyNodeIdToClipboard %} "{{ copyNodeIdToClipboard|escapejs }}"'
         copied-node-id-to-clipboard='{% trans "Copied to Clipboard!" as copiedNodeIdToClipboard %} "{{ copiedNodeIdToClipboard|escapejs }}"'
+        show-facet-path='{% trans "Show facet path" as showFacetPath %} "{{ showFacetPath|escapejs }}"'
+        hide-facet-path='{% trans "Hide facet path" as hideFacetPath %} "{{ hideFacetPath|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
@@ -1052,6 +1054,7 @@
         validatejson='"{% url "validatejson" "aaaa"%}".replace("aaaa", "")'
         get_dsl="{% url 'get_dsl' %}"
         transform_edtf_for_tile="{% url 'transform_edtf_for_tile' %}"
+        api_get_nodegroup_tree="{% url 'api_get_nodegroup_tree' %}"
     ></div>
     {% endblock arches_urls %}
     {% block arches_data %}
