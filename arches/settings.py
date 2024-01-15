@@ -762,9 +762,6 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 #   Reader to be processed. This can correct any errors in the data, or potentially do some
 #   significant series of transformations to get the data into the right form for Arches
 
-GDAL_LIBRARY_PATH = "/Applications/Postgres.app/Contents/Versions/15/lib/libgdal.dylib"
-ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
-OVERRIDE_RESOURCE_MODEL_LOCK = True
 
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
