@@ -1,1 +1,1 @@
-# arches=={{ arches_semantic_version }}
+arches=={{ arches_semantic_version }}
