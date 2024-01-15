@@ -1619,7 +1619,7 @@ class GetNodegroupTree(APIBase):
         with connection.cursor() as cursor:
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
             result = cursor.fetchall()
-            permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]  
-            permitted_result = [nodegroup for nodegroup in result if str(nodegroup[0]) in permitted_nodegroups]  
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]  
+            permitted_result = [nodegroup for nodegroup in result if nodegroup[0] in permitted_nodegroups]  
         
         return JSONResponse({"path": permitted_result})
