@@ -27,7 +27,7 @@ function buildJavascriptFilepathLookup(path, outerAcc, javascriptDirectoryPath) 
                 pathName = Path.join(parsedPath['dir'], parsedPath['name']);
             }
 
-            if (!pathName.includes('.js')) {
+            if (pathName.includes('.DS_Store')) {
                 return acc;
             }
             else {

@@ -13,7 +13,7 @@ jobs:
         image: postgis/postgis:13-3.0
         env:
           POSTGRES_PASSWORD: postgis
-          POSTGRES_DB: {{ app_name }}
+          POSTGRES_DB: package
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -31,9 +31,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           check-latest: true
 
-      - name: Webpack frontend files
+      - name: Check frontend files
         run: |
-          cd {{ app_name }}
           echo "Removing yarn.lock due to yarn v1 package resolution issues"
           echo "https://github.com/iarna/wide-align/issues/63"
           rm yarn.lock
