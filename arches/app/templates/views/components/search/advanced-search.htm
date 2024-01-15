@@ -133,7 +133,11 @@
                     <div role="listitem" style="display: flex; align-items:center;">
                         <div class="search-facet-item" style="display: flex;">
                             <div>
-                                <div style="margin-right:5px;" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: self.getNodegroupPath, class: $data.nodegroup_id == self.selectedNodegroupId() && self.expandPath() ? 'fa fa-times-circle' : 'fa fa-info-circle'"></div>
+                                <div style="margin-right:5px;" role="button" data-bind="onEnterkeyClick, onSpaceClick, click: self.getNodegroupPath, 
+                                class: $data.nodegroup_id === self.selectedNodegroupId() && self.expandPath() ? 'fa fa-times-circle' : 'fa fa-info-circle',
+                                attr: {
+                                    'aria-label': $data.nodegroup_id === self.selectedNodegroupId() && self.expandPath() ? $root.translations.hideFacetPath : $root.translations.showFacetPath
+                                }"></div>
                             </div>
                             <div>
                                 <!-- ko if: $data.nodegroup_id == self.selectedNodegroupId() && self.expandPath() -->
