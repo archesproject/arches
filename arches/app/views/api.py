@@ -1493,7 +1493,7 @@ class UserIncompleteWorkflows(APIBase):
 
         for incomplete_workflow in incomplete_workflows_json:
             incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
-            incomplete_workflow['workflowname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
+            incomplete_workflow['pluginname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
 
         return JSONResponse({
             "incomplete_workflows": incomplete_workflows_json,
