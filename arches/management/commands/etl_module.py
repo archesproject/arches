@@ -103,7 +103,8 @@ class Command(BaseCommand):
 
     def run(self, module, source, config):
         """
-        Lists registered modules
+        Run the specified module
+        Params --module, --source, and --config
 
         """
         loadid = str(uuid.uuid4())
