@@ -20,7 +20,7 @@
     </div>
     <div class="workbench-card-sidepanel-border"></div>
     <div class="workbench-card-sidepanel-body">
-    <div data-bind="css: card.model.cssclass">
+    <div data-bind="css: card.model.cssclass" style="height: 100%">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container" style="margin-left: -16px;">
@@ -47,7 +47,7 @@
 
 
 
-        <div class="new-provisional-edit-card-container">
+        <div class="new-provisional-edit-card-container" style="height: inherit">
             <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
             <div class='new-provisional-edits-list' style="margin-right: -20px">
@@ -101,7 +101,7 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
                     }, click: updateGeoJSON">
-                        <span data-bind="text: $root.translations.update"></span>
+                        <span data-bind="text: $root.translations.updateFeatures"></span>
                     </button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->

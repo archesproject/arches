@@ -12828,12 +12828,11 @@ ul.select2-choices:after {
 }
 
 .map-coordinate-editor {
-    margin-top: 15px;
+    margin-top: 5px;
 }
 
 .map-coordinate-editor-crs-selector {
-    position: fixed;
-    margin-top: 25px;
+    margin-top: 10px;
     background: #fff;
     padding-bottom: 8px;
     border-bottom: 1px solid #ddd;
@@ -12853,8 +12852,9 @@ ul.select2-choices:after {
 }
 
 .map-coordinate-editor-list {
-    padding: 0 5px;
-    margin-top: 70px;
+    padding-top: 5px;
+    padding-left: 5px;
+    overflow-y: auto;
 }
 
 .map-coordinate-editor-list a:focus i {
@@ -12898,21 +12898,18 @@ ul.select2-choices:after {
 }
 
 .map-coordinate-editor-header {
-    position: fixed;
     background: #fff;
     padding: 6px 0;
     font-size: 1.2em;
     width: 370px;
-    margin-top: -6px;
 }
 
 .map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
-    padding: 0 0px 10px 4px;
+    padding: 5px 0px 5px 4px;
 }
 
 .map-coordinate-editor-button-container {
-    position: sticky;
-    bottom: -17px;
+    display: inline-flex;
     background: #fff;
     width: 400px;
     padding: 10px 5px;
