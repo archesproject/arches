@@ -1482,10 +1482,18 @@ class UserIncompleteWorkflows(APIBase):
             for incomplete_workflows_user in incomplete_workflows_users
         }
 
+        plugins = models.Plugin.objects.all()
+
+        workflow_slug_to_workflow_name = {
+            plugin.componentname: plugin.name 
+            for plugin in plugins
+        }
+
         incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
 
         for incomplete_workflow in incomplete_workflows_json:
             incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+            incomplete_workflow['pluginname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
 
         return JSONResponse({
             "incomplete_workflows": incomplete_workflows_json,
@@ -1609,3 +1617,17 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+    
+class GetNodegroupTree(APIBase):
+    """
+    Returns the path to a nodegroup from the root node. Transforms node alias to node name.
+    """
+    def get(self,request):
+        graphid = request.GET.get('graphid')
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+            result = cursor.fetchall()
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]  
+            permitted_result = [nodegroup for nodegroup in result if nodegroup[0] in permitted_nodegroups]  
+        
+        return JSONResponse({"path": permitted_result})

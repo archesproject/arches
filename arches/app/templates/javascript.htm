@@ -930,6 +930,8 @@
         arches-logo='{% trans "Arches logo" as archesLogo %} "{{ archesLogo|escapejs }}"'
         delete-workflow-title='{% trans "Are you sure you would like to delete this workflow?" as deleteWorkflowTitle %} "{{ deleteWorkflowTitle|escapejs }}"'
         delete-workflow-warning='{% trans "All data created during the course of this workflow will be deleted." as deleteWorkflowWarning %} "{{ deleteWorkflowWarning|escapejs }}"'    
+        show-facet-path='{% trans "Show facet path" as showFacetPath %} "{{ showFacetPath|escapejs }}"'
+        hide-facet-path='{% trans "Hide facet path" as hideFacetPath %} "{{ hideFacetPath|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
     {% block arches_urls %}
@@ -1054,6 +1056,7 @@
         validatejson='"{% url "validatejson" "aaaa"%}".replace("aaaa", "")'
         get_dsl="{% url 'get_dsl' %}"
         transform_edtf_for_tile="{% url 'transform_edtf_for_tile' %}"
+        api_get_nodegroup_tree="{% url 'api_get_nodegroup_tree' %}"
     ></div>
     {% endblock arches_urls %}
     {% block arches_data %}
