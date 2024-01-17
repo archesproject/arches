@@ -115,25 +115,31 @@ class GetFrontendI18NData(APIBase):
         if user_language is None:
             user_language = "en"
 
-        language_file_path = None
+        language_file_path = []
 
         if origin_entity_name == os.path.split(settings.APP_ROOT)[1]:  # settings.APP_NAME is unreliable here, so deriving it from directory structure instead
-            language_file_path = os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
-        elif bool(origin_entity_name in settings.ARCHES_APPLICATIONS):
+            language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
+        
+        for origin_entity_name in settings.ARCHES_APPLICATIONS:
             application_path = os.path.split(sys.modules[origin_entity_name].__spec__.origin)[0]
-            language_file_path = os.path.join(application_path, "locale", user_language + ".json")
-        elif origin_entity_name == os.path.split(settings.ROOT_DIR)[1]:
-            language_file_path = os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+            language_file_path.append(os.path.join(application_path, "locale", user_language + ".json"))
+        
+        if origin_entity_name == os.path.split(settings.ROOT_DIR)[1]:
+            language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
 
-        if not language_file_path or not os.path.isfile(language_file_path):
-            raise FileNotFoundError()
+        localized_strings = {}
+        for lang_file in language_file_path:
+            try:
+                localized_strings = json.load(open(lang_file))[user_language] | localized_strings
+            except FileNotFoundError:
+                pass
         
         return JSONResponse({
             'enabled_languages': {
                 language_tuple[0]: str(language_tuple[1])
                 for language_tuple in settings.LANGUAGES
             },
-            'translations': json.load(open(language_file_path)),
+            'translations': {user_language: localized_strings},
             "language": user_language,
         })
     
