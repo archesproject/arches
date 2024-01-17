@@ -1601,7 +1601,7 @@ class MapMarker(models.Model):
 
 class Plugin(models.Model):
     pluginid = models.UUIDField(primary_key=True)
-    name = I18n_TextField()
+    name = I18n_TextField(null=True, blank=True)
     icon = models.TextField(default=None)
     component = models.TextField()
     componentname = models.TextField()
@@ -1616,7 +1616,7 @@ class Plugin(models.Model):
             self.pluginid = uuid.uuid4()
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     class Meta:
         managed = True

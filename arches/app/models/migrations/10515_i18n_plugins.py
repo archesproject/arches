@@ -45,6 +45,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="plugin",
             name="name",
-            field=arches.app.models.fields.i18n.I18n_TextField(default="", encoder=arches.app.utils.betterJSONSerializer.JSONSerializer),
+            field=arches.app.models.fields.i18n.I18n_TextField(
+                blank=True, default="", encoder=arches.app.utils.betterJSONSerializer.JSONSerializer, null=True
+            ),
         ),
     ]
