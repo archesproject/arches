@@ -17,9 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import inspect
-import json
 import os
-import sys
 from datetime import datetime, timedelta
 from contextlib import suppress
 
