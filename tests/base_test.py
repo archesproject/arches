@@ -29,7 +29,6 @@ from arches.app.utils.context_processors import app_settings
 from django.db import connection
 from django.core import management
 from django.test.runner import DiscoverRunner
-from oauth2_provider.models import Application
 
 from arches.app.search.mappings import (
     prepare_terms_index,
@@ -99,15 +98,6 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Account for the fact that some test classes may be failing to call
-        # super().tearDownClass() in their tearDownClass() implementations.
-        try:
-            Application.objects.get(id=44)
-        except Application.DoesNotExist:
-            pass
-        else:
-            return
-
         cursor = connection.cursor()
         sql = """
             INSERT INTO public.oauth2_provider_application(
