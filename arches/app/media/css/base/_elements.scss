@@ -1,3 +1,5 @@
+@import "abstracts/_functions.scss";
+
 body {
     overflow-x: hidden;
     @include break-at(small-desktop) {

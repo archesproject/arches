@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
-{% load compress %}
+{% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 
 <!DOCTYPE html>
@@ -50,12 +50,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/slick.min.css' %}">
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/accessible-slick-theme.min.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/index.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% webpack_static 'css/index-slider.css' %}">
+        {% render_bundle 'css/index' 'css' %}
+        {% render_bundle 'css/index-slider' 'css' %}
+        
         {% if app_settings.ACCESSIBILITY_MODE %}
-            {% compress css %}
-                <link rel="stylesheet" type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" media="screen">
-            {% endcompress %}
+            {% render_bundle 'css/accessibility' 'css' %}
         {% endif %}
     {% endblock css%}
 </head>

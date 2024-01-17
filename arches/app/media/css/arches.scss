@@ -1,4 +1,4 @@
-@import url(fonts/openSans.css);
+@import url(../fonts/openSans.css);
 @import url(../node_modules/bootstrap/dist/css/bootstrap.min.css);
 @import url(../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
 @import url(../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
@@ -23,7 +23,9 @@
 @import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
-@import "css/abstracts";
+@import "abstracts/_breakpoint-settings.scss";
+@import "abstracts/_functions.scss";
+@import "abstracts/_index.scss";
 @import "sidenav.scss";
 @import "edit-history.scss";
 @import "tree.scss";
