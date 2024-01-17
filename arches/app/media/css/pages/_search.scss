@@ -1,4 +1,4 @@
-@import "abstracts/_functions.scss";
+@import "abstracts/functions";
 
 article.main-search-container {
     @include break-at(mobile-max) {

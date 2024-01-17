@@ -23,14 +23,14 @@
 @import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
-@import "abstracts/_breakpoint-settings.scss";
-@import "abstracts/_functions.scss";
-@import "abstracts/_index.scss";
-@import "sidenav.scss";
-@import "edit-history.scss";
-@import "tree.scss";
-@import "jqtree.scss";
-@import "rdm.scss";
+@import "abstracts/breakpoint-settings";
+@import "abstracts/functions";
+@import "abstracts/index";
+@import "sidenav";
+@import "edit-history";
+@import "tree";
+@import "jqtree";
+@import "rdm";
 
 html {
     font-size: 0.62rem;
