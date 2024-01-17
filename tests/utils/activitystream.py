@@ -96,6 +96,8 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         ResourceInstance.objects.all().delete()
 
         for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:

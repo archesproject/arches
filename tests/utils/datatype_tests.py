@@ -49,7 +49,7 @@ class BooleanDataTypeTests(ArchesTestCase):
             with self.subTest(input=truthy):
                 self.assertTrue(boolean.transform_value_for_tile(truthy))
         for falsy in falsy_values:
-            with self.subTest(input=truthy):
+            with self.subTest(input=falsy):
                 self.assertFalse(boolean.transform_value_for_tile(falsy))
 
         with self.assertRaises(ValueError):

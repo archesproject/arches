@@ -48,12 +48,11 @@ class CommandLineTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        # TODO: pull this up higher so that it's not depending on running outside a transaction
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
+        super().setUpClass()
 
     def test_load_package(self):
         resources = models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
