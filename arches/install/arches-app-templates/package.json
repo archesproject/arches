@@ -18,8 +18,5 @@
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
     },
     "nodeModulesPaths": {
-    },
-    "resolutions": {
-        "node-gyp": "^10.0.0"
     }
 }
