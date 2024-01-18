@@ -209,10 +209,14 @@ module.exports = () => {
             const coreArchesCSSFilepathConfiguration = buildCSSFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'), {});
             const projectCSSFilepathConfiguration = buildCSSFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'css'), {});
 
-            const archesApplicationsCSSFilepathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {   
+            const archesApplicationsCSSFilepaths = [];
+            const archesApplicationsCSSFilepathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
+                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'css');
+                archesApplicationsCSSFilepaths.push(path);
+
                 return {
                     ...acc,
-                    ...buildCSSFilepathLookup(STATIC_URL, Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'img'), {})
+                    ...buildCSSFilepathLookup(STATIC_URL, path, {})
                 };
             }, {});
 
@@ -259,7 +263,7 @@ module.exports = () => {
                     ...archesCoreEntryPointConfiguration,
                     ...archesApplicationsEntrypointConfiguration,
                     ...projectEntryPointConfiguration,
-                    ...CSSFilepathLookup
+                    ...CSSFilepathLookup,
                 },
                 devServer: {
                     port: WEBPACK_DEVELOPMENT_SERVER_PORT,
@@ -340,12 +344,7 @@ module.exports = () => {
                                 /node_modules/,
                                 Path.resolve(__dirname, APP_ROOT, 'media', 'css'),
                                 Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'),
-                                ...ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
-                                    const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'css');
-                                    acc.push(path);
-                                    
-                                    return acc;
-                                }, [])
+                                ...archesApplicationsCSSFilepaths
                             ],
                             use: [
                                 {
@@ -381,6 +380,7 @@ module.exports = () => {
                                             indentWidth: 4,
                                             includePaths: [
                                                 Path.resolve(__dirname, APP_ROOT, 'media', 'css'),
+                                                ...archesApplicationsCSSFilepaths,
                                                 Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'),
                                             ],
                                         },
@@ -402,16 +402,17 @@ module.exports = () => {
 
                                     let templatePath;
 
+                                    if (resourcePath.includes(APP_ROOT)) {  // project-level component
+                                        templatePath = resourcePath.split(APP_ROOT)[1];
+                                    }
+
                                     for (const archesApplicationPath of Object.values(ARCHES_APPLICATIONS_PATHS)) {  // arches application component
-                                        if (resourcePath.includes(archesApplicationPath)) {
+                                        if (!templatePath && resourcePath.includes(archesApplicationPath)) {
                                             templatePath = resourcePath.split(archesApplicationPath)[1];
                                         }
                                     }
 
-                                    if (!templatePath && resourcePath.includes(APP_ROOT)) {  // project-level component
-                                        templatePath = resourcePath.split(APP_ROOT)[1];
-                                    }
-                                    else if (!templatePath) {  // arches core component
+                                    if (!templatePath) {  // arches core component
                                         templatePath = resourcePath.split(Path.join(ROOT_DIR, 'app'))[1];
                                     }
 
