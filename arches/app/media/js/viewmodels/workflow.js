@@ -130,7 +130,7 @@ define([
             var stepName = ko.unwrap(stepConfigData.name);
             if (stepConfigData.workflowHistory.stepdata?.[stepName]) {
                 // stepdata might exist without this specific stepName if injected
-                stepConfigData.id = Object.values(stepConfigData.workflowHistory.stepdata[stepName].componentIdLookup)[0];
+                stepConfigData.id = stepConfigData.workflowHistory.stepdata[stepName].stepId;
             }
 
             stepConfigData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
