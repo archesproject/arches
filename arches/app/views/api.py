@@ -109,23 +109,17 @@ class APIBase(View):
 
 class GetFrontendI18NData(APIBase):
     def get(self, request):
-        origin_entity_name = request.GET.get('originEntityName')
-
         user_language = get_language()
-        if user_language is None:
-            user_language = "en"
 
         language_file_path = []
 
-        if origin_entity_name == os.path.split(settings.APP_ROOT)[1]:  # settings.APP_NAME is unreliable here, so deriving it from directory structure instead
-            language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
+        language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
         
-        for origin_entity_name in settings.ARCHES_APPLICATIONS:
-            application_path = os.path.split(sys.modules[origin_entity_name].__spec__.origin)[0]
+        for arches_application_name in settings.ARCHES_APPLICATIONS:
+            application_path = os.path.split(sys.modules[arches_application_name].__spec__.origin)[0]
             language_file_path.append(os.path.join(application_path, "locale", user_language + ".json"))
         
-        if origin_entity_name == os.path.split(settings.ROOT_DIR)[1]:
-            language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
+        language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
 
         localized_strings = {}
         for lang_file in language_file_path:
