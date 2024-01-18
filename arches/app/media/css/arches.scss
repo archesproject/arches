@@ -2,7 +2,7 @@
 @import url(../node_modules/bootstrap/dist/css/bootstrap.min.css);
 @import url(../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
 @import url(../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
-@import url(nifty.min.css);
+@import url(nifty.css);
 @import url(../node_modules/font-awesome/css/font-awesome.min.css);
 @import url(../node_modules/ionicons/css/ionicons.min.css);
 @import url(../node_modules/lt-themify-icons/themify-icons.css);
@@ -5156,7 +5156,7 @@ div.card-grid-item.selected {
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100%-220px);
+    width: calc(100% - 220px);
 }
 
 .no-icon {
