@@ -1835,3 +1835,60 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+
+### Controlled List Manager
+class ControlledList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=127, null=False)
+    dynamic = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "controlled_lists"
+
+
+class ControlledListItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # TODO(?): expose schemes
+    uri = models.URLField(max_length=2048, null=True, unique=True)
+    list = models.ForeignKey(
+        ControlledList,
+        db_column="listid",
+        on_delete=models.CASCADE,
+        related_name="items",
+    )
+    parent = models.ForeignKey(
+        "self", null=True, on_delete=models.CASCADE, related_name="children"
+    )
+
+    class Meta:
+        db_table = "controlled_list_items"
+
+
+class Label(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(
+        ControlledListItem,
+        db_column="itemid",
+        on_delete=models.CASCADE,
+        related_name="labels",
+    )
+    value_type = models.ForeignKey(
+        DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "label"}
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+    )
+    value = models.CharField(max_length=1024, null=False)
+
+    class Meta:
+        db_table = "controlled_list_labels"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["item", "value", "value_type", "language"],
+                name="unique_item_value_valuetype_language",
+            )
+        ]
