@@ -1108,11 +1108,8 @@ class ResourceReport(APIBase):
             resp["related_resources"] = related_resources_summary
 
         if "tiles" not in exclude:
-            permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, tile.nodegroup):
-                    tile.filter_by_perm(request.user, perm)
-                    permitted_tiles.append(tile)
+            resource.load_tiles(user=request.user, perm=perm)
+            permitted_tiles = resource.tiles
 
             resp["tiles"] = permitted_tiles
 
