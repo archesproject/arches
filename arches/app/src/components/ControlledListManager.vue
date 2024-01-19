@@ -1,0 +1,42 @@
+<script setup>
+import { ref } from "vue";
+import Splitter from "primevue/splitter";
+import SplitterPanel from "primevue/splitterpanel";
+
+import ControlledListSidebar from "./ControlledListSidebar.vue";
+import ControlledListTable from "./ControlledListTable.vue";
+
+const lightGray = "#f4f4f4";
+
+const selectedList = ref({});
+</script>
+
+<template>
+    <Splitter
+        :pt="{
+            gutter: { style: { background: lightGray } },
+            gutterHandler: { style: { background: lightGray } },
+        }"
+    >
+        <SplitterPanel :size="30" :minSize="15">
+            <ControlledListSidebar :selectedList="selectedList" />
+        </SplitterPanel>
+
+        <SplitterPanel :size="75" :minSize="50" class="mt-0">
+            <ControlledListTable :selectedList="selectedList" />
+        </SplitterPanel>
+    </Splitter>
+</template>
+
+<style scoped>
+.p-splitter {
+    width: calc(100vw - 50px);
+    height: 100vh;
+    background: white;
+    font-size: 14px;
+}
+.p-splitter-panel {
+    display: flex;
+    flex-direction: column;
+}
+</style>
