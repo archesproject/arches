@@ -6,7 +6,7 @@ import InputText from "primevue/inputtext";
 import SplitButton from "primevue/splitbutton";
 
 import ControlledListsAll from "./ControlledListsAll.vue";
-import Spinner from "./Spinner.vue";
+import Spinner from "../Spinner.vue";
 
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
