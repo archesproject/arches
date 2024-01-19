@@ -4,22 +4,22 @@ import uuid
 
 import django.db.models.deletion
 from django.db import migrations, models
-from django.utils.translation import gettext as _
 
+from arches.app.models.fields.i18n import I18n_String
 
 def add_plugins(apps, schema_editor):
     Plugin = apps.get_model("models", "Plugin")
 
-    Plugin.objects.update_or_create(
+    Plugin(
         pluginid="29321ce0-bd95-4357-a2a5-822e9cb06f70",
-        name=_("Controlled List Manager"),
+        name=I18n_String("Controlled List Manager"),
         icon="fa fa-code-fork",
         component="views/components/plugins/controlled-list-manager",
         componentname="controlled-list-manager",
         config={},
         slug="controlled-list-manager",
         sortorder=0,
-    )
+    ).save()
 
 
 def remove_plugin(apps, schema_editor):
