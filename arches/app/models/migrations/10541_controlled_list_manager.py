@@ -7,6 +7,7 @@ from django.db import migrations, models
 
 from arches.app.models.fields.i18n import I18n_String
 
+from arches.app.models.fields.i18n import I18n_String
 
 def add_plugins(apps, schema_editor):
     Plugin = apps.get_model("models", "Plugin")
