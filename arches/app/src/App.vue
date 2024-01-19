@@ -1,5 +1,5 @@
 <script setup>
-import ControlledListManager from "@/components/ControlledListManager.vue";
+import ControlledListManager from "@/components/ControlledListManager/ControlledListManager.vue";
 </script>
 
 <template>
