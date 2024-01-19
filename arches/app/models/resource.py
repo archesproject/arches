@@ -52,6 +52,7 @@ from arches.app.utils.permission_backend import (
     get_restricted_users,
     get_restricted_instances,
     user_can_read_graph,
+    get_nodegroups_by_perm,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
