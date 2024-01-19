@@ -1279,14 +1279,12 @@ class ResourceReport(APIBase):
 
             resp["related_resources"] = related_resources_summary
 
-
-        # elapsed = time() - start
-        # print(f"_______Time to B = {timedelta(seconds=elapsed)}")
-        # start = time()
+        readable_nodegroups = list(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, ["models.read_nodegroup"], any_perm=True))
+        readable_nodegroups_set = set(readable_nodegroups)
 
         if "tiles" not in exclude:
-            permitted_tiles = TileProxyModel.objects.filter(resourceinstance=resource, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
-            existing_permitted_tile_nodegroupids = list(permitted_tiles.values_list('nodegroup_id', flat=True))
+            resource.load_tiles()
+            permitted_tiles = list(filter(lambda x: str(x.nodegroup_id) in readable_nodegroups_set, resource.tiles))
 
             resp["tiles"] = permitted_tiles
 
@@ -1294,7 +1292,7 @@ class ResourceReport(APIBase):
         # print(f"_______Time to C = {timedelta(seconds=elapsed)}")
         # start = time()
         if "cards" not in exclude:
-            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=existing_permitted_tile_nodegroupids).select_related("nodegroup").order_by("sortorder")
+            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
 
             cardwidgets = [
                 widget
