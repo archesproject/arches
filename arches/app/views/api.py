@@ -1107,6 +1107,9 @@ class ResourceReport(APIBase):
 
             resp["related_resources"] = related_resources_summary
 
+        # collect the nodegroups for which this user has perm
+        readable_nodegroups = list(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, [perm], any_perm=True))
+        
         if "tiles" not in exclude:
             resource.load_tiles(user=request.user, perm=perm)
             permitted_tiles = resource.tiles
@@ -1114,11 +1117,8 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(request.user, perm)
-                    permitted_cards.append(card)
+            # query only the cards whose nodegroups are readable by user
+            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
 
             cardwidgets = [
                 widget
