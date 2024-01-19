@@ -31,12 +31,14 @@
 				overflow-y: hidden;
 			}
 			.search-facet-item {
+                .search-facet-item-heading {
 				&:focus {
 					box-shadow: inset 0 0 0 3px #000;
 					text-decoration: underline;
 				}
 				&:hover {
 					text-decoration: underline;
+                    }
 				}
 			}
 		}
@@ -77,6 +79,8 @@
     border: 1px solid #ddd;
     border-right-width: 0px;
     border-left-width: 0px;
+    overflow: auto;
+    width: 100%;
 }
 
 .search-facet-item:first-of-type {

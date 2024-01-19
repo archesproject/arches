@@ -215,7 +215,7 @@ class ArchesAppCommand(TemplateCommand):
         # need to manually replace instances of {{ app_name }}
         path_to_project = os.path.join(target, app_name) if target else os.path.join(os.getcwd(), app_name)
 
-        for relative_file_path in ['setup.py', 'package.json']:  # relative to app root directory
+        for relative_file_path in ['setup.py', 'package.json', '.yarnrc', 'gettext.config.js']:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path),'r')
             file_data = file.read()
             file.close()

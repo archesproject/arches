@@ -109,31 +109,31 @@ class APIBase(View):
 
 class GetFrontendI18NData(APIBase):
     def get(self, request):
-        origin_entity_name = request.GET.get('originEntityName')
-
         user_language = get_language()
-        if user_language is None:
-            user_language = "en"
 
-        language_file_path = None
+        language_file_path = []
 
-        if origin_entity_name == os.path.split(settings.APP_ROOT)[1]:  # settings.APP_NAME is unreliable here, so deriving it from directory structure instead
-            language_file_path = os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
-        elif bool(origin_entity_name in settings.ARCHES_APPLICATIONS):
-            application_path = os.path.split(sys.modules[origin_entity_name].__spec__.origin)[0]
-            language_file_path = os.path.join(application_path, "locale", user_language + ".json")
-        elif origin_entity_name == os.path.split(settings.ROOT_DIR)[1]:
-            language_file_path = os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+        language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
+        
+        for arches_application_name in settings.ARCHES_APPLICATIONS:
+            application_path = os.path.split(sys.modules[arches_application_name].__spec__.origin)[0]
+            language_file_path.append(os.path.join(application_path, "locale", user_language + ".json"))
+        
+        language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
 
-        if not language_file_path or not os.path.isfile(language_file_path):
-            raise FileNotFoundError()
+        localized_strings = {}
+        for lang_file in language_file_path:
+            try:
+                localized_strings = json.load(open(lang_file))[user_language] | localized_strings
+            except FileNotFoundError:
+                pass
         
         return JSONResponse({
             'enabled_languages': {
                 language_tuple[0]: str(language_tuple[1])
                 for language_tuple in settings.LANGUAGES
             },
-            'translations': json.load(open(language_file_path)),
+            'translations': {user_language: localized_strings},
             "language": user_language,
         })
     
@@ -1510,10 +1510,18 @@ class UserIncompleteWorkflows(APIBase):
             for incomplete_workflows_user in incomplete_workflows_users
         }
 
+        plugins = models.Plugin.objects.all()
+
+        workflow_slug_to_workflow_name = {
+            plugin.componentname: plugin.name 
+            for plugin in plugins
+        }
+
         incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
 
         for incomplete_workflow in incomplete_workflows_json:
             incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+            incomplete_workflow['pluginname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
 
         return JSONResponse({
             "incomplete_workflows": incomplete_workflows_json,
@@ -1637,3 +1645,17 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+    
+class GetNodegroupTree(APIBase):
+    """
+    Returns the path to a nodegroup from the root node. Transforms node alias to node name.
+    """
+    def get(self,request):
+        graphid = request.GET.get('graphid')
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+            result = cursor.fetchall()
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]  
+            permitted_result = [nodegroup for nodegroup in result if nodegroup[0] in permitted_nodegroups]  
+        
+        return JSONResponse({"path": permitted_result})

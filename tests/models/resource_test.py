@@ -47,6 +47,8 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         LanguageSynchronizer.synchronize_settings_with_db()
 
         models.ResourceInstance.objects.all().delete()
@@ -144,6 +146,7 @@ class ResourceTests(ArchesTestCase):
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
         cls.user.delete()
+        super().tearDownClass()
 
     def test_get_node_value_string(self):
         """
@@ -268,8 +271,6 @@ class ResourceTests(ArchesTestCase):
         r2 = Resource(graph_id=self.search_model_graphid)
         r1.save()
         r2.save()
-        self.addCleanup(r1.delete)
-        self.addCleanup(r2.delete)
 
         # Ensure we start from scratch
         r1.descriptor_function = None

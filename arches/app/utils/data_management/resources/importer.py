@@ -236,7 +236,7 @@ class BusinessDataImporter(object):
                     print("*" * 80)
                     print(
                         f"ERROR: No mapping file detected for {self.file[0]}. Please indicate one \
-                        with the '-c' paramater or place one in the same directory as your business data."
+                        with the '-c' parameter or place one in the same directory as your business data."
                     )
                     print("*" * 80)
 
