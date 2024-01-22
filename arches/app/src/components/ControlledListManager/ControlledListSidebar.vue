@@ -1,5 +1,7 @@
 <script setup>
 import arches from "arches";
+import Cookies from "js-cookie";
+import { ref } from "vue";
 
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
@@ -12,6 +14,26 @@ const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
 const { selectedList } = defineProps(["selectedList"]);
+
+const queryMutator = ref(0);
+
+const deleteList = async (id) => {
+    if (!id) {
+        return;
+    }
+    const response = await fetch(arches.urls.controlled_list(id), {
+        method: "DELETE",
+        headers: {
+            "X-CSRFToken": Cookies.get("csrftoken"),
+        },
+    });
+    if (response.ok) {
+        queryMutator.value += 1;
+        if (selectedList.value.id === id) {
+            selectedList.value = null;
+        }
+    }
+};
 </script>
 
 <template>
@@ -56,12 +78,18 @@ const { selectedList } = defineProps(["selectedList"]);
                     },
                 }"
             ></SplitButton>
-            <Button class="button delete" label="Delete List" raised></Button>
+            <!-- We might want an are you sure? modal -->
+            <Button
+                class="button delete"
+                label="Delete List"
+                raised
+                @click="deleteList(selectedList.value?.id)"
+            ></Button>
         </div>
     </div>
 
     <Suspense>
-        <ControlledListsAll :selectedList="selectedList" />
+        <ControlledListsAll :selectedList="selectedList" :key="queryMutator" />
         <template #fallback>
             <Spinner />
         </template>

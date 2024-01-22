@@ -3,13 +3,13 @@ from django.utils.decorators import method_decorator
 
 from arches.app.models.models import ControlledList, ControlledListItem, Label
 from arches.app.utils.decorators import group_required
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONErrorResponse, JSONResponse
 
 
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ControlledListView(View):
+class ControlledListsView(View):
     @classmethod
     def serialize(cls, obj):
         match obj:
@@ -56,3 +56,15 @@ class ControlledListView(View):
         }
 
         return JSONResponse(data)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
+class ControlledListView(View):
+    def delete(self, request, **kwargs):
+        id = kwargs.get("id")
+        objs_deleted, _ = ControlledList.objects.filter(pk=id).delete()
+        if not objs_deleted:
+            return JSONErrorResponse(status=404)
+        return JSONResponse(status=205)

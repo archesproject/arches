@@ -14,7 +14,8 @@ const { selectedList } = defineProps(["selectedList"]);
 <template>
     <div class="list-count">
         <span v-if="controlledLists.length" style="margin-right: 1rem">
-            {{ controlledLists.length }} lists
+            {{ controlledLists.length }}
+            {{ controlledLists.length === 1 ? "list" : "lists" }}
         </span>
     </div>
 
