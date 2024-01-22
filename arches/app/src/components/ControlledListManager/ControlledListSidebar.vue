@@ -17,6 +17,18 @@ const { selectedList } = defineProps(["selectedList"]);
 
 const queryMutator = ref(0);
 
+const createList = async () => {
+    const response = await fetch(arches.urls.controlled_lists, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": Cookies.get("csrftoken"),
+        },
+    });
+    if (response.ok) {
+        queryMutator.value += 1;
+    }
+};
+
 const deleteList = async (id) => {
     if (!id) {
         return;
@@ -77,6 +89,7 @@ const deleteList = async (id) => {
                         },
                     },
                 }"
+                @click="createList"
             ></SplitButton>
             <!-- We might want an are you sure? modal -->
             <Button
