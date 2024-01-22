@@ -154,6 +154,7 @@ def prepare_search_index(create=False):
                         "users_without_edit_perm": {"type": "integer"},
                         "users_without_delete_perm": {"type": "integer"},
                         "users_with_no_access": {"type": "integer"},
+                        "principal_user": {"type": "integer"},
                     },
                 },
                 "strings": {

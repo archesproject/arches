@@ -401,6 +401,7 @@ def retrieve_search_results(search_filter_factory, search_results_object, dsl, l
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
     dsl.include("points")
+    dsl.include("permissions.principal_user")
     dsl.include("permissions.users_without_read_perm")
     dsl.include("permissions.users_without_edit_perm")
     dsl.include("permissions.users_without_delete_perm")

@@ -999,6 +999,14 @@ class ResourceInstance(models.Model):
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+    # This could be used as a lock, but primarily addresses the issue that a creating user
+    # may not yet match the criteria to edit a ResourceInstance (via Set/LogicalSet) simply
+    # because the details may not yet be complete. Only one user can create, as it is an
+    # action, not a state, so we do not need an array here. That may be desirable depending on
+    # future use of this field (e.g. locking to a group).
+    # Note that this is intended to bypass normal permissions logic, so a resource type must
+    # prevent a user who created the resource from editing it, by updating principaluserid logic.
+    principaluser = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def save(self, *args, **kwargs):
         try:

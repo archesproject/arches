@@ -59,7 +59,12 @@ class SearchResultsFilter(BaseSearchFilter):
             sets = get_sets_for_user(self.user, "view_resourceinstance")
             if sets is not None: # Only None if no filtering should be done, but may be an empty set.
                 search_query = Bool()
-                search_query.must(Nested(path="sets", query=Terms(field="sets.id", terms=list(sets))))
+                subsearch_query = Bool()
+                if sets:
+                    subsearch_query.should(Nested(path="sets", query=Terms(field="sets.id", terms=list(sets))))
+                if self.user and self.user.id:
+                    subsearch_query.should(Nested(path="permissions", query=Terms(field="permissions.principal_user", terms=[int(self.user.id)])))
+                search_query.must(subsearch_query)
                 search_results_object["query"].add_query(search_query)
         search_results_object["query"].add_aggregation(nested_agg)
 
