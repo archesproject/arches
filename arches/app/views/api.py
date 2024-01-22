@@ -1127,7 +1127,7 @@ class ResourceReport(APIBase):
 
             cardwidgets = [
                 widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widgets in [sorted(card.cardxnodexwidget_set.all(), key=attrgetter("sortorder")) for card in permitted_cards]
                 for widget in widgets
             ]
 
