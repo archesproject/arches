@@ -1890,5 +1890,10 @@ class Label(models.Model):
             models.UniqueConstraint(
                 fields=["item", "value", "value_type", "language"],
                 name="unique_item_value_valuetype_language",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["item", "language"],
+                condition=Q(value_type="prefLabel"),
+                name="unique_item_preflabel_language",
+            ),
         ]
