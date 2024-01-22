@@ -1118,7 +1118,7 @@ class ResourceReport(APIBase):
             readable_nodegroups = list(get_nodegroups_by_perm(request.user, [perm], any_perm=True))
             
             # query only the cards whose nodegroups are readable by user
-            permitted_cards = list(CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder"))
+            permitted_cards = list(CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups))
 
             cardwidgets = [
                 widget
