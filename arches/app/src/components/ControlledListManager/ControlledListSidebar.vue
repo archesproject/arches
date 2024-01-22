@@ -96,6 +96,7 @@ const deleteList = async (id) => {
                 class="button delete"
                 label="Delete List"
                 raised
+                :disabled="!selectedList.value"
                 @click="deleteList(selectedList.value?.id)"
             ></Button>
         </div>
