@@ -14,6 +14,7 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
+from operator import attrgetter
 from urllib import parse
 from collections import OrderedDict
 from django.contrib.auth import authenticate
@@ -1118,7 +1119,11 @@ class ResourceReport(APIBase):
             readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
             
             # query only the cards whose nodegroups are readable by user
-            permitted_cards = list(CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups))
+            permitted_cards = (
+                CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups)
+                .prefetch_related("cardxnodexwidget_set")
+                .order_by("sortorder")
+            )
 
             cardwidgets = [
                 widget
