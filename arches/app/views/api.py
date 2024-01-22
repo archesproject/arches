@@ -1115,7 +1115,7 @@ class ResourceReport(APIBase):
 
         if "cards" not in exclude:
             # collect the nodegroups for which this user has perm
-            readable_nodegroups = list(get_nodegroups_by_perm(request.user, [perm], any_perm=True))
+            readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
             
             # query only the cards whose nodegroups are readable by user
             permitted_cards = list(CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups))
