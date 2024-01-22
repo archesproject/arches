@@ -49,6 +49,7 @@ from arches.app.utils.permission_backend import (
     get_users_for_object,
     get_restricted_users,
     get_restricted_instances,
+    get_nodegroups_by_perm
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -168,7 +169,8 @@ class Resource(models.ResourceInstance):
         """
 
         if user:
-            self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
+            readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
+            self.tiles = [tile for tile in self.tiles if tile.nodegroup is not None and tile.nodegroup in readable_nodegroups]
         else:
             self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
 

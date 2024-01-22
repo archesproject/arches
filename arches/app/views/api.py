@@ -14,6 +14,7 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
+from operator import attrgetter
 from urllib import parse
 from django.contrib.auth import authenticate
 from django.shortcuts import render
@@ -1279,12 +1280,9 @@ class ResourceReport(APIBase):
 
             resp["related_resources"] = related_resources_summary
 
-        readable_nodegroups = list(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, ["models.read_nodegroup"], any_perm=True))
-        readable_nodegroups_set = set(readable_nodegroups)
-
         if "tiles" not in exclude:
-            resource.load_tiles()
-            permitted_tiles = list(filter(lambda x: str(x.nodegroup_id) in readable_nodegroups_set, resource.tiles))
+            resource.load_tiles(user=request.user, perm=perm)
+            permitted_tiles = resource.tiles
 
             resp["tiles"] = permitted_tiles
 
