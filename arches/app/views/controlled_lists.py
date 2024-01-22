@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from django.views.generic import View
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
+
 
 from arches.app.models.models import ControlledList, ControlledListItem, Label
 from arches.app.utils.decorators import group_required
@@ -56,6 +60,11 @@ class ControlledListsView(View):
         }
 
         return JSONResponse(data)
+
+    def post(self, request):
+        l = ControlledList(name=_("Untitled List: ") + datetime.now().isoformat())
+        l.save()
+        return self.get(request)
 
 
 @method_decorator(
