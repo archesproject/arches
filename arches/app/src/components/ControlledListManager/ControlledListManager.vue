@@ -8,7 +8,7 @@ import ControlledListTable from "./ControlledListTable.vue";
 
 const lightGray = "#f4f4f4";
 
-const selectedList = ref({});
+const displayedList = ref({});
 </script>
 
 <template>
@@ -19,11 +19,11 @@ const selectedList = ref({});
         }"
     >
         <SplitterPanel :size="30" :minSize="15">
-            <ControlledListSidebar :selectedList="selectedList" />
+            <ControlledListSidebar :displayedList="displayedList" />
         </SplitterPanel>
 
         <SplitterPanel :size="75" :minSize="50" class="mt-0">
-            <ControlledListTable :selectedList="selectedList" />
+            <ControlledListTable :displayedList="displayedList" />
         </SplitterPanel>
     </Splitter>
 </template>

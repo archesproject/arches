@@ -8,7 +8,19 @@ const slateBlue = "#2d3c4b";
 const response = await fetch(arches.urls.controlled_lists);
 const { controlled_lists: controlledLists } = await response.json();
 
-const { selectedList } = defineProps(["selectedList"]);
+const { displayedList, selectedLists } = defineProps([
+    "displayedList",
+    "selectedLists",
+]);
+
+const toggleCheckbox = (list) => {
+    const i = selectedLists.indexOf(list);
+    if (i === -1) {
+        selectedLists.push(list);
+    } else {
+        selectedLists.splice(i);
+    }
+};
 </script>
 
 <template>
@@ -24,15 +36,15 @@ const { selectedList } = defineProps(["selectedList"]);
             <div
                 v-for="(item, index) in slotProps.items"
                 class="listRow"
-                :class="{ selected: selectedList.value?.id === item.id }"
+                :class="{ selected: displayedList.value?.id === item.id }"
                 :key="index"
                 @click="
                     () => {
-                        selectedList.value = item;
+                        displayedList.value = item;
                     }
                 "
             >
-                <input type="checkbox" />
+                <input type="checkbox" @click="toggleCheckbox(item)" />
                 <span>{{ item.name }}</span>
             </div>
         </template>

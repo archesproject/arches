@@ -76,4 +76,4 @@ class ControlledListView(View):
         objs_deleted, _ = ControlledList.objects.filter(pk=id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
-        return JSONResponse(status=205)
+        return JSONResponse(status=204)
