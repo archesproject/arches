@@ -43,6 +43,10 @@ const itemsForLanguage = computed(() => {
         };
     });
 });
+
+const staticLabel = "Static: list does not change";
+const dynamicLabel =
+    "Dynamic: list is defined by a query that may change list items";
 </script>
 
 <template>
@@ -51,32 +55,28 @@ const itemsForLanguage = computed(() => {
         <h4>{{ heading }}</h4>
     </div>
 
-    <div
-        v-if="selectedList.value && Object.keys(selectedList.value).length"
-        class="list-editor-container"
-    >
+    <div v-if="!!selectedList.value" class="list-editor-container">
         <div class="characteristics">
             <h4>Characteristics</h4>
             <div class="characteristic">
-                <span>Name: {{ selectedList.value.name }}</span>
+                <h5>Name</h5>
+                <span>{{ selectedList.value.name }}</span>
             </div>
             <div class="characteristic">
-                <span
-                    >Type:
+                <h5>Type</h5>
+                <span>
                     {{
-                        selectedList.value.dynamic
-                            ? "Dynamic: list is defined by a query that may change list items"
-                            : "Static: list does not change"
+                        selectedList.value.dynamic ? dynamicLabel : staticLabel
                     }}</span
                 >
             </div>
             <div class="characteristic">
-                <span>List used by these nodes</span>
+                <h5>List used by these nodes</h5>
             </div>
         </div>
 
         <div class="items">
-            <h4 style="margin-top: 4rem">Items</h4>
+            <h4 style="margin-top: 4rem; margin-left: 0">Items</h4>
             <!-- TODO: language selector -->
             <DataTable
                 :value="itemsForLanguage"
@@ -152,12 +152,12 @@ h4 {
     color: white;
 }
 .characteristic {
-    margin: 1rem;
+    margin: 1rem 1rem 2rem 1rem;
 }
 .list-editor-container {
     margin: 1rem;
 }
-div.list-editor-container div,
+.items,
 table {
     margin: inherit;
 }
