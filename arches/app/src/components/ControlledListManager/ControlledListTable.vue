@@ -1,25 +1,25 @@
 <script setup>
 import { computed } from "vue";
-import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import DataTable from "primevue/datatable";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
-const { selectedList } = defineProps(["selectedList"]);
+const { displayedList } = defineProps(["displayedList"]);
 
 const heading = computed(() => {
     return (
         "List Editor" +
-        (selectedList.value ? " > " + selectedList.value.name : "")
+        (displayedList.value ? " > " + displayedList.value.name : "")
     );
 });
 
 const selectedLanguage = "en";
 const itemsForLanguage = computed(() => {
-    if (!selectedList.value) {
+    if (!displayedList.value) {
         return {};
     }
     // todo: do something with children
-    return selectedList.value.items.map((item) => {
+    return displayedList.value.items.map((item) => {
         return {
             ...item,
             prefLabels: [
@@ -55,18 +55,18 @@ const dynamicLabel =
         <h4>{{ heading }}</h4>
     </div>
 
-    <div v-if="!!selectedList.value" class="list-editor-container">
+    <div v-if="!!displayedList.value" class="list-editor-container">
         <div class="characteristics">
             <h4>Characteristics</h4>
             <div class="characteristic">
                 <h5>Name</h5>
-                <span>{{ selectedList.value.name }}</span>
+                <span>{{ displayedList.value.name }}</span>
             </div>
             <div class="characteristic">
                 <h5>Type</h5>
                 <span>
                     {{
-                        selectedList.value.dynamic ? dynamicLabel : staticLabel
+                        displayedList.value.dynamic ? dynamicLabel : staticLabel
                     }}</span
                 >
             </div>

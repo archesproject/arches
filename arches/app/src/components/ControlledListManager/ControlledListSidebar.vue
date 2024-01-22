@@ -13,7 +13,8 @@ import Spinner from "../Spinner.vue";
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
-const { selectedList } = defineProps(["selectedList"]);
+const { displayedList } = defineProps(["displayedList"]);
+const selectedLists = ref([]);
 
 const queryMutator = ref(0);
 
@@ -29,21 +30,27 @@ const createList = async () => {
     }
 };
 
-const deleteList = async (id) => {
-    if (!id) {
+const deleteLists = async () => {
+    if (!selectedLists.value.length) {
         return;
     }
-    const response = await fetch(arches.urls.controlled_list(id), {
-        method: "DELETE",
-        headers: {
-            "X-CSRFToken": Cookies.get("csrftoken"),
-        },
-    });
-    if (response.ok) {
-        queryMutator.value += 1;
-        if (selectedList.value.id === id) {
-            selectedList.value = null;
+    const promises = selectedLists.value.map((list) =>
+        fetch(arches.urls.controlled_list(list.id), {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+        })
+    );
+
+    const responses = await Promise.all(promises);
+    if (responses.some((resp) => resp.ok)) {
+        if (selectedLists.value.includes(displayedList.value)) {
+            displayedList.value = null;
         }
+        selectedLists.value = [];
+
+        queryMutator.value += 1;
     }
 };
 </script>
@@ -94,16 +101,22 @@ const deleteList = async (id) => {
             <!-- We might want an are you sure? modal -->
             <Button
                 class="button delete"
-                label="Delete List"
+                :label="
+                    selectedLists.length > 1 ? 'Delete Lists' : 'Delete List'
+                "
                 raised
-                :disabled="!selectedList.value"
-                @click="deleteList(selectedList.value?.id)"
+                :disabled="!selectedLists.length"
+                @click="deleteLists"
             ></Button>
         </div>
     </div>
 
     <Suspense>
-        <ControlledListsAll :selectedList="selectedList" :key="queryMutator" />
+        <ControlledListsAll
+            :displayedList="displayedList"
+            :selectedLists="selectedLists"
+            :key="queryMutator"
+        />
         <template #fallback>
             <Spinner />
         </template>
