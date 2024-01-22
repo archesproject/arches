@@ -21,10 +21,28 @@ const toggleCheckbox = (list) => {
         selectedLists.splice(i);
     }
 };
+
+const selectAll = () => {
+    selectedLists.splice(0, selectedLists.length);
+    controlledLists.forEach((list) => {
+        selectedLists.push(list);
+    });
+};
+const clearAll = () => {
+    selectedLists.splice(0, selectedLists.length);
+};
 </script>
 
 <template>
-    <div class="list-count">
+    <div class="list-selection-header">
+        <span v-if="controlledLists.length" style="margin-left: 1rem">
+            <button v-if="selectedLists.length" @click="clearAll">
+                {{ arches.translations.clearAll }}
+            </button>
+            <button v-else @click="selectAll">
+                {{ arches.translations.selectAll }}
+            </button>
+        </span>
         <span v-if="controlledLists.length" style="margin-right: 1rem">
             {{ controlledLists.length }}
             {{ controlledLists.length === 1 ? "list" : "lists" }}
@@ -44,7 +62,11 @@ const toggleCheckbox = (list) => {
                     }
                 "
             >
-                <input type="checkbox" @click="toggleCheckbox(item)" />
+                <input
+                    type="checkbox"
+                    @click="toggleCheckbox(item)"
+                    :checked="selectedLists.indexOf(item) > -1"
+                />
                 <span>{{ item.name }}</span>
             </div>
         </template>
@@ -56,17 +78,17 @@ const toggleCheckbox = (list) => {
 </template>
 
 <style scoped>
-.no-lists {
-    margin: 2rem;
-    display: flex;
-    justify-content: center;
+button {
+    border: none;
+    color: var(--blue-500);
+    background: none;
 }
-.list-count {
+.list-selection-header {
     display: flex;
     background-color: v-bind(lightGray);
     height: 2rem;
     font-size: small;
-    justify-content: right;
+    justify-content: space-between;
 }
 .p-dataview {
     overflow-y: auto;
@@ -86,5 +108,10 @@ const toggleCheckbox = (list) => {
 input[type="checkbox"] {
     margin-top: 0.25rem;
     margin-right: 1rem;
+}
+.no-lists {
+    margin: 2rem;
+    display: flex;
+    justify-content: center;
 }
 </style>
