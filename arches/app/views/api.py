@@ -1292,11 +1292,19 @@ class ResourceReport(APIBase):
         # print(f"_______Time to C = {timedelta(seconds=elapsed)}")
         # start = time()
         if "cards" not in exclude:
-            permitted_cards = CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup_id__in=readable_nodegroups).select_related("nodegroup").order_by("sortorder")
+            # collect the nodegroups for which this user has perm
+            readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
+            
+            # query only the cards whose nodegroups are readable by user
+            permitted_cards = (
+                CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups)
+                .prefetch_related("cardxnodexwidget_set")
+                .order_by("sortorder")
+            )
 
             cardwidgets = [
                 widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widgets in [sorted(card.cardxnodexwidget_set.all(), key=attrgetter("sortorder")) for card in permitted_cards]
                 for widget in widgets
             ]
 
