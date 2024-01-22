@@ -105,4 +105,10 @@ class Migration(migrations.Migration):
                 fields=("item", "value", "value_type", "language"), name="unique_item_value_valuetype_language"
             ),
         ),
+        migrations.AddConstraint(
+            model_name="label",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("value_type", "prefLabel")), fields=("item", "language"), name="unique_item_preflabel_language"
+            ),
+        ),
     ]
