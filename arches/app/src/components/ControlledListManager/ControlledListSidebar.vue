@@ -15,8 +15,12 @@ const buttonPink = "#ed7979";
 
 const { displayedList } = defineProps(["displayedList"]);
 const selectedLists = ref([]);
-
+const searchValue = ref("");
 const queryMutator = ref(0);
+
+const clearSearch = () => {
+    searchValue.value = "";
+};
 
 const createList = async () => {
     const response = await fetch(arches.urls.controlled_lists, {
@@ -66,8 +70,19 @@ const deleteLists = async () => {
                 type="text"
                 class="control"
                 :placeholder="arches.translations.find"
+                v-model="searchValue"
             />
             <i
+                v-if="searchValue"
+                class="fa fa-times"
+                role="button"
+                tabindex="0"
+                @click="clearSearch"
+                @keydown="clearSearch"
+                :aria-label="arches.translations.clear"
+            ></i>
+            <i
+                v-else
                 class="fa fa-search"
                 :aria-label="arches.translations.search"
             ></i>
@@ -115,6 +130,7 @@ const deleteLists = async () => {
         <ControlledListsAll
             :displayedList="displayedList"
             :selectedLists="selectedLists"
+            :searchValue="searchValue"
             :key="queryMutator"
         />
         <template #fallback>
