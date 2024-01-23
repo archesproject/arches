@@ -17,10 +17,13 @@
         <option value="!">{% trans "Not" %}</option>
         <option value="null">{% trans "Has no value" %}</option>
         <option value="not_null">{% trans "Has any value" %}</option>
+        <option value="in_list_any">{% trans "Has any value in list" %}</option>
+        <option value="in_list_all">{% trans "Has all values in list" %}</option>
     </select>
 </div>
 
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <!-- ko if: !ko.unwrap(op).includes('in_list') -->
     <input style="display:inline-block;"
         data-bind="
             value: searchValue,
@@ -28,6 +31,16 @@
                 select2Config: select2Config
             }
         ">
+    <!-- /ko -->
+    <!-- ko if: ko.unwrap(op).includes('in_list') -->
+    <input style="display:inline-block;"
+        data-bind="
+            value: searchValue,
+            select2Query: {
+                select2Config: select2ConfigMulti
+            }
+        ">
+    <!-- /ko -->
     <span style="z-index: 100; position:absolute; right: 24px; top: 8px;" data-bind="visible: select2Config.isEmpty() === false, click: function(){select2Config.clear();}"><i class="fa fa-times-circle fa-lg"></i></span>
 </div>
 <!-- /ko -->

@@ -120,6 +120,10 @@ class BaseConceptDataType(BaseDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
+            elif value["op"] == "in_list_any":
+                self.append_in_list_search_filters(value, node, query, request, match_any=True)
+            elif value["op"] == "in_list_all":
+                self.append_in_list_search_filters(value, node, query, request, match_any=False)
             elif value["val"] != "":
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
@@ -128,6 +132,24 @@ class BaseConceptDataType(BaseDataType):
                 else:
                     query.must(match_query)
 
+        except KeyError as e:
+            pass
+
+    def append_in_list_search_filters(self, value, node, query, request, match_any=True):
+        try:
+            # Extract the list of values from the filter
+            values_list = value.get("val", [])
+
+            if values_list:
+                field_name = "tiles.data.%s" % (str(node.pk))
+                for val in values_list:
+                    match_q = Match(field=field_name, type="phrase", query=val)
+
+                    if match_any:
+                        query.should(match_q)
+                    else:
+                        query.must(match_q)
+        
         except KeyError as e:
             pass
 
