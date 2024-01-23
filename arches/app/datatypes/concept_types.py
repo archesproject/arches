@@ -124,6 +124,8 @@ class BaseConceptDataType(BaseDataType):
                 self.append_in_list_search_filters(value, node, query, request, match_any=True)
             elif value["op"] == "in_list_all":
                 self.append_in_list_search_filters(value, node, query, request, match_any=False)
+            elif value["op"] == "in_list_not":
+                self.append_in_list_search_filters(value, node, query, request, match_any=None)
             elif value["val"] != "":
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
@@ -147,8 +149,11 @@ class BaseConceptDataType(BaseDataType):
 
                     if match_any:
                         query.should(match_q)
-                    else:
+                    elif match_any is False:
                         query.must(match_q)
+                    elif match_any is None:
+                        query.must_not(match_q)
+                query.filter(Exists(field=field_name))
         
         except KeyError as e:
             pass
