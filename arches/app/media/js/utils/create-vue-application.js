@@ -17,7 +17,7 @@ export default async function createVueApp(vueComponent){
      * TODO: cbyrd #10501 - we should add an event listener that will re-fetch i18n data
      * and rebuild the app when a specific event is fired from the LanguageSwitcher component.
     **/ 
-    return fetch('/api/get_frontend_i18n_data').then(resp => {
+    return fetch('api/get_frontend_i18n_data').then(resp => {
         if (!resp.ok) {
             throw new Error(resp.statusText);
         }
