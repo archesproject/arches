@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 
 from django.views.generic import View
@@ -15,21 +16,25 @@ from arches.app.utils.response import JSONErrorResponse, JSONResponse
 )
 class ControlledListsView(View):
     @classmethod
-    def serialize(cls, obj):
+    def serialize(cls, obj, depth_map):
         match obj:
             case ControlledList():
                 return {
                     "id": str(obj.id),
                     "name": obj.name,
                     "dynamic": obj.dynamic,
-                    "items": [cls.serialize(item) for item in obj.items.all()],
+                    "items": [cls.serialize(item, depth_map) for item in obj.items.all()],
                 }
             case ControlledListItem():
+                if obj.parent:
+                    depth_map[obj.id] = depth_map[obj.parent.id] + 1
                 return {
                     "id": str(obj.id),
                     "uri": obj.uri,
-                    "labels": [cls.serialize(label) for label in obj.labels.all()],
-                    "children": [cls.serialize(child) for child in obj.children.all()],
+                    "labels": [cls.serialize(label, depth_map) for label in obj.labels.all()],
+                    "children": [cls.serialize(child, depth_map) for child in obj.children.all()],
+                    "parent_id": str(obj.parent.id) if obj.parent else None,
+                    "depth": depth_map[obj.id],
                 }
             case Label():
                 return {
@@ -52,7 +57,7 @@ class ControlledListsView(View):
 
         data = {
             "controlled_lists": [
-                self.serialize(obj)
+                self.serialize(obj, depth_map=defaultdict(int))
                 for obj in ControlledList.objects.all().prefetch_related(
                     *prefetch_terms
                 )

@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 
@@ -14,16 +14,39 @@ const heading = computed(() => {
 });
 
 const rowClass = (rowData) => {
-    return rowData.children.length ? "" : "no-expander";
+    const depth = `depth-${rowData.depth}`;
+    if (rowData.children.length) {
+        return depth;
+    }
+    return `${depth} no-expander`;
 };
 
 const selectedLanguage = "en";
+
+const expandedRows = ref([]);
+const onRowExpand = (row) => {
+    expandedRows.value.push(row.data.id);
+};
+const onRowCollapse = (row) => {
+    expandedRows.value.splice(expandedRows.value.indexOf(row.data.id));
+};
+const onRowReorder = (dragData) => {
+    // todo: hit server
+};
+
 const itemsForLanguage = computed(() => {
-    if (!displayedList.value) {
-        return {};
-    }
-    // todo: do something with children
-    return displayedList.value.items.map((item) => {
+    // Show/hide rows based on row expansion toggle
+    const itemsToShow = displayedList.value.items.reduce((acc, row) => {
+        if (!row.parent_id) {
+            acc.push(row);
+        } else if (expandedRows.value.includes(row.parent_id)) {
+            acc.push(row);
+        }
+        return acc;
+    }, []);
+
+    // Flatten labels
+    return itemsToShow.map((item) => {
         return {
             ...item,
             prefLabels: [
@@ -94,6 +117,7 @@ const dynamicLabel =
                 Items ({{ displayedList.value.items.length }})
             </h4>
             <!-- TODO: language selector -->
+            <!-- TreeTable exists, but DataTable has better support for reordering -->
             <DataTable
                 :value="itemsForLanguage"
                 :rowClass="rowClass"
@@ -104,13 +128,23 @@ const dynamicLabel =
                 :pt="{
                     bodyRow: { style: { height: '4rem' } },
                 }"
+                @rowExpand="onRowExpand"
+                @rowCollapse="onRowCollapse"
+                @rowReorder="onRowReorder"
             >
                 <Column
                     expander
-                    style="width: 5rem"
+                    style="width: 3rem"
                     :pt="{
                         headerCell: { style: { borderTop: 0 } },
                         headerContent: { style: { height: '4rem' } },
+                    }"
+                />
+                <Column
+                    rowReorder
+                    style="width: 3rem"
+                    :pt="{
+                        headerCell: { style: { borderTop: 0 } },
                     }"
                 />
                 <Column
@@ -200,5 +234,21 @@ table {
 /* https://github.com/primefaces/primevue/issues/1834#issuecomment-982831184 */
 .p-datatable .p-datatable-tbody > tr.no-expander > td .p-row-toggler {
     display: none;
+}
+.depth-1 > td:nth-child(2),
+.depth-1 > td:nth-child(3) {
+    padding-left: 2rem;
+}
+.depth-2 > td:nth-child(2),
+.depth-2 > td:nth-child(3) {
+    padding-left: 4rem;
+}
+.depth-3 > td:nth-child(2),
+.depth-3 > td:nth-child(3) {
+    padding-left: 6rem;
+}
+.depth-4 > td:nth-child(2),
+.depth-4 > td:nth-child(3) {
+    padding-left: 8rem;
 }
 </style>
