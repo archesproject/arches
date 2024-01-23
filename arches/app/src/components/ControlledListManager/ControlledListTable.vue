@@ -13,6 +13,10 @@ const heading = computed(() => {
     );
 });
 
+const rowClass = (rowData) => {
+    return rowData.children.length ? "" : "no-expander";
+};
+
 const selectedLanguage = "en";
 const itemsForLanguage = computed(() => {
     if (!displayedList.value) {
@@ -92,6 +96,7 @@ const dynamicLabel =
             <!-- TODO: language selector -->
             <DataTable
                 :value="itemsForLanguage"
+                :rowClass="rowClass"
                 stripedRows
                 scrollable
                 scrollHeight="400px"
@@ -101,32 +106,37 @@ const dynamicLabel =
                 }"
             >
                 <Column
+                    expander
+                    style="width: 5rem"
+                    :pt="{
+                        headerCell: { style: { borderTop: 0 } },
+                        headerContent: { style: { height: '4rem' } },
+                    }"
+                />
+                <Column
                     field="prefLabels"
                     header="Item Labels"
                     sortable
                     :pt="{
-                        headerCell: { style: { borderTop: 0, width: '250px' } },
-                        headerContent: { style: { height: '4rem' } },
+                        headerCell: { style: { borderTop: 0, width: '220px' } },
                     }"
-                ></Column>
+                />
                 <Column
                     field="altLabels"
                     header="Alternate Labels"
                     sortable
                     :pt="{
-                        headerCell: { style: { borderTop: 0, width: '250px' } },
-                        headerContent: { style: { height: '4rem' } },
+                        headerCell: { style: { borderTop: 0, width: '220px' } },
                     }"
-                ></Column>
+                />
                 <Column
                     field="uri"
                     header="Item URI"
                     sortable
                     :pt="{
                         headerCell: { style: { borderTop: 0 } },
-                        headerContent: { style: { height: '4rem' } },
                     }"
-                ></Column>
+                />
             </DataTable>
         </div>
     </div>
@@ -157,7 +167,7 @@ const dynamicLabel =
 }
 i {
     margin-left: 1rem;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
 }
 h4 {
     margin: 1rem;
@@ -183,5 +193,12 @@ table {
     color: gray;
     border-bottom: 1px solid lightgray;
     font-weight: 400;
+}
+</style>
+
+<style>
+/* https://github.com/primefaces/primevue/issues/1834#issuecomment-982831184 */
+.p-datatable .p-datatable-tbody > tr.no-expander > td .p-row-toggler {
+    display: none;
 }
 </style>
