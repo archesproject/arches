@@ -8,9 +8,10 @@ const slateBlue = "#2d3c4b";
 const response = await fetch(arches.urls.controlled_lists);
 const { controlled_lists: controlledLists } = await response.json();
 
-const { displayedList, selectedLists } = defineProps([
+const { displayedList, selectedLists, searchValue } = defineProps([
     "displayedList",
     "selectedLists",
+    "searchValue",
 ]);
 
 const toggleCheckbox = (list) => {
@@ -49,7 +50,16 @@ const clearAll = () => {
         </span>
     </div>
 
-    <DataView v-if="controlledLists.length" :value="controlledLists">
+    <DataView
+        v-if="controlledLists.length"
+        :value="
+            searchValue
+                ? controlledLists.filter((list) =>
+                      list.name.includes(searchValue)
+                  )
+                : controlledLists
+        "
+    >
         <template #list="slotProps">
             <div
                 v-for="(item, index) in slotProps.items"
@@ -68,6 +78,11 @@ const clearAll = () => {
                     :checked="selectedLists.indexOf(item) > -1"
                 />
                 <span>{{ item.name }}</span>
+            </div>
+        </template>
+        <template #empty>
+            <div>
+                <span class="no-lists">No matching lists.</span>
             </div>
         </template>
     </DataView>
