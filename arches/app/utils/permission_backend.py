@@ -75,6 +75,20 @@ def user_can_delete_model_nodegroups(user, resource):
 
     return user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource)
 
+
+def user_can_read_graph(user, graph_id):
+    """
+    returns a boolean denoting if a user has permmission to read a model's nodegroups
+
+    Arguments:
+    user -- the user to check
+    graph_id -- a graph id to check if a user has permissions to that graph's type specifically
+
+    """
+
+    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], graph_id=graph_id)
+
+
 def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
