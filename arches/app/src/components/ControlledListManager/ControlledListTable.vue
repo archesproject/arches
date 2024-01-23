@@ -60,15 +60,25 @@ const dynamicLabel =
             <h4>Characteristics</h4>
             <div class="characteristic">
                 <h5>Name</h5>
-                <span>{{ displayedList.value.name }}</span>
+                <input
+                    disabled
+                    :value="displayedList.value.name"
+                    :style="{ width: displayedList.value.name.length + 'rem' }"
+                />
             </div>
             <div class="characteristic">
                 <h5>Type</h5>
-                <span>
-                    {{
+                <input
+                    disabled
+                    :value="
                         displayedList.value.dynamic ? dynamicLabel : staticLabel
-                    }}</span
-                >
+                    "
+                    :style="{
+                        width: displayedList.value.dynamic
+                            ? dynamicLabel.length + 'rem'
+                            : staticLabel.length + 'rem',
+                    }"
+                />
             </div>
             <div class="characteristic">
                 <h5>List used by these nodes</h5>
@@ -76,7 +86,9 @@ const dynamicLabel =
         </div>
 
         <div class="items">
-            <h4 style="margin-top: 4rem; margin-left: 0">Items</h4>
+            <h4 style="margin-top: 4rem; margin-left: 0">
+                Items ({{ displayedList.value.items.length }})
+            </h4>
             <!-- TODO: language selector -->
             <DataTable
                 :value="itemsForLanguage"
@@ -153,6 +165,12 @@ h4 {
 }
 .characteristic {
     margin: 1rem 1rem 2rem 1rem;
+}
+.characteristic input {
+    text-align: center;
+    background: var(--gray-400);
+    border-width: 2px;
+    height: 3rem;
 }
 .list-editor-container {
     margin: 1rem;
