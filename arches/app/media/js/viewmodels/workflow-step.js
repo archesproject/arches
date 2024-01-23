@@ -214,7 +214,7 @@ define([
                     [ko.unwrap(self.name)]: {
                         [key]: value,
                         locked: self.locked(),
-                        stepId: self.id()
+                        stepId: self.id(),
                     },
                 },
             };
