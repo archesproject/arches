@@ -4,6 +4,7 @@ import json
 import os
 import uuid
 import zipfile
+from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import connection
@@ -27,7 +28,7 @@ class ImportSingleCsv(BaseImportModule):
         self.userid = request.user.id if request else 1
         if request is None and params is not None:
             request = HttpRequest()
-            request.user = None #TODO user for command-line?
+            request.user = User.objects.get(id=self.userid)
             request.method = "POST"
             for k, v in params.items():
                 request.POST.__setitem__(k, v)
@@ -74,7 +75,7 @@ class ImportSingleCsv(BaseImportModule):
         initiated = self.start(self.request)
 
         if initiated["success"]:
-            read = self.read_for_cli(self.request, source)
+            read = self.read_for_cli(source)
         else:
             return {"success": False, "data": {"title": _("Error"), "message": initiated["message"]}}
 
@@ -88,7 +89,7 @@ class ImportSingleCsv(BaseImportModule):
         else:
             return {"success": False, "data": {"title": _("Error"), "message": written["message"]}}
 
-    def read_for_cli(self, request, source):
+    def read_for_cli(self, source):
         """
         Reads added csv file and returns all the rows
         If the loadid already exsists also returns the load_details
