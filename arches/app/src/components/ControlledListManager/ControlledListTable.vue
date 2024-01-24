@@ -1,11 +1,15 @@
 <script setup>
+import arches from "arches";
+import Cookies from "js-cookie";
 import { computed, ref } from "vue";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
+import { useToast } from "primevue/usetoast";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 const { displayedList } = defineProps(["displayedList"]);
 
+const toast = useToast();
 const heading = computed(() => {
     return (
         "List Editor" +
@@ -91,8 +95,47 @@ const onRowReorder = (dragData) => {
         }
         return 0;
     });
-    console.log(displayedList.value.items);
-    // todo: hit server
+    for (let i = 0; i < displayedList.value.items.length; i++) {
+        displayedList.value.items[i].sortorder = i;
+    }
+
+    postDisplayedListToServer();
+};
+
+const postDisplayedListToServer = async () => {
+    const postData = {
+        ...displayedList.value,
+        items: displayedList.value.items.map((item) => {
+            const strippedItem = {
+                ...item,
+            };
+            delete strippedItem.children;
+            delete strippedItem.depth;
+            return strippedItem;
+        }),
+    };
+
+    try {
+        const response = await fetch(
+            arches.urls.controlled_list(displayedList.value.id),
+            {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": Cookies.get("csrftoken"),
+                },
+                body: JSON.stringify(postData),
+            }
+        );
+        if (!response.ok) {
+            throw new Error();
+        }
+    } catch (error) {
+        toast.add({
+            severity: "error",
+            summary: "Save failed",
+            life: 3000,
+        });
+    }
 };
 
 const itemsForLanguage = computed(() => {
