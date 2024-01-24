@@ -31,6 +31,67 @@ const onRowCollapse = (row) => {
     expandedRows.value.splice(expandedRows.value.indexOf(row.data.id));
 };
 const onRowReorder = (dragData) => {
+    const dragDown = dragData.dropIndex > dragData.dragIndex;
+    const draggedItem = displayedList.value.items[dragData.dragIndex];
+    const draggedItemParent = displayedList.value.items.find(
+        (item) => item.id === draggedItem.parent_id
+    );
+    const oldItemAtDropIndex = displayedList.value.items[dragData.dropIndex];
+    const newParentId =
+        dragDown && expandedRows.value.includes(oldItemAtDropIndex.id)
+            ? oldItemAtDropIndex.id
+            : oldItemAtDropIndex.parent_id;
+
+    if (newParentId !== draggedItem.parent_id) {
+        // Sync expandedRows to new state of datatable (all collapsed)
+        expandedRows.value = [];
+
+        // Remove this item from old parent's children.
+        if (draggedItemParent) {
+            draggedItemParent.children.splice(
+                draggedItemParent.children.findIndex(
+                    (item) => item.id === draggedItem.id
+                ),
+                1
+            );
+            if (!draggedItemParent.children.length) {
+                onRowCollapse({ data: draggedItem });
+            }
+        }
+        // Set new parent on this item.
+        draggedItem.parent_id = newParentId;
+        // Add this item to new parent's children.
+        if (newParentId) {
+            const newParent = displayedList.value.items.find(
+                (item) => item.id === newParentId
+            );
+            const newParentIndex = displayedList.value.items.indexOf(newParent);
+            const indexInChildren = dragData.dropIndex - newParentIndex;
+            newParent.children.splice(indexInChildren, 0, draggedItem);
+            draggedItem.depth = newParent.depth + 1;
+        } else {
+            draggedItem.depth = 0;
+        }
+    }
+
+    displayedList.value.items.sort((a, b) => {
+        const indexInDragDataA = dragData.value.findIndex(
+            (item) => item.id === a.id
+        );
+        const indexInDragDataB = dragData.value.findIndex(
+            (item) => item.id === b.id
+        );
+        if (indexInDragDataA === -1 || indexInDragDataB === -1) {
+            return 0;
+        }
+        if (indexInDragDataA < indexInDragDataB) {
+            return -1;
+        } else if (indexInDragDataB > indexInDragDataA) {
+            return 1;
+        }
+        return 0;
+    });
+    console.log(displayedList.value.items);
     // todo: hit server
 };
 
@@ -112,7 +173,7 @@ const dynamicLabel =
             </div>
         </div>
 
-        <div class="items">
+        <div class="items" style="height: 50vh">
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
             </h4>
@@ -123,7 +184,7 @@ const dynamicLabel =
                 :rowClass="rowClass"
                 stripedRows
                 scrollable
-                scrollHeight="400px"
+                scrollHeight="flex"
                 tableStyle="font-size: 14px; table-layout: fixed"
                 :pt="{
                     bodyRow: { style: { height: '4rem' } },
@@ -150,7 +211,6 @@ const dynamicLabel =
                 <Column
                     field="prefLabels"
                     header="Item Labels"
-                    sortable
                     :pt="{
                         headerCell: { style: { borderTop: 0, width: '220px' } },
                     }"
@@ -158,7 +218,6 @@ const dynamicLabel =
                 <Column
                     field="altLabels"
                     header="Alternate Labels"
-                    sortable
                     :pt="{
                         headerCell: { style: { borderTop: 0, width: '220px' } },
                     }"
@@ -166,7 +225,6 @@ const dynamicLabel =
                 <Column
                     field="uri"
                     header="Item URI"
-                    sortable
                     :pt="{
                         headerCell: { style: { borderTop: 0 } },
                     }"
