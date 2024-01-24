@@ -1,5 +1,5 @@
 // import declarations from other projects or Arches core
-import('../node_modules/arches/declarations.d.ts');
+import('../node_modules/arches/arches/app/src/declarations.d.ts');
 
 // declare modules that have been added to your project (should mirror `package.json`)
 declare module 'arches';
