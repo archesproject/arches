@@ -28,7 +28,7 @@ from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
-from django.core.validators import RegexValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
@@ -1857,13 +1857,19 @@ class ControlledListItem(models.Model):
         on_delete=models.CASCADE,
         related_name="items",
     )
+    sortorder = models.IntegerField(validators=[MinValueValidator(0)])
     parent = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="children"
     )
 
     class Meta:
         db_table = "controlled_list_items"
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=["list", "sortorder"],
+                name="unique_list_sortorder",
+            ),
+        ]
 
 class Label(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
