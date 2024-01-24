@@ -1,12 +1,14 @@
 from collections import defaultdict
 from datetime import datetime
 
+from django.db import transaction
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 
 from arches.app.models.models import ControlledList, ControlledListItem, Label
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 
@@ -31,8 +33,12 @@ class ControlledListsView(View):
                 return {
                     "id": str(obj.id),
                     "uri": obj.uri,
+                    "sortorder": obj.sortorder,
                     "labels": [cls.serialize(label, depth_map) for label in obj.labels.all()],
-                    "children": [cls.serialize(child, depth_map) for child in obj.children.all()],
+                    "children": sorted(
+                        [cls.serialize(child, depth_map) for child in obj.children.all()],
+                        key=lambda d: d["sortorder"],
+                    ),
                     "parent_id": str(obj.parent.id) if obj.parent else None,
                     "depth": depth_map[obj.id],
                 }
@@ -58,7 +64,7 @@ class ControlledListsView(View):
         data = {
             "controlled_lists": [
                 self.serialize(obj, depth_map=defaultdict(int))
-                for obj in ControlledList.objects.all().prefetch_related(
+                for obj in ControlledList.objects.all().order_by("name").prefetch_related(
                     *prefetch_terms
                 )
             ]
@@ -76,6 +82,38 @@ class ControlledListsView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListView(View):
+    def post(self, request, **kwargs):
+        id = kwargs.get("id")
+        data = JSONDeserializer().deserialize(request.body)
+
+        list_locked = ControlledList.objects.filter(id=id).select_for_update()
+
+        items_to_save = []
+        with transaction.atomic():
+            for clist in list_locked:
+                clist.items.all().delete()
+                clist.dynamic = data["dynamic"]
+                clist.name = data["name"]
+
+                for item in data["items"]:
+                    labels = item.pop("labels")
+                    item_to_save = ControlledListItem(**item)
+                    items_to_save.append(item_to_save)
+
+                    labels_to_save = []
+                    for label in labels:
+                        label["language_id"] = label.pop("language")
+                        label["value_type_id"] = label.pop("valuetype")
+                        labels_to_save.append(Label(**label))
+
+                    item_to_save.labels.set(labels_to_save, bulk=False)
+
+                clist.items.set(items_to_save, bulk=False)
+
+                clist.save()
+
+        return JSONResponse(status=200)
+
     def delete(self, request, **kwargs):
         id = kwargs.get("id")
         objs_deleted, _ = ControlledList.objects.filter(pk=id).delete()
