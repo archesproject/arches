@@ -29,8 +29,8 @@ class ControlledListTests(TestCase):
 
         # Create 5 labels per list. (10)
         ControlledListItem.objects.bulk_create(
-            [ControlledListItem(uri=f"https://archesproject.org/{num}", list=cls.list1) for num in range(5)]
-            + [ControlledListItem(uri=f"https://getty.edu/{num}", list=cls.list2) for num in range(5)]
+            [ControlledListItem(uri=f"https://archesproject.org/{num}", list=cls.list1, sortorder=num) for num in range(5)]
+            + [ControlledListItem(uri=f"https://getty.edu/{num}", list=cls.list2, sortorder=num) for num in range(5)]
         )
 
         parent = ControlledListItem.objects.get(list=cls.list2, uri=f"https://getty.edu/0")

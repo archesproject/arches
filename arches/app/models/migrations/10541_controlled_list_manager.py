@@ -51,6 +51,7 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ("uri", models.URLField(max_length=2048, null=True, unique=True)),
+                ("sortorder", models.IntegerField(validators=[django.core.validators.MinValueValidator(0)])),
                 (
                     "list",
                     models.ForeignKey(
@@ -110,5 +111,9 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(
                 condition=models.Q(("value_type", "prefLabel")), fields=("item", "language"), name="unique_item_preflabel_language"
             ),
+        ),
+        migrations.AddConstraint(
+            model_name="controlledlistitem",
+            constraint=models.UniqueConstraint(fields=("list", "sortorder"), name="unique_list_sortorder"),
         ),
     ]
