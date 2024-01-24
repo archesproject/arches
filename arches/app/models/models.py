@@ -25,7 +25,7 @@ from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
-from django.db.models import JSONField
+from django.db.models import Deferrable, JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1921,6 +1921,7 @@ class ControlledListItem(models.Model):
             models.UniqueConstraint(
                 fields=["list", "sortorder"],
                 name="unique_list_sortorder",
+                deferrable=Deferrable.DEFERRED,
             ),
         ]
 
