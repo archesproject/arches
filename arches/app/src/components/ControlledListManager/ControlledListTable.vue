@@ -35,7 +35,6 @@ const onRowCollapse = (row) => {
     expandedRows.value.splice(expandedRows.value.indexOf(row.data.id));
 };
 const onRowReorder = (dragData) => {
-    // TODO: how is first child created?
     const dragDown = dragData.dropIndex > dragData.dragIndex;
     const draggedItem = displayedList.value.items[dragData.dragIndex];
     const draggedItemParent = displayedList.value.items.find(
