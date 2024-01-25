@@ -1,7 +1,13 @@
 {
     "name": "{{ app_name }}",
     "version": "0.0.1",
+    "scripts": {
+        "gettext:extract": "./{{ app_name }}/media/node_modules/.bin/vue-gettext-extract",
+        "gettext:compile": "./{{ app_name }}/media/node_modules/.bin/vue-gettext-compile"
+    },
     "dependencies": {
+        "vue": "^3.3.4",
+        "vue3-gettext": "^3.0.0-beta.4"
     },
     "devDependencies": {
     },

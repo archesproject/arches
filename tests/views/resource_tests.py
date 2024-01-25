@@ -84,13 +84,11 @@ class CommandLineTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
         add_users()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def test_resource_instance_permission_assignment(self):
         """

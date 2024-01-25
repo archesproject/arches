@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9945_file_thumbnail_bin_file_thumbnail_text"),
+        ("models", "10515_i18n_plugins"),
     ]
 
     operations = [

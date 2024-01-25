@@ -36,8 +36,10 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(self):
-        self.loadOntology()
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.loadOntology()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -50,10 +52,6 @@ class BusinessDataExportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def test_invalid_writer_config(self):
         with self.assertRaises(MissingConfigException):

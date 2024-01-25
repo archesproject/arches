@@ -3,6 +3,7 @@ import copy
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
+from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
@@ -15,11 +16,12 @@ class I18n_String(NothingNode):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
+        self.use_nulls = use_nulls
         self.raw_value = {}
         self.value_is_primitive = False
         self.lang = get_language() if lang is None else lang
 
-        self._parse(self.value, self.lang, use_nulls)
+        self._parse(self.value, self.lang, self.use_nulls)
 
     def _parse(self, value, lang, use_nulls):
         ret = {}
@@ -410,3 +412,15 @@ class I18n_JSONField(JSONField):
         """Override to avoid the optimization from Django 4.2 that
         immediately returns `value` if it is None."""
         return self.get_db_prep_value(value, connection)
+
+
+# Register a lighter-weight serializer sufficient for generating migrations.
+class I18NFieldMigrationSerializer(BaseSerializer):
+    def serialize(self):
+        if isinstance(self.value, (I18n_String, I18n_JSONField)):
+            return f'"{self.value.serialize()}"', set()
+        return super().serialize()
+
+
+Serializer.register(I18n_String, I18NFieldMigrationSerializer)
+Serializer.register(I18n_JSONField, I18NFieldMigrationSerializer)

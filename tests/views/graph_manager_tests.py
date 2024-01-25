@@ -37,6 +37,8 @@ class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         LanguageSynchronizer.synchronize_settings_with_db()
+        super().setUpClass()
+
         cls.loadOntology()
 
     def setUp(self):
