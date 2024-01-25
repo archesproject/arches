@@ -85,7 +85,7 @@ class ControlledListTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
         self.client.force_login(self.admin)
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             # 1: session
             # 2: auth
             # 3: SELECT FROM controlled_lists
@@ -95,6 +95,7 @@ class ControlledListTests(TestCase):
             # 7: prefetch children: labels
             # 8: prefetch grandchildren: items
             # there are no grandchildren, so no labels to get
+            # 9: languages
             response = self.client.get(reverse("controlled_lists"), kwargs={"prefetchDepth": 3})
 
         self.assertEqual(response.status_code, 200)
@@ -108,3 +109,6 @@ class ControlledListTests(TestCase):
 
         second_list_first_item = second_list["items"][0]
         self.assertEqual(second_list_first_item["children"], second_list["items"][1:])
+
+        languages = result["languages"]
+        self.assertEqual(languages["de"], "German")

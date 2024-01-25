@@ -9,6 +9,7 @@ import ControlledListTable from "./ControlledListTable.vue";
 const lightGray = "#f4f4f4";
 
 const displayedList = ref({});
+const languageMap = ref({});
 </script>
 
 <template>
@@ -19,11 +20,17 @@ const displayedList = ref({});
         }"
     >
         <SplitterPanel :size="30" :minSize="15">
-            <ControlledListSidebar :displayedList="displayedList" />
+            <ControlledListSidebar
+                :displayedList="displayedList"
+                :languageMap="languageMap"
+            />
         </SplitterPanel>
 
         <SplitterPanel :size="75" :minSize="50" class="mt-0">
-            <ControlledListTable :displayedList="displayedList" />
+            <ControlledListTable
+                :displayedList="displayedList"
+                :languageMap="languageMap"
+            />
         </SplitterPanel>
     </Splitter>
 </template>
