@@ -5,14 +5,20 @@ import DataView from "primevue/dataview";
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
 
-const response = await fetch(arches.urls.controlled_lists);
-const { controlled_lists: controlledLists } = await response.json();
-
-const { displayedList, selectedLists, searchValue } = defineProps([
+const { displayedList, selectedLists, searchValue, languageMap } = defineProps([
     "displayedList",
     "selectedLists",
     "searchValue",
+    "languageMap",
 ]);
+
+const response = await fetch(arches.urls.controlled_lists);
+const { controlled_lists: controlledLists } = await response
+    .json()
+    .then((data) => {
+        languageMap.value = data.languages;
+        return data;
+    });
 
 const toggleCheckbox = (list) => {
     const i = selectedLists.indexOf(list);

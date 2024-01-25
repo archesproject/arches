@@ -11,9 +11,19 @@ import { useToast } from "primevue/usetoast";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
-const { displayedList } = defineProps(["displayedList"]);
+const staticLabel = "Static: list does not change";
+const dynamicLabel =
+    "Dynamic: list is defined by a query that may change list items";
 
+const { displayedList, languageMap } = defineProps([
+    "displayedList",
+    "languageMap",
+]);
 const toast = useToast();
+
+const selectedLanguage = ref(arches.activeLanguage);
+const expandedRows = ref([]);
+
 const heading = computed(() => {
     return (
         "List Editor" +
@@ -29,9 +39,19 @@ const rowClass = (rowData) => {
     return `${depth} no-expander`;
 };
 
-const selectedLanguage = "en";
+const languageDropdownItems = computed(() => {
+    return (
+        Object.entries(languageMap.value ?? {}).map(([code, label]) => {
+            return {
+                label,
+                command: () => {
+                    selectedLanguage.value = code;
+                },
+            };
+        }) || []
+    );
+});
 
-const expandedRows = ref([]);
 const onRowExpand = (row) => {
     expandedRows.value.push(row.data.id);
 };
@@ -161,7 +181,7 @@ const itemsForLanguage = computed(() => {
                 ...item.labels
                     .filter(
                         (label) =>
-                            label.language === selectedLanguage &&
+                            label.language === selectedLanguage.value &&
                             label.valuetype === "prefLabel"
                     )
                     .map((label) => label.value),
@@ -170,7 +190,7 @@ const itemsForLanguage = computed(() => {
                 ...item.labels
                     .filter(
                         (label) =>
-                            label.language === selectedLanguage &&
+                            label.language === selectedLanguage.value &&
                             label.valuetype === "altLabel"
                     )
                     .map((label) => label.value),
@@ -178,10 +198,6 @@ const itemsForLanguage = computed(() => {
         };
     });
 });
-
-const staticLabel = "Static: list does not change";
-const dynamicLabel =
-    "Dynamic: list is defined by a query that may change list items";
 </script>
 
 <template>
@@ -228,7 +244,8 @@ const dynamicLabel =
                 <div class="controls">
                     <SplitButton
                         class="button language-selector"
-                        :label="`Language - ${selectedLanguage}`"
+                        :label="`Language - ${languageMap.value[selectedLanguage]}`"
+                        :model="languageDropdownItems"
                         raised
                         :pt="{
                             button: {
@@ -246,6 +263,9 @@ const dynamicLabel =
                                         border: '1px solid var(--gray-800)',
                                     },
                                 },
+                            },
+                            menu: {
+                                root: { class: 'language-item' },
                             },
                         }"
                     ></SplitButton>
@@ -387,6 +407,9 @@ table {
 </style>
 
 <style>
+.p-tieredmenu.language-item {
+    font-size: inherit;
+}
 .p-datatable-table {
     border: 2px solid var(--gray-200);
 }

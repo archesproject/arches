@@ -13,7 +13,10 @@ import Spinner from "../Spinner.vue";
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
-const { displayedList } = defineProps(["displayedList"]);
+const { displayedList, languageMap } = defineProps([
+    "displayedList",
+    "languageMap",
+]);
 const selectedLists = ref([]);
 const searchValue = ref("");
 const queryMutator = ref(0);
@@ -131,6 +134,7 @@ const deleteLists = async () => {
             :displayedList="displayedList"
             :selectedLists="selectedLists"
             :searchValue="searchValue"
+            :languageMap="languageMap"
             :key="queryMutator"
         />
         <template #fallback>
