@@ -28,8 +28,8 @@ class ControlledListsView(View):
                     "items": [cls.serialize(item, depth_map) for item in obj.items.all()],
                 }
             case ControlledListItem():
-                if obj.parent:
-                    depth_map[obj.id] = depth_map[obj.parent.id] + 1
+                if obj.parent_id:
+                    depth_map[obj.id] = depth_map[obj.parent_id] + 1
                 return {
                     "id": str(obj.id),
                     "uri": obj.uri,
@@ -39,7 +39,7 @@ class ControlledListsView(View):
                         [cls.serialize(child, depth_map) for child in obj.children.all()],
                         key=lambda d: d["sortorder"],
                     ),
-                    "parent_id": str(obj.parent.id) if obj.parent else None,
+                    "parent_id": str(obj.parent_id) if obj.parent_id else None,
                     "depth": depth_map[obj.id],
                 }
             case Label():
