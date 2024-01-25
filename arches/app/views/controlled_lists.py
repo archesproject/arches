@@ -25,7 +25,10 @@ class ControlledListsView(View):
                     "id": str(obj.id),
                     "name": obj.name,
                     "dynamic": obj.dynamic,
-                    "items": [cls.serialize(item, depth_map) for item in obj.items.all()],
+                    "items": sorted(
+                        [cls.serialize(item, depth_map) for item in obj.items.all()],
+                        key=lambda d: d["sortorder"],
+                    ),
                 }
             case ControlledListItem():
                 if obj.parent_id:
@@ -34,7 +37,9 @@ class ControlledListsView(View):
                     "id": str(obj.id),
                     "uri": obj.uri,
                     "sortorder": obj.sortorder,
-                    "labels": [cls.serialize(label, depth_map) for label in obj.labels.all()],
+                    "labels": [
+                        cls.serialize(label, depth_map) for label in obj.labels.all()
+                    ],
                     "children": sorted(
                         [cls.serialize(child, depth_map) for child in obj.children.all()],
                         key=lambda d: d["sortorder"],
@@ -64,9 +69,9 @@ class ControlledListsView(View):
         data = {
             "controlled_lists": [
                 self.serialize(obj, depth_map=defaultdict(int))
-                for obj in ControlledList.objects.all().order_by("name").prefetch_related(
-                    *prefetch_terms
-                )
+                for obj in ControlledList.objects.all()
+                .order_by("name")
+                .prefetch_related(*prefetch_terms)
             ]
         }
 
@@ -89,27 +94,31 @@ class ControlledListView(View):
         list_locked = ControlledList.objects.filter(id=id).select_for_update()
 
         items_to_save = []
+        labels_to_save = []
         with transaction.atomic():
             for clist in list_locked:
-                clist.items.all().delete()
                 clist.dynamic = data["dynamic"]
                 clist.name = data["name"]
 
                 for item in data["items"]:
+                    # Deletion/insertion of list items not yet implemented.
                     labels = item.pop("labels")
-                    item_to_save = ControlledListItem(**item)
+                    item_to_save = ControlledListItem(list_id=id, **item)
+                    # Check for positive sortorder, but avoid further db hits.
+                    item_to_save.clean_fields(exclude=["parent", "list"])
                     items_to_save.append(item_to_save)
 
-                    labels_to_save = []
                     for label in labels:
                         label["language_id"] = label.pop("language")
                         label["value_type_id"] = label.pop("valuetype")
-                        labels_to_save.append(Label(**label))
+                        labels_to_save.append(Label(item_id=item_to_save.id, **label))
 
-                    item_to_save.labels.set(labels_to_save, bulk=False)
-
-                clist.items.set(items_to_save, bulk=False)
-
+                ControlledListItem.objects.bulk_update(
+                    items_to_save, fields=["uri", "sortorder", "parent"]
+                )
+                Label.objects.bulk_update(
+                    labels_to_save, fields=["value", "value_type", "language"]
+                )
                 clist.save()
 
         return JSONResponse(status=200)
