@@ -230,6 +230,24 @@ const dynamicLabel =
                         class="button language-selector"
                         :label="`Language - ${selectedLanguage}`"
                         raised
+                        :pt="{
+                            button: {
+                                root: {
+                                    style: {
+                                        background: 'var(--gray-700)',
+                                        border: '1px solid var(--gray-700)',
+                                    },
+                                },
+                            },
+                            menubutton: {
+                                root: {
+                                    style: {
+                                        background: 'var(--gray-800)',
+                                        border: '1px solid var(--gray-800)',
+                                    },
+                                },
+                            },
+                        }"
                     ></SplitButton>
                     <Button
                         class="button manage-list"
@@ -353,13 +371,9 @@ h4 {
     color: white;
     text-wrap: nowrap;
 }
-.button.language-selector > button {
+.button.manage-list {
     background: v-bind(buttonGreen);
     border: 1px solid v-bind(buttonGreen);
-}
-.button.manage-list {
-    background: var(--gray-600);
-    border: 1px solid var(--gray-600);
 }
 .items,
 table {
