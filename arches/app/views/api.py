@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import site
 import sys
 import uuid
 import traceback
@@ -14,6 +15,7 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
+from operator import attrgetter
 from urllib import parse
 from collections import OrderedDict
 from django.contrib.auth import authenticate
@@ -27,7 +29,7 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -63,10 +65,6 @@ from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils import translation
-
-
-from arches.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +107,37 @@ class APIBase(View):
 
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
+
+class GetFrontendI18NData(APIBase):
+    def get(self, request):
+        user_language = get_language()
+
+        language_file_path = []
+
+        language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
+        
+        for arches_application_name in settings.ARCHES_APPLICATIONS:
+            application_path = os.path.split(sys.modules[arches_application_name].__spec__.origin)[0]
+            language_file_path.append(os.path.join(application_path, "locale", user_language + ".json"))
+        
+        language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
+
+        localized_strings = {}
+        for lang_file in language_file_path:
+            try:
+                localized_strings = json.load(open(lang_file))[user_language] | localized_strings
+            except FileNotFoundError:
+                pass
+        
+        return JSONResponse({
+            'enabled_languages': {
+                language_tuple[0]: str(language_tuple[1])
+                for language_tuple in settings.LANGUAGES
+            },
+            'translations': {user_language: localized_strings},
+            "language": user_language,
+        })
+    
 
 class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
@@ -1151,24 +1180,25 @@ class ResourceReport(APIBase):
             resp["related_resources"] = related_resources_summary
 
         if "tiles" not in exclude:
-            permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, tile.nodegroup):
-                    tile.filter_by_perm(request.user, perm)
-                    permitted_tiles.append(tile)
+            resource.load_tiles(user=request.user, perm=perm)
+            permitted_tiles = resource.tiles
 
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(request.user, perm)
-                    permitted_cards.append(card)
+            # collect the nodegroups for which this user has perm
+            readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
+            
+            # query only the cards whose nodegroups are readable by user
+            permitted_cards = (
+                CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups)
+                .prefetch_related("cardxnodexwidget_set")
+                .order_by("sortorder")
+            )
 
             cardwidgets = [
                 widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widgets in [sorted(card.cardxnodexwidget_set.all(), key=attrgetter("sortorder")) for card in permitted_cards]
                 for widget in widgets
             ]
 
@@ -1525,10 +1555,18 @@ class UserIncompleteWorkflows(APIBase):
             for incomplete_workflows_user in incomplete_workflows_users
         }
 
+        plugins = models.Plugin.objects.all()
+
+        workflow_slug_to_workflow_name = {
+            plugin.componentname: plugin.name 
+            for plugin in plugins
+        }
+
         incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
 
         for incomplete_workflow in incomplete_workflows_json:
             incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+            incomplete_workflow['pluginname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
 
         return JSONResponse({
             "incomplete_workflows": incomplete_workflows_json,
@@ -1652,3 +1690,17 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+    
+class GetNodegroupTree(APIBase):
+    """
+    Returns the path to a nodegroup from the root node. Transforms node alias to node name.
+    """
+    def get(self,request):
+        graphid = request.GET.get('graphid')
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+            result = cursor.fetchall()
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]  
+            permitted_result = [nodegroup for nodegroup in result if nodegroup[0] in permitted_nodegroups]  
+        
+        return JSONResponse({"path": permitted_result})

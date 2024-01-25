@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import uuid
 
-from distutils.util import strtobool
-
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
@@ -59,6 +57,7 @@ from arches.app.utils.permission_backend import (
     user_can_read_resource,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -876,7 +875,7 @@ class RelatedResourcesView(BaseManagerView):
         else:
             lang = request.GET.get("lang", request.LANGUAGE_CODE)
             resourceinstance_graphid = request.GET.get("resourceinstance_graphid")
-            paginate = strtobool(request.GET.get("paginate", "true"))  # default to true
+            paginate = str_to_bool(request.GET.get("paginate", "true"))  # default to true
             resource = Resource.objects.get(pk=resourceid)
 
             if paginate:

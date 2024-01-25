@@ -51,6 +51,8 @@ class APITests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         cls.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
