@@ -2,11 +2,15 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 import { computed, ref } from "vue";
+
+import Button from "primevue/button";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
+import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
+const buttonGreen = "#10b981";
 const { displayedList } = defineProps(["displayedList"]);
 
 const toast = useToast();
@@ -220,59 +224,94 @@ const dynamicLabel =
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
             </h4>
-            <!-- TODO: language selector -->
-            <!-- TreeTable exists, but DataTable has better support for reordering -->
-            <DataTable
-                :value="itemsForLanguage"
-                :rowClass="rowClass"
-                stripedRows
-                scrollable
-                scrollHeight="flex"
-                tableStyle="font-size: 14px; table-layout: fixed"
-                :pt="{
-                    bodyRow: { style: { height: '4rem' } },
-                }"
-                @rowExpand="onRowExpand"
-                @rowCollapse="onRowCollapse"
-                @rowReorder="onRowReorder"
-            >
-                <Column
-                    expander
-                    style="width: 3rem"
+            <div v-if="displayedList.value.items.length" style="height: 100%">
+                <div class="controls">
+                    <SplitButton
+                        class="button language-selector"
+                        :label="`Language - ${selectedLanguage}`"
+                        raised
+                        :pt="{
+                            button: {
+                                root: {
+                                    style: {
+                                        background: 'var(--gray-700)',
+                                        border: '1px solid var(--gray-700)',
+                                    },
+                                },
+                            },
+                            menubutton: {
+                                root: {
+                                    style: {
+                                        background: 'var(--gray-800)',
+                                        border: '1px solid var(--gray-800)',
+                                    },
+                                },
+                            },
+                        }"
+                    ></SplitButton>
+                    <Button
+                        class="button manage-list"
+                        label="Manage List"
+                        raised
+                    ></Button>
+                </div>
+                <!-- TreeTable exists, but DataTable has better support for reordering -->
+                <DataTable
+                    :value="itemsForLanguage"
+                    :rowClass="rowClass"
+                    stripedRows
+                    scrollable
+                    scrollHeight="flex"
+                    tableStyle="font-size: 14px; table-layout: fixed"
                     :pt="{
-                        headerCell: { style: { borderTop: 0 } },
-                        headerContent: { style: { height: '4rem' } },
+                        bodyRow: { style: { height: '4rem' } },
                     }"
-                />
-                <Column
-                    rowReorder
-                    style="width: 3rem"
-                    :pt="{
-                        headerCell: { style: { borderTop: 0 } },
-                    }"
-                />
-                <Column
-                    field="prefLabels"
-                    header="Item Labels"
-                    :pt="{
-                        headerCell: { style: { borderTop: 0, width: '220px' } },
-                    }"
-                />
-                <Column
-                    field="altLabels"
-                    header="Alternate Labels"
-                    :pt="{
-                        headerCell: { style: { borderTop: 0, width: '220px' } },
-                    }"
-                />
-                <Column
-                    field="uri"
-                    header="Item URI"
-                    :pt="{
-                        headerCell: { style: { borderTop: 0 } },
-                    }"
-                />
-            </DataTable>
+                    @rowExpand="onRowExpand"
+                    @rowCollapse="onRowCollapse"
+                    @rowReorder="onRowReorder"
+                >
+                    <Column
+                        expander
+                        style="width: 3rem"
+                        :pt="{
+                            headerCell: { style: { borderTop: 0 } },
+                            headerContent: { style: { height: '5rem' } },
+                        }"
+                    />
+                    <Column
+                        rowReorder
+                        style="width: 3rem"
+                        :pt="{
+                            headerCell: { style: { borderTop: 0 } },
+                        }"
+                    />
+                    <Column
+                        field="prefLabels"
+                        header="Item Labels"
+                        :pt="{
+                            headerCell: {
+                                style: { borderTop: 0, width: '220px' },
+                            },
+                        }"
+                    />
+                    <Column
+                        field="altLabels"
+                        header="Alternate Labels"
+                        :pt="{
+                            headerCell: {
+                                style: { borderTop: 0, width: '220px' },
+                            },
+                        }"
+                    />
+                    <Column
+                        field="uri"
+                        header="Item URI"
+                        :pt="{
+                            headerCell: { style: { borderTop: 0 } },
+                        }"
+                    />
+                </DataTable>
+            </div>
         </div>
     </div>
 
@@ -320,6 +359,22 @@ h4 {
 .list-editor-container {
     margin: 1rem;
 }
+.controls {
+    background: var(--gray-200);
+}
+.button {
+    font-size: inherit;
+    height: 4rem;
+    margin: 0.5rem;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    text-wrap: nowrap;
+}
+.button.manage-list {
+    background: v-bind(buttonGreen);
+    border: 1px solid v-bind(buttonGreen);
+}
 .items,
 table {
     margin: inherit;
@@ -332,6 +387,9 @@ table {
 </style>
 
 <style>
+.p-datatable-table {
+    border: 2px solid var(--gray-200);
+}
 /* https://github.com/primefaces/primevue/issues/1834#issuecomment-982831184 */
 .p-datatable .p-datatable-tbody > tr.no-expander > td .p-row-toggler {
     display: none;
