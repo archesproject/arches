@@ -1,4 +1,4 @@
-Django==4.2.8
+Django==4.2.9
 psycopg2==2.9.9
 urllib3<2
 elasticsearch>=8.3.1,<9.0.0
@@ -7,7 +7,6 @@ django-guardian==2.4.0
 python-memcached==1.59
 celery==5.3.6
 django-celery-results==2.5.1
-mapbox-vector-tile==1.2.0
 SPARQLWrapper==1.8.5
 django-recaptcha==3.0.0
 edtf==4.0.1
@@ -25,7 +24,7 @@ requests[security]>=2.31.0
 python-slugify==7.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
-openpyxl==3.0.7
+openpyxl==3.1.2
 django_compressor==4.4
 django-libsass==0.9
 django-webpack-loader==2.0.1

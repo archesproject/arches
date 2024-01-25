@@ -11,7 +11,6 @@ import os
 from pathlib import Path
 import ast
 import time
-from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 
@@ -28,6 +27,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.i18n import get_localized_value
+from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
     Dsl,
@@ -484,8 +484,8 @@ class BooleanDataType(BaseDataType):
         errors = []
         try:
             if value is not None:
-                type(bool(util.strtobool(str(value)))) is True
-        except Exception:
+                str_to_bool(str(value))
+        except ValueError:
             message = _("Not of type boolean")
             title = _("Invalid Boolean")
             error_message = self.create_error_message(value, source, row_number, message, title)
@@ -522,7 +522,7 @@ class BooleanDataType(BaseDataType):
             return self.compile_json(tile, node, display_value=label, value=value)
 
     def transform_value_for_tile(self, value, **kwargs):
-        return bool(util.strtobool(str(value)))
+        return str_to_bool(str(value))
 
     def append_search_filters(self, value, node, query, request):
         try:
