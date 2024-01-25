@@ -43,6 +43,8 @@ from arches.app.models.models import CardModel, CardXNodeXWidget, Node, NodeGrou
 class TileTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             management.call_command("packages", operation="import_graphs", source=path)
 
@@ -86,6 +88,8 @@ class TileTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+        super().tearDownClass()
 
     def setUp(self):
         cursor = connection.cursor()
@@ -645,14 +649,12 @@ class TileTests(ArchesTestCase):
             nodegroup=node_group,
             graph_id=UUID("2f7f8e40-adbc-11e6-ac7f-14109fd34195"),
         )
-        self.addCleanup(card.delete)
-        x = CardXNodeXWidget.objects.create(
+        CardXNodeXWidget.objects.create(
             card=card,
             node_id=required_file_list_node.nodeid,
             widget=Widget.objects.first(),
             label="Widget name",
         )
-        self.addCleanup(x.delete)
 
         with self.assertRaisesMessage(TileValidationError, "Widget name"):
             tile.check_for_missing_nodes()
