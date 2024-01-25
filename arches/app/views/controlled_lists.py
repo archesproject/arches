@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 
-from arches.app.models.models import ControlledList, ControlledListItem, Label
+from arches.app.models.models import ControlledList, ControlledListItem, Label, Language
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
@@ -72,7 +72,8 @@ class ControlledListsView(View):
                 for obj in ControlledList.objects.all()
                 .order_by("name")
                 .prefetch_related(*prefetch_terms)
-            ]
+            ],
+            "languages": {lang.code: lang.name for lang in Language.objects.all()},
         }
 
         return JSONResponse(data)
