@@ -139,6 +139,27 @@ class BaseConceptDataType(BaseDataType):
         except KeyError as e:
             pass
 
+    def append_in_list_search_filters(self, value, node, query, request, match_any=True):
+        try:
+            # Extract the list of values from the filter
+            values_list = value.get("val", [])
+
+            if values_list:
+                field_name = "tiles.data.%s" % (str(node.pk))
+                for val in values_list:
+                    match_q = Match(field=field_name, type="phrase", query=val)
+
+                    if match_any:
+                        query.should(match_q)
+                    elif match_any is False:
+                        query.must(match_q)
+                    elif match_any is None:
+                        query.must_not(match_q)
+                query.filter(Exists(field=field_name))
+        
+        except KeyError as e:
+            pass
+
 
 class ConceptDataType(BaseConceptDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
