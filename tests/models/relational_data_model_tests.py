@@ -96,13 +96,14 @@ class RelationalDataModelTests(ArchesTestCase):
     # Teardown logic that runs to setup the class (runs only once)
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         if not cls.custom_data_type_graph_existed:
             # There doesn't seem to be a way to delete a graph via the management interface
             Graph.objects.get(pk=cls.custom_data_type_graphid).delete()
 
         if not cls.custom_string_datatype_existed:
             management.call_command("datatype", "unregister", datatype=cls.custom_string_datatype_filename)
+
+        super().tearDownClass()
 
     @classmethod
     def setUpTestData(cls):

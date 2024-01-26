@@ -29,7 +29,7 @@ const buildVueFilePathLookup = function(path, outerAcc, vueDirectoryPath) {
             else {
                 return { 
                     ...acc, 
-                    [filename.replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
+                    [Path.join('vue', filename).replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
                 };
             }
         }
