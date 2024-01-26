@@ -129,16 +129,15 @@ define([
 
         });
 
-        const valueLeaf = self.value?.[arches.activeLanguage]?.value || self.value;
-        if (ko.isObservable(valueLeaf)) {
-            valueLeaf.subscribe(newValue => {
+        if (ko.isObservable(self.value)) {
+            self.value.subscribe(newValue => {
                 const currentLanguage = self.currentLanguage();
                 if(!currentLanguage) { return; }
                 if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
                     self.currentText(newValue?.[currentLanguage.code]?.value);
                 }
             });
-        };
+        }
 
         self.currentText.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
