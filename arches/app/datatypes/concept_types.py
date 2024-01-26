@@ -128,6 +128,12 @@ class BaseConceptDataType(BaseDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
+            elif value["op"] == "in_list_any":
+                self.append_in_list_search_filters(value, node, query, request, match_any=True)
+            elif value["op"] == "in_list_all":
+                self.append_in_list_search_filters(value, node, query, request, match_any=False)
+            elif value["op"] == "in_list_not":
+                self.append_in_list_search_filters(value, node, query, request, match_any=None)
             elif value["val"] != "":
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
