@@ -96,31 +96,38 @@ class ControlledListView(View):
 
         items_to_save = []
         labels_to_save = []
-        with transaction.atomic():
-            for clist in list_locked:
-                clist.dynamic = data["dynamic"]
-                clist.name = data["name"]
+        try:
+            with transaction.atomic():
+                for clist in list_locked:
+                    clist.dynamic = data["dynamic"]
+                    clist.name = data["name"]
 
-                for item in data["items"]:
-                    # Deletion/insertion of list items not yet implemented.
-                    labels = item.pop("labels")
-                    item_to_save = ControlledListItem(list_id=id, **item)
-                    # Check for positive sortorder, but avoid further db hits.
-                    item_to_save.clean_fields(exclude=["parent", "list"])
-                    items_to_save.append(item_to_save)
+                    for item in data["items"]:
+                        # Deletion/insertion of list items not yet implemented.
+                        labels = item.pop("labels")
+                        # Altering hierarchy is done by altering parents.
+                        item.pop("children", None)
+                        item.pop("depth", None)
 
-                    for label in labels:
-                        label["language_id"] = label.pop("language")
-                        label["value_type_id"] = label.pop("valuetype")
-                        labels_to_save.append(Label(item_id=item_to_save.id, **label))
+                        item_to_save = ControlledListItem(list_id=id, **item)
+                        # Check for positive sortorder, but avoid further db hits.
+                        item_to_save.clean_fields(exclude=["parent", "list"])
+                        items_to_save.append(item_to_save)
 
-                ControlledListItem.objects.bulk_update(
-                    items_to_save, fields=["uri", "sortorder", "parent"]
-                )
-                Label.objects.bulk_update(
-                    labels_to_save, fields=["value", "value_type", "language"]
-                )
-                clist.save()
+                        for label in labels:
+                            label["language_id"] = label.pop("language")
+                            label["value_type_id"] = label.pop("valuetype")
+                            labels_to_save.append(Label(item_id=item_to_save.id, **label))
+
+                    ControlledListItem.objects.bulk_update(
+                        items_to_save, fields=["uri", "sortorder", "parent"]
+                    )
+                    Label.objects.bulk_update(
+                        labels_to_save, fields=["value", "value_type", "language"]
+                    )
+                    clist.save()
+        except:
+            return JSONErrorResponse(status=400)
 
         return JSONResponse(status=200)
 

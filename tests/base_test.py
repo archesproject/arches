@@ -98,6 +98,7 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
         cursor = connection.cursor()
         sql = """
             INSERT INTO public.oauth2_provider_application(
@@ -123,14 +124,9 @@ class ArchesTestCase(TestCase):
         cursor = connection.cursor()
         sql = "DELETE FROM public.oauth2_provider_application WHERE id = 44;"
         cursor.execute(sql)
+        super().tearDownClass()
 
     @classmethod
     def deleteGraph(cls, root):
         graph = Graph.objects.get(graphid=str(root))
         graph.delete()
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
