@@ -274,7 +274,7 @@
             <div data-bind="foreach: statusDetails">
                 <div data-bind="text: $data"></div>
             </div>
-            <div data-bind="ifnot: ['indexed','failed'].includes(selectedLoadEvent().status)">
+            <div data-bind="ifnot: ['indexed','failed','cancelled','unloaded'].includes(selectedLoadEvent().status)">
                 <i class="fa fa-spin fa-spinner fa-lg"></i>
             </div>
             <!-- /ko -->

@@ -48,6 +48,8 @@ from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_IN
 class SearchTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         se = SearchEngineFactory().create()
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
@@ -160,6 +162,7 @@ class SearchTests(ArchesTestCase):
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(source_identifier=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
+        super().tearDownClass()
 
     def test_temporal_only_search_1(self):
         """

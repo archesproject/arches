@@ -225,7 +225,12 @@ class TileData(View):
                     resource_instance = tile.resourceinstance
                     is_active = resource_instance.graph.is_active
                 except ObjectDoesNotExist:
-                    return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
+                    return JSONErrorResponse(
+                        title=_("This tile is no longer available"),
+                        message=_("It was likely already deleted by another user"),
+                        # Not localized (not user-facing)
+                        content={"exception": "TileModel.ObjectDoesNotExist"},
+                    )
                 user_is_reviewer = user_is_resource_reviewer(request.user)
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):
