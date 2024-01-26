@@ -16,7 +16,7 @@ def add_plugins(apps, schema_editor):
         icon="fa fa-code-fork",
         component="views/components/plugins/controlled-list-manager",
         componentname="controlled-list-manager",
-        config={},
+        config={"show": True},
         slug="controlled-list-manager",
         sortorder=0,
     ).save()
