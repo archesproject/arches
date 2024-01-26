@@ -2565,3 +2565,28 @@ def get_value_from_jsonld(json_ld_node):
             return
     except IndexError as e:
         return
+
+
+class ReferenceDataType(BaseDataType):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
+        errors = []
+        return errors
+
+    def transform_value_for_tile(self, value, **kwargs):
+        ret = []
+        return ret
+
+    def transform_export_values(self, value, *args, **kwargs):
+        new_values = []
+        return ",".join(new_values)
+
+    def get_display_value(self, tile, node, **kwargs):
+        new_values = []
+        return ",".join(new_values)
+
+    def to_json(self, tile, node):
+        new_values = []
+        return json.dumps({"text":new_values})
+
+    def collects_multiple_values(self):
+        return True
