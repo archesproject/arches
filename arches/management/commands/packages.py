@@ -104,14 +104,29 @@ class Command(BaseCommand):
 
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
+            "-s",
+            "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="Directory or file for processing",
         )
         group.add_argument(
-            "-a", "--arches-application", action="store", dest="arches_application", default="", help="Name of Arches Application",
+            "-a",
+            "--arches-application",
+            action="store",
+            dest="arches_application",
+            default="",
+            help="Name of Arches Application",
         )
 
         parser.add_argument(
-            "-f", "--format", action="store", dest="format", default="arches", help="Format: shp or arches",
+            "-f",
+            "--format",
+            action="store",
+            dest="format",
+            default="arches",
+            help="Format: shp or arches",
         )
 
         parser.add_argument(
@@ -145,7 +160,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-c", "--config_file", action="store", dest="config_file", default=None, help="Usually an export mapping file.",
+            "-c",
+            "--config_file",
+            action="store",
+            dest="config_file",
+            default=None,
+            help="Usually an export mapping file.",
         )
 
         parser.add_argument(
@@ -331,7 +351,10 @@ class Command(BaseCommand):
 
         if options["operation"] == "add_mapbox_layer":
             self.add_mapbox_layer(
-                options["layer_name"], options["mapbox_json_path"], options["layer_icon"], options["is_basemap"],
+                options["layer_name"],
+                options["mapbox_json_path"],
+                options["layer_icon"],
+                options["is_basemap"],
             )
 
         if options["operation"] == "delete_mapbox_layer":
@@ -341,12 +364,12 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
-            arches_application = options['arches_application']
+            arches_application = options["arches_application"]
             arches_application_path = None
 
             if arches_application:
                 application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
-                arches_application_path = os.path.join(application_origin, 'pkg')
+                arches_application_path = os.path.join(application_origin, "pkg")
 
             self.load_package(
                 arches_application_path or options["source"],
@@ -357,6 +380,7 @@ class Command(BaseCommand):
                 options["yes"],
                 options["dev"],
                 False if str(options["defer_indexing"])[0].lower() == "f" else True,
+                False if arches_application_path is None else True,
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -539,8 +563,8 @@ class Command(BaseCommand):
         yes=False,
         dev=False,
         defer_indexing=True,
+        is_application=False,
     ):
-
         celery_worker_running = task_management.check_if_celery_available()
 
         # only defer indexing if the celery worker ISN'T running because celery processes
@@ -607,10 +631,11 @@ class Command(BaseCommand):
 
         @transaction.atomic
         def load_sql(package_dir, sql_dir):
-            sql_files = glob.glob(os.path.join(package_dir, sql_dir, "*.sql"))
+            sql_files = sorted(glob.glob(os.path.join(package_dir, sql_dir, "*.sql")))
             try:
                 with connection.cursor() as cursor:
                     for sql_file in sql_files:
+                        print("  %s" % sql_file)
                         with open(sql_file, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
@@ -619,10 +644,11 @@ class Command(BaseCommand):
                 print("Failed to load sql files")
 
         def load_resource_views(package_dir):
-            resource_views = glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql"))
+            resource_views = sorted(glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql")))
             try:
                 with connection.cursor() as cursor:
                     for view in resource_views:
+                        print("  %s" % view)
                         with open(view, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
@@ -807,9 +833,12 @@ class Command(BaseCommand):
                     if os.path.exists(module_dir) is False:
                         os.mkdir(module_dir)
                     dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
-                    if os.path.exists(dest_path) is False:
+                    if os.path.exists(dest_path) is False and not is_application:
                         module = modules[0]
                         shutil.copy(module, dest_path)
+                        management.call_command(cmd, "register", source=module)
+                    elif is_application:  # do not copy, register source application function
+                        module = modules[0]
                         management.call_command(cmd, "register", source=module)
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(modules[0]))
@@ -884,7 +913,7 @@ class Command(BaseCommand):
                 try:
                     management.call_command("load_template", "-s", template)
                 except CommandError as e:
-                    print(e) # ok to fail, template engine may not be installed
+                    print(e)  # ok to fail, template engine may not be installed
 
         def handle_source(source):
             if os.path.isdir(source):
@@ -978,7 +1007,7 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
-        print('loading templates')
+        print("loading templates")
         load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
@@ -1303,7 +1332,6 @@ class Command(BaseCommand):
         graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID,
         single_file=False,
     ):
-
         resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         if data_dest == ".":
             data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)

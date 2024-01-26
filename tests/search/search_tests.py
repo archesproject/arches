@@ -32,6 +32,7 @@ class SearchTests(ArchesTestCase):
         se = SearchEngineFactory().create()
         se.delete_index(index="test")
         se.delete_index(index="bulk")
+        super().tearDownClass()
 
     def test_delete_by_query(self):
         """

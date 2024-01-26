@@ -33,19 +33,11 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 
 
 class mappedArchesJSONImportTests(ArchesTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         ResourceInstance.objects.all().delete()
         with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def test_single_1(self):
         og_tile_count = TileModel.objects.count()

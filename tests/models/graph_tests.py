@@ -33,6 +33,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class GraphTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         cls.loadOntology()
 
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:

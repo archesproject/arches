@@ -12,6 +12,8 @@ from django.db import connection
 class Customi18nTextFieldTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         sql = """
         CREATE TABLE public._localization_test_model
         (
@@ -36,6 +38,12 @@ class Customi18nTextFieldTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = connection.cursor()
+        cursor.execute("DROP TABLE public._localization_test_model")
+        super().tearDownClass()
 
     class LocalizationTestModel(models.Model):
         name = I18n_TextField(null=False)
@@ -214,6 +222,8 @@ class Customi18nTextFieldTests(ArchesTestCase):
 class Customi18nJSONFieldTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         sql = """
         CREATE TABLE public._localization_test_json_model
         (
@@ -228,6 +238,12 @@ class Customi18nJSONFieldTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = connection.cursor()
+        cursor.execute("DROP TABLE public._localization_test_json_model")
+        super().tearDownClass()
 
     class LocalizationTestJsonModel(models.Model):
         config = I18n_JSONField(null=False)

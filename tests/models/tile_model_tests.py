@@ -33,7 +33,7 @@ from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, ResourceXResource, TileModel
+from arches.app.models.models import CardModel, CardXNodeXWidget, Node, NodeGroup, ResourceXResource, TileModel, Widget
 
 
 # these tests can be run from the command line via
@@ -43,6 +43,8 @@ from arches.app.models.models import Node, NodeGroup, ResourceXResource, TileMod
 class TileTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             management.call_command("packages", operation="import_graphs", source=path)
 
@@ -86,6 +88,8 @@ class TileTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+        super().tearDownClass()
 
     def setUp(self):
         cursor = connection.cursor()
@@ -432,6 +436,16 @@ class TileTests(ArchesTestCase):
 
         self.assertEqual(len(Tile.objects.all()), 0)
 
+    def test_delete_empty_tile(self):
+        tile = Tile({
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {},
+        })
+        tile.delete()
+
     def test_provisional_deletion(self):
         """
         Tests that a tile is NOT deleted if a user does not have the
@@ -627,5 +641,20 @@ class TileTests(ArchesTestCase):
         }
         tile = Tile(json)
 
-        with self.assertRaises(TileValidationError):
+        with self.assertRaisesMessage(TileValidationError, "Required file list"):  # node name
+            tile.check_for_missing_nodes()
+
+        # Add a widget label, should appear in error msg in lieu of node name
+        card = CardModel.objects.create(
+            nodegroup=node_group,
+            graph_id=UUID("2f7f8e40-adbc-11e6-ac7f-14109fd34195"),
+        )
+        CardXNodeXWidget.objects.create(
+            card=card,
+            node_id=required_file_list_node.nodeid,
+            widget=Widget.objects.first(),
+            label="Widget name",
+        )
+
+        with self.assertRaisesMessage(TileValidationError, "Widget name"):
             tile.check_for_missing_nodes()

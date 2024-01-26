@@ -501,7 +501,10 @@ DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 TIMEWHEEL_DATE_TIERS = None
 
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
-CACHE_BY_USER = {"anonymous": 3600 * 24}
+CACHE_BY_USER = {
+    "default": 3600 * 24, #24hrs
+    "anonymous": 3600 * 24 #24hrs
+    }
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
