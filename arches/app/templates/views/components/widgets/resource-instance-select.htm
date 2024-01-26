@@ -66,21 +66,21 @@
                             <button data-bind="click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false,
                                     attr: {'aria-label': $root.translations.editRelatedResource($data.resourceName())}
                             ">
-                                <i class="fa fa-pencil"></i>
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
                             </button>
                         </div>
                         <div class='rr-table-column icon-column'>
                             <button data-bind="click: $parent.deleteRelationship, clickBubble: false,
                                     attr: {'aria-label': $root.translations.deleteRelationshipResource($data.resourceName())}
                             ">
-                                <i class="fa fa-trash"></i>
+                                <i class="fa fa-trash" aria-hidden="true"></i>
                             </button>
                         </div>
                         <div class='rr-table-column icon-column'>
                             <button data-bind="click:function(){self.openReport(ko.unwrap($data.resourceId)) }, clickBubble: false,
                                     attr: {'aria-label': $root.translations.expandResourceReport($data.resourceName())}
                             ">
-                                <i class="fa fa-info-circle"></i>
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
                             </button>
                         </div>
                         <!-- ko if: self.relationship() -->
@@ -304,21 +304,21 @@
                                 <button data-bind="onEnterkeyClick, onSpaceClick, click: function(){window.open($parent.resourceEditorUrl+ko.unwrap($data.resourceId))}, clickBubble: false,
                                         attr: {'aria-label': $root.translations.editRelatedResource($data.resourceName())}
                                 ">
-                                    <i class="fa fa-pencil"></i>
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
                                 <button data-bind="onEnterkeyClick, onSpaceClick, click: $parent.deleteRelationship, clickBubble: false,
                                         attr: {'aria-label': $root.translations.deleteRelationshipResource($data.resourceName())}
                                 ">
-                                    <i class="fa fa-trash"></i>
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                             </div>
                             <div class='rr-table-column icon-column'>
                                 <button data-bind="onEnterkeyClick, onSpaceClick, click:function(){self.reportResourceId(ko.unwrap($data.resourceId));}, clickBubble: false,
                                         attr: {'aria-label': $root.translations.expandResourceReport($data.resourceName())}    
                                 ">
-                                    <i class="fa fa-info-circle"></i>
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
                                 </button>
                             </div>
                             <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" tabindex="0" role="button"

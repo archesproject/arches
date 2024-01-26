@@ -10,7 +10,7 @@ setup(
     license="GNU AGPL3",
     packages=find_packages(),
     include_package_data=True,
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
@@ -22,10 +22,9 @@ setup(
         "Intended Audience :: Information Technology",
         "Topic :: Software Development :: Build Tools",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Framework :: Django :: 4.2",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],

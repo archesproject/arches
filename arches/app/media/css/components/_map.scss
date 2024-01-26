@@ -17,3 +17,7 @@
 .map-sidebar-text {
     font-size: 1.2rem;
 }
+
+.workbench-card-container.map-container {
+    width: calc(100% - 75px);
+}

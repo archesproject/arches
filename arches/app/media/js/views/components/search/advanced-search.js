@@ -25,6 +25,10 @@ define([
                 facets: ko.observableArray()
             };
             this.cardNameDict = {};
+            var pathData = {};
+            this.selectedNodegroupId = ko.observable();
+            this.cardPath = ko.observableArray();
+            this.expandPath = ko.observable(false);
             var createLookup = function(list, idKey) {
                 return _.reduce(list, function(lookup, item) {
                     lookup[item[idKey]] = item;
@@ -43,6 +47,55 @@ define([
 
             this.removeFacet = function(facet){
                 self.filter.facets.remove(facet);
+            };
+
+            var aliasToNodeName = function(path, pathData, graphid) {
+
+                var lookupName = function(alias) {
+                    var namePath = pathData[graphid].filter((cardData) => 
+                    cardData[3] === alias
+                    );
+                    return namePath[0][4];
+                }
+
+                self.cardPath(path.map((alias) => 
+                    lookupName(alias)
+                    )
+                );
+            }
+
+            this.requestPathData = function(graph_id, nodegroup_id) {
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.api_get_nodegroup_tree, 
+                    data: {graphid: graph_id},
+                    context: this
+                }).done(function(response) {
+                    pathData[graph_id] = response['path'];
+                    var graphPath = pathData[graph_id].filter((d) => d[1] === nodegroup_id)
+                    aliasToNodeName(graphPath[0][6].split(' - '), pathData, graph_id);  
+               })
+            };
+
+            this.expandPath = ko.pureComputed(function() {
+                return self.selectedNodegroupId();
+            }); 
+
+            this.getNodegroupPath = function() {
+                if (self.selectedNodegroupId() === this.nodegroup_id) {
+                    self.selectedNodegroupId(undefined);
+                }
+                else if (self.selectedNodegroupId() !== this.nodegroup_id) {
+                    self.selectedNodegroupId(undefined);
+                    self.selectedNodegroupId(this.nodegroup_id);
+                    if (!(this.graph_id in pathData)) {
+                        self.requestPathData(this.graph_id, this.nodegroup_id);
+                    }
+                    else {
+                        var graphPath = pathData[this.graph_id].filter((d) => d[1] === this.nodegroup_id)
+                        aliasToNodeName(graphPath[0][6].split(' - '), pathData, this.graph_id);                
+                    }   
+                }
             };
 
             $.ajax({

@@ -58,10 +58,6 @@ class mappedCSVFileImportTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
     def test_nonexistent_language_check(self):
         new_languages = BusinessDataImporter("tests/fixtures/data/csv/required_node_import_new_languages.csv").scan_for_new_languages()
         self.assertNotEqual(new_languages, None)

@@ -19,6 +19,8 @@ from arches.app.utils.skos import SKOSReader
 class JsonLDExportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         # This runs once per instantiation
         cls.loadOntology()
         cls.factory = RequestFactory()
@@ -90,10 +92,6 @@ class JsonLDExportTests(ArchesTestCase):
         # This runs every test
         #response = self.client.post(reverse('get_token'), {'username': 'admin', 'password': 'admin'})
         #self.token = response.content
-        pass
-
-    @classmethod
-    def tearDownClass(cls):
         pass
 
     def tearDown(self):

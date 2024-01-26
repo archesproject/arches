@@ -26,6 +26,36 @@ from tests.base_test import ArchesTestCase
 # python manage.py test tests/utils/datatype_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
+class BooleanDataTypeTests(ArchesTestCase):
+    def test_validate(self):
+        boolean = DataTypeFactory().get_instance("boolean")
+
+        for good in ["true", "false", "yes", "no", None]:
+            with self.subTest(input=good):
+                no_errors = boolean.validate(good)
+                self.assertEqual(len(no_errors), 0)
+
+        for bad in ["garbage", "True", "False", "None"]:
+            with self.subTest(input=bad):
+                errors = boolean.validate(bad)
+                self.assertEqual(len(errors), 1)
+
+    def test_tile_transform(self):
+        boolean = DataTypeFactory().get_instance("boolean")
+
+        truthy_values = []
+        falsy_values = []
+        for truthy in truthy_values:
+            with self.subTest(input=truthy):
+                self.assertTrue(boolean.transform_value_for_tile(truthy))
+        for falsy in falsy_values:
+            with self.subTest(input=falsy):
+                self.assertFalse(boolean.transform_value_for_tile(falsy))
+
+        with self.assertRaises(ValueError):
+            boolean.transform_value_for_tile(None)
+
+
 class StringDataTypeTests(ArchesTestCase):
     def test_string_validate(self):
         string = DataTypeFactory().get_instance("string")
