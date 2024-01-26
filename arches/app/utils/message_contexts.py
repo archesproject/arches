@@ -19,6 +19,9 @@ def return_message_context(greeting="",closing_text="",email=None,additional_con
 
         if settings.EXTRA_EMAIL_CONTEXT != {}:
             for k,v in settings.EXTRA_EMAIL_CONTEXT.items():
+                # In 7.5, we stringified `v` (could be lazy string), but in 7.6
+                # we won't need to since we provided the encoder arg to the JSONField.
+                # https://code.djangoproject.com/ticket/35071
                 message_context[k] = v
 
         return message_context
