@@ -155,6 +155,7 @@ def package_load_complete(*args, **kwargs):
     context = return_message_context(
         greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
         closing_text=_("Thank you"),
+        email=user.email,
         additional_context={
             "link":"",
             "loaded_resource":[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],

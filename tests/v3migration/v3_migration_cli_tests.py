@@ -25,6 +25,8 @@ class v3MigrationTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         cls.loadOntology()
         management.call_command("packages", operation="import_graphs", source=os.path.join(cls.pkg_fixture, "graphs", "resource_models"))
 
@@ -32,6 +34,7 @@ class v3MigrationTests(ArchesTestCase):
     def tearDownClass(cls):
         if os.path.isdir(cls.pkg):
             shutil.rmtree(cls.pkg)
+        super().tearDownClass()
 
     def load_v4_reference_data(self, dry_run=False):
 
