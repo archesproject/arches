@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load template_tags %}
+
+<!-- ko ifnot: $data.search -->
+<div class="node-config-item">
+    <div class="col-xs-12 control-label widget-input-label">
+        <span data-bind="text: $root.translations.controlledList"></span>
+    </div>
+    <!-- ko if: $data.controlledLists() -->
+        <select 
+            data-bind="
+                options: $data.controlledLists, 
+                optionsText: 'name', 
+                optionsValue: 'id', 
+                select2Query: {
+                    select2Config:{
+                        disable: false,
+                        value: $data.controlledList,
+                        allowClear: true,
+                        placeholder: $root.translations.selectAControlledList, 
+                }},
+                attr: {'data-label': $root.translations.controlledList}
+            "
+        ></select>
+        <div style="padding-top: 12px"
+            data-bind="
+                component: {
+                    name: 'views/components/simple-switch',
+                    params: {
+                        value: $data.multiValue,
+                        config:{
+                            label: $root.translations.multipleValues,
+                            subtitle: $root.translations.allowSelectionOfMultipleItems
+                        }
+                    }
+                }
+            "
+        ></div>
+    <!-- /ko -->
+</div>
+<!-- /ko -->
