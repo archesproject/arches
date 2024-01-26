@@ -1,4 +1,5 @@
 import importlib
+from arches.app.models.system_settings import settings
 
 
 def get_module(path, modulename=""):
@@ -13,6 +14,8 @@ def get_class_from_modulename(modulename, classname, directory_list):
     import_error = None
     for directory in directory_list:
         try:
+            for arches_application in settings.ARCHES_APPLICATIONS:
+                importlib.import_module(arches_application)  # need to import module to find path
             module = importlib.import_module(directory + ".%s" % mod_path)
             import_success = True
         except ImportError as e:
