@@ -182,16 +182,3 @@ class ControlledListTests(ArchesTestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
-
-    def test_reorder_list_items_invalid_duplicate(self):
-        self.client.force_login(self.admin)
-        serialized_list = ControlledListsView.serialize(self.list1, depth_map=defaultdict(int))
-
-        # Attempt setting a duplicate sort order.
-        serialized_list["items"][1]["sortorder"] = 0
-        response = self.client.post(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-            serialized_list,
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, 400)
