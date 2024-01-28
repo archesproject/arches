@@ -2590,3 +2590,15 @@ class ReferenceDataType(BaseDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def default_es_mapping(self):
+        mapping = {
+            "properties": {
+                "uri": {"type": "keyword"},
+                "id": {"type": "keyword"},
+                "labels": {
+                    "properties": {},
+                },
+            }
+        }
+        return mapping
