@@ -11,6 +11,7 @@ define([
         this.search = params.search;
         this.controlledList = params.config.controlledList;
         this.multiValue = params.config.multiValue;
+        this.controlledLists = ko.observable();
         this.getControlledLists = async function() {
             const response = await fetch(arches.urls.controlled_lists, {
                 method: 'GET',
