@@ -1,11 +1,11 @@
 define([
     'knockout',
-    'viewmodels/widget',
+    'viewmodels/reference-select',
     'templates/views/components/widgets/reference-select.htm',
     'bindings/select2-query',
-], function(ko, WidgetViewModel, referenceSelectTemplate) {
+], function(ko, ReferenceSelectViewModel, referenceSelectTemplate) {
     const viewModel = function(params) {
-        WidgetViewModel.apply(this, [params]);
+        ReferenceSelectViewModel.apply(this, [params]);
     };
 
     return ko.components.register('reference-select-widget', {
