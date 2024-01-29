@@ -43,17 +43,14 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 
 
 class APITests(ArchesTestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        # TODO: pull this up higher so that it's not depending on running outside a transaction
+        # same issue in command_line_tests.py
+        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
 
-        geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
+        super().setUpClass()
         cls.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r") as f:
@@ -73,11 +70,6 @@ class APITests(ArchesTestCase):
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
             cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
-
-        # Load the test package to provide resources graph.
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-        LanguageSynchronizer.synchronize_settings_with_db()
 
     def get_tile_by_id(self, tileid, tiles):
         for tile in tiles:
