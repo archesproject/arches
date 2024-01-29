@@ -15,9 +15,10 @@ const staticLabel = "Static: list does not change";
 const dynamicLabel =
     "Dynamic: list is defined by a query that may change list items";
 
-const { displayedList, languageMap } = defineProps([
+const { displayedList, languageMap, openListEditor } = defineProps([
     "displayedList",
     "languageMap",
+    "openListEditor",
 ]);
 const toast = useToast();
 
@@ -51,6 +52,10 @@ const languageDropdownItems = computed(() => {
         }) || []
     );
 });
+
+const manageList = () => {
+    openListEditor(displayedList.value.id);
+};
 
 const onRowExpand = (row) => {
     expandedRows.value.push(row.data.id);
@@ -273,6 +278,7 @@ const itemsForLanguage = computed(() => {
                         class="button manage-list"
                         label="Manage List"
                         raised
+                        @click="manageList"
                     ></Button>
                 </div>
                 <!-- TreeTable exists, but DataTable has better support for reordering -->
