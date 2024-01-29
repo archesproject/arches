@@ -10,8 +10,8 @@ import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
 import Characteristics from "./Characteristics.vue";
+import Header from "./Header.vue";
 
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
 
 const { displayedList, languageMap, setEditing } = defineProps([
@@ -23,13 +23,6 @@ const toast = useToast();
 
 const selectedLanguage = ref(arches.activeLanguage);
 const expandedRows = ref([]);
-
-const heading = computed(() => {
-    return (
-        "List Editor" +
-        (displayedList.value ? " > " + displayedList.value.name : "")
-    );
-});
 
 const rowClass = (rowData) => {
     const depth = `depth-${rowData.depth}`;
@@ -201,10 +194,7 @@ const itemsForLanguage = computed(() => {
 </script>
 
 <template>
-    <div class="header" :style="{ background: slateBlue }">
-        <i class="fa fa-inverse fa-list" aria-hidden="true"></i>
-        <h4>{{ heading }}</h4>
-    </div>
+    <Header :displayedList="displayedList" :isItemEditor="false"></Header>
 
     <div v-if="!!displayedList.value" class="list-editor-container">
         <Characteristics :displayedList="displayedList" />
@@ -328,18 +318,6 @@ const itemsForLanguage = computed(() => {
 </template>
 
 <style scoped>
-.header {
-    display: flex;
-    align-items: center;
-}
-i {
-    margin-left: 1rem;
-    margin-top: 0.25rem;
-}
-h4 {
-    margin: 1rem;
-    color: white;
-}
 .list-editor-container {
     margin: 1rem;
 }

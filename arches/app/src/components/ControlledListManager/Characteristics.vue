@@ -38,6 +38,9 @@ const { displayedList } = defineProps(["displayedList"]);
 </template>
 
 <style scoped>
+.characteristics {
+    padding-top: 0.125rem;
+}
 .characteristic {
     margin: 1rem 1rem 2rem 1rem;
 }
