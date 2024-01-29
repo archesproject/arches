@@ -9,16 +9,15 @@ import DataTable from "primevue/datatable";
 import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
+import Characteristics from "./Characteristics.vue";
+
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
-const staticLabel = "Static: list does not change";
-const dynamicLabel =
-    "Dynamic: list is defined by a query that may change list items";
 
-const { displayedList, languageMap, openListEditor } = defineProps([
+const { displayedList, languageMap, setEditing } = defineProps([
     "displayedList",
     "languageMap",
-    "openListEditor",
+    "setEditing",
 ]);
 const toast = useToast();
 
@@ -52,10 +51,6 @@ const languageDropdownItems = computed(() => {
         }) || []
     );
 });
-
-const manageList = () => {
-    openListEditor(displayedList.value.id);
-};
 
 const onRowExpand = (row) => {
     expandedRows.value.push(row.data.id);
@@ -212,35 +207,7 @@ const itemsForLanguage = computed(() => {
     </div>
 
     <div v-if="!!displayedList.value" class="list-editor-container">
-        <div class="characteristics">
-            <h4>Characteristics</h4>
-            <div class="characteristic">
-                <h5>Name</h5>
-                <input
-                    disabled
-                    :value="displayedList.value.name"
-                    :style="{ width: displayedList.value.name.length + 'rem' }"
-                />
-            </div>
-            <div class="characteristic">
-                <h5>Type</h5>
-                <input
-                    disabled
-                    :value="
-                        displayedList.value.dynamic ? dynamicLabel : staticLabel
-                    "
-                    :style="{
-                        width: displayedList.value.dynamic
-                            ? dynamicLabel.length + 'rem'
-                            : staticLabel.length + 'rem',
-                    }"
-                />
-            </div>
-            <div class="characteristic">
-                <h5>List used by these nodes</h5>
-            </div>
-        </div>
-
+        <Characteristics :displayedList="displayedList" />
         <div class="items" style="height: 50vh">
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
@@ -278,7 +245,7 @@ const itemsForLanguage = computed(() => {
                         class="button manage-list"
                         label="Manage List"
                         raised
-                        @click="manageList"
+                        @click="() => setEditing(true)"
                     ></Button>
                 </div>
                 <!-- TreeTable exists, but DataTable has better support for reordering -->
@@ -373,15 +340,6 @@ h4 {
     margin: 1rem;
     color: white;
 }
-.characteristic {
-    margin: 1rem 1rem 2rem 1rem;
-}
-.characteristic input {
-    text-align: center;
-    background: var(--gray-400);
-    border-width: 2px;
-    height: 3rem;
-}
 .list-editor-container {
     margin: 1rem;
 }
@@ -405,14 +363,15 @@ h4 {
 table {
     margin: inherit;
 }
+</style>
+
+<style>
 .list-editor-container h4 {
     color: gray;
     border-bottom: 1px solid lightgray;
     font-weight: 400;
+    margin-left: 1rem;
 }
-</style>
-
-<style>
 .p-tieredmenu.language-item {
     font-size: inherit;
 }

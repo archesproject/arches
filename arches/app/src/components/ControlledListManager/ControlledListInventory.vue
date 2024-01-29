@@ -7,10 +7,12 @@ import ControlledListSidebar from "./ControlledListSidebar.vue";
 import ControlledListTable from "./ControlledListTable.vue";
 
 const lightGray = "#f4f4f4";
-const { openListEditor } = defineProps(["openListEditor"]);
+const { displayedList, setEditing } = defineProps([
+    "displayedList",
+    "setEditing",
+]);
 
 const languageMap = ref({});
-const displayedList = ref({});
 </script>
 
 <template>
@@ -31,7 +33,7 @@ const displayedList = ref({});
             <ControlledListTable
                 :displayedList="displayedList"
                 :languageMap="languageMap"
-                :openListEditor="openListEditor"
+                :setEditing="setEditing"
             />
         </SplitterPanel>
     </Splitter>
