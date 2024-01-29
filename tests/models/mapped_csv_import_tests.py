@@ -35,6 +35,12 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 
 
 class mappedCSVFileImportTests(ArchesTestCase):
+    @classmethod
+    def setUpClass(self):
+        super().setUpClass()
+        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+            management.call_command("packages", operation="import_graphs", source=path)
+
     def setUp(self):
         ResourceInstance.objects.all().delete()
 
