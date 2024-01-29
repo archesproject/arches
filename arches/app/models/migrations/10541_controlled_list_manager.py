@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
             name="ControlledListItem",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ("uri", models.URLField(max_length=2048, null=True, unique=True)),
+                ("uri", models.URLField(max_length=2048, null=True, blank=True, unique=True)),
                 ("sortorder", models.IntegerField(validators=[django.core.validators.MinValueValidator(0)])),
                 (
                     "list",
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                 (
                     "parent",
                     models.ForeignKey(
-                        null=True, on_delete=django.db.models.deletion.CASCADE, related_name="children", to="models.controlledlistitem"
+                        null=True, blank=True, on_delete=django.db.models.deletion.CASCADE, related_name="children", to="models.controlledlistitem"
                     ),
                 ),
             ],
