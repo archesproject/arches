@@ -35,10 +35,6 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 
 
 class mappedCSVFileImportTests(ArchesTestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def setUp(self):
         ResourceInstance.objects.all().delete()
 
