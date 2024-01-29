@@ -240,7 +240,7 @@ const itemsForLanguage = computed(() => {
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
             </h4>
-            <div v-if="displayedList.value.items.length">
+            <div v-if="displayedList.value.items.length" style="height: 100%">
                 <div class="controls">
                     <SplitButton
                         class="button language-selector"
