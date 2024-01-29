@@ -23,12 +23,12 @@ class WorkflowHistoryTests(ArchesTestCase):
         group.user_set.add(cls.editor)
         super().setUpClass()
 
-    def setUp(self):
-        """The POST tests manipulate this object, so recreate it for simplicity."""
-        self.history = WorkflowHistory.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.history = WorkflowHistory.objects.create(
             workflowid=str(uuid.uuid1()),
             workflowname='test-name',
-            user=self.admin,
+            user=cls.admin,
             created=datetime.datetime.now(),
             completed=False,
             stepdata={
@@ -63,9 +63,6 @@ class WorkflowHistoryTests(ArchesTestCase):
                 # etc...
             },
         )
-
-    def tearDown(self):
-        self.history.delete()
 
     def test_get_nonexistent_workflow_history(self):
         self.client.force_login(self.admin)
