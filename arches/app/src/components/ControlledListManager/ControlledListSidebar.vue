@@ -6,12 +6,14 @@ import { ref } from "vue";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import SplitButton from "primevue/splitbutton";
+import { useToast } from "primevue/usetoast";
 
 import ControlledListsAll from "./ControlledListsAll.vue";
 import Spinner from "../Spinner.vue";
 
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
+const toast = useToast();
 
 const { displayedList, languageMap } = defineProps([
     "displayedList",
@@ -26,14 +28,24 @@ const clearSearch = () => {
 };
 
 const createList = async () => {
-    const response = await fetch(arches.urls.controlled_lists, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": Cookies.get("csrftoken"),
-        },
-    });
-    if (response.ok) {
-        queryMutator.value += 1;
+    try {
+        const response = await fetch(arches.urls.controlled_lists, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+        });
+        if (response.ok) {
+            queryMutator.value += 1;
+        } else {
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: "error",
+            summary: "List creation failed",
+            life: 3000,
+        });
     }
 };
 
@@ -50,14 +62,25 @@ const deleteLists = async () => {
         })
     );
 
-    const responses = await Promise.all(promises);
-    if (responses.some((resp) => resp.ok)) {
-        if (selectedLists.value.includes(displayedList.value)) {
-            displayedList.value = null;
-        }
-        selectedLists.value = [];
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            if (selectedLists.value.includes(displayedList.value)) {
+                displayedList.value = null;
+            }
+            selectedLists.value = [];
 
-        queryMutator.value += 1;
+            queryMutator.value += 1;
+        }
+        if (responses.some((resp) => !resp.ok)) {
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: "error",
+            summary: "One or more lists failed to delete.",
+            life: 3000,
+        });
     }
 };
 </script>
