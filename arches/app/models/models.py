@@ -27,6 +27,7 @@ from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import Deferrable, JSONField
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
@@ -35,7 +36,7 @@ from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
@@ -1902,8 +1903,7 @@ class ControlledList(models.Model):
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # TODO(?): expose schemes
-    uri = models.URLField(max_length=2048, null=True, unique=True)
+    uri = models.URLField(max_length=2048, null=True, blank=True, unique=True)
     list = models.ForeignKey(
         ControlledList,
         db_column="listid",
@@ -1912,7 +1912,7 @@ class ControlledListItem(models.Model):
     )
     sortorder = models.IntegerField(validators=[MinValueValidator(0)])
     parent = models.ForeignKey(
-        "self", null=True, on_delete=models.CASCADE, related_name="children"
+        "self", null=True, blank=True, on_delete=models.CASCADE, related_name="children"
     )
 
     class Meta:
@@ -1924,6 +1924,11 @@ class ControlledListItem(models.Model):
                 deferrable=Deferrable.DEFERRED,
             ),
         ]
+
+    def clean(self):
+        if not self.labels.filter(value_type="prefLabel").exists():
+            raise ValidationError(_("At least one preferred label is required."))
+
 
 class Label(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
