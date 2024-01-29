@@ -111,7 +111,8 @@ class ControlledListView(View):
 
                         item_to_save = ControlledListItem(list_id=id, **item)
                         # Check for positive sortorder, but avoid further db hits.
-                        item_to_save.clean_fields(exclude=["parent", "list"])
+                        # Defer validation of unique sort order.
+                        item_to_save.full_clean(exclude=["parent", "list"], validate_unique=False)
                         items_to_save.append(item_to_save)
 
                         for label in labels:
