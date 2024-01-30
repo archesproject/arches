@@ -35,7 +35,7 @@ define([
                 const tileReady = val.map(uri => {
                     return {
                         "uri": uri,
-                        "id": NAME_LOOKUP[uri]["listid"],
+                        "listid": NAME_LOOKUP[uri]["listid"],
                         "labels": NAME_LOOKUP[uri].labels
                     };
                 });
