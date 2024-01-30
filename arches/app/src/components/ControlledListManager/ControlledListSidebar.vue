@@ -21,7 +21,7 @@ const queryMutator = ref(0);
 
 const createList = async () => {
     try {
-        const response = await fetch(arches.urls.controlled_lists, {
+        const response = await fetch(arches.urls.controlled_list_add, {
             method: "POST",
             headers: {
                 "X-CSRFToken": Cookies.get("csrftoken"),
