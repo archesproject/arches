@@ -206,7 +206,7 @@ const itemsForLanguage = computed(() => {
                 <div class="controls">
                     <SplitButton
                         class="button language-selector"
-                        :label="`Language - ${languageMap.value[selectedLanguage]}`"
+                        :label="`Language - ${languageMap.value?.[selectedLanguage]}`"
                         :model="languageDropdownItems"
                         raised
                         :pt="{
