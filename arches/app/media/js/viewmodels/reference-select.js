@@ -32,6 +32,7 @@ define([
 
         this.selectionValue.subscribe(val => {
             if (val) {
+                if (!(val instanceof Array)) { val = [val]; }
                 const tileReady = val.map(uri => {
                     return {
                         "uri": uri,
@@ -46,7 +47,7 @@ define([
         this.select2Config = {
             value: self.selectionValue,
             clickBubble: true,
-            multiple: true,
+            multiple: this.multiple,
             closeOnSelect: true,
             placeholder: self.placeholder,
             allowClear: true,
