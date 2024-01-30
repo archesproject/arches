@@ -43,7 +43,9 @@
 {% block report %}
 <dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko foreach: value -->
-    <dd data-bind="text: labels[$parent.activeLanguage], class: $parent.nodeCssClasses"></dd>
+    <dd data-bind="class: $parent.nodeCssClasses">
+        <a data-bind="attr:{'href': uri}, text: $parent.getPrefLabel(labels), style: {'color': 'steelblue'}"></a>
+    </dd>
 <!-- /ko -->
 <!-- ko ifnot: value().length -->
 <dd data-bind="class: nodeCssClasses">
