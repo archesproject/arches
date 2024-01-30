@@ -41,7 +41,13 @@
 {% endblock config_form %}
 
 {% block report %}
-<div>
-    <p>block report data here</p>
-</div>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
+<!-- ko foreach: value -->
+    <dd data-bind="text: labels[$parent.activeLanguage], class: $parent.nodeCssClasses"></dd>
+<!-- /ko -->
+<!-- ko ifnot: value().length -->
+<dd data-bind="class: nodeCssClasses">
+    <span data-bind="text: $root.translations.none"></span>
+</dd>
+<!-- /ko -->
 {% endblock report %}
