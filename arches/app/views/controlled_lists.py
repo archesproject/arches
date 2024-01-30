@@ -1,7 +1,9 @@
 from collections import defaultdict
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Max
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -13,49 +15,51 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 
 
+def serialize(obj, depth_map=None):
+    if depth_map is None:
+        depth_map = defaultdict(int)
+    match obj:
+        case ControlledList():
+            return {
+                "id": str(obj.id),
+                "name": obj.name,
+                "dynamic": obj.dynamic,
+                "items": sorted(
+                    [serialize(item, depth_map) for item in obj.items.all()],
+                    key=lambda d: d["sortorder"],
+                ),
+            }
+        case ControlledListItem():
+            if obj.parent_id:
+                depth_map[obj.id] = depth_map[obj.parent_id] + 1
+            return {
+                "id": str(obj.id),
+                "uri": obj.uri,
+                "sortorder": obj.sortorder,
+                "labels": [serialize(label, depth_map) for label in obj.labels.all()],
+                "children": sorted(
+                    [serialize(child, depth_map) for child in obj.children.all()],
+                    key=lambda d: d["sortorder"],
+                ),
+                "parent_id": str(obj.parent_id) if obj.parent_id else None,
+                "depth": depth_map[obj.id],
+            }
+        case Label():
+            return {
+                "id": str(obj.id),
+                "valuetype": obj.value_type_id,
+                "language": obj.language_id,
+                "value": obj.value,
+            }
+
+
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListsView(View):
-    @classmethod
-    def serialize(cls, obj, depth_map):
-        match obj:
-            case ControlledList():
-                return {
-                    "id": str(obj.id),
-                    "name": obj.name,
-                    "dynamic": obj.dynamic,
-                    "items": sorted(
-                        [cls.serialize(item, depth_map) for item in obj.items.all()],
-                        key=lambda d: d["sortorder"],
-                    ),
-                }
-            case ControlledListItem():
-                if obj.parent_id:
-                    depth_map[obj.id] = depth_map[obj.parent_id] + 1
-                return {
-                    "id": str(obj.id),
-                    "uri": obj.uri,
-                    "sortorder": obj.sortorder,
-                    "labels": [
-                        cls.serialize(label, depth_map) for label in obj.labels.all()
-                    ],
-                    "children": sorted(
-                        [cls.serialize(child, depth_map) for child in obj.children.all()],
-                        key=lambda d: d["sortorder"],
-                    ),
-                    "parent_id": str(obj.parent_id) if obj.parent_id else None,
-                    "depth": depth_map[obj.id],
-                }
-            case Label():
-                return {
-                    "id": str(obj.id),
-                    "valuetype": obj.value_type_id,
-                    "language": obj.language_id,
-                    "value": obj.value,
-                }
-
     def get(self, request):
+        # Children at arbitrary depth will still be returned, but tell
+        # the ORM to expect a certain number to mitigate N+1 queries.
         prefetch_depth = request.GET.get("prefetchDepth", 3)
         prefetch_terms = []
         for i in range(prefetch_depth):
@@ -68,7 +72,7 @@ class ControlledListsView(View):
 
         data = {
             "controlled_lists": [
-                self.serialize(obj, depth_map=defaultdict(int))
+                serialize(obj)
                 for obj in ControlledList.objects.all()
                 .order_by("name")
                 .prefetch_related(*prefetch_terms)
@@ -78,55 +82,70 @@ class ControlledListsView(View):
 
         return JSONResponse(data)
 
-    def post(self, request):
-        l = ControlledList(name=_("Untitled List: ") + datetime.now().isoformat())
-        l.save()
-        return self.get(request)
-
 
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListView(View):
     def post(self, request, **kwargs):
-        id = kwargs.get("id")
+        if not (id := kwargs.get("id", None)):
+            # Add a new list.
+            lst = ControlledList(name=_("Untitled List: ") + datetime.now().isoformat())
+            lst.save()
+            return JSONResponse(serialize(lst))
+
         data = JSONDeserializer().deserialize(request.body)
 
-        list_locked = ControlledList.objects.filter(id=id).select_for_update()
+        qs = (
+            ControlledListItem.objects.filter(list_id=id)
+            .select_related("list")
+            .select_for_update()
+        )
+        # TODO: lock labels?
 
         items_to_save = []
         labels_to_save = []
         try:
             with transaction.atomic():
-                for clist in list_locked:
-                    clist.dynamic = data["dynamic"]
-                    clist.name = data["name"]
+                try:
+                    clist = qs[0].list
+                except ControlledListItem.DoesNotExist:
+                    clist = ControlledList.objects.get(pk=id)
+                except (IndexError, ControlledList.DoesNotExist):
+                    return JSONErrorResponse(status=404)
 
-                    for item in data["items"]:
-                        # Deletion/insertion of list items not yet implemented.
-                        labels = item.pop("labels")
-                        # Altering hierarchy is done by altering parents.
-                        item.pop("children", None)
-                        item.pop("depth", None)
+                clist.dynamic = data["dynamic"]
+                clist.name = data["name"]
 
-                        item_to_save = ControlledListItem(list_id=id, **item)
-                        # Check for positive sortorder, but avoid further db hits.
-                        # Defer validation of unique sort order.
-                        item_to_save.full_clean(exclude=["parent", "list"], validate_unique=False)
-                        items_to_save.append(item_to_save)
+                for item in data["items"]:
+                    # Deletion/insertion of list items not yet implemented.
+                    labels = item.pop("labels")
+                    # Altering hierarchy is done by altering parents.
+                    item.pop("children", None)
+                    item.pop("depth", None)
 
-                        for label in labels:
-                            label["language_id"] = label.pop("language")
-                            label["value_type_id"] = label.pop("valuetype")
-                            labels_to_save.append(Label(item_id=item_to_save.id, **label))
-
-                    ControlledListItem.objects.bulk_update(
-                        items_to_save, fields=["uri", "sortorder", "parent"]
+                    item_to_save = ControlledListItem(list_id=id, **item)
+                    # Check for positive sortorder, but avoid further db hits.
+                    # Defer validation of unique sort order.
+                    item_to_save.full_clean(
+                        exclude=["parent", "list"], validate_unique=False
                     )
-                    Label.objects.bulk_update(
-                        labels_to_save, fields=["value", "value_type", "language"]
-                    )
-                    clist.save()
+                    items_to_save.append(item_to_save)
+
+                    for label in labels:
+                        label["language_id"] = label.pop("language")
+                        label["value_type_id"] = label.pop("valuetype")
+                        labels_to_save.append(Label(item_id=item_to_save.id, **label))
+
+                ControlledListItem.objects.bulk_update(
+                    items_to_save, fields=["uri", "sortorder", "parent"]
+                )
+                Label.objects.bulk_update(
+                    labels_to_save, fields=["value", "value_type", "language"]
+                )
+                clist.save()
+        except ValidationError as e:
+            return JSONErrorResponse(message=" ".join(e.messages), status=400)
         except:
             return JSONErrorResponse(status=400)
 
@@ -135,6 +154,44 @@ class ControlledListView(View):
     def delete(self, request, **kwargs):
         id = kwargs.get("id")
         objs_deleted, _ = ControlledList.objects.filter(pk=id).delete()
+        if not objs_deleted:
+            return JSONErrorResponse(status=404)
+        return JSONResponse(status=204)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
+class ControlledListItemView(View):
+    def post(self, request, **kwargs):
+        if not (id := kwargs.get("id", None)):
+            # Add a new list item.
+            data = JSONDeserializer().deserialize(request.body)
+
+            try:
+                lst = (
+                    ControlledList.objects.filter(pk=data["list_id"])
+                    .annotate(max_sortorder=Max("items__sortorder"))
+                    .get()
+                )
+            except ControlledList.DoesNotExist:
+                return JSONErrorResponse(status=404)
+
+            item = ControlledListItem(
+                list=lst,
+                sortorder=(lst.max_sortorder or -1) + 1,
+                parent_id=kwargs.get("parent_id", None),
+            )
+            item.save()
+
+            return JSONResponse(serialize(item))
+
+        # TODO: implement list item update
+        raise NotImplementedError
+
+    def delete(self, request, **kwargs):
+        id = kwargs.get("id")
+        objs_deleted, _ = ControlledListItem.objects.filter(pk=id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)

@@ -14,23 +14,23 @@ import SearchAddDelete from "./SearchAddDelete.vue";
 
 const toast = useToast();
 const lightGray = "#f4f4f4";
-const { controlledLists, displayedList, queryMutator, setEditing } =
-    defineProps([
-        "controlledLists",
-        "displayedList",
-        "queryMutator",
-        "setEditing",
-    ]);
 
+const { displayedList, setEditing } = defineProps([
+    "displayedList",
+    "setEditing",
+]);
+const queryMutator = ref(0);
+const filteredItems = ref([...displayedList.value.items]);
 const selectedItems = ref([]);
 
 const createItem = async () => {
     try {
-        const response = await fetch(arches.urls.controlled_lists, {
+        const response = await fetch(arches.urls.controlled_list_item_add, {
             method: "POST",
             headers: {
                 "X-CSRFToken": Cookies.get("csrftoken"),
             },
+            body: JSON.stringify({ list_id: displayedList.value.id }),
         });
         if (response.ok) {
             queryMutator.value += 1;
@@ -50,8 +50,8 @@ const deleteItems = async () => {
     if (!selectedItems.value.length) {
         return;
     }
-    const promises = selectedItems.value.map((list) =>
-        fetch(arches.urls.controlled_list(list.id), {
+    const promises = selectedItems.value.map((item) =>
+        fetch(arches.urls.controlled_list_item(item.id), {
             method: "DELETE",
             headers: {
                 "X-CSRFToken": Cookies.get("csrftoken"),
@@ -99,7 +99,7 @@ const deleteItems = async () => {
                     <SearchAddDelete
                         :addAction="createItem"
                         addLabel="Add New Item"
-                        filteredItems="[]"
+                        :filteredItems="filteredItems"
                         :deleteAction="deleteItems"
                         deleteLabel="Delete Item"
                         deleteLabelPlural="Delete Items"
