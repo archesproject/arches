@@ -16,13 +16,11 @@ const displayedWorkspace = computed(() => {
 </script>
 
 <template>
-    <KeepAlive>
-        <component
-            :is="displayedWorkspace"
-            :displayedList="displayedList"
-            :setEditing="setEditing"
-        />
-    </KeepAlive>
+    <component
+        :is="displayedWorkspace"
+        :displayedList="displayedList"
+        :setEditing="setEditing"
+    />
 </template>
 
 <style>
