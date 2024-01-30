@@ -1,19 +1,85 @@
 <script setup>
 import arches from "arches";
+import Cookies from "js-cookie";
+import { ref } from "vue";
+
 import Button from "primevue/button";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
+import { useToast } from "primevue/usetoast";
 
 import Characteristics from "./Characteristics.vue";
 import Header from "./Header.vue";
+import SearchAddDelete from "./SearchAddDelete.vue";
 
-const { displayedList, editing, setEditing } = defineProps([
-    "displayedList",
-    "editing",
-    "setEditing",
-]);
-
+const toast = useToast();
 const lightGray = "#f4f4f4";
+const { controlledLists, displayedList, queryMutator, setEditing } =
+    defineProps([
+        "controlledLists",
+        "displayedList",
+        "queryMutator",
+        "setEditing",
+    ]);
+
+const selectedItems = ref([]);
+
+const createItem = async () => {
+    try {
+        const response = await fetch(arches.urls.controlled_lists, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+        });
+        if (response.ok) {
+            queryMutator.value += 1;
+        } else {
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: "error",
+            summary: "Item creation failed",
+            life: 3000,
+        });
+    }
+};
+
+const deleteItems = async () => {
+    if (!selectedItems.value.length) {
+        return;
+    }
+    const promises = selectedItems.value.map((list) =>
+        fetch(arches.urls.controlled_list(list.id), {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+        })
+    );
+
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            if (selectedItems.value.includes(displayedList.value)) {
+                displayedList.value = null;
+            }
+            selectedItems.value = [];
+
+            queryMutator.value += 1;
+        }
+        if (responses.some((resp) => !resp.ok)) {
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: "error",
+            summary: "One or more items failed to delete.",
+            life: 3000,
+        });
+    }
+};
 </script>
 
 <template>
@@ -30,7 +96,15 @@ const lightGray = "#f4f4f4";
                 }"
             >
                 <SplitterPanel :size="30" :minSize="15">
-                    <div>Left</div>
+                    <SearchAddDelete
+                        :addAction="createItem"
+                        addLabel="Add New Item"
+                        filteredItems="[]"
+                        :deleteAction="deleteItems"
+                        deleteLabel="Delete Item"
+                        deleteLabelPlural="Delete Items"
+                        :numberToDelete="selectedItems.length"
+                    />
                 </SplitterPanel>
 
                 <SplitterPanel :size="75" :minSize="50" class="mt-0">
