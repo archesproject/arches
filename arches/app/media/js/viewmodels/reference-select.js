@@ -1,40 +1,28 @@
 define([
-    'knockout',
     'jquery',
+    'knockout',
+    'knockout-mapping',
     'arches',
     'viewmodels/widget',
-], function(ko, $, arches, WidgetViewModel) {
+], function($, ko, koMapping, arches, WidgetViewModel) {
     var NAME_LOOKUP = {};
     var ReferenceSelectViewModel = function(params) {
         var self = this;
 
         params.configKeys = ['placeholder'];
         this.multiple = !!ko.unwrap(params.node.config.multiValue);
-        this.allowClear = true;
         this.displayName = ko.observable('');
-        this.options = [];
-        this.selectionValue = ko.observable([]);
+        this.selectionValue = ko.observable([]); // formatted version of this.value that select2 can use
 
         WidgetViewModel.apply(this, [params]);
-        this.valueList = ko.computed(function() {
-            var valueList = self.selectionValue()
-            self.displayName();
-            if (Array.isArray(valueList)) {
-                return valueList;
-            }
-            return [];
-        });
 
         this.displayValue = ko.computed(function() {
-            var val = self.selectionValue();
-            var name = self.displayName();
-            var displayVal = null;
-
+            const val = self.value();
+            let name = '';
             if (val) {
-                displayVal = name;
+                name = val.map(item=>ko.unwrap(item.labels[arches.activeLanguage])).join(", ");
             }
-
-            return displayVal;
+            return val ? name : null;
         });
 
         this.selectionValue.subscribe(val => {
@@ -74,7 +62,7 @@ define([
                 processResults: function(data) {
                     const items = data.controlled_lists.find(list => list.id === params.node.config.controlledList()).items; 
                     items.forEach(item => {
-                        delete item["children"];
+                        delete item["children"]; // 'children' property forces select2 to use its own grouping. We don't want that right now
                         item["listid"] = item.id;
                         item.id = item.uri;
                     });
@@ -87,10 +75,11 @@ define([
                 }
             },
             templateResult: function(item) {
-                const indentation = '';
-                for (let i = 0; i < item.depth-1; i++) {
-                    indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
-                }
+                // TODO: Support nested items with indentation
+                // const indentation = '';
+                // for (let i = 0; i < item.depth-1; i++) {
+                //     indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                // }
                 // return indentation + item.text;
                 if (item.uri) {
                     const text = item.labels?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel').value || 'Searching...';
@@ -99,72 +88,44 @@ define([
                 }
             },
             templateSelection: function(item) {
-                return NAME_LOOKUP[item.uri]["prefLabel"];
+                if (!item.uri) { // option has a different shape when coming from initSelection vs templateResult
+                    return item.text; 
+                } else {
+                    return NAME_LOOKUP[item.uri]["prefLabel"];
+                }
             },
             escapeMarkup: function(m) { return m; },
             initComplete: false,
             initSelection: function(el, callback) {
-                const valueList = self.valueList();
-                
+
                 const setSelectionData = function(data) {
-                    const valueData = [];
-
-                    if (self.multiple) {
-                        if (!(data instanceof Array)) { data = [data]; }
-                        
-                        valueData = data.map(function(valueId) {
-                            return {
-                                id: valueId,
-                                text: NAME_LOOKUP[valueId]["prefLabel"],
+                    const valueData = koMapping.toJS(self.value());
+                    valueData.forEach(function(value) {
+                        NAME_LOOKUP[value.uri] = {
+                                "prefLabel": value.labels[arches.activeLanguage],
+                                "labels": value.labels,
+                                "listid": value.listid 
                             };
-                        });
-
-                        /* add the rest of the previously selected values */ 
-                        valueList.forEach(function(value) {
-                            if (value !== valueData[0].id) {
-                                valueData.push({
-                                    id: value,
-                                    text: NAME_LOOKUP[value]["prefLabel"],
-                                });
-                            }
-                        });
-
-                        /* keeps valueData obeying valueList as ordering source of truth */ 
-                        if (valueData[0].id !== valueList[0]) {
-                            valueData.reverse();
-                        }
-                    } else {
-                        valueData = [{
-                            id: data,
-                            text: NAME_LOOKUP[data]["prefLabel"],
-                        }];
-                    }
+                    });
+       
                     if(!self.select2Config.initComplete){
                         valueData.forEach(function(data) {
-                            var option = new Option(data.text, data.id, true, true);
+                            const option = new Option(
+                                data.labels[arches.activeLanguage],
+                                data.uri,
+                                true, 
+                                true
+                            );
                             $(el).append(option);
+                            self.selectionValue().push(data.uri);
                         });
                         self.select2Config.initComplete = true;
                     }
-                    self.selectedValues[valueData.id] = valueData;
                     callback(valueData);
                 };
 
-                if (valueList.length > 0) {
-                    valueList.forEach(function(value) {
-                        if (ko.unwrap(value)) {
-                            if (NAME_LOOKUP[value]) {
-                                setSelectionData(value);
-                            } else {
-                                $.ajax(arches.urls.concept_value + '?valueid=' + ko.unwrap(value), {
-                                    dataType: "json"
-                                }).done(function(data) {
-                                    NAME_LOOKUP[value] = data.value;
-                                    setSelectionData(value);
-                                });
-                            }
-                        }
-                    });
+                if (self.value()?.length) {
+                    setSelectionData();
                 } else {
                     callback([]);
                 }
