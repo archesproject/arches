@@ -23,7 +23,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
-from arches.app.views.controlled_lists import ControlledListView, ControlledListsView
+from arches.app.views.controlled_lists import ControlledListItemView, ControlledListView, ControlledListsView
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
 from arches.app.views.thumbnail import ThumbnailView
@@ -315,7 +315,10 @@ urlpatterns = [
     re_path(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     re_path(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
     path("controlled_lists/", ControlledListsView.as_view(), name="controlled_lists"),
-    path("controlled_list/<uuid:id>/", ControlledListView.as_view(), name="controlled_list")
+    path("controlled_list/", ControlledListView.as_view(), name="controlled_list_add"),
+    path("controlled_list/<uuid:id>/", ControlledListView.as_view(), name="controlled_list"),
+    path("controlled_list_item/", ControlledListItemView.as_view(), name="controlled_list_item_add"),
+    path("controlled_list_item/<uuid:id>/", ControlledListItemView.as_view(), name="controlled_list_item"),
 ]
 
 if settings.DEBUG:
