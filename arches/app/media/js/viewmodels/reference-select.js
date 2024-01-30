@@ -13,6 +13,7 @@ define([
         this.multiple = !!ko.unwrap(params.node.config.multiValue);
         this.displayName = ko.observable('');
         this.selectionValue = ko.observable([]); // formatted version of this.value that select2 can use
+        this.activeLanguage = arches.activeLanguage;
 
         WidgetViewModel.apply(this, [params]);
 
