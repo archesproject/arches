@@ -29,7 +29,7 @@ define([
         this.selectionValue.subscribe(val => {
             if (val) {
                 const tileReady = val.map(uri => {
-                    const prefLabels = NAME_LOOKUP[uri].labels.reduce((keyObj, valObj) => (keyObj[valObj.language] = valObj.value, keyObj) ,{});
+                    const prefLabels = NAME_LOOKUP[uri].labels.reduce((keyObj, valObj) => (keyObj[valObj.language] = valObj.value, keyObj), {});
                     return {
                         "uri": uri,
                         "id": NAME_LOOKUP[uri]["listid"],
@@ -104,7 +104,7 @@ define([
                     valueData.forEach(function(value) {
                         NAME_LOOKUP[value.uri] = {
                                 "prefLabel": value.labels[arches.activeLanguage],
-                                "labels": value.labels,
+                                "labels": [value.labels],
                                 "listid": value.listid 
                             };
                     });
