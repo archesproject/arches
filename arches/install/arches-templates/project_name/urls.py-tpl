@@ -9,3 +9,4 @@ urlpatterns = [
 
 # if settings.SHOW_LANGUAGE_SWITCH is True:
 #     urlpatterns = i18n_patterns(*urlpatterns)
+#     urlpatterns.append(path("i18n/", include("django.conf.urls.i18n")))
