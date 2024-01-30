@@ -17,11 +17,15 @@ define([
 
         WidgetViewModel.apply(this, [params]);
 
+        this.getPrefLabel = function(labels){
+            return koMapping.toJS(labels)?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel').value;
+        }; 
+
         this.displayValue = ko.computed(function() {
             const val = self.value();
             let name = '';
             if (val) {
-                name = val.map(item=>ko.unwrap(item.labels[arches.activeLanguage])).join(", ");
+                name = val.map(item=>self.getPrefLabel(item.labels)).join(", ");
             }
             return val ? name : null;
         });
@@ -29,11 +33,10 @@ define([
         this.selectionValue.subscribe(val => {
             if (val) {
                 const tileReady = val.map(uri => {
-                    const prefLabels = NAME_LOOKUP[uri].labels.reduce((keyObj, valObj) => (keyObj[valObj.language] = valObj.value, keyObj), {});
                     return {
                         "uri": uri,
                         "id": NAME_LOOKUP[uri]["listid"],
-                        "labels": prefLabels
+                        "labels": NAME_LOOKUP[uri].labels
                     };
                 });
                 self.value(tileReady);
@@ -83,7 +86,7 @@ define([
                 // }
                 // return indentation + item.text;
                 if (item.uri) {
-                    const text = item.labels?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel').value || 'Searching...';
+                    const text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
                     NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.listid};
                     return text;
                 }
@@ -103,8 +106,8 @@ define([
                     const valueData = koMapping.toJS(self.value());
                     valueData.forEach(function(value) {
                         NAME_LOOKUP[value.uri] = {
-                                "prefLabel": value.labels[arches.activeLanguage],
-                                "labels": [value.labels],
+                                "prefLabel": self.getPrefLabel(value.labels),
+                                "labels": value.labels,
                                 "listid": value.listid 
                             };
                     });
@@ -112,7 +115,7 @@ define([
                     if(!self.select2Config.initComplete){
                         valueData.forEach(function(data) {
                             const option = new Option(
-                                data.labels[arches.activeLanguage],
+                                self.getPrefLabel(data.labels),
                                 data.uri,
                                 true, 
                                 true
