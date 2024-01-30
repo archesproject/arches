@@ -5,18 +5,23 @@ import DataView from "primevue/dataview";
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
 
-const { displayedList, selectedLists, searchValue, languageMap } = defineProps([
-    "displayedList",
-    "selectedLists",
-    "searchValue",
-    "languageMap",
-]);
+const { displayedList, filteredLists, languageMap, selectedLists } =
+    defineProps([
+        "displayedList",
+        "filteredLists",
+        "languageMap",
+        "selectedLists",
+    ]);
 
 const response = await fetch(arches.urls.controlled_lists);
 const { controlled_lists: controlledLists } = await response
     .json()
     .then((data) => {
         languageMap.value = data.languages;
+        filteredLists.splice(0, filteredLists.length);
+        data.controlled_lists.forEach((list) => {
+            filteredLists.push(list);
+        });
         return data;
     });
 
@@ -56,16 +61,7 @@ const clearAll = () => {
         </span>
     </div>
 
-    <DataView
-        v-if="controlledLists.length"
-        :value="
-            searchValue
-                ? controlledLists.filter((list) =>
-                      list.name.includes(searchValue)
-                  )
-                : controlledLists
-        "
-    >
+    <DataView v-if="controlledLists.length" :value="filteredLists">
         <template #list="slotProps">
             <div
                 v-for="(item, index) in slotProps.items"
