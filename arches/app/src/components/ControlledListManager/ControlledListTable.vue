@@ -202,7 +202,7 @@ const itemsForLanguage = computed(() => {
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
             </h4>
-            <div v-if="displayedList.value.items.length" style="height: 100%">
+            <div style="height: 100%">
                 <div class="controls">
                     <SplitButton
                         class="button language-selector"
@@ -240,6 +240,7 @@ const itemsForLanguage = computed(() => {
                 </div>
                 <!-- TreeTable exists, but DataTable has better support for reordering -->
                 <DataTable
+                    v-if="displayedList.value.items.length"
                     :value="itemsForLanguage"
                     :rowClass="rowClass"
                     stripedRows
