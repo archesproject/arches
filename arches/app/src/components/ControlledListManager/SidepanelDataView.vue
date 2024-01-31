@@ -28,6 +28,13 @@ const items = ref([]);
 const selectedItems = ref([]);
 const searchValue = ref("");
 
+const filteredItems = computed(() => {
+    const loweredTerm = searchValue.value.toLowerCase();
+    return items.value.filter(
+        (item) => !loweredTerm || item.name.includes(loweredTerm)
+    );
+});
+
 const toast = useToast();
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
@@ -113,13 +120,9 @@ const selectAll = () => {
 const clearAll = () => {
     selectedItems.value = [];
 };
-
-const filteredItems = computed(() => {
-    const loweredTerm = searchValue.value.toLowerCase();
-    return items.value.filter(
-        (item) => !loweredTerm || item.name.includes(loweredTerm)
-    );
-});
+const selectRow = (item) => {
+    displayedItem.value = item;
+};
 </script>
 
 <template>
@@ -155,11 +158,9 @@ const filteredItems = computed(() => {
                 class="itemRow"
                 :class="{ selected: displayedItem.value?.id === item.id }"
                 :key="index"
-                @click="
-                    () => {
-                        displayedItem.value = item;
-                    }
-                "
+                tabindex="0"
+                @click="selectRow(item)"
+                @keyup.enter="selectRow(item)"
             >
                 <input
                     type="checkbox"
