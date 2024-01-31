@@ -1,7 +1,6 @@
 <script setup>
 import arches from "arches";
 import Cookies from "js-cookie";
-import { ref } from "vue";
 
 import Button from "primevue/button";
 import Splitter from "primevue/splitter";
@@ -22,9 +21,6 @@ const { displayedList, languageMap, setEditing } = defineProps([
     "languageMap",
     "setEditing",
 ]);
-const queryMutator = ref(0);
-const filteredItems = ref([...displayedList.value.items]);
-const selectedItems = ref([]);
 
 const createItem = async () => {
     try {
@@ -112,14 +108,13 @@ const deleteItems = async () => {
                     <Suspense>
                         <SidepanelDataView
                             :displayedItem="displayedList"
-                            :selectedItems="selectedItems"
-                            :filteredItems="filteredItems"
                             :languageMap="languageMap"
+                            :create="createItem"
+                            :delete="deleteItems"
                             itemLabel="item"
                             itemsLabel="items"
                             noSearchResultLabel="No matching items."
                             noItemLabel='Click "Add New Item" to start.'
-                            :key="queryMutator"
                         />
                         <template #fallback>
                             <Spinner />

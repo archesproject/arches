@@ -1,6 +1,5 @@
 <script setup>
 import arches from "arches";
-import { ref, watch } from "vue";
 
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
@@ -16,6 +15,7 @@ const {
     deleteLabel,
     deleteLabelPlural,
     filteredItems,
+    items,
     numberToDelete,
 } = defineProps([
     "addAction",
@@ -24,16 +24,11 @@ const {
     "deleteLabel",
     "deleteLabelPlural",
     "filteredItems",
+    "items",
     "numberToDelete",
 ]);
 
-const searchValue = ref("");
-
-watch(searchValue, () => {
-    filteredItems.value = filteredItems.filter(
-        (item) => !searchValue.value || item.name.includes(searchValue.value)
-    );
-});
+const searchValue = defineModel({ type: String });
 
 const clearSearch = () => {
     searchValue.value = "";
