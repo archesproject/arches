@@ -21,6 +21,24 @@ define([
             return koMapping.toJS(labels)?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel').value;
         }; 
 
+        this.flattenItems = function(items, flatList, depth, uniqueItems){
+            //TODO Children are duplicated coming from the concept_list endpoint. We can remove 'uniqueItems' once that's fixed
+            items.forEach(item=>{
+                if (uniqueItems.includes(item.uri) === false) {
+                    uniqueItems.push(item.uri);
+                    item.depth = depth;
+                    flatList.push(item);
+                    if (item.children.length) {
+                        depth += 1;
+                        self.flattenItems(item.children, flatList, depth, uniqueItems);
+                    }
+                    depth = 0;
+                }
+            });
+            flatList.forEach(subItem=>delete subItem.children); //Prevent select2 from symbolizing parent as grouping reference
+            return flatList;
+          };
+          
         this.displayValue = ko.computed(function() {
             const val = self.value();
             let name = '';
@@ -66,13 +84,13 @@ define([
                 },
                 processResults: function(data) {
                     const items = data.controlled_lists.find(list => list.id === params.node.config.controlledList()).items; 
-                    items.forEach(item => {
-                        delete item["children"]; // 'children' property forces select2 to use its own grouping. We don't want that right now
+                    const flatItems = self.flattenItems(items, [], 0, []);
+                    flatItems.forEach(item => {
                         item["listid"] = item.id;
                         item.id = item.uri;
                     });
                     return {
-                        "results": items,
+                        "results": flatItems,
                         "pagination": {
                             "more": false
                         }
@@ -80,14 +98,13 @@ define([
                 }
             },
             templateResult: function(item) {
-                // TODO: Support nested items with indentation
-                // const indentation = '';
-                // for (let i = 0; i < item.depth-1; i++) {
-                //     indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
-                // }
-                // return indentation + item.text;
+                let indentation = '';
+                for (let i = 0; i < item.depth; i++) {
+                    indentation += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                }
+
                 if (item.uri) {
-                    const text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
+                    const text = indentation + self.getPrefLabel(item.labels) || arches.translations.searching + '...';
                     NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.listid};
                     return text;
                 }
