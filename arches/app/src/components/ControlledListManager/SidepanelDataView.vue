@@ -30,8 +30,11 @@ const searchValue = ref("");
 
 const filteredItems = computed(() => {
     const loweredTerm = searchValue.value.toLowerCase();
-    return items.value.filter(
-        (item) => !loweredTerm || item.name.includes(loweredTerm)
+    if (!loweredTerm) {
+        return items.value;
+    }
+    return items.value.filter((item) =>
+        item.name.toLowerCase().includes(loweredTerm)
     );
 });
 
@@ -127,7 +130,7 @@ const selectRow = (item) => {
 
 <template>
     <SearchAddDelete
-        :v-model="searchValue"
+        v-model="searchValue"
         :addAction="createList"
         addLabel="Create New List"
         :deleteAction="deleteLists"

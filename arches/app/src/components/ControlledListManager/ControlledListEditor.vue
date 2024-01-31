@@ -98,7 +98,6 @@ const deleteItems = async () => {
                     <SearchAddDelete
                         :addAction="createItem"
                         addLabel="Add New Item"
-                        :filteredItems="filteredItems"
                         :deleteAction="deleteItems"
                         deleteLabel="Delete Item"
                         deleteLabelPlural="Delete Items"

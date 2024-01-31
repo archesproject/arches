@@ -14,7 +14,6 @@ const {
     deleteAction,
     deleteLabel,
     deleteLabelPlural,
-    filteredItems,
     items,
     numberToDelete,
 } = defineProps([
@@ -23,7 +22,6 @@ const {
     "deleteAction",
     "deleteLabel",
     "deleteLabelPlural",
-    "filteredItems",
     "items",
     "numberToDelete",
 ]);
