@@ -9,17 +9,17 @@ const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
 const {
-    addAction,
     addLabel,
-    deleteAction,
+    createItem,
+    deleteItems,
     deleteLabel,
     deleteLabelPlural,
     items,
     numberToDelete,
 } = defineProps([
-    "addAction",
     "addLabel",
-    "deleteAction",
+    "createItem",
+    "deleteItems",
     "deleteLabel",
     "deleteLabelPlural",
     "items",
@@ -81,7 +81,7 @@ const clearSearch = () => {
                         },
                     },
                 }"
-                @click="addAction"
+                @click="createItem"
             ></SplitButton>
             <!-- We might want an are you sure? modal -->
             <Button
@@ -89,7 +89,7 @@ const clearSearch = () => {
                 :label="numberToDelete > 1 ? deleteLabelPlural : deleteLabel"
                 raised
                 :disabled="numberToDelete === 0"
-                @click="deleteAction"
+                @click="deleteItems"
             ></Button>
         </div>
     </div>
