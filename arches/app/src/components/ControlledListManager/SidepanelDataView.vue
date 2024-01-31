@@ -5,50 +5,62 @@ import DataView from "primevue/dataview";
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
 
-const { displayedList, filteredLists, languageMap, selectedLists } =
-    defineProps([
-        "displayedList",
-        "filteredLists",
-        "languageMap",
-        "selectedLists",
-    ]);
+const {
+    displayedItem,
+    filteredItems,
+    itemLabel,
+    itemsLabel,
+    languageMap,
+    noItemLabel,
+    noSearchResultLabel,
+    selectedItems,
+} = defineProps([
+    "displayedItem",
+    "filteredItems",
+    "itemLabel",
+    "itemsLabel",
+    "languageMap",
+    "noItemLabel",
+    "noSearchResultLabel",
+    "selectedItems",
+]);
 
 const response = await fetch(arches.urls.controlled_lists);
 const { controlled_lists: controlledLists } = await response
     .json()
     .then((data) => {
         languageMap.value = data.languages;
-        filteredLists.splice(0, filteredLists.length);
+        filteredItems.splice(0, filteredItems.length);
         data.controlled_lists.forEach((list) => {
-            filteredLists.push(list);
+            filteredItems.push(list);
         });
         return data;
     });
 
 const toggleCheckbox = (list) => {
-    const i = selectedLists.indexOf(list);
+    const i = selectedItems.indexOf(list);
     if (i === -1) {
-        selectedLists.push(list);
+        selectedItems.push(list);
     } else {
-        selectedLists.splice(i);
+        selectedItems.splice(i);
     }
 };
 
 const selectAll = () => {
-    selectedLists.splice(0, selectedLists.length);
+    selectedItems.splice(0, selectedItems.length);
     controlledLists.forEach((list) => {
-        selectedLists.push(list);
+        selectedItems.push(list);
     });
 };
 const clearAll = () => {
-    selectedLists.splice(0, selectedLists.length);
+    selectedItems.splice(0, selectedItems.length);
 };
 </script>
 
 <template>
-    <div class="list-selection-header">
+    <div class="selection-header">
         <span v-if="controlledLists.length" style="margin-left: 1rem">
-            <button v-if="selectedLists.length" @click="clearAll">
+            <button v-if="selectedItems.length" @click="clearAll">
                 {{ arches.translations.clearAll }}
             </button>
             <button v-else @click="selectAll">
@@ -57,40 +69,40 @@ const clearAll = () => {
         </span>
         <span v-if="controlledLists.length" style="margin-right: 1rem">
             {{ controlledLists.length }}
-            {{ controlledLists.length === 1 ? "list" : "lists" }}
+            {{ controlledLists.length === 1 ? itemLabel : itemsLabel }}
         </span>
     </div>
 
-    <DataView v-if="controlledLists.length" :value="filteredLists">
+    <DataView v-if="controlledLists.length" :value="filteredItems">
         <template #list="slotProps">
             <div
                 v-for="(item, index) in slotProps.items"
-                class="listRow"
-                :class="{ selected: displayedList.value?.id === item.id }"
+                class="itemRow"
+                :class="{ selected: displayedItem.value?.id === item.id }"
                 :key="index"
                 @click="
                     () => {
-                        displayedList.value = item;
+                        displayedItem.value = item;
                     }
                 "
             >
                 <input
                     type="checkbox"
                     @click="toggleCheckbox(item)"
-                    :checked="selectedLists.indexOf(item) > -1"
+                    :checked="selectedItems.indexOf(item) > -1"
                 />
                 <span>{{ item.name }}</span>
             </div>
         </template>
         <template #empty>
             <div>
-                <span class="no-lists">No matching lists.</span>
+                <span class="no-items">{{ noSearchResultLabel }}</span>
             </div>
         </template>
     </DataView>
 
-    <div v-else class="no-lists">
-        <span>Click "Create New List" to start.</span>
+    <div v-else class="no-items">
+        <span>{{ noItemLabel }}</span>
     </div>
 </template>
 
@@ -100,7 +112,7 @@ button {
     color: var(--blue-500);
     background: none;
 }
-.list-selection-header {
+.selection-header {
     display: flex;
     background-color: v-bind(lightGray);
     height: 2rem;
@@ -112,21 +124,21 @@ button {
     padding-bottom: 5rem;
     font-size: 14px;
 }
-.listRow {
+.itemRow {
     display: flex;
     padding: 1rem;
 }
-.listRow.selected {
+.itemRow.selected {
     background-color: v-bind(slateBlue);
 }
-.listRow.selected span {
+.itemRow.selected span {
     color: white;
 }
 input[type="checkbox"] {
     margin-top: 0.25rem;
     margin-right: 1rem;
 }
-.no-lists {
+.no-items {
     margin: 2rem;
     display: flex;
     justify-content: center;

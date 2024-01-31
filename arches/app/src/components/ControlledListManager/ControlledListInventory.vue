@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from "vue";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
@@ -7,12 +6,11 @@ import ControlledListSidebar from "./ControlledListSidebar.vue";
 import ControlledListTable from "./ControlledListTable.vue";
 
 const lightGray = "#f4f4f4";
-const { displayedList, setEditing } = defineProps([
+const { displayedList, languageMap, setEditing } = defineProps([
     "displayedList",
+    "languageMap",
     "setEditing",
 ]);
-
-const languageMap = ref({});
 </script>
 
 <template>

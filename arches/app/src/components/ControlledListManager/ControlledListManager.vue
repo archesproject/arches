@@ -9,6 +9,7 @@ const editing = ref(false);
 const setEditing = (val) => {
     editing.value = val;
 };
+const languageMap = ref({});
 
 const displayedWorkspace = computed(() => {
     return editing.value ? ControlledListEditor : ControlledListInventory;
@@ -19,6 +20,7 @@ const displayedWorkspace = computed(() => {
     <component
         :is="displayedWorkspace"
         :displayedList="displayedList"
+        :languageMap="languageMap"
         :setEditing="setEditing"
     />
 </template>
