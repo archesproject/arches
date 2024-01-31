@@ -47,7 +47,7 @@
         <a data-bind="attr:{'href': uri}, text: $parent.getPrefLabel(labels), style: {'color': 'steelblue'}"></a>
     </dd>
 <!-- /ko -->
-<!-- ko ifnot: value().length -->
+<!-- ko ifnot: value() -->
 <dd data-bind="class: nodeCssClasses">
     <span data-bind="text: $root.translations.none"></span>
 </dd>
