@@ -11,12 +11,15 @@ import { useToast } from "primevue/usetoast";
 import Characteristics from "./Characteristics.vue";
 import Header from "./Header.vue";
 import SearchAddDelete from "./SearchAddDelete.vue";
+import SidepanelDataView from "./SidepanelDataView.vue";
+import Spinner from "../Spinner.vue";
 
 const toast = useToast();
 const lightGray = "#f4f4f4";
 
-const { displayedList, setEditing } = defineProps([
+const { displayedList, languageMap, setEditing } = defineProps([
     "displayedList",
+    "languageMap",
     "setEditing",
 ]);
 const queryMutator = ref(0);
@@ -105,6 +108,23 @@ const deleteItems = async () => {
                         deleteLabelPlural="Delete Items"
                         :numberToDelete="selectedItems.length"
                     />
+
+                    <Suspense>
+                        <SidepanelDataView
+                            :displayedItem="displayedList"
+                            :selectedItems="selectedItems"
+                            :filteredItems="filteredItems"
+                            :languageMap="languageMap"
+                            itemLabel="item"
+                            itemsLabel="items"
+                            noSearchResultLabel="No matching items."
+                            noItemLabel='Click "Add New Item" to start.'
+                            :key="queryMutator"
+                        />
+                        <template #fallback>
+                            <Spinner />
+                        </template>
+                    </Suspense>
                 </SplitterPanel>
 
                 <SplitterPanel :size="75" :minSize="50" class="mt-0">
