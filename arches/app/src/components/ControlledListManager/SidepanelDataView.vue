@@ -121,7 +121,13 @@ const selectRow = (item) => {
                     @click="toggleCheckbox(item)"
                     :checked="selectedItems.indexOf(item) > -1"
                 />
-                <span>{{ item.name }}</span>
+                <!-- TODO(jtw): factor this out, also get appropriate language -->
+                <span>{{
+                    item.name ??
+                    item.labels.find((label) => label.valuetype === "prefLabel")
+                        ?.value ??
+                    "Unlabeled item"
+                }}</span>
             </div>
         </template>
         <template #empty>
