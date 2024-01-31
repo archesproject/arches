@@ -26,9 +26,9 @@ class Migration(migrations.Migration):
                 'fa fa-list',
                 'datatypes.py',
                 'ReferenceDataType',
+                '{"controlledList": null, "multiValue": false}',
                 'views/components/datatypes/reference',
-                {"controlledList": null, "multiValue": false},
-                reference-datatype-config,
+                'reference-datatype-config',
                 FALSE,
                 '19e56148-82b8-47eb-b66e-f6243639a1a8',
                 TRUE
@@ -44,8 +44,8 @@ class Migration(migrations.Migration):
                 '19e56148-82b8-47eb-b66e-f6243639a1a8',
                 'reference-select-widget',
                 'views/components/widgets/reference-select',
-                '{"i18n_properties": ["placeholder"]}',
-                'reference'
+                'reference',
+                '{"i18n_properties": ["placeholder"]}'
             );
 
             """,

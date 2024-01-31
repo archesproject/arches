@@ -2580,14 +2580,7 @@ class ReferenceDataType(BaseDataType):
         new_values = []
         return ",".join(new_values)
 
-    def get_display_value(self, tile, node, **kwargs):
-        new_values = []
-        return ",".join(new_values)
-
-    def to_json(self, tile, node):
-        new_values = []
-        return json.dumps({"text":new_values})
-
+ 
     def collects_multiple_values(self):
         return True
 
