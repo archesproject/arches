@@ -1,6 +1,7 @@
 <script setup>
 import arches from "arches";
 import Cookies from "js-cookie";
+import { ref } from "vue";
 
 import Button from "primevue/button";
 import Splitter from "primevue/splitter";
@@ -9,10 +10,10 @@ import { useToast } from "primevue/usetoast";
 
 import Characteristics from "./Characteristics.vue";
 import Header from "./Header.vue";
-import SearchAddDelete from "./SearchAddDelete.vue";
 import SidepanelDataView from "./SidepanelDataView.vue";
 import Spinner from "../Spinner.vue";
 
+const items = ref([]);
 const toast = useToast();
 const lightGray = "#f4f4f4";
 
@@ -21,6 +22,10 @@ const { displayedList, languageMap, setEditing } = defineProps([
     "languageMap",
     "setEditing",
 ]);
+
+const fetchItems = async () => {
+    //
+};
 
 const createItem = async () => {
     try {
@@ -32,7 +37,8 @@ const createItem = async () => {
             body: JSON.stringify({ list_id: displayedList.value.id }),
         });
         if (response.ok) {
-            queryMutator.value += 1;
+            const newItem = await response.json();
+            items.value.push(newItem);
         } else {
             throw new Error();
         }
@@ -45,7 +51,7 @@ const createItem = async () => {
     }
 };
 
-const deleteItems = async () => {
+const deleteItems = async (selectedItems) => {
     if (!selectedItems.value.length) {
         return;
     }
@@ -60,14 +66,6 @@ const deleteItems = async () => {
 
     try {
         const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            if (selectedItems.value.includes(displayedList.value)) {
-                displayedList.value = null;
-            }
-            selectedItems.value = [];
-
-            queryMutator.value += 1;
-        }
         if (responses.some((resp) => !resp.ok)) {
             throw new Error();
         }
@@ -78,6 +76,7 @@ const deleteItems = async () => {
             life: 3000,
         });
     }
+    await fetchItems();
 };
 </script>
 
@@ -95,23 +94,18 @@ const deleteItems = async () => {
                 }"
             >
                 <SplitterPanel :size="30" :minSize="15">
-                    <SearchAddDelete
-                        :addAction="createItem"
-                        addLabel="Add New Item"
-                        :filteredItems="filteredItems"
-                        :deleteAction="deleteItems"
-                        deleteLabel="Delete Item"
-                        deleteLabelPlural="Delete Items"
-                        :numberToDelete="selectedItems.length"
-                    />
-
                     <Suspense>
                         <SidepanelDataView
+                            addLabel="Add New Item"
+                            deleteLabel="Delete Item"
+                            deleteLabelPlural="Delete Items"
                             :displayedItem="displayedList"
                             :languageMap="languageMap"
-                            :create="createItem"
-                            :delete="deleteItems"
+                            :createItem="createItem"
+                            :deleteItems="deleteItems"
+                            :fetchItems="fetchItems"
                             itemLabel="item"
+                            :items="items"
                             itemsLabel="items"
                             noSearchResultLabel="No matching items."
                             noItemLabel='Click "Add New Item" to start.'
