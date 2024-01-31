@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Max
 from django.views.generic import View
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 
 
 from arches.app.models.models import ControlledList, ControlledListItem, Label, Language
@@ -53,29 +53,32 @@ def serialize(obj, depth_map=None):
             }
 
 
+def prefetch_terms(request):
+    """Children at arbitrary depth will still be returned, but tell
+    the ORM to expect a certain number to mitigate N+1 queries."""
+    prefetch_depth = request.GET.get("prefetchDepth", 3)
+    prefetch_terms = []
+    for i in range(prefetch_depth):
+        if i == 0:
+            prefetch_terms.extend(["items", "items__labels"])
+        else:
+            prefetch_terms.extend(
+                [f"items{'__children' * i}", f"items{'__children' * i}__labels"]
+            )
+    return prefetch_terms
+
+
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListsView(View):
     def get(self, request):
-        # Children at arbitrary depth will still be returned, but tell
-        # the ORM to expect a certain number to mitigate N+1 queries.
-        prefetch_depth = request.GET.get("prefetchDepth", 3)
-        prefetch_terms = []
-        for i in range(prefetch_depth):
-            if i == 0:
-                prefetch_terms.extend(["items", "items__labels"])
-            else:
-                prefetch_terms.extend(
-                    [f"items{'__children' * i}", f"items{'__children' * i}__labels"]
-                )
-
         data = {
             "controlled_lists": [
                 serialize(obj)
                 for obj in ControlledList.objects.all()
                 .order_by("name")
-                .prefetch_related(*prefetch_terms)
+                .prefetch_related(*prefetch_terms(request))
             ],
             "languages": {lang.code: lang.name for lang in Language.objects.all()},
         }
@@ -87,6 +90,16 @@ class ControlledListsView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListView(View):
+    def get(self, request, **kwargs):
+        id = kwargs.get("id")
+        try:
+            lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
+                pk=id
+            )
+        except ControlledList.DoesNotExist:
+            return JSONErrorResponse(status=404)
+        return JSONResponse(serialize(lst))
+
     def post(self, request, **kwargs):
         if not (id := kwargs.get("id", None)):
             # Add a new list.
@@ -147,7 +160,7 @@ class ControlledListView(View):
         except ValidationError as e:
             return JSONErrorResponse(message=" ".join(e.messages), status=400)
         except:
-            return JSONErrorResponse(status=400)
+            return JSONErrorResponse()
 
         return JSONResponse(status=200)
 
@@ -177,12 +190,28 @@ class ControlledListItemView(View):
             except ControlledList.DoesNotExist:
                 return JSONErrorResponse(status=404)
 
-            item = ControlledListItem(
-                list=lst,
-                sortorder=(lst.max_sortorder or -1) + 1,
-                parent_id=kwargs.get("parent_id", None),
-            )
-            item.save()
+            if lst.max_sortorder is None:
+                sortorder = 0
+            else:
+                sortorder = lst.max_sortorder + 1
+
+            try:
+                with transaction.atomic():
+                    item = ControlledListItem(
+                        list=lst,
+                        sortorder=sortorder,
+                        parent_id=kwargs.get("parent_id", None),
+                    )
+                    item.save()
+                    label = Label(
+                        item=item,
+                        value=_("New Label: ") + datetime.now().isoformat(),
+                        value_type_id="prefLabel",
+                        language_id=get_language(),
+                    )
+                    label.save()
+            except:
+                return JSONErrorResponse()
 
             return JSONResponse(serialize(item))
 

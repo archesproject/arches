@@ -23,8 +23,17 @@ const { displayedList, languageMap, setEditing } = defineProps([
     "setEditing",
 ]);
 
+const displayedItem = ref({});
+
 const fetchItems = async () => {
-    //
+    const response = await fetch(
+        arches.urls.controlled_list(displayedList.value.id)
+    );
+    await response.json().then((data) => {
+        // Preserve reactivity of filteredLists() computed prop
+        items.value.splice(0, items.value.length);
+        items.value.push(...data.items);
+    });
 };
 
 const createItem = async () => {
@@ -52,10 +61,10 @@ const createItem = async () => {
 };
 
 const deleteItems = async (selectedItems) => {
-    if (!selectedItems.value.length) {
+    if (!selectedItems.length) {
         return;
     }
-    const promises = selectedItems.value.map((item) =>
+    const promises = selectedItems.map((item) =>
         fetch(arches.urls.controlled_list_item(item.id), {
             method: "DELETE",
             headers: {
@@ -99,7 +108,7 @@ const deleteItems = async (selectedItems) => {
                             addLabel="Add New Item"
                             deleteLabel="Delete Item"
                             deleteLabelPlural="Delete Items"
-                            :displayedItem="displayedList"
+                            :displayedItem="displayedItem"
                             :languageMap="languageMap"
                             :createItem="createItem"
                             :deleteItems="deleteItems"
