@@ -2575,6 +2575,11 @@ class ReferenceDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         ret = []
         return ret
+    
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
