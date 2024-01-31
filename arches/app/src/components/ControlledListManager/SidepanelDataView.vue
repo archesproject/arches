@@ -1,22 +1,34 @@
 <script setup>
 import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, ref } from "vue";
 
 import DataView from "primevue/dataview";
-import { useToast } from "primevue/usetoast";
 
 import SearchAddDelete from "./SearchAddDelete.vue";
 
 const {
+    addLabel,
+    createItem,
+    deleteItems,
+    deleteLabel,
+    deleteLabelPlural,
     displayedItem,
+    fetchItems,
     itemLabel,
+    items,
     itemsLabel,
     languageMap,
     noItemLabel,
     noSearchResultLabel,
 } = defineProps([
+    "addLabel",
+    "createItem",
+    "deleteItems",
+    "deleteLabel",
+    "deleteLabelPlural",
     "displayedItem",
+    "fetchItems",
+    "items",
     "itemLabel",
     "itemsLabel",
     "languageMap",
@@ -24,112 +36,57 @@ const {
     "noSearchResultLabel",
 ]);
 
-const items = ref([]);
 const selectedItems = ref([]);
 const searchValue = ref("");
 
-const toast = useToast();
+const filteredItems = computed(() => {
+    const loweredTerm = searchValue.value.toLowerCase();
+    if (!loweredTerm) {
+        return items;
+    }
+    return items.filter((item) =>
+        item.name.toLowerCase().includes(loweredTerm)
+    );
+});
+
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
 
-const fetchLists = async () => {
-    const response = await fetch(arches.urls.controlled_lists);
-    await response.json().then((data) => {
-        languageMap.value = data.languages;
-        items.value = data.controlled_lists;
-    });
-};
-await fetchLists();
-
-const createList = async () => {
-    try {
-        const response = await fetch(arches.urls.controlled_list_add, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-        });
-        if (response.ok) {
-            const newItem = await response.json();
-            items.value.push(newItem);
-        } else {
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: "error",
-            summary: "List creation failed",
-            life: 3000,
-        });
-    }
-};
-
-const deleteLists = async () => {
-    if (!selectedItems.value.length) {
-        return;
-    }
-    const promises = selectedItems.value.map((list) =>
-        fetch(arches.urls.controlled_list(list.id), {
-            method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-        })
-    );
-
-    try {
-        const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            if (selectedItems.value.includes(displayedItem.value)) {
-                displayedItem.value = null;
-            }
-            selectedItems.value = [];
-        }
-        if (responses.some((resp) => !resp.ok)) {
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: "error",
-            summary: "One or more lists failed to delete.",
-            life: 3000,
-        });
-    }
-    await fetchLists();
-};
+await fetchItems();
 
 const toggleCheckbox = (list) => {
     const i = selectedItems.value.indexOf(list);
     if (i === -1) {
         selectedItems.value.push(list);
     } else {
-        selectedItems.value.splice(i);
+        selectedItems.value.splice(i, 1);
     }
 };
 
 const selectAll = () => {
-    selectedItems.value = items.value;
+    selectedItems.value = items;
 };
 const clearAll = () => {
     selectedItems.value = [];
 };
-
-const filteredItems = computed(() => {
-    const loweredTerm = searchValue.value.toLowerCase();
-    return items.value.filter(
-        (item) => !loweredTerm || item.name.includes(loweredTerm)
-    );
-});
+const selectRow = (item) => {
+    displayedItem.value = item;
+};
 </script>
 
 <template>
     <SearchAddDelete
-        :v-model="searchValue"
-        :addAction="createList"
-        addLabel="Create New List"
-        :deleteAction="deleteLists"
-        deleteLabel="Delete List"
-        deleteLabelPlural="Delete Lists"
+        v-model="searchValue"
+        :createItem="createItem"
+        :addLabel="addLabel"
+        :deleteItems="
+            () => {
+                deleteItems(selectedItems);
+                selectedItems.splice(0);
+            }
+        "
+        :deleteLabel="deleteLabel"
+        :deleteLabelPlural="deleteLabelPlural"
         :items="items"
         :numberToDelete="selectedItems.length"
     />
@@ -155,11 +112,9 @@ const filteredItems = computed(() => {
                 class="itemRow"
                 :class="{ selected: displayedItem.value?.id === item.id }"
                 :key="index"
-                @click="
-                    () => {
-                        displayedItem.value = item;
-                    }
-                "
+                tabindex="0"
+                @click="selectRow(item)"
+                @keyup.enter="selectRow(item)"
             >
                 <input
                     type="checkbox"
