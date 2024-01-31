@@ -31,7 +31,7 @@ const searchValue = ref("");
 
 watch(searchValue, () => {
     filteredItems.value = filteredItems.filter(
-        (list) => !searchValue.value || list.name.includes(searchValue.value)
+        (item) => !searchValue.value || item.name.includes(searchValue.value)
     );
 });
 

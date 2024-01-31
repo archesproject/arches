@@ -5,8 +5,8 @@ import { ref } from "vue";
 
 import { useToast } from "primevue/usetoast";
 
-import ControlledListsAll from "./ControlledListsAll.vue";
 import SearchAddDelete from "./SearchAddDelete.vue";
+import SidepanelDataView from "./SidepanelDataView.vue";
 import Spinner from "../Spinner.vue";
 
 const toast = useToast();
@@ -93,11 +93,15 @@ const deleteLists = async () => {
     />
 
     <Suspense>
-        <ControlledListsAll
-            :displayedList="displayedList"
-            :selectedLists="selectedLists"
-            :filteredLists="filteredLists"
+        <SidepanelDataView
+            :displayedItem="displayedList"
+            :selectedItems="selectedLists"
+            :filteredItems="filteredLists"
             :languageMap="languageMap"
+            itemLabel="list"
+            itemsLabel="lists"
+            noSearchResultLabel="No matching lists."
+            noItemLabel='Click "Create New List" to start.'
             :key="queryMutator"
         />
         <template #fallback>
