@@ -92,7 +92,7 @@ const deleteItems = async (selectedItems) => {
 <template>
     <Header :displayedList="displayedList" :isItemEditor="true"></Header>
     <div class="list-editor-container">
-        <Characteristics :displayedList="displayedList" />
+        <Characteristics :displayedList="displayedList" :editable="false" />
 
         <div class="items" style="margin: 1rem">
             <h4 style="margin-top: 4rem; margin-left: 0">List Item Editor</h4>

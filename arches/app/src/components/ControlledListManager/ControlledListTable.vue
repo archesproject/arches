@@ -198,7 +198,7 @@ const itemsForLanguage = computed(() => {
     <Header :displayedList="displayedList" :isItemEditor="false"></Header>
 
     <div v-if="!!displayedList.value" class="list-editor-container">
-        <Characteristics :displayedList="displayedList" />
+        <Characteristics :displayedList="displayedList" :editable="true" />
         <div class="items" style="height: 50vh">
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
