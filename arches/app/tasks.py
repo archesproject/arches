@@ -351,6 +351,41 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
+
+@shared_task
+def run_etl_task(**kwargs):
+    """
+        this allows the user to run the custom etl module
+        import_module, import_class, loadid, userid are the required string parameter
+        importer_name can be added (not required) for messaging purpose
+    """
+
+    logger = logging.getLogger(__name__)
+
+    import_module = kwargs.pop("import_module")
+    import_class = kwargs.pop("import_class")
+    importer_name = kwargs.pop("importer_name", import_class)
+    loadid = kwargs.get("loadid")
+    userid = kwargs.get("userid")
+
+    try:
+        import_class = vars(__import__(import_module, globals(), locals(), [import_class]))[import_class]
+        import_class().run_load_task(**kwargs)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("{}: {}").format(importer_name, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+
 @shared_task
 def reverse_etl_load(loadid):
     from arches.app.etl_modules import base_import_module
