@@ -8,25 +8,25 @@ import SplitButton from "primevue/splitbutton";
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
+interface Props {
+    addLabel: string;
+    createItem: () => Promise<void>;
+    deleteItems: () => Promise<void>;
+    deleteLabel: string;
+    deleteLabelPlural: string;
+    numberToDelete: number;
+}
+
 const {
     addLabel,
     createItem,
     deleteItems,
     deleteLabel,
     deleteLabelPlural,
-    items,
     numberToDelete,
-} = defineProps([
-    "addLabel",
-    "createItem",
-    "deleteItems",
-    "deleteLabel",
-    "deleteLabelPlural",
-    "items",
-    "numberToDelete",
-]);
+} = defineProps<Props>();
 
-const searchValue = defineModel({ type: String });
+const searchValue = defineModel<string>({ required: true });
 
 const clearSearch = () => {
     searchValue.value = "";

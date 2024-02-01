@@ -11,13 +11,23 @@ import ControlledListTable from "./ControlledListTable.vue";
 import SidepanelDataView from "./SidepanelDataView.vue";
 import Spinner from "../Spinner.vue";
 
-const { displayedList, languageMap, setEditing } = defineProps([
-    "displayedList",
-    "languageMap",
-    "setEditing",
-]);
+import type { Ref } from "vue";
+import type {
+    ControlledList,
+    LanguageMap,
+} from "@/types/controlledListManager.d";
 
-const items = ref([]);
+const {
+    displayedList,
+    languageMap,
+    setEditing,
+}: {
+    displayedList: Ref<ControlledList>;
+    languageMap: Ref<LanguageMap>;
+    setEditing: (val: boolean) => void;
+} = defineProps(["displayedList", "languageMap", "setEditing"]);
+
+const items: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
 const lightGray = "#f4f4f4";
 
@@ -54,7 +64,7 @@ const createList = async () => {
     }
 };
 
-const deleteLists = async (selectedItems) => {
+const deleteLists = async (selectedItems: ControlledList[]) => {
     if (!selectedItems.length) {
         return;
     }
@@ -108,7 +118,6 @@ const deleteLists = async (selectedItems) => {
                     deleteLabel="Delete List"
                     deleteLabelPlural="Delete Lists"
                     :displayedItem="displayedList"
-                    :languageMap="languageMap"
                     :fetchItems="fetchLists"
                     itemLabel="list"
                     :items="items"

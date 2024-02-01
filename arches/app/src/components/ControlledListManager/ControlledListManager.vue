@@ -4,16 +4,20 @@ import { computed, ref } from "vue";
 import ControlledListInventory from "./ControlledListInventory.vue";
 import ControlledListEditor from "./ControlledListEditor.vue";
 
+import type { Ref } from "vue";
+import type { LanguageMap } from "@/types/controlledListManager.d";
+
 const displayedList = ref({});
 const editing = ref(false);
-const setEditing = (val) => {
-    editing.value = val;
-};
-const languageMap = ref({});
+const languageMap: Ref<LanguageMap> = ref({});
 
 const displayedWorkspace = computed(() => {
     return editing.value ? ControlledListEditor : ControlledListInventory;
 });
+
+const setEditing = (val: boolean) => {
+    editing.value = val;
+};
 </script>
 
 <template>
