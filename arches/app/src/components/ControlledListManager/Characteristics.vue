@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import arches from "arches";
 import { computed, ref } from "vue";
 

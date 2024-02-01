@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
