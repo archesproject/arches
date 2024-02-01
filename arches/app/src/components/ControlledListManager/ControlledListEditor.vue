@@ -13,15 +13,25 @@ import Header from "./Header.vue";
 import SidepanelDataView from "./SidepanelDataView.vue";
 import Spinner from "../Spinner.vue";
 
-const items = ref([]);
+import type { Ref } from "vue";
+import type {
+    ControlledList,
+    ControlledListItem,
+} from "@/types/controlledListManager.d";
+
+const items: Ref<ControlledListItem[]> = ref([]);
 const toast = useToast();
 const lightGray = "#f4f4f4";
 
-const { displayedList, languageMap, setEditing } = defineProps([
-    "displayedList",
-    "languageMap",
-    "setEditing",
-]);
+const {
+    displayedList,
+    languageMap,
+    setEditing,
+}: {
+    displayedList: Ref<ControlledList>;
+    languageMap: Ref<LanguageMap>;
+    setEditing: (val: boolean) => void;
+} = defineProps(["displayedList", "languageMap", "setEditing"]);
 
 const displayedItem = ref({});
 
@@ -60,7 +70,7 @@ const createItem = async () => {
     }
 };
 
-const deleteItems = async (selectedItems) => {
+const deleteItems = async (selectedItems: ControlledList[]) => {
     if (!selectedItems.length) {
         return;
     }
@@ -92,7 +102,7 @@ const deleteItems = async (selectedItems) => {
 <template>
     <Header :displayedList="displayedList" :isItemEditor="true"></Header>
     <div class="list-editor-container">
-        <Characteristics :displayedList="displayedList" :editable="false" />
+        <Characteristics :displayedList="displayedList" :editable="true" />
 
         <div class="items" style="margin: 1rem">
             <h4 style="margin-top: 4rem; margin-left: 0">List Item Editor</h4>
@@ -109,7 +119,6 @@ const deleteItems = async (selectedItems) => {
                             deleteLabel="Delete Item"
                             deleteLabelPlural="Delete Items"
                             :displayedItem="displayedItem"
-                            :languageMap="languageMap"
                             :createItem="createItem"
                             :deleteItems="deleteItems"
                             :fetchItems="fetchItems"

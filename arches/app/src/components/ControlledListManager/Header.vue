@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import type { Ref } from "vue";
+import type { ControlledList } from "@/types/controlledListManager.d";
+
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const { displayedList, isItemEditor } = defineProps([
+const {
+    displayedList,
+    isItemEditor,
+}: { displayedList: Ref<ControlledList>; isItemEditor: boolean } = defineProps([
     "displayedList",
     "isItemEditor",
 ]);
