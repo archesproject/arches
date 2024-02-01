@@ -2,11 +2,20 @@
 import arches from "arches";
 import { computed, ref } from "vue";
 
-const { displayedList, editable } = defineProps(["displayedList", "editable"]);
+import type { Ref } from "vue";
+import type { ControlledList } from "@/types/controlledListManager.d";
+
+const {
+    displayedList,
+    editable,
+}: { displayedList: Ref<ControlledList>; editable: boolean } = defineProps([
+    "displayedList",
+    "editable",
+]);
 
 const editing = ref(false);
 const disabled = computed(() => {
-    return !editable.value || !editing.value;
+    return !editable || !editing.value;
 });
 
 const staticLabel = "Static: list does not change";

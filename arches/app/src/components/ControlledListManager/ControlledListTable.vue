@@ -12,19 +12,29 @@ import { useToast } from "primevue/usetoast";
 import Characteristics from "./Characteristics.vue";
 import Header from "./Header.vue";
 
+import type { Ref } from "vue";
+import type {
+    ControlledList,
+    ControlledListItem,
+    LanguageMap,
+} from "@/types/controlledListManager.d";
+
+const {
+    displayedList,
+    languageMap,
+    setEditing,
+}: {
+    displayedList: Ref<ControlledList>;
+    languageMap: LanguageMap;
+    setEditing: (val: boolean) => void;
+} = defineProps(["displayedList", "languageMap", "setEditing"]);
+
+const selectedLanguage: Ref<string> = ref(arches.activeLanguage);
+const expandedRows: Ref<string[]> = ref([]);
+const toast = useToast();
 const buttonGreen = "#10b981";
 
-const { displayedList, languageMap, setEditing } = defineProps([
-    "displayedList",
-    "languageMap",
-    "setEditing",
-]);
-const toast = useToast();
-
-const selectedLanguage = ref(arches.activeLanguage);
-const expandedRows = ref([]);
-
-const rowClass = (rowData) => {
+const rowClass = (rowData: ControlledListItem) => {
     const depth = `depth-${rowData.depth}`;
     if (rowData.children.length) {
         return depth;
@@ -198,7 +208,7 @@ const itemsForLanguage = computed(() => {
     <Header :displayedList="displayedList" :isItemEditor="false"></Header>
 
     <div v-if="!!displayedList.value" class="list-editor-container">
-        <Characteristics :displayedList="displayedList" :editable="true" />
+        <Characteristics :displayedList="displayedList" :editable="false" />
         <div class="items" style="height: 50vh">
             <h4 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})

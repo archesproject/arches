@@ -6,6 +6,15 @@ import DataView from "primevue/dataview";
 
 import SearchAddDelete from "./SearchAddDelete.vue";
 
+import type { Ref } from "vue";
+import type {
+    ControlledList,
+    ControlledListItem,
+} from "@/types/controlledListManager.d";
+
+type Item = ControlledList | ControlledListItem;
+type Items = ControlledList[] | ControlledListItem[];
+
 const {
     addLabel,
     createItem,
@@ -17,9 +26,21 @@ const {
     itemLabel,
     items,
     itemsLabel,
-    languageMap,
     noItemLabel,
     noSearchResultLabel,
+}: {
+    addLabel: string;
+    createItem: () => Promise<void>;
+    deleteItems: (selectedItems: Items) => Promise<void>;
+    deleteLabel: string;
+    deleteLabelPlural: string;
+    displayedItem: Ref<Item>;
+    fetchItems: () => Promise<void>;
+    items: Items;
+    itemLabel: string;
+    itemsLabel: string;
+    noItemLabel: string;
+    noSearchResultLabel: string;
 } = defineProps([
     "addLabel",
     "createItem",
@@ -36,7 +57,7 @@ const {
     "noSearchResultLabel",
 ]);
 
-const selectedItems = ref([]);
+const selectedItems: Ref<Items> = ref([]);
 const searchValue = ref("");
 
 const filteredItems = computed(() => {
@@ -44,9 +65,16 @@ const filteredItems = computed(() => {
     if (!loweredTerm) {
         return items;
     }
-    return items.filter((item) =>
-        item.name.toLowerCase().includes(loweredTerm)
-    );
+    return items.filter((item) => {
+        if (Object.hasOwn(item, "name")) {
+            return (item as ControlledList).name
+                .toLowerCase()
+                .includes(loweredTerm);
+        } else {
+            // TODO: implement, see below TODO for factoring out label getter
+            throw new Error();
+        }
+    });
 });
 
 const lightGray = "#f4f4f4";
@@ -54,10 +82,10 @@ const slateBlue = "#2d3c4b";
 
 await fetchItems();
 
-const toggleCheckbox = (list) => {
-    const i = selectedItems.value.indexOf(list);
+const toggleCheckbox = (item: ControlledList | ControlledListItem) => {
+    const i = selectedItems.value.indexOf(item);
     if (i === -1) {
-        selectedItems.value.push(list);
+        selectedItems.value.push(item);
     } else {
         selectedItems.value.splice(i, 1);
     }
@@ -69,7 +97,7 @@ const selectAll = () => {
 const clearAll = () => {
     selectedItems.value = [];
 };
-const selectRow = (item) => {
+const selectRow = (item: ControlledList | ControlledListItem) => {
     displayedItem.value = item;
 };
 </script>
@@ -87,7 +115,6 @@ const selectRow = (item) => {
         "
         :deleteLabel="deleteLabel"
         :deleteLabelPlural="deleteLabelPlural"
-        :items="items"
         :numberToDelete="selectedItems.length"
     />
     <div class="selection-header">
