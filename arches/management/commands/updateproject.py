@@ -91,12 +91,12 @@ class Command(BaseCommand):
             print("Copying {} to project root directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", dotfile), settings.APP_ROOT)
     
-        if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "shims.d.ts")):
-            print("Creating /src/shims.d.ts")
+        if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
+            print("Creating /src/declarations.d.ts")
             if not os.path.isdir(os.path.join(settings.APP_ROOT, "src")):
                 os.mkdir(os.path.join(settings.APP_ROOT, "src"))
 
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "src", "shims.d.ts"), os.path.join(settings.APP_ROOT, 'src'))
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "src", "declarations.d.ts"), os.path.join(settings.APP_ROOT, 'src'))
 
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "locale", "messages.pot")):
             print("Creating /locale/messages.pot")

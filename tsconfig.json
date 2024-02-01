@@ -6,7 +6,7 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "noImplicitThis": true,
+    "noImplicitThis": false,
     "strict": true,
     "verbatimModuleSyntax": true,
     "target": "ESNext",

@@ -40,7 +40,8 @@ module.exports = {
         {
             "files": [ "*.vue" ],
             "rules": {
-                "vue/html-indent": [2, 4]
+                "vue/html-indent": [2, 4],
+                "vue/this-in-template": "off"
             }
         },
         {
