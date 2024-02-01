@@ -21,18 +21,15 @@ define([
             return koMapping.toJS(labels)?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel').value;
         }; 
 
-        this.flattenItems = function(items, flatList, depth, uniqueItems){
+        this.flattenItems = function(items, flatList, uniqueItems){
             //TODO Children are duplicated coming from the concept_list endpoint. We can remove 'uniqueItems' once that's fixed
             items.forEach(item=>{
                 if (uniqueItems.includes(item.uri) === false) {
                     uniqueItems.push(item.uri);
-                    item.depth = depth;
                     flatList.push(item);
                     if (item.children.length) {
-                        depth += 1;
-                        self.flattenItems(item.children, flatList, depth, uniqueItems);
+                        self.flattenItems(item.children, flatList, uniqueItems);
                     }
-                    depth = 0;
                 }
             });
             flatList.forEach(subItem=>delete subItem.children); //Prevent select2 from symbolizing parent as grouping reference
@@ -84,7 +81,7 @@ define([
                 },
                 processResults: function(data) {
                     const items = data.controlled_lists.find(list => list.id === params.node.config.controlledList()).items; 
-                    const flatItems = self.flattenItems(items, [], 0, []);
+                    const flatItems = self.flattenItems(items, [], []);
                     flatItems.forEach(item => {
                         item["listid"] = item.id;
                         item.id = item.uri;
