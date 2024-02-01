@@ -12,7 +12,7 @@ from arches.app.models.models import (
     Label,
     Language,
 )
-from arches.app.views.controlled_lists import ControlledListsView
+from arches.app.views.controlled_lists import serialize
 from tests.base_test import ArchesTestCase
 
 class ControlledListTests(ArchesTestCase):
@@ -140,7 +140,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_create_list(self):
         self.client.force_login(self.admin)
-        self.client.post(reverse("controlled_lists"))
+        self.client.post(reverse("controlled_list_add"))
         self.assertEqual(ControlledList.objects.count(), 3)
         self.assertEqual(
             ControlledList.objects.filter(name__startswith="Untitled List: ").count(), 1
@@ -156,7 +156,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_reorder_list_items_valid(self):
         self.client.force_login(self.admin)
-        serialized_list = ControlledListsView.serialize(self.list1, depth_map=defaultdict(int))
+        serialized_list = serialize(self.list1, depth_map=defaultdict(int))
 
         serialized_list["items"][0]["sortorder"] = 1
         serialized_list["items"][1]["sortorder"] = 0
@@ -173,7 +173,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_reorder_list_items_invalid_negative(self):
         self.client.force_login(self.admin)
-        serialized_list = ControlledListsView.serialize(self.list1, depth_map=defaultdict(int))
+        serialized_list = serialize(self.list1, depth_map=defaultdict(int))
 
         serialized_list["items"][0]["sortorder"] = -1
         response = self.client.post(
