@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ControlledListManager from "@/components/ControlledListManager/ControlledListManager.vue";
 import Toast from "primevue/toast";
 </script>
