@@ -24,11 +24,13 @@ const toast = useToast();
 
 const {
     displayedList,
+    languageMap,
     setEditing,
 }: {
     displayedList: Ref<ControlledList>;
+    languageMap: Ref<LanguageMap>;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "setEditing"]);
+} = defineProps(["displayedList", "languageMap", "setEditing"]);
 
 const items: Ref<ControlledListItem[]> = ref([]);
 const displayedItem = ref({});
