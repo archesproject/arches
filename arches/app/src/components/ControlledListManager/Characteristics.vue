@@ -25,9 +25,9 @@ const dynamicLabel =
 
 <template>
     <div class="characteristics">
-        <h4>Characteristics</h4>
+        <h3>Characteristics</h3>
         <div class="characteristic">
-            <h5>Name</h5>
+            <h4>Name</h4>
             <!-- TODO wire up with v-model and factor out into component for use with URI -->
             <input
                 :disabled="disabled"
@@ -73,7 +73,7 @@ const dynamicLabel =
             </span>
         </div>
         <div class="characteristic">
-            <h5>Type</h5>
+            <h4>Type</h4>
             <input
                 :disabled="disabled"
                 :value="
@@ -87,12 +87,19 @@ const dynamicLabel =
             />
         </div>
         <div class="characteristic">
-            <h5>List used by these nodes</h5>
+            <h4>List used by these nodes</h4>
         </div>
     </div>
 </template>
 
 <style scoped>
+h3 {
+    font-size: 1.5rem;
+}
+h4,
+input {
+    font-size: 1.25rem;
+}
 .characteristics {
     padding-top: 0.125rem;
 }
