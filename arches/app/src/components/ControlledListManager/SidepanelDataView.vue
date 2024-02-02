@@ -136,16 +136,16 @@ await fetchItems();
             <div
                 v-for="(item, index) in slotProps.items"
                 class="itemRow"
-                :class="{ selected: displayedItem.value?.id === item.id }"
                 :key="index"
+                :class="{ selected: displayedItem.value?.id === item.id }"
                 tabindex="0"
                 @click="selectRow(item)"
                 @keyup.enter="selectRow(item)"
             >
                 <input
                     type="checkbox"
-                    @click="toggleCheckbox(item)"
                     :checked="selectedItems.indexOf(item) > -1"
+                    @click="toggleCheckbox(item)"
                 />
                 <!-- TODO(jtw): factor this out, also get appropriate language -->
                 <span>{{

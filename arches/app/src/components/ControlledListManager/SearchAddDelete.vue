@@ -39,17 +39,17 @@ const clearSearch = () => {
             <InputText
                 type="text"
                 class="control"
-                :placeholder="arches.translations.find"
                 v-model="searchValue"
+                :placeholder="arches.translations.find"
             />
             <i
                 v-if="searchValue"
                 class="fa fa-times"
                 role="button"
                 tabindex="0"
+                :aria-label="arches.translations.clear"
                 @click="clearSearch"
                 @keydown="clearSearch"
-                :aria-label="arches.translations.clear"
             ></i>
             <i
                 v-else
