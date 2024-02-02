@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-} from "@/types/controlledListManager.d";
+} from "@/types/ControlledListManager.d";
 
 type Item = ControlledList | ControlledListItem;
 type Items = ControlledList[] | ControlledListItem[];

@@ -17,7 +17,7 @@ import type {
     ControlledList,
     ControlledListItem,
     LanguageMap,
-} from "@/types/controlledListManager.d";
+} from "@/types/ControlledListManager.d";
 
 const buttonGreen = "#10b981";
 const toast = useToast();

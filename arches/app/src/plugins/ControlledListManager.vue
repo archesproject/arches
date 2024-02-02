@@ -7,7 +7,7 @@ import ControlledListInventory from "@/components/ControlledListManager/Controll
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
 import type { Ref } from "vue";
-import type { LanguageMap } from "@/types/controlledListManager.d";
+import type { LanguageMap } from "@/types/ControlledListManager.d";
 
 const displayedList = ref({});
 const editing = ref(false);
