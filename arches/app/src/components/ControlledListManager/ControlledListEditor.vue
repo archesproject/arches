@@ -158,7 +158,6 @@ h3 {
     flex-direction: column;
 }
 .list-editor-container {
-    width: calc(100vw - 50px);
     height: 100vh;
     background: white;
     font-size: 14px;
