@@ -3,7 +3,7 @@ import arches from "arches";
 import { computed, ref } from "vue";
 
 import type { Ref } from "vue";
-import type { ControlledList } from "@/types/controlledListManager.d";
+import type { ControlledList } from "@/types/ControlledListManager.d";
 
 const {
     displayedList,

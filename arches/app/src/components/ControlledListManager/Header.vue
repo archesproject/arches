@@ -2,7 +2,7 @@
 import { computed } from "vue";
 
 import type { Ref } from "vue";
-import type { ControlledList } from "@/types/controlledListManager.d";
+import type { ControlledList } from "@/types/ControlledListManager.d";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 

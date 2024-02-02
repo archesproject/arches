@@ -8,16 +8,16 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
-import Characteristics from "./Characteristics.vue";
-import Header from "./Header.vue";
-import SidepanelDataView from "./SidepanelDataView.vue";
-import Spinner from "../Spinner.vue";
+import Characteristics from "@/components/ControlledListManager/Characteristics.vue";
+import Header from "@/components/ControlledListManager/Header.vue";
+import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
+import Spinner from "@/components/Spinner.vue";
 
 import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-} from "@/types/controlledListManager.d";
+} from "@/types/ControlledListManager.d";
 
 const items: Ref<ControlledListItem[]> = ref([]);
 const toast = useToast();
@@ -153,5 +153,11 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 .p-splitter-panel {
     display: flex;
     flex-direction: column;
+}
+.list-editor-container {
+    width: calc(100vw - 50px);
+    height: 100vh;
+    background: white;
+    font-size: 14px;
 }
 </style>
