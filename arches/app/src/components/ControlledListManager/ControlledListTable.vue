@@ -19,6 +19,9 @@ import type {
     LanguageMap,
 } from "@/types/controlledListManager.d";
 
+const buttonGreen = "#10b981";
+const toast = useToast();
+
 const {
     displayedList,
     languageMap,
@@ -31,8 +34,6 @@ const {
 
 const selectedLanguage: Ref<string> = ref(arches.activeLanguage);
 const expandedRows: Ref<string[]> = ref([]);
-const toast = useToast();
-const buttonGreen = "#10b981";
 
 const rowClass = (rowData: ControlledListItem) => {
     const depth = `depth-${rowData.depth}`;

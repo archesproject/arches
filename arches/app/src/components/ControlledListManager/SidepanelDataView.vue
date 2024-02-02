@@ -15,6 +15,9 @@ import type {
 type Item = ControlledList | ControlledListItem;
 type Items = ControlledList[] | ControlledListItem[];
 
+const lightGray = "#f4f4f4";
+const slateBlue = "#2d3c4b";
+
 const {
     addLabel,
     createItem,
@@ -77,11 +80,6 @@ const filteredItems = computed(() => {
     });
 });
 
-const lightGray = "#f4f4f4";
-const slateBlue = "#2d3c4b";
-
-await fetchItems();
-
 const toggleCheckbox = (item: ControlledList | ControlledListItem) => {
     const i = selectedItems.value.indexOf(item);
     if (i === -1) {
@@ -90,7 +88,6 @@ const toggleCheckbox = (item: ControlledList | ControlledListItem) => {
         selectedItems.value.splice(i, 1);
     }
 };
-
 const selectAll = () => {
     selectedItems.value = items;
 };
@@ -100,6 +97,8 @@ const clearAll = () => {
 const selectRow = (item: ControlledList | ControlledListItem) => {
     displayedItem.value = item;
 };
+
+await fetchItems();
 </script>
 
 <template>
