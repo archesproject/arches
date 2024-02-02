@@ -9,8 +9,8 @@ import DataTable from "primevue/datatable";
 import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
-import Characteristics from "@/components/ControlledListManager/Characteristics.vue";
-import Header from "@/components/ControlledListManager/Header.vue";
+import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
+import ItemHeader from "@/components/ControlledListManager/Header.vue";
 
 import type { Ref } from "vue";
 import type {
@@ -210,10 +210,13 @@ const itemsForLanguage = computed(() => {
 </script>
 
 <template>
-    <Header :displayedList="displayedList" :isItemEditor="false"></Header>
+    <ItemHeader
+        :displayedList="displayedList"
+        :isItemEditor="false"
+    ></ItemHeader>
 
     <div v-if="!!displayedList.value" class="list-editor-container">
-        <Characteristics :displayedList="displayedList" :editable="false" />
+        <ItemCharacteristics :displayedList="displayedList" :editable="false" />
         <div class="items" style="height: 50vh">
             <h3 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
