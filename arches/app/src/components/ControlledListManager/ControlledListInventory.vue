@@ -105,25 +105,28 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             gutterHandler: { style: { background: lightGray } },
         }"
     >
-        <SplitterPanel :size="30" :minSize="15">
+        <SplitterPanel
+            :size="30"
+            :min-size="15"
+        >
             <div class="header">
                 <h2>Controlled Lists</h2>
             </div>
 
             <Suspense>
                 <SidepanelDataView
-                    addLabel="Create New List"
-                    :createItem="createList"
-                    :deleteItems="deleteLists"
-                    deleteLabel="Delete List"
-                    deleteLabelPlural="Delete Lists"
-                    :displayedItem="displayedList"
-                    :fetchItems="fetchLists"
-                    itemLabel="list"
+                    add-label="Create New List"
+                    :create-item="createList"
+                    :delete-items="deleteLists"
+                    delete-label="Delete List"
+                    delete-label-plural="Delete Lists"
+                    :displayed-item="displayedList"
+                    :fetch-items="fetchLists"
+                    item-label="list"
                     :items="items"
-                    itemsLabel="lists"
-                    noSearchResultLabel="No matching lists."
-                    noItemLabel='Click "Create New List" to start.'
+                    items-label="lists"
+                    no-search-result-label="No matching lists."
+                    no-item-label="Click &quot;Create New List&quot; to start."
                 />
                 <template #fallback>
                     <SpinnerIcon />
@@ -131,11 +134,15 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             </Suspense>
         </SplitterPanel>
 
-        <SplitterPanel :size="75" :minSize="50" class="mt-0">
+        <SplitterPanel
+            :size="75"
+            :min-size="50"
+            class="mt-0"
+        >
             <ControlledListTable
-                :displayedList="displayedList"
-                :languageMap="languageMap"
-                :setEditing="setEditing"
+                :displayed-list="displayedList"
+                :language-map="languageMap"
+                :set-editing="setEditing"
             />
         </SplitterPanel>
     </Splitter>

@@ -37,9 +37,9 @@ const clearSearch = () => {
     <div class="controls">
         <span class="flex p-input-icon-right">
             <InputText
+                v-model="searchValue"
                 type="text"
                 class="control"
-                v-model="searchValue"
                 :placeholder="arches.translations.find"
             />
             <i
@@ -50,14 +50,17 @@ const clearSearch = () => {
                 :aria-label="arches.translations.clear"
                 @click="clearSearch"
                 @keydown="clearSearch"
-            ></i>
+            />
             <i
                 v-else
                 class="fa fa-search"
                 :aria-label="arches.translations.search"
-            ></i>
+            />
         </span>
-        <div class="flex" style="flex: 0.8; flex-wrap: wrap">
+        <div
+            class="flex"
+            style="flex: 0.8; flex-wrap: wrap"
+        >
             <SplitButton
                 class="button"
                 :label="addLabel"
@@ -82,7 +85,7 @@ const clearSearch = () => {
                     },
                 }"
                 @click="createItem"
-            ></SplitButton>
+            />
             <!-- We might want an are you sure? modal -->
             <Button
                 class="button delete"
@@ -90,7 +93,7 @@ const clearSearch = () => {
                 raised
                 :disabled="numberToDelete === 0"
                 @click="deleteItems"
-            ></Button>
+            />
         </div>
     </div>
 </template>

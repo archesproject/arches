@@ -7,7 +7,7 @@ import arches from "arches";
         <i
             class="fa fa-spin fa-spinner"
             :aria-label="arches.translations.loadingData"
-        ></i>
+        />
     </div>
 </template>
 

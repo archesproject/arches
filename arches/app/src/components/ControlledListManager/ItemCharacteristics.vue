@@ -33,8 +33,11 @@ const dynamicLabel =
                 :disabled="disabled"
                 :value="displayedList.value.name"
                 :style="{ width: displayedList.value.name.length + 'rem' }"
-            />
-            <span v-if="editable && !editing" class="edit-controls">
+            >
+            <span
+                v-if="editable && !editing"
+                class="edit-controls"
+            >
                 <i
                     role="button"
                     tabindex="0"
@@ -45,9 +48,12 @@ const dynamicLabel =
                             editing = true;
                         }
                     "
-                ></i>
+                />
             </span>
-            <span v-if="editable && editing" class="edit-controls">
+            <span
+                v-if="editable && editing"
+                class="edit-controls"
+            >
                 <i
                     role="button"
                     tabindex="0"
@@ -58,7 +64,7 @@ const dynamicLabel =
                             editing = false;
                         }
                     "
-                ></i>
+                />
                 <i
                     role="button"
                     tabindex="0"
@@ -69,7 +75,7 @@ const dynamicLabel =
                             editing = false;
                         }
                     "
-                ></i>
+                />
             </span>
         </div>
         <div class="characteristic">
@@ -84,7 +90,7 @@ const dynamicLabel =
                         ? dynamicLabel.length + 'rem'
                         : staticLabel.length + 'rem',
                 }"
-            />
+            >
         </div>
         <div class="characteristic">
             <h4>List used by these nodes</h4>

@@ -7,7 +7,7 @@ import ControlledListInventory from "@/components/ControlledListManager/Controll
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
 import type { Ref } from "vue";
-import type { LanguageMap } from "@/types/controlledListManager.d";
+import type { LanguageMap } from "@/types/ControlledListManager.d";
 
 const displayedList = ref({});
 const editing = ref(false);
@@ -25,9 +25,9 @@ const setEditing = (val: boolean) => {
 <template>
     <component
         :is="displayedWorkspace"
-        :displayedList="displayedList"
-        :languageMap="languageMap"
-        :setEditing="setEditing"
+        :displayed-list="displayedList"
+        :language-map="languageMap"
+        :set-editing="setEditing"
     />
     <Toast />
 </template>

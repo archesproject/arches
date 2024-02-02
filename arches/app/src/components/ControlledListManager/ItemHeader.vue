@@ -23,8 +23,14 @@ const heading = computed(() => {
 </script>
 
 <template>
-    <div class="header" :style="{ background: slateBlue }">
-        <i class="fa fa-inverse fa-list" aria-hidden="true"></i>
+    <div
+        class="header"
+        :style="{ background: slateBlue }"
+    >
+        <i
+            class="fa fa-inverse fa-list"
+            aria-hidden="true"
+        />
         <h2>{{ heading }}</h2>
     </div>
 </template>
