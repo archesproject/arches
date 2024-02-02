@@ -73,7 +73,6 @@ class Command(BaseCommand):
             "--operation",
             action="store",
             dest="operation",
-            default="Use the -h/--help argument to learn about this command",
             choices=[
                 "setup",
                 "install",
@@ -263,6 +262,10 @@ class Command(BaseCommand):
         parser.add_argument("--languages", action="store", dest="languages", help="languages desired as a comma separated list")
 
     def handle(self, *args, **options):
+        if options["operation"] is None:
+            self.print_help("manage.py", "packages")
+            return
+        
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
         celery_worker_running = task_management.check_if_celery_available()
