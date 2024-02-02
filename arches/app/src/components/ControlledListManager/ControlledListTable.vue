@@ -335,7 +335,6 @@ h3 {
     font-size: 1.5rem;
 }
 .list-editor-container {
-    width: calc(100vw - 50px);
     height: 100vh;
     background: white;
     font-size: 14px;
