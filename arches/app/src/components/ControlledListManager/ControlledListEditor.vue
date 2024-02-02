@@ -8,8 +8,8 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
-import ItemCharacteristics from "@/components/ControlledListManager/Characteristics.vue";
-import ItemHeader from "@/components/ControlledListManager/Header.vue";
+import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
+import ItemHeader from "@/components/ControlledListManager/ItemHeader.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 

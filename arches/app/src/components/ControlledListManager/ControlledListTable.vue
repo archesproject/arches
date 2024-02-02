@@ -10,7 +10,7 @@ import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
 import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
-import ItemHeader from "@/components/ControlledListManager/Header.vue";
+import ItemHeader from "@/components/ControlledListManager/ItemHeader.vue";
 
 import type { Ref } from "vue";
 import type {
