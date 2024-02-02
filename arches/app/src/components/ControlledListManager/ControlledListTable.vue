@@ -211,9 +211,9 @@ const itemsForLanguage = computed(() => {
     <div v-if="!!displayedList.value" class="list-editor-container">
         <Characteristics :displayedList="displayedList" :editable="false" />
         <div class="items" style="height: 50vh">
-            <h4 style="margin-top: 4rem; margin-left: 0">
+            <h3 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
-            </h4>
+            </h3>
             <div style="height: 100%">
                 <div class="controls">
                     <SplitButton
@@ -331,6 +331,9 @@ const itemsForLanguage = computed(() => {
 </template>
 
 <style scoped>
+h3 {
+    font-size: 1.5rem;
+}
 .list-editor-container {
     width: calc(100vw - 50px);
     height: 100vh;
@@ -361,7 +364,7 @@ table {
 </style>
 
 <style>
-.list-editor-container h4 {
+.list-editor-container h3 {
     color: gray;
     border-bottom: 1px solid lightgray;
     font-weight: 400;

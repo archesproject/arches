@@ -25,7 +25,7 @@ const heading = computed(() => {
 <template>
     <div class="header" :style="{ background: slateBlue }">
         <i class="fa fa-inverse fa-list" aria-hidden="true"></i>
-        <h4>{{ heading }}</h4>
+        <h2>{{ heading }}</h2>
     </div>
 </template>
 
@@ -38,7 +38,8 @@ i {
     margin-left: 1rem;
     margin-top: 0.25rem;
 }
-h4 {
+h2 {
+    font-size: 1.5rem;
     margin: 1rem;
     color: white;
 }
