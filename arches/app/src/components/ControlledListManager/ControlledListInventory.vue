@@ -107,7 +107,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
     >
         <SplitterPanel :size="30" :minSize="15">
             <div class="header">
-                <h4>Controlled Lists</h4>
+                <h2>Controlled Lists</h2>
             </div>
 
             <Suspense>
@@ -147,7 +147,8 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
     display: flex;
     align-items: center;
 }
-h4 {
+h2 {
+    font-size: 1.5rem;
     margin: 1rem;
 }
 .p-splitter {

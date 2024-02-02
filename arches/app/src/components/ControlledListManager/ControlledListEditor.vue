@@ -103,7 +103,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
         <Characteristics :displayedList="displayedList" :editable="true" />
 
         <div class="items" style="margin: 1rem">
-            <h4 style="margin-top: 4rem; margin-left: 0">List Item Editor</h4>
+            <h3 style="margin-top: 4rem; margin-left: 0">List Item Editor</h3>
             <Splitter
                 :pt="{
                     gutter: { style: { background: lightGray } },
@@ -144,6 +144,9 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 </template>
 
 <style scoped>
+h3 {
+    font-size: 1.5rem;
+}
 .p-splitter {
     width: calc(100vw - 50px);
     height: calc(100vh - 400px);
