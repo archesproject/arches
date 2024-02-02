@@ -1,3 +1,4 @@
+import importlib
 import os
 import logging
 import shutil
@@ -353,6 +354,19 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
 
 
 @shared_task
+def run_task(module_name=None, class_name=None, method_to_run=None, **kwargs):
+    """
+        this allows the user to run any method as a celery task
+        module_name, class_name, and method_to_run are required
+        pass any additional arguments to the method via the kwargs parameter
+    """
+
+    theClass = getattr(importlib.import_module(module_name), class_name)
+    theMethod = getattr(theClass(), method_to_run)
+    theMethod(**kwargs)
+
+
+@shared_task
 def run_etl_task(**kwargs):
     """
         this allows the user to run the custom etl module
@@ -369,8 +383,7 @@ def run_etl_task(**kwargs):
     userid = kwargs.get("userid")
 
     try:
-        import_class = vars(__import__(import_module, globals(), locals(), [import_class]))[import_class]
-        import_class().run_load_task(**kwargs)
+        run_task(module_name=import_module, class_name=import_class, method_to_run="run_load_task", **kwargs)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
