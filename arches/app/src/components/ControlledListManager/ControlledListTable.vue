@@ -155,13 +155,17 @@ const postDisplayedListToServer = async () => {
             }
         );
         if (!response.ok) {
-            const body = await response.json();
-            throw new Error(body.message);
+            try {
+                const body = await response.json();
+                throw new Error(body.message);
+            } catch {
+                throw new Error(response.statusText);
+            }
         }
     } catch (error) {
         toast.add({
             severity: "error",
-            summary: error.message || "Save failed",
+            summary: error || "Save failed",
             life: 3000,
         });
     }
