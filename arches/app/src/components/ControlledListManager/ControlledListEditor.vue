@@ -19,9 +19,8 @@ import type {
     ControlledListItem,
 } from "@/types/ControlledListManager.d";
 
-const items: Ref<ControlledListItem[]> = ref([]);
-const toast = useToast();
 const lightGray = "#f4f4f4";
+const toast = useToast();
 
 const {
     displayedList,
@@ -31,6 +30,7 @@ const {
     setEditing: (val: boolean) => void;
 } = defineProps(["displayedList", "setEditing"]);
 
+const items: Ref<ControlledListItem[]> = ref([]);
 const displayedItem = ref({});
 
 const fetchItems = async () => {
