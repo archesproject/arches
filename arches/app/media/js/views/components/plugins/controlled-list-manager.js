@@ -1,18 +1,14 @@
 import ko from 'knockout';
-import { createApp } from 'vue';
-import PrimeVue from 'primevue/config';
-import ToastService from 'primevue/toastservice';
-import ControlledListManagerApp from '@/App.vue';
-import ControlledListManager from 'templates/views/components/plugins/controlled-list-manager.htm';
+import ControlledListManager from '@/plugins/ControlledListManager.vue';
+import createVueApp from 'utils/create-vue-application';
+import ControlledListManagerTemplate from 'templates/views/components/plugins/controlled-list-manager.htm';
 
-import 'primevue/resources/themes/bootstrap4-light-blue/theme.css';
 
 ko.components.register('controlled-list-manager', {
     viewModel: function() {
-        const app = createApp(ControlledListManagerApp);
-        app.use(PrimeVue);
-        app.use(ToastService);
-        app.mount('#controlled-list-mounting-point');
+        createVueApp(ControlledListManager).then((vueApp) => {
+            vueApp.mount('#controlled-list-manager-mounting-point');
+        })
     },
-    template: ControlledListManager,
+    template: ControlledListManagerTemplate,
 });

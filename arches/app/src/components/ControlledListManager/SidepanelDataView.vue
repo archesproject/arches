@@ -4,7 +4,7 @@ import { computed, ref } from "vue";
 
 import DataView from "primevue/dataview";
 
-import SearchAddDelete from "./SearchAddDelete.vue";
+import SearchAddDelete from "@/components/ControlledListManager/SearchAddDelete.vue";
 
 import type { Ref } from "vue";
 import type {

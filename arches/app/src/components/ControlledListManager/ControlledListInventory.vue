@@ -7,15 +7,15 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
-import ControlledListTable from "./ControlledListTable.vue";
-import SidepanelDataView from "./SidepanelDataView.vue";
-import Spinner from "../Spinner.vue";
+import ControlledListTable from "@/components/ControlledListManager/ControlledListTable.vue";
+import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
+import Spinner from "@/components/Spinner.vue";
 
 import type { Ref } from "vue";
 import type {
     ControlledList,
     LanguageMap,
-} from "@/types/controlledListManager.d";
+} from "@/types/ControlledListManager.d";
 
 const {
     displayedList,
