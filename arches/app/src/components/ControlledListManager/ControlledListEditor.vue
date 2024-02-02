@@ -8,10 +8,10 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
-import Characteristics from "@/components/ControlledListManager/Characteristics.vue";
-import Header from "@/components/ControlledListManager/Header.vue";
+import ItemCharacteristics from "@/components/ControlledListManager/Characteristics.vue";
+import ItemHeader from "@/components/ControlledListManager/Header.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
-import Spinner from "@/components/Spinner.vue";
+import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
 import type { Ref } from "vue";
 import type {
@@ -100,9 +100,12 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 </script>
 
 <template>
-    <Header :displayedList="displayedList" :isItemEditor="true"></Header>
+    <ItemHeader
+        :displayedList="displayedList"
+        :isItemEditor="true"
+    ></ItemHeader>
     <div class="list-editor-container">
-        <Characteristics :displayedList="displayedList" :editable="true" />
+        <ItemCharacteristics :displayedList="displayedList" :editable="true" />
 
         <div class="items" style="margin: 1rem">
             <h3 style="margin-top: 4rem; margin-left: 0">List Item Editor</h3>
@@ -129,7 +132,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                             noItemLabel='Click "Add New Item" to start.'
                         />
                         <template #fallback>
-                            <Spinner />
+                            <SpinnerIcon />
                         </template>
                     </Suspense>
                 </SplitterPanel>

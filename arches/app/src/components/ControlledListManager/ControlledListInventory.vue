@@ -9,7 +9,7 @@ import { useToast } from "primevue/usetoast";
 
 import ControlledListTable from "@/components/ControlledListManager/ControlledListTable.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
-import Spinner from "@/components/Spinner.vue";
+import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
 import type { Ref } from "vue";
 import type {
@@ -126,7 +126,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
                     noItemLabel='Click "Create New List" to start.'
                 />
                 <template #fallback>
-                    <Spinner />
+                    <SpinnerIcon />
                 </template>
             </Suspense>
         </SplitterPanel>
