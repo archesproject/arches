@@ -17,6 +17,7 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
+    LanguageMap,
 } from "@/types/ControlledListManager.d";
 
 const lightGray = "#f4f4f4";
@@ -100,33 +101,19 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 </script>
 
 <template>
-    <ItemHeader
-        :displayed-list="displayedList"
-        :is-item-editor="true"
-    />
+    <ItemHeader :displayed-list="displayedList" :is-item-editor="true" />
     <div class="list-editor-container">
-        <ItemCharacteristics
-            :displayed-list="displayedList"
-            :editable="true"
-        />
+        <ItemCharacteristics :displayed-list="displayedList" :editable="true" />
 
-        <div
-            class="items"
-            style="margin: 1rem"
-        >
-            <h3 style="margin-top: 4rem; margin-left: 0">
-                List Item Editor
-            </h3>
+        <div class="items" style="margin: 1rem">
+            <h3 style="margin-top: 4rem; margin-left: 0">List Item Editor</h3>
             <Splitter
                 :pt="{
                     gutter: { style: { background: lightGray } },
                     gutterHandler: { style: { background: lightGray } },
                 }"
             >
-                <SplitterPanel
-                    :size="30"
-                    :min-size="15"
-                >
+                <SplitterPanel :size="30" :min-size="15">
                     <Suspense>
                         <SidepanelDataView
                             add-label="Add New Item"
@@ -140,7 +127,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                             :items="items"
                             items-label="items"
                             no-search-result-label="No matching items."
-                            no-item-label="Click &quot;Add New Item&quot; to start."
+                            no-item-label='Click "Add New Item" to start.'
                         />
                         <template #fallback>
                             <SpinnerIcon />
@@ -148,19 +135,13 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     </Suspense>
                 </SplitterPanel>
 
-                <SplitterPanel
-                    :size="75"
-                    :min-size="50"
-                    class="mt-0"
-                >
+                <SplitterPanel :size="75" :min-size="50" class="mt-0">
                     <div>Right</div>
                 </SplitterPanel>
             </Splitter>
         </div>
         <Button @click="setEditing(false)">
-            {{
-                arches.translations.return
-            }}
+            {{ arches.translations.return }}
         </Button>
     </div>
 </template>
