@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import ControlledListInventory from "./ControlledListInventory.vue";
-import ControlledListEditor from "./ControlledListEditor.vue";
+import Toast from "primevue/toast";
+
+import ControlledListInventory from "@/components/ControlledListManager/ControlledListInventory.vue";
+import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
 import type { Ref } from "vue";
 import type { LanguageMap } from "@/types/controlledListManager.d";
@@ -27,13 +29,12 @@ const setEditing = (val: boolean) => {
         :languageMap="languageMap"
         :setEditing="setEditing"
     />
+    <Toast />
 </template>
 
+<!-- Not scoped: workaround for lack of font-family in <body> -->
 <style>
-.list-editor-container {
-    width: calc(100vw - 50px);
-    height: 100vh;
-    background: white;
-    font-size: 14px;
+div {
+    font-family: "Open Sans";
 }
 </style>
