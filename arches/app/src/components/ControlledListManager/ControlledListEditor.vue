@@ -101,35 +101,46 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 
 <template>
     <ItemHeader
-        :displayedList="displayedList"
-        :isItemEditor="true"
-    ></ItemHeader>
+        :displayed-list="displayedList"
+        :is-item-editor="true"
+    />
     <div class="list-editor-container">
-        <ItemCharacteristics :displayedList="displayedList" :editable="true" />
+        <ItemCharacteristics
+            :displayed-list="displayedList"
+            :editable="true"
+        />
 
-        <div class="items" style="margin: 1rem">
-            <h3 style="margin-top: 4rem; margin-left: 0">List Item Editor</h3>
+        <div
+            class="items"
+            style="margin: 1rem"
+        >
+            <h3 style="margin-top: 4rem; margin-left: 0">
+                List Item Editor
+            </h3>
             <Splitter
                 :pt="{
                     gutter: { style: { background: lightGray } },
                     gutterHandler: { style: { background: lightGray } },
                 }"
             >
-                <SplitterPanel :size="30" :minSize="15">
+                <SplitterPanel
+                    :size="30"
+                    :min-size="15"
+                >
                     <Suspense>
                         <SidepanelDataView
-                            addLabel="Add New Item"
-                            deleteLabel="Delete Item"
-                            deleteLabelPlural="Delete Items"
-                            :displayedItem="displayedItem"
-                            :createItem="createItem"
-                            :deleteItems="deleteItems"
-                            :fetchItems="fetchItems"
-                            itemLabel="item"
+                            add-label="Add New Item"
+                            delete-label="Delete Item"
+                            delete-label-plural="Delete Items"
+                            :displayed-item="displayedItem"
+                            :create-item="createItem"
+                            :delete-items="deleteItems"
+                            :fetch-items="fetchItems"
+                            item-label="item"
                             :items="items"
-                            itemsLabel="items"
-                            noSearchResultLabel="No matching items."
-                            noItemLabel='Click "Add New Item" to start.'
+                            items-label="items"
+                            no-search-result-label="No matching items."
+                            no-item-label="Click &quot;Add New Item&quot; to start."
                         />
                         <template #fallback>
                             <SpinnerIcon />
@@ -137,14 +148,20 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     </Suspense>
                 </SplitterPanel>
 
-                <SplitterPanel :size="75" :minSize="50" class="mt-0">
+                <SplitterPanel
+                    :size="75"
+                    :min-size="50"
+                    class="mt-0"
+                >
                     <div>Right</div>
                 </SplitterPanel>
             </Splitter>
         </div>
-        <Button @click="setEditing(false)">{{
-            arches.translations.return
-        }}</Button>
+        <Button @click="setEditing(false)">
+            {{
+                arches.translations.return
+            }}
+        </Button>
     </div>
 </template>
 

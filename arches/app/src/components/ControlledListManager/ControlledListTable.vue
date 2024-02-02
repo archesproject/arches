@@ -211,13 +211,22 @@ const itemsForLanguage = computed(() => {
 
 <template>
     <ItemHeader
-        :displayedList="displayedList"
-        :isItemEditor="false"
-    ></ItemHeader>
+        :displayed-list="displayedList"
+        :is-item-editor="false"
+    />
 
-    <div v-if="!!displayedList.value" class="list-editor-container">
-        <ItemCharacteristics :displayedList="displayedList" :editable="false" />
-        <div class="items" style="height: 50vh">
+    <div
+        v-if="!!displayedList.value"
+        class="list-editor-container"
+    >
+        <ItemCharacteristics
+            :displayed-list="displayedList"
+            :editable="false"
+        />
+        <div
+            class="items"
+            style="height: 50vh"
+        >
             <h3 style="margin-top: 4rem; margin-left: 0">
                 Items ({{ displayedList.value.items.length }})
             </h3>
@@ -249,29 +258,29 @@ const itemsForLanguage = computed(() => {
                                 root: { class: 'language-item' },
                             },
                         }"
-                    ></SplitButton>
+                    />
                     <Button
                         class="button manage-list"
                         label="Manage List"
                         raised
                         @click="() => setEditing(true)"
-                    ></Button>
+                    />
                 </div>
                 <!-- TreeTable exists, but DataTable has better support for reordering -->
                 <DataTable
                     v-if="displayedList.value.items.length"
                     :value="itemsForLanguage"
-                    :rowClass="rowClass"
-                    stripedRows
+                    :row-class="rowClass"
+                    striped-rows
                     scrollable
-                    scrollHeight="flex"
-                    tableStyle="font-size: 14px; table-layout: fixed"
+                    scroll-height="flex"
+                    table-style="font-size: 14px; table-layout: fixed"
                     :pt="{
                         bodyRow: { style: { height: '4rem' } },
                     }"
-                    @rowExpand="onRowExpand"
-                    @rowCollapse="onRowCollapse"
-                    @rowReorder="onRowReorder"
+                    @row-expand="onRowExpand"
+                    @row-collapse="onRowCollapse"
+                    @row-reorder="onRowReorder"
                 >
                     <Column
                         expander
@@ -282,7 +291,7 @@ const itemsForLanguage = computed(() => {
                         }"
                     />
                     <Column
-                        rowReorder
+                        row-reorder
                         style="width: 3rem"
                         :pt="{
                             headerCell: { style: { borderTop: 0 } },
@@ -318,13 +327,17 @@ const itemsForLanguage = computed(() => {
         </div>
     </div>
 
-    <div v-else id="rr-splash" class="rr-splash">
+    <div
+        v-else
+        id="rr-splash"
+        class="rr-splash"
+    >
         <!-- Image -->
         <div
             aria-hidden="true"
             class="img-lg img-circle rr-splash-img-container"
         >
-            <i class="fa fa-list"></i>
+            <i class="fa fa-list" />
         </div>
 
         <!-- Splash Title -->
@@ -333,7 +346,9 @@ const itemsForLanguage = computed(() => {
         </div>
 
         <!-- Splash Instructions -->
-        <div class="rr-splash-description">Select a list from the sidebar.</div>
+        <div class="rr-splash-description">
+            Select a list from the sidebar.
+        </div>
     </div>
 </template>
 

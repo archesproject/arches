@@ -25,9 +25,9 @@ const setEditing = (val: boolean) => {
 <template>
     <component
         :is="displayedWorkspace"
-        :displayedList="displayedList"
-        :languageMap="languageMap"
-        :setEditing="setEditing"
+        :displayed-list="displayedList"
+        :language-map="languageMap"
+        :set-editing="setEditing"
     />
     <Toast />
 </template>
