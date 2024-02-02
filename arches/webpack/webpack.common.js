@@ -305,7 +305,8 @@ module.exports = () => {
                         ...imageFilepathLookup,
                         ...nodeModulesAliases,
                         ...parsedPackageJSONFilepaths,
-                        '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')]
+                        '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
+                        'node_modules': Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules')
                     },
                 },
                 module: {
