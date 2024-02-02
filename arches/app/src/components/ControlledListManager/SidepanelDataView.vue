@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-} from "@/types/controlledListManager.d";
+} from "@/types/ControlledListManager.d";
 
 type Item = ControlledList | ControlledListItem;
 type Items = ControlledList[] | ControlledListItem[];
@@ -104,39 +104,54 @@ await fetchItems();
 <template>
     <SearchAddDelete
         v-model="searchValue"
-        :createItem="createItem"
-        :addLabel="addLabel"
-        :deleteItems="
+        :create-item="createItem"
+        :add-label="addLabel"
+        :delete-items="
             () => {
                 deleteItems(selectedItems);
                 selectedItems.splice(0);
             }
         "
-        :deleteLabel="deleteLabel"
-        :deleteLabelPlural="deleteLabelPlural"
-        :numberToDelete="selectedItems.length"
+        :delete-label="deleteLabel"
+        :delete-label-plural="deleteLabelPlural"
+        :number-to-delete="selectedItems.length"
     />
     <div class="selection-header">
-        <span v-if="items.length" style="margin-left: 1rem">
-            <button v-if="selectedItems.length" @click="clearAll">
+        <span
+            v-if="items.length"
+            style="margin-left: 1rem"
+        >
+            <button
+                v-if="selectedItems.length"
+                @click="clearAll"
+            >
                 {{ arches.translations.clearAll }}
             </button>
-            <button v-else @click="selectAll">
+            <button
+                v-else
+                @click="selectAll"
+            >
                 {{ arches.translations.selectAll }}
             </button>
         </span>
-        <span v-if="items.length" style="margin-right: 1rem">
+        <span
+            v-if="items.length"
+            style="margin-right: 1rem"
+        >
             {{ items.length }}
             {{ items.length === 1 ? itemLabel : itemsLabel }}
         </span>
     </div>
 
-    <DataView v-if="items.length" :value="filteredItems">
+    <DataView
+        v-if="items.length"
+        :value="filteredItems"
+    >
         <template #list="slotProps">
             <div
                 v-for="(item, index) in slotProps.items"
-                class="itemRow"
                 :key="index"
+                class="itemRow"
                 :class="{ selected: displayedItem.value?.id === item.id }"
                 tabindex="0"
                 @click="selectRow(item)"
@@ -146,13 +161,13 @@ await fetchItems();
                     type="checkbox"
                     :checked="selectedItems.indexOf(item) > -1"
                     @click="toggleCheckbox(item)"
-                />
+                >
                 <!-- TODO(jtw): factor this out, also get appropriate language -->
                 <span>{{
                     item.name ??
-                    item.labels.find((label) => label.valuetype === "prefLabel")
-                        ?.value ??
-                    "Unlabeled item"
+                        item.labels.find((label) => label.valuetype === "prefLabel")
+                            ?.value ??
+                        "Unlabeled item"
                 }}</span>
             </div>
         </template>
@@ -163,7 +178,10 @@ await fetchItems();
         </template>
     </DataView>
 
-    <div v-else class="no-items">
+    <div
+        v-else
+        class="no-items"
+    >
         <span>{{ noItemLabel }}</span>
     </div>
 </template>
