@@ -73,7 +73,7 @@ class Command(BaseCommand):
             "--operation",
             action="store",
             dest="operation",
-            default="setup",
+            default="Use the -h/--help argument to learn about this command",
             choices=[
                 "setup",
                 "install",
