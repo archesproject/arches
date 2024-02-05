@@ -1866,6 +1866,8 @@ class ControlledListItem(models.Model):
     class Meta:
         db_table = "controlled_list_items"
         constraints = [
+            # Sort order concerns the list as a whole, not subsets
+            # of the hierarchy.
             models.UniqueConstraint(
                 fields=["list", "sortorder"],
                 name="unique_list_sortorder",
