@@ -33,7 +33,7 @@ const dynamicLabel =
             <input
                 :disabled="disabled"
                 :value="displayedList.name"
-                :style="{ width: displayedList.name.length + 'rem' }"
+                :style="{ width: displayedList.name.length + 2 + 'rem' }"
             >
             <span
                 v-if="editable && !editing"
@@ -88,8 +88,8 @@ const dynamicLabel =
                 "
                 :style="{
                     width: displayedList.dynamic
-                        ? dynamicLabel.length + 'rem'
-                        : staticLabel.length + 'rem',
+                        ? dynamicLabel.length - 20 + 'rem'
+                        : staticLabel.length - 10 + 'rem',
                 }"
             >
         </div>
