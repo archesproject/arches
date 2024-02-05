@@ -24,7 +24,7 @@ const buttonGreen = "#10b981";
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const props : {
+const props: {
     displayedList: ControlledList;
     languageMap: LanguageMap | null;
     setEditing: (val: boolean) => void;
@@ -210,12 +210,12 @@ const itemsForLanguage = computed(() => {
 
 <template>
     <ListHeader
-        :displayed-list="displayedList"
+        :displayed-list="props.displayedList"
         :is-item-editor="false"
     />
 
     <div
-        v-if="!!props.displayedList"
+        v-if="props.displayedList"
         class="list-editor-container"
     >
         <ItemCharacteristics

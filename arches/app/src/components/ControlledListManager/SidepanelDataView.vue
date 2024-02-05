@@ -20,21 +20,7 @@ const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
 const { $gettext } = useGettext();
 
-const {
-    addLabel,
-    createItem,
-    deleteItems,
-    deleteLabel,
-    deleteLabelPlural,
-    displayedItem,
-    fetchItems,
-    itemLabel,
-    items,
-    itemsLabel,
-    noItemLabel,
-    noSearchResultLabel,
-    setDisplayedItem,
-}: {
+const props: {
     addLabel: string;
     createItem: () => Promise<void>;
     deleteItems: (selectedItems: Items) => Promise<void>;
@@ -71,9 +57,9 @@ const searchValue = ref("");
 const filteredItems = computed(() => {
     const loweredTerm = searchValue.value.toLowerCase();
     if (!loweredTerm) {
-        return items;
+        return props.items;
     }
-    return items.filter((item) => {
+    return props.items.filter((item) => {
         if (Object.hasOwn(item, "name")) {
             return (item as ControlledList).name
                 .toLowerCase()
@@ -94,36 +80,36 @@ const toggleCheckbox = (item: ControlledList | ControlledListItem) => {
     }
 };
 const selectAll = () => {
-    selectedItems.value = items;
+    selectedItems.value = props.items;
 };
 const clearAll = () => {
     selectedItems.value = [];
 };
 const selectRow = (item: ControlledList | ControlledListItem) => {
-    setDisplayedItem(item);
+    props.setDisplayedItem(item);
 };
 
-await fetchItems();
+await props.fetchItems();
 </script>
 
 <template>
     <SearchAddDelete
         v-model="searchValue"
-        :create-item="createItem"
-        :add-label="addLabel"
+        :create-item="props.createItem"
+        :add-label="props.addLabel"
         :delete-items="
             () => {
-                deleteItems(selectedItems);
+                props.deleteItems(selectedItems);
                 selectedItems.splice(0);
             }
         "
-        :delete-label="deleteLabel"
-        :delete-label-plural="deleteLabelPlural"
+        :delete-label="props.deleteLabel"
+        :delete-label-plural="props.deleteLabelPlural"
         :number-to-delete="selectedItems.length"
     />
     <div class="selection-header">
         <span
-            v-if="items.length"
+            v-if="props.items.length"
             style="margin-left: 1rem"
         >
             <button
@@ -140,16 +126,16 @@ await fetchItems();
             </button>
         </span>
         <span
-            v-if="items.length"
+            v-if="props.items.length"
             style="margin-right: 1rem"
         >
-            {{ items.length }}
-            {{ items.length === 1 ? itemLabel : itemsLabel }}
+            {{ props.items.length }}
+            {{ props.items.length === 1 ? props.itemLabel : props.itemsLabel }}
         </span>
     </div>
 
     <DataView
-        v-if="items.length"
+        v-if="props.items.length"
         :value="filteredItems"
     >
         <template #list="slotProps">
@@ -157,7 +143,7 @@ await fetchItems();
                 v-for="(item, index) in slotProps.items"
                 :key="index"
                 class="itemRow"
-                :class="{ selected: displayedItem?.id === item.id }"
+                :class="{ selected: props.displayedItem?.id === item.id }"
                 tabindex="0"
                 @click="selectRow(item)"
                 @keyup.enter="selectRow(item)"
@@ -178,7 +164,7 @@ await fetchItems();
         </template>
         <template #empty>
             <div>
-                <span class="no-items">{{ noSearchResultLabel }}</span>
+                <span class="no-items">{{ props.noSearchResultLabel }}</span>
             </div>
         </template>
     </DataView>
@@ -187,7 +173,7 @@ await fetchItems();
         v-else
         class="no-items"
     >
-        <span>{{ noItemLabel }}</span>
+        <span>{{ props.noItemLabel }}</span>
     </div>
 </template>
 

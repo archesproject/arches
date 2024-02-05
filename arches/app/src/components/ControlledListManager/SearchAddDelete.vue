@@ -8,23 +8,21 @@ import SplitButton from "primevue/splitbutton";
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
-interface Props {
+const props: {
     addLabel: string;
     createItem: () => Promise<void>;
     deleteItems: () => Promise<void>;
     deleteLabel: string;
     deleteLabelPlural: string;
     numberToDelete: number;
-}
-
-const {
-    addLabel,
-    createItem,
-    deleteItems,
-    deleteLabel,
-    deleteLabelPlural,
-    numberToDelete,
-} = defineProps<Props>();
+} = defineProps([
+    "addLabel",
+    "createItem",
+    "deleteItems",
+    "deleteLabel",
+    "deleteLabelPlural",
+    "numberToDelete",
+]);
 
 const searchValue = defineModel<string>({ required: true });
 
@@ -63,7 +61,7 @@ const clearSearch = () => {
         >
             <SplitButton
                 class="button"
-                :label="addLabel"
+                :label="props.addLabel"
                 raised
                 style="font-size: inherit"
                 :pt="{
@@ -84,15 +82,15 @@ const clearSearch = () => {
                         },
                     },
                 }"
-                @click="createItem"
+                @click="props.createItem"
             />
             <!-- We might want an are you sure? modal -->
             <Button
                 class="button delete"
-                :label="numberToDelete > 1 ? deleteLabelPlural : deleteLabel"
+                :label="props.numberToDelete > 1 ? props.deleteLabelPlural : props.deleteLabel"
                 raised
-                :disabled="numberToDelete === 0"
-                @click="deleteItems"
+                :disabled="props.numberToDelete === 0"
+                @click="props.deleteItems"
             />
         </div>
     </div>

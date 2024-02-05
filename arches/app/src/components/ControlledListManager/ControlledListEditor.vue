@@ -24,7 +24,7 @@ const lightGray = "#f4f4f4";
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const props : {
+const props: {
     displayedList: ControlledList;
     setEditing: (val: boolean) => void;
 } = defineProps(["displayedList", "setEditing"]);
@@ -40,9 +40,7 @@ const fetchItems = async () => {
         arches.urls.controlled_list(props.displayedList.id)
     );
     await response.json().then((data) => {
-        // Preserve reactivity of filteredLists() computed prop
-        items.value.splice(0, items.value.length);
-        items.value.push(...data.items);
+        items.value = data.items;
     });
 };
 
@@ -107,7 +105,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 
     <div class="list-editor-container">
         <ItemCharacteristics
-            :displayed-list="displayedList"
+            :displayed-list="props.displayedList"
             :editable="true"
         />
 
