@@ -2,6 +2,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 import { ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
@@ -33,6 +34,7 @@ const props: {
 
 const items: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
+const { $gettext } = useGettext();
 const lightGray = "#f4f4f4";
 
 const fetchLists = async () => {
@@ -60,7 +62,7 @@ const createList = async () => {
     } catch {
         toast.add({
             severity: "error",
-            summary: "List creation failed",
+            summary: $gettext("List creation failed"),
             life: 3000,
         });
     }
@@ -96,7 +98,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
     } catch {
         toast.add({
             severity: "error",
-            summary: "One or more lists failed to delete.",
+            summary: $gettext("One or more lists failed to delete."),
             life: 3000,
         });
     }
@@ -116,24 +118,24 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             :min-size="15"
         >
             <div class="header">
-                <h2>Controlled Lists</h2>
+                <h2>{{ $gettext('Controlled Lists') }}</h2>
             </div>
 
             <Suspense>
                 <SidepanelDataView
-                    add-label="Create New List"
+                    :add-label="$gettext('Create New List')"
                     :create-item="createList"
                     :delete-items="deleteLists"
                     :delete-label="$gettext('Delete List')"
                     :delete-label-plural="$gettext('Delete Lists')"
-                    :displayed-item="props.displayedList"
+                    :displayed-item="displayedList"
                     :fetch-items="fetchLists"
-                    item-label="list"
+                    :item-label="$gettext('list')"
                     :items="items"
                     :items-label="$gettext('lists')"
                     :no-search-result-label="$gettext('No matching lists.')"
                     :no-item-label="$gettext('Click &quot;Create New List&quot; to start.')"
-                    :set-displayed-item="props.setDisplayedList"
+                    :set-displayed-item="setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />
