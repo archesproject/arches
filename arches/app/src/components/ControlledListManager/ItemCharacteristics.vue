@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import { computed, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
@@ -17,14 +18,15 @@ const disabled = computed(() => {
     return !editable || !editing.value;
 });
 
-const staticLabel = "Static: list does not change";
+const { $gettext } = useGettext();
+const staticLabel = $gettext("Static: list does not change");
 const dynamicLabel =
-    "Dynamic: list is defined by a query that may change list items";
+    $gettext("Dynamic: list is defined by a query that may change list items");
 </script>
 
 <template>
     <div class="characteristics">
-        <h3>Characteristics</h3>
+        <h3>{{ $gettext("Characteristics") }}</h3>
         <div class="characteristic">
             <h4>Name</h4>
             <!-- TODO wire up with v-model and factor out into component for use with URI -->
@@ -92,7 +94,7 @@ const dynamicLabel =
             >
         </div>
         <div class="characteristic">
-            <h4>List used by these nodes</h4>
+            <h4>{{ $gettext("List used by these nodes") }}</h4>
         </div>
     </div>
 </template>

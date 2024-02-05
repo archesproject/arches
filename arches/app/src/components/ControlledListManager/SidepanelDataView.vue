@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import { computed, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import DataView from "primevue/dataview";
 
@@ -17,6 +18,7 @@ type Items = ControlledList[] | ControlledListItem[];
 
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
+const { $gettext } = useGettext();
 
 const {
     addLabel,
@@ -170,7 +172,7 @@ await fetchItems();
                     item.name ??
                         item.labels.find((label) => label.valuetype === "prefLabel")
                             ?.value ??
-                        "Unlabeled item"
+                        $gettext("Unlabeled item")
                 }}</span>
             </div>
         </template>

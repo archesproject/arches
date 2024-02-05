@@ -2,6 +2,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 import { computed, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import Column from "primevue/column";
@@ -21,6 +22,7 @@ import type {
 
 const buttonGreen = "#10b981";
 const toast = useToast();
+const { $gettext } = useGettext();
 
 const props : {
     displayedList: ControlledList;
@@ -96,6 +98,9 @@ const onRowReorder = (dragData) => {
             const newParent = props.displayedList.items.find(
                 (item) => item.id === newParentId
             );
+            if (!newParent) {
+                throw new Error();
+            }
             const newParentIndex = props.displayedList.items.indexOf(newParent);
             const indexInChildren = dragData.dropIndex - newParentIndex;
             newParent.children.splice(indexInChildren, 0, draggedItem);
@@ -156,7 +161,7 @@ const postDisplayedListToServer = async () => {
     } catch (error) {
         toast.add({
             severity: "error",
-            summary: error || "Save failed",
+            summary: error || $gettext("Save failed"),
             life: 3000,
         });
     }
@@ -293,7 +298,7 @@ const itemsForLanguage = computed(() => {
                     />
                     <Column
                         field="prefLabels"
-                        header="Item Labels"
+                        :header="$gettext('Item Labels')"
                         :pt="{
                             headerCell: {
                                 style: { borderTop: 0, width: '220px' },
@@ -302,7 +307,7 @@ const itemsForLanguage = computed(() => {
                     />
                     <Column
                         field="altLabels"
-                        header="Alternate Labels"
+                        :header="$gettext('Alternate Labels')"
                         :pt="{
                             headerCell: {
                                 style: { borderTop: 0, width: '220px' },
@@ -311,7 +316,7 @@ const itemsForLanguage = computed(() => {
                     />
                     <Column
                         field="uri"
-                        header="Item URI"
+                        :header="$gettext('Item URI')"
                         :pt="{
                             headerCell: { style: { borderTop: 0 } },
                         }"
@@ -336,12 +341,12 @@ const itemsForLanguage = computed(() => {
 
         <!-- Splash Title -->
         <div class="rr-splash-title">
-            Welcome to Arches' Controlled List Manager
+            {{ $gettext("Welcome to Arches' Controlled List Manager") }}
         </div>
 
         <!-- Splash Instructions -->
         <div class="rr-splash-description">
-            Select a list from the sidebar.
+            {{ $gettext("Select a list from the sidebar.") }}
         </div>
     </div>
 </template>
