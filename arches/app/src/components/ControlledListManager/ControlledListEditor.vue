@@ -2,6 +2,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 import { ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import Splitter from "primevue/splitter";
@@ -21,6 +22,7 @@ import type {
 
 const lightGray = "#f4f4f4";
 const toast = useToast();
+const { $gettext } = useGettext();
 
 const props : {
     displayedList: ControlledList;
@@ -62,7 +64,7 @@ const createItem = async () => {
     } catch {
         toast.add({
             severity: "error",
-            summary: "Item creation failed",
+            summary: $gettext("Item creation failed."),
             life: 3000,
         });
     }
@@ -89,7 +91,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
     } catch {
         toast.add({
             severity: "error",
-            summary: "One or more items failed to delete.",
+            summary: $gettext("One or more items failed to delete."),
             life: 3000,
         });
     }
@@ -114,7 +116,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
             style="margin: 1rem"
         >
             <h3 style="margin-top: 4rem; margin-left: 0">
-                List Item Editor
+                {{ $gettext("List Item Editor") }}
             </h3>
             <Splitter
                 :pt="{
@@ -128,18 +130,18 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                 >
                     <Suspense>
                         <SidepanelDataView
-                            add-label="Add New Item"
-                            delete-label="Delete Item"
-                            delete-label-plural="Delete Items"
+                            :add-label="$gettext('Add New Item')"
+                            :delete-label="$gettext('Delete Item')"
+                            :delete-label-plural="$gettext('Delete Items')"
                             :displayed-item="displayedItem"
                             :create-item="createItem"
                             :delete-items="deleteItems"
                             :fetch-items="fetchItems"
-                            item-label="item"
+                            :item-label="$gettext('item')"
                             :items="items"
-                            items-label="items"
-                            no-search-result-label="No matching items."
-                            no-item-label="Click &quot;Add New Item&quot; to start."
+                            :items-label="$gettext('items')"
+                            :no-search-result-label="$gettext('No matching items')"
+                            :no-item-label="$gettext('Click &quot;Add New Item&quot; to start.')"
                             :set-displayed-item="setDisplayedItem"
                         />
                         <template #fallback>

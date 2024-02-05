@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
+const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const props : {
@@ -14,7 +16,7 @@ const props : {
 ]);
 
 const heading = computed(() => {
-    const prefix = props.isItemEditor ? "List Item Editor" : "List Editor";
+    const prefix = props.isItemEditor ? $gettext("List Item Editor") : $gettext("List Editor");
     return (
         prefix + (props.displayedList ? " > " + props.displayedList.name : "")
     );
