@@ -31,19 +31,21 @@ const {
     itemsLabel,
     noItemLabel,
     noSearchResultLabel,
+    setDisplayedItem,
 }: {
     addLabel: string;
     createItem: () => Promise<void>;
     deleteItems: (selectedItems: Items) => Promise<void>;
     deleteLabel: string;
     deleteLabelPlural: string;
-    displayedItem: Ref<Item>;
+    displayedItem: Item;
     fetchItems: () => Promise<void>;
     items: Items;
     itemLabel: string;
     itemsLabel: string;
     noItemLabel: string;
     noSearchResultLabel: string;
+    setDisplayedItem: (item: Item) => void;
 } = defineProps([
     "addLabel",
     "createItem",
@@ -58,6 +60,7 @@ const {
     "languageMap",
     "noItemLabel",
     "noSearchResultLabel",
+    "setDisplayedItem",
 ]);
 
 const selectedItems: Ref<Items> = ref([]);
@@ -95,7 +98,7 @@ const clearAll = () => {
     selectedItems.value = [];
 };
 const selectRow = (item: ControlledList | ControlledListItem) => {
-    displayedItem.value = item;
+    setDisplayedItem(item);
 };
 
 await fetchItems();
@@ -152,7 +155,7 @@ await fetchItems();
                 v-for="(item, index) in slotProps.items"
                 :key="index"
                 class="itemRow"
-                :class="{ selected: displayedItem.value?.id === item.id }"
+                :class="{ selected: displayedItem?.id === item.id }"
                 tabindex="0"
                 @click="selectRow(item)"
                 @keyup.enter="selectRow(item)"

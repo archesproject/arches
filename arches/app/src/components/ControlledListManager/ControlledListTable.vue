@@ -10,7 +10,7 @@ import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
 import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
-import ItemHeader from "@/components/ControlledListManager/ItemHeader.vue";
+import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 
 import type { Ref } from "vue";
 import type {
@@ -22,13 +22,9 @@ import type {
 const buttonGreen = "#10b981";
 const toast = useToast();
 
-const {
-    displayedList,
-    languageMap,
-    setEditing,
-}: {
-    displayedList: Ref<ControlledList>;
-    languageMap: LanguageMap;
+const props : {
+    displayedList: ControlledList;
+    languageMap: LanguageMap | null;
     setEditing: (val: boolean) => void;
 } = defineProps(["displayedList", "languageMap", "setEditing"]);
 
@@ -44,15 +40,18 @@ const rowClass = (rowData: ControlledListItem) => {
 };
 
 const languageDropdownItems = computed(() => {
+    if (!props.languageMap) {
+        return [];
+    }
     return (
-        Object.entries(languageMap.value ?? {}).map(([code, label]) => {
+        Object.entries(props.languageMap).map(([code, label]) => {
             return {
                 label,
                 command: () => {
                     selectedLanguage.value = code;
                 },
             };
-        }) || []
+        })
     );
 });
 
@@ -64,11 +63,11 @@ const onRowCollapse = (row) => {
 };
 const onRowReorder = (dragData) => {
     const dragDown = dragData.dropIndex > dragData.dragIndex;
-    const draggedItem = displayedList.value.items[dragData.dragIndex];
-    const draggedItemParent = displayedList.value.items.find(
+    const draggedItem = props.displayedList.items[dragData.dragIndex];
+    const draggedItemParent = props.displayedList.items.find(
         (item) => item.id === draggedItem.parent_id
     );
-    const oldItemAtDropIndex = displayedList.value.items[dragData.dropIndex];
+    const oldItemAtDropIndex = props.displayedList.items[dragData.dropIndex];
     const newParentId =
         dragDown && expandedRows.value.includes(oldItemAtDropIndex.id)
             ? oldItemAtDropIndex.id
@@ -94,10 +93,10 @@ const onRowReorder = (dragData) => {
         draggedItem.parent_id = newParentId;
         // Add this item to new parent's children.
         if (newParentId) {
-            const newParent = displayedList.value.items.find(
+            const newParent = props.displayedList.items.find(
                 (item) => item.id === newParentId
             );
-            const newParentIndex = displayedList.value.items.indexOf(newParent);
+            const newParentIndex = props.displayedList.items.indexOf(newParent);
             const indexInChildren = dragData.dropIndex - newParentIndex;
             newParent.children.splice(indexInChildren, 0, draggedItem);
             draggedItem.depth = newParent.depth + 1;
@@ -106,7 +105,7 @@ const onRowReorder = (dragData) => {
         }
     }
 
-    displayedList.value.items.sort((a, b) => {
+    props.displayedList.items.sort((a, b) => {
         const indexInDragDataA = dragData.value.findIndex(
             (item) => item.id === a.id
         );
@@ -123,35 +122,23 @@ const onRowReorder = (dragData) => {
         }
         return 0;
     });
-    for (let i = 0; i < displayedList.value.items.length; i++) {
-        displayedList.value.items[i].sortorder = i;
+    for (let i = 0; i < props.displayedList.items.length; i++) {
+        props.displayedList.items[i].sortorder = i;
     }
 
     postDisplayedListToServer();
 };
 
 const postDisplayedListToServer = async () => {
-    const postData = {
-        ...displayedList.value,
-        items: displayedList.value.items.map((item) => {
-            const strippedItem = {
-                ...item,
-            };
-            delete strippedItem.children;
-            delete strippedItem.depth;
-            return strippedItem;
-        }),
-    };
-
     try {
         const response = await fetch(
-            arches.urls.controlled_list(displayedList.value.id),
+            arches.urls.controlled_list(props.displayedList.id),
             {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": Cookies.get("csrftoken"),
                 },
-                body: JSON.stringify(postData),
+                body: JSON.stringify(props.displayedList),
             }
         );
         if (!response.ok) {
@@ -173,7 +160,10 @@ const postDisplayedListToServer = async () => {
 
 const itemsForLanguage = computed(() => {
     // Show/hide rows based on row expansion toggle
-    const itemsToShow = displayedList.value.items.reduce((acc, row) => {
+    if (!props.displayedList) {
+        return [];
+    }
+    const itemsToShow = props.displayedList.items.reduce((acc, row) => {
         if (!row.parent_id) {
             acc.push(row);
         } else if (expandedRows.value.includes(row.parent_id)) {
@@ -210,17 +200,17 @@ const itemsForLanguage = computed(() => {
 </script>
 
 <template>
-    <ItemHeader
+    <ListHeader
         :displayed-list="displayedList"
         :is-item-editor="false"
     />
 
     <div
-        v-if="!!displayedList.value"
+        v-if="!!props.displayedList"
         class="list-editor-container"
     >
         <ItemCharacteristics
-            :displayed-list="displayedList"
+            :displayed-list="props.displayedList"
             :editable="false"
         />
         <div
@@ -228,13 +218,13 @@ const itemsForLanguage = computed(() => {
             style="height: 50vh"
         >
             <h3 style="margin-top: 4rem; margin-left: 0">
-                Items ({{ displayedList.value.items.length }})
+                Items ({{ props.displayedList.items.length }})
             </h3>
             <div style="height: 100%">
                 <div class="controls">
                     <SplitButton
                         class="button language-selector"
-                        :label="`Language - ${languageMap.value?.[selectedLanguage]}`"
+                        :label="`Language - ${languageMap?.[selectedLanguage]}`"
                         :model="languageDropdownItems"
                         raised
                         :pt="{
@@ -268,7 +258,7 @@ const itemsForLanguage = computed(() => {
                 </div>
                 <!-- TreeTable exists, but DataTable has better support for reordering -->
                 <DataTable
-                    v-if="displayedList.value.items.length"
+                    v-if="props.displayedList.items.length"
                     :value="itemsForLanguage"
                     :row-class="rowClass"
                     striped-rows

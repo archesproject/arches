@@ -20,12 +20,22 @@ import type {
 const {
     displayedList,
     languageMap,
+    setDisplayedList,
+    setLanguageMap,
     setEditing,
 }: {
-    displayedList: Ref<ControlledList>;
-    languageMap: Ref<LanguageMap>;
+    displayedList: ControlledList | null;
+    languageMap: LanguageMap | null;
+    setDisplayedList: (list: ControlledList | null) => void;
+    setLanguageMap: (map: LanguageMap) => void;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "languageMap", "setEditing"]);
+} = defineProps([
+    "displayedList",
+    "languageMap",
+    "setDisplayedList",
+    "setLanguageMap",
+    "setEditing",
+]);
 
 const items: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
@@ -34,7 +44,7 @@ const lightGray = "#f4f4f4";
 const fetchLists = async () => {
     const response = await fetch(arches.urls.controlled_lists);
     await response.json().then((data) => {
-        languageMap.value = data.languages;
+        setLanguageMap(data.languages);
         // Preserve reactivity of filteredLists() computed prop
         items.value.splice(0, items.value.length);
         items.value.push(...data.controlled_lists);
@@ -80,8 +90,8 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
     try {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
-            if (selectedItems.includes(displayedList.value)) {
-                displayedList.value = null;
+            if (displayedList && selectedItems.includes(displayedList)) {
+                setDisplayedList(null);
             }
         }
         if (responses.some((resp) => !resp.ok)) {
@@ -127,6 +137,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
                     items-label="lists"
                     no-search-result-label="No matching lists."
                     no-item-label="Click &quot;Create New List&quot; to start."
+                    :set-displayed-item="setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />
