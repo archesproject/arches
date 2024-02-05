@@ -17,15 +17,19 @@ import type {
     LanguageMap,
 } from "@/types/ControlledListManager.d";
 
-const {
-    displayedList,
-    languageMap,
-    setEditing,
-}: {
-    displayedList: Ref<ControlledList>;
-    languageMap: Ref<LanguageMap>;
+const props: {
+    displayedList: ControlledList | null;
+    languageMap: LanguageMap | null;
+    setDisplayedList: (list: ControlledList | null) => void;
+    setLanguageMap: (map: LanguageMap) => void;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "languageMap", "setEditing"]);
+} = defineProps([
+    "displayedList",
+    "languageMap",
+    "setDisplayedList",
+    "setLanguageMap",
+    "setEditing",
+]);
 
 const items: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
@@ -34,10 +38,8 @@ const lightGray = "#f4f4f4";
 const fetchLists = async () => {
     const response = await fetch(arches.urls.controlled_lists);
     await response.json().then((data) => {
-        languageMap.value = data.languages;
-        // Preserve reactivity of filteredLists() computed prop
-        items.value.splice(0, items.value.length);
-        items.value.push(...data.controlled_lists);
+        props.setLanguageMap(data.languages);
+        items.value = data.controlled_lists;
     });
 };
 
@@ -77,11 +79,15 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
         })
     );
 
+    const shouldResetDisplay = (
+        props.displayedList && selectedItems.includes(props.displayedList)
+    );
+
     try {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
-            if (selectedItems.includes(displayedList.value)) {
-                displayedList.value = null;
+            if (shouldResetDisplay) {
+                props.setDisplayedList(null);
             }
         }
         if (responses.some((resp) => !resp.ok)) {
@@ -118,15 +124,16 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
                     add-label="Create New List"
                     :create-item="createList"
                     :delete-items="deleteLists"
-                    delete-label="Delete List"
-                    delete-label-plural="Delete Lists"
-                    :displayed-item="displayedList"
+                    :delete-label="$gettext('Delete List')"
+                    :delete-label-plural="$gettext('Delete Lists')"
+                    :displayed-item="props.displayedList"
                     :fetch-items="fetchLists"
                     item-label="list"
                     :items="items"
-                    items-label="lists"
-                    no-search-result-label="No matching lists."
-                    no-item-label="Click &quot;Create New List&quot; to start."
+                    :items-label="$gettext('lists')"
+                    :no-search-result-label="$gettext('No matching lists.')"
+                    :no-item-label="$gettext('Click &quot;Create New List&quot; to start.')"
+                    :set-displayed-item="props.setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />
@@ -140,9 +147,9 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             class="mt-0"
         >
             <ControlledListTable
-                :displayed-list="displayedList"
-                :language-map="languageMap"
-                :set-editing="setEditing"
+                :displayed-list="props.displayedList"
+                :language-map="props.languageMap"
+                :set-editing="props.setEditing"
             />
         </SplitterPanel>
     </Splitter>

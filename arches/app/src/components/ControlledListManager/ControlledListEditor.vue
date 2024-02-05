@@ -9,7 +9,7 @@ import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
 import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
-import ItemHeader from "@/components/ControlledListManager/ItemHeader.vue";
+import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
@@ -17,33 +17,28 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-    LanguageMap,
 } from "@/types/ControlledListManager.d";
 
 const lightGray = "#f4f4f4";
 const toast = useToast();
 
-const {
-    displayedList,
-    languageMap,
-    setEditing,
-}: {
-    displayedList: Ref<ControlledList>;
-    languageMap: Ref<LanguageMap>;
+const props: {
+    displayedList: ControlledList;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "languageMap", "setEditing"]);
+} = defineProps(["displayedList", "setEditing"]);
 
 const items: Ref<ControlledListItem[]> = ref([]);
-const displayedItem = ref({});
+const displayedItem: Ref<ControlledListItem> = ref(null);
+const setDisplayedItem = (item: ControlledListItem) => {
+    displayedItem.value = item;
+};
 
 const fetchItems = async () => {
     const response = await fetch(
-        arches.urls.controlled_list(displayedList.value.id)
+        arches.urls.controlled_list(props.displayedList.id)
     );
     await response.json().then((data) => {
-        // Preserve reactivity of filteredLists() computed prop
-        items.value.splice(0, items.value.length);
-        items.value.push(...data.items);
+        items.value = data.items;
     });
 };
 
@@ -54,7 +49,7 @@ const createItem = async () => {
             headers: {
                 "X-CSRFToken": Cookies.get("csrftoken"),
             },
-            body: JSON.stringify({ list_id: displayedList.value.id }),
+            body: JSON.stringify({ list_id: props.displayedList.id }),
         });
         if (response.ok) {
             const newItem = await response.json();
@@ -101,13 +96,14 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
 </script>
 
 <template>
-    <ItemHeader
-        :displayed-list="displayedList"
+    <ListHeader
+        :displayed-list="props.displayedList"
         :is-item-editor="true"
     />
+
     <div class="list-editor-container">
         <ItemCharacteristics
-            :displayed-list="displayedList"
+            :displayed-list="props.displayedList"
             :editable="true"
         />
 
@@ -142,6 +138,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                             items-label="items"
                             no-search-result-label="No matching items."
                             no-item-label="Click &quot;Add New Item&quot; to start."
+                            :set-displayed-item="setDisplayedItem"
                         />
                         <template #fallback>
                             <SpinnerIcon />

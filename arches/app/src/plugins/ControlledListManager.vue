@@ -7,26 +7,35 @@ import ControlledListInventory from "@/components/ControlledListManager/Controll
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
 import type { Ref } from "vue";
-import type { LanguageMap } from "@/types/ControlledListManager.d";
+import type { ControlledList, LanguageMap } from "@/types/ControlledListManager.d";
 
-const displayedList = ref({});
+const displayedList: Ref<ControlledList | null> = ref(null);
+const setDisplayedList = (list: ControlledList | null) => {
+    displayedList.value = list;
+};
+
+const languageMap: Ref<LanguageMap | null> = ref(null);
+const setLanguageMap = (map: LanguageMap) => {
+    languageMap.value = map;
+};
+
 const editing = ref(false);
-const languageMap: Ref<LanguageMap> = ref({});
+const setEditing = (val: boolean) => {
+    editing.value = val;
+};
 
 const displayedWorkspace = computed(() => {
     return editing.value ? ControlledListEditor : ControlledListInventory;
 });
-
-const setEditing = (val: boolean) => {
-    editing.value = val;
-};
 </script>
 
 <template>
     <component
         :is="displayedWorkspace"
         :displayed-list="displayedList"
+        :set-displayed-list="setDisplayedList"
         :language-map="languageMap"
+        :set-language-map="setLanguageMap"
         :set-editing="setEditing"
     />
     <Toast />
