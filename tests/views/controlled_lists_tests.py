@@ -53,7 +53,7 @@ class ControlledListTests(ArchesTestCase):
         )
 
         parent = ControlledListItem.objects.get(
-            list=cls.list2, uri=f"https://getty.edu/0"
+            list=cls.list2, uri="https://getty.edu/0"
         )
         for child in ControlledListItem.objects.filter(list=cls.list2).exclude(
             pk=parent.pk
