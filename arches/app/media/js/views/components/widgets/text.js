@@ -21,6 +21,14 @@ define([
     const viewModel = function(params) {
         params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue', 'uneditable'];
 
+        // If the defaultValue of the selected language is empty set to ""
+        // fixes #10027 where inputted values will be reset after navigating away
+        if (params?.config?.()?.defaultValue != "") {
+            if (params?.config?.()?.defaultValue[arches.activeLanguage]["value"] == '') {
+                params.config().defaultValue = ""
+            }
+        }
+
         WidgetViewModel.apply(this, [params]);
         const self = this;
 
