@@ -1,23 +1,22 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import type { Ref } from "vue";
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const {
-    displayedList,
-    isItemEditor,
-}: { displayedList: Ref<ControlledList>; isItemEditor: boolean } = defineProps([
+const props : {
+    displayedList: ControlledList;
+    isItemEditor: boolean;
+} = defineProps([
     "displayedList",
     "isItemEditor",
 ]);
 
 const heading = computed(() => {
-    const prefix = isItemEditor ? "List Item Editor" : "List Editor";
+    const prefix = props.isItemEditor ? "List Item Editor" : "List Editor";
     return (
-        prefix + (displayedList.value ? " > " + displayedList.value.name : "")
+        prefix + (props.displayedList ? " > " + props.displayedList.name : "")
     );
 });
 </script>

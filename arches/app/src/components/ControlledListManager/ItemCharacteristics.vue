@@ -2,13 +2,12 @@
 import arches from "arches";
 import { computed, ref } from "vue";
 
-import type { Ref } from "vue";
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
 const {
     displayedList,
     editable,
-}: { displayedList: Ref<ControlledList>; editable: boolean } = defineProps([
+}: { displayedList: ControlledList; editable: boolean } = defineProps([
     "displayedList",
     "editable",
 ]);
@@ -31,8 +30,8 @@ const dynamicLabel =
             <!-- TODO wire up with v-model and factor out into component for use with URI -->
             <input
                 :disabled="disabled"
-                :value="displayedList.value.name"
-                :style="{ width: displayedList.value.name.length + 'rem' }"
+                :value="displayedList.name"
+                :style="{ width: displayedList.name.length + 'rem' }"
             >
             <span
                 v-if="editable && !editing"
@@ -83,10 +82,10 @@ const dynamicLabel =
             <input
                 :disabled="disabled"
                 :value="
-                    displayedList.value.dynamic ? dynamicLabel : staticLabel
+                    displayedList.dynamic ? dynamicLabel : staticLabel
                 "
                 :style="{
-                    width: displayedList.value.dynamic
+                    width: displayedList.dynamic
                         ? dynamicLabel.length + 'rem'
                         : staticLabel.length + 'rem',
                 }"
