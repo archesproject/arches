@@ -22,6 +22,11 @@ const setLanguageMap = (map: LanguageMap) => {
 const editing = ref(false);
 const setEditing = (val: boolean) => {
     editing.value = val;
+    if (!val) {
+        // In future, if we desire to leave the previously
+        // displayed list still displayed, ensure it has new data.
+        displayedList.value = null;
+    }
 };
 
 const displayedWorkspace = computed(() => {
