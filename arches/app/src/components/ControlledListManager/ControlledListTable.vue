@@ -31,7 +31,7 @@ const props: {
 } = defineProps(["displayedList", "languageMap", "setEditing"]);
 
 const selectedLanguage: Ref<string> = ref(arches.activeLanguage);
-const expandedRows: Ref<string[]> = ref([]);
+const expandedRows = ref({});
 
 const rowClass = (rowData: ControlledListItem) => {
     const depth = `depth-${rowData.depth}`;
@@ -58,10 +58,10 @@ const languageDropdownItems = computed(() => {
 });
 
 const onRowExpand = (row) => {
-    expandedRows.value.push(row.data.id);
+    expandedRows[row.data.id] = true;
 };
 const onRowCollapse = (row) => {
-    expandedRows.value.splice(expandedRows.value.indexOf(row.data.id));
+    expandedRows[row.data.id] = false;
 };
 const onRowReorder = (dragData) => {
     const dragDown = dragData.dropIndex > dragData.dragIndex;
@@ -71,13 +71,13 @@ const onRowReorder = (dragData) => {
     );
     const oldItemAtDropIndex = props.displayedList.items[dragData.dropIndex];
     const newParentId =
-        dragDown && expandedRows.value.includes(oldItemAtDropIndex.id)
+        dragDown && expandedRows.value[oldItemAtDropIndex.id]
             ? oldItemAtDropIndex.id
             : oldItemAtDropIndex.parent_id;
 
     if (newParentId !== draggedItem.parent_id) {
         // Sync expandedRows to new state of datatable (all collapsed)
-        expandedRows.value = [];
+        expandedRows.value = {};
 
         // Remove this item from old parent's children.
         if (draggedItemParent) {
@@ -175,7 +175,7 @@ const itemsForLanguage = computed(() => {
     const itemsToShow = props.displayedList.items.reduce((acc, row) => {
         if (!row.parent_id) {
             acc.push(row);
-        } else if (expandedRows.value.includes(row.parent_id)) {
+        } else if (expandedRows.value[row.parent_id]) {
             acc.push(row);
         }
         return acc;
@@ -268,6 +268,8 @@ const itemsForLanguage = computed(() => {
                 <!-- TreeTable exists, but DataTable has better support for reordering -->
                 <DataTable
                     v-if="props.displayedList.items.length"
+                    v-model:expandedRows="expandedRows"
+                    data-key="id"
                     :value="itemsForLanguage"
                     :row-class="rowClass"
                     striped-rows
