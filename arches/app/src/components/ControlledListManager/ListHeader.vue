@@ -7,7 +7,7 @@ import type { ControlledList } from "@/types/ControlledListManager.d";
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const props : {
+const props: {
     displayedList: ControlledList;
     isItemEditor: boolean;
 } = defineProps([

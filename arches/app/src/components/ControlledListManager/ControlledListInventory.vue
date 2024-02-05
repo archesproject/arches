@@ -18,13 +18,7 @@ import type {
     LanguageMap,
 } from "@/types/ControlledListManager.d";
 
-const {
-    displayedList,
-    languageMap,
-    setDisplayedList,
-    setLanguageMap,
-    setEditing,
-}: {
+const props: {
     displayedList: ControlledList | null;
     languageMap: LanguageMap | null;
     setDisplayedList: (list: ControlledList | null) => void;
@@ -46,10 +40,8 @@ const lightGray = "#f4f4f4";
 const fetchLists = async () => {
     const response = await fetch(arches.urls.controlled_lists);
     await response.json().then((data) => {
-        setLanguageMap(data.languages);
-        // Preserve reactivity of filteredLists() computed prop
-        items.value.splice(0, items.value.length);
-        items.value.push(...data.controlled_lists);
+        props.setLanguageMap(data.languages);
+        items.value = data.controlled_lists;
     });
 };
 
@@ -89,11 +81,15 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
         })
     );
 
+    const shouldResetDisplay = (
+        props.displayedList && selectedItems.includes(props.displayedList)
+    );
+
     try {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
-            if (displayedList && selectedItems.includes(displayedList)) {
-                setDisplayedList(null);
+            if (shouldResetDisplay) {
+                props.setDisplayedList(null);
             }
         }
         if (responses.some((resp) => !resp.ok)) {
@@ -132,14 +128,14 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
                     :delete-items="deleteLists"
                     :delete-label="$gettext('Delete List')"
                     :delete-label-plural="$gettext('Delete Lists')"
-                    :displayed-item="displayedList"
+                    :displayed-item="props.displayedList"
                     :fetch-items="fetchLists"
                     :item-label="$gettext('list')"
                     :items="items"
                     :items-label="$gettext('lists')"
                     :no-search-result-label="$gettext('No matching lists.')"
                     :no-item-label="$gettext('Click &quot;Create New List&quot; to start.')"
-                    :set-displayed-item="setDisplayedList"
+                    :set-displayed-item="props.setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />
@@ -153,9 +149,9 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             class="mt-0"
         >
             <ControlledListTable
-                :displayed-list="displayedList"
-                :language-map="languageMap"
-                :set-editing="setEditing"
+                :displayed-list="props.displayedList"
+                :language-map="props.languageMap"
+                :set-editing="props.setEditing"
             />
         </SplitterPanel>
     </Splitter>
