@@ -105,6 +105,9 @@ const onRowReorder = (dragData) => {
         }
     }
 
+    // We don't want to make a trip to the server just to fetch
+    // sort information that already agrees with the UI.
+    // eslint-disable-next-line vue/no-mutating-props
     props.displayedList.items.sort((a, b) => {
         const indexInDragDataA = dragData.value.findIndex(
             (item) => item.id === a.id
@@ -123,6 +126,7 @@ const onRowReorder = (dragData) => {
         return 0;
     });
     for (let i = 0; i < props.displayedList.items.length; i++) {
+        // eslint-disable-next-line vue/no-mutating-props
         props.displayedList.items[i].sortorder = i;
     }
 
