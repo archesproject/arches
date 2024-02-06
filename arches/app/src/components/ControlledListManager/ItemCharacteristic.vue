@@ -6,25 +6,31 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { postDisplayedListToServer } from "@/components/ControlledListManager/api.ts";
-import type { ControlledList } from "@/types/ControlledListManager.d";
+import { postItemToServer, postListToServer } from "@/components/ControlledListManager/api.ts";
+import type { Item } from "@/types/ControlledListManager.d";
 
 const props: {
-    displayedList: ControlledList;
+    item: Item;
     editable: boolean;
-    field: 'name';
+    field: 'name' | 'uri';
     label: string;
 } = defineProps([
-    "displayedList",
+    "item",
     "editable",
     "field",
     "label",
 ]);
 
-const inputValue = ref(props.displayedList[props.field] ?? "");
+const inputValue = ref(props.item[props.field] ?? "");
 const editing = ref(false);
 const disabled = computed(() => {
     return !props.editable || !editing.value;
+});
+
+const onSave = computed(() => {
+    return Object.hasOwn(props.item, "items")
+        ? postListToServer
+        : postItemToServer;
 });
 
 const toast = useToast();
@@ -70,8 +76,8 @@ const { $gettext } = useGettext();
                     () => {
                         editing = false;
                         // eslint-disable-next-line vue/no-mutating-props
-                        props.displayedList.name = inputValue;
-                        postDisplayedListToServer(props.displayedList, toast, $gettext);
+                        props.item[field] = inputValue;
+                        onSave(props.item, toast, $gettext);
                     }
                 "
             />
@@ -83,7 +89,7 @@ const { $gettext } = useGettext();
                 @click="
                     () => {
                         editing = false;
-                        inputValue = props.displayedList.name;
+                        inputValue = props.item[field];
                     }
                 "
             />
