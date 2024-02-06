@@ -318,11 +318,27 @@ const itemsForLanguage = computed(() => {
                     />
                     <Column
                         field="uri"
-                        :header="$gettext('Item URI')"
                         :pt="{
                             headerCell: { style: { borderTop: 0 } },
                         }"
-                    />
+                    >
+                        <template #header>
+                            {{ $gettext("Item URI") }}
+                            <i
+                                v-tooltip.top="$gettext('Definition from a thesaurus or authority document')"
+                                class="fa fa-info-circle"
+                            />
+                        </template>
+                        <template #body="slotProps">
+                            <a
+                                :href="slotProps.data.uri"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ slotProps.data.uri }}
+                            </a>
+                        </template>
+                    </Column>
                 </DataTable>
             </div>
         </div>
@@ -382,6 +398,12 @@ h3 {
 .items,
 table {
     margin: inherit;
+}
+a {
+    color: var(--blue-500);
+}
+i {
+    margin-left: 4px;
 }
 </style>
 
