@@ -168,7 +168,7 @@ h2 {
     margin: 1rem;
 }
 .p-splitter {
-    width: calc(100vw - 50px);
+    width: calc(100vw - 60px);
     height: 100vh;
     background: white;
     font-size: 14px;
