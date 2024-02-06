@@ -68,6 +68,38 @@ def prefetch_terms(request):
     return prefetch_terms
 
 
+def handle_items(items):
+    items_to_save = []
+    labels_to_save = []
+
+    for item in items:
+        # Deletion/insertion of list items not yet implemented.
+        labels = item.pop("labels")
+        # Altering hierarchy is done by altering parents.
+        item.pop("children", None)
+        item.pop("depth", None)
+
+        item_to_save = ControlledListItem(list_id=id, **item)
+        # Check for positive sortorder, but avoid further db hits.
+        # Defer validation of unique sort order.
+        item_to_save.full_clean(
+            exclude=["parent", "list"], validate_unique=False
+        )
+        items_to_save.append(item_to_save)
+
+        for label in labels:
+            label["language_id"] = label.pop("language")
+            label["value_type_id"] = label.pop("valuetype")
+            labels_to_save.append(Label(item_id=item_to_save.id, **label))
+
+    ControlledListItem.objects.bulk_update(
+        items_to_save, fields=["uri", "sortorder", "parent"]
+    )
+    Label.objects.bulk_update(
+        labels_to_save, fields=["value", "value_type", "language"]
+    )
+
+
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
@@ -130,32 +162,8 @@ class ControlledListView(View):
                 clist.dynamic = data["dynamic"]
                 clist.name = data["name"]
 
-                for item in data["items"]:
-                    # Deletion/insertion of list items not yet implemented.
-                    labels = item.pop("labels")
-                    # Altering hierarchy is done by altering parents.
-                    item.pop("children", None)
-                    item.pop("depth", None)
+                handle_items(data["items"])
 
-                    item_to_save = ControlledListItem(list_id=id, **item)
-                    # Check for positive sortorder, but avoid further db hits.
-                    # Defer validation of unique sort order.
-                    item_to_save.full_clean(
-                        exclude=["parent", "list"], validate_unique=False
-                    )
-                    items_to_save.append(item_to_save)
-
-                    for label in labels:
-                        label["language_id"] = label.pop("language")
-                        label["value_type_id"] = label.pop("valuetype")
-                        labels_to_save.append(Label(item_id=item_to_save.id, **label))
-
-                ControlledListItem.objects.bulk_update(
-                    items_to_save, fields=["uri", "sortorder", "parent"]
-                )
-                Label.objects.bulk_update(
-                    labels_to_save, fields=["value", "value_type", "language"]
-                )
                 clist.save()
         except ValidationError as e:
             return JSONErrorResponse(message=" ".join(e.messages), status=400)
@@ -176,47 +184,67 @@ class ControlledListView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemView(View):
+    def add_new_item(self, request, parent_id):
+        data = JSONDeserializer().deserialize(request.body)
+
+        try:
+            lst = (
+                ControlledList.objects.filter(pk=data["list_id"])
+                .annotate(max_sortorder=Max("items__sortorder"))
+                .get()
+            )
+        except ControlledList.DoesNotExist:
+            return JSONErrorResponse(status=404)
+
+        if lst.max_sortorder is None:
+            sortorder = 0
+        else:
+            sortorder = lst.max_sortorder + 1
+
+        try:
+            with transaction.atomic():
+                item = ControlledListItem(
+                    list=lst,
+                    sortorder=sortorder,
+                    parent_id=parent_id,
+                )
+                item.save()
+                label = Label(
+                    item=item,
+                    value=_("New Label: ") + datetime.now().isoformat(),
+                    value_type_id="prefLabel",
+                    language_id=get_language(),
+                )
+                label.save()
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(serialize(item))
+
     def post(self, request, **kwargs):
         if not (id := kwargs.get("id", None)):
-            # Add a new list item.
-            data = JSONDeserializer().deserialize(request.body)
+            return self.add_new_item(request, parent_id=kwargs.get("parent_id", None))
 
-            try:
-                lst = (
-                    ControlledList.objects.filter(pk=data["list_id"])
-                    .annotate(max_sortorder=Max("items__sortorder"))
-                    .get()
-                )
-            except ControlledList.DoesNotExist:
-                return JSONErrorResponse(status=404)
+        # Update list item
+        data = JSONDeserializer().deserialize(request.body)
 
-            if lst.max_sortorder is None:
-                sortorder = 0
-            else:
-                sortorder = lst.max_sortorder + 1
+        try:
+            with transaction.atomic():
+                for _item in (
+                    ControlledListItem.objects.filter(pk=id)
+                    .select_for_update()
+                ):
+                    handle_items([data])
+                    break
+                else:
+                    JSONErrorResponse(status=404)
 
-            try:
-                with transaction.atomic():
-                    item = ControlledListItem(
-                        list=lst,
-                        sortorder=sortorder,
-                        parent_id=kwargs.get("parent_id", None),
-                    )
-                    item.save()
-                    label = Label(
-                        item=item,
-                        value=_("New Label: ") + datetime.now().isoformat(),
-                        value_type_id="prefLabel",
-                        language_id=get_language(),
-                    )
-                    label.save()
-            except:
-                return JSONErrorResponse()
+        except ValidationError as e:
+            return JSONErrorResponse(message=" ".join(e.messages), status=400)
+        except:
+            return JSONErrorResponse()
 
-            return JSONResponse(serialize(item))
-
-        # TODO: implement list item update
-        raise NotImplementedError
+        return JSONResponse(status=200)
 
     def delete(self, request, **kwargs):
         id = kwargs.get("id")

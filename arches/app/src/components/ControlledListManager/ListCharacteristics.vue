@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
-import ListCharacteristic from "@/Components/ControlledListManager/ListCharacteristic.vue";
+import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
@@ -19,21 +19,21 @@ const { $gettext } = useGettext();
 <template>
     <div class="characteristics">
         <h3>{{ $gettext("Characteristics") }}</h3>
-        <ListCharacteristic
-            :displayed-list="props.displayedList"
+        <ItemCharacteristic
+            :item="props.displayedList"
             :editable="props.editable"
             field="name"
             :label="$gettext('Name')"
         />
-        <ListCharacteristic
-            :displayed-list="props.displayedList"
+        <ItemCharacteristic
+            :item="props.displayedList"
             :editable="false"
             field="dynamic"
             :label="$gettext('Dynamic')"
             :style="{ width: '4rem' }"
         />
-        <ListCharacteristic
-            :displayed-list="props.displayedList"
+        <ItemCharacteristic
+            :item="props.displayedList"
             :editable="false"
             :label="$gettext('List used by these nodes')"
         />

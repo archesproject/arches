@@ -172,6 +172,7 @@ h2 {
     height: 100vh;
     background: white;
     font-size: 14px;
+    border: 0;
 }
 .p-splitter-panel {
     display: flex;
