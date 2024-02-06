@@ -160,7 +160,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                 <SplitterPanel
                     :size="75"
                     :min-size="50"
-                    class="mt-0"
+                    class="item-editor-container"
                 >
                     <ItemEditor
                         v-if="displayedItem"
@@ -201,6 +201,10 @@ h3 {
     height: 100vh;
     background: white;
     font-size: 14px;
+}
+.item-editor-container {
+    margin-top: 0;
+    overflow-y: auto;
 }
 .button.return {
     margin-left: 1rem;

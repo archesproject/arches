@@ -186,9 +186,12 @@ button {
 .selection-header {
     display: flex;
     background-color: v-bind(lightGray);
-    height: 2rem;
+    height: 3rem;
     font-size: small;
     justify-content: space-between;
+}
+.selection-header span {
+    align-self: center;
 }
 .p-dataview {
     overflow-y: auto;

@@ -1,7 +1,11 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import type { ControlledList, ControlledListItem } from "@/types/controlledListManager.d";
+import type {
+    ControlledList,
+    ControlledListItem,
+    Label,
+} from "@/types/controlledListManager.d";
 
 export const postItemToServer = async (item: ControlledListItem, toast, $gettext) => {
     try {
@@ -56,6 +60,32 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
         toast.add({
             severity: "error",
             summary: error || $gettext("Save failed"),
+            life: 3000,
+        });
+    }
+};
+
+
+export const deleteLabel = async (label: Label, toast, $gettext) => {
+    try {
+        const response = await fetch(arches.urls.label(label.id), {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+        });
+        if (!response.ok) {
+            try {
+                const body = await response.json();
+                throw new Error(body.message);
+            } catch {
+                throw new Error(response.statusText);
+            }
+        }
+    } catch (error) {
+        toast.add({
+            severity: "error",
+            summary: error || $gettext("Deletion failed"),
             life: 3000,
         });
     }
