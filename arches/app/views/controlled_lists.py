@@ -252,3 +252,15 @@ class ControlledListItemView(View):
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
+class LabelView(View):
+    def delete(self, request, **kwargs):
+        id = kwargs.get("id")
+        objs_deleted, _ = Label.objects.filter(pk=id).delete()
+        if not objs_deleted:
+            return JSONErrorResponse(status=404)
+        return JSONResponse(status=204)

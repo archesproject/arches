@@ -1061,6 +1061,7 @@
         controlled_list_add="{% url 'controlled_list_add' %}"
         controlled_list_item='(itemid) => {return "{% url "controlled_list_item" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", itemid)}'
         controlled_list_item_add="{% url 'controlled_list_item_add' %}"
+        label='(labelid) => {return "{% url "label" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", labelid)}'
     ></div>
     {% endblock arches_urls %}
     {% block arches_data %}

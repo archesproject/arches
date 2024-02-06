@@ -12,7 +12,7 @@ import type { Item } from "@/types/ControlledListManager.d";
 const props: {
     item: Item;
     editable: boolean;
-    field: 'name' | 'uri';
+    field: "name" | "uri";
     label: string;
 } = defineProps([
     "item",
@@ -33,6 +33,13 @@ const onSave = computed(() => {
         : postItemToServer;
 });
 
+const width = computed(() => {
+    if (props.field === "uri") {
+        return "100%";
+    }
+    return Math.max(inputValue.value.length + 2, 4) + "rem";
+});
+
 const toast = useToast();
 const { $gettext } = useGettext();
 </script>
@@ -45,7 +52,7 @@ const { $gettext } = useGettext();
             type="text"
             class="control"
             :disabled="disabled"
-            :style="{ width: Math.max(inputValue.length + 2, 4) + 'rem' }"
+            :style="{ width: width }"
         />
         <span
             v-if="props.editable && !editing"
