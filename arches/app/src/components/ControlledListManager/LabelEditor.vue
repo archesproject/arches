@@ -2,6 +2,8 @@
 import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
+
 import type {
     ControlledListItem,
     ValueType,
@@ -51,12 +53,22 @@ const headings: { heading: string; subheading: string } = computed(() => {
     <div class="label-editor-container">
         <h4>{{ headings.heading }}</h4>
         <h5>{{ headings.subheading }}</h5>
+        <div
+            v-for="label in item.labels.filter(
+                label => label.valuetype === props.type
+            )"
+            :key="label.id"
+            class="label-box"
+        >
+            <LabelRow :label="label" />
+        </div>
     </div>
 </template>
 
 <style scoped>
 .label-editor-container {
     margin: 1rem 1rem 3rem 1rem;
+    width: 80%;
 }
 h4 {
     color: v-bind(slateBlue);
