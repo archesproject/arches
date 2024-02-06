@@ -9,7 +9,7 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
-import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
+import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
@@ -104,7 +104,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
     />
 
     <div class="list-editor-container">
-        <ItemCharacteristics
+        <ListCharacteristics
             :displayed-list="props.displayedList"
             :editable="true"
         />
