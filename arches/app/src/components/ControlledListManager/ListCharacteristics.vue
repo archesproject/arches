@@ -3,19 +3,24 @@ import arches from "arches";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import InputText from "primevue/inputtext";
+
+import { postDisplayedListToServer } from "@/components/ControlledListManager/api.ts";
+
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
-const {
-    displayedList,
-    editable,
-}: { displayedList: ControlledList; editable: boolean } = defineProps([
+const props: {
+    displayedList: ControlledList;
+    editable: boolean;
+} = defineProps([
     "displayedList",
     "editable",
 ]);
 
+const nameValue = ref(props.displayedList.name);
 const editing = ref(false);
 const disabled = computed(() => {
-    return !editable || !editing.value;
+    return !props.editable || !editing.value;
 });
 
 const { $gettext } = useGettext();
@@ -28,15 +33,16 @@ const dynamicLabel =
     <div class="characteristics">
         <h3>{{ $gettext("Characteristics") }}</h3>
         <div class="characteristic">
-            <h4>Name</h4>
-            <!-- TODO wire up with v-model and factor out into component for use with URI -->
-            <input
+            <h4>{{ $gettext("Name") }}</h4>
+            <InputText
+                v-model="nameValue"
+                type="text"
+                class="control"
                 :disabled="disabled"
-                :value="displayedList.name"
-                :style="{ width: displayedList.name.length + 2 + 'rem' }"
-            >
+                :style="{ width: Math.max(nameValue.length + 2, 4) + 'rem' }"
+            />
             <span
-                v-if="editable && !editing"
+                v-if="props.editable && !editing"
                 class="edit-controls"
             >
                 <i
@@ -52,7 +58,7 @@ const dynamicLabel =
                 />
             </span>
             <span
-                v-if="editable && editing"
+                v-if="props.editable && editing"
                 class="edit-controls"
             >
                 <i
@@ -63,6 +69,9 @@ const dynamicLabel =
                     @click="
                         () => {
                             editing = false;
+                            // eslint-disable-next-line vue/no-mutating-props
+                            props.displayedList.name = nameValue;
+                            postDisplayedListToServer(props.displayedList, toast, $gettext);
                         }
                     "
                 />
@@ -74,20 +83,21 @@ const dynamicLabel =
                     @click="
                         () => {
                             editing = false;
+                            nameValue = props.displayedList.name;
                         }
                     "
                 />
             </span>
         </div>
         <div class="characteristic">
-            <h4>Type</h4>
+            <h4>{{ $gettext("Type") }}</h4>
             <input
-                :disabled="disabled"
+                disabled
                 :value="
-                    displayedList.dynamic ? dynamicLabel : staticLabel
+                    props.displayedList.dynamic ? dynamicLabel : staticLabel
                 "
                 :style="{
-                    width: displayedList.dynamic
+                    width: props.displayedList.dynamic
                         ? dynamicLabel.length - 20 + 'rem'
                         : staticLabel.length - 10 + 'rem',
                 }"
@@ -115,14 +125,19 @@ input {
 }
 .characteristic input {
     text-align: center;
-    background: var(--gray-400);
     border-width: 2px;
     height: 3rem;
 }
+.characteristic input[disabled] {
+    background: var(--gray-400);
+}
 .edit-controls {
     margin-left: 1rem;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 4rem;
 }
 .edit-controls i {
-    border: 2px solid;
+    font-size: medium;
 }
 </style>

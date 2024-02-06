@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -10,8 +9,10 @@ import DataTable from "primevue/datatable";
 import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
-import ItemCharacteristics from "@/components/ControlledListManager/ItemCharacteristics.vue";
+import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
+
+import { postDisplayedListToServer } from "@/components/ControlledListManager/api.ts";
 
 import type { Ref } from "vue";
 import type {
@@ -135,36 +136,7 @@ const onRowReorder = (dragData) => {
         props.displayedList.items[i].sortorder = i;
     }
 
-    postDisplayedListToServer();
-};
-
-const postDisplayedListToServer = async () => {
-    try {
-        const response = await fetch(
-            arches.urls.controlled_list(props.displayedList.id),
-            {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": Cookies.get("csrftoken"),
-                },
-                body: JSON.stringify(props.displayedList),
-            }
-        );
-        if (!response.ok) {
-            try {
-                const body = await response.json();
-                throw new Error(body.message);
-            } catch {
-                throw new Error(response.statusText);
-            }
-        }
-    } catch (error) {
-        toast.add({
-            severity: "error",
-            summary: error || $gettext("Save failed"),
-            life: 3000,
-        });
-    }
+    postDisplayedListToServer(props.displayedList, toast, $gettext);
 };
 
 const itemsForLanguage = computed(() => {
@@ -218,7 +190,7 @@ const itemsForLanguage = computed(() => {
         v-if="props.displayedList"
         class="list-editor-container"
     >
-        <ItemCharacteristics
+        <ListCharacteristics
             :displayed-list="props.displayedList"
             :editable="false"
         />
