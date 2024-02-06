@@ -7,8 +7,6 @@
 @import url(node_modules/ionicons/css/ionicons.min.css);
 @import url(node_modules/lt-themify-icons/themify-icons.css);
 @import url(node_modules/chosen-js/chosen.css);
-// @import url(node_modules/select2/select2.css);
-// @import url(node_modules/select2/select2-bootstrap.css);
 @import url(node_modules/select-woo/dist/css/selectWoo.min.css);
 @import url(node_modules/mapbox-gl/dist/mapbox-gl.css);
 @import url(node_modules/nouislider/distribute/nouislider.min.css);
@@ -23,9 +21,7 @@
 @import url(node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
-@import "abstracts/breakpoint-settings";
-@import "abstracts/functions";
-@import "abstracts/index";
+@import "abstracts";
 @import "sidenav";
 @import "edit-history";
 @import "tree";
