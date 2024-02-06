@@ -9,6 +9,7 @@ import DataTable from "primevue/datatable";
 import SplitButton from "primevue/splitbutton";
 import { useToast } from "primevue/usetoast";
 
+import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 
@@ -316,29 +317,10 @@ const itemsForLanguage = computed(() => {
         </div>
     </div>
 
-    <div
+    <ControlledListSplash
         v-else
-        id="rr-splash"
-        class="rr-splash"
-    >
-        <!-- Image -->
-        <div
-            aria-hidden="true"
-            class="img-lg img-circle rr-splash-img-container"
-        >
-            <i class="fa fa-list" />
-        </div>
-
-        <!-- Splash Title -->
-        <div class="rr-splash-title">
-            {{ $gettext("Welcome to Arches' Controlled List Manager") }}
-        </div>
-
-        <!-- Splash Instructions -->
-        <div class="rr-splash-description">
-            {{ $gettext("Select a list from the sidebar.") }}
-        </div>
-    </div>
+        :description="$gettext('Select a list from the sidebar.')"
+    />
 </template>
 
 <style scoped>

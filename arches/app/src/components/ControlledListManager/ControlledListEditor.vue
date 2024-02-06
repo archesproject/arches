@@ -9,6 +9,7 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
+import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
@@ -140,8 +141,14 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                             :item-label="$gettext('item')"
                             :items="items"
                             :items-label="$gettext('items')"
-                            :no-search-result-label="$gettext('No matching items')"
-                            :no-item-label="$gettext('Click &quot;Add New Item&quot; to start.')"
+                            :no-search-result-label="
+                                $gettext('No matching items')
+                            "
+                            :no-item-label="
+                                $gettext(
+                                    'Click &quot;Add New Item&quot; to start.'
+                                )
+                            "
                             :set-displayed-item="setDisplayedItem"
                         />
                         <template #fallback>
@@ -155,7 +162,14 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     :min-size="50"
                     class="mt-0"
                 >
-                    <ItemEditor />
+                    <ItemEditor
+                        v-if="displayedItem"
+                        :item="displayedItem"
+                    />
+                    <ControlledListSplash
+                        v-else
+                        :description="$gettext('Select an item from the sidebar.')"
+                    />
                 </SplitterPanel>
             </Splitter>
         </div>
@@ -174,7 +188,7 @@ h3 {
     font-size: 1.5rem;
 }
 .p-splitter {
-    width: calc(100vw - 50px);
+    width: calc(100vw - 60px);
     height: calc(100vh - 450px);
     background: white;
     font-size: 14px;

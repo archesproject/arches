@@ -5,6 +5,8 @@ export type Label = {
     value: string,
 }
 
+export type ValueType = "prefLabel" | "altLabel";
+
 export type ControlledListItem = {
     id: string,
     uri: string,
