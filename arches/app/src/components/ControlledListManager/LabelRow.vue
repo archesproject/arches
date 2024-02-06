@@ -3,7 +3,10 @@ import arches from "arches";
 
 import type { Label } from "@/types/ControlledListManager.d";
 
-const props: { label: Label } = defineProps(["label"]);
+const props: {
+    label: Label,
+    onDelete: (labelId: Label) => Promise<void>,
+} = defineProps(["label", "onDelete"]);
 </script>
 
 <template>
@@ -11,7 +14,9 @@ const props: { label: Label } = defineProps(["label"]);
         <span class="label">{{ props.label.value }}</span>
         <div class="label-end">
             <span class="controls">
-                <button>{{ arches.translations.delete }}</button>
+                <button @click="props.onDelete(props.label)">
+                    {{ arches.translations.delete }}
+                </button>
                 <button>{{ arches.translations.edit }}</button>
             </span>
             <span class="label language">{{ props.label.language }}</span>
@@ -31,6 +36,7 @@ span {
 }
 .label {
     color: black;
+    align-self: center;
 }
 .controls {
     display: inline-flex;
@@ -42,6 +48,9 @@ button {
     font-size: smaller;
     background: none;
     border: none;
+    /* when adjusting padding, ensure action area of button is not inaccessibly slim */
+    /* I'm showing ~37px, which is already below the MDN recommendation of 44 */
+    padding: 1rem;
 }
 .label.language {
     width: 4rem;

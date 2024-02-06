@@ -29,7 +29,7 @@ const props: {
         :item="props.item"
         :editable="true"
         field="uri"
-        :style="{ display: 'flex', alignItems: 'center' }"
+        :style="{ display: 'flex', alignItems: 'center', width: '80%' }"
     />
 </template>
 

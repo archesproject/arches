@@ -2,10 +2,14 @@
 import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import { useToast } from "primevue/usetoast";
+
+import { deleteLabel } from "@/components/ControlledListManager/api.ts";
 import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 
 import type {
     ControlledListItem,
+    Label,
     ValueType,
 } from "@/types/ControlledListManager.d";
 
@@ -14,6 +18,7 @@ const props: {
     type: ValueType | "URI";
 } = defineProps(["item", "type"]);
 
+const toast = useToast();
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
@@ -47,6 +52,13 @@ const headings: { heading: string; subheading: string } = computed(() => {
             };
     }  
 });
+
+const onDelete = async (label: Label) => {
+    await deleteLabel(label, toast, $gettext);
+    const toDelete = props.item.labels.findIndex(l => l.id === label.id);
+    // eslint-disable-next-line vue/no-mutating-props
+    props.item.labels.splice(toDelete, 1);
+};
 </script>
 
 <template>
@@ -60,7 +72,10 @@ const headings: { heading: string; subheading: string } = computed(() => {
             :key="label.id"
             class="label-box"
         >
-            <LabelRow :label="label" />
+            <LabelRow
+                :label="label"
+                :on-delete="() => { onDelete(label) }"
+            />
         </div>
     </div>
 </template>
