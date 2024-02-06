@@ -9,6 +9,7 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
+import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
@@ -21,6 +22,7 @@ import type {
 } from "@/types/ControlledListManager.d";
 
 const lightGray = "#f4f4f4";
+const buttonGreen = "#10b981";
 const toast = useToast();
 const { $gettext } = useGettext();
 
@@ -153,11 +155,15 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     :min-size="50"
                     class="mt-0"
                 >
-                    <div>Right</div>
+                    <ItemEditor />
                 </SplitterPanel>
             </Splitter>
         </div>
-        <Button @click="setEditing(false)">
+        <Button
+            raised
+            class="button return"
+            @click="setEditing(false)"
+        >
             {{ arches.translations.return }}
         </Button>
     </div>
@@ -169,7 +175,7 @@ h3 {
 }
 .p-splitter {
     width: calc(100vw - 50px);
-    height: calc(100vh - 400px);
+    height: calc(100vh - 450px);
     background: white;
     font-size: 14px;
 }
@@ -181,5 +187,11 @@ h3 {
     height: 100vh;
     background: white;
     font-size: 14px;
+}
+.button.return {
+    margin-left: 1rem;
+    background: v-bind(buttonGreen);
+    border: 1px solid v-bind(buttonGreen);
+    color: white;
 }
 </style>
