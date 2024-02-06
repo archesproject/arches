@@ -19,7 +19,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#11-cbyrd-remove-node-sass-and-eslint-webpack-plugin"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
