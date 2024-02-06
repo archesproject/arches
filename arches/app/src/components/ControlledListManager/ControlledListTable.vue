@@ -13,7 +13,7 @@ import ControlledListSplash from "@/components/ControlledListManager/ControlledL
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 
-import { postDisplayedListToServer } from "@/components/ControlledListManager/api.ts";
+import { postListToServer } from "@/components/ControlledListManager/api.ts";
 
 import type { Ref } from "vue";
 import type {
@@ -137,7 +137,7 @@ const onRowReorder = (dragData) => {
         props.displayedList.items[i].sortorder = i;
     }
 
-    postDisplayedListToServer(props.displayedList, toast, $gettext);
+    postListToServer(props.displayedList, toast, $gettext);
 };
 
 const itemsForLanguage = computed(() => {
