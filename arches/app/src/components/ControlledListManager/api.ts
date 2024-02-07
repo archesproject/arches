@@ -8,6 +8,7 @@ import type {
 } from "@/types/controlledListManager.d";
 
 export const postItemToServer = async (item: ControlledListItem, toast, $gettext) => {
+    let errorText;
     try {
         const response = await fetch(
             arches.urls.controlled_list_item(item.id),
@@ -20,23 +21,22 @@ export const postItemToServer = async (item: ControlledListItem, toast, $gettext
             }
         );
         if (!response.ok) {
-            try {
-                const body = await response.json();
-                throw new Error(body.message);
-            } catch {
-                throw new Error(response.statusText);
-            }
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
+            throw new Error();
         }
-    } catch (error) {
+    } catch {
         toast.add({
             severity: "error",
-            summary: error || $gettext("Save failed"),
+            summary: errorText || $gettext("Save failed"),
             life: 3000,
         });
     }
 };
 
 export const postListToServer = async (list: ControlledList, toast, $gettext) => {
+    let errorText;
     try {
         const response = await fetch(
             arches.urls.controlled_list(list.id),
@@ -49,17 +49,15 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
             }
         );
         if (!response.ok) {
-            try {
-                const body = await response.json();
-                throw new Error(body.message);
-            } catch {
-                throw new Error(response.statusText);
-            }
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
+            throw new Error();
         }
-    } catch (error) {
+    } catch {
         toast.add({
             severity: "error",
-            summary: error || $gettext("Save failed"),
+            summary: errorText || $gettext("Save failed"),
             life: 3000,
         });
     }
@@ -67,6 +65,7 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
 
 
 export const deleteLabel = async (label: Label, toast, $gettext) => {
+    let errorText;
     try {
         const response = await fetch(arches.urls.label(label.id), {
             method: "DELETE",
@@ -75,17 +74,15 @@ export const deleteLabel = async (label: Label, toast, $gettext) => {
             },
         });
         if (!response.ok) {
-            try {
-                const body = await response.json();
-                throw new Error(body.message);
-            } catch {
-                throw new Error(response.statusText);
-            }
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
+            throw new Error();
         }
-    } catch (error) {
+    } catch {
         toast.add({
             severity: "error",
-            summary: error || $gettext("Deletion failed"),
+            summary: errorText || $gettext("Deletion failed"),
             life: 3000,
         });
     }
