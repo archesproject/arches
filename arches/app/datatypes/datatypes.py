@@ -2570,6 +2570,23 @@ def get_value_from_jsonld(json_ld_node):
 class ReferenceDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
+        title = _("Invalid Reference Datatype Value")
+        if type(value) == list and len(value):
+            for reference in value:
+                if "uri" in reference and len(reference["uri"]):
+                    pass
+                else:
+                    errors.append({"type": "ERROR", "message": _("Reference objects require a 'uri' property and corresponding value"), "title": title})
+                if "labels" in reference:
+                    pref_label_languages = []
+                    for label in reference["labels"]:
+                        if not all([key in label for key in ("id", "value", "language", "valuetype")]):
+                            errors.append({"type": "ERROR", "message": _("Reference labels require properties: id(uuid), value(string), language(e.g. 'en'), and valuetype(e.g. 'prefLabel')"), "title": title})
+                        else:
+                            if label["valuetype"] == "prefLabel" and label["language"] in pref_label_languages:
+                                errors.append({"type": "ERROR", "message": _("A reference can have only one prefLabel per language"), "title": title})
+        else:  
+            errors.append({"type": "ERROR", "message": _("Reference value must be a list of reference objects"), "title": title})
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
