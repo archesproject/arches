@@ -68,7 +68,7 @@ def prefetch_terms(request):
     return prefetch_terms
 
 
-def handle_items(itemDicts):
+def handle_items(itemDicts, list_id):
     items_to_save = []
     labels_to_save = []
 
@@ -79,7 +79,7 @@ def handle_items(itemDicts):
         itemDict.pop("children", None)
         itemDict.pop("depth", None)
 
-        item_to_save = ControlledListItem(list_id=id, **itemDict)
+        item_to_save = ControlledListItem(list_id=list_id, **itemDict)
         item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
 
@@ -124,17 +124,17 @@ class ControlledListsView(View):
 )
 class ControlledListView(View):
     def get(self, request, **kwargs):
-        id = kwargs.get("id")
+        list_id = kwargs.get("id")
         try:
             lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
-                pk=id
+                pk=list_id
             )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=404)
         return JSONResponse(serialize(lst))
 
     def post(self, request, **kwargs):
-        if not (id := kwargs.get("id", None)):
+        if not (list_id := kwargs.get("id", None)):
             # Add a new list.
             lst = ControlledList(name=_("Untitled List: ") + datetime.now().isoformat())
             lst.save()
@@ -143,7 +143,7 @@ class ControlledListView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         qs = (
-            ControlledListItem.objects.filter(list_id=id)
+            ControlledListItem.objects.filter(list_id=list_id)
             .select_related("list")
             .select_for_update()
         )
@@ -156,14 +156,14 @@ class ControlledListView(View):
                 try:
                     clist = qs[0].list
                 except ControlledListItem.DoesNotExist:
-                    clist = ControlledList.objects.get(pk=id)
+                    clist = ControlledList.objects.get(pk=list_id)
                 except (IndexError, ControlledList.DoesNotExist):
                     return JSONErrorResponse(status=404)
 
                 clist.dynamic = data["dynamic"]
                 clist.name = data["name"]
 
-                handle_items(data["items"])
+                handle_items(data["items"], list_id=list_id)
 
                 clist.save()
         except ValidationError as e:
@@ -174,8 +174,8 @@ class ControlledListView(View):
         return JSONResponse(status=200)
 
     def delete(self, request, **kwargs):
-        id = kwargs.get("id")
-        objs_deleted, _ = ControlledList.objects.filter(pk=id).delete()
+        list_id = kwargs.get("id")
+        objs_deleted, _ = ControlledList.objects.filter(pk=list_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
@@ -185,7 +185,7 @@ class ControlledListView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemView(View):
-    def add_new_item(self, request, parent_id):
+    def add_new_item(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
         try:
@@ -207,7 +207,7 @@ class ControlledListItemView(View):
                 item = ControlledListItem(
                     list=lst,
                     sortorder=sortorder,
-                    parent_id=parent_id,
+                    parent_id=data.get("parent_id", None),
                 )
                 item.save()
                 label = Label(
@@ -223,19 +223,20 @@ class ControlledListItemView(View):
         return JSONResponse(serialize(item))
 
     def post(self, request, **kwargs):
-        if not (id := kwargs.get("id", None)):
-            return self.add_new_item(request, parent_id=kwargs["parent_id"])
+        if not (item_id := kwargs.get("id", None)):
+            return self.add_new_item(request)
 
         # Update list item
         data = JSONDeserializer().deserialize(request.body)
+        list_id = data["list_id"]
 
         try:
             with transaction.atomic():
                 for _item in (
-                    ControlledListItem.objects.filter(pk=id)
+                    ControlledListItem.objects.filter(pk=item_id)
                     .select_for_update()
                 ):
-                    handle_items([data])
+                    handle_items([data], list_id=list_id)
                     break
                 else:
                     JSONErrorResponse(status=404)
@@ -248,8 +249,8 @@ class ControlledListItemView(View):
         return JSONResponse(status=200)
 
     def delete(self, request, **kwargs):
-        id = kwargs.get("id")
-        objs_deleted, _ = ControlledListItem.objects.filter(pk=id).delete()
+        item_id = kwargs.get("id")
+        objs_deleted, _ = ControlledListItem.objects.filter(pk=item_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
@@ -280,12 +281,12 @@ class LabelView(View):
         return JSONResponse(serialize(label))
 
     def post(self, request, **kwargs):
-        if not (id := kwargs.get("id", None)):
+        if not (label_id := kwargs.get("id", None)):
             return self.add_new_label(request)
 
     def delete(self, request, **kwargs):
-        id = kwargs.get("id")
-        objs_deleted, _ = Label.objects.filter(pk=id).delete()
+        label_id = kwargs.get("id")
+        objs_deleted, _ = Label.objects.filter(pk=label_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
