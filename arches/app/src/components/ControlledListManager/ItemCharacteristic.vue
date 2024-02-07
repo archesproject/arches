@@ -21,7 +21,6 @@ const props: {
     "label",
 ]);
 
-const inputValue = ref(props.item[props.field] ?? "");
 const editing = ref(false);
 const disabled = computed(() => {
     return !props.editable || !editing.value;
@@ -37,7 +36,7 @@ const width = computed(() => {
     if (props.field === "uri") {
         return "100%";
     }
-    return Math.max(inputValue.value.length + 2, 4) + "rem";
+    return Math.max((props.item[props.field] ?? "").length + 2, 4) + "rem";
 });
 
 const toast = useToast();
@@ -47,8 +46,9 @@ const { $gettext } = useGettext();
 <template>
     <div class="characteristic">
         <h4>{{ props.label }}</h4>
+        <!-- eslint-disable-next-line vue/no-mutating-props -->
         <InputText
-            v-model="inputValue"
+            v-model="props.item[props.field]"
             type="text"
             class="control"
             :disabled="disabled"
@@ -82,8 +82,6 @@ const { $gettext } = useGettext();
                 @click="
                     () => {
                         editing = false;
-                        // eslint-disable-next-line vue/no-mutating-props
-                        props.item[field] = inputValue;
                         onSave(props.item, toast, $gettext);
                     }
                 "
