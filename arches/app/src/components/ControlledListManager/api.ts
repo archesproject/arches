@@ -79,6 +79,8 @@ export const createLabel = async (label: NewLabel, toast, $gettext) => {
             const body = await response.json();
             errorText = body.message;
             throw new Error();
+        } else {
+            return await response.json();
         }
     } catch {
         toast.add({

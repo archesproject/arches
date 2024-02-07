@@ -19,6 +19,11 @@ const props: {
     type: ValueType | "URI";
 } = defineProps(["item", "type"]);
 
+const insertLabel = (label: Label) => {
+    // eslint-disable-next-line: vue/no-mutating-props
+    props.item.labels.push(label);
+};
+
 const toast = useToast();
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
@@ -82,6 +87,7 @@ const onDelete = async (label: Label) => {
             v-if="type !== 'URI'"
             :item="item"
             :type="type"
+            :insertLabel="insertLabel"
         />
     </div>
 </template>
