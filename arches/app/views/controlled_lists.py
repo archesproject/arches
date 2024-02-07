@@ -68,29 +68,30 @@ def prefetch_terms(request):
     return prefetch_terms
 
 
-def handle_items(items):
+def handle_items(itemDicts):
     items_to_save = []
     labels_to_save = []
 
-    for item in items:
+    for itemDict in itemDicts:
         # Deletion/insertion of list items not yet implemented.
-        labels = item.pop("labels")
+        labels = itemDict.pop("labels")
         # Altering hierarchy is done by altering parents.
-        item.pop("children", None)
-        item.pop("depth", None)
+        itemDict.pop("children", None)
+        itemDict.pop("depth", None)
 
-        item_to_save = ControlledListItem(list_id=id, **item)
-        # Check for positive sortorder, but avoid further db hits.
-        # Defer validation of unique sort order.
-        item_to_save.full_clean(
-            exclude=["parent", "list"], validate_unique=False
-        )
+        item_to_save = ControlledListItem(list_id=id, **itemDict)
+        item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
 
         for label in labels:
             label["language_id"] = label.pop("language")
             label["value_type_id"] = label.pop("valuetype")
             labels_to_save.append(Label(item_id=item_to_save.id, **label))
+
+    # Consider skipping uniqueness checks and just letting IntegrityError
+    # bubble up. But doing Django validation provides a localized error.
+    for itemDict in items_to_save:
+        item_to_save.full_clean(exclude=["parent", "list", "id"])
 
     ControlledListItem.objects.bulk_update(
         items_to_save, fields=["uri", "sortorder", "parent"]
