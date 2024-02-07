@@ -5,6 +5,13 @@ export type Label = {
     value: string,
 }
 
+export type NewLabel = {
+    valuetype: string,
+    language: string,
+    value: string,
+    itemId: string,
+}
+
 export type ValueType = "prefLabel" | "altLabel";
 
 export type ControlledListItem = {
