@@ -11,16 +11,18 @@ import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 import type {
     ControlledListItem,
     Label,
+    LanguageMap,
     ValueType,
 } from "@/types/ControlledListManager.d";
 
 const props: {
     item: ControlledListItem;
+    languageMap: LanguageMap;
     type: ValueType | "URI";
-} = defineProps(["item", "type"]);
+} = defineProps(["item", "languageMap", "type"]);
 
 const insertLabel = (label: Label) => {
-    // eslint-disable-next-line: vue/no-mutating-props
+    // eslint-disable-next-line vue/no-mutating-props
     props.item.labels.push(label);
 };
 
@@ -86,8 +88,9 @@ const onDelete = async (label: Label) => {
         <AddLabel
             v-if="type !== 'URI'"
             :item="item"
+            :language-map
             :type="type"
-            :insertLabel="insertLabel"
+            :insert-label="insertLabel"
         />
     </div>
 </template>
