@@ -5,6 +5,7 @@ import { useGettext } from "vue3-gettext";
 import { useToast } from "primevue/usetoast";
 
 import { deleteLabel } from "@/components/ControlledListManager/api.ts";
+import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 
 import type {
@@ -77,6 +78,11 @@ const onDelete = async (label: Label) => {
                 :on-delete="() => { onDelete(label) }"
             />
         </div>
+        <AddLabel
+            v-if="type !== 'URI'"
+            :item="item"
+            :type="type"
+        />
     </div>
 </template>
 

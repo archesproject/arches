@@ -168,7 +168,9 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     />
                     <ControlledListSplash
                         v-else
-                        :description="$gettext('Select an item from the sidebar.')"
+                        :description="
+                            $gettext('Select an item from the sidebar.')
+                        "
                     />
                 </SplitterPanel>
             </Splitter>
@@ -211,5 +213,6 @@ h3 {
     background: v-bind(buttonGreen);
     border: 1px solid v-bind(buttonGreen);
     color: white;
+    font-weight: 600;
 }
 </style>

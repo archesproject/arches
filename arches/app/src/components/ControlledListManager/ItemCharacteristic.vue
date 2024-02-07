@@ -6,7 +6,10 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { postItemToServer, postListToServer } from "@/components/ControlledListManager/api.ts";
+import {
+    postItemToServer,
+    postListToServer,
+} from "@/components/ControlledListManager/api.ts";
 import type { Item } from "@/types/ControlledListManager.d";
 
 const props: {
@@ -14,12 +17,7 @@ const props: {
     editable: boolean;
     field: "name" | "uri";
     label: string;
-} = defineProps([
-    "item",
-    "editable",
-    "field",
-    "label",
-]);
+} = defineProps(["item", "editable", "field", "label"]);
 
 const editing = ref(false);
 const disabled = computed(() => {
@@ -46,7 +44,7 @@ const { $gettext } = useGettext();
 <template>
     <div class="characteristic">
         <h4>{{ props.label }}</h4>
-        <!-- eslint-disable-next-line vue/no-mutating-props -->
+        <!-- eslint-disable vue/no-mutating-props -->
         <InputText
             v-model="props.item[props.field]"
             type="text"
@@ -54,6 +52,7 @@ const { $gettext } = useGettext();
             :disabled="disabled"
             :style="{ width: width }"
         />
+        <!-- eslint-enable vue/no-mutating-props -->
         <span
             v-if="props.editable && !editing"
             class="edit-controls"
