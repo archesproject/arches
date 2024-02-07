@@ -100,30 +100,3 @@ class Command(BaseCommand):
                 print(etl_module.componentname)
         except Exception as e:
             print(e)
-
-    def run(self, module, source, config):
-        """
-        Run the specified module
-        Params --module, --source, and --config
-
-        """
-        loadid = str(uuid.uuid4())
-        if os.path.exists(config):
-            with open(config) as f:
-                config = json.load(f)
-        try:
-            etl_module = ETLModule.objects.get(componentname=module).get_class_module()(loadid=loadid,params=config)
-        except ETLModule.DoesNotExist:
-            try:
-                moduleid = uuid.UUID(module)
-                etl_module = ETLModule.objects.get(pk=moduleid).get_class_module()(loadid=loadid,params=config)
-            except ValueError:
-                etl_modules = ETLModule.objects.all()
-                print(_("You must supply the valid name or the uuid for the etl module"))
-                for etl_module in etl_modules:
-                    print("\t", etl_module.componentname, "\t",etl_module.etlmoduleid)
-                return
-        import_function = getattr(etl_module, "cli")
-        response = import_function(source)
-        if response['success']:
-            print(_(""))
