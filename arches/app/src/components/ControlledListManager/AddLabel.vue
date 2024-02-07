@@ -14,14 +14,16 @@ import { createLabel } from "@/components/ControlledListManager/api.ts";
 import type {
     ControlledListItem,
     Label,
+    LanguageMap,
     ValueType,
 } from "@/types/ControlledListManager.d";
 
 const props: {
     item: ControlledListItem;
+    languageMap: LanguageMap;
     type: ValueType;
     insertLabel: (label: Label) => Promise<Label>;
-} = defineProps(["item", "type", "insertLabel"]);
+} = defineProps(["item", "languageMap", "type", "insertLabel"]);
 
 const visible = ref(false);
 const value = ref("");
@@ -33,11 +35,23 @@ const buttonLabel = computed(() => {
         : $gettext("Add Alternate Label");
 });
 
+const languageOptions = computed(() => {
+    if (!props.languageMap) {
+        return [];
+    }
+    return (
+        Object.entries(props.languageMap).map(([code, label]) => {
+            return {
+                label,
+                code,
+            };
+        })
+    );
+});
+
 watch(visible, () => {
     value.value = "";
 });
-
-const languages = ['en', 'de']; // todo: wire up
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -102,7 +116,9 @@ const onSave = async () => {
             <Dropdown
                 v-model="language"
                 aria-labelledby="language-label"
-                :options="languages"
+                :options="languageOptions"
+                optionLabel="label"
+                optionValue="code"
                 :pt="{
                     input: { style: { fontSize: 'small' } },
                     panel: { style: { fontSize: 'small' } },

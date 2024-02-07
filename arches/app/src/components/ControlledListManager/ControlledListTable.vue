@@ -28,7 +28,7 @@ const { $gettext } = useGettext();
 
 const props: {
     displayedList: ControlledList;
-    languageMap: LanguageMap | null;
+    languageMap: LanguageMap;
     setEditing: (val: boolean) => void;
 } = defineProps(["displayedList", "languageMap", "setEditing"]);
 
