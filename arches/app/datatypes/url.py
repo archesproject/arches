@@ -70,6 +70,7 @@ class URLDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
+
         if value is not None:
             try:
                 if value.get("url") is not None:
@@ -82,6 +83,18 @@ class URLDataType(BaseDataType):
                 title = _("Invalid HTTP/HTTPS URL")
                 error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
+            
+            #10592 raise error if label added without URL 
+            if value.get("url_label") and not value.get("url"):
+                message = _("URL label cannot be saved without a URL")
+                title = _("No URL added")
+                error_message = self.create_error_message(value, source, row_number, message, title)
+                errors.append(error_message)
+
+            #10593 adds url_label to JSON if no label added
+            if "url_label" not in value:
+                value["url_label"] = ""
+                
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
