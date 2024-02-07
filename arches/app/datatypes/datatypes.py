@@ -2590,7 +2590,7 @@ class ReferenceDataType(BaseDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        ret = []
+        ret = value
         return ret
     
     def clean(self, tile, nodeid):
@@ -2599,10 +2599,9 @@ class ReferenceDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def transform_export_values(self, value, *args, **kwargs):
-        new_values = []
+        new_values = value
         return ",".join(new_values)
 
- 
     def collects_multiple_values(self):
         return True
 
