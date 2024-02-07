@@ -49,12 +49,11 @@ define([
 
         this.fileListNodeId = getfileListNode();
 
-        this.cleanUrl = function(url)
-        {
-            let httpRegex = /^https?:\/\//;
+        this.cleanUrl = function(url) {
+            const httpRegex = /^https?:\/\//;
             return !url || httpRegex.test(url) || url.startsWith(arches.urls.url_subpath) ? url :
                 (arches.urls.url_subpath + url).replace('//', '/');
-        }
+        };
 
         this.getUrl = function(tile){
             var url = '';

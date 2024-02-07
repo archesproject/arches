@@ -232,8 +232,8 @@ define([
         }, this, 'beforeChange');
 
         this.getFileUrl = function(urltoclean) {
-            let url = ko.unwrap(urltoclean);
-            let httpRegex = /^https?:\/\//;
+            const url = ko.unwrap(urltoclean);
+            const httpRegex = /^https?:\/\//;
             // test whether the url is fully qualified or already starts with url_subpath
             return !url || httpRegex.test(url) || url.startsWith(arches.urls.url_subpath) ? url :
                 (arches.urls.url_subpath + url).replace('//', '/');
