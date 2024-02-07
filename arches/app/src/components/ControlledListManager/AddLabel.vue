@@ -7,6 +7,9 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
+import { useToast } from "primevue/usetoast";
+
+import { createLabel } from "@/components/ControlledListManager/api.ts";
 
 import type {
     ControlledListItem,
@@ -34,8 +37,25 @@ watch(visible, () => {
 
 const languages = ['en', 'nl']; // todo: wire up
 
+const toast = useToast();
 const { $gettext } = useGettext();
+const staticItemLabel = $gettext("Item Label");
+const staticLanguageLabel = $gettext("Language");
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
+
+const onSave = async () => {
+    visible.value = false;
+    await createLabel(
+        {
+            value: value.value,
+            language: language.value,
+            valuetype: props.type,
+            itemId: props.item.id,
+        },
+        toast,
+        $gettext,
+    );
+};
 </script>
 
 <template>
@@ -64,7 +84,7 @@ const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
         }"
     >
         <div class="form-input">
-            <label for="value">{{ $gettext("Item Label") }}</label>
+            <label for="value">{{ staticItemLabel }}</label>
             <InputText
                 id="value"
                 v-model="value"
@@ -75,7 +95,7 @@ const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
             <span
                 id="language-label"
                 style="margin-bottom: 5px"
-            >{{ $gettext("Language") }}</span>
+            >{{ staticLanguageLabel }}</span>
             <Dropdown
                 v-model="language"
                 aria-labelledby="language-label"
@@ -91,7 +111,7 @@ const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
                 type="button"
                 :label="arches.translations.save"
                 :disabled="!value || !language"
-                @click="visible = false"
+                @click="onSave"
             />
             <Button
                 type="button"

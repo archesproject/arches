@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Max
 from django.views.generic import View
 from django.utils.decorators import method_decorator
@@ -224,7 +224,7 @@ class ControlledListItemView(View):
 
     def post(self, request, **kwargs):
         if not (id := kwargs.get("id", None)):
-            return self.add_new_item(request, parent_id=kwargs.get("parent_id", None))
+            return self.add_new_item(request, parent_id=kwargs["parent_id"])
 
         # Update list item
         data = JSONDeserializer().deserialize(request.body)
@@ -259,6 +259,30 @@ class ControlledListItemView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class LabelView(View):
+    def add_new_label(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+
+        label = Label(
+            item_id=data["itemId"],
+            value_type_id=data["valuetype"],
+            language=Language.objects.get(code=data["language"]),
+            value=data["value"],
+        )
+        try:
+            label.save()
+        except (ControlledListItem.DoesNotExist, Language.DoesNotExist):
+            return JSONErrorResponse(status=404)
+        except IntegrityError as e:
+            return JSONErrorResponse(message=" ".join(e.args), status=400)
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(serialize(label))
+
+    def post(self, request, **kwargs):
+        if not (id := kwargs.get("id", None)):
+            return self.add_new_label(request)
+
     def delete(self, request, **kwargs):
         id = kwargs.get("id")
         objs_deleted, _ = Label.objects.filter(pk=id).delete()

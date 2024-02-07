@@ -325,6 +325,7 @@ urlpatterns = [
     path("controlled_list_item/", ControlledListItemView.as_view(), name="controlled_list_item_add"),
     path("controlled_list_item/<uuid:id>/", ControlledListItemView.as_view(), name="controlled_list_item"),
     path("label/<uuid:id>/", LabelView.as_view(), name="label"),
+    path("label/", LabelView.as_view(), name="label_add"),
 ]
 
 if settings.DEBUG:
