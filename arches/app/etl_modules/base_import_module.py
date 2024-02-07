@@ -259,7 +259,6 @@ class BaseImportModule:
         return {"success": True, "data": result}
 
     def start(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
@@ -275,7 +274,6 @@ class BaseImportModule:
 
 
     def write(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
@@ -290,6 +288,80 @@ class BaseImportModule:
                 response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid)
 
             return response
+
+    def cli(self, source):
+        initiated = self.start(self.request)
+
+        if initiated["success"]:
+            read = self.read_for_cli(source)
+        else:
+            return {"success": False, "data": {"title": _("Error"), "message": initiated["data"]["message"]}}
+
+        if read["success"]:
+            self.request.POST.__setitem__('load_details', json.dumps({"result": read["data"]}))
+            written = self.write(self.request)
+        else:
+            return {"success": False, "data": {"title": _("Error"), "message": read["data"]["message"]}}
+
+        if written["success"]:
+            return {"success": True, "data": "done"}
+        else:
+            return {"success": False, "data": {"title": _("Error"), "message": written["data"]["message"]}}
+
+    def read_for_cli(self, source):
+        self.cumulative_excel_files_size = 0
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
+        try:
+            self.delete_from_default_storage(self.temp_dir)
+        except (FileNotFoundError):
+            pass
+        validator = FileValidator()
+        if len(validator.validate_file_type(source)) > 0:
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("Invalid excel file/zip specified"),
+                "message": _("Upload a valid excel file"),
+            }
+
+        file_name = os.path.basename(source).split('/')[-1]
+        file_stat = os.stat(source)
+
+        if source.split(".")[-1].lower() == "zip":
+            with zipfile.ZipFile(source, "r") as zip_ref:
+                files = zip_ref.infolist()
+                for file in files:
+                    if file.filename.split(".")[-1] == "xlsx":
+                        self.cumulative_excel_files_size += file.file_size
+                    if not file.filename.startswith("__MACOSX"):
+                        if not file.is_dir():
+                            result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
+                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+                        default_storage.save(os.path.join(self.temp_dir, file_name), File(zip_ref.open(file)))
+        elif source.split(".")[-1] == "xlsx":
+            with open(source, "rb") as xlsx_file:
+                result = {"summary": {"name": file_name, "size": self.filesize_format(file_stat.st_size), "files": {}}}
+                self.cumulative_excel_files_size += file_stat.st_size
+                result["summary"]["files"][file_name] = {"size": (self.filesize_format(file_stat.st_size))}
+                result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+                default_storage.save(os.path.join(self.temp_dir, file_name), File(xlsx_file))
+
+        has_valid_excel_file = False
+        for file in result["summary"]["files"]:
+            if file.split(".")[-1] == "xlsx":
+                try:
+                    uploaded_file_path = os.path.join(self.temp_dir, file)
+                    workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+                    self.validate_uploaded_file(workbook)
+                    has_valid_excel_file = True
+                except:
+                    pass
+        if not has_valid_excel_file:
+            title = _("Invalid Uploaded File")
+            message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
+            return {"success": False, "data": {"title": title, "message": message}}
+
+        return {"success": True, "data": result}
 
 class FileValidationError(Exception):
     def __init__(self, message=_("Unable to read file"), code=400):
