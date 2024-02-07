@@ -16,11 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import json
-import os
 import uuid
 from django.core.management.base import BaseCommand
-from django.utils.translation import gettext as _
 from arches.app.models.models import ETLModule
 from arches.app.utils import module_importer
 
@@ -38,10 +35,6 @@ class Command(BaseCommand):
 
         parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The name of the extension to unregister")
 
-        parser.add_argument("-m", "--module", action="store", dest="module", default="", help="The id of the etl-module to run")
-
-        parser.add_argument("-c", "--config", action="store", dest="config", default="", help="The configuration for the etl-module to run")
-
     def handle(self, *args, **options):
         if options["operation"] == "register":
             self.register(source=options["source"])
@@ -51,9 +44,6 @@ class Command(BaseCommand):
 
         if options["operation"] == "list":
             self.list()
-
-        if options["operation"] == "run":
-            self.run(module=options["module"], source=options["source"], config=options["config"])
 
     def start(self, dest_dir):
         """
@@ -97,6 +87,6 @@ class Command(BaseCommand):
         try:
             etl_modules = ETLModule.objects.all()
             for etl_module in etl_modules:
-                print(etl_module.componentname)
+                print(etl_module.name)
         except Exception as e:
             print(e)
