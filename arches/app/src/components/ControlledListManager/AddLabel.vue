@@ -13,13 +13,15 @@ import { createLabel } from "@/components/ControlledListManager/api.ts";
 
 import type {
     ControlledListItem,
+    Label,
     ValueType,
 } from "@/types/ControlledListManager.d";
 
 const props: {
     item: ControlledListItem;
     type: ValueType;
-} = defineProps(["item", "type"]);
+    insertLabel: (label: Label) => Promise<Label>;
+} = defineProps(["item", "type", "insertLabel"]);
 
 const visible = ref(false);
 const value = ref("");
@@ -35,7 +37,7 @@ watch(visible, () => {
     value.value = "";
 });
 
-const languages = ['en', 'nl']; // todo: wire up
+const languages = ['en', 'de']; // todo: wire up
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -45,7 +47,7 @@ const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const onSave = async () => {
     visible.value = false;
-    await createLabel(
+    const response = await createLabel(
         {
             value: value.value,
             language: language.value,
@@ -55,6 +57,7 @@ const onSave = async () => {
         toast,
         $gettext,
     );
+    props.insertLabel(response);
 };
 </script>
 
