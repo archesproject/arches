@@ -10,6 +10,6 @@ try:
 except Exception as e:
     pass
 
-VERSION = (7, 4, 3, "beta", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
+VERSION = (7, 4, 4, "beta", 0)  # VERSION[3] options = "alpha", "beta", "rc", or "final"
 
 __version__ = get_version(VERSION)
