@@ -121,6 +121,16 @@ parser_start.add_argument(
     type=str,
     default='',)
 
+parser_start.add_argument(
+    '--exclude', '-x',
+    default='.git',  # defaulting to `.git` here so hidden directories such as `.github` will be copied over
+    nargs='?', 
+    help=(
+        'The directory name(s) to exclude, in addition to .git and '
+        '__pycache__. Can be used multiple times.'
+    ),
+)
+
 parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
                     type=int, choices=[0, 1, 2, 3],
                     help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')

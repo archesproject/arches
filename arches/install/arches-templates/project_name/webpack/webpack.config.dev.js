@@ -4,7 +4,6 @@ const Path = require('path');
 const Webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const StylelintPlugin = require('stylelint-webpack-plugin');
-const ESLintPlugin = require('eslint-webpack-plugin');
 
 const commonWebpackConfigPromise = require('./webpack.common.js');
 
@@ -31,11 +30,14 @@ module.exports = () => {
                     },
                     port: commonWebpackConfig.WEBPACK_DEVELOPMENT_SERVER_PORT,
                 },
+                watchOptions: {
+                    ignored: '**/node_modules',
+                },
+                stats: {
+                    modules: false
+                },
                 target: 'web',
                 plugins: [
-                    // new ESLintPlugin({
-                    //     extensions: [`js`, `jsx`],
-                    // }),
                     new Webpack.DefinePlugin({
                         'process.env.NODE_ENV': JSON.stringify('development'),
                     }),
