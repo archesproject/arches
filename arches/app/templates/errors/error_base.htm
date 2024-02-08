@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load static %}
 {% load i18n %}
-{% load compress %}
+{% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 
 <!DOCTYPE html>
@@ -41,14 +41,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="shortcut icon" href="{% webpack_static 'img/favicon.png' %}" />
 
     {% block css %}
-        {% compress css %}
-        <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen">
-    	{% endcompress %}
+        {% render_bundle 'css/arches' 'css' %}
+
         {% if app_settings.ACCESSIBILITY_MODE %}
-        <link href="{% webpack_static 'css/accessibility.css' %}" rel="stylesheet">
+            {% render_bundle 'css/accessibility' 'css' %}
         {% endif %}
-        <link href="{% webpack_static 'css/package.css' %}" rel="stylesheet">
-        <link href="{% webpack_static 'css/project.css' %}" rel="stylesheet">
+
+        {% render_bundle 'css/package' 'css' %}
+        {% render_bundle 'css/project' 'css' %}
     {% endblock css%}
 
 </head>
