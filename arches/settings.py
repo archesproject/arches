@@ -247,6 +247,8 @@ RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = os.path.join(ROOT_DIR)
 
+TEMP_UPLOADS_ROOT = None
+
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
 MEDIA_URL = "/files/"
