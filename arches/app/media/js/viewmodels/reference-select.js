@@ -67,20 +67,19 @@ define([
             placeholder: self.placeholder,
             allowClear: true,
             ajax: {
-                url: arches.urls.controlled_lists,
+                url: arches.urls.controlled_list(ko.unwrap(params.node.config.controlledList)),
                 dataType: 'json',
                 quietMillis: 250,
                 data: function(requestParams) {
                     let term = requestParams.term || '';
                     let page = requestParams.page || 1;
                     return {
-                        conceptid: ko.unwrap(params.node.config.controlledList),
                         query: term,
                         page: page
                     };
                 },
                 processResults: function(data) {
-                    const items = data.controlled_lists.find(list => list.id === params.node.config.controlledList()).items; 
+                    const items = data.items; 
                     const flatItems = self.flattenItems(items, [], []);
                     flatItems.forEach(item => {
                         item["listid"] = item.id;
