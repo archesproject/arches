@@ -26,7 +26,7 @@ import type {
 const lightGray = "#f4f4f4";
 const buttonGreen = "#10b981";
 const toast = useToast();
-const { $gettext } = useGettext();
+const { $gettext, $ngettext } = useGettext();
 
 const props: {
     displayedList: ControlledList;
@@ -140,9 +140,8 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                             :create-item="createItem"
                             :delete-items="deleteItems"
                             :fetch-items="fetchItems"
-                            :item-label="$gettext('item')"
+                            :item-label="$ngettext('item', 'items', items.length)"
                             :items="items"
-                            :items-label="$gettext('items')"
                             :no-search-result-label="
                                 $gettext('No matching items')
                             "
