@@ -1,11 +1,12 @@
 export type Label = {
-    id: string,
+    id: string | null,
     valuetype: string,
     language: string,
     value: string,
 }
 
 export type NewLabel = {
+    id: null,
     valuetype: string,
     language: string,
     value: string,

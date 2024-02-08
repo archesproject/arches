@@ -64,10 +64,11 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
     }
 };
 
-export const createLabel = async (label: NewLabel, toast, $gettext) => {
+export const upsertLabel = async (label: NewLabel, toast, $gettext) => {
     let errorText;
+    const url = label.id ? arches.urls.label(label.id) : arches.urls.label_add;
     try {
-        const response = await fetch(arches.urls.label_add, {
+        const response = await fetch(url, {
             method: "POST",
             headers: {
                 "X-CSRFToken": Cookies.get("csrftoken"),
