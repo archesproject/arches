@@ -13,7 +13,7 @@ def add_plugins(apps, schema_editor):
     Plugin = apps.get_model("models", "Plugin")
 
     Plugin(
-        pluginid="29321ce0-bd95-4357-a2a5-822e9cb06f70",
+        pluginid="60aa3e80-4aea-4042-a76e-5a872b1c36a0",
         name=I18n_String("Controlled List Manager"),
         icon="fa fa-code-fork",
         component="views/components/plugins/controlled-list-manager",
