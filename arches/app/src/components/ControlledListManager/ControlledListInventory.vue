@@ -34,7 +34,7 @@ const props: {
 
 const items: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
-const { $gettext } = useGettext();
+const { $gettext, $ngettext } = useGettext();
 const lightGray = "#f4f4f4";
 
 const fetchLists = async () => {
@@ -130,9 +130,8 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
                     :delete-label-plural="$gettext('Delete Lists')"
                     :displayed-item="props.displayedList"
                     :fetch-items="fetchLists"
-                    :item-label="$gettext('list')"
+                    :item-label="$ngettext('list', 'lists', items.length)"
                     :items="items"
-                    :items-label="$gettext('lists')"
                     :no-search-result-label="$gettext('No matching lists.')"
                     :no-item-label="$gettext('Click &quot;Create New List&quot; to start.')"
                     :set-displayed-item="props.setDisplayedList"

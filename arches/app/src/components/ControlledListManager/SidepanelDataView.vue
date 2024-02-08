@@ -30,7 +30,6 @@ const props: {
     fetchItems: () => Promise<void>;
     items: Items;
     itemLabel: string;
-    itemsLabel: string;
     noItemLabel: string;
     noSearchResultLabel: string;
     setDisplayedItem: (item: Item) => void;
@@ -44,7 +43,6 @@ const props: {
     "fetchItems",
     "items",
     "itemLabel",
-    "itemsLabel",
     "languageMap",
     "noItemLabel",
     "noSearchResultLabel",
@@ -142,7 +140,7 @@ await props.fetchItems();
             style="margin-right: 1rem"
         >
             {{ props.items.length }}
-            {{ props.items.length === 1 ? props.itemLabel : props.itemsLabel }}
+            {{ itemLabel }}
         </span>
     </div>
 
