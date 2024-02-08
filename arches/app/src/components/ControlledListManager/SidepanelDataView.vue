@@ -71,6 +71,18 @@ const filteredItems = computed(() => {
     });
 });
 
+const rowClass = (rowData: Item) => {
+    if (!(rowData as ControlledListItem).depth) {
+        return "";
+    }
+    const item = rowData as ControlledListItem;
+    const depth = `depth-${item.depth}`;
+    if (item.children.length) {
+        return depth;
+    }
+    return `${depth} indented-row`;
+};
+
 const toggleCheckbox = (item: ControlledList | ControlledListItem) => {
     const i = selectedItems.value.indexOf(item);
     if (i === -1) {
@@ -150,6 +162,7 @@ await props.fetchItems();
             >
                 <input
                     type="checkbox"
+                    :class="rowClass(item)"
                     :checked="selectedItems.indexOf(item) > -1"
                     @click="toggleCheckbox(item)"
                 >
@@ -211,6 +224,18 @@ button {
 input[type="checkbox"] {
     margin-top: 0.25rem;
     margin-right: 1rem;
+}
+.depth-1.indented-row {
+    margin-left: 2rem;
+}
+.depth-2.indented-row {
+    margin-left: 4rem;
+}
+.depth-3 > indented-row {
+    margin-left: 6rem;
+}
+.depth-4 > indented-row {
+    margin-left: 8rem;
 }
 .no-items {
     margin: 2rem;
