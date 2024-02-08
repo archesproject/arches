@@ -73,6 +73,15 @@ parser_startproject.add_argument(
     type=str,
     default='',
 )
+parser_startproject.add_argument(
+    '--exclude', '-x',
+    default='.git',  # defaulting to `.git` here so hidden directories such as `.github` will be copied over
+    nargs='?', 
+    help=(
+        'The directory name(s) to exclude, in addition to .git and '
+        '__pycache__. Can be used multiple times.'
+    ),
+)
 
 parser_startapp = subparsers.add_parser(
     'startapp',
@@ -106,6 +115,15 @@ parser_startapp.add_argument(
     help='Specifies which files in the app template (in addition to those matching --extension) should be rendered with the template engine.',
     type=str,
     default='',
+)
+parser_startapp.add_argument(
+    '--exclude', '-x',
+    default='.git',  # defaulting to `.git` here so hidden directories such as `.github` will be copied over
+    nargs='?', 
+    help=(
+        'The directory name(s) to exclude, in addition to .git and '
+        '__pycache__. Can be used multiple times.'
+    ),
 )
 
 class ArchesProjectCommand(TemplateCommand):
