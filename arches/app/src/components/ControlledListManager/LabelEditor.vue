@@ -21,7 +21,7 @@ const props: {
     type: ValueType | "URI";
 } = defineProps(["item", "languageMap", "type"]);
 
-const insertLabel = (label: Label) => {
+const onInsert = (label: Label) => {
     // eslint-disable-next-line vue/no-mutating-props
     props.item.labels.push(label);
 };
@@ -81,16 +81,18 @@ const onDelete = async (label: Label) => {
             class="label-box"
         >
             <LabelRow
-                :label="label"
+                :item
+                :label
+                :language-map
                 :on-delete="() => { onDelete(label) }"
             />
         </div>
         <AddLabel
             v-if="type !== 'URI'"
-            :item="item"
+            :item
             :language-map
             :type="type"
-            :insert-label="insertLabel"
+            :on-insert
         />
     </div>
 </template>

@@ -232,10 +232,9 @@ class ControlledListItemView(View):
 
         try:
             with transaction.atomic():
-                for _item in (
-                    ControlledListItem.objects.filter(pk=item_id)
-                    .select_for_update()
-                ):
+                for _item in ControlledListItem.objects.filter(
+                    pk=item_id
+                ).select_for_update():
                     handle_items([data], list_id=list_id)
                     break
                 else:
@@ -283,6 +282,22 @@ class LabelView(View):
     def post(self, request, **kwargs):
         if not (label_id := kwargs.get("id", None)):
             return self.add_new_label(request)
+
+        # Update label
+        data = JSONDeserializer().deserialize(request.body)
+
+        try:
+            Label.objects.filter(pk=label_id).update(
+                value=data["value"], language_id=data["language"]
+            )
+        except Label.DoesNotExist:
+            return JSONErrorResponse(status=404)
+        except IntegrityError as e:
+            return JSONErrorResponse(message=" ".join(e.args), status=400)
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(serialize(Label.objects.get(pk=label_id)))
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")

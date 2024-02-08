@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import arches from "arches";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -15,8 +16,8 @@ const props: {
     item: ControlledListItem;
     languageMap: LanguageMap;
     type: ValueType;
-    insertLabel: (label: Label) => Promise<Label>;
-} = defineProps(["item", "languageMap", "type", "insertLabel"]);
+    onInsert: (label: Label) => Promise<Label>;
+} = defineProps(["item", "languageMap", "type", "onInsert"]);
 
 const visible = ref(false);
 
@@ -48,8 +49,13 @@ const buttonLabel = computed(() => {
         :item
         :header="buttonLabel"
         :language-map
-        :type
-        :insert-label
+        :label="{
+            id: null,
+            valuetype: props.type,
+            language: arches.activeLanguage,
+            value: '',
+        }"
+        :on-insert
     />
 </template>
 
