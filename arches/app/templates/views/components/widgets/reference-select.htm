@@ -47,7 +47,7 @@
 <dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko foreach: value -->
     <dd data-bind="class: $parent.nodeCssClasses">
-        <a data-bind="attr:{'href': uri}, text: $parent.getPrefLabel(labels), style: {'color': 'steelblue'}"></a>
+        <a data-bind="attr:{'href': uri, 'target': '_blank'}, text: $parent.getPrefLabel(labels), style: {'color': 'steelblue'}"></a>
     </dd>
 <!-- /ko -->
 <!-- ko ifnot: value() -->
