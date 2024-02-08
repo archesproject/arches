@@ -9,25 +9,25 @@ import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { createLabel } from "@/components/ControlledListManager/api.ts";
+import { upsertLabel } from "@/components/ControlledListManager/api.ts";
 
 import type {
     ControlledListItem,
     Label,
     LanguageMap,
-    ValueType,
 } from "@/types/ControlledListManager.d";
 
 const props: {
     item: ControlledListItem;
     header: string;
     languageMap: LanguageMap;
-    type: ValueType;
-    insertLabel: (label: Label) => Promise<Label>;
-} = defineProps(["item", "header", "languageMap", "type", "insertLabel"]);
+    label: Label;
+    // updates don't need an insert callback
+    onInsert: null | ((label: Label) => Promise<Label>);
+} = defineProps(["item", "header", "languageMap", "label", "onInsert"]);
 
-const value = ref("");
-const language = ref(arches.activeLanguage);
+const value = ref(props.label.value);
+const language = ref(props.label.language);
 
 const visible = defineModel<boolean>({ required: true });
 
@@ -51,22 +51,29 @@ const staticItemLabel = $gettext("Item Label");
 const staticLanguageLabel = $gettext("Language");
 
 const onSave = async () => {
-    const newLabel = await createLabel(
+    const upsertedLabel = await upsertLabel(
         {
+            id: props.label.id,
             value: value.value,
             language: language.value,
-            valuetype: props.type,
+            valuetype: props.label.valuetype,
             itemId: props.item.id,
         },
         toast,
         $gettext,
     );
 
-    if (newLabel) {
+    if (upsertedLabel) {
+        if (props.onInsert !== null) {
+            props.onInsert(upsertedLabel);
+            value.value = "";
+        } else {
+            /* eslint-disable vue/no-mutating-props */
+            props.label.language = language.value;
+            props.label.value = value.value;
+            /* eslint-enable vue/no-mutating-props */
+        }
         visible.value = false;
-        value.value = "";
-
-        props.insertLabel(newLabel);
     }
 };
 </script>

@@ -1,12 +1,28 @@
 <script setup lang="ts">
 import arches from "arches";
+import { computed, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
-import type { Label } from "@/types/ControlledListManager.d";
+import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
+
+import type { ControlledListItem, Label, LanguageMap } from "@/types/ControlledListManager.d";
 
 const props: {
+    item: ControlledListItem,
     label: Label,
+    languageMap: LanguageMap,
     onDelete: (labelId: Label) => Promise<void>,
-} = defineProps(["label", "onDelete"]);
+} = defineProps(["item", "label", "languageMap", "onDelete"]);
+
+const visible = ref(false);
+
+const { $gettext } = useGettext();
+const header = computed(() => {
+    return props.label.valuetype === "prefLabel"
+        ? $gettext("Edit Preferred Label")
+        : $gettext("Edit Alternate Label");
+});
+
 </script>
 
 <template>
@@ -17,11 +33,21 @@ const props: {
                 <button @click="props.onDelete(props.label)">
                     {{ arches.translations.delete }}
                 </button>
-                <button>{{ arches.translations.edit }}</button>
+                <button @click="visible = true">
+                    {{ arches.translations.edit }}
+                </button>
             </span>
             <span class="label language">{{ props.label.language }}</span>
         </div>
     </div>
+    <EditLabel
+        v-model="visible"
+        :item
+        :header
+        :language-map
+        :label
+        :on-insert="null"
+    />
 </template>
 
 <style scoped>
