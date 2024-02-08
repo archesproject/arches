@@ -57,6 +57,7 @@ define([
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
         this.previewValue = ko.observable();
+        this.previewLimit = ko.observable();
         this.showPreview = ko.observable(false);
         this.searchUrl = ko.observable();
         this.caseInsensitive = ko.observable();
@@ -204,6 +205,7 @@ define([
                 self.showPreview(true);
                 self.numberOfResources(data.result.number_of_resources);
                 self.numberOfTiles(data.result.number_of_tiles);
+                self.previewLimit(data.result.preview_limit);
             }).fail(function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
