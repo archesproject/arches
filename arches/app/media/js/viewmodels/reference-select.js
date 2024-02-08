@@ -18,7 +18,7 @@ define([
         WidgetViewModel.apply(this, [params]);
 
         this.getPrefLabel = function(labels){
-            return koMapping.toJS(labels)?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel').value;
+            return koMapping.toJS(labels)?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel')?.value;
         }; 
 
         this.flattenItems = function(items, flatList, uniqueItems){
