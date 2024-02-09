@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 'reference-select-widget',
                 'views/components/widgets/reference-select',
                 'reference',
-                '{"i18n_properties": ["placeholder"]}'
+                '{"placeholder": "Select an option", "i18n_properties": ["placeholder"]}'
             );
 
             """,
