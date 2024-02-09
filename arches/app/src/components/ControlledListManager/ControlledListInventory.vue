@@ -47,7 +47,10 @@ const fetchLists = async () => {
             errorText = body.message;
             throw new Error();
         } else {
-            return await response.json();
+            await response.json().then((data) => {
+                props.setLanguageMap(data.languages);
+                items.value = data.controlled_lists;
+            });
         }
     } catch {
         toast.add({
