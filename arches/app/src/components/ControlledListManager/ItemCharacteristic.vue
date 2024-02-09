@@ -24,35 +24,53 @@ const disabled = computed(() => {
     return !props.editable || !editing.value;
 });
 
-const onSave = computed(() => {
-    return Object.hasOwn(props.item, "items")
-        ? postListToServer
-        : postItemToServer;
+const dirtyFormValue = ref("");
+
+const inputValue = computed({
+    get() {
+        return props.item[props.field];
+    },
+    set(newVal: string) {
+        dirtyFormValue.value = newVal;
+    },
 });
 
 const width = computed(() => {
     if (props.field === "uri") {
         return "100%";
     }
-    return Math.max((props.item[props.field] ?? "").length + 2, 4) + "rem";
+    return Math.max((props.item[props.field]).length + 2, 4) + "rem";
 });
 
 const toast = useToast();
 const { $gettext } = useGettext();
+
+const onSave = () => {
+    editing.value = false;
+    // eslint-disable-next-line vue/no-mutating-props
+    props.item[props.field] = dirtyFormValue.value;
+
+    const saveFn = Object.hasOwn(props.item, "items")
+        ? postListToServer
+        : postItemToServer;
+    saveFn(props.item, toast, $gettext);
+};
+const onCancel = () => {
+    editing.value = false;
+    dirtyFormValue.value = props.item[props.field];
+};
 </script>
 
 <template>
     <div class="characteristic">
         <h4>{{ props.label }}</h4>
-        <!-- eslint-disable vue/no-mutating-props -->
         <InputText
-            v-model="props.item[props.field]"
+            v-model="inputValue"
             type="text"
             class="control"
             :disabled="disabled"
             :style="{ width: width }"
         />
-        <!-- eslint-enable vue/no-mutating-props -->
         <span
             v-if="props.editable && !editing"
             class="edit-controls"
@@ -62,11 +80,8 @@ const { $gettext } = useGettext();
                 tabindex="0"
                 class="fa fa-pencil"
                 :aria-label="arches.translations.edit"
-                @click="
-                    () => {
-                        editing = true;
-                    }
-                "
+                @click="editing = true"
+                @keyup.enter="editing = true"
             />
         </span>
         <span
@@ -78,24 +93,16 @@ const { $gettext } = useGettext();
                 tabindex="0"
                 class="fa fa-check"
                 :aria-label="arches.translations.saveEdit"
-                @click="
-                    () => {
-                        editing = false;
-                        onSave(props.item, toast, $gettext);
-                    }
-                "
+                @click="onSave"
+                @keyup.enter="onSave"
             />
             <i
                 role="button"
                 tabindex="0"
                 class="fa fa-times"
                 :aria-label="arches.translations.cancelEdit"
-                @click="
-                    () => {
-                        editing = false;
-                        inputValue = props.item[field];
-                    }
-                "
+                @click="onCancel"
+                @keyup.enter="onCancel"
             />
         </span>
     </div>

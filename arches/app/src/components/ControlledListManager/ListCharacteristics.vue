@@ -35,6 +35,7 @@ const { $gettext } = useGettext();
         <ItemCharacteristic
             :item="props.displayedList"
             :editable="false"
+            field="dynamic"
             :label="$gettext('List used by these nodes')"
         />
     </div>
