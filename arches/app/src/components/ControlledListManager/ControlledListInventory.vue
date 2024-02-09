@@ -38,11 +38,24 @@ const { $gettext, $ngettext } = useGettext();
 const lightGray = "#f4f4f4";
 
 const fetchLists = async () => {
-    const response = await fetch(arches.urls.controlled_lists);
-    await response.json().then((data) => {
-        props.setLanguageMap(data.languages);
-        items.value = data.controlled_lists;
-    });
+    let errorText;
+    try {
+        const response = await fetch(arches.urls.controlled_lists);
+        if (!response.ok) {
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
+            throw new Error();
+        } else {
+            return await response.json();
+        }
+    } catch {
+        toast.add({
+            severity: "error",
+            summary: errorText || $gettext("Unable to fetch lists"),
+            life: 3000,
+        });
+    }
 };
 
 const createList = async () => {

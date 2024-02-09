@@ -38,6 +38,13 @@ export const postItemToServer = async (item: ControlledListItem, toast, $gettext
 
 export const postListToServer = async (list: ControlledList, toast, $gettext) => {
     let errorText;
+
+    // need to delete children, as they might prevent
+    // stringification if circular references exist.
+    const flatList = {
+        ...list,
+        items: list.items.map((item) => { return {...item, children: []}; }),
+    };
     try {
         const response = await fetch(
             arches.urls.controlled_list(list.id),
@@ -46,7 +53,7 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
                 headers: {
                     "X-CSRFToken": Cookies.get("csrftoken"),
                 },
-                body: JSON.stringify(list),
+                body: JSON.stringify(flatList),
             }
         );
         if (!response.ok) {
