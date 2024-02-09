@@ -13,8 +13,8 @@ import type {
     ControlledListItem,
 } from "@/types/ControlledListManager.d";
 
-type Item = ControlledList | ControlledListItem;
-type Items = ControlledList[] | ControlledListItem[];
+type Selectable = ControlledList | ControlledListItem;
+type Selectables = ControlledList[] | ControlledListItem[];
 
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
@@ -23,16 +23,16 @@ const { $gettext } = useGettext();
 const props: {
     addLabel: string;
     createItem: () => Promise<void>;
-    deleteItems: (selectedItems: Items) => Promise<void>;
+    deleteItems: (selectedItems: Selectables) => Promise<void>;
     deleteLabel: string;
     deleteLabelPlural: string;
-    displayedItem: Item;
+    displayedItem: Selectable;
     fetchItems: () => Promise<void>;
-    items: Items;
+    items: Selectables;
     itemLabel: string;
     noItemLabel: string;
     noSearchResultLabel: string;
-    setDisplayedItem: (item: Item) => void;
+    setDisplayed: (item: Selectable) => void;
 } = defineProps([
     "addLabel",
     "createItem",
@@ -46,13 +46,13 @@ const props: {
     "languageMap",
     "noItemLabel",
     "noSearchResultLabel",
-    "setDisplayedItem",
+    "setDisplayed",
 ]);
 
-const selectedItems: Ref<Items> = ref([]);
+const selectedItems: Ref<Selectables> = ref([]);
 const searchValue = ref("");
 
-const bestRepresentation = (item: Item) => {
+const bestRepresentation = (item: Selectable) => {
     if (!item) {
         return $gettext("Unlabeled Item");
     }
@@ -86,7 +86,7 @@ const filteredItems = computed(() => {
     });
 });
 
-const rowClass = (rowData: Item) => {
+const rowClass = (rowData: Selectable) => {
     if (!(rowData as ControlledListItem).depth) {
         return "";
     }
@@ -113,7 +113,7 @@ const clearAll = () => {
     selectedItems.value = [];
 };
 const selectRow = (item: ControlledList | ControlledListItem) => {
-    props.setDisplayedItem(item);
+    props.setDisplayed(item);
 };
 
 await props.fetchItems();

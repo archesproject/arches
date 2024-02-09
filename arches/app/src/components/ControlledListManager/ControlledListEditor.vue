@@ -36,7 +36,7 @@ const props: {
 
 const items: Ref<ControlledListItem[]> = ref([]);
 const displayedItem: Ref<ControlledListItem> = ref(null);
-const setDisplayedItem = (item: ControlledListItem) => {
+const setDisplayed = (item: ControlledListItem) => {
     displayedItem.value = item;
 };
 
@@ -150,7 +150,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                                     'Click &quot;Add New Item&quot; to start.'
                                 )
                             "
-                            :set-displayed-item="setDisplayedItem"
+                            :set-displayed
                         />
                         <template #fallback>
                             <SpinnerIcon />
