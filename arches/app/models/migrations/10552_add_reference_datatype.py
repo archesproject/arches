@@ -50,8 +50,15 @@ class Migration(migrations.Migration):
 
             """,
             reverse_sql="""
+            DELETE FROM cards_x_nodes_x_widgets
+                WHERE nodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference'); 
+            DELETE FROM edges
+                WHERE domainnodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference') 
+                OR rangenodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference');
+            DELETE FROM nodes WHERE datatype = 'reference';
             DELETE FROM widgets WHERE widgetid = '19e56148-82b8-47eb-b66e-f6243639a1a8';
             DELETE FROM d_data_types WHERE datatype = 'reference';
+            DELETE FROM tiles WHERE nodegroupid IN (SELECT nodegroupid FROM nodes WHERE datatype = 'reference');
             """,
         ),
     ]
