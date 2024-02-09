@@ -150,7 +150,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
                     :items="items"
                     :no-search-result-label="$gettext('No matching lists.')"
                     :no-item-label="$gettext('Click &quot;Create New List&quot; to start.')"
-                    :set-displayed-item="setDisplayedList"
+                    :set-displayed="setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />
@@ -164,9 +164,9 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             class="mt-0"
         >
             <ControlledListTable
-                :displayed-list="props.displayedList"
-                :language-map="props.languageMap"
-                :set-editing="props.setEditing"
+                :displayed-list
+                :language-map
+                :set-editing
             />
         </SplitterPanel>
     </Splitter>
