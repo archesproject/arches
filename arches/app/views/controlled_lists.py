@@ -155,9 +155,9 @@ class ControlledListView(View):
             with transaction.atomic():
                 try:
                     clist = qs[0].list
-                except ControlledListItem.DoesNotExist:
+                except (IndexError, ControlledListItem.DoesNotExist):
                     clist = ControlledList.objects.get(pk=list_id)
-                except (IndexError, ControlledList.DoesNotExist):
+                except ControlledList.DoesNotExist:
                     return JSONErrorResponse(status=404)
 
                 clist.dynamic = data["dynamic"]
