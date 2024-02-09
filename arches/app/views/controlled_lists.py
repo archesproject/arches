@@ -17,9 +17,10 @@ from arches.app.models.models import (
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
+from arches.app.utils.string_utils import str_to_bool
 
 
-def serialize(obj, depth_map=None):
+def serialize(obj, depth_map=None, flat=False):
     if depth_map is None:
         depth_map = defaultdict(int)
     match obj:
@@ -29,25 +30,27 @@ def serialize(obj, depth_map=None):
                 "name": obj.name,
                 "dynamic": obj.dynamic,
                 "items": sorted(
-                    [serialize(item, depth_map) for item in obj.items.all()],
+                    [serialize(item, depth_map, flat) for item in obj.items.all()],
                     key=lambda d: d["sortorder"],
                 ),
             }
         case ControlledListItem():
             if obj.parent_id:
                 depth_map[obj.id] = depth_map[obj.parent_id] + 1
-            return {
+            data = {
                 "id": str(obj.id),
                 "uri": obj.uri,
                 "sortorder": obj.sortorder,
                 "labels": [serialize(label, depth_map) for label in obj.labels.all()],
-                "children": sorted(
-                    [serialize(child, depth_map) for child in obj.children.all()],
-                    key=lambda d: d["sortorder"],
-                ),
                 "parent_id": str(obj.parent_id) if obj.parent_id else None,
                 "depth": depth_map[obj.id],
             }
+            if not flat:
+                data["children"] = sorted(
+                    [serialize(child, depth_map, flat) for child in obj.children.all()],
+                    key=lambda d: d["sortorder"],
+                )
+            return data
         case ControlledListItemLabel():
             return {
                 "id": str(obj.id),
@@ -60,13 +63,15 @@ def serialize(obj, depth_map=None):
 
 def prefetch_terms(request):
     """Children at arbitrary depth will still be returned, but tell
-    the ORM to expect a certain number to mitigate N+1 queries."""
+    the ORM to prefetch a certain depth to mitigate N+1 queries after."""
     prefetch_depth = request.GET.get("prefetchDepth", 3)
+    find_children = not str_to_bool(request.GET.get("flat", "false"))
+
     prefetch_terms = []
     for i in range(prefetch_depth):
         if i == 0:
             prefetch_terms.extend(["items", "items__labels"])
-        else:
+        elif find_children:
             prefetch_terms.extend(
                 [f"items{'__children' * i}", f"items{'__children' * i}__labels"]
             )
@@ -114,9 +119,14 @@ def handle_items(itemDicts):
 )
 class ControlledListsView(View):
     def get(self, request):
+        """
+        Returns BOTH a flat representation and a tree representation.
+        This may change before the feature is stable.
+        For the flat representation only, use ?flat=true.
+        """
         data = {
             "controlled_lists": [
-                serialize(obj)
+                serialize(obj, flat=str_to_bool(request.GET.get("flat", None)))
                 for obj in ControlledList.objects.all()
                 .order_by("name")
                 .prefetch_related(*prefetch_terms(request))
@@ -131,6 +141,11 @@ class ControlledListsView(View):
 )
 class ControlledListView(View):
     def get(self, request, **kwargs):
+        """
+        Returns BOTH a flat representation and a tree representation.
+        This may change before the feature is stable.
+        For the flat representation only, use ?flat=true.
+        """
         list_id = kwargs.get("id")
         try:
             lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
@@ -138,7 +153,9 @@ class ControlledListView(View):
             )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=404)
-        return JSONResponse(serialize(lst))
+        return JSONResponse(
+            serialize(lst, flat=str_to_bool(request.GET.get("flat", "false")))
+        )
 
     def post(self, request, **kwargs):
         if not (list_id := kwargs.get("id", None)):
