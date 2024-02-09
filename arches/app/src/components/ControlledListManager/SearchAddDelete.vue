@@ -57,7 +57,7 @@ const clearSearch = () => {
         </span>
         <div
             class="flex"
-            style="flex: 0.8; flex-wrap: wrap"
+            style="flex-wrap: wrap"
         >
             <SplitButton
                 class="button"
@@ -108,7 +108,7 @@ const clearSearch = () => {
     margin-right: 2rem;
 }
 .p-inputtext {
-    flex: 0.95;
+    flex: 1;
     margin: 0.5rem;
 }
 .button {
