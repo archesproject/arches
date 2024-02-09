@@ -24,13 +24,22 @@ const disabled = computed(() => {
     return !props.editable || !editing.value;
 });
 
-const inputValue = ref(props.item[props.field] ?? "");
+const dirtyFormValue = ref("");
+
+const inputValue = computed({
+    get() {
+        return props.item[props.field];
+    },
+    set(newVal: string) {
+        dirtyFormValue.value = newVal;
+    },
+});
 
 const width = computed(() => {
     if (props.field === "uri") {
         return "100%";
     }
-    return Math.max((props.item[props.field] ?? "").length + 2, 4) + "rem";
+    return Math.max((props.item[props.field]).length + 2, 4) + "rem";
 });
 
 const toast = useToast();
@@ -38,7 +47,8 @@ const { $gettext } = useGettext();
 
 const onSave = () => {
     editing.value = false;
-    props.item[props.field] = inputValue.value;
+    // eslint-disable-next-line vue/no-mutating-props
+    props.item[props.field] = dirtyFormValue.value;
 
     const saveFn = Object.hasOwn(props.item, "items")
         ? postListToServer
@@ -47,7 +57,7 @@ const onSave = () => {
 };
 const onCancel = () => {
     editing.value = false;
-    inputValue.value = props.item[props.field];
+    dirtyFormValue.value = props.item[props.field];
 };
 </script>
 
@@ -61,7 +71,6 @@ const onCancel = () => {
             :disabled="disabled"
             :style="{ width: width }"
         />
-        <!-- eslint-enable vue/no-mutating-props -->
         <span
             v-if="props.editable && !editing"
             class="edit-controls"
