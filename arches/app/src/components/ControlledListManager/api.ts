@@ -8,6 +8,8 @@ import type {
     NewLabel,
 } from "@/types/controlledListManager.d";
 
+const DEFAULT_TOAST_LIFE = 5000;
+
 export const postItemToServer = async (item: ControlledListItem, toast, $gettext) => {
     let errorText;
     try {
@@ -31,7 +33,7 @@ export const postItemToServer = async (item: ControlledListItem, toast, $gettext
         toast.add({
             severity: "error",
             summary: errorText || $gettext("Save failed"),
-            life: 3000,
+            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
@@ -66,7 +68,7 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
         toast.add({
             severity: "error",
             summary: errorText || $gettext("Save failed"),
-            life: 3000,
+            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
@@ -94,7 +96,7 @@ export const upsertLabel = async (label: NewLabel, toast, $gettext) => {
         toast.add({
             severity: "error",
             summary: errorText || $gettext("Save failed"),
-            life: 3000,
+            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
@@ -118,7 +120,7 @@ export const deleteLabel = async (label: Label, toast, $gettext) => {
         toast.add({
             severity: "error",
             summary: errorText || $gettext("Deletion failed"),
-            life: 3000,
+            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
