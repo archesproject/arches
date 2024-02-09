@@ -169,7 +169,7 @@ await props.fetchItems();
                     item.name ??
                         item.labels.find((label) => label.valuetype === "prefLabel")
                             ?.value ??
-                        $gettext("Unlabeled item")
+                        $gettext("Unlabeled Item")
                 }}</span>
             </div>
         </template>
