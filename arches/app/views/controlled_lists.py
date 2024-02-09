@@ -68,7 +68,7 @@ def prefetch_terms(request):
     return prefetch_terms
 
 
-def handle_items(itemDicts, list_id):
+def handle_items(itemDicts):
     items_to_save = []
     labels_to_save = []
 
@@ -79,7 +79,7 @@ def handle_items(itemDicts, list_id):
         itemDict.pop("children", None)
         itemDict.pop("depth", None)
 
-        item_to_save = ControlledListItem(list_id=list_id, **itemDict)
+        item_to_save = ControlledListItem(**itemDict)
         item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
 
@@ -163,7 +163,9 @@ class ControlledListView(View):
                 clist.dynamic = data["dynamic"]
                 clist.name = data["name"]
 
-                handle_items(data["items"], list_id=list_id)
+                for item in data["items"]:
+                    item["list_id"] = list_id
+                handle_items(data["items"])
 
                 clist.save()
         except ValidationError as e:
@@ -228,14 +230,13 @@ class ControlledListItemView(View):
 
         # Update list item
         data = JSONDeserializer().deserialize(request.body)
-        list_id = data["list_id"]
 
         try:
             with transaction.atomic():
                 for _item in ControlledListItem.objects.filter(
                     pk=item_id
                 ).select_for_update():
-                    handle_items([data], list_id=list_id)
+                    handle_items([data])
                     break
                 else:
                     JSONErrorResponse(status=404)
