@@ -52,20 +52,37 @@ const props: {
 const selectedItems: Ref<Items> = ref([]);
 const searchValue = ref("");
 
+const bestRepresentation = (item: Item) => {
+    if (!item) {
+        return $gettext("Unlabeled Item");
+    }
+    if (Object.hasOwn(item, "name")) {
+        return (item as ControlledList).name;
+    }
+    const prefLabels = (item as ControlledListItem).labels.filter(
+        (label) => label.valuetype === "prefLabel"
+    );
+    if (!prefLabels.length) {
+        // Shouldn't be possible.
+        return $gettext("Unlabeled Item");
+    }
+    const bestLabel = prefLabels.find(
+        label => label.language === arches.activeLanguage
+    ) ?? prefLabels[0];
+    // but is it better to fall back on altLabels?
+    // consider leveraging python-side rank_label() in response
+    return bestLabel.value;
+};
+
 const filteredItems = computed(() => {
     const loweredTerm = searchValue.value.toLowerCase();
     if (!loweredTerm) {
         return props.items;
     }
     return props.items.filter((item) => {
-        if (Object.hasOwn(item, "name")) {
-            return (item as ControlledList).name
-                .toLowerCase()
-                .includes(loweredTerm);
-        } else {
-            // TODO: implement, see below TODO for factoring out label getter
-            throw new Error();
-        }
+        return bestRepresentation(item)
+            .toLowerCase()
+            .includes(loweredTerm);
     });
 });
 
@@ -105,21 +122,21 @@ await props.fetchItems();
 <template>
     <SearchAddDelete
         v-model="searchValue"
-        :create-item="props.createItem"
-        :add-label="props.addLabel"
+        :create-item
+        :add-label
         :delete-items="
             () => {
-                props.deleteItems(selectedItems);
+                deleteItems(selectedItems);
                 selectedItems.splice(0);
             }
         "
-        :delete-label="props.deleteLabel"
-        :delete-label-plural="props.deleteLabelPlural"
+        :delete-label
+        :delete-label-plural
         :number-to-delete="selectedItems.length"
     />
     <div class="selection-header">
         <span
-            v-if="props.items.length"
+            v-if="items.length"
             style="margin-left: 1rem"
         >
             <button
@@ -136,16 +153,16 @@ await props.fetchItems();
             </button>
         </span>
         <span
-            v-if="props.items.length"
+            v-if="items.length"
             style="margin-right: 1rem"
         >
-            {{ props.items.length }}
+            {{ items.length }}
             {{ itemLabel }}
         </span>
     </div>
 
     <DataView
-        v-if="props.items.length"
+        v-if="items.length"
         :value="filteredItems"
     >
         <template #list="slotProps">
@@ -153,7 +170,7 @@ await props.fetchItems();
                 v-for="(item, index) in slotProps.items"
                 :key="index"
                 class="itemRow"
-                :class="{ selected: props.displayedItem?.id === item.id }"
+                :class="{ selected: displayedItem?.id === item.id }"
                 tabindex="0"
                 @click="selectRow(item)"
                 @keyup.enter="selectRow(item)"
@@ -164,18 +181,12 @@ await props.fetchItems();
                     :checked="selectedItems.indexOf(item) > -1"
                     @click="toggleCheckbox(item)"
                 >
-                <!-- TODO(jtw): factor this out, also get appropriate language -->
-                <span>{{
-                    item.name ??
-                        item.labels.find((label) => label.valuetype === "prefLabel")
-                            ?.value ??
-                        $gettext("Unlabeled Item")
-                }}</span>
+                <span>{{ bestRepresentation(item) }}</span>
             </div>
         </template>
         <template #empty>
             <div>
-                <span class="no-items">{{ props.noSearchResultLabel }}</span>
+                <span class="no-items">{{ noSearchResultLabel }}</span>
             </div>
         </template>
     </DataView>
@@ -184,7 +195,7 @@ await props.fetchItems();
         v-else
         class="no-items"
     >
-        <span>{{ props.noItemLabel }}</span>
+        <span>{{ noItemLabel }}</span>
     </div>
 </template>
 
