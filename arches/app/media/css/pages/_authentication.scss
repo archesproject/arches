@@ -1,4 +1,4 @@
-@import "css/themes/default";
+@import "themes/default";
 
 #container.cls-container.arches-login {
     background: $auth-background;
@@ -34,7 +34,7 @@
 .floating-label-group {
     position: relative;
     display: flex;
-    align-items: start;
+    align-items: flex-start;
 }
 
 .floating-label-input {

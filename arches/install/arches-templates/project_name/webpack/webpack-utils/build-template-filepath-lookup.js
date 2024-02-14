@@ -23,14 +23,14 @@ const buildTemplateFilePathLookup = function(path, outerAcc, templateDirectoryPa
             const parsedPath = Path.parse(subPath);
             const filename = parsedPath['dir'] ? Path.join(parsedPath['dir'], parsedPath['base']) : parsedPath['base'];
 
-            if (filename.includes('.DS_Store')) {
-                return acc;
-            }
-            else {
+            if (filename.includes('.htm') || filename.includes('.html')) {
                 return { 
                     ...acc, 
                     [Path.join('templates', filename).replace(/\\/g, '/')]: Path.resolve(__dirname, Path.join(outerPath, subPath))
                 };
+            }
+            else {
+                return acc;
             }
         }
     }, outerAcc);
