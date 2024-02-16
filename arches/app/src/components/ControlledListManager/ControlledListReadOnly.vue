@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
+import Button from "primevue/button";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
@@ -12,16 +13,21 @@ import ListTree from "@/components/ControlledListManager/ListTree.vue";
 import type { ControlledList } from "@/types/ControlledListManager.d";
 
 const lightGray = "#f4f4f4";
+const buttonGreen = "#10b981";
+const buttonPink = "#ed7979";
+
 const { $gettext } = useGettext();
 const listSummary = $gettext("List Summary");
 const listDetails = $gettext("List Details");
-
+const manageList = $gettext("Manage List");
+const deleteList = $gettext("Delete List");
 const selectAList = $gettext('Select a list from the sidebar.');
 
 const props: {
     displayedList: ControlledList;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "setEditing"]);
+    deleteLists: () => Promise<void>;
+} = defineProps(["displayedList", "setEditing", "deleteLists"]);
 </script>
 
 <template>
@@ -61,6 +67,24 @@ const props: {
         </SplitterPanel>
     </Splitter>
 
+    <div
+        v-if="props.displayedList"
+        :style="{ background: lightGray }"
+    >
+        <Button
+            class="button manage-list"
+            :label="manageList"
+            raised
+            @click="() => setEditing(true)"
+        />
+        <Button
+            class="button delete"
+            :label="deleteList"
+            raised
+            @click="() => { deleteLists([displayedList]) }"
+        />
+    </div>
+
     <ControlledListSplash
         v-else
         :description="selectAList"
@@ -72,7 +96,27 @@ h3 {
     font-size: 1.5rem;
     margin: 1rem;
 }
+.p-splitter {
+    max-height: calc(100% - 135px);
+}
 .p-splitter-panel {
     margin: 1rem;
+}
+.button {
+    font-size: inherit;
+    height: 4rem;
+    margin: 0.5rem;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    text-wrap: nowrap;
+}
+.button.manage-list {
+    background: v-bind(buttonGreen);
+    border: 1px solid v-bind(buttonGreen);
+}
+.button.delete {
+    background: v-bind(buttonPink);
+    border: 1px solid v-bind(buttonPink);
 }
 </style>
