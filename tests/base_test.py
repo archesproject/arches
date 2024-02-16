@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from contextlib import contextmanager
+
 from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
@@ -134,3 +136,20 @@ class ArchesTestCase(TestCase):
 
     def tearDown(self):
         pass
+
+
+@contextmanager
+def sync_overridden_test_settings_to_arches(*args, **kwargs):
+    """Django's @override_settings test util acts on django.conf.settings,
+    which is not enough for us, because we use SystemSettings at runtime.
+
+    This context manager swaps in the overridden django.conf.settings for SystemSettings.
+    """
+    from django.conf import settings as patched_settings
+
+    original_settings_wrapped = settings._wrapped
+    try:
+        settings._wrapped = patched_settings._wrapped
+        yield True
+    finally:
+        settings._wrapped = original_settings_wrapped
