@@ -162,7 +162,7 @@ const deleteItems = async (selectedItems: ControlledListItem[]) => {
                 </SplitterPanel>
 
                 <SplitterPanel
-                    :size="75"
+                    :size="70"
                     :min-size="50"
                     class="item-editor-container"
                 >

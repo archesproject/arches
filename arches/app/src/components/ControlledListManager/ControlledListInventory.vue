@@ -8,7 +8,7 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
-import ControlledListTable from "@/components/ControlledListManager/ControlledListTable.vue";
+import ControlledListReadOnly from "@/components/ControlledListManager/ControlledListReadOnly.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
@@ -170,11 +170,11 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
         </SplitterPanel>
 
         <SplitterPanel
-            :size="75"
+            :size="70"
             :min-size="50"
             class="mt-0"
         >
-            <ControlledListTable
+            <ControlledListReadOnly
                 :displayed-list
                 :set-editing
             />
