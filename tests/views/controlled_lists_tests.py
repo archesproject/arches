@@ -15,6 +15,7 @@ from arches.app.models.models import (
 from arches.app.views.controlled_lists import serialize
 from tests.base_test import ArchesTestCase
 
+
 class ControlledListTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
@@ -131,8 +132,8 @@ class ControlledListTests(ArchesTestCase):
         for item in first_list["items"]:
             self.assertEqual(item["children"], [])
 
-        second_list_first_item = second_list["items"][0]
-        self.assertEqual(second_list_first_item["children"], second_list["items"][1:])
+        self.assertEqual(len(second_list["items"]), 1)
+        self.assertEqual(len(second_list["items"][0]["children"]), 4)
 
     def test_create_list(self):
         self.client.force_login(self.admin)
@@ -163,13 +164,18 @@ class ControlledListTests(ArchesTestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            [item.sortorder for item in ControlledListItem.objects.filter(list=self.list1).order_by("uri")],
-            [1, 0, 2, 3, 4]
+            [
+                item.sortorder
+                for item in ControlledListItem.objects.filter(list=self.list1).order_by(
+                    "uri"
+                )
+            ],
+            [1, 0, 2, 3, 4],
         )
 
     def test_reorder_list_items_invalid_negative(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, depth_map=defaultdict(int))
+        serialized_list = serialize(self.list1, depth_map=defaultdict(int), flat=False)
 
         serialized_list["items"][0]["sortorder"] = -1
         response = self.client.post(
