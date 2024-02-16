@@ -30,7 +30,11 @@ def serialize(obj, depth_map=None, flat=False):
                 "name": obj.name,
                 "dynamic": obj.dynamic,
                 "items": sorted(
-                    [serialize(item, depth_map, flat) for item in obj.items.all()],
+                    [
+                        serialize(item, depth_map, flat)
+                        for item in obj.items.all()
+                        if flat or item.parent_id is None
+                    ],
                     key=lambda d: d["sortorder"],
                 ),
             }
@@ -82,11 +86,14 @@ def handle_items(itemDicts):
     items_to_save = []
     labels_to_save = []
 
-    for itemDict in itemDicts:
+    def handle_item(itemDict):
+        nonlocal items_to_save
+        nonlocal labels_to_save
+
         # Deletion/insertion of list items not yet implemented.
         labels = itemDict.pop("labels")
         # Altering hierarchy is done by altering parents.
-        itemDict.pop("children", None)
+        children = itemDict.pop("children", None)
         itemDict.pop("depth", None)
 
         item_to_save = ControlledListItem(**itemDict)
@@ -100,6 +107,13 @@ def handle_items(itemDicts):
             labels_to_save.append(
                 ControlledListItemLabel(item_id=item_to_save.id, **label)
             )
+
+        # Recurse
+        for child in children:
+            handle_item(child)
+
+    for itemDict in itemDicts:
+        handle_item(itemDict)
 
     # Consider skipping uniqueness checks and just letting IntegrityError
     # bubble up. But doing Django validation provides a localized error.
@@ -119,14 +133,10 @@ def handle_items(itemDicts):
 )
 class ControlledListsView(View):
     def get(self, request):
-        """
-        Returns BOTH a flat representation and a tree representation.
-        This may change before the feature is stable.
-        For the flat representation only, use ?flat=true.
-        """
+        """Returns either a flat representation (?flat=true) or a tree (default)."""
         data = {
             "controlled_lists": [
-                serialize(obj, flat=str_to_bool(request.GET.get("flat", None)))
+                serialize(obj, flat=str_to_bool(request.GET.get("flat", "false")))
                 for obj in ControlledList.objects.all()
                 .order_by("name")
                 .prefetch_related(*prefetch_terms(request))
@@ -141,11 +151,7 @@ class ControlledListsView(View):
 )
 class ControlledListView(View):
     def get(self, request, **kwargs):
-        """
-        Returns BOTH a flat representation and a tree representation.
-        This may change before the feature is stable.
-        For the flat representation only, use ?flat=true.
-        """
+        """Returns either a flat representation (?flat=true) or a tree (default)."""
         list_id = kwargs.get("id")
         try:
             lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
