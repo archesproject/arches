@@ -177,6 +177,7 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
             <ControlledListReadOnly
                 :displayed-list
                 :set-editing
+                :delete-lists
             />
         </SplitterPanel>
     </Splitter>
