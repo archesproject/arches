@@ -83,8 +83,9 @@ define([
                 }
 
                 if (item.uri) {
-                    const text = indentation + self.getPrefLabel(item.labels) || arches.translations.searching + '...';
+                    let text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
                     NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.listid};
+                    text = indentation + text;
                     return text;
                 }
             },
