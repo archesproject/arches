@@ -56,11 +56,9 @@ define([
                 dataType: 'json',
                 quietMillis: 250,
                 data: function(requestParams) {
-                    let term = requestParams.term || '';
-                    let page = requestParams.page || 1;
+
                     return {
-                        query: term,
-                        page: page
+                        flat: true
                     };
                 },
                 processResults: function(data) {
