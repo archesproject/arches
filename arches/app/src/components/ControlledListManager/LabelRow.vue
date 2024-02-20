@@ -18,11 +18,15 @@ const visible = ref(false);
 
 const { $gettext } = useGettext();
 const header = computed(() => {
-    return props.label.valuetype === "prefLabel"
-        ? $gettext("Edit Preferred Label")
-        : $gettext("Edit Alternate Label");
+    switch (props.label.valuetype) {
+        case "prefLabel":
+            return $gettext("Edit Preferred Label");
+        case "altLabel":
+            return $gettext("Edit Alternate Label");
+        default:
+            throw new Error();
+    }
 });
-
 </script>
 
 <template>
