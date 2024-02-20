@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import type { ControlledList } from "@/types/ControlledListManager.d";
+import type { ControlledList } from "@/types/ControlledListManager";
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere

@@ -13,7 +13,7 @@ import type {
     Label,
     LanguageMap,
     ValueType,
-} from "@/types/ControlledListManager.d";
+} from "@/types/ControlledListManager";
 
 const props: {
     item: ControlledListItem;

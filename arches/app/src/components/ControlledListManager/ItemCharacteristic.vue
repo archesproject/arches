@@ -10,7 +10,7 @@ import {
     postItemToServer,
     postListToServer,
 } from "@/components/ControlledListManager/api.ts";
-import type { Item } from "@/types/ControlledListManager.d";
+import type { Item } from "@/types/ControlledListManager";
 
 const props: {
     item: Item;
