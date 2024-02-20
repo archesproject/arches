@@ -10,15 +10,15 @@ const buttonPink = "#ed7979";
 
 const props: {
     addLabel: string;
-    createItem: () => Promise<void>;
-    deleteItems: () => Promise<void>;
+    createAction: () => Promise<void>;
+    deleteAction: () => Promise<void>;
     deleteLabel: string;
     deleteLabelPlural: string;
     numberToDelete: number;
 } = defineProps([
     "addLabel",
-    "createItem",
-    "deleteItems",
+    "createAction",
+    "deleteAction",
     "deleteLabel",
     "deleteLabelPlural",
     "numberToDelete",
@@ -82,7 +82,7 @@ const clearSearch = () => {
                         },
                     },
                 }"
-                @click="props.createItem"
+                @click="props.createAction"
             />
             <!-- We might want an are you sure? modal -->
             <Button
@@ -90,7 +90,7 @@ const clearSearch = () => {
                 :label="props.numberToDelete > 1 ? props.deleteLabelPlural : props.deleteLabel"
                 raised
                 :disabled="props.numberToDelete === 0"
-                @click="props.deleteItems"
+                @click="props.deleteAction"
             />
         </div>
     </div>
