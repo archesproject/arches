@@ -50,9 +50,8 @@ const onSave = () => {
     // eslint-disable-next-line vue/no-mutating-props
     props.item[props.field] = dirtyFormValue.value;
 
-    const saveFn = Object.hasOwn(props.item, "items")
-        ? postListToServer
-        : postItemToServer;
+    const isList = Object.hasOwn(props.item, "items");
+    const saveFn = isList ? postListToServer : postItemToServer;
     saveFn(props.item, toast, $gettext);
 };
 const onCancel = () => {
