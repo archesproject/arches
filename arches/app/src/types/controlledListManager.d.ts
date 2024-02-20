@@ -1,8 +1,9 @@
 export type Label = {
-    id: string | null,
+    id: string,
     valuetype: string,
     language: string,
     value: string,
+    item_id: string,
 }
 
 export type NewLabel = {
@@ -10,7 +11,7 @@ export type NewLabel = {
     valuetype: string,
     language: string,
     value: string,
-    itemId: string,
+    item_id: string,
 }
 
 export type ValueType = "prefLabel" | "altLabel";

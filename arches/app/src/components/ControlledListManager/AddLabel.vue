@@ -9,6 +9,7 @@ import type {
     ControlledListItem,
     Label,
     LanguageMap,
+    NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
 
@@ -23,6 +24,16 @@ const visible = ref(false);
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
+
+const newLabel: NewLabel = computed(() => {
+    return {
+        id: null,
+        valuetype: props.type,
+        language: arches.activeLanguage,
+        value: '',
+        item_id: props.item.id,
+    };
+});
 
 const buttonLabel = computed(() => {
     switch (props.type) {
@@ -51,15 +62,9 @@ const buttonLabel = computed(() => {
     </button>
     <EditLabel
         v-model="visible"
-        :item
         :header="buttonLabel"
         :language-map
-        :label="{
-            id: null,
-            valuetype: props.type,
-            language: arches.activeLanguage,
-            value: '',
-        }"
+        :label="newLabel"
         :on-insert
     />
 </template>

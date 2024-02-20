@@ -81,7 +81,6 @@ const onDelete = async (label: Label) => {
             class="label-box"
         >
             <LabelRow
-                :item
                 :label
                 :language-map
                 :on-delete="() => { onDelete(label) }"

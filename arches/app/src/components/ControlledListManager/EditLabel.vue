@@ -12,19 +12,18 @@ import { useToast } from "primevue/usetoast";
 import { upsertLabel } from "@/components/ControlledListManager/api.ts";
 
 import type {
-    ControlledListItem,
     Label,
     LanguageMap,
+    NewLabel,
 } from "@/types/ControlledListManager";
 
 const props: {
-    item: ControlledListItem;
     header: string;
+    label: Label | NewLabel;
     languageMap: LanguageMap;
-    label: Label;
     // updates don't need an insert callback
     onInsert: null | ((label: Label) => Promise<Label>);
-} = defineProps(["item", "header", "languageMap", "label", "onInsert"]);
+} = defineProps(["header", "label", "languageMap", "onInsert"]);
 
 const value = ref(props.label.value);
 const language = ref(props.label.language);
@@ -51,20 +50,20 @@ const staticItemLabel = $gettext("Item Label");
 const staticLanguageLabel = $gettext("Language");
 
 const onSave = async () => {
-    const upsertedLabel = await upsertLabel(
+    const upsertedLabel: Label = await upsertLabel(
         {
             id: props.label.id,
             value: value.value,
             language: language.value,
             valuetype: props.label.valuetype,
-            itemId: props.item.id,
+            item_id: props.label.item_id,
         },
         toast,
         $gettext,
     );
 
     if (upsertedLabel) {
-        if (props.onInsert !== null) {
+        if (props.onInsert) {
             props.onInsert(upsertedLabel);
             value.value = "";
         } else {
@@ -126,7 +125,7 @@ const onSave = async () => {
             <Button
                 type="button"
                 :label="arches.translations.cancelEdit"
-                @click="visible = false"
+                @click="visible = false; value = props.label.value"
             />
         </div>
     </Dialog>
