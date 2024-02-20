@@ -25,9 +25,14 @@ const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const buttonLabel = computed(() => {
-    return props.type === "prefLabel"
-        ? $gettext("Add Preferred Label")
-        : $gettext("Add Alternate Label");
+    switch (props.type) {
+        case "prefLabel":
+            return $gettext("Add Preferred Label");
+        case "altLabel":
+            return $gettext("Add Alternate Label");
+        default:
+            throw new Error();
+    }
 });
 </script>
 
