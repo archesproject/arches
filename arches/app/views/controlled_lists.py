@@ -8,8 +8,12 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, gettext as _
 
-
-from arches.app.models.models import ControlledList, ControlledListItem, Label, Language
+from arches.app.models.models import (
+    ControlledList,
+    ControlledListItem,
+    ControlledListItemLabel,
+    Language,
+)
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
@@ -44,7 +48,7 @@ def serialize(obj, depth_map=None):
                 "parent_id": str(obj.parent_id) if obj.parent_id else None,
                 "depth": depth_map[obj.id],
             }
-        case Label():
+        case ControlledListItemLabel():
             return {
                 "id": str(obj.id),
                 "valuetype": obj.value_type_id,
@@ -86,7 +90,9 @@ def handle_items(itemDicts):
         for label in labels:
             label["language_id"] = label.pop("language")
             label["value_type_id"] = label.pop("valuetype")
-            labels_to_save.append(Label(item_id=item_to_save.id, **label))
+            labels_to_save.append(
+                ControlledListItemLabel(item_id=item_to_save.id, **label)
+            )
 
     # Consider skipping uniqueness checks and just letting IntegrityError
     # bubble up. But doing Django validation provides a localized error.
@@ -96,7 +102,7 @@ def handle_items(itemDicts):
     ControlledListItem.objects.bulk_update(
         items_to_save, fields=["uri", "sortorder", "parent"]
     )
-    Label.objects.bulk_update(
+    ControlledListItemLabel.objects.bulk_update(
         labels_to_save, fields=["value", "value_type", "language"]
     )
 
@@ -212,7 +218,7 @@ class ControlledListItemView(View):
                     parent_id=data.get("parent_id", None),
                 )
                 item.save()
-                label = Label(
+                label = ControlledListItemLabel(
                     item=item,
                     value=_("New Label: ") + datetime.now().isoformat(),
                     value_type_id="prefLabel",
@@ -263,7 +269,7 @@ class LabelView(View):
     def add_new_label(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
-        label = Label(
+        label = ControlledListItemLabel(
             item_id=data["itemId"],
             value_type_id=data["valuetype"],
             language=Language.objects.get(code=data["language"]),
@@ -288,21 +294,21 @@ class LabelView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            Label.objects.filter(pk=label_id).update(
+            ControlledListItemLabel.objects.filter(pk=label_id).update(
                 value=data["value"], language_id=data["language"]
             )
-        except Label.DoesNotExist:
+        except ControlledListItemLabel.DoesNotExist:
             return JSONErrorResponse(status=404)
         except IntegrityError as e:
             return JSONErrorResponse(message=" ".join(e.args), status=400)
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(Label.objects.get(pk=label_id)))
+        return JSONResponse(serialize(ControlledListItemLabel.objects.get(pk=label_id)))
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")
-        objs_deleted, _ = Label.objects.filter(pk=label_id).delete()
+        objs_deleted, _ = ControlledListItemLabel.objects.filter(pk=label_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
