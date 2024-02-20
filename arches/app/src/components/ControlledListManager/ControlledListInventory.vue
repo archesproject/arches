@@ -13,22 +13,15 @@ import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataV
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
 import type { Ref } from "vue";
-import type {
-    ControlledList,
-    LanguageMap,
-} from "@/types/ControlledListManager";
+import type {  ControlledList } from "@/types/ControlledListManager";
 
 const props: {
     displayedList: ControlledList | null;
-    languageMap: LanguageMap | null;
     setDisplayedList: (list: ControlledList | null) => void;
-    setLanguageMap: (map: LanguageMap) => void;
     setEditing: (val: boolean) => void;
 } = defineProps([
     "displayedList",
-    "languageMap",
     "setDisplayedList",
-    "setLanguageMap",
     "setEditing",
 ]);
 
@@ -49,7 +42,6 @@ const fetchLists = async () => {
             throw new Error();
         } else {
             await response.json().then((data) => {
-                props.setLanguageMap(data.languages);
                 items.value = data.controlled_lists;
             });
         }
@@ -166,7 +158,6 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
         >
             <ControlledListTable
                 :displayed-list
-                :language-map
                 :set-editing
             />
         </SplitterPanel>

@@ -121,7 +121,6 @@ class ControlledListsView(View):
                 .order_by("name")
                 .prefetch_related(*prefetch_terms(request))
             ],
-            "languages": {lang.code: lang.name for lang in Language.objects.all()},
         }
 
         return JSONResponse(data)

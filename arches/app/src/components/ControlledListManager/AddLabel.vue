@@ -8,17 +8,15 @@ import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 import type {
     ControlledListItem,
     Label,
-    LanguageMap,
     NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
 
 const props: {
     item: ControlledListItem;
-    languageMap: LanguageMap;
     type: ValueType;
     onInsert: (label: Label) => Promise<Label>;
-} = defineProps(["item", "languageMap", "type", "onInsert"]);
+} = defineProps(["item", "type", "onInsert"]);
 
 const visible = ref(false);
 
@@ -63,7 +61,6 @@ const buttonLabel = computed(() => {
     <EditLabel
         v-model="visible"
         :header="buttonLabel"
-        :language-map
         :label="newLabel"
         :on-insert
     />
