@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 
-import type { ControlledListItem, Label, LanguageMap } from "@/types/ControlledListManager.d";
+import type { ControlledListItem, Label, LanguageMap } from "@/types/ControlledListManager";
 
 const props: {
     item: ControlledListItem,

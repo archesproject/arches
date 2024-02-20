@@ -3,7 +3,7 @@ import { useGettext } from "vue3-gettext";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 
-import type { ControlledList } from "@/types/ControlledListManager.d";
+import type { ControlledList } from "@/types/ControlledListManager";
 
 const props: {
     displayedList: ControlledList;

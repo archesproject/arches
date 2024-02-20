@@ -4,7 +4,7 @@ import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 
 import type {
     ControlledListItem, LanguageMap,
-} from "@/types/ControlledListManager.d";
+} from "@/types/ControlledListManager";
 
 const props: {
     item: ControlledListItem;

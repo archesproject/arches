@@ -16,7 +16,7 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     LanguageMap,
-} from "@/types/ControlledListManager.d";
+} from "@/types/ControlledListManager";
 
 const props: {
     displayedList: ControlledList | null;
