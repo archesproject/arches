@@ -23,6 +23,7 @@ import type {
     LanguageMap,
 } from "@/types/ControlledListManager.d";
 
+const ERROR = "error";
 const lightGray = "#f4f4f4";
 const buttonGreen = "#10b981";
 const toast = useToast();
@@ -66,7 +67,7 @@ const createItem = async () => {
         }
     } catch {
         toast.add({
-            severity: "error",
+            severity: ERROR,
             summary: $gettext("Item creation failed."),
             life: 3000,
         });
@@ -93,7 +94,7 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
         }
     } catch {
         toast.add({
-            severity: "error",
+            severity: ERROR,
             summary: $gettext("One or more items failed to delete."),
             life: 3000,
         });
