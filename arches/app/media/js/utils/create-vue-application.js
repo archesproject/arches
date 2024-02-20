@@ -1,4 +1,6 @@
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
@@ -32,6 +34,8 @@ export default async function createVueApp(vueComponent){
         const app = createApp(vueComponent);
         app.use(PrimeVue);
         app.use(gettext);
+        app.use(ToastService);
+        app.directive('tooltip', Tooltip);
 
         return app;
     });
