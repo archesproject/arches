@@ -36,6 +36,3 @@ const props: {
         :style="{ display: 'flex', alignItems: 'center', width: '80%' }"
     />
 </template>
-
-<style scoped>
-</style>
