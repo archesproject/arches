@@ -91,6 +91,7 @@ def handle_items(itemDicts):
         for label in labels:
             label["language_id"] = label.pop("language")
             label["value_type_id"] = label.pop("valuetype")
+            label.pop("item_id")  # trust the item, not the label
             labels_to_save.append(
                 ControlledListItemLabel(item_id=item_to_save.id, **label)
             )
