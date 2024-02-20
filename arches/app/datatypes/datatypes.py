@@ -2616,3 +2616,22 @@ class ReferenceDataType(BaseDataType):
             }
         }
         return mapping
+
+    def validate_node(self, node):
+        valid = False
+        message = ""
+        title = ""
+        try:
+            uuid.UUID(node.config["controlledList"])
+            valid = True
+        except TypeError:
+            message = _("A reference datatype node must be configured with a controlled list")
+            title = _("Invalid Node Configuration")
+            logger.error(message)
+
+        except Exception as e:
+            message = _("Ensure your node is propertly configured for the reference datatype")
+            title = _("Invalid Node Configuration")
+            logger.error(message)
+
+        return {"success": valid, "message": message, "title": title}
