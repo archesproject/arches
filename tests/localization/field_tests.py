@@ -1,4 +1,7 @@
 import json
+import unittest
+
+from arches.app.models.models import DDataType
 from arches.app.models.fields.i18n import I18n_String, I18n_TextField, I18n_JSON, I18n_JSONField
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
@@ -6,7 +9,7 @@ from django.utils import translation
 from django.db import connection
 
 # these tests can be run from the command line via
-# python manage.py test tests/localization/field_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.localization.field_tests --settings="tests.test_settings"
 
 
 class Customi18nTextFieldTests(ArchesTestCase):
@@ -371,3 +374,45 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         m.save()
         m = self.LocalizationTestJsonModel.objects.get(pk=3)
         self.assertEqual(m.config.raw_value, expected_output_json)
+
+
+class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
+    def test_bulk_update_node_config_homogenous_value(self):
+        new_config = I18n_JSON({
+            "en": "some",
+            "zh": "json",
+        })
+        for_bulk_update = []
+        for dt in DDataType.objects.all()[:3]:
+            dt.defaultconfig = new_config
+            for_bulk_update.append(dt)
+
+        DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+
+        for i, obj in enumerate(for_bulk_update):
+            with self.subTest(obj_index=i):
+                obj.refresh_from_db()
+                self.assertEqual(str(obj.defaultconfig), str(new_config))
+
+    @unittest.skip("https://github.com/archesproject/arches/issues/10619")
+    def test_bulk_update_heterogenous_values(self):
+        new_configs = [
+            I18n_JSON({
+                "en": "some",
+                "zh": "json",
+            }),
+            I18n_JSON({}),
+            None,
+        ]
+        for_bulk_update = []
+        for i, dt in enumerate(DDataType.objects.all()[:3]):
+            dt.defaultconfig = new_configs[i]
+            for_bulk_update.append(dt)
+
+        DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+
+        for i, obj in enumerate(for_bulk_update):
+            new_config_as_string = str(new_configs[i])
+            with self.subTest(new_config=new_config_as_string):
+                obj.refresh_from_db()
+                self.assertEqual(str(obj.defaultconfig), new_config_as_string)
