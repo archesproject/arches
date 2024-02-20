@@ -21,7 +21,7 @@ import type {
     ControlledList,
     ControlledListItem,
     LanguageMap,
-} from "@/types/ControlledListManager.d";
+} from "@/types/ControlledListManager";
 
 const ERROR = "error";
 const lightGray = "#f4f4f4";

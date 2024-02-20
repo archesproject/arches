@@ -11,7 +11,7 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-} from "@/types/ControlledListManager.d";
+} from "@/types/ControlledListManager";
 
 type Selectable = ControlledList | ControlledListItem;
 type Selectables = ControlledList[] | ControlledListItem[];

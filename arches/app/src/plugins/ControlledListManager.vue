@@ -7,7 +7,7 @@ import ControlledListInventory from "@/components/ControlledListManager/Controll
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
 import type { Ref } from "vue";
-import type { ControlledList, LanguageMap } from "@/types/ControlledListManager.d";
+import type { ControlledList, LanguageMap } from "@/types/ControlledListManager";
 
 const displayedList: Ref<ControlledList | null> = ref(null);
 const setDisplayedList = (list: ControlledList | null) => {
