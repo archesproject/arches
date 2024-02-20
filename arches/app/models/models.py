@@ -1932,7 +1932,7 @@ class ControlledListItem(models.Model):
             raise ValidationError(_("At least one preferred label is required."))
 
 
-class Label(models.Model):
+class ControlledListItemLabel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     item = models.ForeignKey(
         ControlledListItem,
@@ -1952,7 +1952,7 @@ class Label(models.Model):
     value = models.CharField(max_length=1024, null=False)
 
     class Meta:
-        db_table = "controlled_list_labels"
+        db_table = "controlled_list_item_labels"
         constraints = [
             models.UniqueConstraint(
                 fields=["item", "value", "value_type", "language"],

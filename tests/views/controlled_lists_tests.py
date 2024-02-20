@@ -8,8 +8,8 @@ from django.test.client import Client
 from arches.app.models.models import (
     ControlledList,
     ControlledListItem,
+    ControlledListItemLabel,
     DValueType,
-    Label,
     Language,
 )
 from arches.app.views.controlled_lists import serialize
@@ -62,9 +62,9 @@ class ControlledListTests(ArchesTestCase):
             child.save()
 
         # Create a prefLabel and altLabel per item. (20)
-        Label.objects.bulk_create(
+        ControlledListItemLabel.objects.bulk_create(
             [
-                Label(
+                ControlledListItemLabel(
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     value_type=cls.pref_label,
@@ -73,7 +73,7 @@ class ControlledListTests(ArchesTestCase):
                 for num in range(5)
             ]
             + [
-                Label(
+                ControlledListItemLabel(
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     value_type=cls.alt_label,
@@ -82,7 +82,7 @@ class ControlledListTests(ArchesTestCase):
                 for num in range(5)
             ]
             + [
-                Label(
+                ControlledListItemLabel(
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     value_type=cls.pref_label,
@@ -91,7 +91,7 @@ class ControlledListTests(ArchesTestCase):
                 for num in range(5)
             ]
             + [
-                Label(
+                ControlledListItemLabel(
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     value_type=cls.alt_label,
