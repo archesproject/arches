@@ -10,12 +10,12 @@ import {
     postItemToServer,
     postListToServer,
 } from "@/components/ControlledListManager/api.ts";
-import type { Item } from "@/types/ControlledListManager";
+import type { ControlledList, Selectable } from "@/types/ControlledListManager";
 
 const props: {
-    item: Item;
+    item: Selectable;
     editable: boolean;
-    field: "name" | "uri";
+    field: "name" | "dynamic" | "uri";
     label: string;
 } = defineProps(["item", "editable", "field", "label"]);
 
@@ -28,7 +28,7 @@ const dirtyFormValue = ref("");
 
 const inputValue = computed({
     get() {
-        return props.item[props.field];
+        return (props.item as any)[props.field];
     },
     set(newVal: string) {
         dirtyFormValue.value = newVal;
@@ -39,7 +39,7 @@ const width = computed(() => {
     if (props.field === "uri") {
         return "100%";
     }
-    return Math.max((props.item[props.field]).length + 2, 4) + "rem";
+    return '12rem'; // todo: change in next iteration
 });
 
 const toast = useToast();
@@ -48,7 +48,7 @@ const { $gettext } = useGettext();
 const onSave = () => {
     editing.value = false;
     // eslint-disable-next-line vue/no-mutating-props
-    props.item[props.field] = dirtyFormValue.value;
+    (props.item as any)[props.field] = dirtyFormValue.value;
 
     const isList = Object.hasOwn(props.item, "items");
     const saveFn = isList ? postListToServer : postItemToServer;
@@ -56,7 +56,7 @@ const onSave = () => {
 };
 const onCancel = () => {
     editing.value = false;
-    dirtyFormValue.value = props.item[props.field];
+    dirtyFormValue.value = (props.item as any)[props.field];
 };
 </script>
 

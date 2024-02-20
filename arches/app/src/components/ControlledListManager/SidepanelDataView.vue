@@ -11,10 +11,9 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
+    Selectable,
+    Selectables,
 } from "@/types/ControlledListManager";
-
-type Selectable = ControlledList | ControlledListItem;
-type Selectables = ControlledList[] | ControlledListItem[];
 
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
@@ -22,33 +21,33 @@ const { $gettext } = useGettext();
 
 const props: {
     addLabel: string;
-    createItem: () => Promise<void>;
-    deleteItems: (selectedItems: Selectables) => Promise<void>;
+    createAction: () => Promise<void>;
+    countLabel: string;
+    deleteAction: (selected: Selectables) => Promise<void>;
     deleteLabel: string;
     deleteLabelPlural: string;
-    displayedItem: Selectable;
-    fetchItems: () => Promise<void>;
-    items: Selectables;
-    itemLabel: string;
-    noItemLabel: string;
+    fetchAction: () => Promise<void>;
     noSearchResultLabel: string;
-    setDisplayed: (item: Selectable) => void;
+    noSelectionLabel: string;
+    selectables: Selectables;
+    selection: Selectable | null;
+    setSelection: (selectable: Selectable) => void;
 } = defineProps([
     "addLabel",
-    "createItem",
-    "deleteItems",
+    "createAction",
+    "countLabel",
+    "deleteAction",
     "deleteLabel",
     "deleteLabelPlural",
-    "displayedItem",
-    "fetchItems",
-    "items",
-    "itemLabel",
-    "noItemLabel",
+    "fetchAction",
     "noSearchResultLabel",
-    "setDisplayed",
+    "noSelectionLabel",
+    "selectables",
+    "selection",
+    "setSelection",
 ]);
 
-const selectedItems: Ref<Selectables> = ref([]);
+const selected: Ref<Selectables> = ref([]);
 const searchValue = ref("");
 
 const bestRepresentation = (item: Selectable) => {
@@ -73,13 +72,13 @@ const bestRepresentation = (item: Selectable) => {
     return bestLabel.value;
 };
 
-const filteredItems = computed(() => {
+const filteredSelectables = computed(() => {
     const loweredTerm = searchValue.value.toLowerCase();
     if (!loweredTerm) {
-        return props.items;
+        return props.selectables;
     }
-    return props.items.filter((item) => {
-        return bestRepresentation(item)
+    return props.selectables.filter((selectable) => {
+        return bestRepresentation(selectable)
             .toLowerCase()
             .includes(loweredTerm);
     });
@@ -97,49 +96,49 @@ const rowClass = (rowData: Selectable) => {
     return `${depth} indented-row`;
 };
 
-const toggleCheckbox = (item: ControlledList | ControlledListItem) => {
-    const i = selectedItems.value.indexOf(item);
+const toggleCheckbox = (selectable: ControlledList | ControlledListItem) => {
+    const i = selected.value.indexOf(selectable);
     if (i === -1) {
-        selectedItems.value.push(item);
+        selected.value.push(selectable);
     } else {
-        selectedItems.value.splice(i, 1);
+        selected.value.splice(i, 1);
     }
 };
 const selectAll = () => {
-    selectedItems.value = props.items;
+    selected.value = props.selectables;
 };
 const clearAll = () => {
-    selectedItems.value = [];
+    selected.value = [];
 };
-const selectRow = (item: ControlledList | ControlledListItem) => {
-    props.setDisplayed(item);
+const selectRow = (selected: ControlledList | ControlledListItem) => {
+    props.setSelection(selected);
 };
 
-await props.fetchItems();
+await props.fetchAction();
 </script>
 
 <template>
     <SearchAddDelete
         v-model="searchValue"
-        :create-item
+        :create-action
         :add-label
-        :delete-items="
+        :delete-action="
             () => {
-                deleteItems(selectedItems);
-                selectedItems.splice(0);
+                deleteAction(selected);
+                selected.splice(0);
             }
         "
         :delete-label
         :delete-label-plural
-        :number-to-delete="selectedItems.length"
+        :number-to-delete="selected.length"
     />
     <div class="selection-header">
         <span
-            v-if="items.length"
+            v-if="selectables.length"
             style="margin-left: 1rem"
         >
             <button
-                v-if="selectedItems.length"
+                v-if="selected.length"
                 @click="clearAll"
             >
                 {{ arches.translations.clearAll }}
@@ -152,49 +151,49 @@ await props.fetchItems();
             </button>
         </span>
         <span
-            v-if="items.length"
+            v-if="selectables.length"
             style="margin-right: 1rem"
         >
-            {{ items.length }}
-            {{ itemLabel }}
+            {{ selectables.length }}
+            {{ countLabel }}
         </span>
     </div>
 
     <DataView
-        v-if="items.length"
-        :value="filteredItems"
+        v-if="selectables.length"
+        :value="filteredSelectables"
     >
         <template #list="slotProps">
             <div
-                v-for="(item, index) in slotProps.items"
+                v-for="(selectable, index) in slotProps.items"
                 :key="index"
                 class="itemRow"
-                :class="{ selected: displayedItem?.id === item.id }"
+                :class="{ selected: selection?.id === selectable.id }"
                 tabindex="0"
-                @click="selectRow(item)"
-                @keyup.enter="selectRow(item)"
+                @click="selectRow(selectable)"
+                @keyup.enter="selectRow(selectable)"
             >
                 <input
                     type="checkbox"
-                    :class="rowClass(item)"
-                    :checked="selectedItems.indexOf(item) > -1"
-                    @click="toggleCheckbox(item)"
+                    :class="rowClass(selectable)"
+                    :checked="selected.indexOf(selectable) > -1"
+                    @click="toggleCheckbox(selectable)"
                 >
-                <span>{{ bestRepresentation(item) }}</span>
+                <span>{{ bestRepresentation(selectable) }}</span>
             </div>
         </template>
         <template #empty>
             <div>
-                <span class="no-items">{{ noSearchResultLabel }}</span>
+                <span class="no-selections">{{ noSearchResultLabel }}</span>
             </div>
         </template>
     </DataView>
 
     <div
         v-else
-        class="no-items"
+        class="no-selections"
     >
-        <span>{{ noItemLabel }}</span>
+        <span>{{ noSelectionLabel }}</span>
     </div>
 </template>
 
@@ -245,7 +244,7 @@ input[type="checkbox"] {
 .depth-4 > indented-row {
     margin-left: 8rem;
 }
-.no-items {
+.no-selections {
     margin: 2rem;
     display: flex;
     justify-content: center;

@@ -25,7 +25,7 @@ const props: {
     "setEditing",
 ]);
 
-const items: Ref<ControlledList[]> = ref([]);
+const lists: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
 const { $gettext, $ngettext } = useGettext();
 const lightGray = "#f4f4f4";
@@ -42,7 +42,7 @@ const fetchLists = async () => {
             throw new Error();
         } else {
             await response.json().then((data) => {
-                items.value = data.controlled_lists;
+                lists.value = data.controlled_lists;
             });
         }
     } catch {
@@ -64,7 +64,7 @@ const createList = async () => {
         });
         if (response.ok) {
             const newItem = await response.json();
-            items.value.unshift(newItem);
+            lists.value.unshift(newItem);
         } else {
             throw new Error();
         }
@@ -77,11 +77,11 @@ const createList = async () => {
     }
 };
 
-const deleteLists = async (selectedItems: ControlledList[]) => {
-    if (!selectedItems.length) {
+const deleteLists = async (selectedLists: ControlledList[]) => {
+    if (!selectedLists.length) {
         return;
     }
-    const promises = selectedItems.map((list) =>
+    const promises = selectedLists.map((list) =>
         fetch(arches.urls.controlled_list(list.id), {
             method: "DELETE",
             headers: {
@@ -91,7 +91,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
     );
 
     const shouldResetDisplay = (
-        props.displayedList && selectedItems.includes(props.displayedList)
+        props.displayedList && selectedLists.includes(props.displayedList)
     );
 
     try {
@@ -133,17 +133,17 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
             <Suspense>
                 <SidepanelDataView
                     :add-label="$gettext('Create New List')"
-                    :create-item="createList"
-                    :delete-items="deleteLists"
+                    :create-action="createList"
+                    :count-label="$ngettext('list', 'lists', lists.length)"
+                    :delete-action="deleteLists"
                     :delete-label="$gettext('Delete List')"
                     :delete-label-plural="$gettext('Delete Lists')"
-                    :displayed-item="displayedList"
-                    :fetch-items="fetchLists"
-                    :item-label="$ngettext('list', 'lists', items.length)"
-                    :items="items"
+                    :fetch-action="fetchLists"
                     :no-search-result-label="$gettext('No matching lists.')"
-                    :no-item-label="$gettext('Click &quot;Create New List&quot; to start.')"
-                    :set-displayed="setDisplayedList"
+                    :no-selection-label="$gettext('Click &quot;Create New List&quot; to start.')"
+                    :selectables="lists"
+                    :selection="displayedList"
+                    :set-selection="setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />

@@ -32,3 +32,6 @@ export type ControlledList = {
     dynamic: boolean,
     items: ControlledListItem[],
 };
+
+export type Selectable = ControlledList | ControlledListItem;
+export type Selectables = ControlledList[] | ControlledListItem[];

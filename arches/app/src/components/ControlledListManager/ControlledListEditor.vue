@@ -35,7 +35,7 @@ const props: {
 
 const items: Ref<ControlledListItem[]> = ref([]);
 const displayedItem: Ref<ControlledListItem> = ref(null);
-const setDisplayed = (item: ControlledListItem) => {
+const setDisplayedItem = (item: ControlledListItem) => {
     displayedItem.value = item;
 };
 
@@ -72,7 +72,7 @@ const createItem = async () => {
     }
 };
 
-const deleteItems = async (selectedItems: ControlledList[]) => {
+const deleteItems = async (selectedItems: ControlledListItem[]) => {
     if (!selectedItems.length) {
         return;
     }
@@ -133,23 +133,23 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     <Suspense>
                         <SidepanelDataView
                             :add-label="$gettext('Add New Item')"
+                            :create-action="createItem"
+                            :count-label="$ngettext('item', 'items', items.length)"
+                            :delete-action="deleteItems"
                             :delete-label="$gettext('Delete Item')"
                             :delete-label-plural="$gettext('Delete Items')"
-                            :displayed-item="displayedItem"
-                            :create-item="createItem"
-                            :delete-items="deleteItems"
-                            :fetch-items="fetchItems"
-                            :item-label="$ngettext('item', 'items', items.length)"
-                            :items="items"
+                            :fetch-action="fetchItems"
                             :no-search-result-label="
-                                $gettext('No matching items')
+                                $gettext('No matching items.')
                             "
-                            :no-item-label="
+                            :no-selection-label="
                                 $gettext(
                                     'Click &quot;Add New Item&quot; to start.'
                                 )
                             "
-                            :set-displayed
+                            :selectables="items"
+                            :selection="displayedItem"
+                            :set-selection="setDisplayedItem"
                         />
                         <template #fallback>
                             <SpinnerIcon />
