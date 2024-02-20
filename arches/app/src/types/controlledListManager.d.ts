@@ -32,7 +32,3 @@ export type ControlledList = {
     dynamic: boolean,
     items: ControlledListItem[],
 };
-
-export type LanguageMap = {
-    readonly [index: string]: string;
-};

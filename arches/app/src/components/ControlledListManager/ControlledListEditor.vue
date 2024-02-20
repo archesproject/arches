@@ -20,7 +20,6 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-    LanguageMap,
 } from "@/types/ControlledListManager";
 
 const ERROR = "error";
@@ -31,9 +30,8 @@ const { $gettext, $ngettext } = useGettext();
 
 const props: {
     displayedList: ControlledList;
-    languageMap: LanguageMap;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "languageMap", "setEditing"]);
+} = defineProps(["displayedList", "setEditing"]);
 
 const items: Ref<ControlledListItem[]> = ref([]);
 const displayedItem: Ref<ControlledListItem> = ref(null);
@@ -167,7 +165,6 @@ const deleteItems = async (selectedItems: ControlledList[]) => {
                     <ItemEditor
                         v-if="displayedItem"
                         :item="displayedItem"
-                        :language-map="languageMap"
                     />
                     <ControlledListSplash
                         v-else

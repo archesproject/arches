@@ -2,30 +2,22 @@
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 
-import type {
-    ControlledListItem, LanguageMap,
-} from "@/types/ControlledListManager";
+import type { ControlledListItem } from "@/types/ControlledListManager";
 
-const props: {
-    item: ControlledListItem;
-    languageMap: LanguageMap;
-} = defineProps(["item", "languageMap"]);
+const props: { item: ControlledListItem } = defineProps(["item"]);
 </script>
 
 <template>
     <LabelEditor
         :item="props.item"
-        :language-map
         type="prefLabel"
     />
     <LabelEditor
         :item="props.item"
-        :language-map
         type="altLabel"
     />
     <LabelEditor
         :item="props.item"
-        :language-map
         type="URI"
         :style="{ marginBottom: 0 }"
     />

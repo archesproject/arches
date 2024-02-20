@@ -108,7 +108,7 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(response.status_code, 403)
 
         self.client.force_login(self.admin)
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(8):
             # 1: session
             # 2: auth
             # 3: SELECT FROM controlled_lists
@@ -118,7 +118,6 @@ class ControlledListTests(ArchesTestCase):
             # 7: prefetch children: labels
             # 8: prefetch grandchildren: items
             # there are no grandchildren, so no labels to get
-            # 9: languages
             response = self.client.get(
                 reverse("controlled_lists"), kwargs={"prefetchDepth": 3}
             )
@@ -134,9 +133,6 @@ class ControlledListTests(ArchesTestCase):
 
         second_list_first_item = second_list["items"][0]
         self.assertEqual(second_list_first_item["children"], second_list["items"][1:])
-
-        languages = result["languages"]
-        self.assertEqual(languages["de"], "German")
 
     def test_create_list(self):
         self.client.force_login(self.admin)

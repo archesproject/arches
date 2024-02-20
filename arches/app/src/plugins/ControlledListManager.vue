@@ -7,16 +7,11 @@ import ControlledListInventory from "@/components/ControlledListManager/Controll
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
 import type { Ref } from "vue";
-import type { ControlledList, LanguageMap } from "@/types/ControlledListManager";
+import type { ControlledList } from "@/types/ControlledListManager";
 
 const displayedList: Ref<ControlledList | null> = ref(null);
 const setDisplayedList = (list: ControlledList | null) => {
     displayedList.value = list;
-};
-
-const languageMap: Ref<LanguageMap | null> = ref(null);
-const setLanguageMap = (map: LanguageMap) => {
-    languageMap.value = map;
 };
 
 const editing = ref(false);
@@ -39,8 +34,6 @@ const displayedWorkspace = computed(() => {
         :is="displayedWorkspace"
         :displayed-list="displayedList"
         :set-displayed-list="setDisplayedList"
-        :language-map="languageMap"
-        :set-language-map="setLanguageMap"
         :set-editing="setEditing"
     />
     <Toast />

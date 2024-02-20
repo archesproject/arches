@@ -16,10 +16,10 @@ import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
 
 import type { Ref } from "vue";
+import type { Language } from "@/types/arches";
 import type {
     ControlledList,
     ControlledListItem,
-    LanguageMap,
 } from "@/types/ControlledListManager";
 
 const buttonGreen = "#10b981";
@@ -28,11 +28,12 @@ const { $gettext } = useGettext();
 
 const props: {
     displayedList: ControlledList;
-    languageMap: LanguageMap;
     setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "languageMap", "setEditing"]);
+} = defineProps(["displayedList", "setEditing"]);
 
-const selectedLanguage: Ref<string> = ref(arches.activeLanguage);
+const selectedLanguage: Ref<Language> = ref(
+    (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
+);
 const expandedRows = ref({});
 
 const rowClass = (rowData: ControlledListItem) => {
@@ -44,19 +45,14 @@ const rowClass = (rowData: ControlledListItem) => {
 };
 
 const languageDropdownItems = computed(() => {
-    if (!props.languageMap) {
-        return [];
-    }
-    return (
-        Object.entries(props.languageMap).map(([code, label]) => {
-            return {
-                label,
-                command: () => {
-                    selectedLanguage.value = code;
-                },
-            };
-        })
-    );
+    return (arches.languages as Language[]).map((lang) => {
+        return {
+            label: lang.name,
+            command: () => {
+                selectedLanguage.value = lang;
+            },
+        };
+    });
 });
 
 const onRowExpand = (row) => {
@@ -162,7 +158,7 @@ const itemsForLanguage = computed(() => {
                 ...item.labels
                     .filter(
                         (label) =>
-                            label.language === selectedLanguage.value &&
+                            label.language === selectedLanguage.value.code &&
                             label.valuetype === "prefLabel"
                     )
                     .map((label) => label.value),
@@ -171,7 +167,7 @@ const itemsForLanguage = computed(() => {
                 ...item.labels
                     .filter(
                         (label) =>
-                            label.language === selectedLanguage.value &&
+                            label.language === selectedLanguage.value.code &&
                             label.valuetype === "altLabel"
                     )
                     .map((label) => label.value),
@@ -206,7 +202,7 @@ const itemsForLanguage = computed(() => {
                 <div class="controls">
                     <SplitButton
                         class="button language-selector"
-                        :label="`Language - ${languageMap?.[selectedLanguage]}`"
+                        :label="`Language - ${selectedLanguage.name}`"
                         :model="languageDropdownItems"
                         raised
                         :pt="{
