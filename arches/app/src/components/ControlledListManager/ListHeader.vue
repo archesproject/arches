@@ -8,7 +8,7 @@ const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const props: {
-    displayedList: ControlledList;
+    displayedList: ControlledList | null;
     isItemEditor: boolean;
 } = defineProps([
     "displayedList",
@@ -16,10 +16,21 @@ const props: {
 ]);
 
 const heading = computed(() => {
-    const prefix = props.isItemEditor ? $gettext("List Item Editor") : $gettext("List Editor");
-    return (
-        prefix + (props.displayedList ? " > " + props.displayedList.name : "")
-    );
+    if (props.isItemEditor) {
+        return $gettext(
+            "List Item Editor > %{itemName}",
+            { itemName: props.displayedList!.name },
+        );
+    } else {
+        if (props.displayedList) {
+            return $gettext(
+                "List Editor > %{listName}",
+                { listName: props.displayedList.name},
+            );
+        } else {
+            return $gettext("List Editor");
+        }
+    }
 });
 </script>
 
