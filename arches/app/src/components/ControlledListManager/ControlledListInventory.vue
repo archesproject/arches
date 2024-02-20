@@ -36,6 +36,7 @@ const items: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
 const { $gettext, $ngettext } = useGettext();
 const lightGray = "#f4f4f4";
+const ERROR = "error";
 
 const fetchLists = async () => {
     let errorText;
@@ -54,7 +55,7 @@ const fetchLists = async () => {
         }
     } catch {
         toast.add({
-            severity: "error",
+            severity: ERROR,
             summary: errorText || $gettext("Unable to fetch lists"),
             life: 3000,
         });
@@ -77,7 +78,7 @@ const createList = async () => {
         }
     } catch {
         toast.add({
-            severity: "error",
+            severity: ERROR,
             summary: $gettext("List creation failed"),
             life: 3000,
         });
@@ -113,7 +114,7 @@ const deleteLists = async (selectedItems: ControlledList[]) => {
         }
     } catch {
         toast.add({
-            severity: "error",
+            severity: ERROR,
             summary: $gettext("One or more lists failed to delete."),
             life: 3000,
         });
