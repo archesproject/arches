@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -13,36 +13,20 @@ import { upsertLabel } from "@/components/ControlledListManager/api.ts";
 
 import type {
     Label,
-    LanguageMap,
     NewLabel,
 } from "@/types/ControlledListManager";
 
 const props: {
     header: string;
     label: Label | NewLabel;
-    languageMap: LanguageMap;
     // updates don't need an insert callback
     onInsert: null | ((label: Label) => Promise<Label>);
-} = defineProps(["header", "label", "languageMap", "onInsert"]);
+} = defineProps(["header", "label", "onInsert"]);
 
 const value = ref(props.label.value);
 const language = ref(props.label.language);
 
 const visible = defineModel<boolean>({ required: true });
-
-const languageOptions = computed(() => {
-    if (!props.languageMap) {
-        return [];
-    }
-    return (
-        Object.entries(props.languageMap).map(([code, label]) => {
-            return {
-                label,
-                code,
-            };
-        })
-    );
-});
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -106,8 +90,8 @@ const onSave = async () => {
             <Dropdown
                 v-model="language"
                 aria-labelledby="language-label"
-                :options="languageOptions"
-                option-label="label"
+                :options="arches.languages"
+                option-label="name"
                 option-value="code"
                 :pt="{
                     input: { style: { fontSize: 'small' } },

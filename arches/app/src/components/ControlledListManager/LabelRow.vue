@@ -5,13 +5,12 @@ import { useGettext } from "vue3-gettext";
 
 import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 
-import type { Label, LanguageMap } from "@/types/ControlledListManager";
+import type { Label } from "@/types/ControlledListManager";
 
 const props: {
     label: Label,
-    languageMap: LanguageMap,
     onDelete: (labelId: Label) => Promise<void>,
-} = defineProps(["label", "languageMap", "onDelete"]);
+} = defineProps(["label", "onDelete"]);
 
 const visible = ref(false);
 
@@ -46,7 +45,6 @@ const header = computed(() => {
     <EditLabel
         v-model="visible"
         :header
-        :language-map
         :label
         :on-insert="null"
     />

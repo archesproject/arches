@@ -43,7 +43,6 @@ const props: {
     "fetchItems",
     "items",
     "itemLabel",
-    "languageMap",
     "noItemLabel",
     "noSearchResultLabel",
     "setDisplayed",
