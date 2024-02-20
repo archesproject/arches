@@ -54,6 +54,7 @@ def serialize(obj, depth_map=None):
                 "valuetype": obj.value_type_id,
                 "language": obj.language_id,
                 "value": obj.value,
+                "item_id": obj.item_id,
             }
 
 
@@ -90,6 +91,7 @@ def handle_items(itemDicts):
         for label in labels:
             label["language_id"] = label.pop("language")
             label["value_type_id"] = label.pop("valuetype")
+            label.pop("item_id")  # trust the item, not the label
             labels_to_save.append(
                 ControlledListItemLabel(item_id=item_to_save.id, **label)
             )
@@ -270,7 +272,7 @@ class LabelView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         label = ControlledListItemLabel(
-            item_id=data["itemId"],
+            item_id=data["item_id"],
             value_type_id=data["valuetype"],
             language=Language.objects.get(code=data["language"]),
             value=data["value"],
