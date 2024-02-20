@@ -5,7 +5,6 @@ from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
-from django.db.models.expressions import BaseExpression
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
@@ -249,8 +248,6 @@ class I18n_JSON(NothingNode):
             ret = value.raw_value
         elif isinstance(value, dict):
             ret = value
-        elif isinstance(value, BaseExpression):
-            raise NotImplementedError("Bulk updates are not supported for I18n_JSON fields.")
         self.raw_value = ret
 
         if "i18n_properties" in self.raw_value:
