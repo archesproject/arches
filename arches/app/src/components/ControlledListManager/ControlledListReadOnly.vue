@@ -10,7 +10,7 @@ import ListCharacteristics from "@/components/ControlledListManager/ListCharacte
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
 
-import type { ControlledList } from "@/types/ControlledListManager.d";
+import type { ControlledList } from "@/types/ControlledListManager";
 
 const lightGray = "#f4f4f4";
 const buttonGreen = "#10b981";
