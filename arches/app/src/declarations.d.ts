@@ -54,6 +54,7 @@ declare module "moment-timezone";
 declare module "nouislider";
 declare module "numeral";
 declare module "primevue";
+declare module "primevue/*";
 declare module "proj4";
 declare module "regenerator-runtime";
 declare module "requirejs";
