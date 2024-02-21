@@ -10,7 +10,11 @@ import {
     postItemToServer,
     postListToServer,
 } from "@/components/ControlledListManager/api.ts";
-import type { ControlledList, Selectable } from "@/types/ControlledListManager";
+import type {
+    ControlledList,
+    ControlledListItem,
+    Selectable,
+} from "@/types/ControlledListManager";
 
 const props: {
     item: Selectable;
@@ -28,7 +32,11 @@ const dirtyFormValue = ref("");
 
 const inputValue = computed({
     get() {
-        return (props.item as any)[props.field];
+        if (props.field === "uri") {
+            return (props.item as ControlledListItem)[props.field];
+        } else {
+            return (props.item as ControlledList)[props.field];
+        }
     },
     set(newVal: string) {
         dirtyFormValue.value = newVal;
@@ -47,8 +55,16 @@ const { $gettext } = useGettext();
 
 const onSave = () => {
     editing.value = false;
-    // eslint-disable-next-line vue/no-mutating-props
-    (props.item as any)[props.field] = dirtyFormValue.value;
+
+    const field = props.field;
+    if (field === "uri") {
+        // eslint-disable-next-line vue/no-mutating-props
+        (props.item as ControlledListItem)[field] = dirtyFormValue.value;
+    }
+    if (field === 'name') {
+        // eslint-disable-next-line vue/no-mutating-props
+        (props.item as ControlledList)[field] = dirtyFormValue.value;
+    }
 
     const isList = Object.hasOwn(props.item, "items");
     const saveFn = isList ? postListToServer : postItemToServer;
@@ -56,7 +72,15 @@ const onSave = () => {
 };
 const onCancel = () => {
     editing.value = false;
-    dirtyFormValue.value = (props.item as any)[props.field];
+
+    let originalValue;
+    if (props.field === "uri") {
+        originalValue = (props.item as ControlledListItem)[props.field];
+    } else {
+        originalValue = (props.item as ControlledList)[props.field];
+    }
+
+    dirtyFormValue.value = originalValue;
 };
 </script>
 
