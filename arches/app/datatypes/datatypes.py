@@ -819,7 +819,7 @@ class EDTFDataType(BaseDataType):
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
-        if not value.get('op'):
+        if not value.get("op"):
             pass
         elif value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
@@ -2571,7 +2571,7 @@ class ReferenceDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         title = _("Invalid Reference Datatype Value")
-        if value:
+        if value != None:
             if type(value) == list and len(value):
                 for reference in value:
                     if "uri" in reference and len(reference["uri"]):
@@ -2613,7 +2613,7 @@ class ReferenceDataType(BaseDataType):
     def transform_value_for_tile(self, value, **kwargs):
         ret = value
         return ret
-    
+
     def clean(self, tile, nodeid):
         super().clean(tile, nodeid)
         if tile.data[nodeid] == []:
