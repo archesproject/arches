@@ -23,9 +23,9 @@ const props: {
     addLabel: string;
     createAction: () => Promise<void>;
     countLabel: string;
-    deleteAction: (selected: Selectables) => Promise<void>;
-    deleteLabel: string;
-    deleteLabelPlural: string;
+    delAction: (selected: Selectables) => Promise<void>;
+    delLabel: string;
+    delLabelPlural: string;
     fetchAction: () => Promise<void>;
     noSearchResultLabel: string;
     noSelectionLabel: string;
@@ -36,9 +36,9 @@ const props: {
     "addLabel",
     "createAction",
     "countLabel",
-    "deleteAction",
-    "deleteLabel",
-    "deleteLabelPlural",
+    "delAction",
+    "delLabel",
+    "delLabelPlural",
     "fetchAction",
     "noSearchResultLabel",
     "noSelectionLabel",
@@ -122,14 +122,14 @@ await props.fetchAction();
         v-model="searchValue"
         :create-action
         :add-label
-        :delete-action="
+        :del-action="
             () => {
-                deleteAction(selected);
+                delAction(selected);
                 selected.splice(0);
             }
         "
-        :delete-label
-        :delete-label-plural
+        :del-label
+        :del-label-plural
         :number-to-delete="selected.length"
     />
     <div class="selection-header">
