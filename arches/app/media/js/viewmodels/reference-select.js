@@ -84,7 +84,6 @@ define([
                 processResults: function(data) {
                     const items = data.items; 
                     items.forEach(item => {
-                        delete item.children;
                         item["listid"] = item.id;
                         item.id = item.uri;
                     });
