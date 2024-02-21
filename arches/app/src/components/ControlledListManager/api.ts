@@ -6,7 +6,7 @@ import type {
     ControlledListItem,
     Label,
     NewLabel,
-} from "@/types/controlledListManager";
+} from "@/types/ControlledListManager";
 
 const DEFAULT_TOAST_LIFE = 5000;
 const ERROR = "error";
