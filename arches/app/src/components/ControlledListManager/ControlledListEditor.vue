@@ -135,9 +135,9 @@ const deleteItems = async (selectedItems: ControlledListItem[]) => {
                             :add-label="$gettext('Add New Item')"
                             :create-action="createItem"
                             :count-label="$ngettext('item', 'items', items.length)"
-                            :delete-action="deleteItems"
-                            :delete-label="$gettext('Delete Item')"
-                            :delete-label-plural="$gettext('Delete Items')"
+                            :del-action="deleteItems"
+                            :del-label="$gettext('Delete Item')"
+                            :del-label-plural="$gettext('Delete Items')"
                             :fetch-action="fetchItems"
                             :no-search-result-label="
                                 $gettext('No matching items.')
