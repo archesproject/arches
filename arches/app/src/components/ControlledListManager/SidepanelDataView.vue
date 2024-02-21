@@ -11,10 +11,9 @@ import type { Ref } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
+    Selectable,
+    Selectables,
 } from "@/types/ControlledListManager";
-
-type Selectable = ControlledList | ControlledListItem;
-type Selectables = ControlledList[] | ControlledListItem[];
 
 const lightGray = "#f4f4f4";
 const slateBlue = "#2d3c4b";
