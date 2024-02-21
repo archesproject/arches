@@ -41,6 +41,8 @@ define([
                     };
                 });
                 self.value(tileReady);
+            } else {
+                self.value(null);
             }
         });
 
