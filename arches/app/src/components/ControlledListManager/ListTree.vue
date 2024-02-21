@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import arches from "arches";
 import { computed, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
+import Button from "primevue/button";
+import Dropdown from "primevue/dropdown";
 import Tree from "primevue/tree";
 
 import type { Ref } from "vue";
-import type { TreeContext, TreeNode } from "primevue/tree/TreeNode";
+import type { TreeContext, TreeExpandedKeys, TreeNode } from "primevue/tree/Tree";
 
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
     ControlledListItem
-} from "@/types/ControlledListManager.d";
+} from "@/types/ControlledListManager";
 
 const props: {
     displayedList: ControlledList;
@@ -22,6 +25,8 @@ const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
 );
 const selectedKey: Ref<string | null> = ref(null);
+const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
+const { $gettext } = useGettext();
 
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
@@ -38,7 +43,7 @@ const bestLabel = (item: ControlledListItem) => {
     return bestLabel;
 };
 
-function asNode(item: ControlledListItem): TreeNode {
+function asNode(item: ControlledListItem): typeof TreeNode {
     return {
         key: item.id,
         label: bestLabel(item).value,
@@ -47,15 +52,74 @@ function asNode(item: ControlledListItem): TreeNode {
     };
 }
 
-const value = computed(() => {
+const controlledListItemsTree = computed(() => {
     return props.displayedList.items.map(item => asNode(item));
 });
+
+const itemClass = (id: string) => {
+    if (id === selectedKey.value) {
+        return "selected";
+    }
+    return "";
+};
+
+const expandAll = () => {
+    for (const node of controlledListItemsTree.value) {
+        expandNode(node);
+    }
+
+    expandedKeys.value = { ...expandedKeys.value };
+};
+
+const collapseAll = () => {
+    expandedKeys.value = {};
+};
+
+const expandNode = (node: typeof TreeNode) => {
+    if (node.children && node.children.length) {
+        expandedKeys.value[node.key] = true;
+
+        for (const child of node.children) {
+            expandNode(child);
+        }
+    }
+};
 </script>
 
 <template>
+    <div class="controls">
+        <Button
+            class="control"
+            type="button"
+            icon="fa fa-plus"
+            :label="$gettext('Expand')"
+            @click="expandAll"
+        />
+        <Button
+            class="control"
+            type="button"
+            icon="fa fa-minus"
+            :label="$gettext('Collapse')"
+            @click="collapseAll"
+        />
+        <Dropdown
+            v-model="selectedLanguage"
+            :options="arches.languages"
+            option-label="name"
+            :placeholder="$gettext('Language')"
+            checkmark
+            :highlight-on-select="false"
+            :pt="{
+                root: { class: 'control' },
+                input: { style: { fontSize: 'small' } },
+                itemLabel: { style: { fontSize: 'small' } },
+            }"
+        />
+    </div>
     <Tree
         v-model:selectionKeys="selectedKey"
-        :value
+        :value="controlledListItemsTree"
+        :expanded-keys
         :filter="true"
         filter-mode="lenient"
         selection-mode="single"
@@ -81,7 +145,7 @@ const value = computed(() => {
                         :href="slotProps.node.data.uri"
                         target="_blank"
                         rel="noopener noreferrer"
-                        :class="selectedKey && slotProps.node.data.id in selectedKey ? 'selected' : ''"
+                        :class="itemClass(slotProps.node.data.id)"
                     >{{ slotProps.node.data.uri }}</a>)
                 </span>
             </span>
@@ -92,5 +156,17 @@ const value = computed(() => {
 <style scoped>
 a {
     color: var(--blue-500);
+}
+.controls {
+    display: flex;
+    background: #f3fbfd;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+.control {
+    flex: 0.33;
+    border: 0;
+    background: lightgray;
+    font-size: small;
 }
 </style>
