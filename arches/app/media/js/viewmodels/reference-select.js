@@ -30,19 +30,37 @@ define([
             return val ? name : null;
         });
 
-        this.selectionValue.subscribe(val => {
-            if (val) {
-                if (!(val instanceof Array)) { val = [val]; }
-                const tileReady = val.map(uri => {
-                    return {
-                        "uri": uri,
-                        "listid": NAME_LOOKUP[uri]["listid"],
-                        "labels": NAME_LOOKUP[uri].labels
-                    };
-                });
-                self.value(tileReady);
+        this.valueAndSelectionDiffer = function(value, selection) {
+            if (!(ko.unwrap(value) instanceof Array)) {
+                return true;
+            }
+            const valueUris = ko.unwrap(value).map(val=>ko.unwrap(val.uri));
+            return (JSON.stringify(selection) != JSON.stringify(valueUris))
+        };
+
+        this.selectionValue.subscribe(selection => {
+            if (selection) {
+                if (!(selection instanceof Array)) { selection = [selection]; }
+                if (self.valueAndSelectionDiffer(self.value, selection)) {
+                    const tileReady = selection.map(uri => {
+                        return {
+                            "uri": uri,
+                            "listid": NAME_LOOKUP[uri]["listid"],
+                            "labels": NAME_LOOKUP[uri].labels
+                        };
+                    });
+                    self.value(tileReady);
+                }
             } else {
                 self.value(null);
+            }
+        });
+
+        this.value.subscribe(val => {
+            if (val && self.valueAndSelectionDiffer(val, self.selectionValue)) {
+                self.selectionValue(val.map(item=>ko.unwrap(item.uri)));
+            } else {
+                self.selectionValue(null);
             }
         });
 
