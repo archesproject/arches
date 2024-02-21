@@ -116,7 +116,7 @@ class ReferenceDataTypeTests(ArchesTestCase):
                 [{}], # reference has no 'uri'
                 [{"uri":""}], # reference uri is empty
             ]:
-            with self.subTest(whatever_label_you_want_in_the_output=value):
+            with self.subTest(reference=value):
                 errors = reference.validate(value="")
                 self.assertIsNotNone(errors)
 
