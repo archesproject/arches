@@ -1,6 +1,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
+import Toast from "primevue/toast";
 import type {
     ControlledList,
     ControlledListItem,
@@ -10,8 +11,11 @@ import type {
 
 const DEFAULT_TOAST_LIFE = 5000;
 const ERROR = "error";
+type GetText = (s: string) => string;
 
-export const postItemToServer = async (item: ControlledListItem, toast, $gettext) => {
+export const postItemToServer = async (
+    item: ControlledListItem, toast: typeof Toast, $gettext: GetText
+) => {
     let errorText;
     try {
         const response = await fetch(
@@ -39,7 +43,9 @@ export const postItemToServer = async (item: ControlledListItem, toast, $gettext
     }
 };
 
-export const postListToServer = async (list: ControlledList, toast, $gettext) => {
+export const postListToServer = async (
+    list: ControlledList, toast: typeof Toast, $gettext: GetText
+) => {
     let errorText;
 
     // need to delete children, as they might prevent
@@ -74,7 +80,9 @@ export const postListToServer = async (list: ControlledList, toast, $gettext) =>
     }
 };
 
-export const upsertLabel = async (label: NewLabel, toast, $gettext) => {
+export const upsertLabel = async (
+    label: NewLabel, toast: typeof Toast, $gettext: GetText
+) => {
     let errorText;
     const url = label.id ? arches.urls.label(label.id) : arches.urls.label_add;
     try {
@@ -102,7 +110,9 @@ export const upsertLabel = async (label: NewLabel, toast, $gettext) => {
     }
 };
 
-export const deleteLabel = async (label: Label, toast, $gettext) => {
+export const deleteLabel = async (
+    label: Label, toast: typeof Toast, $gettext: GetText
+) => {
     let errorText;
     try {
         const response = await fetch(arches.urls.label(label.id), {
