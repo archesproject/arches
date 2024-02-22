@@ -1,9 +1,12 @@
 from collections import defaultdict
 from datetime import datetime
 
+from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Max
+from django.db.models import Max, OuterRef, UUIDField
+from django.db.models.fields.json import KT
+from django.db.models.functions import Cast
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, gettext as _
@@ -13,6 +16,7 @@ from arches.app.models.models import (
     ControlledListItem,
     ControlledListItemLabel,
     Language,
+    Node,
 )
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
@@ -20,12 +24,12 @@ from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
 
-def serialize(obj, depth_map=None, flat=False):
+def serialize(obj, depth_map=None, flat=False, nodes=False):
     if depth_map is None:
         depth_map = defaultdict(int)
     match obj:
         case ControlledList():
-            return {
+            data = {
                 "id": str(obj.id),
                 "name": obj.name,
                 "dynamic": obj.dynamic,
@@ -38,6 +42,9 @@ def serialize(obj, depth_map=None, flat=False):
                     key=lambda d: d["sortorder"],
                 ),
             }
+            if nodes:
+                data["nodes"] = [str(uid) for uid in obj.node_ids]
+            return data
         case ControlledListItem():
             if obj.parent_id:
                 depth_map[obj.id] = depth_map[obj.parent_id] + 1
@@ -134,12 +141,27 @@ def handle_items(itemDicts):
 class ControlledListsView(View):
     def get(self, request):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
+        lists = (
+            ControlledList.objects.all()
+            .annotate(
+                node_ids=ArraySubquery(
+                    Node.objects.annotate(
+                        as_uuid=Cast(
+                            KT("config__controlledList"), output_field=UUIDField()
+                        )
+                    )
+                    .filter(as_uuid=OuterRef("id"))
+                    .values("pk")
+                )
+            )
+            # check node perms?
+            .order_by("name")
+            .prefetch_related(*prefetch_terms(request))
+        )
         data = {
             "controlled_lists": [
-                serialize(obj, flat=str_to_bool(request.GET.get("flat", "false")))
-                for obj in ControlledList.objects.all()
-                .order_by("name")
-                .prefetch_related(*prefetch_terms(request))
+                serialize(obj, nodes=True, flat=str_to_bool(request.GET.get("flat", "false")))
+                for obj in lists
             ],
         }
 

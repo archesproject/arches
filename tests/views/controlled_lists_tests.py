@@ -11,6 +11,8 @@ from arches.app.models.models import (
     ControlledListItemLabel,
     DValueType,
     Language,
+    Node,
+    NodeGroup,
 )
 from arches.app.views.controlled_lists import serialize
 from tests.base_test import ArchesTestCase
@@ -102,6 +104,20 @@ class ControlledListTests(ArchesTestCase):
             ]
         )
 
+        random_node_group = NodeGroup.objects.last()
+        cls.node_using_list1 = Node(
+            pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834",
+            name="Uses list1",
+            datatype="reference",
+            nodegroup=random_node_group,
+            istopnode=False,
+            config={
+                "multiValue": False,
+                "controlledList": str(cls.list1.pk),
+            },
+        )
+        cls.node_using_list1.save()
+
     def test_get_controlled_lists(self):
         self.client.force_login(self.anonymous)
         response = self.client.get(reverse("controlled_lists"))
@@ -129,6 +145,9 @@ class ControlledListTests(ArchesTestCase):
         # pprint(result)
 
         first_list, second_list = result["controlled_lists"]
+
+        self.assertEqual(first_list["nodes"], [str(self.node_using_list1.pk)])
+
         for item in first_list["items"]:
             self.assertEqual(item["children"], [])
 
