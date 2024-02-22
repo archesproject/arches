@@ -12,8 +12,8 @@ import ControlledListTable from "@/components/ControlledListManager/ControlledLi
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
-import type { Ref } from "vue";
-import type {  ControlledList } from "@/types/ControlledListManager";
+import type { Ref } from "@/types/Ref";
+import type { ControlledList } from "@/types/ControlledListManager";
 
 const props: {
     displayedList: ControlledList | null;

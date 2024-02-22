@@ -16,7 +16,7 @@ import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
-import type { Ref } from "vue";
+import type { Ref } from "@/types/Ref";
 import type {
     ControlledList,
     ControlledListItem,
