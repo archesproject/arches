@@ -115,4 +115,16 @@ class Migration(migrations.Migration):
                 deferrable=django.db.models.constraints.Deferrable["DEFERRED"], fields=("list", "sortorder"), name="unique_list_sortorder"
             ),
         ),
+        migrations.AlterModelTable(
+            name="controlledlist",
+            table="controlled_lists",
+        ),
+        migrations.AlterModelTable(
+            name="controlledlistitem",
+            table="controlled_list_items",
+        ),
+        migrations.AlterModelTable(
+            name="controlledlistitemlabel",
+            table="controlled_list_item_labels",
+        ),
     ]
