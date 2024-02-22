@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // This entire file is being removed in the next iteration.
 // Leaving it here for now for the sake of preserving demoable functionality.
-//@ts-nocheck
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import arches from "arches";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
