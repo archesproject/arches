@@ -98,7 +98,7 @@ def handle_items(itemDicts):
 
     # Consider skipping uniqueness checks and just letting IntegrityError
     # bubble up. But doing Django validation provides a localized error.
-    for itemDict in items_to_save:
+    for item_to_save in items_to_save:
         item_to_save.full_clean(exclude=["parent", "list", "id"])
 
     ControlledListItem.objects.bulk_update(
