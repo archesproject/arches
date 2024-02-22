@@ -11,6 +11,7 @@ import { useToast } from "primevue/usetoast";
 
 import { upsertLabel } from "@/components/ControlledListManager/api.ts";
 
+import type { Ref } from "@/types/Ref";
 import type {
     Label,
     NewLabel,
@@ -26,7 +27,7 @@ const props: {
 const value = ref(props.label.value);
 const language = ref(props.label.language);
 
-const visible = defineModel<boolean>({ required: true });
+const visible: Ref<boolean> = defineModel({ required: true });
 
 const toast = useToast();
 const { $gettext } = useGettext();

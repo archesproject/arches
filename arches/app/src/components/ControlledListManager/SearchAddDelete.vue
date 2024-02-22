@@ -5,6 +5,8 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import SplitButton from "primevue/splitbutton";
 
+import type { Ref } from "@/types/Ref";
+
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
@@ -24,7 +26,7 @@ const props: {
     "numberToDelete",
 ]);
 
-const searchValue = defineModel<string>({ required: true });
+const searchValue: Ref<string> = defineModel({ required: true });
 
 const clearSearch = () => {
     searchValue.value = "";

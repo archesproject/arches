@@ -6,7 +6,7 @@ import Toast from "primevue/toast";
 import ControlledListInventory from "@/components/ControlledListManager/ControlledListInventory.vue";
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 
-import type { Ref } from "vue";
+import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
 
 const displayedList: Ref<ControlledList | null> = ref(null);
