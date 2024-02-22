@@ -24,6 +24,8 @@ from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import Deferrable, JSONField
+from django.db.models.fields.json import KT
+from django.db.models.functions import Cast
 from django.core.cache import caches
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
@@ -724,6 +726,12 @@ class Node(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
             models.UniqueConstraint(fields=["alias", "graph"], name="unique_alias_graph"),
+        ]
+        indexes = [
+            models.Index(
+                Cast(KT("config__controlledList"), output_field=models.UUIDField(null=True)),
+                name="lists_reffed_by_node_idx",
+            )
         ]
 
 
