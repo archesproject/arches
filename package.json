@@ -78,6 +78,9 @@
         "vue": "^3.3.4",
         "webpack-bundle-tracker": "^1.4.0"
     },
+    "resolutions": {
+        "datatables.net": "1.12.1"
+    },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
         "leaflet-side-by-side": "plugins/leaflet-side-by-side/index",
