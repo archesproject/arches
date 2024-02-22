@@ -394,8 +394,11 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
                 obj.refresh_from_db()
                 self.assertEqual(str(obj.defaultconfig), str(new_config))
 
-    @unittest.skip("https://github.com/archesproject/arches/issues/10619")
+    @unittest.expectedFailure
     def test_bulk_update_heterogenous_values(self):
+        """Situation may improve in Django 5.1?
+        https://github.com/archesproject/arches/issues/10619
+        """
         new_configs = [
             I18n_JSON({
                 "en": "some",
