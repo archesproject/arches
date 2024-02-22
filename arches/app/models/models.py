@@ -1844,6 +1844,9 @@ class ControlledList(models.Model):
     name = models.CharField(max_length=127, null=False)
     dynamic = models.BooleanField(default=False)
 
+    class Meta:
+        db_table = "controlled_lists"
+
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1861,6 +1864,7 @@ class ControlledListItem(models.Model):
     )
 
     class Meta:
+        db_table = "controlled_list_items"
         constraints = [
             # Sort order concerns the list as a whole, not subsets
             # of the hierarchy.
@@ -1896,6 +1900,7 @@ class ControlledListItemLabel(models.Model):
     value = models.CharField(max_length=1024, null=False)
 
     class Meta:
+        db_table = "controlled_list_item_labels"
         constraints = [
             models.UniqueConstraint(
                 fields=["item", "value", "value_type", "language"],
