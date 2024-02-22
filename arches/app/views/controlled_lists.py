@@ -156,8 +156,6 @@ class ControlledListView(View):
         )
         # TODO: lock labels?
 
-        items_to_save = []
-        labels_to_save = []
         try:
             with transaction.atomic():
                 try:
