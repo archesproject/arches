@@ -96,7 +96,7 @@ const rowClass = (rowData: Selectable) => {
     return `${depth} indented-row`;
 };
 
-const toggleCheckbox = (selectable: ControlledList | ControlledListItem) => {
+const toggleCheckbox = (selectable: ControlledList & ControlledListItem) => {
     const i = selected.value.indexOf(selectable);
     if (i === -1) {
         selected.value.push(selectable);
