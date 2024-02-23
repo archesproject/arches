@@ -146,7 +146,10 @@ class ControlledListTests(ArchesTestCase):
 
         first_list, second_list = result["controlled_lists"]
 
-        self.assertEqual(first_list["nodes"], [str(self.node_using_list1.pk)])
+        self.assertEqual(
+            first_list["nodes"],
+            [{"id": str(self.node_using_list1.pk), "name": self.node_using_list1.name}],
+        )
 
         for item in first_list["items"]:
             self.assertEqual(item["children"], [])
