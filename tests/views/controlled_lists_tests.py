@@ -1,9 +1,10 @@
 import json
 from collections import defaultdict
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.urls import reverse
 from django.test.client import Client
+from guardian.shortcuts import assign_perm
 
 from arches.app.models.models import (
     ControlledList,
@@ -25,6 +26,12 @@ class ControlledListTests(ArchesTestCase):
         cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
+
+        cls.rdm_user = User.objects.create_user(
+            "test", "test@archesproject.org", "password"
+        )
+        rdm_admin_group = Group.objects.get(name="RDM Administrator")
+        cls.rdm_user.groups.add(rdm_admin_group)
 
     @classmethod
     def setUpTestData(cls):
@@ -104,12 +111,12 @@ class ControlledListTests(ArchesTestCase):
             ]
         )
 
-        random_node_group = NodeGroup.objects.last()
+        cls.nodegroup = NodeGroup.objects.get(pk="20000000-0000-0000-0000-100000000000")
         cls.node_using_list1 = Node(
             pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834",
             name="Uses list1",
             datatype="reference",
-            nodegroup=random_node_group,
+            nodegroup=cls.nodegroup,
             istopnode=False,
             config={
                 "multiValue": False,
@@ -118,6 +125,19 @@ class ControlledListTests(ArchesTestCase):
         )
         cls.node_using_list1.save()
 
+        cls.node_using_list2 = Node(
+            pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8835",
+            name="Uses list2",
+            datatype="reference",
+            nodegroup=cls.nodegroup,
+            istopnode=False,
+            config={
+                "multiValue": False,
+                "controlledList": str(cls.list2.pk),
+            },
+        )
+        cls.node_using_list2.save()
+
     def test_get_controlled_lists(self):
         self.client.force_login(self.anonymous)
         response = self.client.get(reverse("controlled_lists"))
@@ -125,7 +145,7 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(response.status_code, 403)
 
         self.client.force_login(self.admin)
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(11):
             # 1: session
             # 2: auth
             # 3: SELECT FROM controlled_lists
@@ -135,6 +155,8 @@ class ControlledListTests(ArchesTestCase):
             # 7: prefetch children: labels
             # 8: prefetch grandchildren: items
             # there are no grandchildren, so no labels to get
+            # 9: get permitted nodegroups
+            # 10-11: permission checks
             response = self.client.get(
                 reverse("controlled_lists"), kwargs={"prefetchDepth": 3}
             )
@@ -148,7 +170,13 @@ class ControlledListTests(ArchesTestCase):
 
         self.assertEqual(
             first_list["nodes"],
-            [{"id": str(self.node_using_list1.pk), "name": self.node_using_list1.name}],
+            [
+                {
+                    "id": str(self.node_using_list1.pk),
+                    "name": self.node_using_list1.name,
+                    "nodegroup_id": str(self.nodegroup.pk),
+                },
+            ],
         )
 
         for item in first_list["items"]:
@@ -156,6 +184,15 @@ class ControlledListTests(ArchesTestCase):
 
         self.assertEqual(len(second_list["items"]), 1)
         self.assertEqual(len(second_list["items"][0]["children"]), 4)
+
+    def test_get_controlled_list_permitted_nodegroups(self):
+        assign_perm("no_access_to_nodegroup", self.rdm_user, self.nodegroup)
+
+        self.client.force_login(self.rdm_user)
+        response = self.client.get(reverse("controlled_lists"))
+        result = json.loads(response.content)
+
+        self.assertEqual(result["controlled_lists"][0]["nodes"], [])
 
     def test_create_list(self):
         self.client.force_login(self.admin)
