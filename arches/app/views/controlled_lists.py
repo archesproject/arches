@@ -20,6 +20,7 @@ from arches.app.models.models import (
 )
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
@@ -58,10 +59,16 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
             }
             if nodes:
                 data["nodes"] = []
-                for node_id, node_name in zip(
-                    obj.node_ids, obj.node_names, strict=True
+                for node_id, node_name, nodegroup_id in zip(
+                    obj.node_ids, obj.node_names, obj.nodegroup_ids, strict=True
                 ):
-                    data["nodes"].append({"id": str(node_id), "name": node_name})
+                    data["nodes"].append(
+                        {
+                            "id": node_id,
+                            "name": node_name,
+                            "nodegroup_id": nodegroup_id,
+                        }
+                    )
             return data
         case ControlledListItem():
             if obj.parent_id:
@@ -163,18 +170,18 @@ class ControlledListsView(View):
             ControlledList.objects.all()
             .annotate(node_ids=self.node_subquery())
             .annotate(node_names=self.node_subquery("name"))
-            # check node perms?
+            .annotate(nodegroup_ids=self.node_subquery("nodegroup_id"))
             .order_by("name")
             .prefetch_related(*prefetch_terms(request))
         )
-        data = {
-            "controlled_lists": [
-                serialize(
-                    obj, nodes=True, flat=str_to_bool(request.GET.get("flat", "false"))
-                )
-                for obj in lists
-            ],
-        }
+        serialized_lists = [
+            serialize(
+                obj, nodes=True, flat=str_to_bool(request.GET.get("flat", "false"))
+            )
+            for obj in lists
+        ]
+        filtered = self.filter_permitted_nodegroups(serialized_lists, request)
+        data = {"controlled_lists": filtered}
 
         return JSONResponse(data)
 
@@ -188,6 +195,19 @@ class ControlledListsView(View):
             .order_by("pk")
             .values(node_field)
         )
+
+    def filter_permitted_nodegroups(self, serialized_lists, request):
+        permitted_nodegroups = [
+            ng.pk for ng in get_nodegroups_by_perm(request.user, "read_nodegroup")
+        ]
+
+        for lst in serialized_lists:
+            lst["nodes"] = [
+                node_dict
+                for node_dict in lst["nodes"]
+                if node_dict["nodegroup_id"] in permitted_nodegroups
+            ]
+        return serialized_lists
 
 
 @method_decorator(
