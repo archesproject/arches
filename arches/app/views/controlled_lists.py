@@ -59,14 +59,19 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
             }
             if nodes:
                 data["nodes"] = []
-                for node_id, node_name, nodegroup_id in zip(
-                    obj.node_ids, obj.node_names, obj.nodegroup_ids, strict=True
+                for node_id, node_name, nodegroup_id, graph_id in zip(
+                    obj.node_ids,
+                    obj.node_names,
+                    obj.nodegroup_ids,
+                    obj.graph_ids,
+                    strict=True,
                 ):
                     data["nodes"].append(
                         {
                             "id": node_id,
                             "name": node_name,
                             "nodegroup_id": nodegroup_id,
+                            "graph_id": graph_id,
                         }
                     )
             return data
@@ -171,6 +176,7 @@ class ControlledListsView(View):
             .annotate(node_ids=self.node_subquery())
             .annotate(node_names=self.node_subquery("name"))
             .annotate(nodegroup_ids=self.node_subquery("nodegroup_id"))
+            .annotate(graph_ids=self.node_subquery("graph_id"))
             .order_by("name")
             .prefetch_related(*prefetch_terms(request))
         )
