@@ -106,8 +106,7 @@ const clearSearch = () => {
     background: #f3fbfd;
 }
 .controls i {
-    margin-top: -0.75rem;
-    margin-right: 2rem;
+    align-self: center;
 }
 .p-inputtext {
     flex: 1;
