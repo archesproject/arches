@@ -1,3 +1,4 @@
+import importlib
 import os
 import logging
 import shutil
@@ -350,6 +351,53 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
         msg = _("Bulk Data Deletion: [{}]").format(status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
+
+
+@shared_task
+def run_task(module_name=None, class_name=None, method_to_run=None, **kwargs):
+    """
+        this allows the user to run any method as a celery task
+        module_name, class_name, and method_to_run are required
+        pass any additional arguments to the method via the kwargs parameter
+    """
+
+    theClass = getattr(importlib.import_module(module_name), class_name)
+    theMethod = getattr(theClass(), method_to_run)
+    theMethod(**kwargs)
+
+
+@shared_task
+def run_etl_task(**kwargs):
+    """
+        this allows the user to run the custom etl module
+        import_module, import_class, loadid, userid are the required string parameter
+        importer_name can be added (not required) for messaging purpose
+    """
+
+    logger = logging.getLogger(__name__)
+
+    import_module = kwargs.pop("import_module")
+    import_class = kwargs.pop("import_class")
+    importer_name = kwargs.pop("importer_name", import_class)
+    loadid = kwargs.get("loadid")
+    userid = kwargs.get("userid")
+
+    try:
+        run_task(module_name=import_module, class_name=import_class, method_to_run="run_load_task", **kwargs)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("{}: {}").format(importer_name, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
 
 @shared_task
 def reverse_etl_load(loadid):
