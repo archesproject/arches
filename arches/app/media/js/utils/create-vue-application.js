@@ -1,4 +1,9 @@
 import PrimeVue from 'primevue/config';
+import AnimateOnScroll from 'primevue/animateonscroll';
+import ConfirmationService from 'primevue/confirmationservice';
+import DialogService from 'primevue/dialogservice';
+import FocusTrap from 'primevue/focustrap';
+import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
@@ -34,7 +39,12 @@ export default async function createVueApp(vueComponent){
         const app = createApp(vueComponent);
         app.use(PrimeVue);
         app.use(gettext);
+        app.use(ConfirmationService);
+        app.use(DialogService);
         app.use(ToastService);
+        app.directive('animateonscroll', AnimateOnScroll);
+        app.directive('focustrap', FocusTrap);
+        app.directive('styleclass', StyleClass);
         app.directive('tooltip', Tooltip);
 
         return app;
