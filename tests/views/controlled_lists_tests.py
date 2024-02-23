@@ -11,6 +11,7 @@ from arches.app.models.models import (
     ControlledListItem,
     ControlledListItemLabel,
     DValueType,
+    GraphModel,
     Language,
     Node,
     NodeGroup,
@@ -111,9 +112,11 @@ class ControlledListTests(ArchesTestCase):
             ]
         )
 
+        cls.graph = GraphModel.objects.create(isresource=True)
         cls.nodegroup = NodeGroup.objects.get(pk="20000000-0000-0000-0000-100000000000")
         cls.node_using_list1 = Node(
             pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834",
+            graph=cls.graph,
             name="Uses list1",
             datatype="reference",
             nodegroup=cls.nodegroup,
@@ -175,6 +178,7 @@ class ControlledListTests(ArchesTestCase):
                     "id": str(self.node_using_list1.pk),
                     "name": self.node_using_list1.name,
                     "nodegroup_id": str(self.nodegroup.pk),
+                    "graph_id": str(self.graph.graphid),
                 },
             ],
         )
