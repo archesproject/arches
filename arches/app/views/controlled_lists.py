@@ -25,6 +25,20 @@ from arches.app.utils.string_utils import str_to_bool
 
 
 def serialize(obj, depth_map=None, flat=False, nodes=False):
+    """
+    This is a recursive function. The first caller (you) doesn't need
+    to provide a `depth_map`, but the recursive calls (see below) do.
+
+    flat=False provides a tree representation.
+    flat=True is just that, flat (used in reference datatype widget).
+
+    nodes=True assumes a controlled list model instance has been
+    annotated with node_id and node_names for associated nodes.
+
+    The default nodes=False is mainly here to facilitate reusing
+    this as a helper method when setting up unit tests
+    (where no such annotation is done.)
+    """
     if depth_map is None:
         depth_map = defaultdict(int)
     match obj:
@@ -43,7 +57,11 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 ),
             }
             if nodes:
-                data["nodes"] = [str(uid) for uid in obj.node_ids]
+                data["nodes"] = []
+                for node_id, node_name in zip(
+                    obj.node_ids, obj.node_names, strict=True
+                ):
+                    data["nodes"].append({"id": str(node_id), "name": node_name})
             return data
         case ControlledListItem():
             if obj.parent_id:
@@ -143,29 +161,33 @@ class ControlledListsView(View):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         lists = (
             ControlledList.objects.all()
-            .annotate(
-                node_ids=ArraySubquery(
-                    Node.objects.annotate(
-                        as_uuid=Cast(
-                            KT("config__controlledList"), output_field=UUIDField()
-                        )
-                    )
-                    .filter(as_uuid=OuterRef("id"))
-                    .values("pk")
-                )
-            )
+            .annotate(node_ids=self.node_subquery())
+            .annotate(node_names=self.node_subquery("name"))
             # check node perms?
             .order_by("name")
             .prefetch_related(*prefetch_terms(request))
         )
         data = {
             "controlled_lists": [
-                serialize(obj, nodes=True, flat=str_to_bool(request.GET.get("flat", "false")))
+                serialize(
+                    obj, nodes=True, flat=str_to_bool(request.GET.get("flat", "false"))
+                )
                 for obj in lists
             ],
         }
 
         return JSONResponse(data)
+
+    @staticmethod
+    def node_subquery(node_field: str = "pk"):
+        return ArraySubquery(
+            Node.objects.annotate(
+                as_uuid=Cast(KT("config__controlledList"), output_field=UUIDField())
+            )
+            .filter(as_uuid=OuterRef("id"))
+            .order_by("pk")
+            .values(node_field)
+        )
 
 
 @method_decorator(
