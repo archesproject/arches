@@ -18,7 +18,6 @@ const { $gettext } = useGettext();
 
 <template>
     <div class="characteristics">
-        <h3>{{ $gettext("Characteristics") }}</h3>
         <ItemCharacteristic
             :item="props.displayedList"
             :editable="props.editable"
@@ -40,11 +39,3 @@ const { $gettext } = useGettext();
         />
     </div>
 </template>
-
-<style scoped>
-h3 {
-    font-size: 1.5rem;
-}.characteristics {
-    padding-top: 0.125rem;
-}
-</style>
