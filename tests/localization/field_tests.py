@@ -1,5 +1,4 @@
 import json
-import unittest
 
 from arches.app.models.models import DDataType
 from arches.app.models.fields.i18n import I18n_String, I18n_TextField, I18n_JSON, I18n_JSONField
@@ -394,11 +393,7 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
                 obj.refresh_from_db()
                 self.assertEqual(str(obj.defaultconfig), str(new_config))
 
-    @unittest.expectedFailure
     def test_bulk_update_heterogenous_values(self):
-        """Situation may improve in Django 5.1?
-        https://github.com/archesproject/arches/issues/10619
-        """
         new_configs = [
             I18n_JSON({
                 "en": "some",
@@ -412,10 +407,20 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
             dt.defaultconfig = new_configs[i]
             for_bulk_update.append(dt)
 
-        DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+        with self.assertRaises(NotImplementedError):
+            DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
 
-        for i, obj in enumerate(for_bulk_update):
-            new_config_as_string = str(new_configs[i])
-            with self.subTest(new_config=new_config_as_string):
-                obj.refresh_from_db()
-                self.assertEqual(str(obj.defaultconfig), new_config_as_string)
+        # If the above starts failing, it's likely the underlying Django
+        # regression was fixed.
+        # https://code.djangoproject.com/ticket/35167
+        
+        # In that case, remove the with statement, de-indent the bulk_update,
+        # and comment the following code back in:
+
+        # for i, obj in enumerate(for_bulk_update):
+        #     new_config_as_string = str(new_configs[i])
+        #     with self.subTest(new_config=new_config_as_string):
+        #         obj.refresh_from_db()
+        #         self.assertEqual(str(obj.defaultconfig), new_config_as_string)
+
+        # Also consider removing the code at the top of I18n_JSON._parse()
