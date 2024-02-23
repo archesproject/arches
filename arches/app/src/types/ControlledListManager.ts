@@ -31,7 +31,15 @@ export type ControlledList = {
     name: string,
     dynamic: boolean,
     items: ControlledListItem[],
+    nodes: ReferencingNode[],
 };
 
 export type Selectable = ControlledList | ControlledListItem;
 export type Selectables = ControlledList[] | ControlledListItem[];
+
+export type ReferencingNode = {
+    id: string,
+    name: string,
+    nodegroup_id: string,
+    graph_id: string,
+};
