@@ -24,7 +24,7 @@ const props: {
 const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
 );
-const selectedKey: Ref<string | null> = ref(null);
+const selectedKey: Ref<string | null> = defineModel();
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
 const { $gettext } = useGettext();
 

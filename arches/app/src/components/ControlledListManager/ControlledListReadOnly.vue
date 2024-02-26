@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -6,10 +7,12 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
 import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
+import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
 
+import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
 
 const lightGray = "#f4f4f4";
@@ -28,6 +31,18 @@ const props: {
     setEditing: (val: boolean) => void;
     deleteLists: () => Promise<void>;
 } = defineProps(["displayedList", "setEditing", "deleteLists"]);
+
+// todo, better name or flesh out with comment
+const selectedKey: Ref = ref(null);
+
+const listOrItemView = computed(() => {
+    if (
+        selectedKey.value === null || props.displayedList.id in selectedKey.value
+    ) {
+        return ListCharacteristics;
+    }
+    return ItemEditor;
+});
 </script>
 
 <template>
@@ -51,6 +66,7 @@ const props: {
             <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs-->
             <ListTree
                 :key="props.displayedList.id"
+                v-model="selectedKey"
                 :displayed-list
                 :set-editing
             />
@@ -62,7 +78,10 @@ const props: {
             <h3 style="padding-bottom: 1rem; border-bottom: 1px solid;">
                 {{ listDetails }}
             </h3>
-            <ListCharacteristics
+            <!-- TODO: figure out why this needed ugly unwrapping like this -->
+            <component
+                :is="listOrItemView"
+                :item-id="Object.keys(selectedKey ?? {})[0]"
                 :displayed-list
                 :editable="false"
             />
