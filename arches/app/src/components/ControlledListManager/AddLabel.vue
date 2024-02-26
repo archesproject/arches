@@ -18,7 +18,7 @@ const props: {
     onInsert: (label: Label) => Promise<Label>;
 } = defineProps(["item", "type", "onInsert"]);
 
-const visible = ref(false);
+const modalVisible = ref(false);
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
@@ -48,7 +48,7 @@ const buttonLabel = computed(() => {
 <template>
     <button
         class="add-label"
-        @click="visible = true"
+        @click="modalVisible = true"
     >
         <i
             class="fa fa-plus-circle"
@@ -59,7 +59,7 @@ const buttonLabel = computed(() => {
         </span>
     </button>
     <EditLabel
-        v-model="visible"
+        v-model="modalVisible"
         :header="buttonLabel"
         :label="newLabel"
         :on-insert

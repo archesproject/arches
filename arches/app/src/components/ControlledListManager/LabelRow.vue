@@ -11,7 +11,7 @@ const props: {
     onDelete: (labelId: Label) => Promise<void>,
 } = defineProps(["label", "onDelete"]);
 
-const visible = ref(false);
+const modalVisible = ref(false);
 
 const { $gettext } = useGettext();
 const header = computed(() => {
@@ -34,7 +34,7 @@ const header = computed(() => {
                 <button @click="props.onDelete(props.label)">
                     {{ $gettext("Delete") }}
                 </button>
-                <button @click="visible = true">
+                <button @click="modalVisible = true">
                     {{ $gettext("Edit") }}
                 </button>
             </span>
@@ -42,7 +42,7 @@ const header = computed(() => {
         </div>
     </div>
     <EditLabel
-        v-model="visible"
+        v-model="modalVisible"
         :header
         :label
         :on-insert="null"
