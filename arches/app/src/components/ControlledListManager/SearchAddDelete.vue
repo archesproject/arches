@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import arches from "arches";
-
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import SplitButton from "primevue/splitbutton";
@@ -40,21 +38,21 @@ const clearSearch = () => {
                 v-model="searchValue"
                 type="text"
                 class="control"
-                :placeholder="arches.translations.find"
+                :placeholder="$gettext('Find')"
             />
             <i
                 v-if="searchValue"
                 class="fa fa-times"
                 role="button"
                 tabindex="0"
-                :aria-label="arches.translations.clear"
+                :aria-label="$gettext('Clear')"
                 @click="clearSearch"
                 @keydown="clearSearch"
             />
             <i
                 v-else
                 class="fa fa-search"
-                :aria-label="arches.translations.search"
+                :aria-label="$gettext('Search')"
             />
         </span>
         <div

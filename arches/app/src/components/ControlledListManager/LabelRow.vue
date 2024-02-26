@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import arches from "arches";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -33,10 +32,10 @@ const header = computed(() => {
         <div class="label-end">
             <span class="controls">
                 <button @click="props.onDelete(props.label)">
-                    {{ arches.translations.delete }}
+                    {{ $gettext("Delete") }}
                 </button>
                 <button @click="visible = true">
-                    {{ arches.translations.edit }}
+                    {{ $gettext("Edit") }}
                 </button>
             </span>
             <span class="label language">{{ props.label.language }}</span>

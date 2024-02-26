@@ -31,8 +31,6 @@ const visible: Ref<boolean> = defineModel({ required: true });
 
 const toast = useToast();
 const { $gettext } = useGettext();
-const staticItemLabel = $gettext("Item Label");
-const staticLanguageLabel = $gettext("Language");
 
 const onSave = async () => {
     const upsertedLabel: Label = await upsertLabel(
@@ -76,7 +74,7 @@ const onSave = async () => {
         }"
     >
         <div class="form-input">
-            <label for="value">{{ staticItemLabel }}</label>
+            <label for="value">{{ $gettext("Item Label") }}</label>
             <InputText
                 id="value"
                 v-model="value"
@@ -87,7 +85,7 @@ const onSave = async () => {
             <span
                 id="language-label"
                 style="margin-bottom: 5px"
-            >{{ staticLanguageLabel }}</span>
+            >{{ $gettext("Language") }}</span>
             <Dropdown
                 v-model="language"
                 aria-labelledby="language-label"
@@ -103,13 +101,13 @@ const onSave = async () => {
         <div class="controls">
             <Button
                 type="button"
-                :label="arches.translations.save"
+                :label="$gettext('Save')"
                 :disabled="!value || !language"
                 @click="onSave"
             />
             <Button
                 type="button"
-                :label="arches.translations.cancelEdit"
+                :label="$gettext('Cancel edit')"
                 @click="visible = false; value = props.label.value"
             />
         </div>
