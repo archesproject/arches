@@ -111,14 +111,22 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
                 props.setDisplayedList(null);
             }
         }
-        if (responses.some((resp) => !resp.ok)) {
-            throw new Error();
-        }
+        responses.forEach(async (response) => {
+            if (!response.ok) {
+                const body = await response.json();
+                toast.add({
+                    severity: ERROR,
+                    summary: $gettext("List deletion failed"),
+                    detail: body.message,
+                    life: 8000,
+                });
+            }
+        });
     } catch {
         toast.add({
             severity: ERROR,
-            summary: $gettext("One or more lists failed to delete."),
-            life: 3000,
+            summary: $gettext("List deletion failed"),
+            life: 5000,
         });
     }
     await fetchLists();
