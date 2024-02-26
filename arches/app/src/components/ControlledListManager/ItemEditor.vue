@@ -1,28 +1,40 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 
-import type { ControlledListItem } from "@/types/ControlledListManager";
+import type { ControlledList } from "@/types/ControlledListManager";
 
-const props: { item: ControlledListItem } = defineProps(["item"]);
+const props: {
+    displayedList: ControlledList
+    editable: boolean,
+    itemId: string,
+} = defineProps(["displayedList", "editable", "itemId"]);
+
+const item = computed(() => {
+    if (!props.displayedList) {
+        return null;
+    }
+    return props.displayedList.items.find(item => item.id === props.itemId);
+});
 </script>
 
 <template>
     <LabelEditor
-        :item="props.item"
+        :item
         type="prefLabel"
     />
     <LabelEditor
-        :item="props.item"
+        :item
         type="altLabel"
     />
     <LabelEditor
-        :item="props.item"
+        :item
         type="URI"
         :style="{ marginBottom: 0 }"
     />
     <ItemCharacteristic
-        :item="props.item"
+        :item
         :editable="true"
         field="uri"
         :style="{ display: 'flex', alignItems: 'center', width: '80%' }"
