@@ -1,12 +1,11 @@
 from collections import defaultdict
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Max, OuterRef, UUIDField
-from django.db.models.fields.json import KT
-from django.db.models.functions import Cast
+from django.db.models import Max, OuterRef
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, gettext as _
@@ -25,6 +24,10 @@ from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
 
+if TYPE_CHECKING:
+    from uuid import UUID
+
+
 def serialize(obj, depth_map=None, flat=False, nodes=False):
     """
     This is a recursive function. The first caller (you) doesn't need
@@ -34,11 +37,9 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
     flat=True is just that, flat (used in reference datatype widget).
 
     nodes=True assumes a controlled list model instance has been
-    annotated with node_id and node_names for associated nodes.
-
-    The default nodes=False is mainly here to facilitate reusing
-    this as a helper method when setting up unit tests
-    (where no such annotation is done.)
+    .annotate()'d with various node-related arrays. (The default
+    nodes=False is mainly here to facilitate reusing this as a helper
+    method when setting up unit tests; the view should set nodes=True.
     """
     if depth_map is None:
         depth_map = defaultdict(int)
@@ -194,10 +195,8 @@ class ControlledListsView(View):
     @staticmethod
     def node_subquery(node_field: str = "pk"):
         return ArraySubquery(
-            Node.objects.annotate(
-                as_uuid=Cast(KT("config__controlledList"), output_field=UUIDField())
-            )
-            .filter(as_uuid=OuterRef("id"))
+            Node.with_controlled_list
+            .filter(controlled_list=OuterRef("id"))
             .order_by("pk")
             .values(node_field)
         )
@@ -274,8 +273,23 @@ class ControlledListView(View):
         return JSONResponse(status=200)
 
     def delete(self, request, **kwargs):
-        list_id = kwargs.get("id")
-        objs_deleted, _ = ControlledList.objects.filter(pk=list_id).delete()
+        list_id: UUID = kwargs.get("id")
+        for node in Node.with_controlled_list.filter(controlled_list=list_id):
+            try:
+                lst = ControlledList.objects.get(id=list_id)
+            except ControlledList.DoesNotExist:
+                return JSONErrorResponse(status=404)
+            return JSONErrorResponse(
+                message=_(
+                    "{controlled_list} could not be deleted: still in use by {graph} - {node}".format(
+                        controlled_list=lst.name,
+                        graph=node.graph.name,
+                        node=node.name,
+                    )
+                ),
+                status=400,
+            )
+        objs_deleted, unused = ControlledList.objects.filter(pk=list_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)

@@ -35,6 +35,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db.models import Q, Max
+from django.db.models.fields.json import KT
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
@@ -679,6 +680,21 @@ class Node(models.Model):
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
 
+    objects = models.Manager()
+
+    # custom manager provides indexed lookup on controlled lists, e.g.
+    # Node.with_controlled_list.filter(controlled_list=your_list_id_as_uuid)
+    class WithControlledListManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().annotate(
+                controlled_list=Cast(
+                    KT("config__controlledList"),
+                    output_field=models.UUIDField(),
+                )
+            )
+
+    with_controlled_list = WithControlledListManager()
+
     def get_child_nodes_and_edges(self):
         """
         gather up the child nodes and edges of this node
@@ -763,7 +779,7 @@ class Node(models.Model):
         ]
         indexes = [
             models.Index(
-                Cast(KT("config__controlledList"), output_field=models.UUIDField(null=True)),
+                Cast(KT("config__controlledList"), output_field=models.UUIDField()),
                 name="lists_reffed_by_node_idx",
             )
         ]
