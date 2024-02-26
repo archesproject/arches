@@ -101,7 +101,7 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
     );
 
     const shouldResetDisplay = (
-        props.displayedList && selectedLists.includes(props.displayedList)
+        selectedLists.some(l => l.id === props.displayedList?.id)
     );
 
     try {
