@@ -43,17 +43,26 @@ const bestLabel = (item: ControlledListItem) => {
     return bestLabel;
 };
 
-function asNode(item: ControlledListItem): typeof TreeNode {
+function itemAsNode(item: ControlledListItem): typeof TreeNode {
     return {
         key: item.id,
         label: bestLabel(item).value,
-        children: item.children.map(child => asNode(child)),
+        children: item.children.map(child => itemAsNode(child)),
         data: item,
     };
 }
 
+function listAsNode(list: ControlledList): typeof TreeNode {
+    return {
+        key: list.id,
+        label: list.name,
+        children: list.items.map(item => itemAsNode(item)),
+        data: list,
+    };
+}
+
 const controlledListItemsTree = computed(() => {
-    return props.displayedList.items.map(item => asNode(item));
+    return [listAsNode(props.displayedList)];
 });
 
 const itemClass = (id: string) => {
@@ -84,6 +93,9 @@ const expandNode = (node: typeof TreeNode) => {
         }
     }
 };
+
+// Runs on list switch if the parent remembers to send a :key
+expandAll();
 </script>
 
 <template>

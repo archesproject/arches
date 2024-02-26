@@ -32,7 +32,9 @@ const { $gettext } = useGettext();
             :label="$gettext('Dynamic')"
             :style="{ width: '4rem' }"
         />
-        <h4 class="nodes-heading">{{ $gettext("List used by these nodes") }}</h4>
+        <h4 class="nodes-heading">
+            {{ $gettext("List used by these nodes") }}
+        </h4>
         <div class="nodes">
             <div
                 v-for="node in props.displayedList.nodes"
