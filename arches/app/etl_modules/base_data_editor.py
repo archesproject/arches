@@ -231,7 +231,7 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_preview_data(self, node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word):
+    def get_preview_data(self, node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word, preview_limit):
         request = HttpRequest()
         request.user = self.request.user
         request.method = "GET"
@@ -312,7 +312,7 @@ class BulkStringEditor(BaseBulkEditor):
         nested_agg.add_aggregation(search_filter_agg)
 
         se = SearchEngineFactory().create()
-        query = Query(se, limit=5)
+        query = Query(se, limit=preview_limit)
 
         query.add_query(search_url_query)
         query.add_aggregation(nested_agg)
@@ -326,7 +326,7 @@ class BulkStringEditor(BaseBulkEditor):
         number_of_resources = results['hits']['total']['value']
         number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
 
-        return values[:5], number_of_tiles, number_of_resources
+        return values[:preview_limit], number_of_tiles, number_of_resources
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -340,6 +340,8 @@ class BulkStringEditor(BaseBulkEditor):
         whole_word = request.POST.get("whole_word", 'false')
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
+
+        preview_limit = ETLModule.objects.get(pk=self.moduleid).config.get("previewLimit", 5)
 
         try:
             self.validate_inputs(request)
@@ -374,7 +376,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         try:
             first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-                node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word
+                node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word, preview_limit
             )
         except TypeError:
             return {
@@ -408,7 +410,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         return {
             "success": True,
-            "data": {"value": return_list, "number_of_tiles": number_of_tiles, "number_of_resources": number_of_resources},
+            "data": {"value": return_list, "number_of_tiles": number_of_tiles, "number_of_resources": number_of_resources, "preview_limit": preview_limit},
         }
 
     def write(self, request):
