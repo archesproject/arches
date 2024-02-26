@@ -104,7 +104,7 @@ export const upsertLabel = async (
     } catch {
         toast.add({
             severity: ERROR,
-            summary: errorText || $gettext("Save failed"),
+            summary: errorText || $gettext("Label save failed"),
             life: DEFAULT_TOAST_LIFE,
         });
     }
@@ -130,7 +130,7 @@ export const deleteLabel = async (
     } catch {
         toast.add({
             severity: ERROR,
-            summary: errorText || $gettext("Deletion failed"),
+            summary: errorText || $gettext("Label deletion failed"),
             life: DEFAULT_TOAST_LIFE,
         });
     }
