@@ -231,16 +231,12 @@ define([
             });
         }, this, 'beforeChange');
 
-        this.getFileUrl = function(url){
-            url = ko.unwrap(url);
-            var httpRegex = /^https?:\/\//;
-            // test whether the url is external (starts with http(s), if it is just return it)
-            if (httpRegex.test(url)){
-                return url;
-            }else{
-                return (arches.urls.url_subpath + url).replace('//', '/');
-            }
-
+        this.getFileUrl = function(urltoclean) {
+            const url = ko.unwrap(urltoclean);
+            const httpRegex = /^https?:\/\//;
+            // test whether the url is fully qualified or already starts with url_subpath
+            return !url || httpRegex.test(url) || url.startsWith(arches.urls.url_subpath) ? url :
+                (arches.urls.url_subpath + url).replace('//', '/');
         };
 
         if (Array.isArray(self.value())) {
@@ -292,7 +288,7 @@ define([
             }
             if (self.filesJSON().length > 0) { self.selectedFile(self.filesJSON()[newfilePosition]); }
         };
-        
+
         this.pageCt = ko.observable(5);
         this.pageCtReached = ko.computed(function() {
             return (self.filesJSON().length > self.pageCt() ? 'visible' : 'hidden');
@@ -399,7 +395,7 @@ define([
         };
 
         this.displayValue = ko.computed(function() {
-            return self.uploadedFiles().length === 1 ? ko.unwrap(self.uploadedFiles()[0].name) : self.uploadedFiles().length; 
+            return self.uploadedFiles().length === 1 ? ko.unwrap(self.uploadedFiles()[0].name) : self.uploadedFiles().length;
         });
 
         this.reportFiles = ko.computed(function() {
