@@ -108,32 +108,32 @@ def prefetch_terms(request):
     prefetch_depth = request.GET.get("prefetchDepth", 3)
     find_children = not str_to_bool(request.GET.get("flat", "false"))
 
-    prefetch_terms = []
+    terms = []
     for i in range(prefetch_depth):
         if i == 0:
-            prefetch_terms.extend(["items", "items__labels"])
+            terms.extend(["items", "items__labels"])
         elif find_children:
-            prefetch_terms.extend(
+            terms.extend(
                 [f"items{'__children' * i}", f"items{'__children' * i}__labels"]
             )
-    return prefetch_terms
+    return terms
 
 
-def handle_items(itemDicts):
+def handle_items(item_dicts):
     items_to_save = []
     labels_to_save = []
 
-    def handle_item(itemDict):
+    def handle_item(item_dict):
         nonlocal items_to_save
         nonlocal labels_to_save
 
         # Deletion/insertion of list items not yet implemented.
-        labels = itemDict.pop("labels")
+        labels = item_dict.pop("labels")
         # Altering hierarchy is done by altering parents.
-        children = itemDict.pop("children", None)
-        itemDict.pop("depth", None)
+        children = item_dict.pop("children", None)
+        item_dict.pop("depth", None)
 
-        item_to_save = ControlledListItem(**itemDict)
+        item_to_save = ControlledListItem(**item_dict)
         item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
 
@@ -149,8 +149,8 @@ def handle_items(itemDicts):
         for child in children:
             handle_item(child)
 
-    for itemDict in itemDicts:
-        handle_item(itemDict)
+    for item_dict in item_dicts:
+        handle_item(item_dict)
 
     # Consider skipping uniqueness checks and just letting IntegrityError
     # bubble up. But doing Django validation provides a localized error.
