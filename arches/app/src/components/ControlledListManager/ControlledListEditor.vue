@@ -39,6 +39,16 @@ const setDisplayedItem = (item: ControlledListItem) => {
     displayedItem.value = item;
 };
 
+// Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
+// https://github.com/archesproject/arches/pull/10569/files#r1496212837
+const ADD_NEW_ITEM = $gettext("Add New Item");
+const DELETE_ITEM = $gettext("Delete Item");
+const DELETE_ITEMS = $gettext("Delete Items");
+const NO_MATCHING_ITEMS = $gettext("No matching items.");
+const NO_SELECTION_LABEL = $gettext("Click &quot;Add New Item&quot; to start.");
+const ITEM_COUNT = $ngettext("list", "lists", items.value.length);
+const SPLASH_DESCRIPTION = $gettext("Select an item from the sidebar.");
+
 const fetchItems = async () => {
     const response = await fetch(
         arches.urls.controlled_list(props.displayedList.id)
@@ -132,21 +142,15 @@ const deleteItems = async (selectedItems: ControlledListItem[]) => {
                 >
                     <Suspense>
                         <SidepanelDataView
-                            :add-label="$gettext('Add New Item')"
+                            :add-label="ADD_NEW_ITEM"
                             :create-action="createItem"
-                            :count-label="$ngettext('item', 'items', items.length)"
+                            :count-label="ITEM_COUNT"
                             :del-action="deleteItems"
-                            :del-label="$gettext('Delete Item')"
-                            :del-label-plural="$gettext('Delete Items')"
+                            :del-label="DELETE_ITEM"
+                            :del-label-plural="DELETE_ITEMS"
                             :fetch-action="fetchItems"
-                            :no-search-result-label="
-                                $gettext('No matching items.')
-                            "
-                            :no-selection-label="
-                                $gettext(
-                                    'Click &quot;Add New Item&quot; to start.'
-                                )
-                            "
+                            :no-search-result-label="NO_MATCHING_ITEMS"
+                            :no-selection-label="NO_SELECTION_LABEL"
                             :selectables="items"
                             :selection="displayedItem"
                             :set-selection="setDisplayedItem"
@@ -168,9 +172,7 @@ const deleteItems = async (selectedItems: ControlledListItem[]) => {
                     />
                     <ControlledListSplash
                         v-else
-                        :description="
-                            $gettext('Select an item from the sidebar.')
-                        "
+                        :description="SPLASH_DESCRIPTION"
                     />
                 </SplitterPanel>
             </Splitter>

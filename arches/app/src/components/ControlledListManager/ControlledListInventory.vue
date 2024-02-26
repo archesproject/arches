@@ -31,6 +31,16 @@ const { $gettext, $ngettext } = useGettext();
 const lightGray = "#f4f4f4";
 const ERROR = "error";
 
+// Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
+// https://github.com/archesproject/arches/pull/10569/files#r1496212837
+const CONTROLLED_LISTS = $gettext("Controlled Lists");
+const CREATE_NEW_LIST = $gettext("Create New List");
+const NO_MATCHING_LISTS = $gettext("No matching lists.");
+const NO_SELECTION_LABEL = $gettext("Click &quot;Create New List&quot; to start.");
+const DELETE_LIST = $gettext("Delete Lists");
+const DELETE_LISTS = $gettext("Delete Lists");
+const LIST_COUNT = $ngettext('list', 'lists', lists.value.length);
+
 const fetchLists = async () => {
     let errorText;
     try {
@@ -127,20 +137,20 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
             :min-size="15"
         >
             <div class="header">
-                <h2>{{ $gettext('Controlled Lists') }}</h2>
+                <h2>{{ CONTROLLED_LISTS }}</h2>
             </div>
 
             <Suspense>
                 <SidepanelDataView
-                    :add-label="$gettext('Create New List')"
+                    :add-label="CREATE_NEW_LIST"
                     :create-action="createList"
-                    :count-label="$ngettext('list', 'lists', lists.length)"
+                    :count-label="LIST_COUNT"
                     :del-action="deleteLists"
-                    :del-label="$gettext('Delete List')"
-                    :del-label-plural="$gettext('Delete Lists')"
+                    :del-label="DELETE_LIST"
+                    :del-label-plural="DELETE_LISTS"
                     :fetch-action="fetchLists"
-                    :no-search-result-label="$gettext('No matching lists.')"
-                    :no-selection-label="$gettext('Click &quot;Create New List&quot; to start.')"
+                    :no-search-result-label="NO_MATCHING_LISTS"
+                    :no-selection-label="NO_SELECTION_LABEL"
                     :selectables="lists"
                     :selection="displayedList"
                     :set-selection="setDisplayedList"
