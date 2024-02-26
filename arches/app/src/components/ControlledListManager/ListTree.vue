@@ -28,6 +28,9 @@ const selectedKey: Ref<string | null> = ref(null);
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
 const { $gettext } = useGettext();
 
+const LIST_LABEL = $gettext("Controlled List");
+const GUIDE_LABEL = $gettext("Guide Item");
+const INDEXABLE_LABEL = $gettext("Indexable Item");
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const bestLabel = (item: ControlledListItem) => {
@@ -49,6 +52,8 @@ function itemAsNode(item: ControlledListItem): typeof TreeNode {
         label: bestLabel(item).value,
         children: item.children.map(child => itemAsNode(child)),
         data: item,
+        icon: item.guide ? "fa fa-folder-open" : "fa fa-hand-pointer-o",
+        iconLabel: item.guide ? GUIDE_LABEL : INDEXABLE_LABEL,
     };
 }
 
@@ -58,6 +63,8 @@ function listAsNode(list: ControlledList): typeof TreeNode {
         label: list.name,
         children: list.items.map(item => itemAsNode(item)),
         data: list,
+        icon: "fa fa-list",
+        iconLabel: LIST_LABEL,
     };
 }
 
@@ -123,7 +130,7 @@ expandAll();
             :highlight-on-select="false"
             :pt="{
                 root: { class: 'control' },
-                input: { style: { fontSize: 'small' } },
+                input: { style: { fontSize: 'small', textAlign: 'center' } },
                 itemLabel: { style: { fontSize: 'small' } },
             }"
         />
@@ -140,26 +147,27 @@ expandAll();
                 placeholder: $gettext('Find'),
                 style: { height: '3.5rem', fontSize: '14px' },
             },
-            container: { style: { fontSize: '14px' }},
+            container: { style: { fontSize: '14px' } },
             content: ({ context }) : { context: TreeContext } => ({
                 style: {
                     background: context.selected ? slateBlue : '',
                     height: '3.5rem',
                 },
+                tabindex: '0',
             }),
+            label: { style: { textWrap: 'nowrap' } },
+            nodeicon: { ariaHidden: 'true' },
         }"
     >
         <template #default="slotProps">
-            <span>
-                {{ slotProps.node.label }}
-                <span v-if="slotProps.node.data.uri">
-                    (<a
-                        :href="slotProps.node.data.uri"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        :class="itemClass(slotProps.node.data.id)"
-                    >{{ slotProps.node.data.uri }}</a>)
-                </span>
+            {{ slotProps.node.label }}
+            <span v-if="slotProps.node.data.uri">
+                (<a
+                    :href="slotProps.node.data.uri"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :class="itemClass(slotProps.node.data.id)"
+                >{{ slotProps.node.data.uri }}</a>)
             </span>
         </template>
     </Tree>
