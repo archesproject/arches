@@ -49,6 +49,7 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 "id": str(obj.id),
                 "name": obj.name,
                 "dynamic": obj.dynamic,
+                "search_only": obj.search_only,
                 "items": sorted(
                     [
                         serialize(item, depth_map, flat)
@@ -83,6 +84,7 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 "id": str(obj.id),
                 "uri": obj.uri,
                 "sortorder": obj.sortorder,
+                "guide": obj.guide,
                 "labels": [serialize(label, depth_map) for label in obj.labels.all()],
                 "parent_id": str(obj.parent_id) if obj.parent_id else None,
                 "depth": depth_map[obj.id],
@@ -258,6 +260,7 @@ class ControlledListView(View):
                     return JSONErrorResponse(status=404)
 
                 clist.dynamic = data["dynamic"]
+                clist.search_only = data["search_only"]
                 clist.name = data["name"]
 
                 for item in data["items"]:
