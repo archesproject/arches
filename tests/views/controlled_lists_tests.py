@@ -208,7 +208,13 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_list(self):
         self.client.force_login(self.admin)
-        self.client.delete(
+        response = self.client.delete(
+            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+        )
+        self.assertEqual(response.status_code, 400)
+        del self.node_using_list1.config["controlledList"]
+        self.node_using_list1.save()
+        response = self.client.delete(
             reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
         )
         self.assertEqual(ControlledList.objects.count(), 1)
