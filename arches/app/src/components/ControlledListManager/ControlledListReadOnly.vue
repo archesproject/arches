@@ -48,7 +48,9 @@ const props: {
             :min-size="25"
         >
             <h3>{{ listSummary }}</h3>
+            <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs-->
             <ListTree
+                :key="props.displayedList.id"
                 :displayed-list
                 :set-editing
             />
