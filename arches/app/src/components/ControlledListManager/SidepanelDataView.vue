@@ -141,13 +141,13 @@ await props.fetchAction();
                 v-if="selected.length"
                 @click="clearAll"
             >
-                {{ arches.translations.clearAll }}
+                {{ $gettext("Clear All") }}
             </button>
             <button
                 v-else
                 @click="selectAll"
             >
-                {{ arches.translations.selectAll }}
+                {{ $gettext("Select All") }}
             </button>
         </span>
         <span

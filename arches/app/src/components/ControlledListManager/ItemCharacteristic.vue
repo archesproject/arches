@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import arches from "arches";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -102,7 +101,7 @@ const onCancel = () => {
                 role="button"
                 tabindex="0"
                 class="fa fa-pencil"
-                :aria-label="arches.translations.edit"
+                :aria-label="$gettext('Edit')"
                 @click="editing = true"
                 @keyup.enter="editing = true"
             />
@@ -115,7 +114,7 @@ const onCancel = () => {
                 role="button"
                 tabindex="0"
                 class="fa fa-check"
-                :aria-label="arches.translations.saveEdit"
+                :aria-label="$gettext('Save edit')"
                 @click="onSave"
                 @keyup.enter="onSave"
             />
@@ -123,7 +122,7 @@ const onCancel = () => {
                 role="button"
                 tabindex="0"
                 class="fa fa-times"
-                :aria-label="arches.translations.cancelEdit"
+                :aria-label="$gettext('Cancel edit')"
                 @click="onCancel"
                 @keyup.enter="onCancel"
             />

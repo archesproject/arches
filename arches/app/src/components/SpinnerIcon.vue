@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import arches from "arches";
+import { useGettext } from "vue3-gettext";
+
+const { $gettext } = useGettext();
 </script>
 
 <template>
     <div id="spinner-container">
         <i
             class="fa fa-spin fa-spinner"
-            :aria-label="arches.translations.loadingData"
+            :aria-label="$gettext('Loading data')"
         />
     </div>
 </template>

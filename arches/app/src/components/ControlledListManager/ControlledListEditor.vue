@@ -180,7 +180,7 @@ const deleteItems = async (selectedItems: ControlledListItem[]) => {
             class="button return"
             @click="setEditing(false)"
         >
-            {{ arches.translations.return }}
+            {{ $gettext("Return") }}
         </Button>
     </div>
 </template>
