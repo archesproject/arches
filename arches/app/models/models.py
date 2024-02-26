@@ -1867,6 +1867,7 @@ class ControlledList(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=127, null=False)
     dynamic = models.BooleanField(default=False)
+    search_only = models.BooleanField(default=False)
 
     class Meta:
         db_table = "controlled_lists"
@@ -1886,6 +1887,7 @@ class ControlledListItem(models.Model):
     parent = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, related_name="children"
     )
+    guide = models.BooleanField(default=False)
 
     class Meta:
         db_table = "controlled_list_items"

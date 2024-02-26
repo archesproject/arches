@@ -20,6 +20,7 @@ export type ControlledListItem = {
     id: string,
     uri: string,
     sortorder: number,
+    guide: boolean,
     labels: Label[],
     children: ControlledListItem[],
     parent_id: string,
@@ -30,6 +31,7 @@ export type ControlledList = {
     id: string,
     name: string,
     dynamic: boolean,
+    search_only: boolean,
     items: ControlledListItem[],
     nodes: ReferencingNode[],
 };
