@@ -364,7 +364,7 @@ class ControlledListItemView(View):
 
     def delete(self, request, **kwargs):
         item_id = kwargs.get("id")
-        objs_deleted, _ = ControlledListItem.objects.filter(pk=item_id).delete()
+        objs_deleted, unused = ControlledListItem.objects.filter(pk=item_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
@@ -416,7 +416,7 @@ class LabelView(View):
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")
-        objs_deleted, _ = ControlledListItemLabel.objects.filter(pk=label_id).delete()
+        objs_deleted, unused = ControlledListItemLabel.objects.filter(pk=label_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)
