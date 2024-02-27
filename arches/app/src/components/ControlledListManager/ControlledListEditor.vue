@@ -19,10 +19,7 @@ const lightGray = "#f4f4f4";
 const { $gettext } = useGettext();
 const LIST_SUMMARY = $gettext("List Summary");
 
-const props: {
-    displayedList: ControlledList;
-    deleteLists: () => Promise<void>;
-} = defineProps(["displayedList", "deleteLists"]);
+const props: { displayedList: ControlledList } = defineProps(["displayedList"]);
 
 const editing: Ref<boolean> = defineModel("editing");
 
