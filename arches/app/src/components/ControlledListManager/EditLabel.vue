@@ -70,6 +70,7 @@ const onSave = async () => {
         :pt="{
             header: { style: { backgroundColor: '#2d3c4b' } },
             title: { style: { color: 'white' } },
+            content: { style: { paddingTop: '1rem' } },
             closeButtonIcon: { style: { color: 'white' } },
         }"
     >
@@ -115,10 +116,6 @@ const onSave = async () => {
 </template>
 
 <style scoped>
-.p-dialog-content {
-    display: grid;
-    gap: 2rem;
-}
 .form-input {
     display: flex;
     flex-direction: column;

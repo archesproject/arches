@@ -91,6 +91,7 @@ const clearSearch = () => {
                 :label="props.numberToDelete > 1 ? DELETE_LISTS : DELETE_LIST"
                 raised
                 :disabled="props.numberToDelete === 0"
+                :pt="{ root: { style: { background: buttonPink } } }"
                 @click="props.delAction"
             />
         </div>
@@ -119,9 +120,5 @@ const clearSearch = () => {
     font-weight: 600;
     color: white;
     text-wrap: nowrap;
-}
-.button.delete {
-    background: v-bind(buttonPink);
-    border: 1px solid v-bind(buttonPink);
 }
 </style>
