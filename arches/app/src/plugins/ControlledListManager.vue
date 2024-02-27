@@ -22,6 +22,11 @@ const displayedWorkspace = computed(() => {
         :is="displayedWorkspace"
         v-model:displayedList="displayedList"
         v-model:editing="editing"
+        :style="{
+            // subtract sizes of arches toolbars
+            width: 'calc(100vw - 50px)',
+            height: 'calc(100vh - 50px)',
+        }"
     />
     <Toast />
 </template>
