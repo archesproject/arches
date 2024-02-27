@@ -28,7 +28,7 @@ const header = computed(() => {
 
 <template>
     <div class="label-container">
-        <span class="label">{{ props.label.value }}</span>
+        <span class="item-label">{{ props.label.value }}</span>
         <div class="label-end">
             <span class="controls">
                 <button @click="props.onDelete(props.label)">
@@ -38,7 +38,7 @@ const header = computed(() => {
                     {{ $gettext("Edit") }}
                 </button>
             </span>
-            <span class="label language">{{ props.label.language }}</span>
+            <span class="item-label language">{{ props.label.language }}</span>
         </div>
     </div>
     <EditLabel
@@ -59,9 +59,10 @@ const header = computed(() => {
 span {
     margin: 1rem;
 }
-.label {
+.item-label {
     color: black;
     align-self: center;
+    font-size: small;
 }
 .controls {
     display: inline-flex;
@@ -70,17 +71,18 @@ span {
 }
 button {
     color: var(--blue-500);
-    font-size: smaller;
+    font-size: small;
     background: none;
     border: none;
     /* when adjusting padding, ensure action area of button is not inaccessibly slim */
     /* I'm showing ~37px, which is already below the MDN recommendation of 44 */
     padding: 1rem;
 }
-.label.language {
+.item-label.language {
     width: 4rem;
     height: 2rem;
     border-radius: 1px;
     background: var(--gray-200);
+    padding: 0.25rem;
 }
 </style>

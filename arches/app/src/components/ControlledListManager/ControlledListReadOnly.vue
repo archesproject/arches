@@ -6,13 +6,13 @@ import Button from "primevue/button";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
-import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
 
 import type { Ref } from "@/types/Ref";
+import type { TreeSelectionKeys } from "primevue/tree/Tree";
 import type { ControlledList } from "@/types/ControlledListManager";
 
 const lightGray = "#f4f4f4";
@@ -20,25 +20,30 @@ const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
 const { $gettext } = useGettext();
-const listSummary = $gettext("List Summary");
-const listDetails = $gettext("List Details");
-const manageList = $gettext("Manage List");
-const deleteList = $gettext("Delete List");
-const selectAList = $gettext('Select a list from the sidebar.');
+const LIST_SUMMARY = $gettext("List Summary");
+const MANAGE_LIST = $gettext("Manage List");
+const DELETE_LIST = $gettext("Delete List");
 
 const props: {
     displayedList: ControlledList;
-    setEditing: (val: boolean) => void;
     deleteLists: () => Promise<void>;
-} = defineProps(["displayedList", "setEditing", "deleteLists"]);
+} = defineProps(["displayedList", "deleteLists"]);
 
-// todo, better name or flesh out with comment
-const selectedKey: Ref = ref(null);
+const editing: Ref<boolean> = defineModel("editing");
+
+// Key for selected item in Tree view, could be list or list item
+// e.g. { "2000000-...": true }
+const selectedKey: Ref<typeof TreeSelectionKeys> = ref({[props.displayedList.id]: true});
+const selectedTreeNodeId = computed(() => {
+    return Object.keys(selectedKey.value)[0] ?? null;
+});
 
 const listOrItemView = computed(() => {
-    if (
-        selectedKey.value === null || props.displayedList.id in selectedKey.value
-    ) {
+    if (selectedKey.value === null) {
+        return ListCharacteristics;
+    }
+    const selectedTreeNodeId = Object.keys(selectedKey.value)[0] ?? null;
+    if (selectedTreeNodeId  === props.displayedList.id) {
         return ListCharacteristics;
     }
     return ItemEditor;
@@ -62,26 +67,22 @@ const listOrItemView = computed(() => {
             :size="40"
             :min-size="25"
         >
-            <h3>{{ listSummary }}</h3>
-            <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs-->
+            <h3>{{ LIST_SUMMARY }}</h3>
+            <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs -->
             <ListTree
                 :key="props.displayedList.id"
                 v-model="selectedKey"
                 :displayed-list
-                :set-editing
             />
         </SplitterPanel>
         <SplitterPanel
             :size="60"
             :min-size="25"
         >
-            <h3 style="padding-bottom: 1rem; border-bottom: 1px solid;">
-                {{ listDetails }}
-            </h3>
-            <!-- TODO: figure out why this needed ugly unwrapping like this -->
             <component
                 :is="listOrItemView"
-                :item-id="Object.keys(selectedKey ?? {})[0]"
+                :item-id="selectedTreeNodeId"
+                :key="selectedTreeNodeId"
                 :displayed-list
                 :editable="false"
             />
@@ -94,22 +95,17 @@ const listOrItemView = computed(() => {
     >
         <Button
             class="button manage-list"
-            :label="manageList"
+            :label="MANAGE_LIST"
             raised
-            @click="() => setEditing(true)"
+            @click="editing = true"
         />
         <Button
             class="button delete"
-            :label="deleteList"
+            :label="DELETE_LIST"
             raised
             @click="() => { deleteLists([displayedList]) }"
         />
     </div>
-
-    <ControlledListSplash
-        v-else
-        :description="selectAList"
-    />
 </template>
 
 <style scoped>
