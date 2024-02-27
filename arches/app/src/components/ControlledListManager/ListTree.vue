@@ -38,8 +38,7 @@ const INDEXABLE_LABEL = $gettext("Indexable Item");
 const MANAGE_LIST = $gettext("Manage List");
 const RETURN = $gettext("Return to List Manager");
 
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
-const lightGray = "#f4f4f4";
+const lightGray = "#f4f4f4"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
 
 const bestLabel = (item: ControlledListItem) => {
@@ -160,7 +159,7 @@ expandAll();
             container: { style: { fontSize: '14px' } },
             content: ({ context }) : { context: TreeContext } => ({
                 style: {
-                    background: context.selected ? slateBlue : '',
+                    background: context.selected ? lightGray : '',
                     height: '3.5rem',
                 },
                 tabindex: '0',
