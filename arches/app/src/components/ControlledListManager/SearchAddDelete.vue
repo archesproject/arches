@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -22,10 +23,12 @@ const props: {
 
 const searchValue: Ref<string> = defineModel({ required: true });
 
-const { $gettext } = useGettext();
+const { $gettext, $ngettext } = useGettext();
 const ADD_NEW_LIST = $gettext("Add New List");
-const DELETE_LIST = $gettext("Delete List");
-const DELETE_LISTS = $gettext("Delete Lists");
+
+const deleteLabel = computed(() => {
+    return $ngettext("Delete List", "Delete Lists", props.numberToDelete);
+});
 
 const clearSearch = () => {
     searchValue.value = "";
@@ -88,7 +91,7 @@ const clearSearch = () => {
             <!-- We might want an are you sure? modal -->
             <Button
                 class="button delete"
-                :label="props.numberToDelete > 1 ? DELETE_LISTS : DELETE_LIST"
+                :label="deleteLabel"
                 raised
                 :disabled="props.numberToDelete === 0"
                 :pt="{ root: { style: { background: buttonPink } } }"

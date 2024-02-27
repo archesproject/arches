@@ -54,7 +54,6 @@ const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
                 :key="displayedList.id"
                 v-model:editing="editing"
                 :displayed-list
-                :delete-lists
             />
             <ControlledListSplash
                 v-else
