@@ -37,7 +37,6 @@ export type ControlledList = {
 };
 
 export type Selectable = ControlledList | ControlledListItem;
-export type Selectables = ControlledList[] | ControlledListItem[];
 
 export type ReferencingNode = {
     id: string,
