@@ -28,12 +28,19 @@ const selectedLanguage: Ref<Language> = ref(
 );
 const selectedKey: Ref<typeof TreeSelectionKeys> = defineModel({ default: {} });
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
+const editing: Ref<boolean> = defineModel("editing");
+
 const { $gettext } = useGettext();
 
 const LIST_LABEL = $gettext("Controlled List");
 const GUIDE_LABEL = $gettext("Guide Item");
 const INDEXABLE_LABEL = $gettext("Indexable Item");
+const MANAGE_LIST = $gettext("Manage List");
+const RETURN = $gettext("Return to List Manager");
+
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
+const lightGray = "#f4f4f4";
+const buttonGreen = "#10b981";
 
 const bestLabel = (item: ControlledListItem) => {
     const labelsInLang = item.labels.filter(l => l.language === selectedLanguage.value.code);
@@ -145,6 +152,7 @@ expandAll();
         filter-mode="lenient"
         selection-mode="single"
         :pt="{
+            root: { style: { flexGrow: 1 } },
             input: {
                 placeholder: $gettext('Find'),
                 style: { height: '3.5rem', fontSize: '14px' },
@@ -173,6 +181,16 @@ expandAll();
             </span>
         </template>
     </Tree>
+    <div
+        :style="{ background: lightGray }"
+    >
+        <Button
+            class="button manage-list"
+            :label="editing ? RETURN : MANAGE_LIST"
+            raised
+            @click="editing = !editing"
+        />
+    </div>
 </template>
 
 <style scoped>
@@ -190,5 +208,18 @@ a {
     border: 0;
     background: lightgray;
     font-size: small;
+}
+.button {
+    font-size: small;
+    height: 4rem;
+    margin: 0.5rem;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    text-wrap: nowrap;
+}
+.button.manage-list {
+    background: v-bind(buttonGreen);
+    border: 1px solid v-bind(buttonGreen);
 }
 </style>

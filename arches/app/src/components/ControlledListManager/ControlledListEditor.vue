@@ -2,7 +2,6 @@
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import Button from "primevue/button";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
@@ -16,13 +15,9 @@ import type { TreeSelectionKeys } from "primevue/tree/Tree";
 import type { ControlledList } from "@/types/ControlledListManager";
 
 const lightGray = "#f4f4f4";
-const buttonGreen = "#10b981";
-const buttonPink = "#ed7979";
 
 const { $gettext } = useGettext();
 const LIST_SUMMARY = $gettext("List Summary");
-const MANAGE_LIST = $gettext("Manage List");
-const DELETE_LIST = $gettext("Delete List");
 
 const props: {
     displayedList: ControlledList;
@@ -51,89 +46,63 @@ const listOrItemView = computed(() => {
 </script>
 
 <template>
-    <ListHeader
-        :displayed-list="props.displayedList"
-        :is-item-editor="false"
-    />
-
-    <Splitter
-        v-if="props.displayedList"
-        :pt="{
-            gutter: { style: { background: lightGray } },
-            gutterHandler: { style: { background: lightGray } },
-        }"
-    >
-        <SplitterPanel
-            :size="40"
-            :min-size="25"
-        >
-            <h3>{{ LIST_SUMMARY }}</h3>
-            <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs -->
-            <ListTree
-                :key="props.displayedList.id"
-                v-model="selectedKey"
-                :displayed-list
-            />
-        </SplitterPanel>
-        <SplitterPanel
-            :size="60"
-            :min-size="25"
-        >
-            <component
-                :is="listOrItemView"
-                :item-id="selectedTreeNodeId"
-                :key="selectedTreeNodeId"
-                :displayed-list
-                :editable="editing"
-            />
-        </SplitterPanel>
-    </Splitter>
-
-    <div
-        v-if="props.displayedList"
-        :style="{ background: lightGray }"
-    >
-        <Button
-            class="button manage-list"
-            :label="MANAGE_LIST"
-            raised
-            @click="editing = true"
+    <!-- div receives conditional height/width from parent -->
+    <div class="list-editor-container">
+        <ListHeader
+            :displayed-list="props.displayedList"
+            :is-item-editor="false"
         />
-        <Button
-            class="button delete"
-            :label="DELETE_LIST"
-            raised
-            @click="() => { deleteLists([displayedList]) }"
-        />
+        <Splitter
+            v-if="props.displayedList"
+            :pt="{
+                root: { style: { height: '100%' } },
+                gutter: { style: { background: lightGray } },
+                gutterHandler: { style: { background: lightGray } },
+            }"
+        >
+            <SplitterPanel
+                :size="40"
+                :min-size="25"
+                :pt="{
+                    root: { style: { display: 'flex', flexDirection: 'column' } },
+                }"
+            >
+                <h3>{{ LIST_SUMMARY }}</h3>
+                <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs -->
+                <ListTree
+                    :key="props.displayedList.id"
+                    v-model="selectedKey"
+                    v-model:editing="editing"
+                    :displayed-list
+                />
+            </SplitterPanel>
+            <SplitterPanel
+                :size="60"
+                :min-size="25"
+            >
+                <component
+                    :is="listOrItemView"
+                    :key="selectedTreeNodeId"
+                    :item-id="selectedTreeNodeId"
+                    :displayed-list
+                    :editable="editing"
+                />
+            </SplitterPanel>
+        </Splitter>
     </div>
 </template>
 
 <style scoped>
+.list-editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
 h3 {
     font-size: 1.5rem;
     margin: 1rem;
 }
-.p-splitter {
-    max-height: calc(100% - 135px);
-}
 .p-splitter-panel {
     margin: 1rem;
-}
-.button {
-    font-size: inherit;
-    height: 4rem;
-    margin: 0.5rem;
-    justify-content: center;
-    font-weight: 600;
-    color: white;
-    text-wrap: nowrap;
-}
-.button.manage-list {
-    background: v-bind(buttonGreen);
-    border: 1px solid v-bind(buttonGreen);
-}
-.button.delete {
-    background: v-bind(buttonPink);
-    border: 1px solid v-bind(buttonPink);
 }
 </style>

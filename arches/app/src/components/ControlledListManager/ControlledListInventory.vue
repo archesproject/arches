@@ -170,8 +170,8 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
         >
             <ControlledListEditor
                 v-if="displayedList"
-                v-model:editing="editing"
                 :key="displayedList.id"
+                v-model:editing="editing"
                 :displayed-list
                 :delete-lists
             />
@@ -194,8 +194,6 @@ h2 {
     margin: 1rem;
 }
 .p-splitter {
-    width: calc(100vw - 60px);
-    height: 100vh;
     background: white;
     font-size: 14px;
     border: 0;
