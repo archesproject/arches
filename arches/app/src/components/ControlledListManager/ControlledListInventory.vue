@@ -9,27 +9,22 @@ import SplitterPanel from "primevue/splitterpanel";
 import { useToast } from "primevue/usetoast";
 
 import ControlledListReadOnly from "@/components/ControlledListManager/ControlledListReadOnly.vue";
+import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
 import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
 
-const props: {
-    displayedList: ControlledList | null;
-    setDisplayedList: (list: ControlledList | null) => void;
-    setEditing: (val: boolean) => void;
-} = defineProps([
-    "displayedList",
-    "setDisplayedList",
-    "setEditing",
-]);
+const displayedList: Ref<ControlledList | null> = defineModel("displayedList");
+const editing: Ref<boolean> = defineModel("editing");
 
 const lists: Ref<ControlledList[]> = ref([]);
 const toast = useToast();
 const { $gettext, $ngettext } = useGettext();
 const lightGray = "#f4f4f4";
 const ERROR = "error";
+const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
 
 // Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
 // https://github.com/archesproject/arches/pull/10569/files#r1496212837
@@ -101,14 +96,14 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
     );
 
     const shouldResetDisplay = (
-        selectedLists.some(l => l.id === props.displayedList?.id)
+        selectedLists.some(l => l.id === displayedList.value?.id)
     );
 
     try {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
             if (shouldResetDisplay) {
-                props.setDisplayedList(null);
+                displayedList.value = null;
             }
         }
         responses.forEach(async (response) => {
@@ -150,6 +145,7 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
 
             <Suspense>
                 <SidepanelDataView
+                    v-model="displayedList"
                     :add-label="CREATE_NEW_LIST"
                     :create-action="createList"
                     :count-label="LIST_COUNT"
@@ -160,8 +156,6 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
                     :no-search-result-label="NO_MATCHING_LISTS"
                     :no-selection-label="NO_SELECTION_LABEL"
                     :selectables="lists"
-                    :selection="displayedList"
-                    :set-selection="setDisplayedList"
                 />
                 <template #fallback>
                     <SpinnerIcon />
@@ -175,9 +169,15 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
             class="mt-0"
         >
             <ControlledListReadOnly
+                v-if="displayedList"
+                v-model:editing="editing"
+                :key="displayedList.id"
                 :displayed-list
-                :set-editing
                 :delete-lists
+            />
+            <ControlledListSplash
+                v-else
+                :description="SELECT_A_LIST"
             />
         </SplitterPanel>
     </Splitter>

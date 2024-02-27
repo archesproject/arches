@@ -7,8 +7,13 @@ import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 import Tree from "primevue/tree";
 
-import type { Ref } from "vue";
-import type { TreeContext, TreeExpandedKeys, TreeNode } from "primevue/tree/Tree";
+import type { Ref } from "@/types/Ref";
+import type {
+    TreeContext,
+    TreeExpandedKeys,
+    TreeNode,
+    TreeSelectionKeys,
+} from "primevue/tree/Tree";
 
 import type { Language } from "@/types/arches";
 import type {
@@ -16,15 +21,12 @@ import type {
     ControlledListItem
 } from "@/types/ControlledListManager";
 
-const props: {
-    displayedList: ControlledList;
-    setEditing: (val: boolean) => void;
-} = defineProps(["displayedList", "setEditing"]);
+const props: { displayedList: ControlledList } = defineProps(["displayedList"]);
 
 const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
 );
-const selectedKey: Ref<string | null> = defineModel();
+const selectedKey: Ref<typeof TreeSelectionKeys> = defineModel({ default: {} });
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
 const { $gettext } = useGettext();
 
@@ -73,7 +75,7 @@ const controlledListItemsTree = computed(() => {
 });
 
 const itemClass = (id: string) => {
-    if (id === selectedKey.value) {
+    if (id in selectedKey.value) {
         return "selected";
     }
     return "";
