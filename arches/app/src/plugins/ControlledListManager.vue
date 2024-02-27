@@ -18,16 +18,16 @@ const displayedWorkspace = computed(() => {
 </script>
 
 <template>
-    <component
-        :is="displayedWorkspace"
-        v-model:displayedList="displayedList"
-        v-model:editing="editing"
-        :style="{
-            // subtract sizes of arches toolbars
-            width: 'calc(100vw - 50px)',
-            height: 'calc(100vh - 50px)',
-        }"
-    />
+    <!-- Subtract size of arches toolbars -->
+    <div style="width: calc(100vw - 50px); height: calc(100vh - 50px)">
+        <div style="height: 100%">
+            <component
+                :is="displayedWorkspace"
+                v-model:displayedList="displayedList"
+                v-model:editing="editing"
+            />
+        </div>
+    </div>
     <Toast />
 </template>
 
