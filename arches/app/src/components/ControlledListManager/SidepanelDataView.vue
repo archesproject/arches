@@ -26,7 +26,7 @@ const searchValue = ref("");
 // Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
 // https://github.com/archesproject/arches/pull/10569/files#r1496212837
 const NO_MATCHING_ITEMS = $gettext("No matching items.");
-const NO_SELECTION_LABEL = $gettext("Click &quot;Add New Item&quot; to start.");
+const NO_SELECTION_LABEL = $gettext('Click "Add New Item" to start.');
 
 const filteredLists = computed(() => {
     const loweredTerm = searchValue.value.toLowerCase();

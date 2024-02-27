@@ -17,6 +17,7 @@ const editing: Ref<boolean> = defineModel("editing");
 
 const { $gettext } = useGettext();
 const lightGray = "#f4f4f4";
+const CONTROLLED_LISTS = $gettext("Controlled Lists");
 const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
 </script>
 
