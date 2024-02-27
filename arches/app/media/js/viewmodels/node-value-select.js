@@ -121,6 +121,11 @@ define([
             initSelection: function(element, callback) {
                 var id = $(element).val();
                 var tiles = self.tiles();
+                
+                if (self.value()) {
+                    id = self.value()
+                }
+                
                 if (id !== "") {
                     var setSelection = function(tiles, callback)   {
                         var selection =  _.find(tiles, function(tile) {
