@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import arches from "arches";
-import Cookies from "js-cookie";
-import { ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
-import { useToast } from "primevue/usetoast";
 
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
@@ -19,113 +15,9 @@ import type { ControlledList } from "@/types/ControlledListManager";
 const displayedList: Ref<ControlledList | null> = defineModel("displayedList");
 const editing: Ref<boolean> = defineModel("editing");
 
-const lists: Ref<ControlledList[]> = ref([]);
-const toast = useToast();
-const { $gettext, $ngettext } = useGettext();
+const { $gettext } = useGettext();
 const lightGray = "#f4f4f4";
-const ERROR = "error";
 const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
-
-// Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
-// https://github.com/archesproject/arches/pull/10569/files#r1496212837
-const CONTROLLED_LISTS = $gettext("Controlled Lists");
-const CREATE_NEW_LIST = $gettext("Create New List");
-const NO_MATCHING_LISTS = $gettext("No matching lists.");
-const NO_SELECTION_LABEL = $gettext("Click &quot;Create New List&quot; to start.");
-const DELETE_LIST = $gettext("Delete Lists");
-const DELETE_LISTS = $gettext("Delete Lists");
-const LIST_COUNT = $ngettext('list', 'lists', lists.value.length);
-
-const fetchLists = async () => {
-    let errorText;
-    try {
-        const response = await fetch(arches.urls.controlled_lists);
-        if (!response.ok) {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
-            throw new Error();
-        } else {
-            await response.json().then((data) => {
-                lists.value = data.controlled_lists;
-            });
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            summary: errorText || $gettext("Unable to fetch lists"),
-            life: 3000,
-        });
-    }
-};
-
-const createList = async () => {
-    try {
-        const response = await fetch(arches.urls.controlled_list_add, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-        });
-        if (response.ok) {
-            const newItem = await response.json();
-            lists.value.unshift(newItem);
-        } else {
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            summary: $gettext("List creation failed"),
-            life: 3000,
-        });
-    }
-};
-
-const deleteLists = async (selectedLists: ControlledList[]) => {
-    if (!selectedLists.length) {
-        return;
-    }
-    const promises = selectedLists.map((list) =>
-        fetch(arches.urls.controlled_list(list.id), {
-            method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-        })
-    );
-
-    const shouldResetDisplay = (
-        selectedLists.some(l => l.id === displayedList.value?.id)
-    );
-
-    try {
-        const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            if (shouldResetDisplay) {
-                displayedList.value = null;
-            }
-        }
-        responses.forEach(async (response) => {
-            if (!response.ok) {
-                const body = await response.json();
-                toast.add({
-                    severity: ERROR,
-                    summary: $gettext("List deletion failed"),
-                    detail: body.message,
-                    life: 8000,
-                });
-            }
-        });
-    } catch {
-        toast.add({
-            severity: ERROR,
-            summary: $gettext("List deletion failed"),
-            life: 5000,
-        });
-    }
-    await fetchLists();
-};
 </script>
 
 <template>
@@ -144,19 +36,7 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
             </div>
 
             <Suspense>
-                <SidepanelDataView
-                    v-model="displayedList"
-                    :add-label="CREATE_NEW_LIST"
-                    :create-action="createList"
-                    :count-label="LIST_COUNT"
-                    :del-action="deleteLists"
-                    :del-label="DELETE_LIST"
-                    :del-label-plural="DELETE_LISTS"
-                    :fetch-action="fetchLists"
-                    :no-search-result-label="NO_MATCHING_LISTS"
-                    :no-selection-label="NO_SELECTION_LABEL"
-                    :selectables="lists"
-                />
+                <SidepanelDataView v-model="displayedList" />
                 <template #fallback>
                     <SpinnerIcon />
                 </template>
