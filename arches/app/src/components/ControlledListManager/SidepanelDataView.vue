@@ -10,8 +10,6 @@ import SearchAddDelete from "@/components/ControlledListManager/SearchAddDelete.
 import type { Ref } from "@/types/Ref";
 import type {
     ControlledList,
-    ControlledListItem,
-    Selectable,
     Selectables,
 } from "@/types/ControlledListManager";
 
@@ -29,9 +27,7 @@ const props: {
     fetchAction: () => Promise<void>;
     noSearchResultLabel: string;
     noSelectionLabel: string;
-    selectables: Selectables;
-    selection: Selectable | null;
-    setSelection: (selectable: Selectable) => void;
+    selectables: ControlledList[];
 } = defineProps([
     "addLabel",
     "createAction",
@@ -43,34 +39,11 @@ const props: {
     "noSearchResultLabel",
     "noSelectionLabel",
     "selectables",
-    "selection",
-    "setSelection",
 ]);
 
-const selected: Ref<Selectables> = ref([]);
+const displayedList: Ref<ControlledList | null> = defineModel();
+const selected: Ref<ControlledList[]> = ref([]);
 const searchValue = ref("");
-
-const bestRepresentation = (item: Selectable) => {
-    if (!item) {
-        return $gettext("Unlabeled Item");
-    }
-    if (Object.hasOwn(item, "name")) {
-        return (item as ControlledList).name;
-    }
-    const prefLabels = (item as ControlledListItem).labels.filter(
-        (label) => label.valuetype === "prefLabel"
-    );
-    if (!prefLabels.length) {
-        // Shouldn't be possible.
-        return $gettext("Unlabeled Item");
-    }
-    const bestLabel = prefLabels.find(
-        label => label.language === arches.activeLanguage
-    ) ?? prefLabels[0];
-    // but is it better to fall back on altLabels?
-    // consider leveraging python-side rank_label() in response
-    return bestLabel.value;
-};
 
 const filteredSelectables = computed(() => {
     const loweredTerm = searchValue.value.toLowerCase();
@@ -78,25 +51,13 @@ const filteredSelectables = computed(() => {
         return props.selectables;
     }
     return props.selectables.filter((selectable) => {
-        return bestRepresentation(selectable)
+        return selectable.name
             .toLowerCase()
             .includes(loweredTerm);
     });
 });
 
-const rowClass = (rowData: Selectable) => {
-    if (!(rowData as ControlledListItem).depth) {
-        return "";
-    }
-    const item = rowData as ControlledListItem;
-    const depth = `depth-${item.depth}`;
-    if (item.children.length) {
-        return depth;
-    }
-    return `${depth} indented-row`;
-};
-
-const toggleCheckbox = (selectable: ControlledList & ControlledListItem) => {
+const toggleCheckbox = (selectable: ControlledList) => {
     const i = selected.value.indexOf(selectable);
     if (i === -1) {
         selected.value.push(selectable);
@@ -110,8 +71,8 @@ const selectAll = () => {
 const clearAll = () => {
     selected.value = [];
 };
-const selectRow = (selected: ControlledList | ControlledListItem) => {
-    props.setSelection(selected);
+const selectRow = (selected: ControlledList) => {
+    displayedList.value = selected;
 };
 
 await props.fetchAction();
@@ -168,18 +129,17 @@ await props.fetchAction();
                 v-for="(selectable, index) in slotProps.items"
                 :key="index"
                 class="itemRow"
-                :class="{ selected: selection?.id === selectable.id }"
+                :class="{ selected: displayedList?.id === selectable.id }"
                 tabindex="0"
                 @click="selectRow(selectable)"
                 @keyup.enter="selectRow(selectable)"
             >
                 <input
                     type="checkbox"
-                    :class="rowClass(selectable)"
                     :checked="selected.indexOf(selectable) > -1"
                     @click="toggleCheckbox(selectable)"
                 >
-                <span>{{ bestRepresentation(selectable) }}</span>
+                <span>{{ selectable.name }}</span>
             </div>
         </template>
         <template #empty>
@@ -231,18 +191,6 @@ button {
 input[type="checkbox"] {
     margin-top: 0.25rem;
     margin-right: 1rem;
-}
-.depth-1.indented-row {
-    margin-left: 2rem;
-}
-.depth-2.indented-row {
-    margin-left: 4rem;
-}
-.depth-3 > indented-row {
-    margin-left: 6rem;
-}
-.depth-4 > indented-row {
-    margin-left: 8rem;
 }
 .no-selections {
     margin: 2rem;

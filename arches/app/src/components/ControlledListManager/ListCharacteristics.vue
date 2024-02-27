@@ -15,9 +15,11 @@ const props: {
 ]);
 
 const { $gettext } = useGettext();
+const LIST_DETAILS = $gettext("List Details");
 </script>
 
 <template>
+    <h3>{{ LIST_DETAILS }}</h3>
     <div class="characteristics">
         <ItemCharacteristic
             :item="props.displayedList"
@@ -47,6 +49,12 @@ const { $gettext } = useGettext();
 </template>
 
 <style scoped>
+h3 {
+    font-size: 1.5rem;
+    margin: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid;
+}
 h4 {
     font-size: 1.25rem;
 }
