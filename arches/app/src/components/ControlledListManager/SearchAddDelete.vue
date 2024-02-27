@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import arches from "arches";
+import { useGettext } from "vue3-gettext";
+
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import SplitButton from "primevue/splitbutton";
@@ -9,22 +12,21 @@ const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
 const props: {
-    addLabel: string;
     createAction: () => Promise<void>;
     delAction: () => Promise<void>;
-    delLabel: string;
-    delLabelPlural: string;
     numberToDelete: number;
 } = defineProps([
-    "addLabel",
     "createAction",
     "delAction",
-    "delLabel",
-    "delLabelPlural",
     "numberToDelete",
 ]);
 
 const searchValue: Ref<string> = defineModel({ required: true });
+
+const { $gettext } = useGettext();
+const ADD_NEW_LIST = $gettext("Add New List");
+const DELETE_LIST = $gettext("Delete List");
+const DELETE_LISTS = $gettext("Delete Lists");
 
 const clearSearch = () => {
     searchValue.value = "";
@@ -61,7 +63,7 @@ const clearSearch = () => {
         >
             <SplitButton
                 class="button"
-                :label="props.addLabel"
+                :label="ADD_NEW_LIST"
                 raised
                 style="font-size: inherit"
                 :pt="{
@@ -87,7 +89,7 @@ const clearSearch = () => {
             <!-- We might want an are you sure? modal -->
             <Button
                 class="button delete"
-                :label="props.numberToDelete > 1 ? props.delLabelPlural : props.delLabel"
+                :label="props.numberToDelete > 1 ? DELETE_LISTS : DELETE_LIST"
                 raised
                 :disabled="props.numberToDelete === 0"
                 @click="props.delAction"
