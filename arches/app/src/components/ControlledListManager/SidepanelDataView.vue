@@ -234,11 +234,14 @@ button {
     border: none;
     color: var(--blue-500);
     background: none;
+    /* increase interaction area */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 .selection-header {
     display: flex;
     background-color: v-bind(lightGray);
-    height: 3rem;
+    height: 4rem;
     font-size: small;
     justify-content: space-between;
 }

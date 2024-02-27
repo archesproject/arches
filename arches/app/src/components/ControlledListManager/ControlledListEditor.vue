@@ -46,7 +46,6 @@ const listOrItemView = computed(() => {
 </script>
 
 <template>
-    <!-- div receives conditional height/width from parent -->
     <div class="list-editor-container">
         <ListHeader
             :displayed-list="props.displayedList"
@@ -55,7 +54,7 @@ const listOrItemView = computed(() => {
         <Splitter
             v-if="props.displayedList"
             :pt="{
-                root: { style: { height: '100%' } },
+                root: { style: { height: '97%' } },
                 gutter: { style: { background: lightGray } },
                 gutterHandler: { style: { background: lightGray } },
             }"
@@ -104,5 +103,6 @@ h3 {
 }
 .p-splitter-panel {
     margin: 1rem;
+    overflow-y: auto;
 }
 </style>
