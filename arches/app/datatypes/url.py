@@ -84,14 +84,13 @@ class URLDataType(BaseDataType):
                 error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
             
-            #10592 raise error if label added without URL 
+            # raise error if label added without URL (#10592)
             if value.get("url_label") and not value.get("url"):
                 message = _("URL label cannot be saved without a URL")
                 title = _("No URL added")
                 error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
 
-            #10593 adds url_label to JSON if no label added
             if "url_label" not in value:
                 value["url_label"] = ""
                 
