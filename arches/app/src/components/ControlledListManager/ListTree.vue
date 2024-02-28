@@ -7,6 +7,8 @@ import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 import Tree from "primevue/tree";
 
+import { bestLabel } from "@/components/ControlledListManager/utils.ts";
+
 import type { Ref } from "@/types/Ref";
 import type {
     TreeContext,
@@ -23,11 +25,9 @@ import type {
 
 const props: { displayedList: ControlledList } = defineProps(["displayedList"]);
 
-const selectedLanguage: Ref<Language> = ref(
-    (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
-);
-const selectedKey: Ref<typeof TreeSelectionKeys> = defineModel({ default: {} });
+const selectedKey: Ref<typeof TreeSelectionKeys> = defineModel("selectedKey");
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
+const selectedLanguage: Ref<Language> = defineModel("selectedLanguage");
 const editing: Ref<boolean> = defineModel("editing");
 
 const { $gettext } = useGettext();
@@ -41,23 +41,10 @@ const RETURN = $gettext("Return to List Manager");
 const lightGray = "#f4f4f4"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
 
-const bestLabel = (item: ControlledListItem) => {
-    const labelsInLang = item.labels.filter(l => l.language === selectedLanguage.value.code);
-    const bestLabel = (
-        labelsInLang.find(l => l.valuetype === "prefLabel")
-        ?? labelsInLang.find(l => l.valuetype === "altLabel")
-        ?? item.labels.find(l => l.valuetype === "prefLabel")
-    );
-    if (!bestLabel) {
-        throw new Error();
-    }
-    return bestLabel;
-};
-
 function itemAsNode(item: ControlledListItem): typeof TreeNode {
     return {
         key: item.id,
-        label: bestLabel(item).value,
+        label: bestLabel(item, selectedLanguage.value.code).value,
         children: item.children.map(child => itemAsNode(child)),
         data: item,
         icon: item.guide ? "fa fa-folder-open" : "fa fa-hand-pointer-o",
