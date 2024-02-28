@@ -41,10 +41,24 @@ const item = computed(() => {
 
     return recurse(props.displayedList.items);
 });
+
+const iconClass = (item: ControlledListItem) => {
+    return item.guide ? "fa fa-folder-open" : "fa fa-hand-pointer-o";
+};
+const iconLabel = (item: ControlledListItem) => {
+    return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
+};
 </script>
 
 <template>
-    <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
+    <span class="item-header">
+        <i
+            :class="iconClass(item)"
+            aria-hidden="true"
+        />
+        <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
+        <span class="item-type">{{ iconLabel(item) }}</span>
+    </span>
     <LabelEditor
         :item
         type="prefLabel"
@@ -67,10 +81,21 @@ const item = computed(() => {
 </template>
 
 <style scoped>
-h3 {
-    font-size: 1.5rem;
-    margin: 1rem;
+.item-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 1rem 0rem 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid;
+    width: 80%;
+}
+h3 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+.item-type {
+    font-size: small;
+    font-weight: 200;
 }
 </style>
