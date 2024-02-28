@@ -5,16 +5,19 @@ import { useGettext } from "vue3-gettext";
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 
+import { bestLabel } from "@/components/ControlledListManager/utils.ts";
+
+import type { Language } from "@/types/arches";
 import type { ControlledList, ControlledListItem } from "@/types/ControlledListManager";
 
 const props: {
     displayedList: ControlledList
     editable: boolean,
     itemId: string,
-} = defineProps(["displayedList", "editable", "itemId"]);
+    selectedLanguage: Language,
+} = defineProps(["displayedList", "editable", "itemId", "selectedLanguage"]);
 
 const { $gettext } = useGettext();
-const ITEM_DETAILS = $gettext("Item Details");
 
 const item = computed(() => {
     if (!props.displayedList) {
@@ -41,7 +44,7 @@ const item = computed(() => {
 </script>
 
 <template>
-    <h3>{{ ITEM_DETAILS }}</h3>
+    <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
     <LabelEditor
         :item
         type="prefLabel"

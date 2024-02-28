@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import arches from "arches";
 import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -10,6 +11,7 @@ import ListCharacteristics from "@/components/ControlledListManager/ListCharacte
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
 
+import type { Language } from "@/types/arches";
 import type { Ref } from "@/types/Ref";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
 import type { ControlledList } from "@/types/ControlledListManager";
@@ -29,6 +31,9 @@ const selectedKey: Ref<typeof TreeSelectionKeys> = ref({[props.displayedList.id]
 const selectedTreeNodeId = computed(() => {
     return Object.keys(selectedKey.value)[0] ?? null;
 });
+const selectedLanguage: Ref<Language> = ref(
+    (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
+);
 
 const listOrItemView = computed(() => {
     if (selectedKey.value === null) {
@@ -64,7 +69,8 @@ const listOrItemView = computed(() => {
                 <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs -->
                 <ListTree
                     :key="props.displayedList.id"
-                    v-model="selectedKey"
+                    v-model:selected-key="selectedKey"
+                    v-model:selected-language="selectedLanguage"
                     v-model:editing="editing"
                     :displayed-list
                 />
@@ -79,6 +85,7 @@ const listOrItemView = computed(() => {
                     :item-id="selectedTreeNodeId"
                     :displayed-list
                     :editable="editing"
+                    :selected-language="selectedLanguage"
                 />
             </SplitterPanel>
         </Splitter>
