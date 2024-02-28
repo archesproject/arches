@@ -44,10 +44,7 @@ const listOrItemView = computed(() => {
 
 <template>
     <div class="list-editor-container">
-        <ListHeader
-            :displayed-list="props.displayedList"
-            :is-item-editor="false"
-        />
+        <ListHeader :displayed-list="props.displayedList" />
         <Splitter
             v-if="props.displayedList"
             :pt="{
