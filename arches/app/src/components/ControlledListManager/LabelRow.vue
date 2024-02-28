@@ -64,6 +64,9 @@ span {
     align-self: center;
     font-size: small;
 }
+.label-end {
+    display: inline-flex;
+}
 .controls {
     display: inline-flex;
     justify-content: space-between;
@@ -79,10 +82,8 @@ button {
     padding: 1rem;
 }
 .item-label.language {
-    width: 4rem;
-    height: 2rem;
     border-radius: 1px;
     background: var(--gray-200);
-    padding: 0.25rem;
+    padding: 0.5rem;
 }
 </style>

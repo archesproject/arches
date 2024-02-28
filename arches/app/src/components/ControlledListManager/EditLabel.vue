@@ -94,7 +94,7 @@ const onSave = async () => {
                 option-label="name"
                 option-value="code"
                 :pt="{
-                    input: { style: { fontSize: 'small' } },
+                    input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
                     panel: { style: { fontSize: 'small' } },
                 }"
             />
@@ -102,12 +102,14 @@ const onSave = async () => {
         <div class="controls">
             <Button
                 type="button"
+                class="save"
                 :label="$gettext('Save')"
                 :disabled="!value || !language"
                 @click="onSave"
             />
             <Button
                 type="button"
+                class="delete"
                 :label="$gettext('Cancel edit')"
                 @click="visible = false; value = props.label.value"
             />
@@ -135,11 +137,11 @@ label, .p.dropdown-label {
     font-size: small;
     font-weight: 600;
 }
-.controls > button:nth-child(1) {
+button.save {
     background: #10b981;
     border-color: #10b981;
 }
-.controls > button:nth-child(2) {
+button.delete {
     background: coral;
     border-color: coral;
 }

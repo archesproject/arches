@@ -7,30 +7,16 @@ import type { ControlledList } from "@/types/ControlledListManager";
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const props: {
-    displayedList: ControlledList | null;
-    isItemEditor: boolean;
-} = defineProps([
-    "displayedList",
-    "isItemEditor",
-]);
+const props: { displayedList: ControlledList | null } = defineProps(["displayedList"]);
 
 const heading = computed(() => {
-    if (props.isItemEditor) {
-        return $gettext(
-            "List Item Editor > %{itemName}",
-            { itemName: props.displayedList!.name },
-        );
-    } else {
-        if (props.displayedList) {
-            return $gettext(
-                "List Editor > %{listName}",
-                { listName: props.displayedList.name},
-            );
-        } else {
-            return $gettext("List Editor");
-        }
+    if (!props.displayedList) {
+        return $gettext("List Editor");
     }
+    return $gettext(
+        "List Editor > %{listName}",
+        { listName: props.displayedList.name },
+    );
 });
 </script>
 
