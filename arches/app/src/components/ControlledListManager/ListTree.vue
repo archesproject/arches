@@ -138,7 +138,7 @@ expandAll();
             :highlight-on-select="false"
             :pt="{
                 root: { class: 'control' },
-                input: { style: { fontSize: 'small', textAlign: 'center' } },
+                input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center' } },
                 itemLabel: { style: { fontSize: 'small' } },
             }"
         />
