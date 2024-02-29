@@ -9,6 +9,16 @@ define([
     const viewModel = function(params) {
         const self = this;
         this.search = params.search;
+
+        this.search = params.search;
+        if (this.search) {
+            params.config = ko.observable({
+                controlledList:[],
+                placeholder: arches.translations.selectAnOption,
+                multiValue: true
+            });
+        }
+
         this.controlledList = params.config.controlledList;
         this.multiValue = params.config.multiValue;
         this.controlledLists = ko.observable();
