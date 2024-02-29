@@ -2651,7 +2651,7 @@ class ReferenceDataType(BaseDataType):
             logger.error(message)
 
         except Exception as e:
-            message = _("Ensure your node is propertly configured for the reference datatype")
+            message = _("Ensure your node is properly configured for the reference datatype")
             title = _("Invalid Node Configuration")
             logger.error(message)
 
