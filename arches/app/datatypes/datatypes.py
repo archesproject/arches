@@ -2622,6 +2622,16 @@ class ReferenceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         new_values = value
         return ",".join(new_values)
+    
+    def get_display_value(self, tile, node, **kwargs):
+        labels = []
+        requested_language = kwargs.pop("language", None)
+        current_language = requested_language or get_language()
+        for item in self.get_tile_data(tile)[str(node.nodeid)]:
+            for label in item["labels"]:
+                if label["language"] == current_language and label["valuetype"] == "prefLabel":
+                    labels.append(label.get("value", ""))
+        return ", ".join(labels)
 
     def collects_multiple_values(self):
         return True
