@@ -35,7 +35,7 @@ define([
                 return true;
             }
             const valueUris = ko.unwrap(value).map(val=>ko.unwrap(val.uri));
-            return (JSON.stringify(selection) != JSON.stringify(valueUris))
+            return (JSON.stringify(selection) !== JSON.stringify(valueUris))
         };
 
         this.selectionValue.subscribe(selection => {
