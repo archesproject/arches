@@ -88,6 +88,27 @@ class URLDataType(BaseDataType):
                         ),
                     }
                 )
+            
+            # raise error if label added without URL (#10592)
+            if value.get("url_label") and not value.get("url"):
+                errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} value: {1} {2} {3} - {4}. {5}".format(
+                            self.datatype_model.datatype,
+                            value,
+                            source,
+                            row_number,
+                            "URL label cannot be saved without a URL",
+                            "No URL added.",
+                        ),
+                    }
+                )
+
+            if "url_label" not in value:
+                value["url_label"] = ""
+
+
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
