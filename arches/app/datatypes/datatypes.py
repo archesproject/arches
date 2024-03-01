@@ -379,7 +379,7 @@ class StringDataType(BaseDataType):
             tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
 
 
-class StringNonLocalizedDataType(BaseDataType):
+class NonLocalizedStringDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         try:
@@ -413,7 +413,7 @@ class StringNonLocalizedDataType(BaseDataType):
 
         if nodevalue is not None:
             if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
-                terms.append(SearchTerm(value=nodevalue, lang="nonlocalized"))
+                terms.append(SearchTerm(value=nodevalue, lang=""))
         return terms
 
     def append_search_filters(self, value, node, query, request):

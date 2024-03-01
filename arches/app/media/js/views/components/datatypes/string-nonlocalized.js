@@ -1,8 +1,8 @@
 define([
     'knockout',
-    'templates/views/components/datatypes/string-nonlocalized.htm',
-], function (ko, stringNonLocalizedDatatypeTemplate) {
-    const name = 'string-nonlocalized-datatype-config';
+    'templates/views/components/datatypes/non-localized-string.htm',
+], function (ko, nonLocalizedStringDatatypeTemplate) {
+    const name = 'non-localized-string-datatype-config';
 
     const viewModel = function (params) {
         var self = this;
@@ -26,7 +26,7 @@ define([
 
     ko.components.register(name, {
         viewModel: viewModel,
-        template: stringNonLocalizedDatatypeTemplate
+        template: nonLocalizedStringDatatypeTemplate
     });
 
     return name;

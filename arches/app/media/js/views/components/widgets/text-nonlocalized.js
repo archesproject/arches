@@ -3,8 +3,8 @@ define([
     'underscore', 
     'viewmodels/widget',
     'arches',
-    'templates/views/components/widgets/text-nonlocalized.htm'
-], function (ko, _, WidgetViewModel, arches, textNonlocalizedWidgetTemplate) {
+    'templates/views/components/widgets/non-localized-text.htm'
+], function (ko, _, WidgetViewModel, arches, nonlocalizedTextWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -28,8 +28,8 @@ define([
             }, self);
     };
 
-    return ko.components.register('text-nonlocalized-widget', {
+    return ko.components.register('non-localized-text-widget', {
         viewModel: viewModel,
-        template: textNonlocalizedWidgetTemplate
+        template: nonlocalizedTextWidgetTemplate
     });
 });

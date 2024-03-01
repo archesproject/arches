@@ -21,13 +21,13 @@ class Migration(migrations.Migration):
                 defaultwidget,
                 issearchable
             ) VALUES (
-                'string-nonlocalized',
+                'non-localized-string',
                 'fa fa-file-code-o',
                 'datatypes.py',
-                'StringNonLocalizedDataType',
+                'NonLocalizedStringDataType',
                 null,
-                'views/components/datatypes/string-nonlocalized',
-                'string-nonlocalized-datatype-config',
+                'views/components/datatypes/non-localized-string',
+                'non-localized-string-datatype-config',
                 FALSE,
                 '46ef064b-2611-4708-9f52-60136bd8a65b',
                 TRUE
@@ -40,9 +40,9 @@ class Migration(migrations.Migration):
                 defaultconfig
             ) VALUES (
                 '46ef064b-2611-4708-9f52-60136bd8a65b',
-                'text-nonlocalized-widget',
-                'views/components/widgets/text-nonlocalized',
-                'string-nonlocalized',
+                'non-localized-text-widget',
+                'views/components/widgets/non-localized-text',
+                'non-localized-string',
                 '{
                     "width": "100%",
                     "maxLength": null,
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             """,
             reverse_sql = """
             DELETE FROM d_data_types
-                WHERE datatype = 'string-nonlocalized';
+                WHERE datatype = 'non-localized-string';
             DELETE from widgets
                 WHERE widgetid = '46ef064b-2611-4708-9f52-60136bd8a65b';
             """
