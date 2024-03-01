@@ -55,6 +55,8 @@ class Migration(migrations.Migration):
             DELETE FROM edges
                 WHERE domainnodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference') 
                 OR rangenodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference');
+            DELETE FROM constraints_x_nodes
+                WHERE nodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference');
             DELETE FROM nodes WHERE datatype = 'reference';
             DELETE FROM widgets WHERE widgetid = '19e56148-82b8-47eb-b66e-f6243639a1a8';
             DELETE FROM d_data_types WHERE datatype = 'reference';
