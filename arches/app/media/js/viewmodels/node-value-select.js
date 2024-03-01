@@ -122,6 +122,7 @@ define([
                 var id = $(element).val();
                 var tiles = self.tiles();
                 
+                // fixes #10027 where inputted values will be reset after navigating away  
                 if (self.value()) {
                     id = self.value()
                 }
