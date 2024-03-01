@@ -403,7 +403,7 @@ class NonLocalizedStringDataType(BaseDataType):
         if nodevalue is not None:
             val = {
                 "string": nodevalue, 
-                "language": "nonlocalized",
+                "language": "",
                 "nodegroup_id": tile.nodegroup_id, 
                 "provisional": provisional}
             document["strings"].append(val)
