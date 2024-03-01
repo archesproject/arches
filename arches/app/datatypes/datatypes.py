@@ -2589,7 +2589,7 @@ class ReferenceDataType(BaseDataType):
                 if "labels" in reference:
                     pref_label_languages = []
                     for label in reference["labels"]:
-                        if not all([key in label for key in ("id", "value", "language", "valuetype")]):
+                        if not all(key in label for key in ("id", "value", "language", "valuetype")):
                             errors.append(
                                 {
                                     "type": "ERROR",
