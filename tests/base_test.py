@@ -29,7 +29,6 @@ from arches.app.utils.context_processors import app_settings
 from django.db import connection
 from django.core import management
 from django.test.runner import DiscoverRunner
-from oauth2_provider.models import Application
 
 from arches.app.search.mappings import (
     prepare_terms_index,
@@ -55,6 +54,14 @@ DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE applica
 
 
 class ArchesTestRunner(DiscoverRunner):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs["debug_mode"] = True
+        # Unless the user has something other than the Django default, give them
+        # what they probably want.
+        if kwargs["pattern"] == "test*.py":
+            kwargs["pattern"] = "*.py"
+        super().__init__(*args, **kwargs)
+
     def setup_databases(self, **kwargs):
         ret = super().setup_databases(**kwargs)
 
@@ -77,7 +84,7 @@ class ArchesTestCase(TestCase):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
-            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "rU") as f:
+            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"], True)
             BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
@@ -91,15 +98,6 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Account for the fact that some test classes may be failing to call
-        # super().tearDownClass() in their tearDownClass() implementations.
-        try:
-            Application.objects.get(id=44)
-        except Application.DoesNotExist:
-            pass
-        else:
-            return
-
         cursor = connection.cursor()
         sql = """
             INSERT INTO public.oauth2_provider_application(

@@ -2,6 +2,7 @@ define([
     'knockout',
     'knockout-mapping',
     'underscore',
+    'arches',
     'dropzone',
     'uuid',
     'viewmodels/card-component',
@@ -12,9 +13,9 @@ define([
     'bindings/fadeVisible',
     'bindings/dropzone',
     'bindings/gallery',
-], function(ko, koMapping, _, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
+], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
     const viewModel = function(params) {
-         
+
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
         var self = this;
         CardComponentViewModel.apply(this, [params]);
@@ -48,13 +49,19 @@ define([
 
         this.fileListNodeId = getfileListNode();
 
+        this.cleanUrl = function(url) {
+            const httpRegex = /^https?:\/\//;
+            return !url || httpRegex.test(url) || url.startsWith(arches.urls.url_subpath) ? url :
+                (arches.urls.url_subpath + url).replace('//', '/');
+        };
+
         this.getUrl = function(tile){
             var url = '';
             var name = '';
             var val = ko.unwrap(tile.data[this.fileListNodeId]);
             if (val && val.length == 1) {
                 {
-                    url = ko.unwrap(val[0].url) || ko.unwrap(val[0].content);
+                    url = self.cleanUrl(ko.unwrap(val[0].url)) || ko.unwrap(val[0].content);
                     name = ko.unwrap(val[0].name);
                 }
             }

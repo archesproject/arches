@@ -9,7 +9,7 @@ ul.jqtree-tree
         border: 1px solid #ccc;
         text-decoration: none;
         font-weight: 700;
-        background: linear-gradient(top, #fafafa0, #eee100);
+        background: linear-gradient(to bottom, #fafafa0, #eee100);
         border-radius: 3px;
         box-sizing: border-box;
         margin: 5px 0;
@@ -68,7 +68,7 @@ ul.jqtree-tree
     }
 
     .jqtree-title.jqtree_common, .jqtree-title.jqtree_common.jqtree-title-folder  {
-        font-size: 13px;
+        font-size: 1.3rem;
         &:hover{
             color: #123;
         }

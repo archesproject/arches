@@ -11,10 +11,10 @@ import os
 from pathlib import Path
 import ast
 import time
-from distutils import util
 from datetime import datetime
 from mimetypes import MimeTypes
 
+from django.core.files.images import get_image_dimensions
 from django.db.models import fields
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -27,6 +27,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.i18n import get_localized_value
+from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
     Dsl,
@@ -277,13 +278,16 @@ class StringDataType(BaseDataType):
         if edge_info["range_tile_data"] is not None:
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             for key in edge_info["range_tile_data"].keys():
-                g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key)))
+                if edge_info["range_tile_data"][key]["value"]:
+                    g.add(
+                        (edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"][key]["value"], lang=key))
+                    )
         return g
 
     def transform_value_for_tile(self, value, **kwargs):
         language = None
         try:
-            regex = re.compile("(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
+            regex = re.compile(r"(.+)\|([A-Za-z-]+)$", flags=re.DOTALL | re.MULTILINE)
             match = regex.match(value)
             if match is not None:
                 language = match.groups()[1]
@@ -554,8 +558,8 @@ class BooleanDataType(BaseDataType):
         errors = []
         try:
             if value is not None:
-                type(bool(util.strtobool(str(value)))) is True
-        except Exception:
+                str_to_bool(str(value))
+        except ValueError:
             message = _("Not of type boolean")
             title = _("Invalid Boolean")
             error_message = self.create_error_message(value, source, row_number, message, title)
@@ -592,7 +596,7 @@ class BooleanDataType(BaseDataType):
             return self.compile_json(tile, node, display_value=label, value=value)
 
     def transform_value_for_tile(self, value, **kwargs):
-        return bool(util.strtobool(str(value)))
+        return str_to_bool(str(value))
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -856,32 +860,42 @@ class EDTFDataType(BaseDataType):
 
     def append_search_filters(self, value, node, query, request):
         def add_date_to_doc(query, edtf):
+            invalid_filter_exception = Exception(
+                _(
+                    'Only dates that specify an exact year, month, \
+                        and day can be used with the "=", ">", "<", ">=", and "<=" operators'
+                )
+            )
+
             if value["op"] == "eq":
                 if edtf.lower != edtf.upper:
-                    raise Exception(_('Only dates that specify an exact year, month, and day can be used with the "=" operator'))
-                query.should(Match(field="tiles.data.%s.dates.date" % (str(node.pk)), query=edtf.lower, type="phrase_prefix"))
+                    raise invalid_filter_exception
+                else:
+                    operators = {"gte": edtf.lower, "lte": edtf.lower}
+                    query.must(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
             else:
                 if value["op"] == "overlaps":
                     operators = {"gte": edtf.lower, "lte": edtf.upper}
                 else:
                     if edtf.lower != edtf.upper:
-                        raise Exception(
-                            _(
-                                'Only dates that specify an exact year, month, \
-                                    and day can be used with the ">", "<", ">=", and "<=" operators'
-                            )
-                        )
+                        raise invalid_filter_exception
 
                     operators = {value["op"]: edtf.lower or edtf.upper}
 
                 try:
-                    query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
-                    query.should(Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators))
+                    group_query = Bool()
+                    group_query.should(Range(field="tiles.data.%s.dates.date" % (str(node.pk)), **operators))
+                    group_query.should(
+                        Range(field="tiles.data.%s.date_ranges.date_range" % (str(node.pk)), relation="intersects", **operators)
+                    )
+                    query.must(group_query)
                 except RangeDSLException:
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
-        if value["op"] == "null" or value["op"] == "not_null":
+        if not value.get('op'):
+            pass
+        elif value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
         elif value["val"] != "" and value["val"] is not None:
             edtf = ExtendedDateFormat(value["val"])
@@ -1557,6 +1571,7 @@ class FileListDataType(BaseDataType):
         if len(file_type_errors) > 0:
             title = _("Invalid File Type")
             errors.append({"type": "ERROR", "message": _("File type not permitted"), "title": title})
+
         if node:
             self.node_lookup[str(node.pk)] = node
         elif nodeid:
@@ -1568,7 +1583,7 @@ class FileListDataType(BaseDataType):
 
         def format_bytes(size):
             # 2**10 = 1024
-            power = 2 ** 10
+            power = 2**10
             n = 0
             power_labels = {0: "", 1: "kilo", 2: "mega", 3: "giga", 4: "tera"}
             while size > power:
@@ -1580,6 +1595,24 @@ class FileListDataType(BaseDataType):
             config = node.config
             limit = config["maxFiles"]
             max_size = config["maxFileSize"] if "maxFileSize" in config.keys() else None
+
+            images_only = config.get("imagesOnly", False)
+            if images_only and request:
+                for metadata in value:
+                    if not any(localizedString["value"] for localizedString in metadata.get("altText", {}).values()):
+                        errors.append(
+                            {
+                                "type": "ERROR",
+                                "title": _("Missing alt text"),
+                                "message": _("The image '{0}' is missing an alternative text.").format(metadata["name"]),
+                            }
+                        )
+                files = request.FILES.getlist(f"file-list_{node.nodeid}", [])
+                for file in files:
+                    width, height = get_image_dimensions(file.file)
+                    if not width or not height:
+                        title = _("Invalid File Type")
+                        errors.append({"type": "ERROR", "message": _("This node allows only images."), "title": title})
 
             if value is not None and config["activateMax"] is True and len(value) > limit:
                 message = _("This node has a limit of {0} files. Please reduce files.".format(limit))
@@ -1600,7 +1633,7 @@ class FileListDataType(BaseDataType):
             if path:
                 for file in value:
                     if not default_storage.exists(os.path.join(path, file["name"])):
-                        message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], default_storage.path(path)))
+                        message = _('The file "{0}" does not exist in "{1}"'.format(file["name"], path))
                         title = _("File Not Found")
                         errors.append({"type": "ERROR", "message": message, "title": title})
         except Exception as e:
@@ -1609,6 +1642,11 @@ class FileListDataType(BaseDataType):
             title = _("Unexpected File Error")
             errors.append({"type": "ERROR", "message": message, "title": title})
         return errors
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         try:
@@ -1654,7 +1692,7 @@ class FileListDataType(BaseDataType):
             current_tile_data = self.get_tile_data(tile)
             if previously_saved_tile.count() == 1:
                 previously_saved_tile_data = self.get_tile_data(previously_saved_tile[0])
-                if previously_saved_tile_data[nodeid] is not None:
+                if previously_saved_tile_data and previously_saved_tile_data[nodeid] is not None:
                     for previously_saved_file in previously_saved_tile_data[nodeid]:
                         previously_saved_file_has_been_removed = True
                         for incoming_file in current_tile_data[nodeid]:
@@ -1668,18 +1706,14 @@ class FileListDataType(BaseDataType):
                                 logger.exception(_("File does not exist"))
 
             files = request.FILES.getlist("file-list_" + nodeid + "_preloaded", []) + request.FILES.getlist("file-list_" + nodeid, [])
+            tile_exists = models.TileModel.objects.filter(pk=tile.tileid).exists()
 
             for file_data in files:
                 file_model = models.File()
                 file_model.path = file_data
                 file_model.tile = tile
-                if models.TileModel.objects.filter(pk=tile.tileid).exists():
-                    original_storage = file_model.path.storage
-                    # Prevents Django's file storage API from overwriting files uploaded directly from client re #9321
-                    if file_data.name in [x.name for x in request.FILES.getlist("file-list_" + nodeid + "_preloaded", [])]:
-                        file_model.path.storage = FileSystemStorage()
+                if tile_exists:
                     file_model.save()
-                    file_model.path.storage = original_storage
                 if current_tile_data[nodeid] is not None:
                     resave_tile = False
                     updated_file_records = []
@@ -1687,6 +1721,7 @@ class FileListDataType(BaseDataType):
                         if file_json["name"] == file_data.name and file_json["url"] is None:
                             file_json["file_id"] = str(file_model.pk)
                             file_json["url"] = settings.MEDIA_URL + str(file_model.fileid)
+                            file_json["path"] = file_model.path.name
                             file_json["status"] = "uploaded"
                             resave_tile = True
                         updated_file_records.append(file_json)
@@ -1725,8 +1760,8 @@ class FileListDataType(BaseDataType):
         Accepts a comma delimited string of file paths as 'value' to create a file datatype value
         with corresponding file record in the files table for each path. Only the basename of each path is used, so
         the accuracy of the full path is not important. However the name of each file must match the name of a file in
-        the directory from which Arches will request files. By default, this is the 'uploadedfiles' directory
-        in a project.
+        the directory from which Arches will request files. By default, this is the directory in a project as defined
+        in settings.UPLOADED_FILES_DIR.
 
         """
 
@@ -1745,7 +1780,7 @@ class FileListDataType(BaseDataType):
             tile_file["name"] = os.path.basename(file_path)
             tile_file["type"] = mime.guess_type(file_path)[0]
             tile_file["type"] = "" if tile_file["type"] is None else tile_file["type"]
-            file_path = "uploadedfiles/" + str(tile_file["name"])
+            file_path = "%s/%s" % (settings.UPLOADED_FILES_DIR, str(tile_file["name"]))
             tile_file["file_id"] = str(uuid.uuid4())
             if source_path:
                 source_file = os.path.join(source_path, tile_file["name"])
@@ -1753,7 +1788,7 @@ class FileListDataType(BaseDataType):
                 try:
                     with default_storage.open(source_file) as f:
                         current_file, created = models.File.objects.get_or_create(fileid=tile_file["file_id"])
-                        filename = fs.save(os.path.join("uploadedfiles", os.path.basename(f.name)), File(f))
+                        filename = fs.save(os.path.join(settings.UPLOADED_FILES_DIR, os.path.basename(f.name)), File(f))
                         current_file.path = os.path.join(filename)
                         current_file.save()
                         tile_file["size"] = current_file.path.size
@@ -1779,7 +1814,7 @@ class FileListDataType(BaseDataType):
                     if file["file_id"]:
                         if file["url"] == f'{settings.MEDIA_URL}{file["file_id"]}':
                             val = uuid.UUID(file["file_id"])  # to test if file_id is uuid
-                            file_path = "uploadedfiles/" + file["name"]
+                            file_path = "%s/%s" % (settings.UPLOADED_FILES_DIR, file["name"])
                             try:
                                 file_model = models.File.objects.get(pk=file["file_id"])
                             except ObjectDoesNotExist:
@@ -1797,7 +1832,7 @@ class FileListDataType(BaseDataType):
                     logger.warning(_("This file's fileid is not a valid UUID"))
 
     def transform_export_values(self, value, *args, **kwargs):
-        return ",".join([settings.MEDIA_URL + "uploadedfiles/" + str(file["name"]) for file in value])
+        return ",".join([settings.MEDIA_URL + settings.UPLOADED_FILES_DIR + "/" + str(file["name"]) for file in value])
 
     def is_a_literal_in_rdf(self):
         return False
@@ -2170,6 +2205,11 @@ class DomainListDataType(BaseDomainDataType):
 
         return terms
 
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         domain_text_values = set([])
         node = models.Node.objects.get(nodeid=nodeid)
@@ -2304,6 +2344,11 @@ class ResourceInstanceDataType(BaseDataType):
                     errors.append(error_message)
 
         return errors
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
 
     def pre_tile_save(self, tile, nodeid):
         relationships = tile.data[nodeid]

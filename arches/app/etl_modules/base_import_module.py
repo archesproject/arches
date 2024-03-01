@@ -15,6 +15,7 @@ from django.db import connection
 
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.models.models import Node
+from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.transaction import reverse_edit_log_entries
@@ -156,7 +157,7 @@ class BaseImportModule:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
 
-    def run_load_task(self, files, summary, result, temp_dir, loadid):
+    def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
         with connection.cursor() as cursor:
             for file in files.keys():
                 self.stage_excel_file(file, summary, cursor)
@@ -173,7 +174,12 @@ class BaseImportModule:
             result["validation"] = self.validate(loadid)
             if len(result["validation"]["data"]) == 0:
                 self.loadid = loadid  # currently redundant, but be certain
-                save_to_tiles(loadid, multiprocessing=False)
+                save_to_tiles(userid, loadid)
+                cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
+                cursor.execute("""SELECT __arches_refresh_spatial_views();""")
+                refresh_successful = cursor.fetchone()[0]
+                if not refresh_successful:
+                    raise Exception('Unable to refresh spatial views')
             else:
                 cursor.execute(
                     """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
@@ -204,7 +210,7 @@ class BaseImportModule:
         self.loadid = request.POST.get("load_id")
         self.cumulative_excel_files_size = 0
         content = request.FILES["file"]
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(self.temp_dir)
         except (FileNotFoundError):
@@ -254,7 +260,7 @@ class BaseImportModule:
 
     def start(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
             try:
@@ -270,7 +276,7 @@ class BaseImportModule:
 
     def write(self, request):
         self.loadid = request.POST.get("load_id")
-        self.temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
         result = {}
         if self.file_details:
@@ -281,10 +287,10 @@ class BaseImportModule:
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 response = self.run_load_task_async(request, self.loadid)
             else:
-                response = self.run_load_task(files, summary, result, self.temp_dir, self.loadid)
+                response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid)
 
             return response
-        
+
 class FileValidationError(Exception):
     def __init__(self, message=_("Unable to read file"), code=400):
         self.title = _("Invalid Uploaded File")

@@ -10,8 +10,8 @@
 {% endblock etl_status %}
 
 {% block loading_status %}
-<div>
-    <h4>
+<div class="bulk-load-status">
+    <h4 class="summary-header">
         <span data-bind="text: $root.translations.loadingData"></span>
     </h4>
     <div>
@@ -51,9 +51,14 @@
 </div>
 
 <!-- ko if: loadDetails.number_of_import -->
-<div style="padding: 5px 0">
-    <h4>
-        <span data-bind="text: $root.translations.numberOfResourcesImported"></span>
+<div class="bulk-load-status" style="padding: 5px 0">
+    <h4 class="summary-header">
+        <span data-bind="text: $root.translations.importedData"></span>
+        <span>
+            <a class="etl-status-link" target="_blank"
+                data-bind="text: '('+$root.translations.viewInEditLog+')', attr: { href: editHistoryUrl }">
+            </a>
+        </span>
     </h4>
     <div>
         <!-- ko foreach: loadDetails.number_of_import -->
@@ -69,12 +74,12 @@
     </div>
 </div>
 <!-- /ko -->
-
 {% endblock loading_status %}
 
 {% block etl_error_report %}
-    <!-- ko if: validated -->
-    <h4>
+<!-- ko if: validated -->
+<div class="etl-error-report">
+    <h4 class="summary-header">
         <span data-bind="text: $root.translations.validationErrors"></span>
     </h4>
     <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
@@ -104,7 +109,7 @@
                 <td data-bind="text: $data.nodeAlias"></td>
                 <td data-bind="text: $data.datatype"></td>
                 <td data-bind="text: $data.count"></td>
-                <td class='etl-error-report-link'
+                <td class='etl-status-link'
                     data-bind="
                         if: $data.type === 'node',
                         click: function(){
@@ -146,7 +151,7 @@
             <!-- /ko -->    
             <!-- /ko -->
             <tr>
-                <td colspan="6" class='etl-error-report-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
+                <td colspan="6" class='etl-status-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
             </tr>
         </tbody>
         <!-- /ko -->
@@ -161,6 +166,7 @@
         </tbody>
         <!-- /ko -->            
     </table>
-    <!-- /ko -->
+</div>
+<!-- /ko -->
 {% endblock etl_error_report %}
 <!-- /ko -->

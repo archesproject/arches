@@ -79,7 +79,7 @@ class CsvWriter(Writer):
 
         # for export of multilingual nodes/columns
         if column:
-            lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
+            lang_regex = re.compile(r".+ \(([A-Za-z-]+)\)")
             matches = lang_regex.match(column)
             if len(matches.groups()) > 0:
                 lang = matches.groups()[0]
@@ -335,19 +335,16 @@ class TileCsvWriter(Writer):
             columns.insert(0, columns.pop(columns.index(name)))
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
+        # this call filters tiles by user permission (user is found in kwargs)
+        # and stores on self.tiles
         super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
 
         csvs_for_export = []
 
-        if graph_id:
-            tiles = self.group_tiles(
-                list(TileModel.objects.filter(resourceinstance__graph_id=graph_id).order_by("nodegroup_id").values()), "nodegroup_id"
-            )
-        else:
-            tiles = self.group_tiles(
-                list(TileModel.objects.filter(resourceinstance_id__in=resourceinstanceids).order_by("nodegroup_id").values()),
-                "nodegroup_id",
-            )
+        tiles = self.group_tiles(
+            self.tiles.order_by("nodegroup_id").values(),  # TODO: refactor to avoid going to the db again
+            "nodegroup_id",
+        )
         semantic_nodes = [str(n[0]) for n in Node.objects.filter(datatype="semantic").values_list("nodeid")]
 
         for nodegroupid, nodegroup_tiles in tiles.items():
@@ -416,10 +413,20 @@ class CsvReader(Reader):
                 resources.append(newresourceinstance)
                 if len(resources) >= settings.BULK_IMPORT_BATCH_SIZE:
                     Resource.bulk_save(resources=resources, transaction_id=transaction_id)
+                    if not prevent_indexing:
+                        for resource in resources:
+                            resource.save_descriptors()
+                            # This is our last chance to index, so we are going to take it.
+                            # However, not only are we not using a bulk indexer here, we've
+                            # already bulk-indexed once above. TODO: improve this
+                            resource.index()
                     del resources[:]  # clear out the array
             else:
                 try:
-                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
+                    newresourceinstance.save(index=False, transaction_id=transaction_id)
+                    if not prevent_indexing:
+                        newresourceinstance.save_descriptors()
+                        newresourceinstance.index()
 
                 except TransportError as e:
 
@@ -460,7 +467,7 @@ class CsvReader(Reader):
         new_languages = []
         first_business_data_row = next(iter(business_data))
         for column in first_business_data_row.keys():
-            column_regex = re.compile("^.+ \(([A-Za-z-]+)\)$")
+            column_regex = re.compile(r"^.+ \(([A-Za-z-]+)\)$")
             match = column_regex.match(column)
             if match is not None:
                 new_language_candidate = match.groups()[0]
@@ -790,7 +797,7 @@ class CsvReader(Reader):
                                 # is used to push this value deeper into the import process.  A later check will retrieve this
                                 # value and add it to the i18n string object
                                 else:
-                                    column_regex = re.compile("{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
+                                    column_regex = re.compile(r"{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
                                     column_match = column_regex.match(key.upper())
                                     if column_match is not None:
                                         language = column_match.groups()[0]

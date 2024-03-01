@@ -1,0 +1,9 @@
+@import "abstracts/functions.scss";
+
+.search-listing-footer {
+    font-size: 1.2rem;
+    @include break-at(mobile-small){
+        flex-direction: column;
+        height: auto;
+    }
+}

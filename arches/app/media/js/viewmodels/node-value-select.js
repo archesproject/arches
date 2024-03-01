@@ -102,9 +102,10 @@ define([
                 data: function(term) {
                     return {nodeid: params.node.config.nodeid(), term:term};
                 },
-                results: function(data) {
+                processResults: function(data) {
                     var options = [];
                     data.tiles.forEach(function(tile) {
+                        tile.id = tile.tileid;
                         options.push(tile);
                     });
                     return { results: options };
@@ -140,10 +141,7 @@ define([
                 }
             },
             escapeMarkup: function(m) { return m; },
-            id: function(tile) {
-                return tile.tileid;
-            },
-            formatResult: function(tile) {
+            templateResult: function(tile) {
                 var nodeid = params.node.config.nodeid();
                 var nodeDisplayValue = _.find(tile.display_values, function(displayValue) {
                     return nodeid === displayValue.nodeid;
@@ -163,12 +161,12 @@ define([
                     return markup;
                 }
             },
-            formatSelection: function(tile) {
+            templateSelection: function(tile) {
                 var nodeid = params.node.config.nodeid();
                 var displayValue = _.find(tile.display_values, function(dv) {
                     return nodeid === dv.nodeid;
                 });
-                return displayValue.value;
+                return displayValue?.value;
             }
         };
     };

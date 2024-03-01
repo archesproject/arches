@@ -1,14 +1,29 @@
 {% load i18n %}
 <!-- ko ifnot: $data.search -->
-<div class="row">
-    <div class="form-group">
-        <div class="relative">
-            <label class="col-xs-12 control-label widget-input-label">
-                <p class="control-label node-widget-label">
-                    <span data-bind="text: $root.translations.maximumNumberOfFiles"></span>
-                </p>
-                <input class="form-control input-md widget-input widget-file" placeholder="1" type="number" data-bind="textInput: maxFiles"></input>
-            </label>
+<div class="relative">
+    <div class="node-config-item">
+        <label class="col-xs-12 control-label widget-input-label">
+            <p class="control-label node-widget-label">
+                <span data-bind="text: $root.translations.maximumNumberOfFiles"></span>
+            </p>
+            <input class="form-control input-md widget-input widget-file" placeholder="1" type="number" data-bind="textInput: maxFiles"></input>
+        </label>
+    </div>
+    <div class="node-config-item">
+        <div class="pad-no">
+            <div
+                data-bind="
+                    component: {
+                        name: 'views/components/simple-switch',
+                        params: {
+                            value: imagesOnly,
+                            config: {
+                                label: $root.translations.imagesOnly,
+                            }
+                        }
+                    }
+                "
+            ></div>
         </div>
     </div>
 </div>

@@ -42,10 +42,11 @@ class BranchExcelExporter(BaseExcelExporter):
         self.request = request if request else None
         self.userid = request.user.id if request else None
         self.moduleid = request.POST.get("module") if request else None
+        self.filename = request.POST.get("filename") if request else None
         self.loadid = loadid if loadid else None
 
 
-    def run_export_task(self, load_id, graph_id, graph_name, resource_ids):
+    def run_export_task(self, load_id, graph_id, graph_name, resource_ids, *args, **kwargs):
         if resource_ids is None:
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT resourceinstanceid FROM resource_instances WHERE graphid = (%s)""", [graph_id])
@@ -53,6 +54,14 @@ class BranchExcelExporter(BaseExcelExporter):
                 resource_ids = [ row[0] for row in rows ]
 
         with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET load_details = %s WHERE  loadid = (%s)""",
+                (json.dumps({
+                    "graph": graph_name,
+                    "number_of_resources": len(resource_ids),
+                }), load_id),
+            )
+
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graph_id,))
             nodegroup_lookup = dictfetchall(cursor)
 
@@ -79,10 +88,13 @@ class BranchExcelExporter(BaseExcelExporter):
                             alias = node_lookup_by_id[key]["alias"]
                             if node_lookup_by_id[key]["datatype"] == "file-list":
                                 file_names_to_export = []
-                                for file in value:
-                                    files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
-                                    file_names_to_export.append(file["name"])
-                                tile[alias] = ",".join(file_names_to_export)
+                                if value is not None:
+                                    for file in value:
+                                        files_to_download.append({"name": file["name"], "file_id": file["file_id"]})
+                                        file_names_to_export.append(file["name"])
+                                    tile[alias] = ",".join(file_names_to_export)
+                                else:
+                                    tile[alias] = value
                             elif node_lookup_by_id[key]["datatype"] in ["concept-list", "domain-value-list"]:
                                 if type(value) == list:
                                     value = ",".join(value)
@@ -97,7 +109,9 @@ class BranchExcelExporter(BaseExcelExporter):
 
         wb = create_workbook(graph_id, tiles_to_export)
 
-        zip_file, download_files, skipped_files = self.get_files_in_zip_file(files_to_download, graph_name, wb)
+        user_generated_filename = self.filename or kwargs.get('filename')
+        zip_file, download_files, skipped_files, files_not_found = self.get_files_in_zip_file(files_to_download, graph_name, wb, user_generated_filename=user_generated_filename)
+        
         zip_file_name = os.path.basename(zip_file.path.name)
         zip_file_url = settings.MEDIA_URL + zip_file.path.name
 
@@ -106,6 +120,7 @@ class BranchExcelExporter(BaseExcelExporter):
             "number_of_resources": len(resource_ids),
             "number_of_files": len(download_files),
             "skipped_files": skipped_files,
+            "files_not_found": files_not_found,
             "zipfile": {
                 "name": zip_file_name,
                 "url": zip_file_url,
@@ -127,9 +142,10 @@ class BranchExcelExporter(BaseExcelExporter):
         graph_id = request.POST.get("graph_id", None)
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
+        filename = request.POST.get("filename")
 
         export_task = tasks.export_branch_excel.apply_async(
-            (self.userid, self.loadid, graph_id, graph_name, resource_ids),
+            (self.userid, self.loadid, graph_id, graph_name, resource_ids, filename),
         )
 
         with connection.cursor() as cursor:

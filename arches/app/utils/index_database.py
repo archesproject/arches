@@ -193,20 +193,25 @@ def index_resources_using_singleprocessing(
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
+            last_resource = None
             for resource in resources:
                 resource.set_node_datatypes(node_datatypes)
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if recalculate_descriptors:
-                    resource.calculate_descriptors()
+                    # Reuse the queryset for FunctionXGraph rows if the graph is the same.
+                    if last_resource and (resource.graph_id == last_resource.graph_id):
+                        resource.descriptor_function = last_resource.descriptor_function
+                    resource.save_descriptors()
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 document, terms = resource.get_documents_to_index(
                     fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
-                resource.save(index=False)
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
+
+                last_resource = resource
 
     return os.getpid()
 
@@ -243,7 +248,6 @@ def index_resources_by_type(
             resource_types = resource_types.split(",")
         except:
             pass
-        # resource_types = [resource_types]
 
     for resource_type in resource_types:
         start = datetime.now()
@@ -298,13 +302,11 @@ def index_resources_by_type(
 
 
 def _index_resource_batch(resourceids, recalculate_descriptors):
-    from arches.app.search.search_engine_factory import SearchEngineInstance as _se
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    return index_resources_using_singleprocessing(
-        resources, batch_size, quiet=True, se=_se, recalculate_descriptors=recalculate_descriptors
-    )
+    return index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=False, title="Indexing Resource Batch", recalculate_descriptors=recalculate_descriptors)
+
 
 
 def index_custom_indexes(index_name=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):

@@ -153,7 +153,6 @@
     <div class="file-workbench-files" data-bind="foreach: canvases">
         <div class='file-workbench-file' style="display: inline-flex;" data-bind="css: {staged: (($parent.selectPrimaryPanel() && ko.unwrap($parent.canvas) === $data.images[0].resource.service['@id']) || !$parent.selectPrimaryPanel() && ko.unwrap($parent.secondaryCanvas) === $data.images[0].resource.service['@id'])}">
             <input type="checkbox" style="width:15px; height:15px;" data-bind="value: $data, checked: $parent.canvasesForDeletion">
-            <span data-bind="text: console.log($parent.canvasLabel(), $parent.canvas(), $data.images[0])"></span>
             <span class='file-name manifest-manager-canvas-name' data-bind="text: label, click: $parent.canvasClick, clickBubble: false"></span>
         </div>
     </div>
@@ -195,7 +194,7 @@
     </label>
     <div>
         <input type="text" class="form-control input-lg" style="height: 36px;" 
-        data-bind="attr:{placeholder: $root.translations.imageCaption}, textInput: self.canvasLabel, valueUpdate: 'keyup'">
+        data-bind="attr:{placeholder: $root.translations.imageCaption, disabled: compareMode }, textInput: self.canvasLabel, valueUpdate: 'keyup'">
     </div>
     <!--/ko-->
     
@@ -203,10 +202,10 @@
     
     <div class="install-buttons" style="display: inline-flex; justify-content: space-between;">
         <div class="file-workbench-buttons">
-            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty()">
+            <button class="btn btn-mint btn-md btn-labeled fa fa-pencil" data-bind="click: updateManifest, clickBubble: false, disable: !isCanvasDirty(), css: {disabled: !isCanvasDirty()}">
                 <span data-bind="text: $root.translations.save"></span>
             </button>
-            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty()">
+            <button class="btn btn-warning btn-md btn-labeled fa fa-refresh" data-bind="click: reset, clickBubble: false, disable: !isCanvasDirty(), css: {disabled: !isCanvasDirty()}">
                 <span data-bind="text: $root.translations.cancel"></span>
             </button>
         </div>
@@ -222,17 +221,17 @@
 <div>
     <ul class="nav nav-tabs flex pad-no">
         <li data-bind="if: shouldShowCreateService">
-            <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); editService(false)}, css: { active: createService }">
+            <div class='manifest-manager-nav-tab' data-bind="click: function(){createService(true); selectService(false)}, css: { active: createService }">
                 <div class='tab-label'>
                     <span data-bind="text: $root.translations.createNewService"></span>
                 </div>
             </div>
         </li>
-        <li data-bind="if: shouldShowEditService">
+        <li data-bind="if: shouldShowSelectService">
             <div class='manifest-manager-nav-tab' data-bind=
-                "click: function(){createService(false); editService(true)}, css: { active: editService }">
+                "click: function(){createService(false); selectService(true)}, css: { active: selectService }">
                 <div class='tab-label'>
-                    <span data-bind="text: $root.translations.editService"></span>
+                    <span data-bind="text: $root.translations.selectService"></span>
                 </div>
             </div>
         </li>
@@ -281,23 +280,23 @@
 </div>
 <!-- /ko -->
 
-<!--ko if: editService -->
+<!--ko if: selectService -->
 <div class="file-select loader-select" style="height: 100%;">
     <div style="display:flex; flex-direction: column; align-items: center;">
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-picture-o r-select-icon"></i></span>
         </div> 
         <h2>
-            <span data-bind="text: $root.translations.editExistingImageService"></span>
+            <span data-bind="text: $root.translations.selectExistingImageService"></span>
         </h2>
         <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
         <div style="display:flex; flex-direction: column; width: 300px">
             <div class="manifest-editor-input">
-                <input class="form-control input-lg widget-input"
-                    data-bind="value: manifest,
-                    select2Query: {
+                <select class="form-control input-lg widget-input"
+                    data-bind="select2Query: {
                         select2Config: manifestSelectConfig
                     }">
+                </select>
             </div>
         </div>
         <h5 class="rr-splash-description">
@@ -328,7 +327,7 @@
         class="iiif-gallery-sequence-label" 
         style="padding:0 5px" 
         data-bind="
-            if: shouldShowEditService,
+            if: shouldShowSelectService,
             click: toggleManifestEditor,
         "
     >

@@ -36,8 +36,10 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(self):
-        self.loadOntology()
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.loadOntology()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -46,14 +48,10 @@ class BusinessDataExportTests(ArchesTestCase):
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_collection.xml")
         ret = skos.save_concepts_from_skos(rdf)
 
-        with open(os.path.join("tests/fixtures/resource_graphs/resource_export_test.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/resource_export_test.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def test_invalid_writer_config(self):
         with self.assertRaises(MissingConfigException):
@@ -68,7 +66,7 @@ class BusinessDataExportTests(ArchesTestCase):
 
         csv_output = list(csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n")))[0]
         csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
-        csv_input = list(csv.DictReader(open(csvinputfile, "rU", encoding="utf-8"), restkey="ADDITIONAL", restval="MISSING"))[0]
+        csv_input = list(csv.DictReader(open(csvinputfile, "r", encoding="utf-8"), restkey="ADDITIONAL", restval="MISSING"))[0]
 
         self.assertDictEqual(dict(csv_input), dict(csv_output))
 

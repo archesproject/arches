@@ -36,6 +36,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         cls.loadOntology()
 
     def setUp(self):

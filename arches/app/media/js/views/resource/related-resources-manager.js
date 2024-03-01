@@ -10,7 +10,6 @@ define([
     'utils/ontology',
     'templates/views/resource/related-resources/related-resources-manager.htm',
     'views/components/related-resources-graph',
-    'plugins/knockout-select2',
     'bindings/datepicker',
     'bindings/datatable'
 ], function($, _, Backbone, ko, koMapping, arches, ResourceInstanceSelect, RelatedResourcesNodeList, ontologyUtils, relatedResourcesManagerTemplate) {
@@ -371,7 +370,9 @@ define([
                     },
                     dataType: 'json',
                     quietMillis: 250,
-                    data: function(term, page) {
+                    data: function(requestParams) {
+                        let term = requestParams.term || '';
+                        let page = requestParams.page || 1;
                         //TODO This regex isn't working, but it would nice fix it so that we can do more robust url checking
                         // var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
                         // var regex = new RegExp(expression);
@@ -407,11 +408,18 @@ define([
                             return data;
                         }
                     },
-
-                    results: function(data, page) {
+                    processResults: function(data) {
+                        data.results.hits.hits.forEach(function(hit){
+                            if (self.disableSearchResults(hit) === true) {
+                                hit.disabled = true;
+                            }
+                            hit.id = hit._id;
+                        });
                         return {
-                            results: data.results.hits.hits,
-                            more: data['paging-filter'].paginator.has_next
+                            "results": data.results.hits.hits,
+                            "pagination": {
+                                "more": data['paging-filter'].paginator.has_next
+                            }
                         };
                     }
                 },
@@ -425,35 +433,29 @@ define([
                         self.relationshipCandidateIds(null);
                     });
                 },
-                id: function(item) {
-                    return item._id;
-                },
-                formatResult: function(item) {
-                    if (self.disableSearchResults(item) === false) {
+                templateResult: function(item) {
+                    var ret = '';
+                    if(!item.id){
+                        return item.text;
+                    }
+                    if(item.disabled){
+                        ret = '<span>' + item._source.displayname + ' Cannot be related</span>';
+                    } else {
                         if (item._source) {
-                            return item._source.displayname;
+                            ret = '<span>' + item._source.displayname + '</span>';
                         } else {
-                            return '<b> Create a new ' + item.name + ' . . . </b>';
+                            ret = '<b> Create a new ' + item.name + ' . . . </b>';
                         }
-                    } else {
-                        return '<span>' + item._source.displayname + ' Cannot be related</span>';
                     }
+                    return $(ret);
                 },
-                formatResultCssClass: function(item) {
-                    if (self.disableSearchResults(item) === false) {
-                        return '';
-                    } else {
-                        return 'disabled';
-                    }
-                },
-                formatSelection: function(item) {
+                templateSelection: function(item) {
                     if (item._source) {
                         return item._source.displayname;
                     } else {
                         return item.name;
                     }
-                },
-                initSelection: function(el, callback) { }
+                }
             };
         },
 

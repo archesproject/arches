@@ -1,18 +1,25 @@
 {
     "name": "arches",
-    "version": "7.5.0",
+    "version": "7.6.0",
+    "license": "AGPL-3.0-only",
     "scripts": {
-        "build_production": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.prod.js",
-        "build_development": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js",
-        "build_test": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config arches/webpack/webpack.config.dev.js --env test=true",
-        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config arches/webpack/webpack.config.dev.js"
+        "build_development": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.dev.js",
+        "build_production": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.prod.js",
+        "build_test": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.dev.js --env test=true",
+        "eslint:check": "./arches/app/media/node_modules/.bin/eslint ./arches/app/src --resolve-plugins-relative-to ./arches/app/media --ext .vue,.ts --parser ./arches/app/media/node_modules/vue-eslint-parser/index.js",
+        "eslint:watch": "./arches/app/media/node_modules/.bin/nodemon --watch ./arches/app/src --ext ts,vue --exec yarn --silent eslint:check",
+        "gettext:extract": "./arches/app/media/node_modules/.bin/vue-gettext-extract",
+        "gettext:compile": "./arches/app/media/node_modules/.bin/vue-gettext-compile",
+        "ts:check": "./arches/app/media/node_modules/.bin/vue-tsc --noEmit",
+        "ts:watch": "./arches/app/media/node_modules/.bin/vue-tsc --watch --noEmit",
+        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config ./arches/webpack/webpack.config.dev.js"
     },
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.5.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
@@ -66,28 +73,33 @@
         "moment-timezone": "~0.5.43",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
+        "primevue": "^3.45.0",
         "proj4": "^2.3.15",
         "regenerator-runtime": "^0.13.9",
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "~2.0.16",
+        "select-woo": "jadu/selectWoo",
         "select2": "3.5.1",
         "underscore": "~1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.3.4",
+        "vue3-gettext": "^3.0.0-beta.4",
         "webpack-bundle-tracker": "^1.4.0"
     },
     "nodeModulesPaths": {
-        "plugins/knockout-select2": "plugins/knockout-select2.js",
         "nifty": "plugins/nifty",
         "leaflet-side-by-side": "plugins/leaflet-side-by-side/index",
         "themepunch-tools": "plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min",
         "revolution-slider": "plugins/revolution-slider",
+        "slick": "plugins/slick",
         "async": "node_modules/requirejs-plugins/src/async",
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",
         "js-cookie": "node_modules/js-cookie/src/js.cookie",
         "select2": "node_modules/select2/select2",
+        "select-woo": "node_modules/select-woo/dist/js/selectWoo.full",
+        "select-woo-src": "node_modules/select-woo/src/js/select2",
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap.min",
         "jquery-ui": "node_modules/jqueryui/jquery-ui.min",
         "backbone": "node_modules/backbone/backbone-min",

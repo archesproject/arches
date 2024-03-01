@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
-from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
+from arches.app.models.models import CardModel, CardXNodeXWidget, Language, PublishedGraph
 from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -300,7 +300,9 @@ class ArchesPOLoader:
 
 
 class LanguageSynchronizer:
-    def synchronize_settings_with_db():
+    def synchronize_settings_with_db(update_published_graphs=True):
+        from arches.app.models.graph import Graph  # avoids circular import
+
         if settings.LANGUAGES:
             for lang in settings.LANGUAGES:
                 found_language = Language.objects.filter(code=lang[0]).first()
@@ -318,18 +320,7 @@ class LanguageSynchronizer:
                     isdefault=False,
                 )
 
-            for lang in settings.LANGUAGES:
-                for graph in GraphModel.objects.all():
-                    if graph.publication:
-                        found_language_published_graph = graph.get_published_graph(language=lang[0])
-
-                        # no need to add the language if it already exists
-                        if found_language_published_graph:
-                            continue
-
-                        publication_language = Language.objects.filter(code=lang[0]).first()
-                        PublishedGraph.objects.create(
-                            language=publication_language,
-                            serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(graph, force_recalculation=True)),
-                            publication=graph.publication,
-                        )
+            if update_published_graphs:
+                for graph in Graph.objects.all():
+                    if graph.publication_id:
+                        graph.update_published_graphs()

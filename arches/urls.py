@@ -25,6 +25,7 @@ from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
+from arches.app.views.thumbnail import ThumbnailView
 from arches.app.views.graph import (
     GraphDesignerView,
     GraphSettingsView,
@@ -51,6 +52,7 @@ from arches.app.views.resource import (
 )
 from arches.app.views.resource import ResourceEditorView, ResourceActivityStreamPageView, ResourceActivityStreamCollectionView
 from arches.app.views.plugin import PluginView
+from arches.app.views.workflow_history import WorkflowHistoryView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
@@ -239,7 +241,9 @@ urlpatterns = [
     re_path(r"^%s/(?P<path>.*)$" % settings.KIBANA_CONFIG_BASEPATH, api.KibanaProxy.as_view()),
     re_path(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     re_path(r"^graphs", api.Graphs.as_view(action="get_graph_models"), name="get_graph_models_api"),
-    re_path(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
+    re_path(
+        r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"
+    ),
     re_path(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     re_path(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     re_path(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),
@@ -254,10 +258,15 @@ urlpatterns = [
         api.BulkDisambiguatedResourceInstance.as_view(),
         name="api_bulk_disambiguated_resource_instance",
     ),
+    re_path(r"^api/get_frontend_i18n_data$", api.GetFrontendI18NData.as_view(), name="get_frontend_i18n_data"),
     re_path(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
+    re_path(r"^api/user_incomplete_workflows$", api.UserIncompleteWorkflows.as_view(), name="api_user_incomplete_workflows"),
+    re_path(r"^api/plugins/(?P<pluginid>%s)?$" % uuid_regex, api.Plugins.as_view(), name="api_plugins"),
+    re_path(r"^api/get_nodegroup_tree$", api.GetNodegroupTree.as_view(), name="api_get_nodegroup_tree"),
     re_path(r"^rdm/concepts/(?P<conceptid>%s|())$" % uuid_regex, api.Concepts.as_view(), name="concepts"),
     re_path(r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"),
     re_path(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
+    re_path(r"^workflow_history/(?P<workflowid>%s|())$" % uuid_regex, WorkflowHistoryView.as_view(), name="workflow_history"),
     re_path(r"^cards/(?P<resourceid>%s|())$" % uuid_regex, api.Card.as_view(), name="api_card"),
     re_path(r"^search_component_data/(?P<componentname>[-\w]+)$", api.SearchComponentData.as_view(), name="api_search_component_data"),
     re_path(r"^geojson$", api.GeoJSON.as_view(), name="geojson"),
@@ -274,16 +283,13 @@ urlpatterns = [
     re_path(r"^history/$", ResourceActivityStreamCollectionView.as_view(), name="as_stream_collection"),
     re_path(r"^history/(?P<page>[0-9]+)$", ResourceActivityStreamPageView.as_view(), name="as_stream_page"),
     re_path(r"^icons$", IconDataView.as_view(), name="icons"),
+    re_path(r"^thumbnail/(?P<resource_id>%s)$" % uuid_regex, ThumbnailView.as_view(), name="thumbnail"),
     # Uncomment the admin/doc line below to enable admin documentation:
     # re_path(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     re_path(r"^admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
-    re_path(
-        r"^password_reset/$",
-        PasswordResetView.as_view(),
-        name="password_reset",
-    ),
+    re_path(r"^password_reset/$",PasswordResetView.as_view(),name="password_reset",),
     re_path(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path(
         "reset/<uidb64>/<token>/",
@@ -297,8 +303,11 @@ urlpatterns = [
     re_path(r"^iiifannotations$", api.IIIFAnnotations.as_view(), name="iiifannotations"),
     re_path(r"^iiifannotationnodes$", api.IIIFAnnotationNodes.as_view(), name="iiifannotationnodes"),
     re_path(r"^manifest/(?P<id>[0-9]+)$", api.Manifest.as_view(), name="manifest"),
+    re_path(r"^manifest/(?P<id>%s)$" % uuid_regex, api.Manifest.as_view(), name="manifest"),
     re_path(r"^image-service-manager", ManifestManagerView.as_view(), name="manifest_manager"),
-    re_path(r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"),
+    re_path(
+        r"^two-factor-authentication-settings", TwoFactorAuthenticationSettingsView.as_view(), name="two-factor-authentication-settings"
+    ),
     re_path(r"^two-factor-authentication-login", TwoFactorAuthenticationLoginView.as_view(), name="two-factor-authentication-login"),
     re_path(r"^two-factor-authentication-reset", TwoFactorAuthenticationResetView.as_view(), name="two-factor-authentication-reset"),
     re_path(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),

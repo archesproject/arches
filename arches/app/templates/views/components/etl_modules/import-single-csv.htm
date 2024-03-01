@@ -153,12 +153,16 @@
 {% endblock task_details %}
 
 {% block etl_status %}
-<div style="margin-bottom: 20px;">
-    <h4>
-        <span data-bind="text: $root.translations.importSingleCsv"></span>
+<div class="bulk-load-status" style="margin-bottom: 20px;">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.singleCsvImportSummary"></span>
     </h4>
     <!-- ko if: loadDetails -->
     <!-- ko ifnot: loading() -->
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fileName + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: loadDetails.file_name"></span>
+    </div>
     <div>
         <span class="etl-loading-metadata-key" data-bind="text: $root.translations.targetResource + ':'"></span>
         <span class="etl-loading-metadata-value" data-bind="text: getGraphName(loadDetails.graph)"></span>

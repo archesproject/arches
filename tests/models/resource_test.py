@@ -23,8 +23,10 @@ import time
 from tests import test_settings
 from django.contrib.auth.models import User, Group
 from django.core import management
+from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
 from arches.app.models.graph import Graph
@@ -34,7 +36,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.index_database import index_resources_by_type
+from arches.app.utils.index_database import index_resources_by_type, index_resources_using_singleprocessing
 from tests.base_test import ArchesTestCase
 
 
@@ -45,6 +47,8 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         LanguageSynchronizer.synchronize_settings_with_db()
 
         models.ResourceInstance.objects.all().delete()
@@ -52,7 +56,7 @@ class ResourceTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
 
@@ -124,7 +128,7 @@ class ResourceTests(ArchesTestCase):
         tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
         cls.test_resource.tiles.append(tile)
 
-        # Add Gometry
+        # Add Geometry
         cls.geom = {
             "type": "FeatureCollection",
             "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
@@ -142,6 +146,7 @@ class ResourceTests(ArchesTestCase):
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
         cls.user.delete()
+        super().tearDownClass()
 
     def test_get_node_value_string(self):
         """
@@ -217,6 +222,36 @@ class ResourceTests(ArchesTestCase):
 
         self.assertEqual(result, "Passed")
 
+    def test_publication_restored_on_save(self):
+        """
+        If a resource lacks a graph publication, it is restored by a call to save().
+        """
+
+        publication = self.test_resource.graph_publication
+        cursor = connection.cursor()
+        # Hack out the graph publication
+        sql = """
+            UPDATE resource_instances
+            SET graphpublicationid = NULL
+            WHERE resourceinstanceid = '{resource_pk}';
+        """.format(
+            resource_pk=self.test_resource.pk
+        )
+        cursor.execute(sql)
+        self.addCleanup(setattr, self.test_resource, "graph_publication", publication)
+        self.addCleanup(self.test_resource.save)
+        self.test_resource.refresh_from_db()
+        self.assertIsNone(self.test_resource.graph_publication)  # ensure test setup is good
+
+        # update_or_create() delegates to save()
+        obj, created = models.ResourceInstance.objects.filter(pk=self.test_resource.pk).update_or_create(
+            pk=self.test_resource.pk,
+            graph=self.test_resource.graph,
+        )
+        obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
+
+        self.assertIsNotNone(obj.graph_publication)
+
     def test_creator_has_permissions(self):
         """
         Test user that created instance has full permissions
@@ -230,3 +265,21 @@ class ResourceTests(ArchesTestCase):
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
         self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
+
+    def test_recalculate_descriptors_one_query_for_descriptor_function(self):
+        r1 = Resource(graph_id=self.search_model_graphid)
+        r2 = Resource(graph_id=self.search_model_graphid)
+        r1.save()
+        r2.save()
+
+        # Ensure we start from scratch
+        r1.descriptor_function = None
+        r2.descriptor_function = None
+
+        with CaptureQueriesContext(connection) as queries:
+            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+
+        function_x_graph_selects = [
+            q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
+        ]
+        self.assertEqual(len(function_x_graph_selects), 1)

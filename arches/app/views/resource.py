@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import uuid
 
-from distutils.util import strtobool
-
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group, Permission
 from django.db import transaction
@@ -59,6 +57,7 @@ from arches.app.utils.permission_backend import (
     user_can_read_resource,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -201,6 +200,7 @@ class ResourceEditorView(MapBaseManagerView):
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
 
+
         ontologyclass = None
         nodegroups = []
         editable_nodegroups = []
@@ -342,6 +342,9 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
+    
+        if resourceid not in (None, ""):
+            context["nav"]["report_view"] = True
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
             context["nav"]["help"] = {"title": _("Managing System Settings"), "templates": ["system-settings-help"]}
@@ -536,12 +539,16 @@ class ResourceEditLogView(BaseManagerView):
                     pass
 
     def get(self, request, resourceid=None, view_template="views/resource/edit-log.htm"):
+        transaction_id = request.GET.get("transactionid", None)
         if resourceid is None:
-            recent_edits = (
-                models.EditLog.objects.all()
-                .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                .order_by("-timestamp")[:100]
-            )
+            if transaction_id:
+                recent_edits = models.EditLog.objects.filter(transactionid=transaction_id).order_by("-timestamp")
+            else:
+                recent_edits = (
+                    models.EditLog.objects.all()
+                    .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    .order_by("-timestamp")[:100]
+                )
             edited_ids = list({edit.resourceinstanceid for edit in recent_edits})
             resources = Resource.objects.filter(resourceinstanceid__in=edited_ids).select_related("graph")
             edit_type_lookup = {
@@ -863,7 +870,7 @@ class RelatedResourcesView(BaseManagerView):
         else:
             lang = request.GET.get("lang", request.LANGUAGE_CODE)
             resourceinstance_graphid = request.GET.get("resourceinstance_graphid")
-            paginate = strtobool(request.GET.get("paginate", "true"))  # default to true
+            paginate = str_to_bool(request.GET.get("paginate", "true"))  # default to true
             resource = Resource.objects.get(pk=resourceid)
 
             if paginate:
