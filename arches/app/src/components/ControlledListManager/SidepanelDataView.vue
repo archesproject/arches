@@ -77,7 +77,6 @@ const fetchLists = async () => {
         toast.add({
             severity: ERROR,
             summary: errorText || $gettext("Unable to fetch lists"),
-            life: 3000,
         });
     }
 };
@@ -100,7 +99,6 @@ const createList = async () => {
         toast.add({
             severity: ERROR,
             summary: $gettext("List creation failed"),
-            life: 3000,
         });
     }
 };
@@ -136,7 +134,6 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
                     severity: ERROR,
                     summary: $gettext("List deletion failed"),
                     detail: body.message,
-                    life: 8000,
                 });
             }
         });
@@ -144,7 +141,6 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
         toast.add({
             severity: ERROR,
             summary: $gettext("List deletion failed"),
-            life: 5000,
         });
     }
     await fetchLists();

@@ -9,7 +9,6 @@ import type {
     NewLabel,
 } from "@/types/ControlledListManager";
 
-const DEFAULT_TOAST_LIFE = 5000;
 const ERROR = "error";
 type GetText = (s: string) => string;
 
@@ -38,7 +37,6 @@ export const postItemToServer = async (
         toast.add({
             severity: ERROR,
             summary: errorText || $gettext("Save failed"),
-            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
@@ -75,7 +73,6 @@ export const postListToServer = async (
         toast.add({
             severity: ERROR,
             summary: errorText || $gettext("Save failed"),
-            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
@@ -105,7 +102,6 @@ export const upsertLabel = async (
         toast.add({
             severity: ERROR,
             summary: errorText || $gettext("Label save failed"),
-            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
@@ -131,7 +127,6 @@ export const deleteLabel = async (
         toast.add({
             severity: ERROR,
             summary: errorText || $gettext("Label deletion failed"),
-            life: DEFAULT_TOAST_LIFE,
         });
     }
 };
