@@ -114,7 +114,8 @@
                                 <span data-bind="text: $root.translations.addingPhotosOptional"></span>
                             </p>
                             <p>
-                                <span data-bind="text: $root.translations.maxPhotoSizeWarning"></span>
+                                <span data-bind="text: $root.translations.maxPhotoSizeWarning + ' : '"></span>
+                                <span data-bind="text: maxFilesize() + ' MB'"></span>
                             </p>
                         </div>
 
