@@ -268,12 +268,7 @@ class ResourceEditorView(MapBaseManagerView):
 
         serialized_graph = None
         if graph.publication:
-            try:
-                published_graph = graph.get_published_graph()
-            except models.PublishedGraph.DoesNotExist:
-                LanguageSynchronizer.synchronize_settings_with_db()
-                published_graph = graph.get_published_graph()
-
+            published_graph = graph.get_published_graph()
             serialized_graph = published_graph.serialized_graph
 
         if serialized_graph:
