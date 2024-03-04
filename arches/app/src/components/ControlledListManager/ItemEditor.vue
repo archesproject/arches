@@ -5,6 +5,7 @@ import { useGettext } from "vue3-gettext";
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 
+import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Language } from "@/types/arches";
@@ -61,15 +62,15 @@ const iconLabel = (item: ControlledListItem) => {
     </span>
     <LabelEditor
         :item
-        type="prefLabel"
+        :type="PREF_LABEL"
     />
     <LabelEditor
         :item
-        type="altLabel"
+        :type="ALT_LABEL"
     />
     <LabelEditor
         :item
-        type="URI"
+        :type="URI"
         :style="{ marginBottom: 0 }"
     />
     <ItemCharacteristic
@@ -90,10 +91,12 @@ const iconLabel = (item: ControlledListItem) => {
     border-bottom: 1px solid;
     width: 80%;
 }
+
 h3 {
     font-size: 1.5rem;
     margin: 0;
 }
+
 .item-type {
     font-size: small;
     font-weight: 200;

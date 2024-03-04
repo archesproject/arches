@@ -8,6 +8,8 @@ import { deleteLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 
+import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
+
 import type {
     ControlledListItem,
     Label,
@@ -30,21 +32,21 @@ const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const headings: { heading: string; subheading: string } = computed(() => {
     switch (props.type) {
-        case "prefLabel":
+        case PREF_LABEL:
             return {
                 heading: $gettext("Preferred Label(s)"),
                 subheading: $gettext(
                     "Provide at least one preferred label and language for your list item."
                 ),
             };
-        case "altLabel":
+        case ALT_LABEL:
             return {
                 heading: $gettext("Alternate Label(s)"),
                 subheading: $gettext(
                     "Optionally, you can provide additional label/language labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
                 ),
             };
-        case "URI":
+        case URI:
             return {
                 heading: $gettext("List Item URI"),
                 subheading: $gettext(
@@ -56,7 +58,7 @@ const headings: { heading: string; subheading: string } = computed(() => {
                 heading: "",
                 subheading: "",
             };
-    }  
+    }
 });
 
 const onDelete = async (label: Label) => {
@@ -84,7 +86,7 @@ const onDelete = async (label: Label) => {
             />
         </div>
         <AddLabel
-            v-if="type !== 'URI'"
+            v-if="type !== URI"
             :item
             :type="type"
             :on-insert
@@ -97,11 +99,13 @@ const onDelete = async (label: Label) => {
     margin: 1rem 1rem 3rem 1rem;
     width: 80%;
 }
+
 h4 {
     color: v-bind(slateBlue);
     margin-top: 0;
     font-size: small;
 }
+
 h5 {
     font-weight: normal;
     margin-top: 0;
