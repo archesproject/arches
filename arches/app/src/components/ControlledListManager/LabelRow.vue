@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
+import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type { Label } from "@/types/ControlledListManager";
 
@@ -16,9 +17,9 @@ const modalVisible = ref(false);
 const { $gettext } = useGettext();
 const header = computed(() => {
     switch (props.label.valuetype) {
-        case "prefLabel":
+        case PREF_LABEL:
             return $gettext("Edit Preferred Label");
-        case "altLabel":
+        case ALT_LABEL:
             return $gettext("Edit Alternate Label");
         default:
             throw new Error();

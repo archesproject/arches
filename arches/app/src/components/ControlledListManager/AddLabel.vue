@@ -5,6 +5,8 @@ import { useGettext } from "vue3-gettext";
 
 import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 
+import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
+
 import type {
     ControlledListItem,
     Label,
@@ -35,9 +37,9 @@ const newLabel: NewLabel = computed(() => {
 
 const buttonLabel = computed(() => {
     switch (props.type) {
-        case "prefLabel":
+        case PREF_LABEL:
             return $gettext("Add Preferred Label");
-        case "altLabel":
+        case ALT_LABEL:
             return $gettext("Add Alternate Label");
         default:
             throw new Error();
