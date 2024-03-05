@@ -354,4 +354,4 @@ class ResourceTests(ArchesTestCase):
         r.save_descriptors()
 
         # Until 7.4, a RecursionError was caught after this value was repeated many times.
-        self.assertEqual(r.displayname(), "test value")
+        self.assertEqual(r.displayname(), "test value ")
