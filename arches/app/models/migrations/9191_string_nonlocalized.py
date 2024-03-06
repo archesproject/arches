@@ -52,11 +52,7 @@ class Migration(migrations.Migration):
                 }'
             );
             """,
-            reverse_sql = """
-            DELETE FROM d_data_types
-                WHERE datatype = 'non-localized-string';
-            DELETE from widgets
-                WHERE widgetid = '46ef064b-2611-4708-9f52-60136bd8a65b';
+            reverse_sql = """ 
             """
             ),
         ]
