@@ -232,7 +232,7 @@ class Resource(models.ResourceInstance):
 
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            tile.save(request=request, index=False, transaction_id=transaction_id, context=context)
+            tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
         if request is None:
             if user is None:
                 user = {}
