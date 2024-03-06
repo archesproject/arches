@@ -15,7 +15,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
-        cls.editor = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
+        cls.editor = User.objects.create_user(username="editor", email="editor@resources.com", password="Test12345!")
         group = Group.objects.get(name="Resource Editor")
         group.user_set.add(cls.editor)
         super().setUpClass()
