@@ -105,10 +105,6 @@ class URLDataType(BaseDataType):
                     }
                 )
 
-            if "url_label" not in value:
-                value["url_label"] = ""
-
-
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -278,3 +274,10 @@ class URLDataType(BaseDataType):
                 },
             }
         }
+
+    def pre_tile_save(self, tile, nodeid):
+        try:
+            if "url_label" not in tile.data[nodeid]:
+                tile.data[nodeid]["url_label"] = ""
+        except AttributeError:
+            pass
