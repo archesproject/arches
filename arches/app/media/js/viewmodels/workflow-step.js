@@ -130,7 +130,7 @@ define([
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
-            var workflowComponentAbstractId = self.id();
+            var workflowComponentAbstractId = null;
 
             if (config.workflowHistory.stepdata) {
                 const componentIdLookup = config.workflowHistory.stepdata?.[ko.unwrap(self.name)]?.[COMPONENT_ID_LOOKUP_LABEL];
@@ -214,6 +214,7 @@ define([
                     [ko.unwrap(self.name)]: {
                         [key]: value,
                         locked: self.locked(),
+                        stepId: self.id(),
                     },
                 },
             };
