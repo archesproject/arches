@@ -279,7 +279,7 @@ class MVT(APIBase):
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
             raise Http404()
-        search_geometries = None
+        search_geometries = []
         config = node.config
         cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
