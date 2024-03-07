@@ -41,7 +41,7 @@
                             clickBubble: false,
                             onEnterkeyClick, onSpaceClick," 
                         style="cursor: pointer;">
-                        <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
+                        <div class="rr-table-instance-label"><span style="float: left; padding-right: 8px;"><i class="fa fa-gear"></i></span><span data-bind="text: $data.name"></span></div>
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
