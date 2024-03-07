@@ -90,9 +90,6 @@ class URLDataType(BaseDataType):
                 title = _("No URL added")
                 error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
-
-            if "url_label" not in value:
-                value["url_label"] = ""
                 
         return errors
 
@@ -267,3 +264,10 @@ class URLDataType(BaseDataType):
                 },
             }
         }
+
+    def pre_tile_save(self, tile, nodeid):
+        try:
+            if "url_label" not in tile.data[nodeid]:
+                tile.data[nodeid]["url_label"] = ""
+        except AttributeError:
+            pass
