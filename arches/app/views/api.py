@@ -280,7 +280,7 @@ class MVT(APIBase):
             raise Http404()
         search_geometries = []
         config = node.config
-        cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
         tile = cache.get(cache_key)
         if tile is None:
             resource_ids = get_restricted_instances(request.user, allresources=True)
