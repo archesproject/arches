@@ -315,6 +315,10 @@ class BaseImportModule:
             self.delete_from_default_storage(self.temp_dir)
         except (FileNotFoundError):
             pass
+        file_name = os.path.basename(source).split('/')[-1]
+        file_stat = os.stat(source)
+
+        result = {"summary": {"name": file_name, "size": self.filesize_format(file_stat.st_size), "files": {}}}
         validator = FileValidator()
         if len(validator.validate_file_type(source)) > 0:
             return {
@@ -323,9 +327,6 @@ class BaseImportModule:
                 "title": _("Invalid excel file/zip specified"),
                 "message": _("Upload a valid excel file"),
             }
-
-        file_name = os.path.basename(source).split('/')[-1]
-        file_stat = os.stat(source)
 
         if source.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(source, "r") as zip_ref:
@@ -337,7 +338,7 @@ class BaseImportModule:
                         if not file.is_dir():
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                             result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-                        default_storage.save(os.path.join(self.temp_dir, file_name), File(zip_ref.open(file)))
+                        default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
         elif source.split(".")[-1] == "xlsx":
             with open(source, "rb") as xlsx_file:
                 result = {"summary": {"name": file_name, "size": self.filesize_format(file_stat.st_size), "files": {}}}
