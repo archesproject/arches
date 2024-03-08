@@ -176,7 +176,7 @@ def index_resources_using_multiprocessing(
         for resource_batch in resource_batches:
             pool.apply_async(
                 _index_resource_batch,
-                args=(resource_batch, recalculate_descriptors),
+                args=(resource_batch, recalculate_descriptors, quiet),
                 callback=process_complete_callback,
                 error_callback=process_error_callback,
             )
@@ -301,11 +301,11 @@ def index_resources_by_type(
     return status
 
 
-def _index_resource_batch(resourceids, recalculate_descriptors):
+def _index_resource_batch(resourceids, recalculate_descriptors, quiet=False):
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
     batch_size = int(len(resourceids) / 2)
-    return index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=False, title="Indexing Resource Batch", recalculate_descriptors=recalculate_descriptors)
+    return index_resources_using_singleprocessing(resources=resources, batch_size=batch_size, quiet=quiet, title="Indexing Resource Batch", recalculate_descriptors=recalculate_descriptors)
 
 
 
