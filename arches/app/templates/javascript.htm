@@ -524,7 +524,7 @@
         uploaded-files='{% trans "Uploaded Files" as uploadedFiles %} "{{ uploadedFiles|escapejs }}"'
         allowed-document-formats='{% trans "Allowed document formats:" as allowedDocumentFormats %} "{{ allowedDocumentFormats|escapejs }}"'
         max-file-size-warning='{% trans "You may upload as many documents as you wish, but the maximum size of any single file is" as maxFileSizeWarning %} "{{ maxFileSizeWarning|escapejs }}"'
-        max-photo-size-warning='{% trans "You may upload as many photos as you wish, but the maximum size of any single file is" as maxPhotoSizeWarning %} "{{ maxPhotoSizeWarning|escapejs }}"'
+        max-photo-size-warning='(maxFilesize) => {return {% trans "You may upload as many photos as you wish, but the maximum size of any single file is ${maxFilesize} MB" as maxPhotoSizeWarning %} `{{ maxPhotoSizeWarning|escapejs }}` }'
         adding-documents-optional='{% trans "Adding documents to this record is optional." as addingDocumentsOptional %} "{{ addingDocumentsOptional|escapejs }}"'
         adding-photos-optional='{% trans "Adding photos to this record is optional." as addingPhotosOptional %} "{{ addingPhotosOptional|escapejs }}"'
         select-files='{% trans "Select Files" as selectFiles %} "{{ selectFiles|escapejs }}"'
