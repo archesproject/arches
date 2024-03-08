@@ -378,7 +378,6 @@ class MVT(APIBase):
                     else:
                         tile = ""
                         cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
-                        raise Http404()
                 else:
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
