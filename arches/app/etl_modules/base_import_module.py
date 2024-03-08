@@ -157,7 +157,7 @@ class BaseImportModule:
             lookup[node.alias] = {"nodeid": str(node.nodeid), "datatype": node.datatype, "config": node.config}
         return lookup
 
-    def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
+    def run_load_task(self, userid, files, summary, result, temp_dir, loadid, multiprocessing=False):
         with connection.cursor() as cursor:
             for file in files.keys():
                 self.stage_excel_file(file, summary, cursor)
@@ -174,7 +174,7 @@ class BaseImportModule:
             result["validation"] = self.validate(loadid)
             if len(result["validation"]["data"]) == 0:
                 self.loadid = loadid  # currently redundant, but be certain
-                save_to_tiles(userid, loadid)
+                save_to_tiles(userid, loadid, multiprocessing)
                 cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
                 cursor.execute("""SELECT __arches_refresh_spatial_views();""")
                 refresh_successful = cursor.fetchone()[0]
@@ -276,6 +276,7 @@ class BaseImportModule:
     def write(self, request):
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
+        multiprocessing = request.POST.get('multiprocessing', False)
         result = {}
         if self.file_details:
             details = json.loads(self.file_details)
@@ -285,7 +286,7 @@ class BaseImportModule:
             if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 response = self.run_load_task_async(request, self.loadid)
             else:
-                response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid)
+                response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid, multiprocessing)
 
             return response
 
@@ -299,6 +300,7 @@ class BaseImportModule:
 
         if read["success"]:
             self.request.POST.__setitem__('load_details', json.dumps({"result": read["data"]}))
+            self.request.POST.__setitem__('multiprocessing', True)
             written = self.write(self.request)
         else:
             return {"success": False, "data": {"title": _("Error"), "message": read["data"]["message"]}}
