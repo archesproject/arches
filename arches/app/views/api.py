@@ -359,6 +359,8 @@ class MVT(APIBase):
                             [distance, min_points, search_geometries, nodeid, zoom, x, y, zoom, x, y],
                         )
                     else:
+                        tile = ""
+                        cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
                         raise Http404()
                 else:
                     cursor.execute(
