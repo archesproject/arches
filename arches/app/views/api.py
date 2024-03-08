@@ -295,8 +295,8 @@ class MVT(APIBase):
                     min_points = int(config["clusterMinPoints"])
                     distance = settings.CLUSTER_DISTANCE_MAX if distance > settings.CLUSTER_DISTANCE_MAX else distance
 
-                    pre_query = """
-                    SELECT id FROM geojson_geometries
+                    count_query = """
+                    SELECT count(*) FROM geojson_geometries
                     WHERE
                     ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
                     AND
