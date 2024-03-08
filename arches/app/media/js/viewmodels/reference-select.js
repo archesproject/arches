@@ -44,9 +44,9 @@ define([
                 if (self.valueAndSelectionDiffer(self.value, selection)) {
                     const tileReady = selection.map(uri => {
                         return {
-                            "uri": uri,
+                            "labels": NAME_LOOKUP[uri].labels,
                             "listid": NAME_LOOKUP[uri]["listid"],
-                            "labels": NAME_LOOKUP[uri].labels
+                            "uri": uri
                         };
                     });
                     self.value(tileReady);
