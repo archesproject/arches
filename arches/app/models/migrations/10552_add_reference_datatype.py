@@ -32,7 +32,8 @@ class Migration(migrations.Migration):
                 FALSE,
                 '19e56148-82b8-47eb-b66e-f6243639a1a8',
                 TRUE
-            );
+            )
+            ON CONFLICT DO NOTHING;
 
             INSERT INTO widgets(
                 widgetid,
@@ -46,21 +47,10 @@ class Migration(migrations.Migration):
                 'views/components/widgets/reference-select',
                 'reference',
                 '{"placeholder": "Select an option", "i18n_properties": ["placeholder"]}'
-            );
+            )
+            ON CONFLICT DO NOTHING;
 
             """,
-            reverse_sql="""
-            DELETE FROM cards_x_nodes_x_widgets
-                WHERE nodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference'); 
-            DELETE FROM edges
-                WHERE domainnodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference') 
-                OR rangenodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference');
-            DELETE FROM constraints_x_nodes
-                WHERE nodeid IN (SELECT nodeid FROM nodes WHERE datatype = 'reference');
-            DELETE FROM nodes WHERE datatype = 'reference';
-            DELETE FROM widgets WHERE widgetid = '19e56148-82b8-47eb-b66e-f6243639a1a8';
-            DELETE FROM d_data_types WHERE datatype = 'reference';
-            DELETE FROM tiles WHERE nodegroupid IN (SELECT nodegroupid FROM nodes WHERE datatype = 'reference');
-            """,
+            reverse_sql=migrations.RunSQL.noop,
         ),
     ]
