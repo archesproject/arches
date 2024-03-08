@@ -279,7 +279,7 @@ class MVT(APIBase):
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
             raise Http404()
-        search_geometries = []
+        search_geom_count = 0
         config = node.config
         cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
         tile = cache.get(cache_key)
@@ -303,12 +303,11 @@ class MVT(APIBase):
                     nodeid = %s and resourceinstanceid not in %s
                     """
 
-                    # Execute the potential_geometries_query to get the list of geometries
-                    cursor.execute(pre_query, [zoom, x, y, nodeid, resource_ids])
-                    search_geometries = tuple(str(row[0]) for row in cursor.fetchall())
+                    # get the count of matching geometries
+                    cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
+                    search_geom_count = cursor.fetchone()[0]
 
-                    # unclear if the pre_query could be inserted into the clustering query as a subquery
-                    if len(search_geometries):
+                    if search_geom_count:
                         cursor.execute(
                             """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
                             AS (
