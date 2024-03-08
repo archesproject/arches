@@ -57,7 +57,7 @@ define([
         });
 
         this.value.subscribe(val => {
-            if (val && self.valueAndSelectionDiffer(val, self.selectionValue)) {
+            if (val?.length) {
                 self.selectionValue(val.map(item=>ko.unwrap(item.uri)));
             } else {
                 self.selectionValue(null);
