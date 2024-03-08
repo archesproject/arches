@@ -138,7 +138,12 @@
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </div>
-                            <div class="rr-table-column" style="flex-grow: 1;" data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
+                            <div class='rr-table-column icon-column'>
+                                <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
+                                    <i class="fa fa-gear"></i>
+                                </button>
+                            </div>
+                            <div class="rr-table-column" style="flex-grow: 1;">
                                 <div class="rr-table-instance-label" data-bind="text: resource.displayname"></div>
                             </div>
                         </div>
