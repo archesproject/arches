@@ -42,14 +42,14 @@ define([
             if (selection) {
                 if (!(selection instanceof Array)) { selection = [selection]; }
                 if (self.valueAndSelectionDiffer(self.value, selection)) {
-                    const tileReady = selection.map(uri => {
+                    const newItem = selection.map(uri => {
                         return {
                             "labels": NAME_LOOKUP[uri].labels,
                             "listid": NAME_LOOKUP[uri]["listid"],
                             "uri": uri
                         };
                     });
-                    self.value(tileReady);
+                    self.value(newItem);
                 }
             } else {
                 self.value(null);
