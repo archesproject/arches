@@ -318,7 +318,10 @@ class MVT(APIBase):
                                         nodeid,
                                         geom
                                     FROM geojson_geometries
-                                    WHERE id in %s
+                                    WHERE 
+                                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
+                                    AND
+                                    nodeid = %s and resourceinstanceid not in %s
                                 ) m
                             )
                             SELECT ST_AsMVT(
@@ -355,7 +358,7 @@ class MVT(APIBase):
                                 WHERE cid IS NOT NULL
                                 GROUP BY cid
                             ) as tile;""",
-                            [distance, min_points, search_geometries, nodeid, zoom, x, y, zoom, x, y],
+                            [distance, min_points, zoom, x, y, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
                         )
                     else:
                         tile = ""
