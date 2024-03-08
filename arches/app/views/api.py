@@ -307,7 +307,7 @@ class MVT(APIBase):
                     cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
                     search_geom_count = cursor.fetchone()[0]
 
-                    if search_geom_count:
+                    if search_geom_count >= min_points:
                         cursor.execute(
                             """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
                             AS (
@@ -360,6 +360,21 @@ class MVT(APIBase):
                                 GROUP BY cid
                             ) as tile;""",
                             [distance, min_points, zoom, x, y, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
+                        )
+                    elif search_geom_count:
+                        cursor.execute(
+                            """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                                id,
+                                resourceinstanceid,
+                                nodeid,
+                                ST_AsMVTGeom(
+                                    geom,
+                                    TileBBox(%s, %s, %s, 3857)
+                                ) AS geom,
+                                1 AS total
+                            FROM geojson_geometries
+                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
+                            [nodeid, zoom, x, y, nodeid, resource_ids],
                         )
                     else:
                         tile = ""
