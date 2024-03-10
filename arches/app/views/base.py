@@ -117,6 +117,10 @@ class MapBaseManagerView(BaseManagerView):
                     map_layer = datatype.get_map_layer(node)
                     if map_layer is not None:
                         resource_layers.append(map_layer)
+                    # check node config for query layers
+                    if "querylayers" in node.config:
+                        for query_layer in node.config["querylayers"]:
+                            resource_sources.append(datatype.get_map_source(node, query_layer=query_layer))
 
         context["geom_nodes"] = geom_nodes
         context["resource_map_layers"] = resource_layers
