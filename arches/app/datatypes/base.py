@@ -99,15 +99,18 @@ class BaseDataType(object):
         if tile.data[nodeid] == "":
             tile.data[nodeid] = None
 
-    def get_map_source(self, node=None, preview=False):
+    def get_map_source(self, node=None, preview=False, query_layer=None):
         """
         Gets the map source definition to add to the map for a given node
         should be a dictionary including (as in map_sources table):
         name, source (json)
+        query_layer = { "label": string, "targetnodeid": nodeid, "targetvalue": string}
         """
         tileserver_url = urllib.parse.unquote(reverse("mvt", args=(node.nodeid, "{z}", "{x}", "{y}")))
         if node is None:
             return None
+        if query_layer:
+            tileserver_url = urllib.parse.unquote(reverse("mvt", args=(node.nodeid, "{z}", "{x}", "{y}", query_layer["targetnodeid"], query_layer["targetvalue"])))
         source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:
