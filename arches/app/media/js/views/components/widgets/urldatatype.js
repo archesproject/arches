@@ -13,13 +13,11 @@ define([
 
 
         // #10027 assign this.url & this.url_label with value versions for updating UI with edits
-        if (typeof (this.value) === "function") {
-            if (this.value()) {
-                var valueUrl = this.value().url
-                var valueUrlLabel = this.value().url_label
-                this.url(valueUrl)
-                this.url_label(valueUrlLabel)
-            }
+        if (ko.isObservable(this.value) && this.value()) {
+            var valueUrl = this.value().url
+            var valueUrlLabel = this.value().url_label
+            this.url(valueUrl)
+            this.url_label(valueUrlLabel)
         }
 
 
