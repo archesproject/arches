@@ -78,7 +78,6 @@ const onDelete = async (label: Label) => {
                 label => label.valuetype === props.type
             )"
             :key="label.id"
-            class="label-box"
         >
             <LabelRow
                 :label

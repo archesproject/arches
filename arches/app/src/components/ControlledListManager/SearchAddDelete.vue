@@ -41,7 +41,6 @@ const clearSearch = () => {
             <InputText
                 v-model="searchValue"
                 type="text"
-                class="control"
                 :placeholder="$gettext('Find')"
             />
             <i
@@ -90,7 +89,7 @@ const clearSearch = () => {
             />
             <!-- We might want an are you sure? modal -->
             <Button
-                class="button delete"
+                class="button"
                 :label="deleteLabel"
                 raised
                 :disabled="props.numberToDelete === 0"
@@ -108,13 +107,16 @@ const clearSearch = () => {
     padding: 1rem;
     background: #f3fbfd;
 }
+
 .controls i {
     align-self: center;
 }
+
 .p-inputtext {
     flex: 1;
     margin: 0.5rem;
 }
+
 .button {
     height: 4rem;
     margin: 0.5rem;
