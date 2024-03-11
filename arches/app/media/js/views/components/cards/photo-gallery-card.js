@@ -50,7 +50,7 @@ define([
         this.fileListNodeId = getfileListNode();
 
         this.maxFilesize = ko.computed(function(){
-            var mfs = "Missing maxFilesize"
+            var mfs = "Missing maxFilesize";
             self.card.widgets().forEach(function(widget){
                 if (widget.node_id() === self.fileListNodeId) {
                     mfs = widget.config.maxFilesize();
