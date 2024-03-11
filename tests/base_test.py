@@ -82,7 +82,7 @@ class ArchesTestRunner(DiscoverRunner):
 class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
-        if settings.DEFAULT_BOUNDS is None:
+        if 0 and settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
             with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)

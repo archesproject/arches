@@ -13,7 +13,9 @@ const ERROR = "error";
 type GetText = (s: string) => string;
 
 export const postItemToServer = async (
-    item: ControlledListItem, toast: typeof Toast, $gettext: GetText
+    item: ControlledListItem,
+    toast: typeof Toast,
+    $gettext: GetText
 ) => {
     let errorText;
     try {
@@ -42,7 +44,9 @@ export const postItemToServer = async (
 };
 
 export const postListToServer = async (
-    list: ControlledList, toast: typeof Toast, $gettext: GetText
+    list: ControlledList,
+    toast: typeof Toast,
+    $gettext: GetText
 ) => {
     let errorText;
 
@@ -50,19 +54,18 @@ export const postListToServer = async (
     // stringification if circular references exist.
     const flatList = {
         ...list,
-        items: list.items.map((item) => { return {...item, children: []}; }),
+        items: list.items.map((item) => {
+            return { ...item, children: [] };
+        }),
     };
     try {
-        const response = await fetch(
-            arches.urls.controlled_list(list.id),
-            {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": Cookies.get("csrftoken"),
-                },
-                body: JSON.stringify(flatList),
-            }
-        );
+        const response = await fetch(arches.urls.controlled_list(list.id), {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+            body: JSON.stringify(flatList),
+        });
         if (!response.ok) {
             errorText = response.statusText;
             const body = await response.json();
@@ -78,10 +81,14 @@ export const postListToServer = async (
 };
 
 export const upsertLabel = async (
-    label: NewLabel, toast: typeof Toast, $gettext: GetText
+    label: NewLabel,
+    toast: typeof Toast,
+    $gettext: GetText
 ) => {
     let errorText;
-    const url = label.id ? arches.urls.label(label.id) : arches.urls.label_add;
+    const url = label.id
+        ? arches.urls.controlled_list_item_label(label.id)
+        : arches.urls.controlled_list_item_label_add;
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -107,16 +114,21 @@ export const upsertLabel = async (
 };
 
 export const deleteLabel = async (
-    label: Label, toast: typeof Toast, $gettext: GetText
+    label: Label,
+    toast: typeof Toast,
+    $gettext: GetText
 ) => {
     let errorText;
     try {
-        const response = await fetch(arches.urls.label(label.id), {
-            method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-        });
+        const response = await fetch(
+            arches.urls.controlled_list_item_label(label.id),
+            {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": Cookies.get("csrftoken"),
+                },
+            }
+        );
         if (!response.ok) {
             errorText = response.statusText;
             const body = await response.json();

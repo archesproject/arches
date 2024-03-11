@@ -50,23 +50,23 @@ class ControlledListTests(ArchesTestCase):
             [
                 ControlledListItem(
                     uri=f"https://archesproject.org/{num}",
-                    list=cls.list1,
+                    controlled_list=cls.list1,
                     sortorder=num,
                 )
                 for num in range(5)
             ]
             + [
                 ControlledListItem(
-                    uri=f"https://getty.edu/{num}", list=cls.list2, sortorder=num
+                    uri=f"https://getty.edu/{num}", controlled_list=cls.list2, sortorder=num
                 )
                 for num in range(5)
             ]
         )
 
         parent = ControlledListItem.objects.get(
-            list=cls.list2, uri="https://getty.edu/0"
+            controlled_list=cls.list2, uri="https://getty.edu/0"
         )
-        for child in ControlledListItem.objects.filter(list=cls.list2).exclude(
+        for child in ControlledListItem.objects.filter(controlled_list=cls.list2).exclude(
             pk=parent.pk
         ):
             child.parent = parent
@@ -79,7 +79,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     value_type=cls.pref_label,
-                    item=ControlledListItem.objects.filter(list=cls.list1)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list1)[num],
                 )
                 for num in range(5)
             ]
@@ -88,7 +88,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     value_type=cls.alt_label,
-                    item=ControlledListItem.objects.filter(list=cls.list1)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list1)[num],
                 )
                 for num in range(5)
             ]
@@ -97,7 +97,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     value_type=cls.pref_label,
-                    item=ControlledListItem.objects.filter(list=cls.list2)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list2)[num],
                 )
                 for num in range(5)
             ]
@@ -106,7 +106,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     value_type=cls.alt_label,
-                    item=ControlledListItem.objects.filter(list=cls.list2)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list2)[num],
                 )
                 for num in range(5)
             ]
@@ -235,7 +235,7 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(
             [
                 item.sortorder
-                for item in ControlledListItem.objects.filter(list=self.list1).order_by(
+                for item in ControlledListItem.objects.filter(controlled_list=self.list1).order_by(
                     "uri"
                 )
             ],
