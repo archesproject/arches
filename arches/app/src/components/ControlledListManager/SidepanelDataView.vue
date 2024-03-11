@@ -143,6 +143,10 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
             summary: $gettext("List deletion failed"),
         });
     }
+};
+
+const deleteAndRefresh = async (selectedLists: ControlledList[]) => {
+    await deleteLists(selectedLists);
     await fetchLists();
 };
 
@@ -153,11 +157,10 @@ await fetchLists();
     <SearchAddDelete
         v-model="searchValue"
         :create-action="createList"
-        :del-action="
-            () => {
-                deleteLists(selected);
-                selected.splice(0);
-            }
+        :del-action="() => {
+            deleteAndRefresh(selected);
+            selected.splice(0);
+        }
         "
         :number-to-delete="selected.length"
     />
