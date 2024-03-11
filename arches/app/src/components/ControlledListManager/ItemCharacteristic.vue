@@ -89,7 +89,6 @@ const onCancel = () => {
         <InputText
             v-model="inputValue"
             type="text"
-            class="control"
             :disabled="disabled"
             :style="{ width: width }"
         />
@@ -135,23 +134,28 @@ h4,
 input {
     font-size: 1.25rem;
 }
+
 .characteristic {
     margin: 1rem 1rem 2rem 1rem;
 }
+
 .characteristic input {
     text-align: center;
     border-width: 2px;
     height: 3rem;
 }
+
 .characteristic input[disabled] {
     background: var(--gray-400);
 }
+
 .edit-controls {
     margin-left: 1rem;
     display: inline-flex;
     justify-content: space-between;
     width: 4rem;
 }
+
 .edit-controls i {
     font-size: medium;
     padding: 4px;

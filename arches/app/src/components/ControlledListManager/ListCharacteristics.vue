@@ -20,7 +20,7 @@ const LIST_DETAILS = $gettext("List Details");
 
 <template>
     <h3>{{ LIST_DETAILS }}</h3>
-    <div class="characteristics">
+    <div>
         <ItemCharacteristic
             :item="props.displayedList"
             :editable="props.editable"
@@ -55,12 +55,15 @@ h3 {
     padding-bottom: 1rem;
     border-bottom: 1px solid;
 }
+
 h4 {
     font-size: 1.25rem;
 }
+
 .nodes-heading {
     margin: 1rem 1rem 2rem 1rem;
 }
+
 .nodes {
     display: flex;
     flex-wrap: wrap;
