@@ -27,7 +27,7 @@ from arches.app.views.controlled_lists import (
     ControlledListItemView,
     ControlledListView,
     ControlledListsView,
-    LabelView,
+    ControlledListItemLabelView,
 )
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
@@ -324,8 +324,8 @@ urlpatterns = [
     path("controlled_list/<uuid:id>/", ControlledListView.as_view(), name="controlled_list"),
     path("controlled_list_item/", ControlledListItemView.as_view(), name="controlled_list_item_add"),
     path("controlled_list_item/<uuid:id>/", ControlledListItemView.as_view(), name="controlled_list_item"),
-    path("label/<uuid:id>/", LabelView.as_view(), name="label"),
-    path("label/", LabelView.as_view(), name="label_add"),
+    path("controlled_list_item_label/<uuid:id>/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label"),
+    path("controlled_list_item_label/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label_add"),
 ]
 
 if settings.DEBUG:

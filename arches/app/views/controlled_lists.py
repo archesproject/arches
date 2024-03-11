@@ -53,7 +53,7 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 "items": sorted(
                     [
                         serialize(item, depth_map, flat)
-                        for item in obj.items.all()
+                        for item in obj.controlled_list_items.all()
                         if flat or item.parent_id is None
                     ],
                     key=lambda d: d["sortorder"],
@@ -85,7 +85,10 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 "uri": obj.uri,
                 "sortorder": obj.sortorder,
                 "guide": obj.guide,
-                "labels": [serialize(label, depth_map) for label in obj.labels.all()],
+                "labels": [
+                    serialize(label, depth_map)
+                    for label in obj.controlled_list_item_labels.all()
+                ],
                 "parent_id": str(obj.parent_id) if obj.parent_id else None,
                 "depth": depth_map[obj.id],
             }
@@ -101,7 +104,7 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 "valuetype": obj.value_type_id,
                 "language": obj.language_id,
                 "value": obj.value,
-                "item_id": obj.item_id,
+                "item_id": obj.controlled_list_item_id,
             }
 
 
@@ -114,10 +117,18 @@ def prefetch_terms(request):
     terms = []
     for i in range(prefetch_depth):
         if i == 0:
-            terms.extend(["items", "items__labels"])
+            terms.extend(
+                [
+                    "controlled_list_items",
+                    "controlled_list_items__controlled_list_item_labels",
+                ]
+            )
         elif find_children:
             terms.extend(
-                [f"items{'__children' * i}", f"items{'__children' * i}__labels"]
+                [
+                    f"controlled_list_items{'__children' * i}",
+                    f"controlled_list_items{'__children' * i}__controlled_list_item_labels",
+                ]
             )
     return terms
 
@@ -145,7 +156,7 @@ def handle_items(item_dicts):
             label["value_type_id"] = label.pop("valuetype")
             label.pop("item_id")  # trust the item, not the label
             labels_to_save.append(
-                ControlledListItemLabel(item_id=item_to_save.id, **label)
+                ControlledListItemLabel(controlled_list_item_id=item_to_save.id, **label)
             )
 
         # Recurse
@@ -158,7 +169,7 @@ def handle_items(item_dicts):
     # Consider skipping uniqueness checks and just letting IntegrityError
     # bubble up. But doing Django validation provides a localized error.
     for item_to_save in items_to_save:
-        item_to_save.full_clean(exclude=["parent", "list", "id"])
+        item_to_save.full_clean(exclude=["parent", "controlled_list", "id"])
 
     ControlledListItem.objects.bulk_update(
         items_to_save, fields=["uri", "sortorder", "parent"]
@@ -197,8 +208,7 @@ class ControlledListsView(View):
     @staticmethod
     def node_subquery(node_field: str = "pk"):
         return ArraySubquery(
-            Node.with_controlled_list
-            .filter(controlled_list=OuterRef("id"))
+            Node.with_controlled_list.filter(controlled_list=OuterRef("id"))
             .order_by("pk")
             .values(node_field)
         )
@@ -244,16 +254,16 @@ class ControlledListView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         qs = (
-            ControlledListItem.objects.filter(list_id=list_id)
-            .select_related("list")
+            ControlledListItem.objects.filter(controlled_list_id=list_id)
+            .select_related("controlled_list")
             .select_for_update()
         )
-        # TODO: lock labels?
+        # Does not currently bother to lock labels.
 
         try:
             with transaction.atomic():
                 try:
-                    clist = qs[0].list
+                    clist = qs[0].controlled_list
                 except (IndexError, ControlledListItem.DoesNotExist):
                     clist = ControlledList.objects.get(pk=list_id)
                 except ControlledList.DoesNotExist:
@@ -264,7 +274,7 @@ class ControlledListView(View):
                 clist.name = data["name"]
 
                 for item in data["items"]:
-                    item["list_id"] = list_id
+                    item["controlled_list_id"] = list_id
                 handle_items(data["items"])
 
                 clist.save()
@@ -374,12 +384,12 @@ class ControlledListItemView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class LabelView(View):
+class ControlledListItemLabelView(View):
     def add_new_label(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
         label = ControlledListItemLabel(
-            item_id=data["item_id"],
+            controlled_list_item_id=data["item_id"],
             value_type_id=data["valuetype"],
             language=Language.objects.get(code=data["language"]),
             value=data["value"],
@@ -417,7 +427,9 @@ class LabelView(View):
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")
-        objs_deleted, unused = ControlledListItemLabel.objects.filter(pk=label_id).delete()
+        objs_deleted, unused = ControlledListItemLabel.objects.filter(
+            pk=label_id
+        ).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=404)
         return JSONResponse(status=204)

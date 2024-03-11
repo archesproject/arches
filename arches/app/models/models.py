@@ -1877,11 +1877,11 @@ class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # TODO(?): expose schemes
     uri = models.URLField(max_length=2048, null=True, blank=True, unique=True)
-    list = models.ForeignKey(
+    controlled_list = models.ForeignKey(
         ControlledList,
         db_column="listid",
         on_delete=models.CASCADE,
-        related_name="items",
+        related_name="controlled_list_items",
     )
     sortorder = models.IntegerField(validators=[MinValueValidator(0)])
     parent = models.ForeignKey(
@@ -1895,24 +1895,24 @@ class ControlledListItem(models.Model):
             # Sort order concerns the list as a whole, not subsets
             # of the hierarchy.
             models.UniqueConstraint(
-                fields=["list", "sortorder"],
+                fields=["controlled_list", "sortorder"],
                 name="unique_list_sortorder",
                 deferrable=Deferrable.DEFERRED,
             ),
         ]
 
     def clean(self):
-        if not self.labels.filter(value_type="prefLabel").exists():
+        if not self.controlled_list_item_labels.filter(value_type="prefLabel").exists():
             raise ValidationError(_("At least one preferred label is required."))
 
 
 class ControlledListItemLabel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    item = models.ForeignKey(
+    controlled_list_item = models.ForeignKey(
         ControlledListItem,
         db_column="itemid",
         on_delete=models.CASCADE,
-        related_name="labels",
+        related_name="controlled_list_item_labels",
     )
     value_type = models.ForeignKey(
         DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "label"}
@@ -1929,11 +1929,11 @@ class ControlledListItemLabel(models.Model):
         db_table = "controlled_list_item_labels"
         constraints = [
             models.UniqueConstraint(
-                fields=["item", "value", "value_type", "language"],
+                fields=["controlled_list_item", "value", "value_type", "language"],
                 name="unique_item_value_valuetype_language",
             ),
             models.UniqueConstraint(
-                fields=["item", "language"],
+                fields=["controlled_list_item", "language"],
                 condition=Q(value_type="prefLabel"),
                 name="unique_item_preflabel_language",
             ),
