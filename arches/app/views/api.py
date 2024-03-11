@@ -507,7 +507,7 @@ class Resources(APIBase):
 
             elif format == "json-ld":
                 try:
-                    resource = models.ResourceInstance.objects.get(pk=resourceid)  # check for existence
+                    resource = models.ResourceInstance.objects.select_related("graph").get(pk=resourceid)
                     if not resource.graph.ontology_id:
                         return JSONErrorResponse(
                             message=_(
