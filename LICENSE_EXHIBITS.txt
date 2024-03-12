@@ -1,0 +1,27 @@
+                            EXHIBIT B
+
+               3rd Party FOSS components used by Arches:
+
+Django v2.2.6
+psycopg2-binary v2.8.4
+elasticsearch v7.4
+rdflib v4.2.2
+django-guardian v2.1.0
+python-memcached v1.59
+celery v4.3.0
+django-celery-results v1.1.2
+mapbox-vector-tile v1.2.0
+SPARQLWrapper v1.8.4
+django-recaptcha v2.0.5
+edtf v4.0.1
+couchdb v1.2
+django-revproxy v0.9.15
+django-cors-headers v3.1.1
+django-oauth-toolkit v1.2.0
+python-docx v0.8.10
+PyLD[requests] v1.0.5
+Pyprind v2.11.2
+Pycryptodome v3.3.1
+requests[security] v2.18.1
+python-slugify v4.0.0
+
