@@ -34,7 +34,9 @@ define([
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
             viewModel.ontologies = ko.observable(data['ontologies']);
-            viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
+            viewModel.ontologyClasses = ko.pureComputed(function(){
+                return data['ontologyClasses'].filter((cls) => cls.ontology_id === viewModel.graph.ontology_id());
+            });
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
