@@ -200,7 +200,7 @@ class BaseDataType(object):
                 logger.warning(_("Multiple provisional edits. Returning first edit"))
             userid = list(provisionaledits.keys())[0]
             return provisionaledits[userid]["value"]
-        else:
+        elif not data:
             logger.exception(_("Tile has no authoritative or provisional data"))
 
 
