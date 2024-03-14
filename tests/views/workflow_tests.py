@@ -8,6 +8,9 @@ from django.test.client import Client
 from arches.app.models.models import WorkflowHistory
 from tests.base_test import ArchesTestCase
 
+# these tests can be run from the command line via
+# python manage.py test tests.views.workflow_tests --settings="tests.test_settings"
+
 
 class WorkflowHistoryTests(ArchesTestCase):
     @classmethod
