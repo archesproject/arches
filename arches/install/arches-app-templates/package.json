@@ -11,7 +11,7 @@
         "ts:watch": "./{{ app_name }}/media/node_modules/.bin/vue-tsc --watch --noEmit"
     },
     "dependencies": {
-        "vue": "^3.4.15",
+        "vue": "^3.3.4",
         "vue3-gettext": "^3.0.0-beta.4"
     },
     "devDependencies": {
