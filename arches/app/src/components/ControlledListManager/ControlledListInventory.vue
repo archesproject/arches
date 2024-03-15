@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
+import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
-import SpinnerIcon from "@/components/SpinnerIcon.vue";
 
 import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
@@ -39,7 +39,7 @@ const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
             <Suspense>
                 <SidepanelDataView v-model="displayedList" />
                 <template #fallback>
-                    <SpinnerIcon />
+                    <ProgressSpinner />
                 </template>
             </Suspense>
         </SplitterPanel>
