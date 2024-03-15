@@ -863,7 +863,9 @@ class Card(APIBase):
         serialized_graph = None
         if graph.publication:
             published_graph = graph.get_published_graph()
-            serialized_graph = published_graph.serialized_graph
+
+            if published_graph:
+                serialized_graph = published_graph.serialized_graph
 
         if serialized_graph:
             serialized_cards = serialized_graph["cards"]

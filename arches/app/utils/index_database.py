@@ -41,7 +41,10 @@ def get_serialized_graph(graph):
 
     if graph.graphid not in serialized_graphs:
         published_graph = graph.get_published_graph()
-        serialized_graphs[graph.graphid] = published_graph.serialized_graph
+
+        if published_graph:
+            serialized_graphs[graph.graphid] = published_graph.serialized_graph
+            
     return serialized_graphs[graph.graphid]
 
 

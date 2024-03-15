@@ -528,13 +528,7 @@ class GraphModel(models.Model):
         try:
             graph = PublishedGraph.objects.get(publication=self.publication, language=language)
         except PublishedGraph.DoesNotExist:
-            try:
-                from arches.app.utils.i18n import LanguageSynchronizer  # prevents circular import
-
-                LanguageSynchronizer.synchronize_settings_with_db()
-                graph = PublishedGraph.objects.get(publication=self.publication, language=language)
-            except PublishedGraph.DoesNotExist:
-                graph = None
+            graph = None
 
         return graph
 
