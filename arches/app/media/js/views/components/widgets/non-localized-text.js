@@ -21,7 +21,7 @@ define([
     
             WidgetViewModel.apply(this, [params]);
 
-            let self = this;
+            const self = this;
     
             this.disable = ko.computed(() => {
                 return ko.unwrap(self.disabled) || ko.unwrap(self.uneditable); 

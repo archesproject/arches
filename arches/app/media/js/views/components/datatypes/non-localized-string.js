@@ -5,7 +5,7 @@ define([
     const name = 'non-localized-string-datatype-config';
 
     const viewModel = function (params) {
-        var self = this;
+        const self = this;
         this.search = params.search;
         if (this.search) {
             var filter = params.filterValue();
