@@ -78,8 +78,6 @@ const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
         expandNode(node);
     }
-
-    expandedKeys.value = { ...expandedKeys.value };
 };
 
 const collapseAll = () => {
@@ -149,7 +147,6 @@ expandAll();
                     background: context.selected ? lightGray : '',
                     height: '3.5rem',
                 },
-                tabindex: '0',
             }),
             label: { style: { textWrap: 'nowrap' } },
             nodeicon: { ariaHidden: 'true' },
