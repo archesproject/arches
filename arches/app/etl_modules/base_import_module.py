@@ -14,7 +14,7 @@ from django.utils.decorators import method_decorator
 from django.db import connection
 
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.models import Node
+from arches.app.models.models import ETLModule, Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
@@ -282,8 +282,9 @@ class BaseImportModule:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
-            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
+            use_celery_file_size_threshold = ETLModule.objects.get(pk=self.moduleid).config["celeryThreshold"]
+
+            if summary["cumulative_excel_files_size"] > use_celery_file_size_threshold:
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid, multiprocessing)
