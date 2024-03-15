@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10012_alter_file_path"),
+        ("models", "10515_i18n_plugins"),
     ]
 
     add_celery_threshold_config = """
