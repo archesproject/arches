@@ -71,30 +71,8 @@ TEST_RUNNER = "tests.base_test.ArchesTestRunner"
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
 
-# these are set in Travis CI
-SAUCE_USERNAME = os.environ.get("SAUCE_USERNAME")
-SAUCE_ACCESS_KEY = os.environ.get("SAUCE_ACCESS_KEY")
-
 ENABLE_USER_SIGNUP = True
 FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
-
-RUN_LOCAL = True
-if SAUCE_USERNAME and SAUCE_ACCESS_KEY:
-    RUN_LOCAL = False
-
-# browser/os combinations to use with saucelabs
-REMOTE_BROWSERS = [
-    # {"platform": "Windows 8.1",
-    #  "browserName": "internet explorer",
-    #  "version": "11"},
-    # {"platform": "Mac OS X 10.9",
-    #  "browserName": "chrome",
-    #  "version": "53"},
-    # {"platform": "Linux",
-    #  "browserName": "firefox",
-    #  "version": "45"}
-]
-
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 
