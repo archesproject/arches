@@ -130,6 +130,7 @@ class ControlledListTests(ArchesTestCase):
 
         cls.node_using_list2 = Node(
             pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8835",
+            graph=cls.graph,
             name="Uses list2",
             datatype="reference",
             nodegroup=cls.nodegroup,
