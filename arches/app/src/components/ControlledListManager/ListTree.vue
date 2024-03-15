@@ -7,6 +7,7 @@ import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 import Tree from "primevue/tree";
 
+import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "@/types/Ref";
@@ -32,9 +33,6 @@ const editing: Ref<boolean> = defineModel("editing");
 
 const { $gettext } = useGettext();
 
-const LIST_LABEL = $gettext("Controlled List");
-const GUIDE_LABEL = $gettext("Guide Item");
-const INDEXABLE_LABEL = $gettext("Indexable Item");
 const MANAGE_LIST = $gettext("Manage List");
 const RETURN = $gettext("Return to List Manager");
 
@@ -47,8 +45,6 @@ function itemAsNode(item: ControlledListItem): typeof TreeNode {
         label: bestLabel(item, selectedLanguage.value.code).value,
         children: item.children.map(child => itemAsNode(child)),
         data: item,
-        icon: item.guide ? "fa fa-folder-open" : "fa fa-hand-pointer-o",
-        iconLabel: item.guide ? GUIDE_LABEL : INDEXABLE_LABEL,
     };
 }
 
@@ -58,8 +54,6 @@ function listAsNode(list: ControlledList): typeof TreeNode {
         label: list.name,
         children: list.items.map(item => itemAsNode(item)),
         data: list,
-        icon: "fa fa-list",
-        iconLabel: LIST_LABEL,
     };
 }
 
@@ -148,10 +142,12 @@ expandAll();
                     height: '3.5rem',
                 },
             }),
-            label: { style: { textWrap: 'nowrap' } },
-            nodeicon: { ariaHidden: 'true' },
+            label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
         }"
     >
+        <template #nodeicon="slotProps">
+            <LetterCircle :labelled="slotProps.node.data" />
+        </template>
         <template #default="slotProps">
             {{ slotProps.node.label }}
             <span v-if="slotProps.node.data.uri">

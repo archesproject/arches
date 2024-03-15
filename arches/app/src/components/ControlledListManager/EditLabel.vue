@@ -69,7 +69,7 @@ const onSave = async () => {
         :style="{ width: '40rem' }"
         :pt="{
             header: { style: { backgroundColor: '#2d3c4b' } },
-            title: { style: { color: 'white' } },
+            title: { style: { color: 'white', fontWeight: 600 } },
             content: { style: { paddingTop: '1rem' } },
             closeButtonIcon: { style: { color: 'white' } },
         }"
