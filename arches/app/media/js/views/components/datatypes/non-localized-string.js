@@ -9,6 +9,7 @@ define([
         this.search = params.search;
         if (this.search) {
             var filter = params.filterValue();
+            this.node = params.node;
             this.op = ko.observable(filter.op || '~');
             this.searchValue = ko.observable(filter.val || '');
             this.filterValue = ko.computed(function () {
