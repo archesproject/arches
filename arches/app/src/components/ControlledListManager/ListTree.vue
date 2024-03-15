@@ -136,11 +136,11 @@ expandAll();
         :expanded-keys
         :filter="true"
         filter-mode="lenient"
+        :filter-placeholder="$gettext('Find')"
         selection-mode="single"
         :pt="{
             root: { style: { flexGrow: 1 } },
             input: {
-                placeholder: $gettext('Find'),
                 style: { height: '3.5rem', fontSize: '14px' },
             },
             container: { style: { fontSize: '14px' } },
