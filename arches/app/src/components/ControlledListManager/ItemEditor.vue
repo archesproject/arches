@@ -4,6 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
+import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
 import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
@@ -43,9 +44,6 @@ const item = computed(() => {
     return recurse(props.displayedList.items);
 });
 
-const iconClass = (item: ControlledListItem) => {
-    return item.guide ? "fa fa-folder-open" : "fa fa-hand-pointer-o";
-};
 const iconLabel = (item: ControlledListItem) => {
     return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
 };
@@ -53,10 +51,7 @@ const iconLabel = (item: ControlledListItem) => {
 
 <template>
     <span class="item-header">
-        <i
-            :class="iconClass(item)"
-            aria-hidden="true"
-        />
+        <LetterCircle :labelled="item" />
         <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
         <span class="item-type">{{ iconLabel(item) }}</span>
     </span>
