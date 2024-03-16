@@ -39,6 +39,7 @@
                         <button 
                             data-bind="
                             click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; },
+                            attr: {'aria-label': $root.translations.configureRelateResourceRelationship},
                             clickBubble: false,
                             onEnterkeyClick, onSpaceClick," 
                             style="cursor: pointer;">
