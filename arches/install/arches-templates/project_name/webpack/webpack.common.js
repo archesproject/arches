@@ -216,7 +216,7 @@ module.exports = () => {
 
                 return {
                     ...acc,
-                    ...buildCSSFilepathLookup(STATIC_URL, path, {})
+                    ...buildCSSFilepathLookup(path, {})
                 };
             }, {});
 
