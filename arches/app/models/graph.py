@@ -879,6 +879,7 @@ class Graph(models.GraphModel):
                 widget.source_identifier_id = widget.pk
                 
             widget.pk = uuid.uuid1()
+
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
 

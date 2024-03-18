@@ -36,6 +36,7 @@ from arches.app.views.graph import (
     CardView,
     FunctionManagerView,
     PermissionDataView,
+    ModelHistoryView,
     IconDataView,
     NodegroupView,
 )
@@ -190,6 +191,9 @@ urlpatterns = [
     ),
     re_path(r"^graph/(?P<graphid>%s)/publish$" % uuid_regex, GraphPublicationView.as_view(action="publish"), name="publish_graph"),
     re_path(r"^graph/(?P<graphid>%s)/revert$" % uuid_regex, GraphPublicationView.as_view(action="revert"), name="revert_graph"),
+    re_path(r"^graph/(?P<graphid>%s)/model_history$" % uuid_regex, ModelHistoryView.as_view(), name="model_history"),
+    re_path(r"^graph/(?P<graphid>%s)/update_published_graph$" % uuid_regex, ModelHistoryView.as_view(), name="update_published_graph"),
+    re_path(r"^graph/(?P<graphid>%s)/delete_published_graph$" % uuid_regex, ModelHistoryView.as_view(), name="delete_published_graph"),
     re_path(r"^graph/(?P<graphid>%s)/function_manager$" % uuid_regex, FunctionManagerView.as_view(), name="function_manager"),
     re_path(r"^graph/(?P<graphid>%s)/apply_functions$" % uuid_regex, FunctionManagerView.as_view(), name="apply_functions"),
     re_path(r"^graph/(?P<graphid>%s)/remove_functions$" % uuid_regex, FunctionManagerView.as_view(), name="remove_functions"),
