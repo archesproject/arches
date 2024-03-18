@@ -182,6 +182,8 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                             )
 
                         translation.deactivate()
+                    else:
+                        graph.publish()
 
             except GraphImportException as ge:
                 logger.exception(ge)

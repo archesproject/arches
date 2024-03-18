@@ -128,7 +128,7 @@ class Graph(models.GraphModel):
                         has_deferred_args = True
 
                 #  accessing the graph publication while deferring args results in a recursive loop
-                if self.publication and not self.source_identifier_id and not has_deferred_args:
+                if self.publication and not self.source_identifier_id and not self.has_unpublished_changes and not has_deferred_args:
                     self.serialized_graph = self.serialize()  # reads from graph_publication table and returns serialized graph as dict
 
                     node_slugs = []
@@ -270,9 +270,6 @@ class Graph(models.GraphModel):
         )
 
         graph = Graph.objects.get(pk=graph_model.graphid)
-
-        if not graph.source_identifier_id:
-            graph.create_editable_future_graph()
 
         return graph
 
@@ -875,7 +872,6 @@ class Graph(models.GraphModel):
                 widget.source_identifier_id = widget.pk
                 
             widget.pk = uuid.uuid1()
-
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
 
@@ -1705,37 +1701,49 @@ class Graph(models.GraphModel):
                 else:
                     raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
-    def update_published_graphs(self):
+    def update_published_graphs(self, user=None, notes=None):
         """
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
         """
-        with transaction.atomic():
-            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
-            published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+        if self.source_identifier:  # don't update future graphs
+            raise Exception("Cannot update graphs with a source_identifier. Please apply updates to the source graph.")
+        else:  
+            with transaction.atomic():
+                LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
 
-            for language_tuple in settings.LANGUAGES:
-                translation.activate(language=language_tuple[0])
+                if self.has_unpublished_changes:
+                    self.has_unpublished_changes = False
+                    self.save()
+                    self.create_editable_future_graph()
 
-                serialized_graph = JSONDeserializer().deserialize(
-                    JSONSerializer().serialize(self, force_recalculation=True)
-                )
+                published_graph_edit = models.PublishedGraphEdit.objects.create(publication=self.publication, user=user, notes=notes)
+                published_graph_edit.save()
 
-                published_graph_query = published_graphs.filter(language=language_tuple[0])
-                if not len(published_graph_query):
-                    published_graph = models.PublishedGraph.objects.create(
-                        publication_id=self.publication_id,
-                        serialized_graph=serialized_graph,
-                        language=models.Language.objects.get(code=language_tuple[0]),
+                published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+
+                for language_tuple in settings.LANGUAGES:
+                    translation.activate(language=language_tuple[0])
+
+                    serialized_graph = JSONDeserializer().deserialize(
+                        JSONSerializer().serialize(self, force_recalculation=True)
                     )
-                elif len(published_graph_query) == 1:
-                    published_graph = published_graph_query[0]
-                    published_graph.serialized_graph = serialized_graph
-                else:
-                    raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
 
-                published_graph.save()
-                translation.deactivate()
+                    published_graph_query = published_graphs.filter(language=language_tuple[0])
+                    if not len(published_graph_query):
+                        published_graph = models.PublishedGraph.objects.create(
+                            publication_id=self.publication_id,
+                            serialized_graph=serialized_graph,
+                            language=models.Language.objects.get(code=language_tuple[0]),
+                        )
+                    elif len(published_graph_query) == 1:
+                        published_graph = published_graph_query[0]
+                        published_graph.serialized_graph = serialized_graph
+                    else:
+                        raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
+
+                    published_graph.save()
+                    translation.deactivate()
 
     def create_editable_future_graph(self):
         """
@@ -1757,7 +1765,7 @@ class Graph(models.GraphModel):
             editable_future_graph.has_unpublished_changes = False
             editable_future_graph.slug = None  # workaround to allow editable_future_graph to be saved without conflicts
 
-            editable_future_graph.save()
+            editable_future_graph.save(validate=False)
 
             return editable_future_graph
 
@@ -2064,6 +2072,84 @@ class Graph(models.GraphModel):
 
         self.create_editable_future_graph()
 
+    def restore_state_from_serialized_graph(self, serialized_graph):
+        """
+        Restores a Graph's state from a serialized graph, and creates a
+        new editable_future_graph
+        """
+        models.NodeGroup.objects.filter(pk__in=[nodegroup.pk for nodegroup in self.get_nodegroups(force_recalculation=True)]).delete()
+        models.Node.objects.filter(pk__in=[node.pk for node in self.nodes.values()]).delete()
+        models.Edge.objects.filter(pk__in=[edge.pk for edge in self.edges.values()]).delete()
+        models.CardModel.objects.filter(pk__in=[card.pk for card in self.cards.values()]).delete()
+        models.CardXNodeXWidget.objects.filter(pk__in=[card_x_node_x_widget.pk for card_x_node_x_widget in self.widgets.values()]).delete()
+
+        for serialized_nodegroup in serialized_graph["nodegroups"]:
+            for key, value in serialized_nodegroup.items():
+                try:
+                    serialized_nodegroup[key] = uuid.UUID(value)
+                except:
+                    pass
+
+            nodegroup = models.NodeGroup(**serialized_nodegroup)
+            nodegroup.save()
+
+        for serialized_node in serialized_graph["nodes"]:
+            for key, value in serialized_node.items():
+                try:
+                    serialized_node[key] = uuid.UUID(value)
+                except:
+                    pass
+
+            del serialized_node["is_collector"]
+            del serialized_node["parentproperty"]
+
+            node = models.Node(**serialized_node)
+            node.save()
+
+        for serialized_edge in serialized_graph["edges"]:
+            for key, value in serialized_edge.items():
+                try:
+                    serialized_edge[key] = uuid.UUID(value)
+                except:
+                    pass
+
+            edge = models.Edge(**serialized_edge)
+            edge.save()
+
+        for serialized_card in serialized_graph["cards"]:
+            for key, value in serialized_card.items():
+                try:
+                    serialized_card[key] = uuid.UUID(value)
+                except:
+                    pass
+
+            del serialized_card["constraints"]
+            del serialized_card["is_editable"]
+
+            card = Card(**serialized_card)
+            card.save()
+
+        widget_dict = {}
+        for serialized_widget in serialized_graph["widgets"]:
+            for key, value in serialized_widget.items():
+                try:
+                    serialized_widget[key] = uuid.UUID(value)
+                except:
+                    pass
+
+            updated_widget = models.CardXNodeXWidget(**serialized_widget)
+            updated_widget.save()
+
+            widget_dict[updated_widget.pk] = updated_widget
+
+        updated_graph = Graph(serialized_graph)
+        updated_graph.widgets = widget_dict
+
+        updated_graph.save()
+        updated_graph.create_editable_future_graph()
+
+        return updated_graph
+
     def publish(self, user=None, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
@@ -2072,9 +2158,6 @@ class Graph(models.GraphModel):
         self.publication = None
 
         with transaction.atomic():
-            if not self.source_identifier:
-                self.update_from_editable_future_graph()
-
             publication = models.GraphXPublishedGraph.objects.create(graph=self, notes=notes, user=user)
             publication.save()
 

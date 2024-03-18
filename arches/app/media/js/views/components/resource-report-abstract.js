@@ -24,6 +24,7 @@ define([
         this.configType = params.configType;
 
         this.graphHasDifferentPublication = ko.observable(params.graph_has_different_publication === "True" ? true : false);
+        this.graphHasUnpublishedChanges = ko.observable(params.graph_has_unpublished_changes === "True" ? true : false);
         this.graphHasDifferentPublicationAndUserHasInsufficientPermissions = ko.observable(
             params.graph_has_different_publication_and_user_has_insufficient_permissions === "True" ? true : false
         );

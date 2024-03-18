@@ -191,6 +191,16 @@ urlpatterns = [
     ),
     re_path(r"^graph/(?P<graphid>%s)/publish$" % uuid_regex, GraphPublicationView.as_view(action="publish"), name="publish_graph"),
     re_path(r"^graph/(?P<graphid>%s)/revert$" % uuid_regex, GraphPublicationView.as_view(action="revert"), name="revert_graph"),
+    re_path(
+        r"^graph/(?P<graphid>%s)/restore_state_from_serialized_graph$" % uuid_regex,
+        GraphPublicationView.as_view(action="restore_state_from_serialized_graph"),
+        name="restore_state_from_serialized_graph",
+    ),
+    re_path(
+        r"^graph/(?P<graphid>%s)/update_published_graphs$" % uuid_regex,
+        GraphPublicationView.as_view(action="update_published_graphs"),
+        name="update_published_graphs",
+    ),
     re_path(r"^graph/(?P<graphid>%s)/model_history$" % uuid_regex, ModelHistoryView.as_view(), name="model_history"),
     re_path(r"^graph/(?P<graphid>%s)/update_published_graph$" % uuid_regex, ModelHistoryView.as_view(), name="update_published_graph"),
     re_path(r"^graph/(?P<graphid>%s)/delete_published_graph$" % uuid_regex, ModelHistoryView.as_view(), name="delete_published_graph"),

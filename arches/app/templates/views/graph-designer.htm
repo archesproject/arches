@@ -29,9 +29,35 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block graph_title %}
 <div class="ep-tools-title">
-    <h1 class="page-header text-overflow ep-graph-title">
-        <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
-        <span data-bind="text: graph.name()"></span><span class="graph-type" data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"></span>
+    <h1 
+        style="display: flex; justify-content: space-between;"
+        class="page-header text-overflow ep-graph-title"
+    >
+        <span>
+            <i class="text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: (graph.iconclass() || 'fa fa-question')" ></i>
+            <span data-bind="text: graph.name()"></span>
+            <span 
+                class="graph-type" 
+                data-bind="text: graph.isresource() ? &quot;({% trans "Resource Model" %})&quot; : &quot;({% trans "Branch" %})&quot;"
+            ></span>
+        </span>
+        <span>
+            <button
+                style="
+                    border: 1px solid #ddd; 
+                    border-radius: 4px;
+                    padding: 8px;
+                    font-size: 16px;
+                "
+                data-bind="click: $data.toggleLockedState"
+            >
+                <i 
+                    class="text-center" 
+                    data-bind="css: ($data.graph.source_identifier_id() ? 'fa fa-unlock' : 'fa fa-lock')" 
+                ></i>
+                <span data-bind="text: $data.graph.source_identifier_id() ? &quot;{% trans "Unlocked" %}&quot; : &quot;{% trans "Locked" %}&quot;"></span>
+            </button>
+        </span>
     </h1>
 </div>
 {% endblock graph_title %}
@@ -103,14 +129,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     rows="4" 
                     type="text" 
                     name="publication_notes"
-                    placeholder="Add publication notes..."
+                    placeholder="{% quoted_trans 'Add notes...'  %}"
                 ></textarea>
             </div>
                     
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
                 <span style="align-self: flex-end;">
-                    <button style="transition: none;" class="btn btn-sm btn-primary btn-labeled fa fa-check" data-bind="click: $data.publishGraph">
+                    <button 
+                        style="transition: none;" 
+                        class="btn btn-sm btn-primary btn-labeled fa fa-check" 
+                        data-bind="click: $data.shouldShowUpdatePublishedGraphsButton() ? $data.updatePublishedGraphs : $data.publishGraph"
+                    >
+                        <!-- ko if: $data.shouldShowUpdatePublishedGraphsButton() -->
+                        <span>{% trans "Update Published Graphs" %}</span>
+                        <!-- /ko -->
+                        <!-- ko ifnot: $data.shouldShowUpdatePublishedGraphsButton() -->
                         <span>{% trans "Publish" %}</span>
+                        <!-- /ko -->
                     </button>
                 </span>
             <!-- /ko -->
@@ -198,18 +233,28 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <!-- /ko -->
 
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-            <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
-                <span 
-                    style="font-size: 14px;" 
-                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Publish Resource Model'%} : {% quoted_trans 'Publish Branch'%}"
-                ></span>
-            </button>
-            <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertGraphAlert">
-                <span 
-                    style="font-size: 14px;" 
-                    data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Revert Resource Model'%} : {% quoted_trans 'Revert Branch'%}"
-                ></span>
-            </button>
+                <!-- ko if: $data.graph.source_identifier_id() -->
+                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: function() { $data.shouldShowPublishModal(true); }">
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Publish Resource Model'%} : {% quoted_trans 'Publish Branch'%}"
+                    ></span>
+                </button>
+                <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRevertGraphAlert">
+                    <span 
+                        style="font-size: 14px;" 
+                        data-bind="text: $data.graph.isresource() ? {% quoted_trans 'Revert Resource Model'%} : {% quoted_trans 'Revert Branch'%}"
+                    ></span>
+                </button>
+                <!-- /ko -->
+                <!-- ko ifnot: $data.graph.source_identifier_id() -->
+                <button class="btn btn-md btn-primary btn-labeled fa fa-check" data-bind="click: $data.showUpdatePublishedGraphsModal">
+                    <span style="font-size: 14px;">{% trans 'Apply Changes'%}</span>
+                </button>
+                <button class="btn btn-md btn-danger btn-labeled fa fa-undo" data-bind="click: $data.showRestoreStateFromSerializedGraphAlert">
+                    <span style="font-size: 14px;">{% trans 'Revert Changes'%}</span>
+                </button>
+                <!-- /ko -->
             <!-- /ko -->
 
             <a class="btn btn-md btn-mint btn-labeled fa fa-mail-reply back-to-designer" data-bind="
@@ -243,7 +288,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                 {% trans 'Cards' %}
                             </a>
                         </li>
-                        <!--ko if: graph.isresource() -->
+                        <!--ko if: graph.isresource() && !graph.source_identifier_id() -->
                         <li data-bind="css: { active: activeTab() === 'permissions' }, click: function(){activeTab('permissions');}">
                             <a class="graph-designer-tab ion-lock-combination" aria-expanded="false">
                                 {% trans 'Permissions' %}
@@ -432,6 +477,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "datatypes": {{datatypes_json}},
         "graph": {{graph}},
         "source_graph": {{source_graph}},
+        "source_graph_id": "{{source_graph_id}}",
+        "editable_future_graph_id": "{{editable_future_graph_id}}",
         "publication_resource_instance_count": {{publication_resource_instance_count}},
         "ontology_namespaces": "{{ontology_namespaces}}",
         "branches": {{branches}},
