@@ -9,6 +9,8 @@
     <div data-bind="if: conceptCollections().length > 0">
         <select 
             data-bind="
+                placeholder: $root.translations.selectAConceptCollection, 
+                value: topConcept, 
                 disable: isEditable === false, 
                 options: conceptCollections, 
                 optionsText: 'label', 
