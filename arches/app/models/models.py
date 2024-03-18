@@ -1176,7 +1176,7 @@ class TileModel(models.Model):  # Tile
     resourceinstance = models.ForeignKey(ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE)
     parenttile = models.ForeignKey("self", db_column="parenttileid", blank=True, null=True, on_delete=models.CASCADE)
     data = JSONField(blank=True, null=True, db_column="tiledata")
-    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
+    nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
 
@@ -1188,6 +1188,11 @@ class TileModel(models.Model):  # Tile
         super(TileModel, self).__init__(*args, **kwargs)
         if not self.tileid:
             self.tileid = uuid.uuid4()
+
+    @property
+    def nodegroup(self):
+        nodegroup_query = NodeGroup.objects.filter(pk=self.nodegroup_id)
+        return nodegroup_query.first()
 
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))

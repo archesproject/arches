@@ -238,7 +238,9 @@ class ResourceEditorView(MapBaseManagerView):
                 is_system_settings = True
                 displayname = _("System Settings")
 
-            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(nodegroup__in=nodegroups)
+            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(
+                nodegroup_id__in=[nodegroup.pk for nodegroup in nodegroups]
+            )
             provisionaltiles = []
             for tile in tiles:
                 append_tile = True
@@ -353,7 +355,7 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             context["nav"]["help"] = {"title": _("Using the Resource Editor"), "templates": ["resource-editor-help"]}
 
-        if graph.has_unpublished_changes or resource_instance and not resource_instance.graph_publication_id == graph.publication_id:
+        if graph.has_unpublished_changes or resource_instance and resource_instance.graph_publication_id != graph.publication_id:
             return redirect("resource_report", resourceid=resourceid)
         else:
             return render(request, view_template, context)
@@ -712,7 +714,7 @@ class ResourceTiles(View):
         tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
         if nodeid is not None:
             node = models.Node.objects.get(pk=nodeid)
-            tiles = tiles.filter(nodegroup=node.nodegroup)
+            tiles = tiles.filter(nodegroup_id=node.nodegroup_id)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):

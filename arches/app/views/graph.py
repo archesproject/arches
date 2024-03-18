@@ -562,7 +562,8 @@ class GraphPublicationView(View):
                     {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully reverted.")}
                 )
             except Exception as e:
-                return JSONErrorResponse(str(e))
+                logger.exception(e)
+                return JSONErrorResponse(str(_("Unable to process publication"), _("Please contact your administrator if issue persists")))
 
         elif self.action == "update_published_graphs":
             try:
@@ -838,10 +839,15 @@ class PermissionDataView(View):
                     # TODO The following try block is here because the key for the nodegroupid in the new permission manager
                     # is 'nodegroupid' where it was 'nodegroup' in the old permission manager. Once the old permission manager is deleted
                     # we can replace it with `nodegroupid = card['nodegroupid']`
+
                     try:
                         nodegroupid = card["nodegroupid"]
                     except KeyError:
-                        nodegroupid = card["nodegroup"]
+                        try:
+                            nodegroupid = card["nodegroup"]
+                        except KeyError:
+                            nodegroupid = card["model"]["nodegroup_id"]
+
                     nodegroup = models.NodeGroup.objects.get(pk=nodegroupid)
 
                     # first remove all the current permissions

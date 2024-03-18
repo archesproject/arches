@@ -37,6 +37,7 @@ from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation
+from guardian.models import GroupObjectPermission, UserObjectPermission
 
 
 logger = logging.getLogger(__name__)
@@ -82,8 +83,20 @@ class Graph(models.GraphModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].items():
-                    if key not in ("root", "nodes", "edges", "cards", "functions", "publication"):
+                    if key not in (
+                        "root",
+                        "nodes",
+                        "edges",
+                        "cards",
+                        "functions",
+                        "is_editable",
+                        "publication",
+                        "user_permissions",
+                        "group_permissions",
+                    ):
                         setattr(self, key, value)
+
+                self.update_permissions(args[0])
 
                 nodegroups = dict((item["nodegroupid"], item) for item in args[0]["nodegroups"])
                 for node in args[0]["nodes"]:
@@ -153,7 +166,7 @@ class Graph(models.GraphModel):
 
                         for key, value in card_dict.items():
                             # filter out keys from the serialized_graph that would cause an error on instantiation
-                            if key not in ["constraints"]:
+                            if key not in ["constraints", "is_editable"]:
                                 if isinstance(value, str):
                                     try:
                                         value = uuid.UUID(value)
@@ -559,7 +572,7 @@ class Graph(models.GraphModel):
             for widget in self.widgets.values():
                 widget.delete()
 
-            super(Graph, self).delete()
+        super(Graph, self).delete()
 
     def delete_instances(self, verbose=False):
         """
@@ -1044,6 +1057,7 @@ class Graph(models.GraphModel):
             nodegroups = []
 
             tree = self.get_tree(root=node)
+            tile_count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id).count()
 
             def traverse_tree(tree):
                 nodes.append(tree["node"])
@@ -1346,8 +1360,109 @@ class Graph(models.GraphModel):
                 if node.is_collector:
                     nodegroups.add(node.nodegroup)
             for card in self.cards.values():
-                nodegroups.add(card.nodegroup)
+                try:
+                    nodegroups.add(card.nodegroup)
+                except models.NodeGroup.DoesNotExist:
+                    pass
             return list(nodegroups)
+
+    def update_permissions(self, serialized_graph):
+        if "user_permissions" in serialized_graph or "group_permissions" in serialized_graph:
+            graph_from_database_query = Graph.objects.filter(pk=self.pk)
+            if len(graph_from_database_query):
+                graph_from_database = graph_from_database_query[0]
+
+            if "user_permissions" in serialized_graph:
+                # first, delete all existing user permissions for graph
+                if graph_from_database:
+                    user_permissions = graph_from_database.get_user_permissions(force_recalculation=True)  # may not need force_recacluation
+                    for user_permission_list in user_permissions.values():
+                        for user_permission in user_permission_list:
+                            user_permission.delete()
+
+                # then, create permissions from serialized permissions
+                for serialized_user_permission_list in serialized_graph["user_permissions"].values():
+                    for serialized_user_permission in serialized_user_permission_list:
+                        updated_user_permission = UserObjectPermission(**serialized_user_permission)
+                        updated_user_permission.save()
+
+            if "group_permissions" in serialized_graph:
+                # first, delete all existing group permissions for graph
+                if graph_from_database:
+                    group_permissions = graph_from_database.get_group_permissions(
+                        force_recalculation=True
+                    )  # may not need force_recacluation
+                    for group_permission_list in group_permissions.values():
+                        for group_permission in group_permission_list:
+                            group_permission.delete()
+
+                # then, create permissions from serialized permissions
+                for serialized_group_permission_list in serialized_graph["group_permissions"].values():
+                    for serialized_group_permission in serialized_group_permission_list:
+                        updated_group_permission = GroupObjectPermission(**serialized_group_permission)
+                        updated_group_permission.save()
+
+    def get_user_permissions(self, force_recalculation=False):
+        """
+        get the user permissions associated with this graph
+
+        returns {
+            nodegroup.pk: [<UserObjectPermission>, ...],
+            ...
+        },
+        """
+        if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
+            user_permissions = self.serialized_graph["user_permissions"]
+            return {
+                nodegroup_id: [
+                    UserObjectPermission(**serialized_user_permission) for serialized_user_permission in serialized_user_permissions
+                ]
+                for nodegroup_id, serialized_user_permissions in user_permissions.items()
+            }
+        else:
+            user_permissions = {}
+
+            nodegroup_ids = [str(nodegroup.pk) for nodegroup in self.get_nodegroups(force_recalculation=force_recalculation)]
+            user_object_permissions = UserObjectPermission.objects.filter(object_pk__in=nodegroup_ids)
+
+            for user_object_permission in user_object_permissions:
+                if not user_permissions.get(uuid.UUID(user_object_permission.object_pk)):
+                    user_permissions[uuid.UUID(user_object_permission.object_pk)] = []
+
+                user_permissions[uuid.UUID(user_object_permission.object_pk)].append(user_object_permission)
+
+            return user_permissions
+
+    def get_group_permissions(self, force_recalculation=False):
+        """
+        get the user permissions associated with this graph
+
+        returns {
+            nodegroup.pk: [<UserObjectPermission>, ...],
+            ...
+        },
+        """
+        if self.serialized_graph and not self.source_identifier_id and not force_recalculation:
+            group_permissions = self.serialized_graph["group_permissions"]
+            return {
+                nodegroup_id: [
+                    GroupObjectPermission(**serialized_group_permission) for serialized_group_permission in serialized_group_permissions
+                ]
+                for nodegroup_id, serialized_group_permissions in group_permissions.items()
+            }
+        else:
+            group_permissions = {}
+
+            nodegroup_ids = [str(nodegroup.pk) for nodegroup in self.get_nodegroups(force_recalculation=force_recalculation)]
+            user_object_permissions = GroupObjectPermission.objects.filter(object_pk__in=nodegroup_ids)
+
+            for user_object_permission in user_object_permissions:
+                if not group_permissions.get(uuid.UUID(user_object_permission.object_pk)):
+                    group_permissions[uuid.UUID(user_object_permission.object_pk)] = []
+
+                group_permissions[uuid.UUID(user_object_permission.object_pk)].append(user_object_permission)
+
+            return group_permissions
 
     def get_or_create_nodegroup(self, nodegroupid, nodegroups_list=[]):
         """
@@ -1388,7 +1503,7 @@ class Graph(models.GraphModel):
             if card.nodegroup.parentnodegroup is None:
                 return card
 
-    def get_cards(self, check_if_editable=True, use_raw_i18n_json=False):
+    def get_cards(self, use_raw_i18n_json=False):
         """
         get the card data (if any) associated with this graph
 
@@ -1484,6 +1599,16 @@ class Graph(models.GraphModel):
                 ret["nodegroups"] = sorted(nodegroups, key=lambda k: k.pk)
             else:
                 ret.pop("nodegroups", None)
+
+            if "user_permissions" not in exclude:
+                ret["user_permissions"] = self.get_user_permissions(force_recalculation=force_recalculation)
+            else:
+                ret.pop("user_permissions", None)
+
+            if "group_permissions" not in exclude:
+                ret["group_permissions"] = self.get_group_permissions(force_recalculation=force_recalculation)
+            else:
+                ret.pop("group_permissions", None)
 
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes() if "domain_connections" not in exclude else ret.pop("domain_connections", None)
@@ -2124,7 +2249,9 @@ class Graph(models.GraphModel):
                     pass
 
             del serialized_card["constraints"]
-            del serialized_card["is_editable"]
+
+            if "is_editable" in serialized_card:
+                del serialized_card["is_editable"]
 
             card = Card(**serialized_card)
             card.save()

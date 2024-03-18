@@ -200,7 +200,7 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
+        tiles = models.TileModel.objects.filter(nodegroup_id__in=[node.nodegroup_id for node in nodes])
         last_page = None
         if resourceid is not None:
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
@@ -1179,7 +1179,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "report_json": resource.to_json(compact=compact, version=version),
+            # "report_json": resource.to_json(compact=compact, version=version),
         }
 
         if "template" not in exclude:
@@ -1216,13 +1216,8 @@ class ResourceReport(APIBase):
         if "cards" not in exclude:
             permitted_serialized_cards = []
             permitted_cards = []
-            for serialized_card in published_graph.serialized_graph["cards"]:
-                del serialized_card["constraints"]
-                del serialized_card["is_editable"]
-                card = CardProxyModel(**serialized_card)
-
+            for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
                 if request.user.has_perm(perm, card.nodegroup):
-                    permitted_serialized_cards.append(serialized_card)
                     permitted_cards.append(card)
 
             cardwidgets = [
