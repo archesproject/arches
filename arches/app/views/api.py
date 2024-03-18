@@ -1139,8 +1139,28 @@ class ResourceReport(APIBase):
         perm = "read_nodegroup"
 
         resource = Resource.objects.get(pk=resourceid)
-        graph = Graph.objects.get(graphid=resource.graph_id)
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=translation.get_language())
+        graph = Graph(published_graph.serialized_graph)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
+        graph_has_different_publication = bool(resource.graph.publication_id != published_graph.publication_id)
+
+        # if a user is viewing a report for a resource that does not have the same publication as the current graph publication
+        # ( and therefore is out-of-date ) only allow them to access report details if they have Graph Editor permissions or higher.
+        if (
+            graph_has_different_publication
+            and not request.user.groups.filter(
+                name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+            ).exists()
+        ):
+            return JSONResponse(
+                {
+                    "displayname": resource.displayname(),
+                    "resourceid": resourceid,
+                    "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+                    "template": template,
+                    "graph": graph,
+                }
+            )
 
         if not template.preload_resource_data:
             return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version, user=request.user, perm=perm)})
@@ -1186,15 +1206,16 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            # collect the nodegroups for which this user has perm
-            readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
-            
-            # query only the cards whose nodegroups are readable by user
-            permitted_cards = (
-                CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups)
-                .prefetch_related("cardxnodexwidget_set")
-                .order_by("sortorder")
-            )
+            permitted_serialized_cards = []
+            permitted_cards = []
+            for serialized_card in published_graph.serialized_graph["cards"]:
+                del serialized_card["constraints"]
+                del serialized_card["is_editable"]
+                card = CardProxyModel(**serialized_card)
+
+                if request.user.has_perm(perm, card.nodegroup):
+                    permitted_serialized_cards.append(serialized_card)
+                    permitted_cards.append(card)
 
             cardwidgets = [
                 widget
@@ -1202,7 +1223,7 @@ class ResourceReport(APIBase):
                 for widget in widgets
             ]
 
-            resp["cards"] = permitted_cards
+            resp["cards"] = permitted_serialized_cards
             resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)

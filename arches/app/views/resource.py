@@ -793,6 +793,7 @@ class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
         resource = Resource.objects.only("graph_id").get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
+        graph_has_different_publication = bool(resource.graph_publication_id != graph.publication_id)
 
         try:
             map_markers = models.MapMarker.objects.all()
@@ -808,7 +809,13 @@ class ResourceReportView(MapBaseManagerView):
             widgets=models.Widget.objects.all(),
             map_markers=map_markers,
             geocoding_providers=geocoding_providers,
-            graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id),
+            graph_has_different_publication=graph_has_different_publication,
+            graph_has_different_publication_and_user_has_insufficient_permissions=bool(
+                graph_has_different_publication
+                and not request.user.groups.filter(
+                    name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+                ).exists()
+            ),
         )
 
         if graph.iconclass:
