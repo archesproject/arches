@@ -89,6 +89,7 @@ class ArchesTestCase(TestCase):
             with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"], True)
+            management.call_command("graph", ["publish"])
             BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
             settings.update_from_db()
 
