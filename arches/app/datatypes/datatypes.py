@@ -16,6 +16,8 @@ from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
 from django.db.models import fields
+
+from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -98,7 +100,7 @@ class DataTypeFactory(object):
         try:
             datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
         except KeyError:
-            class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, settings.DATATYPE_LOCATIONS)
+            class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, ExtensionType.DATATYPES)
             datatype_instance = class_method(d_datatype)
             DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
             self.datatype_instances = DataTypeFactory._datatype_instances

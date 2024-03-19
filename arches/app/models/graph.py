@@ -299,6 +299,7 @@ class Graph(models.GraphModel):
             node.issearchable = nodeobj.get("issearchable", True)
             node.isrequired = nodeobj.get("isrequired", False)
             node.exportable = nodeobj.get("exportable", False)
+            node.sortorder = nodeobj.get("sortorder", 0)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
             node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)

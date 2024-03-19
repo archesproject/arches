@@ -18,6 +18,7 @@ import logging
 import traceback
 import django.utils.timezone
 
+from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
@@ -464,7 +465,7 @@ class Function(models.Model):
         return json_string
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.FUNCTION_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.FUNCTIONS)
 
 
 class FunctionXGraph(models.Model):
@@ -1070,7 +1071,7 @@ class SearchComponent(models.Model):
         db_table = "search_component"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.SEARCH_COMPONENTS)
 
     def toJSON(self):
         from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1777,7 +1778,7 @@ class ETLModule(models.Model):
         db_table = "etl_modules"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.ETL_MODULES)
 
 
 class LoadEvent(models.Model):
