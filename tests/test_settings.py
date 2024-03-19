@@ -64,6 +64,8 @@ CACHES = {
     },
 }
 
+LOGGING["loggers"]["arches"]["level"] = "ERROR"
+
 ELASTICSEARCH_PREFIX = "test"
 
 TEST_RUNNER = "tests.base_test.ArchesTestRunner"
