@@ -36,7 +36,6 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.response import JSONResponse
 import arches.app.utils.zip as zip_utils
-from arches.app.views import search as SearchView
 from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
