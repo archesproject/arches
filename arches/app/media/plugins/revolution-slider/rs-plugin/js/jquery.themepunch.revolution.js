@@ -1703,7 +1703,7 @@
 			container.find('.tp-caption').each(function() { jQuery(this).addClass(jQuery(this).data('transition')); jQuery(this).addClass('start') });
 
 			// PREPARE THE UL CONTAINER TO HAVEING MAX HEIGHT AND HEIGHT FOR ANY SITUATION
-			container.find('>ul:first').css({overflow:'hidden',width:'100%',height:'100%',maxHeight:container.parent().css('maxHeight')}).addClass("tp-revslider-mainul");
+			container.find('>ul:first').css({overflow:'hidden',width:'100%',height:'100%',padding:'0px',maxHeight:container.parent().css('maxHeight')}).addClass("tp-revslider-mainul");
 			if (opt.autoHeight=="on") {
 			   container.find('>ul:first').css({overflow:'hidden',width:'100%',height:'100%',maxHeight:"none"});
 			   container.css({'maxHeight':'none'});
