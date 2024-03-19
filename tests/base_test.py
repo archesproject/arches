@@ -97,7 +97,7 @@ class ArchesTestCase(TestCase):
     def loadOntology(cls):
         ontologies_count = Ontology.objects.exclude(ontologyid__isnull=True).count()
         if ontologies_count == 0:
-            management.call_command("load_ontology", source=test_settings.ONTOLOGY_PATH)
+            management.call_command("load_ontology", source=test_settings.ONTOLOGY_PATH, verbosity=0)
 
     @classmethod
     def setUpClass(cls):
