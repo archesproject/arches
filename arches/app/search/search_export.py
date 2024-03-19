@@ -147,7 +147,7 @@ class SearchResultsExporter(object):
 
     def export(self, format, report_link):
         ret = []
-        search_res_json = SearchView.search_results(self.search_request)
+        search_res_json = search_res_json = reverse("search_results", self.search_request)
         if search_res_json.status_code == 500:
             return ret
         results = JSONDeserializer().deserialize(search_res_json.content)
