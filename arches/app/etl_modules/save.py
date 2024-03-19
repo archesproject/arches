@@ -17,7 +17,7 @@ def log_event_details(cursor, loadid, details):
         (details, loadid),
     )
 
-def save_to_tiles(userid, loadid):
+def save_to_tiles(userid, loadid, multiprocessing=False):
     with connection.cursor() as cursor:
         saved = False
         try:
@@ -91,7 +91,7 @@ def save_to_tiles(userid, loadid):
 
         try:
             log_event_details(cursor, loadid, "done|Indexing...")
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=multiprocessing, recalculate_descriptors=True)
             user = User.objects.get(id=userid)
             user_email = getattr(user, "email", "")
             user_firstname = getattr(user, "first_name", "")

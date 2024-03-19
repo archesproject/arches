@@ -4,13 +4,15 @@ import json
 import os
 import uuid
 import zipfile
+from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.db.models.functions import Lower
+from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, NodeGroup
+from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -21,10 +23,17 @@ from arches.app.etl_modules.save import save_to_tiles
 
 
 class ImportSingleCsv(BaseImportModule):
-    def __init__(self, request=None, loadid=None):
-        self.request = request if request else None
+    def __init__(self, request=None, loadid=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
-        self.userid = request.user.id if request else None
+        self.userid = request.user.id if request else 1
+        if request is None and params is not None:
+            request = HttpRequest()
+            request.user = User.objects.get(id=self.userid)
+            request.method = "POST"
+            for k, v in params.items():
+                request.POST.__setitem__(k, v)
+            # self.params = params
+        self.request = request if request else None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
@@ -61,6 +70,69 @@ class ImportSingleCsv(BaseImportModule):
         if graphid not in self.node_lookup.keys():
             self.node_lookup[graphid] = Node.objects.filter(graph_id=graphid)
         return self.node_lookup[graphid]
+
+    def cli(self, source):
+        initiated = self.start(self.request)
+
+        if initiated["success"]:
+            read = self.read_for_cli(source)
+        else:
+            return {"success": False, "data": {"title": _("Error"), "message": initiated["message"]}}
+
+        if read["success"]:
+            written = self.write(self.request)
+        else:
+            return {"success": False, "data": {"title": _("Error"), "message": read["message"]}}
+
+        if written["success"]:
+            return {"success": True, "data": "done"}
+        else:
+            return {"success": False, "data": {"title": _("Error"), "message": written["message"]}}
+
+    def read_for_cli(self, source):
+        """
+        Reads added csv file and returns all the rows
+        If the loadid already exsists also returns the load_details
+        """
+
+        temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
+        try:
+            self.delete_from_default_storage(temp_dir)
+        except (FileNotFoundError):
+            pass
+
+        csv_file_name = None
+        if source.split(".")[-1].lower() == "csv":
+            csv_file_name = os.path.basename(source).split('/')[-1]
+            csv_file_path = os.path.join(temp_dir, csv_file_name)
+            default_storage.save(csv_file_path, File(open(source, "r")))
+        elif source.split(".")[-1].lower() == "zip":
+            with zipfile.ZipFile(source, "r") as zip_ref:
+                files = zip_ref.infolist()
+                for file in files:
+                    if not file.filename.startswith("__MACOSX"):
+                        default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
+                        if file.filename.endswith(".csv"):
+                            csv_file_name = file.filename
+            csv_file_path = os.path.join(temp_dir, csv_file_name)
+
+        if csv_file_name is None:
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("No csv file found"),
+                "message": _("Upload a valid csv file"),
+            }
+
+        with default_storage.open(csv_file_path, mode="r") as csvfile:
+            reader = csv.reader(csvfile)
+            data = {"csv": [line for line in reader], "csv_file": csv_file_name}
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
+                row = cursor.fetchall()
+            if len(row) > 0:
+                data["config"] = row[0][0]
+        return {"success": True, "data": data}
 
     def read(self, request):
         """
@@ -123,12 +195,20 @@ class ImportSingleCsv(BaseImportModule):
         """
         Move the records from load_staging to tiles table using db function
         """
-
+        # # if self.params:
+        # #     graphid = self.params["graphid"]
+        # #     has_headers = bool(self.params["has_headers"])
+        # #     fieldnames = self.params["fieldnames"]
+        # #     csv_mapping = self.params["csv_mapping"]
+        # #     csv_file_name = self.params["csv_file_name"]
+        # else:
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
-        fieldnames = request.POST.get("fieldnames").split(",")
+        fieldnames = request.POST.get("fieldnames")
+        if type(fieldnames) != list:
+            fieldnames = fieldnames.split(",")
         csv_mapping = request.POST.get("fieldMapping")
-        if csv_mapping:
+        if csv_mapping and type(csv_mapping) == str:
             csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
@@ -150,7 +230,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         csv_size = default_storage.size(csv_file_path)  # file size in byte
-        use_celery_threshold = 500  # 500 bytes
+        use_celery_threshold = ETLModule.objects.get(pk=self.moduleid).config["celeryThreshold"]
 
         if csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
@@ -211,7 +291,9 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         csv_mapping = request.POST.get("fieldMapping")
         csv_file_name = request.POST.get("csvFileName")
-        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid, "file_name": csv_file_name}
+        if type(csv_mapping) == str:
+            csv_mapping = json.loads(csv_mapping)
+        mapping_details = {"mapping": csv_mapping, "graph": graphid, "file_name": csv_file_name}
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
