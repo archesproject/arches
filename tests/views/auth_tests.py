@@ -16,13 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import base64
 from tests.base_test import ArchesTestCase, OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, CREATE_TOKEN_SQL, DELETE_TOKEN_SQL
 from django.db import connection
@@ -163,15 +156,16 @@ class AuthTests(ArchesTestCase):
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
 
-        response = self.client.post(
-            reverse("two-factor-authentication-login"),
-            {
-                "username": "test",
-                "password": "password",
-                "user-has-enabled-two-factor-authentication": True,
-                "two-factor-authentication": 123456,
-            },
-        )
+        with self.assertLogs("django.request", "WARNING"):
+            response = self.client.post(
+                reverse("two-factor-authentication-login"),
+                {
+                    "username": "test",
+                    "password": "password",
+                    "user-has-enabled-two-factor-authentication": True,
+                    "two-factor-authentication": 123456,
+                },
+            )
 
         self.assertTemplateUsed(response, "two_factor_authentication_login.htm")
         self.assertTrue(response.status_code == 401)

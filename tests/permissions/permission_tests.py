@@ -13,14 +13,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-Replace this with more appropriate tests for your application.
-"""
-
 import os
-import json
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
@@ -76,7 +69,6 @@ class PermissionTests(ArchesTestCase):
             try:
                 user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
                 user.save()
-                print(("Added: {0}, password: {1}".format(user.username, user.password)))
 
                 for group_name in profile["groups"]:
                     group = Group.objects.get(name=group_name)
@@ -90,7 +82,7 @@ class PermissionTests(ArchesTestCase):
         # TODO: pull this up higher so that it's not depending on running outside a transaction
         # same issue in command_line_tests.py
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
         cls.add_users()
