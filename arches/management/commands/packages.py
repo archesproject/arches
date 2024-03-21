@@ -697,6 +697,13 @@ class Command(BaseCommand):
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
 
+            uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
+            dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
+            if os.path.exists(dest_files_dir) is False:
+                os.makedirs(dest_files_dir)
+            for f in uploaded_files:
+                shutil.copy(f, dest_files_dir)
+
             business_data = []
             if dev and os.path.isdir(os.path.join(package_dir, "business_data", "dev_data")):
                 if "business_data_load_order" in configs and len(configs["business_data_load_order"]) > 0:
@@ -757,12 +764,6 @@ class Command(BaseCommand):
             for relation in relations:
                 self.import_business_data_relations(relation)
 
-            uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
-            dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
-            if os.path.exists(dest_files_dir) is False:
-                os.makedirs(dest_files_dir)
-            for f in uploaded_files:
-                shutil.copy(f, dest_files_dir)
 
         def load_extensions(package_dir, ext_type, cmd):
             extensions = glob.glob(os.path.join(package_dir, "extensions", ext_type, "*"))
