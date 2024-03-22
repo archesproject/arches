@@ -37,6 +37,17 @@ class GraphTests(ArchesTestCase):
 
         cls.loadOntology()
 
+        cls.custom_string_datatype_filename = os.path.join(
+            test_settings.TEST_ROOT,
+            "fixtures",
+            "datatypes",
+            "extended_string_datatype.py",
+        )
+        custom_string_datatype_name = "extended-string-datatype"
+        custom_string_datatype = models.DDataType.objects.filter(datatype=custom_string_datatype_name)
+
+        if custom_string_datatype is None or len(custom_string_datatype) != 1:
+            management.call_command("datatype", "register", source=cls.custom_string_datatype_filename, verbosity=0)
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             management.call_command("packages", operation="import_graphs", source=path)
 

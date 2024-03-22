@@ -23,7 +23,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
-from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.models import GraphModel, ResourceInstance, Node
 from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
@@ -79,10 +79,12 @@ class PermissionTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        # TODO: pull this up higher so that it's not depending on running outside a transaction
-        # same issue in command_line_tests.py
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+        if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
+            # TODO: pull this up higher so that it's not depending on running outside a transaction
+            # same issue in command_line_tests.py
+            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
         cls.add_users()

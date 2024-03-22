@@ -53,7 +53,7 @@ CREATE_TOKEN_SQL = """
             VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
     """
 DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
-
+SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
 
 class ArchesTestRunner(DiscoverRunner):
     def __init__(self, *args, **kwargs) -> None:
@@ -86,11 +86,12 @@ class ArchesTestCase(TestCase):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
-            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
-                archesfile = JSONDeserializer().deserialize(f)
-            ResourceGraphImporter(archesfile["graph"], True)
-            management.call_command("graph", ["publish"])
-            BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
+            if not Graph.objects.filter(pk=SYSTEM_SETINGS_GRAPH_ID).exists():
+                with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
+                    archesfile = JSONDeserializer().deserialize(f)
+                ResourceGraphImporter(archesfile["graph"], True)
+                management.call_command("graph", ["publish"])
+                BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
             settings.update_from_db()
 
     @classmethod
