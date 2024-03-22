@@ -1733,8 +1733,13 @@ class SpatialView(APIBase):
             return JSONResponse(response_data)
 
     
-    def post():
+    def post(self, request):
+        spatialview_id = request.get("id", None)
+        spatialview_slug = request.get("slug", None)
         pass
 
-    def delete():
+    @method_decorator(group_required("Application Administrator"))
+    def delete(self, request):
+        spatialview_id = request.get("id", None)
+        spatialview_slug = request.get("slug", None)
         pass
