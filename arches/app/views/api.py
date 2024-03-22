@@ -29,6 +29,7 @@ from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -1756,9 +1757,15 @@ class SpatialView(APIBase):
             if "geometrynodeid" not in json_data:
                 return JSONErrorResponse(_("No Geometry Nodeid provided"), status=400)
             else:
-                geom_node = models.Node.objects.get(nodeid=json_data["geometrynodeid"])
+                try:
+                    geom_node = models.Node.objects.get(nodeid=json_data["geometrynodeid"])
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(_("No Node exists for supplied geometrynodeid"), status=400)
             if "language" in json_data:
-                lang = models.Language.objects.get(code=json_data["language"])
+                try:
+                    lang = models.Language.objects.get(code=json_data["language"])
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(_("No Language exists for supplied language code"), status=400)
             else:
                 graph_x_pubs = models.GraphXPublishedGraph.objects.filter(graph=geom_node.graph)
                 pubs = models.PublishedGraph.objects.filter(publication__in=graph_x_pubs)
