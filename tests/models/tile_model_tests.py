@@ -40,7 +40,7 @@ class TileTests(ArchesTestCase):
         cls.loadOntology()
 
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path)
+            management.call_command("packages", operation="import_graphs", source=path, verbosity=0)
 
     @classmethod
     def setUpTestData(cls):

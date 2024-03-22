@@ -21,6 +21,7 @@ from operator import itemgetter
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
+from django.test.utils import captured_stdout
 from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -38,8 +39,9 @@ class mappedCSVFileImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.loadOntology()
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path)
+            management.call_command("packages", operation="import_graphs", source=path, verbosity=0)
 
     def setUp(self):
         ResourceInstance.objects.all().delete()
@@ -67,84 +69,96 @@ class mappedCSVFileImportTests(ArchesTestCase):
 
     def test_single_1(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-1_to_1.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-1_to_1.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 1)
 
     def test_single_n_to_n(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-n_to_n.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-n_to_n.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 2)
 
     def test_single_n_to_1(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-n_to_1.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/single-n_to_1.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 1)
 
     def test_1_1(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/1-1.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/1-1.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 2)
 
     def test_1_n(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/1-n.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/1-n.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 3)
 
     def test_n_1(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/n-1.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/n-1.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 4)
 
     def test_n_n(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/n-n.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/cardinality_test_data/n-n.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 6)
 
     def test_domain_label_import(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/domain_label_import.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/domain_label_import.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 1)
 
     def test_concept_label_import(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/concept_label_import.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/concept_label_import.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 1)
 
     def test_required_node_import(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/required_node_import.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/required_node_import.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 0)
 
     def test_required_child_node_import(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/required_child_node_import.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/required_child_node_import.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 0)
 
     def test_file_list_datatype_import(self):
         og_tile_count = TileModel.objects.count()
-        BusinessDataImporter("tests/fixtures/data/csv/file_list_datatype_import.csv").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/data/csv/file_list_datatype_import.csv").import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
         self.assertEqual(tile_difference, 1)

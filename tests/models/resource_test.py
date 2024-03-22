@@ -277,7 +277,7 @@ class ResourceTests(ArchesTestCase):
         r2.descriptor_function = None
 
         with CaptureQueriesContext(connection) as queries:
-            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True, quiet=True)
 
         function_x_graph_selects = [
             q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
