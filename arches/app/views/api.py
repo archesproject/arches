@@ -1742,4 +1742,12 @@ class SpatialView(APIBase):
     def delete(self, request):
         spatialview_id = request.get("id", None)
         spatialview_slug = request.get("slug", None)
-        pass
+        spatial_view = None
+        if spatialview_id:
+            spatial_view = models.SpatialView.objects.get(pk=spatialview_id)
+        elif spatialview_slug:
+            spatial_view = models.SpatialView.objects.get(slug=spatialview_slug)
+        else:
+            return JSONErrorResponse(_("No Spatial View id or slug provided"), status=404)
+        spatial_view.delete()
+        return JSONResponse(status=200)
