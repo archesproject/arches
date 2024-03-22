@@ -1765,6 +1765,21 @@ class SpatialView(APIBase):
             if "isactive" in json_data:
                 isactive = json_data["isactive"]
 
+            if self.action == "create":
+                spatialview = models.SpatialView()
+                spatialview.schema = json_data["schema"]
+                spatialview.slug = json_data["slug"]
+                spatialview.description = json_data["description"]
+                spatialview.geometrynode = geom_node
+                spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+                spatialview.language = lang
+                spatialview.attributenodes = attributenodes
+                spatialview.isactive = isactive
+                spatialview.save()
+
+            elif self.action == "update":
+
+                pass
         pass
 
     @method_decorator(group_required("Application Administrator"))
