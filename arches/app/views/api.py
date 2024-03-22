@@ -1732,7 +1732,7 @@ class SpatialView(APIBase):
             ]
             return JSONResponse(response_data)
 
-    
+    @method_decorator(group_required("Application Administrator"))
     def post(self, request):
         spatialview_id = request.get("id", None)
         spatialview_slug = request.get("slug", None)
