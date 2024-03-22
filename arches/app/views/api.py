@@ -1736,6 +1736,35 @@ class SpatialView(APIBase):
     def post(self, request):
         spatialview_id = request.get("id", None)
         spatialview_slug = request.get("slug", None)
+        lang = None
+        isactive = True
+
+        json_data = request.POST.get("data", None)
+
+        if json_data is not None:
+            if "slug" not in json_data:
+                return JSONErrorResponse(_("No slug or Geometry Nodeid provided"), status=400)
+            if "geometrynodeid" not in json_data:
+                return JSONErrorResponse(_("No Geometry Nodeid provided"), status=400)
+            else:
+                geom_node = models.Node.objects.get(nodeid=json_data["geometrynodeid"])
+            if "language" in json_data:
+                lang = models.Language.objects.get(code=json_data["language"])
+            else:
+                graph_x_pubs = models.GraphXPublishedGraph.objects.filter(graph=geom_node.graph)
+                pubs = models.PublishedGraph.objects.filter(publication__in=graph_x_pubs)
+                pub_graph_with_default_lang = list(filter(lambda x: x.language.isdefault is True, pubs))
+                try:
+                    lang = pub_graph_with_default_lang[0].language
+                except:
+                    return JSONErrorResponse(_("No default Language available in your Arches instance."), status=400)
+            if "attributenodes" in json_data:
+                attributenodes = json_data["attributenodes"]
+            else:
+                attributenodes = None
+            if "isactive" in json_data:
+                isactive = json_data["isactive"]
+
         pass
 
     @method_decorator(group_required("Application Administrator"))
