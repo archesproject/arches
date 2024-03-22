@@ -1732,6 +1732,13 @@ class SpatialView(APIBase):
             ]
             return JSONResponse(response_data)
 
+    def attribute_nodes_are_valid(self, geom_node=models.Node, attribute_nodeids=[]):
+        attribute_node_graphs = [n.graph_id for n in models.Node.objects.filter(nodeid__in=attribute_nodeids)]
+        # if any of the graphs in attribute_node_graphs != geom_node.graph return False
+        are_valid = not any(graph_id != geom_node.graph_id for graph_id in attribute_node_graphs)
+
+        return are_valid
+
     @method_decorator(group_required("Application Administrator"))
     def post(self, request):
         spatialview_id = request.get("id", None)
@@ -1760,6 +1767,9 @@ class SpatialView(APIBase):
                     return JSONErrorResponse(_("No default Language available in your Arches instance."), status=400)
             if "attributenodes" in json_data:
                 attributenodes = json_data["attributenodes"]
+                attributenodes_are_valid = self.attribute_nodes_are_valid(geom_node, json_data["attributenodes"])
+                if not attributenodes_are_valid:
+                    return JSONErrorResponse(_("One or more Attribute Nodes are not on the same Graph as the Geometry Node."), status=400)
             else:
                 attributenodes = None
             if "isactive" in json_data:
