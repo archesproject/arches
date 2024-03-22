@@ -1663,3 +1663,16 @@ class GetNodegroupTree(APIBase):
             permitted_result = [nodegroup for nodegroup in result if nodegroup[0] in permitted_nodegroups]  
         
         return JSONResponse({"path": permitted_result})
+
+
+class SpatialView(APIBase):
+    """
+    """
+    def get():
+        pass
+
+    def post():
+        pass
+
+    def delete():
+        pass
