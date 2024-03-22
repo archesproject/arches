@@ -1744,7 +1744,9 @@ class SpatialView(APIBase):
         spatialview_id = request.get("id", None)
         spatialview_slug = request.get("slug", None)
         lang = None
-        isactive = True
+        isactive = None
+        ismixedgeometrytypes = None
+        description = None
 
         json_data = request.POST.get("data", None)
 
@@ -1774,6 +1776,10 @@ class SpatialView(APIBase):
                 attributenodes = None
             if "isactive" in json_data:
                 isactive = json_data["isactive"]
+            if "ismixedgeometrytypes" in json_data:
+                ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+            if "description" in json_data["description"]:
+                description = json_data["description"]
 
             if self.action == "create":
                 spatialview = models.SpatialView()
@@ -1784,13 +1790,29 @@ class SpatialView(APIBase):
                 spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
                 spatialview.language = lang
                 spatialview.attributenodes = attributenodes
-                spatialview.isactive = isactive
+                spatialview.isactive = isactive or None
                 spatialview.save()
 
             elif self.action == "update":
+                try:
+                    if spatialview_id:
+                        spatialview = models.SpatialView.objects.get(spatialviewid=spatialview_id)
+                    else:
+                        spatialview = models.SpatialView.objects.get(slug=spatialview_slug)
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(_("No SpatialView identified by Slug or UUID provided"), status=404)
 
-                pass
-        pass
+                if attributenodes and attributenodes != spatialview.attributenodes:
+                    spatialview.attributenodes = attributenodes
+                spatialview.isactive = spatialview.isactive or isactive
+                spatialview.ismixedgeometrytypes = spatialview.ismixedgeometrytypes or ismixedgeometrytypes
+                if description:
+                    spatialview.description = description
+            else:
+                return JSONErrorResponse(status=500)
+            
+            return JSONResponse(staus=200)
+
 
     @method_decorator(group_required("Application Administrator"))
     def delete(self, request):
