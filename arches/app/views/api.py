@@ -1668,9 +1668,71 @@ class GetNodegroupTree(APIBase):
 class SpatialView(APIBase):
     """
     """
-    def get():
-        pass
 
+    def get(self, request):
+        """
+        Returns a permitted spatial view given an id or slug
+        otherwise returns a list of permitted spatial views
+        """
+        spatialview_id = request.get("id", None)
+        spatialview_slug = request.get("slug", None)
+        # spatialview_geometrynodeid = request.get("geometrynodeid", None)
+        spatialview = None
+
+        # permission check
+        permitted_nodegroupids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        spatialviews_dict = {str(sv.geometrynode.pk): sv for sv in models.SpatialView.objects.all()}
+        spatialview_nodes = [ sv.geometrynode for sv in list(spatialviews_dict.values()) ]
+
+        permitted_spatialview_nodes = list(filter(lambda x: x.nodegroup_id in permitted_nodegroupids, spatialview_nodes))
+        permitted_spatialviews = [ spatialviews_dict[str(sv_node.pk)] for sv_node in permitted_spatialview_nodes ]
+
+        if spatialview_id or spatialview_slug:
+            if spatialview_id:
+                spatialview = list(filter(lambda x: x.pk == spatialview_id, permitted_spatialviews))
+                spatial_view_exists = len(list(filter(lambda x: x.pk == spatialview_id, list(spatialviews_dict.values()) ))) > 0
+            else:
+                spatialview = list(filter(lambda x: x.slug == spatialview_slug, permitted_spatialviews))
+                spatial_view_exists = len(list(filter(lambda x: x.slug == spatialview_slug, list(spatialviews_dict.values()) ))) > 0
+            
+
+            if not len(spatialview):
+                if spatial_view_exists:
+                    return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
+                else:
+                    return JSONErrorResponse(_("No Spatial View Exists with this id or slug"), status=404)
+            else:
+                spatialview = spatialview[0]
+                response_data = {
+                    "spatialviewid": str(spatialview.spatialviewid),
+                    "schema": spatialview.schema,
+                    "slug": spatialview.slug,
+                    "description": spatialview.description,
+                    "geometrynodeid": str(spatialview.geometrynode.id),
+                    "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+                    "language": spatialview.language.code,
+                    "attributenodes": spatialview.attributenodes,
+                    "isactive": spatialview.isactive
+                }
+                return JSONResponse(response_data)
+
+        else:
+            response_data = [
+                {
+                    "spatialviewid": str(spatialview.spatialviewid),
+                    "schema": spatialview.schema,
+                    "slug": spatialview.slug,
+                    "description": spatialview.description,
+                    "geometrynodeid": str(spatialview.geometrynode.pk),
+                    "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+                    "language": spatialview.language.code,
+                    "attributenodes": spatialview.attributenodes,
+                    "isactive": spatialview.isactive
+                } for spatialview in permitted_spatialviews
+            ]
+            return JSONResponse(response_data)
+
+    
     def post():
         pass
 
