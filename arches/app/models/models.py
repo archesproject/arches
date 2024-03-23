@@ -1827,6 +1827,7 @@ class SpatialView(models.Model):
     description = models.TextField(default="arches spatial view")  # provide a description of the spatial view
     geometrynode = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
     ismixedgeometrytypes = models.BooleanField(default=False)
+    language = models.ForeignKey(Language, db_column="languageid", to_field="code", on_delete=models.CASCADE)
     attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
     isactive = models.BooleanField(default=True)  # the view is not created in the DB until set to active.
 
