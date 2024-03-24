@@ -6,13 +6,13 @@ define([
     'report-templates',
     'models/report',
     'models/graph',
+    'viewmodels/alert',
     'templates/views/components/resource-report-abstract.htm',
     'viewmodels/card',
-], function($, _, ko, arches, reportLookup, ReportModel, GraphModel, resourceReportAbstractTemplate) {
+], function($, _, ko, arches, reportLookup, ReportModel, GraphModel, AlertViewmodel, resourceReportAbstractTemplate) {
     var ResourceReportAbstract = function(params) {
         var self = this;
         var CardViewModel = require('viewmodels/card');
-
          
         this.loading = ko.observable(true);
 
@@ -23,12 +23,24 @@ define([
         this.configForm = params.configForm;
         this.configType = params.configType;
 
+        this.graphHasDifferentPublication = ko.observable(params.graph_has_different_publication === "True" ? true : false);
+
         this.template = ko.observable();
         this.report = ko.observable();
 
         this.initialize = function() {
             var url;
             params.cache = params.cache === undefined ? true : params.cache;
+
+            if (params.view) {
+                params.view.alert(new AlertViewmodel(
+                    'ep-alert-red',
+                    arches.translations.resourceGraphHasDifferentPublication.title,
+                    arches.translations.resourceGraphHasDifferentPublication.text,
+                    null,
+                    function() {}
+                ));
+            }
 
             if (params.report) {
                 if (

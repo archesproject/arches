@@ -189,7 +189,7 @@ urlpatterns = [
         name="get_domain_connections",
     ),
     re_path(r"^graph/(?P<graphid>%s)/publish$" % uuid_regex, GraphPublicationView.as_view(action="publish"), name="publish_graph"),
-    re_path(r"^graph/(?P<graphid>%s)/unpublish$" % uuid_regex, GraphPublicationView.as_view(action="unpublish"), name="unpublish_graph"),
+    re_path(r"^graph/(?P<graphid>%s)/revert$" % uuid_regex, GraphPublicationView.as_view(action="revert"), name="revert_graph"),
     re_path(r"^graph/(?P<graphid>%s)/function_manager$" % uuid_regex, FunctionManagerView.as_view(), name="function_manager"),
     re_path(r"^graph/(?P<graphid>%s)/apply_functions$" % uuid_regex, FunctionManagerView.as_view(), name="apply_functions"),
     re_path(r"^graph/(?P<graphid>%s)/remove_functions$" % uuid_regex, FunctionManagerView.as_view(), name="remove_functions"),
@@ -242,8 +242,12 @@ urlpatterns = [
     re_path(r"^graphs/(?P<graph_id>%s)$" % (uuid_regex), api.Graphs.as_view(), name="graphs_api"),
     re_path(r"^graphs", api.Graphs.as_view(action="get_graph_models"), name="get_graph_models_api"),
     re_path(
-        r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"
+        r"^graph_has_unpublished_changes/(?P<graph_id>%s)$" % (uuid_regex),
+        api.GraphHasUnpublishedChanges.as_view(),
+        name="graph_has_unpublished_changes_api",
     ),
+    re_path(r"^graph_is_active/(?P<graph_id>%s)$" % (uuid_regex), api.GraphIsActive.as_view(), name="graph_is_active_api"),
+    re_path(r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex), api.Resources.as_view(), name="resources_graphid"),
     re_path(r"^resources/(?P<slug>[-\w]+)/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources_slug"),
     re_path(r"^resources/(?P<resourceid>%s|())$" % uuid_regex, api.Resources.as_view(), name="resources"),
     re_path(r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex), api.Tile.as_view(), name="api_tiles"),

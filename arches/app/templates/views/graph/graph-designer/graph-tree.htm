@@ -50,7 +50,7 @@
             <!-- /ko -->
             <span class="" data-bind="{text: graphTree.getDisplayName(node)}"></span>
             <!-- ko if: graphTree.showIds -->
-            <span style="font-weight:bold;" data-bind="text: ': ' + node.nodeid"></span>
+            <span style="font-weight:bold;" data-bind="text: ': ' + graphTree.getNodeIdentifier(node)"></span>
             <!-- /ko -->
             <span class="spacer"></span>
             <i class="jstree-node-action-icon ion-ios-copy-outline" role="presentation" data-bind="visible: graphTree.showIds(), clipboard: {value: node.nodeid, tooltip: true, beforeCopiedText: graphTree.translations.copyNodeIdToClipboard, afterCopiedText: graphTree.translations.copiedNodeIdToClipboard}" data-toggle="tooltip" data-placement="auto" data-container="body"></i>

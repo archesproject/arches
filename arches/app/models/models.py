@@ -22,6 +22,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import JSONField
@@ -93,6 +94,7 @@ class CardModel(models.Model):
         "CardComponent", db_column="componentid", default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"), on_delete=models.SET_DEFAULT
     )
     config = JSONField(blank=True, null=True, db_column="config")
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
@@ -106,6 +108,11 @@ class CardModel(models.Model):
             self.cardid = uuid.uuid4()
         if isinstance(self.cardid, str):
             self.cardid = uuid.UUID(self.cardid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(CardModel, self).save()
 
     class Meta:
         managed = True
@@ -175,6 +182,7 @@ class CardXNodeXWidget(models.Model):
     label = I18n_TextField(blank=True, null=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
@@ -261,6 +269,7 @@ class Edge(models.Model):
     domainnode = models.ForeignKey("Node", db_column="domainnodeid", related_name="edge_domains", on_delete=models.CASCADE)
     rangenode = models.ForeignKey("Node", db_column="rangenodeid", related_name="edge_ranges", on_delete=models.CASCADE)
     graph = models.ForeignKey("GraphModel", db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
 
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
@@ -268,6 +277,11 @@ class Edge(models.Model):
             self.edgeid = uuid.uuid4()
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Edge, self).save()
 
     class Meta:
         managed = True
@@ -490,6 +504,7 @@ class GraphModel(models.Model):
     deploymentdate = models.DateTimeField(blank=True, null=True)
     version = models.TextField(blank=True, null=True)
     isresource = models.BooleanField()
+    is_active = models.BooleanField(default=False)
     iconclass = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
@@ -504,13 +519,17 @@ class GraphModel(models.Model):
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
+    source_identifier = models.ForeignKey(
+        blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
+    )
+    has_unpublished_changes = models.BooleanField(default=False)
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
-        if not self.publication:
-            return _("This Model is currently unpublished and not available for instance creation.")
+        if not self.is_active:
+            return _("This Model is not active, and is not available for instance creation.")
         return False
 
     def is_editable(self):
@@ -647,6 +666,7 @@ class Node(models.Model):
     exportable = models.BooleanField(default=False, null=True)
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
+    source_identifier = models.ForeignKey("self", db_column="source_identifier", blank=True, null=True, on_delete=models.CASCADE)
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -713,10 +733,23 @@ class Node(models.Model):
                 new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
                 new_r2r.save()
 
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude, **kwargs)
+
+        if ret["config"] and ret["config"].get("options"):
+            ret["config"]["options"] = sorted(ret["config"]["options"], key=lambda k: k["id"])
+
+        return ret
+
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
         if not self.nodeid:
             self.nodeid = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+        super(Node, self).save()
 
     class Meta:
         managed = True

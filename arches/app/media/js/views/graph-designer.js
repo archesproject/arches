@@ -38,44 +38,83 @@ define([
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
-            viewModel.isGraphPublished = ko.observable(ko.unwrap(data['graph'].publication_id));
             viewModel.graphPublicationNotes = ko.observable();
-            viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
-                var shouldShowGraphPublishButtons = true;
+            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+            viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
+            viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
+            viewModel.isGraphActive = ko.observable(data['graph']['is_active']);
+
+            viewModel.hasDirtyWidget = ko.observable();
+
+            viewModel.isGraphActive.subscribe(isGraphActive => {
+                $.ajax({
+                    type: 'POST',
+                    url: arches.urls.graph_is_active_api(data.graphid),
+                    data: {'is_active': isGraphActive},
+                    error: function() {
+                        const alert = new AlertViewModel(
+                            'ep-alert-red', 
+                            arches.translations.resourceGraphChangeActiveStatusError.title,
+                            arches.translations.resourceGraphChangeActiveStatusError.text,
+                            null,
+                            function(){},
+                        );
+
+                        viewModel.alert(alert);
+
+                        alert.active.subscribe(function() {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
+
+            viewModel.isDirty = ko.pureComputed(() => {
+                let isDirty = false;
 
                 if (viewModel.dirty()) {
-                    shouldShowGraphPublishButtons = false;
+                    isDirty = true;
                 }
-                else if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
-                    shouldShowGraphPublishButtons = false;
+                if (viewModel.hasDirtyWidget()) {
+                    isDirty = true;
                 }
-                else if (viewModel.isNodeDirty()) {
-                    shouldShowGraphPublishButtons = false;
+                if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
+                    isDirty = true;
                 }
-                else if (ko.unwrap(viewModel.cardTree.selection)) {
-                    var selection = ko.unwrap(viewModel.cardTree.selection);
+                if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                    isDirty = true;
+                }
+                if (ko.unwrap(viewModel.cardTree.selection)) {
+                    const selection = ko.unwrap(viewModel.cardTree.selection);
 
                     if (selection.model && selection.model.dirty()) {
-                        shouldShowGraphPublishButtons = false;
+                        isDirty = true;
                     }
-                    else if (selection.card && selection.card.dirty()) {
-                        shouldShowGraphPublishButtons = false;
+                    if (selection.card && selection.card.dirty()) {
+                        isDirty = true;
                     }
                 }
-                
-                return shouldShowGraphPublishButtons;
+
+                return isDirty;
             });
-            viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+            
+            viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
+                return Boolean(!viewModel.isDirty() && viewModel.graphHasUnpublishedChanges());
+            });
+
+            viewModel.isNodeDirty = ko.pureComputed(function() {
+                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
+            });
 
             viewModel.isNodeDirty = ko.pureComputed(function() {
                 return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
             });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
-                return graph.isresource;
+                return graph.isresource && !graph.source_identifier_id;
             });
             var graphs = ko.utils.arrayFilter(viewData.graphs, function(graph) {
-                return !graph.isresource;
+                return !graph.isresource && !graph.source_identifier_id;
             });
 
             var newGraph = function(url, data) {
@@ -107,9 +146,6 @@ define([
 
             viewModel.shouldShowPublishModal = ko.observable(false);
 
-            viewModel.displayUnpublishWarning = function() {
-                viewModel.alert(new AlertViewModel('ep-alert-red', 'Unpublish the graph?', 'This will make the graph inaccessible to other users.', function() {}, viewModel.unpublishGraph));
-            };
             viewModel.publishGraph = function() {
                 viewModel.loading(true);
 
@@ -118,13 +154,31 @@ define([
                     data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
+                        let alert;
+
                         if (status === 'success') {
-                            viewModel.isGraphPublished(true);
-                            viewModel.alert(new AlertViewModel('ep-alert-blue', response.responseJSON.title, response.responseJSON.message));
+                            alert = new AlertViewModel(
+                                'ep-alert-blue', 
+                                response.responseJSON.title, 
+                                response.responseJSON.message,
+                                null,
+                                function(){},
+                            );
                         }
                         else {
-                            viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
+                            alert = new JsonErrorAlertViewModel(
+                                'ep-alert-red', 
+                                response.responseJSON,
+                                null,
+                                function(){},
+                            );
                         }
+
+                        // must reload window since this editable_future_graph has been deleted
+                        alert.active.subscribe(function() {
+                            window.location.reload();
+                        });
+                        viewModel.alert(alert);
                         
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
@@ -132,22 +186,28 @@ define([
                     }
                 });
             };
-            viewModel.unpublishGraph = function() {
+
+            viewModel.showRevertGraphAlert = function() {
+                viewModel.alert(new AlertViewModel(
+                    'ep-alert-red', 
+                    arches.translations.confirmGraphRevert.title, 
+                    arches.translations.confirmGraphRevert.text,
+                    function() {}, 
+                    viewModel.revertGraph,
+                ));
+            };
+
+            viewModel.revertGraph = function() {
                 viewModel.loading(true);
 
                 $.ajax({
                     type: "POST",
-                    url: arches.urls.unpublish_graph(viewModel.graph.graphid()),
+                    url: arches.urls.revert_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
-                        if (status === 'success') {
-                            viewModel.isGraphPublished(false);
-                        }
+                        if (status === 'success') { window.location.reload(); }
                         else {
                             viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
                         }
-
-                        viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
                     }
                 });
             };
@@ -163,7 +223,7 @@ define([
                         viewModel.loading(true);
                         $.ajax({
                             type: "DELETE",
-                            url: arches.urls.delete_graph(viewModel.graph.graphid()),
+                            url: arches.urls.delete_graph(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()),
                             complete: function(response, status) {
                                 viewModel.loading(false);
                                 if (status === 'success') {
@@ -177,10 +237,10 @@ define([
                 ));
             };
             viewModel.cloneGraph = function() {
-                newGraph(arches.urls.clone_graph(viewModel.graph.graphid()));
+                newGraph(arches.urls.clone_graph(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()));
             };
             viewModel.exportGraph = function() {
-                window.open(arches.urls.export_graph(viewModel.graph.graphid()), '_blank');
+                window.open(arches.urls.export_graph(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()), '_blank');
             };
             viewModel.importGraph = function(data, e) {
                 var formData = new FormData();
@@ -227,7 +287,7 @@ define([
                         viewModel.loading(true);
                         $.ajax({
                             type: "DELETE",
-                            url: arches.urls.delete_instances(viewModel.graph.graphid()),
+                            url: arches.urls.delete_instances(viewModel.graph.source_identifier_id() || viewModel.graph.graphid()),
                             complete: function(response, status) {
                                 viewModel.loading(false);
                                 if (status === 'success') {
@@ -265,15 +325,6 @@ define([
             });
 
             viewModel.datatypes = _.keys(viewModel.graphModel.get('datatypelookup'));
-
-            viewModel.graphModel.on('changed', function(model, response) {
-                viewModel.alert(null);
-                // viewModel.loading(false);  // TODO: @cbyrd 8842 disable page refresh on branch append
-                if (response.status !== 200) {
-                    viewModel.loading(false);
-                    viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
-                }
-            });
 
             viewModel.graphModel.on('error', function(response) {
                 viewModel.alert(new JsonErrorAlertViewModel('ep-alert-red', response.responseJSON));
@@ -321,6 +372,10 @@ define([
                 }
             };
 
+            viewModel.saveCardEdits = function(card) {
+                card.save();
+            };
+
             viewModel.cardTree = new CardTreeViewModel({
                 graph: viewModel.graph,
                 appliedFunctions: viewModel.appliedFunctions,
@@ -329,8 +384,9 @@ define([
             });
 
             viewModel.permissionTree = new CardTreeViewModel({
-                graph: viewModel.graph,
+                graph: koMapping.fromJS(data.source_graph),
                 graphModel: viewModel.graphModel,
+                isPermissionTree: true,
                 appliedFunctions: viewModel.appliedFunctions,
                 primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
                 multiselect: true
@@ -403,6 +459,12 @@ define([
                     if (viewModel.report.get('template_id')() !== graph["template_id"]) {
                         viewModel.report.get('template_id')(graph["template_id"]);
                     }
+                },
+                onSave: function() {
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('graphSettingsSave')
+                    );
                 }
             });
 
@@ -602,7 +664,25 @@ define([
             viewModel.graphModel.on('select-node', function(node) {
                 viewModel.graphTree.expandParentNode(node);
             });
+            function updateGraphUnpublishedChanges() {
+                viewModel.graphHasUnpublishedChanges(true);
 
+                $.ajax({
+                    type: 'POST',
+                    url: arches.urls.graph_has_unpublished_changes_api(data.graphid),
+                    data: {'has_unpublished_changes': true}
+                });
+            }
+
+            document.addEventListener('appendBranch', updateGraphUnpublishedChanges);
+            document.addEventListener('addChildNode', updateGraphUnpublishedChanges);
+            document.addEventListener('deleteNode', updateGraphUnpublishedChanges);
+            document.addEventListener('reorderNodes', updateGraphUnpublishedChanges);
+            document.addEventListener('reorderCards', updateGraphUnpublishedChanges);
+            document.addEventListener('cardSave', updateGraphUnpublishedChanges);
+            document.addEventListener('nodeSave', updateGraphUnpublishedChanges);
+            document.addEventListener('graphSettingsSave', updateGraphUnpublishedChanges);
+            
             BaseManagerView.prototype.initialize.apply(this, arguments);
         }
     });

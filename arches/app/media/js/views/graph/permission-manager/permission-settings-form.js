@@ -97,7 +97,7 @@ define([
                 }),
                 'selectedCards': this.selectedCards().map(function(card) {
                     return {
-                        nodegroupid: card.nodegroupid
+                        nodegroupid: card.nodegroupid || ko.unwrap(card.model.nodegroup_id)
                     };
                 }),
                 'selectedPermissions': _.filter(this.nodegroupPermissions(), function(perm) {

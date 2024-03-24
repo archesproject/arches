@@ -58,7 +58,7 @@
                 </li>
                 <!-- Menu Item -->
                 <li class="edit-menu-item" data-bind="visible: graph.isresource">
-                    <a href="{% url 'function_manager' graphid %}" data-bind="click:function () { navigate('{% url 'function_manager' graphid %}'); }">
+                    <a href="{% url 'function_manager' source_graph_id %}" data-bind="click:function () { navigate('{% url 'function_manager' source_graph_id %}'); }">
                         <div class="media-body">
                             <div class="menu-item-title"><i class="fa fa-code"></i> {% trans "Functions" %}</div>
                             <span class="text-muted menu-item-subtitle">{% trans "Configure functions attached to this Resource Model" %} </span>

@@ -39,7 +39,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource, PublishedModelError
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -313,7 +313,7 @@ class ResourceEditorView(MapBaseManagerView):
             resource_graphs=(
                 models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
             ),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
@@ -340,6 +340,13 @@ class ResourceEditorView(MapBaseManagerView):
             is_system_settings=is_system_settings,
         )
 
+        graph_has_unpublished_changes = False
+        editable_future_graph = Graph.objects.get(source_identifier=graph.pk)
+        if editable_future_graph and editable_future_graph.has_unpublished_changes:
+            graph_has_unpublished_changes = True
+
+        context["graph_has_unpublished_changes"] = graph_has_unpublished_changes
+
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
     
@@ -363,9 +370,6 @@ class ResourceEditorView(MapBaseManagerView):
                 ret = Resource.objects.get(pk=resourceid)
                 try:
                     deleted = ret.delete(user=request.user)
-                except PublishedModelError as e:
-                    message = _("Unable to delete. Please verify the model is not currently published.")
-                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                 except PermissionDenied:
                     return JSONErrorResponse(delete_error, delete_msg)
                 if deleted is True:
@@ -801,6 +805,7 @@ class ResourceReportView(MapBaseManagerView):
             widgets=models.Widget.objects.all(),
             map_markers=map_markers,
             geocoding_providers=geocoding_providers,
+            graph_has_different_publication=bool(resource.graph_publication_id != graph.publication_id),
         )
 
         if graph.iconclass:
@@ -819,7 +824,7 @@ class RelatedResourcesView(BaseManagerView):
         models.GraphModel.objects.all()
         .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .exclude(isresource=False)
-        .exclude(publication=None)
+        .exclude(is_active=False)
     )
 
     def paginate_related_resources(self, related_resources, page, request):
@@ -963,11 +968,7 @@ class RelatedResourcesView(BaseManagerView):
                     datestarted=datefrom,
                     dateended=dateto,
                 )
-                try:
-                    rr.save()
-                except PublishedModelError as e:
-                    message = _("Unable to save. Please verify the model is not currently published.")
-                    return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                rr.save()
             else:
                 print("relationship not permitted")
 
@@ -977,11 +978,7 @@ class RelatedResourcesView(BaseManagerView):
             rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
-            try:
-                rr.save()
-            except PublishedModelError as e:
-                message = _("Unable to save. Please verify the model is not currently published.")
-                return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+            rr.save()
 
         start = request.GET.get("start", 0)
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])
