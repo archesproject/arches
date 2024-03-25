@@ -156,7 +156,7 @@ class AuthTests(ArchesTestCase):
         """
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = True
 
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             response = self.client.post(
                 reverse("two-factor-authentication-login"),
                 {

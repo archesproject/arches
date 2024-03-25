@@ -146,7 +146,7 @@ class CommandLineTests(ArchesTestCase):
         group = Group.objects.get(pk=2)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", group, resource)
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(url)
         self.assertTrue(response.status_code == 403)
 
@@ -160,7 +160,7 @@ class CommandLineTests(ArchesTestCase):
         group = Group.objects.get(pk=2)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("view_resourceinstance", group, resource)
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(url)
         self.assertTrue(response.status_code == 403)
 
@@ -174,7 +174,7 @@ class CommandLineTests(ArchesTestCase):
         group = Group.objects.get(pk=2)
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
         assign_perm("change_resourceinstance", group, resource)
-        with self.assertLogs("django.request", "ERROR"):
+        with self.assertLogs("django.request", level="ERROR"):
             response = self.client.delete(url)
         self.assertTrue(response.status_code == 500)
 
@@ -193,11 +193,11 @@ class CommandLineTests(ArchesTestCase):
         assign_perm("change_resourceinstance", group, resource)
         assign_perm("delete_resourceinstance", group, resource)
         assign_perm("no_access_to_resourceinstance", user, resource)
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             view = self.client.get(view_url)
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             edit = self.client.get(edit_url)
-        with self.assertLogs("django.request", "ERROR"):
+        with self.assertLogs("django.request", level="ERROR"):
             delete = self.client.delete(edit_url)
         self.assertTrue(view.status_code == 403 and edit.status_code == 403 and delete.status_code == 500)
 

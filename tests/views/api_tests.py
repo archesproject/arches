@@ -82,13 +82,13 @@ class APITests(ArchesTestCase):
 
         request = factory.get(reverse("api_node_value", kwargs={}), {"ver": "2.0"})
         request.user = None
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.0")
 
         request = factory.get(reverse("api_node_value"), kwargs={})
         request.user = None
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
@@ -288,7 +288,7 @@ class APITests(ArchesTestCase):
 
         # ==Act : GET confirmation that resource does not exist in database=================================
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context:
-            with self.assertLogs("django.request", "ERROR"):
+            with self.assertLogs("django.request", level="ERROR"):
                 resp_get = self.client.get(
                     reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json"
                 )
@@ -327,7 +327,7 @@ class APITests(ArchesTestCase):
         # ==================================================================================================
 
         # ==Act : PUT resource changes to database, with invalid URI========================================
-        with self.assertLogs("django.request", "WARNING"):
+        with self.assertLogs("django.request", level="WARNING"):
             resp_put_uri_diff = self.client.put(
                 reverse("resources", kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"}) + "?format=arches-json",
                 payload_modified,
@@ -382,7 +382,7 @@ class APITests(ArchesTestCase):
 
         # ==Act : GET confirmation that resource does not exist in database=================================
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context_del:
-            with self.assertLogs("django.request", "ERROR"):
+            with self.assertLogs("django.request", level="ERROR"):
                 resp_get_deleted = self.client.get(
                     reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json"
                 )

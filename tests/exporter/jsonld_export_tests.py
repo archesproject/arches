@@ -107,8 +107,8 @@ class JsonLDExportTests(ArchesTestCase):
         # this 'resources' is from urls.py
         self.client.login(username="admin", password="admin")
         url = self._create_url(resource_id="00000000-f6b5-11e9-8f09-a4d18cec433a")
-        with self.assertLogs("django.request", "WARNING"):
-            with self.assertLogs("arches.app.views.api", "ERROR"):
+        with self.assertLogs("django.request", level="WARNING"):
+            with self.assertLogs("arches.app.views.api", level="ERROR"):
                 response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 404)
 
