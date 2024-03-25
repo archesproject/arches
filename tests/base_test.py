@@ -21,7 +21,7 @@ from contextlib import contextmanager
 
 from django.test import TestCase
 from arches.app.models.graph import Graph
-from arches.app.models.models import Ontology
+from arches.app.models.models import DDataType, Ontology
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
@@ -104,6 +104,15 @@ class ArchesTestCase(TestCase):
     @classmethod
     def ensure_resource_test_model_loaded(cls):
         resource_test_model_graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
+        custom_string_datatype_filename = os.path.join(
+            test_settings.TEST_ROOT,
+            "fixtures",
+            "datatypes",
+            "extended_string_datatype.py",
+        )
+
+        if not DDataType.objects.filter(datatype="extended-string-datatype").exists():
+            management.call_command("datatype", "register", source=custom_string_datatype_filename, verbosity=0)
         if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
             for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
                 with captured_stdout():
