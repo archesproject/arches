@@ -20,6 +20,7 @@ import os
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
+from django.test.utils import captured_stdout
 from django.urls import reverse
 from arches.app.models.models import GraphModel, ResourceInstance, EditLog
 from django.test.client import RequestFactory, Client
@@ -45,15 +46,11 @@ def add_users():
     )
 
     for profile in profiles:
-        try:
-            user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+        user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
 
-            for group_name in profile["groups"]:
-                group = Group.objects.get(name=group_name)
-                group.user_set.add(user)
-
-        except Exception as e:
-            print(e)
+        for group_name in profile["groups"]:
+            group = Group.objects.get(name=group_name)
+            group.user_set.add(user)
 
 
 class CommandLineTests(ArchesTestCase):
@@ -78,7 +75,8 @@ class CommandLineTests(ArchesTestCase):
         if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: pull this up higher so that it's not depending on running outside a transaction
             test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-            management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
         add_users()

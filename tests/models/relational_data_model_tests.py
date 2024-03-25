@@ -20,6 +20,7 @@ import os
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
+from django.test.utils import captured_stdout
 from arches.app.models.models import DDataType
 from arches.app.models.graph import Graph
 from django.db import connection
@@ -40,12 +41,13 @@ class RelationalDataModelTests(ArchesTestCase):
         super().setUpClass()
         # Create the Datatype Graph if it doesn't exist
         if not Graph.objects.filter(graphid=cls.custom_data_type_graphid).exists():
-            management.call_command(
-                "packages",
-                operation="import_graphs",
-                source=cls.custom_datatype_graph_filename,
-                verbosity=0,
-            )
+            with captured_stdout():
+                management.call_command(
+                    "packages",
+                    operation="import_graphs",
+                    source=cls.custom_datatype_graph_filename,
+                    verbosity=0,
+                )
 
     @classmethod
     def setUpTestData(cls):

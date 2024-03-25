@@ -265,7 +265,9 @@ class Command(BaseCommand):
         if options["operation"] is None:
             self.print_help("manage.py", "packages")
             return
-        
+
+        self.quiet = options["verbosity"] < 2
+
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
         celery_worker_running = task_management.check_if_celery_available()
@@ -683,7 +685,7 @@ class Command(BaseCommand):
             for file_type in file_types:
                 concept_data.extend(glob.glob(os.path.join(package_dir, "reference_data", "concepts", file_type)))
 
-            bar1 = pyprind.ProgBar(len(concept_data), bar_char="█") if len(concept_data) > 1 else None
+            bar1 = pyprind.ProgBar(len(concept_data), bar_char="█", stream=self.stdout) if len(concept_data) > 1 else None
             for path in concept_data:
                 if bar1 is None:
                     print(path)
@@ -696,7 +698,7 @@ class Command(BaseCommand):
             for file_type in file_types:
                 collection_data.extend(glob.glob(os.path.join(package_dir, "reference_data", "collections", file_type)))
 
-            bar2 = pyprind.ProgBar(len(collection_data), bar_char="█") if len(collection_data) > 1 else None
+            bar2 = pyprind.ProgBar(len(collection_data), bar_char="█", stream=self.stdout) if len(collection_data) > 1 else None
             for path in collection_data:
                 if bar2 is None:
                     print(path)
@@ -1014,7 +1016,7 @@ class Command(BaseCommand):
         load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
-            management.call_command("es", "reindex_database", recalculate_descriptors=True)
+            management.call_command("es", "reindex_database", recalculate_descriptors=True, quiet=self.quiet)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
