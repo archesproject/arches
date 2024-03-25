@@ -620,6 +620,7 @@ class Resource(models.ResourceInstance):
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
                 .exclude(is_active=False)
+                .exclude(source_identifier__isnull=False)
             )
 
         graph_lookup = {

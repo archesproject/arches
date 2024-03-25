@@ -316,6 +316,7 @@ class ResourceEditorView(MapBaseManagerView):
                 models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
                 .exclude(is_active=False)
+                .exclude(source_identifier__isnull=False)
             ),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
@@ -833,6 +834,7 @@ class RelatedResourcesView(BaseManagerView):
         .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .exclude(isresource=False)
         .exclude(is_active=False)
+        .exclude(source_identifier__isnull=False)
     )
 
     def paginate_related_resources(self, related_resources, page, request):
