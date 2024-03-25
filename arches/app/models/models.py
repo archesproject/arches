@@ -105,6 +105,7 @@ class CardModel(models.Model):
     def save(self, *args, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
         super(CardModel, self).save()
 
     class Meta:
@@ -181,6 +182,12 @@ class CardXNodeXWidget(models.Model):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
         if not self.id:
             self.id = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
+        super(CardXNodeXWidget, self).save()
 
     class Meta:
         managed = True
@@ -274,6 +281,7 @@ class Edge(models.Model):
     def save(self, *args, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
         super(Edge, self).save()
 
     class Meta:
@@ -739,6 +747,7 @@ class Node(models.Model):
     def save(self, *args, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
         super(Node, self).save()
 
     class Meta:
