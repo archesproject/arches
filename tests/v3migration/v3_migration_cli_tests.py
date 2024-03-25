@@ -4,6 +4,7 @@ import json
 import shutil
 from glob import glob
 from django.core import management
+from django.test.utils import captured_stdout
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance, ResourceXResource
@@ -28,7 +29,12 @@ class v3MigrationTests(ArchesTestCase):
         super().setUpClass()
 
         cls.loadOntology()
-        management.call_command("packages", operation="import_graphs", source=os.path.join(cls.pkg_fixture, "graphs", "resource_models"))
+        with captured_stdout():
+            management.call_command(
+                "packages",
+                operation="import_graphs",
+                source=os.path.join(cls.pkg_fixture, "graphs", "resource_models"),
+            )
 
     @classmethod
     def tearDownClass(cls):
@@ -59,7 +65,8 @@ class v3MigrationTests(ArchesTestCase):
         os.mkdir(self.pkg)
         os.mkdir(os.path.join(self.pkg, "reference_data"))
 
-        management.call_command("v3", "start-migration", target=self.pkg, overwrite=True)
+        with captured_stdout():
+            management.call_command("v3", "start-migration", target=self.pkg, overwrite=True, verbose=False)
 
         self.assertTrue(os.path.isdir(os.path.join(self.pkg, "v3data", "business_data")))
         self.assertTrue(os.path.isdir(os.path.join(self.pkg, "v3data", "graph_data")))
@@ -79,7 +86,8 @@ class v3MigrationTests(ArchesTestCase):
         shutil.copytree(os.path.join(self.pkg_fixture, "graphs", "resource_models"), os.path.join(self.pkg, "graphs", "resource_models"))
 
         # now run the management command
-        management.call_command("v3", "generate-rm-configs", target=self.pkg)
+        with captured_stdout():
+            management.call_command("v3", "generate-rm-configs", target=self.pkg, verbose=False)
 
         # test that the file has been created, and that it has the correct
         # number of entries to match the number of resource models.
@@ -116,7 +124,8 @@ class v3MigrationTests(ArchesTestCase):
 
         # generate the lookup files. the fact that the are created is tested here,
         # not their content.
-        management.call_command("v3", "generate-lookups", target=self.pkg, overwrite=True)
+        with captured_stdout():
+            management.call_command("v3", "generate-lookups", target=self.pkg, overwrite=True, verbose=False)
 
         for f in node_lookups:
             self.assertTrue(os.path.isfile(f))
@@ -129,11 +138,13 @@ class v3MigrationTests(ArchesTestCase):
 
         # run the test-lookups cli command. this tests the command, but NOT
         # the actual configs. that is done in the next section.
-        management.call_command("v3", "test-lookups", target=self.pkg)
+        with captured_stdout():
+            management.call_command("v3", "test-lookups", target=self.pkg, verbose=False)
 
         # now run the function that is used to test the filled out resource
         # configs. This actually tests the configs.
-        errors = v3utils.test_rm_configs(os.path.join(self.pkg, "v3data"))
+        with captured_stdout():
+            errors = v3utils.test_rm_configs(os.path.join(self.pkg, "v3data"))
         self.assertEqual(len(errors), 0)
 
     def test_v3migration_004_convert_v3_skos(self):
@@ -150,7 +161,8 @@ class v3MigrationTests(ArchesTestCase):
         os.mkdir(os.path.join(self.pkg, "reference_data", "collections"))
 
         # run the conversion command.
-        management.call_command("v3", "convert-v3-skos", target=self.pkg)
+        with captured_stdout():
+            management.call_command("v3", "convert-v3-skos", target=self.pkg, verbose=False)
 
         # now test that the files exist
         self.load_v4_reference_data(dry_run=True)
@@ -169,7 +181,8 @@ class v3MigrationTests(ArchesTestCase):
         os.mkdir(os.path.join(self.pkg, "business_data", "relations"))
 
         # run the conversion command.
-        management.call_command("v3", "write-v4-relations", target=self.pkg)
+        with captured_stdout():
+            management.call_command("v3", "write-v4-relations", target=self.pkg, verbose=False)
 
         # now test that the new relations file exist, and has the right headers
         v4_relations = os.path.join(self.pkg, "business_data", "relations", "all.relations")
@@ -205,7 +218,8 @@ class v3MigrationTests(ArchesTestCase):
         all_models = [os.path.splitext(i)[0] for i in os.listdir(rm_dir) if i.endswith(".json")]
 
         temp_file = os.path.join(self.pkg, "business_data", "single_resource.json")
-        management.call_command("v3", "write-v4-json", target=self.pkg, number=10, resource_models=all_models, verbose=True)
+        with captured_stdout():
+            management.call_command("v3", "write-v4-json", target=self.pkg, number=10, resource_models=all_models, verbose=False)
 
         # basic test to make sure the v4 file has been created. No tests on
         # the actual data load operations are performed up to this point.
@@ -257,7 +271,7 @@ class v3MigrationTests(ArchesTestCase):
         self.assertEqual(ResourceXResource.objects.all().count(), 0)
 
         # run the conversion command.
-        management.call_command("v3", "write-v4-relations", "--import", target=self.pkg)
+        management.call_command("v3", "write-v4-relations", "--import", target=self.pkg, verbose=False)
 
         # get count of v3 relationships for comparison
         v3_ct = 0
