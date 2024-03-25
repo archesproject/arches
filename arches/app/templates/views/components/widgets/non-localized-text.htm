@@ -6,7 +6,10 @@
     <div class="form-group">
         <label class="control-label widget-input-label" for="" data-bind="text:label"></label>
         <!-- ko if: node -->
-        <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+        <i data-bind="
+            css: {'ion-asterisk widget-label-required': node.isrequired},
+            attr: {'aria-label': $root.translations.required}        
+        "></i>
         <!-- /ko -->
         <div class="col-xs-12">
             <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable}" class="form-control input-lg widget-input">
