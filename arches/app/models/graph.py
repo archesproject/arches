@@ -1944,6 +1944,7 @@ class Graph(models.GraphModel):
         previous_node_ids = [str(node.pk) for node in self.nodes.values()]
         previous_edge_ids = [str(edge.pk) for edge in self.edges.values()]
         previous_widget_ids = [str(widget.pk) for widget in self.widgets.values()]
+        previous_nodegroup_ids = [str(nodegroup.pk) for nodegroup in self.get_nodegroups(force_recalculation=True)]
 
         self.cards = {}
         self.nodes = {}
@@ -2107,39 +2108,6 @@ class Graph(models.GraphModel):
         self.root = self.nodes[self.root.pk]
         # END copy attrs from editable_future_graph to source_graph
 
-        # BEGIN save related models
-        # save order is _very_ important!
-        for widget in editable_future_graph.widgets.values():
-            widget.delete()
-        for widget in self.widgets.values():
-            try:
-                widget_from_database = models.CardXNodeXWidget.objects.get(
-                    card_id=widget.card_id, node_id=widget.node_id, widget_id=widget.widget_id
-                )
-                widget_from_database.delete()
-            except models.CardXNodeXWidget.DoesNotExist:
-                pass
-
-            widget.save()
-
-        for card in editable_future_graph.cards.values():
-            card.delete()
-        for card in self.cards.values():
-            card.save()
-
-        for edge in editable_future_graph.edges.values():
-            edge.delete()
-        for edge in self.edges.values():
-            edge.save()
-
-        for node in editable_future_graph.nodes.values():
-            node.delete()
-        for node in self.nodes.values():
-            node.save()
-        # END save related models
-
-        self.save(validate=False)
-
         # BEGIN delete superflous models
         # Compares UUIDs between models related to the source graph and models related to
         # the editable_future_graph. If the item related to the source graph exists, but the item
@@ -2183,7 +2151,47 @@ class Graph(models.GraphModel):
                     edge.delete()
                 except ObjectDoesNotExist:  # already deleted
                     pass
+
+        for previous_nodegroup_id in previous_nodegroup_ids:
+            try:
+                node = models.Node.objects.get(pk=previous_nodegroup_id)
+            except ObjectDoesNotExist:  # node has been moved, therefore empty Nodegroup
+                nodegroup = models.NodeGroup.objects.get(pk=previous_nodegroup_id)
+                nodegroup.delete()
         # END delete superflous models
+
+        # BEGIN save related models
+        # save order is _very_ important!
+        for widget in editable_future_graph.widgets.values():
+            widget.delete()
+        for widget in self.widgets.values():
+            try:
+                widget_from_database = models.CardXNodeXWidget.objects.get(
+                    card_id=widget.card_id, node_id=widget.node_id, widget_id=widget.widget_id
+                )
+                widget_from_database.delete()
+            except models.CardXNodeXWidget.DoesNotExist:
+                pass
+
+            widget.save()
+
+        for card in editable_future_graph.cards.values():
+            card.delete()
+        for card in self.cards.values():
+            card.save()
+
+        for edge in editable_future_graph.edges.values():
+            edge.delete()
+        for edge in self.edges.values():
+            edge.save()
+
+        for node in editable_future_graph.nodes.values():
+            node.delete()
+        for node in self.nodes.values():
+            node.save()
+        # END save related models
+            
+        self.save(validate=False)
 
         # This ensures essential objects that have been re-assigned to the `source_graph`
         # are NOT deleted via waterfall deletion when the `editable_future_graph` is deleted.
