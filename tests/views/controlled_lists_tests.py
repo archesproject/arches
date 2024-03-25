@@ -144,7 +144,8 @@ class ControlledListTests(ArchesTestCase):
 
     def test_get_controlled_lists(self):
         self.client.force_login(self.anonymous)
-        response = self.client.get(reverse("controlled_lists"))
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(reverse("controlled_lists"))
 
         self.assertEqual(response.status_code, 403)
 
@@ -209,9 +210,10 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_list(self):
         self.client.force_login(self.admin)
-        response = self.client.delete(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-        )
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.delete(
+                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            )
         self.assertEqual(response.status_code, 400)
         del self.node_using_list1.config["controlledList"]
         self.node_using_list1.save()
@@ -248,9 +250,10 @@ class ControlledListTests(ArchesTestCase):
         serialized_list = serialize(self.list1, depth_map=defaultdict(int), flat=False)
 
         serialized_list["items"][0]["sortorder"] = -1
-        response = self.client.post(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-            serialized_list,
-            content_type="application/json",
-        )
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(
+                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+                serialized_list,
+                content_type="application/json",
+            )
         self.assertEqual(response.status_code, 400)
