@@ -18,8 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, json, uuid
 from django.contrib.auth.models import User
-from django.core import management
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
@@ -1073,7 +1071,6 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(node=self.rootNode)
         admin = User.objects.get(username="admin")
         graph.publish(user=admin)
-        self.addCleanup(graph.unpublish)
 
         with self.assertRaises(GraphValidationError) as cm:
             graph.append_node()
@@ -1087,6 +1084,5 @@ class GraphTests(ArchesTestCase):
         admin = User.objects.get(username="admin")
         branch = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
         branch.publish(user=admin)
-        self.addCleanup(branch.unpublish)
 
         graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)

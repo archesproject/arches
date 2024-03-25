@@ -18,22 +18,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from tests import test_settings
-from django.test import TestCase
+from django.test.utils import captured_stdout
 from django.core import management
 from arches.app.models import models
+from tests.base_test import ArchesTestCase
 from django.test.client import Client
 
 # these tests can be run from the command line via
 # python manage.py test tests/views/command_line_tests.py --pattern="*.py" --settings="tests.test_settings"
 
 
-class CommandLineTests(TestCase):
+class CommandLineTests(ArchesTestCase):
     def setUp(self):
         self.expected_resource_count = 2
         self.client = Client()
-
-    def tearDown(self):
-        models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     @classmethod
     def setUpClass(cls):
@@ -41,7 +39,8 @@ class CommandLineTests(TestCase):
         if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: pull this up higher so that it's not depending on running outside a transaction
             test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-            management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
 

@@ -19,6 +19,7 @@ from tests.base_test import ArchesTestCase
 from django.core import management
 from django.urls import reverse
 from django.test.client import RequestFactory, Client
+from django.test.utils import captured_stdout
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -84,7 +85,8 @@ class PermissionTests(ArchesTestCase):
             # TODO: pull this up higher so that it's not depending on running outside a transaction
             # same issue in command_line_tests.py
             test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-            management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
         cls.add_users()

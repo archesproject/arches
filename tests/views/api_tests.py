@@ -42,7 +42,8 @@ class APITests(ArchesTestCase):
             # TODO: pull this up higher so that it's not depending on running outside a transaction
             # same issue in command_line_tests.py
             test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-            management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
         cls.loadOntology()

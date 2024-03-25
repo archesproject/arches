@@ -37,7 +37,7 @@ class mappedCSVFileImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.loadOntology()        
+        cls.loadOntology()
         cls.ensure_resource_test_model_loaded()
 
     def setUp(self):
