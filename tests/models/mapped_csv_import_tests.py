@@ -18,9 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from operator import itemgetter
-from tests import test_settings
 from tests.base_test import ArchesTestCase
-from django.core import management
 from django.test.utils import captured_stdout
 from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.models.concept import Concept
@@ -39,9 +37,8 @@ class mappedCSVFileImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.loadOntology()
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path, verbosity=0)
+        cls.loadOntology()        
+        cls.ensure_resource_test_model_loaded()
 
     def setUp(self):
         ResourceInstance.objects.all().delete()

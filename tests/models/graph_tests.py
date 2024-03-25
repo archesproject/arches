@@ -36,6 +36,7 @@ class GraphTests(ArchesTestCase):
         super().setUpClass()
 
         cls.loadOntology()
+        cls.ensure_resource_test_model_loaded()
 
         cls.custom_string_datatype_filename = os.path.join(
             test_settings.TEST_ROOT,
@@ -48,8 +49,6 @@ class GraphTests(ArchesTestCase):
 
         if custom_string_datatype is None or len(custom_string_datatype) != 1:
             management.call_command("datatype", "register", source=cls.custom_string_datatype_filename, verbosity=0)
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path)
 
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"

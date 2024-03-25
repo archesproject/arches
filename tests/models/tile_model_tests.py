@@ -17,10 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 from uuid import UUID
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.db import connection
-from django.core import management
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
@@ -38,9 +36,7 @@ class TileTests(ArchesTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.loadOntology()
-
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path, verbosity=0)
+        cls.ensure_resource_test_model_loaded()
 
     @classmethod
     def setUpTestData(cls):

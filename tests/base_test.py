@@ -101,6 +101,13 @@ class ArchesTestCase(TestCase):
             management.call_command("load_ontology", source=test_settings.ONTOLOGY_PATH, verbosity=0)
 
     @classmethod
+    def ensure_resource_test_model_loaded(cls):
+        resource_test_model_graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
+        if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
+            for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+                management.call_command("packages", operation="import_graphs", source=path, verbosity=0)
+
+    @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cursor = connection.cursor()
