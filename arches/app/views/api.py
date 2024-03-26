@@ -1892,14 +1892,14 @@ class SpatialView(APIBase):
 
     @method_decorator(group_required("Application Administrator"))
     def delete(self, request, identifier=None):
-        spatialview_id = request.get("id", None)
-        spatialview_slug = request.get("slug", None)
         spatial_view = None
-        if spatialview_id:
-            spatial_view = models.SpatialView.objects.get(pk=spatialview_id)
-        elif spatialview_slug:
-            spatial_view = models.SpatialView.objects.get(slug=spatialview_slug)
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatial_view = models.SpatialView.objects.get(pk=identifier)
+            else:
+                spatial_view = models.SpatialView.objects.get(slug=identifier)
         else:
-            return JSONErrorResponse(_("No Spatial View id or slug provided"), status=404)
+            return JSONErrorResponse(_("No slug or spatialviewid provided"), status=400)
+
         spatial_view.delete()
         return JSONResponse(status=200)
