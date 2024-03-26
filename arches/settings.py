@@ -356,6 +356,8 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
+ARCHES_APPLICATIONS = ()
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
