@@ -1783,7 +1783,9 @@ class SpatialView(APIBase):
                 isactive = json_data["isactive"]
             if "ismixedgeometrytypes" in json_data:
                 ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-            if "description" in json_data["description"]:
+            else:
+                ismixedgeometrytypes = False
+            if "description" in json_data:
                 description = json_data["description"]
 
             spatialview = models.SpatialView()
