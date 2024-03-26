@@ -14,7 +14,7 @@ from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
 
 # these tests can be run from the command line via
-# python manage.py test tests/exporter/jsonld_export_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.exporter.jsonld_export_tests --settings="tests.test_settings"
 
 class JsonLDExportTests(ArchesTestCase):
     @classmethod

@@ -37,7 +37,7 @@ from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/resource_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.resource_tests --settings="tests.test_settings"
 
 
 def add_users():

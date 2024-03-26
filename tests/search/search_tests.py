@@ -23,7 +23,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 
 # these tests can be run from the command line via
-# python manage.py test tests/search/search_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.search.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):
