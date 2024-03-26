@@ -1675,9 +1675,8 @@ class SpatialView(APIBase):
         Returns a permitted spatial view given an id or slug
         otherwise returns a list of permitted spatial views
         """
-        spatialview_id = request.get("id", None)
-        spatialview_slug = request.get("slug", None)
-        # spatialview_geometrynodeid = request.get("geometrynodeid", None)
+        spatialview_id = None
+        spatialview_slug = None
         spatialview = None
 
         if identifier:
@@ -1693,10 +1692,10 @@ class SpatialView(APIBase):
         permitted_spatialview_nodes = list(filter(lambda x: x.nodegroup_id in permitted_nodegroupids, spatialview_nodes))
         permitted_spatialviews = [ spatialviews_dict[str(sv_node.pk)] for sv_node in permitted_spatialview_nodes ]
 
-        if spatialview_id or spatialview_slug:
+        if identifier:
             if spatialview_id:
-                spatialview = list(filter(lambda x: x.pk == spatialview_id, permitted_spatialviews))
-                spatial_view_exists = len(list(filter(lambda x: x.pk == spatialview_id, list(spatialviews_dict.values()) ))) > 0
+                spatialview = list(filter(lambda x: str(x.pk) == spatialview_id, permitted_spatialviews))
+                spatial_view_exists = len(list(filter(lambda x: str(x.pk) == spatialview_id, list(spatialviews_dict.values()) ))) > 0
             else:
                 spatialview = list(filter(lambda x: x.slug == spatialview_slug, permitted_spatialviews))
                 spatial_view_exists = len(list(filter(lambda x: x.slug == spatialview_slug, list(spatialviews_dict.values()) ))) > 0
@@ -1714,7 +1713,7 @@ class SpatialView(APIBase):
                     "schema": spatialview.schema,
                     "slug": spatialview.slug,
                     "description": spatialview.description,
-                    "geometrynodeid": str(spatialview.geometrynode.id),
+                    "geometrynodeid": str(spatialview.geometrynode.pk),
                     "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
                     "language": spatialview.language.code,
                     "attributenodes": spatialview.attributenodes,
@@ -1754,11 +1753,14 @@ class SpatialView(APIBase):
     @method_decorator(group_required("Application Administrator"))
     def post(self, request, identifier=None):
         lang = None
-        isactive = None
+        isactive = False
         ismixedgeometrytypes = None
         description = None
 
-        json_data = request.POST.get("data", None)
+        try:
+            json_data = json.loads(request.body.decode('utf-8'))
+        except ValueError:
+            return JSONErrorResponse(_("Invalid JSON"), status=400)
 
         if json_data is not None:
             if "slug" not in json_data:
@@ -1789,7 +1791,7 @@ class SpatialView(APIBase):
                 if not attributenodes_are_valid:
                     return JSONErrorResponse(_("One or more Attribute Nodes are not on the same Graph as the Geometry Node."), status=400)
             else:
-                attributenodes = None
+                attributenodes = []
             if "isactive" in json_data:
                 isactive = json_data["isactive"]
             if "ismixedgeometrytypes" in json_data:
@@ -1808,7 +1810,7 @@ class SpatialView(APIBase):
             spatialview.ismixedgeometrytypes = ismixedgeometrytypes
             spatialview.language = lang
             spatialview.attributenodes = attributenodes
-            spatialview.isactive = isactive or False
+            spatialview.isactive = isactive
             spatialview.save()
             
             return JSONResponse(status=200)
@@ -1816,21 +1818,25 @@ class SpatialView(APIBase):
         
     @method_decorator(group_required("Application Administrator"))
     def put(self, request, identifier=None):
-        spatialview_id = request.get("id", None)
-        spatialview_slug = request.get("slug", None)
+        spatialview_id = None
+        spatialview_slug = None
         lang = None
-        isactive = None
-        ismixedgeometrytypes = None
+        isactive = False
+        ismixedgeometrytypes = False
         description = None
 
-        json_data = request.PUT.get("data", None)
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatialview_id = identifier
+            else:
+                spatialview_slug = identifier
+        else:
+            return JSONErrorResponse(_("No slug or spatialviewid provided"), status=400)
+
+        json_data = json.loads(request.body.decode('utf-8'))
 
         if json_data is not None:
-            if "slug" not in json_data:
-                return JSONErrorResponse(_("No slug or Geometry Nodeid provided"), status=400)
-            if "geometrynodeid" not in json_data:
-                return JSONErrorResponse(_("No Geometry Nodeid provided"), status=400)
-            else:
+            if "geometrynodeid" in json_data:
                 try:
                     geom_node = models.Node.objects.get(nodeid=json_data["geometrynodeid"])
                 except ObjectDoesNotExist:
@@ -1859,7 +1865,7 @@ class SpatialView(APIBase):
                 isactive = json_data["isactive"]
             if "ismixedgeometrytypes" in json_data:
                 ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-            if "description" in json_data["description"]:
+            if "description" in json_data:
                 description = json_data["description"]
 
             try:
@@ -1874,11 +1880,13 @@ class SpatialView(APIBase):
                 spatialview.attributenodes = attributenodes
             spatialview.isactive = spatialview.isactive or isactive
             spatialview.ismixedgeometrytypes = spatialview.ismixedgeometrytypes or ismixedgeometrytypes
+            if lang and lang != spatialview.language:
+                spatialview.language = lang
             if description:
                 spatialview.description = description
             spatialview.save()
             
-            return JSONResponse(staus=200)
+            return JSONResponse(status=200)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
 
