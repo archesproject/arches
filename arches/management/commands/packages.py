@@ -1059,7 +1059,11 @@ class Command(BaseCommand):
         if graphid is False and file_format == "json":
             graphids = [
                 str(graph.graphid)
-                for graph in models.GraphModel.objects.filter(isresource=True).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                for graph in (
+                    models.GraphModel.objects.filter(isresource=True)
+                    .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                    .exclude(source_identifier__isnull=False)
+                )
             ]
         if graphid is False and file_format != "json":
             utils.print_message(

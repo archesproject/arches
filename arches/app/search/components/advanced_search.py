@@ -65,6 +65,7 @@ class AdvancedSearch(BaseSearchFilter):
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
             .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
         )
         searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
         searchable_nodes = models.Node.objects.filter(

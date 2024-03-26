@@ -1189,6 +1189,7 @@ class ResourceReport(APIBase):
                 models.GraphModel.objects.filter(isresource=True)
                 .exclude(is_active=False)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(source_identifier__isnull=False)
             )
 
             get_params = request.GET.copy()

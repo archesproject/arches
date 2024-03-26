@@ -550,7 +550,7 @@ class GraphPublicationView(View):
                 source_graph.publish(notes=data.get("notes"), user=request.user)
 
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully updated.")}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been updated. Please click the OK button to reload the page.")}
                 )
             except Exception as e:
                 logger.exception(e)
@@ -560,7 +560,7 @@ class GraphPublicationView(View):
             try:
                 source_graph.revert()
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully reverted.")}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been reverted. Please click the OK button to reload the page.")}
                 )
             except Exception as e:
                 logger.exception(e)

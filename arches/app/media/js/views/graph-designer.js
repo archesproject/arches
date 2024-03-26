@@ -209,10 +209,13 @@ define([
                             window.location.reload();
                         });
                         viewModel.alert(alert);
+
+                        // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
+                        const cardAlertPanel = document.querySelector('#card-alert-panel');
+                        cardAlertPanel.style.zIndex = 2147483647;
                         
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
                     }
                 });
             };
@@ -305,11 +308,14 @@ define([
                             window.location.reload();
                         });
                         viewModel.alert(alert);
+
+                        // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
+                        const cardAlertPanel = document.querySelector('#card-alert-panel');
+                        cardAlertPanel.style.zIndex = 2147483647;
                         
                         viewModel.shouldShowUpdatePublishedGraphsButton(false);
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
                     }
                 });
             };
