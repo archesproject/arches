@@ -3400,7 +3400,6 @@ ul.nav.nav-tabs.nav-justified {
 .graph-active-switch-container {
     display: flex;
     align-items: center;
-    margin-left: 20px;
 }
 .graph-active-switch-container .toggle-container {
     padding: 0 !important;
@@ -5609,12 +5608,12 @@ div.card-grid-item.selected {
     width: 100%;
     height: 50px;
     overflow: hidden;
+    display: flex;
 }
 
 .ep-graph-title {
     font-size: 1.6rem;
     padding: 5px;
-    flex-wrap: wrap;
     align-items: center;
 }
 

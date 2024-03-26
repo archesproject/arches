@@ -33,6 +33,9 @@ define([
             viewModel.helpTemplate(viewData.help);
             viewModel.graphSettingsVisible = ko.observable(false);
             viewModel.graph = koMapping.fromJS(data['graph']);
+            viewModel.sourceGraph = koMapping.fromJS(data['source_graph']);
+            viewModel.sourceGraphPublicationDate = new Date(data['source_graph_publication']['published_time']).toLocaleString();
+            viewModel.sourceGraphPublicationMostRecentEditDate = data['source_graph_publication_most_recent_edit'] ? new Date(data['source_graph_publication_most_recent_edit']['edit_time']).toLocaleString() : null;
             viewModel.ontologies = ko.observable(data['ontologies']);
             viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
             viewModel.cardComponents = data.cardComponents;
@@ -43,9 +46,24 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
-            viewModel.isGraphActive = ko.observable(data['graph']['is_active']);
+            viewModel.isGraphActive = ko.observable();
 
-            viewModel.hasDirtyWidget = ko.observable();
+            fetch(arches.urls.graph_is_active_api(data.graphid)).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    viewModel.alert(new AlertViewModel(
+                        'ep-alert-red', 
+                        _("Could not obtain the Resource Model active status"),
+                        _('Please contact your System Administrator'),
+                        null,
+                        function(){},
+                    ));
+                }
+            }).then(responseJSON => {
+                viewModel.isGraphActive(responseJSON);
+            });
 
             viewModel.isGraphActive.subscribe(isGraphActive => {
                 $.ajax({
@@ -69,6 +87,8 @@ define([
                     }
                 });
             });
+
+            viewModel.hasDirtyWidget = ko.observable();
 
             viewModel.isDirty = ko.pureComputed(() => {
                 let isDirty = false;
@@ -101,10 +121,6 @@ define([
             
             viewModel.shouldShowGraphPublishButtons = ko.pureComputed(function() {
                 return Boolean(!viewModel.isDirty() && viewModel.graphHasUnpublishedChanges());
-            });
-
-            viewModel.isNodeDirty = ko.pureComputed(function() {
-                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
             });
 
             viewModel.isNodeDirty = ko.pureComputed(function() {
@@ -193,10 +209,13 @@ define([
                             window.location.reload();
                         });
                         viewModel.alert(alert);
+
+                        // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
+                        const cardAlertPanel = document.querySelector('#card-alert-panel');
+                        cardAlertPanel.style.zIndex = 2147483647;
                         
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
                     }
                 });
             };
@@ -289,11 +308,14 @@ define([
                             window.location.reload();
                         });
                         viewModel.alert(alert);
+
+                        // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
+                        const cardAlertPanel = document.querySelector('#card-alert-panel');
+                        cardAlertPanel.style.zIndex = 2147483647;
                         
                         viewModel.shouldShowUpdatePublishedGraphsButton(false);
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
                     }
                 });
             };

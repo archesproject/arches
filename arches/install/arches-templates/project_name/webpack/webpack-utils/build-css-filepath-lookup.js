@@ -1,13 +1,13 @@
 const Path = require('path');
 const fs = require('fs');
 
-function buildCSSFilepathLookup(path, outerAcc, javascriptDirectoryPath) {
+function buildCSSFilepathLookup(path, outerAcc, cssDirectoryPath) {
     if (!fs.existsSync(path)) {
         return;
     }
     
     return fs.readdirSync(path).reduce((acc, name) => {
-        const outerPath = javascriptDirectoryPath || path;   // original `path` arg is persisted through recursion
+        const outerPath = cssDirectoryPath || path;   // original `path` arg is persisted through recursion
         
         if (fs.lstatSync(Path.join(path, name)).isDirectory() ) {
             return buildCSSFilepathLookup(

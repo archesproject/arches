@@ -18,6 +18,7 @@ import logging
 import traceback
 import django.utils.timezone
 
+from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
@@ -105,6 +106,7 @@ class CardModel(models.Model):
     def save(self, *args, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
         super(CardModel, self).save()
 
     class Meta:
@@ -181,6 +183,12 @@ class CardXNodeXWidget(models.Model):
         super(CardXNodeXWidget, self).__init__(*args, **kwargs)
         if not self.id:
             self.id = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
+        super(CardXNodeXWidget, self).save()
 
     class Meta:
         managed = True
@@ -274,6 +282,7 @@ class Edge(models.Model):
     def save(self, *args, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
         super(Edge, self).save()
 
     class Meta:
@@ -468,7 +477,7 @@ class Function(models.Model):
         return json_string
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.FUNCTION_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.FUNCTIONS)
 
 
 class FunctionXGraph(models.Model):
@@ -511,7 +520,7 @@ class GraphModel(models.Model):
         "ReportTemplate", db_column="templateid", default="50000000-0000-0000-0000-000000000001", on_delete=models.SET_DEFAULT
     )
     config = JSONField(db_column="config", default=dict)
-    slug = models.TextField(validators=[validate_slug], unique=True, null=True)
+    slug = models.TextField(validators=[validate_slug], null=True)
     publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
     source_identifier = models.ForeignKey(
         blank=True, db_column="source_identifier", null=True, on_delete=models.CASCADE, to="models.graphmodel"
@@ -529,9 +538,7 @@ class GraphModel(models.Model):
         return False
 
     def is_editable(self):
-        if settings.OVERRIDE_RESOURCE_MODEL_LOCK == True:
-            return True
-        elif self.isresource:
+        if self.isresource:
             return not ResourceInstance.objects.filter(graph_id=self.graphid).exists()
         else:
             return True
@@ -741,6 +748,7 @@ class Node(models.Model):
     def save(self, *args, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
+            add_to_update_fields(kwargs, "source_identifier_id")
         super(Node, self).save()
 
     class Meta:
@@ -1083,7 +1091,7 @@ class SearchComponent(models.Model):
         db_table = "search_component"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.SEARCH_COMPONENTS)
 
     def toJSON(self):
         from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1795,7 +1803,7 @@ class ETLModule(models.Model):
         db_table = "etl_modules"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.ETL_MODULES)
 
 
 class LoadEvent(models.Model):

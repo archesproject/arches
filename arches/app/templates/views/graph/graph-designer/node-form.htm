@@ -142,7 +142,7 @@
                 </div>
             </div>
 
-            <div style="position: relative; height: 190px;">
+            <div style="position: relative;">
                 <!-- ko if: graph.isresource() && ( node().is_immutable || !graph.source_identifier_id() )-->
                 <div 
                     style="
@@ -255,7 +255,7 @@
                                             class="switch switch-small arches-switch" 
                                             data-bind="
                                                 css: {
-                                                    'on': $data.node() && $data.node().nodeid === $data.node().nodeGroupId() && $data.nodegroup().cardinality() === 'n', 
+                                                    'on': $data.node() && $data.node().nodeid === $data.node().nodeGroupId() && ($data.nodegroup() && $data.nodegroup().cardinality() === 'n'), 
                                                     'disabled': !$data.nodegroup() || $data.node() && $data.node().nodeid !== $data.node().nodeGroupId()
                                                 }, 
                                                 click: $data.updateCardinality

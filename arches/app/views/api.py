@@ -15,7 +15,6 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
-from operator import attrgetter
 from urllib import parse
 from collections import OrderedDict
 from django.contrib.auth import authenticate
@@ -430,9 +429,9 @@ class GraphIsActive(APIBase):
         graph = Graph.objects.get(pk=graph_id)
 
         if graph.source_identifier:
-            grah = graph.source_identifier
+            graph = graph.source_identifier
 
-        return JSONResponse(grah.is_active)
+        return JSONResponse(graph.is_active)
 
     def post(self, request, graph_id=None):
         try:
@@ -647,7 +646,7 @@ class Resources(APIBase):
                         data = JSONDeserializer().deserialize(request.body)
                         reader = JsonLdReader()
                         if slug is not None:
-                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                            graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                         reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                         if reader.errors:
                             response = []
@@ -724,7 +723,7 @@ class Resources(APIBase):
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
                     if slug is not None:
-                        graphid = models.GraphModel.objects.get(slug=slug).pk
+                        graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                     reader.read_resource(data, graphid=graphid)
                     if reader.errors:
                         response = []
@@ -1190,6 +1189,7 @@ class ResourceReport(APIBase):
                 models.GraphModel.objects.filter(isresource=True)
                 .exclude(is_active=False)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(source_identifier__isnull=False)
             )
 
             get_params = request.GET.copy()
@@ -1214,19 +1214,22 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_serialized_cards = []
             permitted_cards = []
-            for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
+            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
                 if request.user.has_perm(perm, card.nodegroup):
+                    card.filter_by_perm(request.user, perm)
                     permitted_cards.append(card)
 
             cardwidgets = [
                 widget
-                for widgets in [sorted(card.cardxnodexwidget_set.all(), key=attrgetter("sortorder")) for card in permitted_cards]
+                for widgets in [
+                    sorted(card.cardxnodexwidget_set.all(), key=lambda x: x.sortorder or 0)
+                    for card in permitted_cards
+                ]
                 for widget in widgets
             ]
 
-            resp["cards"] = permitted_serialized_cards
+            resp["cards"] = permitted_cards
             resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)

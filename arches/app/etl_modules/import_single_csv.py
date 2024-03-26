@@ -37,6 +37,7 @@ class ImportSingleCsv(BaseImportModule):
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
             .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
             .order_by(graph_name_i18n)
         )
         return {"success": True, "data": graphs}

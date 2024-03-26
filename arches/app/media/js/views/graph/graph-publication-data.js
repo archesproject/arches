@@ -3,10 +3,14 @@ define([], function() {
         return string.replace(/,\s*}*$/, "}");
     }
 
-    const graphPublicationDataHTML = document.querySelector('#graphPublicationData');
-    const graphPublicationData = graphPublicationDataHTML.getAttribute('graphPublicationData');
-
-    const parsedGraphPublicationData = JSON.parse(removeTrailingCommaFromObject(graphPublicationData));
-
-    return parsedGraphPublicationData;
+    try {
+        const graphPublicationDataHTML = document.querySelector('#graphPublicationData');
+        const graphPublicationData = graphPublicationDataHTML.getAttribute('graphPublicationData');
+    
+        const parsedGraphPublicationData = JSON.parse(removeTrailingCommaFromObject(graphPublicationData));
+    
+        return parsedGraphPublicationData;
+    } catch (error) {
+        console.error(error);
+    }
 });

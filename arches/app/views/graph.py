@@ -31,6 +31,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.utils import translation
 from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -212,10 +213,6 @@ class GraphDesignerView(GraphBaseView):
             function__functiontype="primarydescriptors"
         )
 
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-
         datatypes = models.DDataType.objects.all()
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0] if len(primary_descriptor_functions) > 0 else None
@@ -279,11 +276,15 @@ class GraphDesignerView(GraphBaseView):
 
         context["source_graph"] = JSONSerializer().serialize(self.source_graph, force_recalculation=True)
         context["source_graph_id"] = self.source_graph.pk
+
+        context["source_graph_publication"] = JSONSerializer().serialize(self.source_graph.publication)
+        context["source_graph_publication_most_recent_edit"] = JSONSerializer().serialize(self.source_graph.publication.most_recent_edit if self.source_graph.publication else {})
+
         context["editable_future_graph_id"] = self.editable_future_graph.pk if self.editable_future_graph else None
 
         context["nav"]["menu"] = True
 
-        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+        context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
 
         return render(request, "views/graph-designer.htm", context)
 
@@ -427,13 +428,14 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == "export_branch":
-                    if graph.source_identifier:
-                        graph = Graph.objects.get(pk=graph.source_identifier_id)
-
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
                     clone_data["copy"].save()
-                    ret = {"success": True, "graphid": clone_data["copy"].pk}
+
+                    clone_data['copy'].create_editable_future_graph()
+                    clone_data['copy'].publish()
+
+                    ret = {"success": True, "graphid": clone_data['copy'].pk}
 
                 elif self.action == "clone_graph":
                     if graph.source_identifier:
@@ -445,6 +447,7 @@ class GraphDataView(View):
                     ret.save()
 
                     ret.create_editable_future_graph()
+                    ret.publish()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
@@ -465,8 +468,6 @@ class GraphDataView(View):
             return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except PublishedModelError as e:
-            return JSONErrorResponse(e.title, e.message)
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
@@ -499,9 +500,9 @@ class GraphDataView(View):
                 graph.delete()
 
                 try:
-                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier_id)
+                    source_graph = Graph.objects.get(pk=graph.source_identifier_id)
                     source_graph.delete()
-                except models.GraphModel.DoesNotExist:
+                except Graph.DoesNotExist:
                     pass  # no sourcee graph to delete
 
                 return JSONResponse({"success": True})
@@ -549,7 +550,7 @@ class GraphPublicationView(View):
                 source_graph.publish(notes=data.get("notes"), user=request.user)
 
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully updated.")}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been updated. Please click the OK button to reload the page.")}
                 )
             except Exception as e:
                 logger.exception(e)
@@ -559,7 +560,7 @@ class GraphPublicationView(View):
             try:
                 source_graph.revert()
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully reverted.")}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been reverted. Please click the OK button to reload the page.")}
                 )
             except Exception as e:
                 logger.exception(e)
@@ -629,14 +630,20 @@ class ModelHistoryView(GraphBaseView):
         )
 
         user_ids_to_user_data = {}
+        graph_publication_id_to_resource_instance_count = {}
 
         for graph_x_published_graph in graphs_x_published_graphs:
+
+            graph_publication_id_to_resource_instance_count[str(graph_x_published_graph.publicationid)] = models.ResourceInstance.objects.filter(
+                graph_publication_id=graph_x_published_graph.publicationid
+            ).count()
+
             # changes datetime to human-readable format with local timezone
             graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
                 "%Y-%m-%d | %I:%M %p %Z"
             )
 
-            if not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
+            if graph_x_published_graph.user and not user_ids_to_user_data.get(graph_x_published_graph.user.pk):
                 user_ids_to_user_data[graph_x_published_graph.user.pk] = {
                     "username": graph_x_published_graph.user.username,
                     "first_name": graph_x_published_graph.user.first_name,
@@ -648,9 +655,10 @@ class ModelHistoryView(GraphBaseView):
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
             user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
+            graph_publication_id_to_resource_instance_count=JSONSerializer().serialize(graph_publication_id_to_resource_instance_count),
         )
         context["nav"]["title"] = self.graph.name
-        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
+        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "templates": ["graph-publications-help"]}
 
         return render(request, "views/graph/model-history.htm", context)
 
