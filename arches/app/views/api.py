@@ -1670,7 +1670,7 @@ class SpatialView(APIBase):
     """
     """
 
-    def get(self, request):
+    def get(self, request, identifier=None):
         """
         Returns a permitted spatial view given an id or slug
         otherwise returns a list of permitted spatial views
@@ -1741,7 +1741,7 @@ class SpatialView(APIBase):
         return are_valid
 
     @method_decorator(group_required("Application Administrator"))
-    def post(self, request):
+    def post(self, request, identifier=None):
         lang = None
         isactive = None
         ismixedgeometrytypes = None
@@ -1804,7 +1804,7 @@ class SpatialView(APIBase):
         return JSONErrorResponse(_("No json request payload"), status=400)
         
     @method_decorator(group_required("Application Administrator"))
-    def put(self, request):
+    def put(self, request, identifier=None):
         spatialview_id = request.get("id", None)
         spatialview_slug = request.get("slug", None)
         lang = None
@@ -1872,7 +1872,7 @@ class SpatialView(APIBase):
 
 
     @method_decorator(group_required("Application Administrator"))
-    def delete(self, request):
+    def delete(self, request, identifier=None):
         spatialview_id = request.get("id", None)
         spatialview_slug = request.get("slug", None)
         spatial_view = None
