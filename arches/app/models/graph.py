@@ -1936,7 +1936,6 @@ class Graph(models.GraphModel):
                 _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
 
         with transaction.atomic():
-
             self.root.set_relatable_resources([
                 node.pk for node in editable_future_graph.root.get_relatable_resources()
             ])

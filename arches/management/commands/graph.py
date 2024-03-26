@@ -34,11 +34,14 @@ class Command(BaseCommand):
             nargs="?",
             choices=[
                 "publish",
+                "create_editable_future_graphs"
             ],
             help="""
             Operation Type
-              'publish' publishes resource models indicated using the --graphs arg.
-               Publish applies to all resource models if a --graphs value is not provided",
+                'publish' publishes resource models indicated using the --graphs arg.
+                'create_editable_future_graphs' creates an editable_future_graph for resource models indicated using the --graphs arg.
+
+                Operations apply to all resource models if a --graphs value is not provided,
             """,
         )
         parser.add_argument(
@@ -71,17 +74,35 @@ class Command(BaseCommand):
             help="Do you want to assign new graph publication ids to all corresponding resource instances?",
         )
 
+
     def handle(self, *args, **options):
         if options["graphs"]:
             self.graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
         else:
-            self.graphs = Graph.objects.filter(isresource=True)
+            self.graphs = Graph.objects.filter(isresource=True).exclude(source_identifier__isnull=False)
 
         self.update_instances = True if options["update_instances"] else False
         self.update = True if options["update"] else False
 
         if options["operation"] == "publish":
             self.publish(options["username"])
+
+        if options["operation"] == "create_editable_future_graphs":
+            self.create_editable_future_graphs()
+
+
+    def create_editable_future_graphs(self):
+        print("\BEGIN Create editable_future_graphs...")
+
+        for graph in self.graphs:
+            print("\nCreating editable_future_graph for %s" % graph.name)
+            graph.create_editable_future_graph()
+
+            print("\n%s has been updated. Creating a new publication for %s" % graph.name, graph.name)
+            graph.publish()
+
+        print("\END Create editable_future_graphs. Success!")
+
 
     def publish(self, username):
         user = User.objects.get(username=username)
