@@ -1795,7 +1795,7 @@ class SpatialView(APIBase):
             spatialview.ismixedgeometrytypes = ismixedgeometrytypes
             spatialview.language = lang
             spatialview.attributenodes = attributenodes
-            spatialview.isactive = isactive or None
+            spatialview.isactive = isactive or False
             spatialview.save()
             
             return JSONResponse(status=200)
