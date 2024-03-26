@@ -5,6 +5,7 @@ import Toast from "primevue/toast";
 
 import ControlledListInventory from "@/components/ControlledListManager/ControlledListInventory.vue";
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
+import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
 import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
@@ -20,7 +21,7 @@ function setDisplayedList(val: ControlledList | null) {
     displayedList.value = val;
 }
 
-provide("displayedList", { displayedList, setDisplayedList });
+provide(displayedListKey, { displayedList, setDisplayedList });
 </script>
 
 <template>

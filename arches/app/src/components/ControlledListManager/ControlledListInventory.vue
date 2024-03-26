@@ -9,10 +9,11 @@ import SplitterPanel from "primevue/splitterpanel";
 import ControlledListEditor from "@/components/ControlledListManager/ControlledListEditor.vue";
 import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
+import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
 import type { Ref } from "@/types/Ref";
 
-const { displayedList } = inject("displayedList");
+const { displayedList } = inject(displayedListKey);
 const editing: Ref<boolean> = defineModel("editing");
 
 const { $gettext } = useGettext();

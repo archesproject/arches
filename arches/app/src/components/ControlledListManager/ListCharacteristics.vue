@@ -4,9 +4,10 @@ import { useGettext } from "vue3-gettext";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
+import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
 const props: { editable: boolean } = defineProps(["editable"]);
-const { displayedList } = inject("displayedList");
+const { displayedList } = inject(displayedListKey);
 
 const { $gettext } = useGettext();
 const LIST_DETAILS = $gettext("List Details");
