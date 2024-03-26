@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Splitter from "primevue/splitter";
@@ -14,20 +14,17 @@ import ListTree from "@/components/ControlledListManager/ListTree.vue";
 import type { Language } from "@/types/arches";
 import type { Ref } from "@/types/Ref";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
-import type { ControlledList } from "@/types/ControlledListManager";
 
 const lightGray = "#f4f4f4";
-
 const { $gettext } = useGettext();
 const LIST_SUMMARY = $gettext("List Summary");
 
-const props: { displayedList: ControlledList } = defineProps(["displayedList"]);
-
+const { displayedList } = inject("displayedList");
 const editing: Ref<boolean> = defineModel("editing");
 
 // Key for selected item in Tree view, could be list or list item
 // e.g. { "2000000-...": true }
-const selectedKey: Ref<typeof TreeSelectionKeys> = ref({[props.displayedList.id]: true});
+const selectedKey: Ref<typeof TreeSelectionKeys> = ref({[displayedList.value.id]: true});
 const selectedTreeNodeId = computed(() => {
     return Object.keys(selectedKey.value)[0] ?? null;
 });
@@ -40,7 +37,7 @@ const listOrItemView = computed(() => {
         return ListCharacteristics;
     }
     const selectedTreeNodeId = Object.keys(selectedKey.value)[0];
-    if (!selectedTreeNodeId || selectedTreeNodeId === props.displayedList.id) {
+    if (!selectedTreeNodeId || selectedTreeNodeId === displayedList.value.id) {
         return ListCharacteristics;
     }
     return ItemEditor;
@@ -49,9 +46,9 @@ const listOrItemView = computed(() => {
 
 <template>
     <div class="list-editor-container">
-        <ListHeader :displayed-list="props.displayedList" />
+        <ListHeader />
         <Splitter
-            v-if="props.displayedList"
+            v-if="displayedList"
             :pt="{
                 root: { style: { height: '97%' } },
                 gutter: { style: { background: lightGray } },
@@ -68,7 +65,7 @@ const listOrItemView = computed(() => {
                 <h3>{{ LIST_SUMMARY }}</h3>
                 <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs -->
                 <ListTree
-                    :key="props.displayedList.id"
+                    :key="displayedList.id"
                     v-model:selected-key="selectedKey"
                     v-model:selected-language="selectedLanguage"
                     v-model:editing="editing"
@@ -83,7 +80,6 @@ const listOrItemView = computed(() => {
                     :is="listOrItemView"
                     :key="selectedTreeNodeId"
                     :item-id="selectedTreeNodeId"
-                    :displayed-list
                     :editable="editing"
                     :selected-language="selectedLanguage"
                 />

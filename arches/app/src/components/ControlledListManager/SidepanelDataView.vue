@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import DataView from "primevue/dataview";
@@ -19,9 +19,10 @@ const { $gettext, $ngettext } = useGettext();
 const toast = useToast();
 
 const lists: Ref<ControlledList[]> = ref([]);
-const displayedList: Ref<ControlledList | null> = defineModel();
 const selected: Ref<ControlledList[]> = ref([]);
 const searchValue = ref("");
+
+const { displayedList, setDisplayedList } = inject("displayedList");
 
 // Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
 // https://github.com/archesproject/arches/pull/10569/files#r1496212837
@@ -53,9 +54,6 @@ const selectAll = () => {
 };
 const clearAll = () => {
     selected.value = [];
-};
-const selectRow = (selected: ControlledList) => {
-    displayedList.value = selected;
 };
 
 
@@ -124,7 +122,7 @@ const deleteLists = async (selectedLists: ControlledList[]) => {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
             if (shouldResetDisplay) {
-                displayedList.value = null;
+                setDisplayedList(null);
             }
         }
         responses.forEach(async (response) => {
@@ -202,8 +200,8 @@ await fetchLists();
                 class="itemRow"
                 :class="{ selected: displayedList?.id === selectable.id }"
                 tabindex="0"
-                @click="selectRow(selectable)"
-                @keyup.enter="selectRow(selectable)"
+                @click="setDisplayedList(selectable)"
+                @keyup.enter="setDisplayedList(selectable)"
             >
                 <input
                     type="checkbox"

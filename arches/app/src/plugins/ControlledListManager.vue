@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, provide, ref } from "vue";
 
 import Toast from "primevue/toast";
 
@@ -15,6 +15,12 @@ const editing = ref(false);
 const displayedWorkspace = computed(() => {
     return editing.value ? ControlledListEditor : ControlledListInventory;
 });
+
+function setDisplayedList(val: ControlledList | null) {
+    displayedList.value = val;
+}
+
+provide("displayedList", { displayedList, setDisplayedList });
 </script>
 
 <template>
@@ -23,7 +29,6 @@ const displayedWorkspace = computed(() => {
         <div style="height: 100%">
             <component
                 :is="displayedWorkspace"
-                v-model:displayedList="displayedList"
                 v-model:editing="editing"
             />
         </div>

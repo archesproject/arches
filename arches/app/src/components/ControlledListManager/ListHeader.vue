@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
-
-import type { ControlledList } from "@/types/ControlledListManager";
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const props: { displayedList: ControlledList | null } = defineProps(["displayedList"]);
+const { displayedList } = inject("displayedList");
 
 const heading = computed(() => {
-    if (!props.displayedList) {
+    if (!displayedList) {
         return $gettext("List Editor");
     }
     return $gettext(
         "List Editor > %{listName}",
-        { listName: props.displayedList.name },
+        { listName: displayedList.value.name },
     );
 });
 </script>
