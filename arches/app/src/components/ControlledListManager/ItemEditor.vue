@@ -6,7 +6,7 @@ import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacter
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
-import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
+import { displayedListKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Language } from "@/types/arches";
@@ -17,7 +17,7 @@ const props: {
     itemId: string,
     selectedLanguage: Language,
 } = defineProps(["editable", "itemId", "selectedLanguage"]);
-const { displayedList } = inject("displayedList");
+const { displayedList } = inject(displayedListKey);
 
 const { $gettext } = useGettext();
 

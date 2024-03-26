@@ -10,6 +10,7 @@ import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
+import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
 import type { Language } from "@/types/arches";
 import type { Ref } from "@/types/Ref";
@@ -19,7 +20,7 @@ const lightGray = "#f4f4f4";
 const { $gettext } = useGettext();
 const LIST_SUMMARY = $gettext("List Summary");
 
-const { displayedList } = inject("displayedList");
+const { displayedList } = inject(displayedListKey);
 const editing: Ref<boolean> = defineModel("editing");
 
 // Key for selected item in Tree view, could be list or list item

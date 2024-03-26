@@ -8,6 +8,7 @@ import DataView from "primevue/dataview";
 import { useToast } from "primevue/usetoast";
 
 import SearchAddDelete from "@/components/ControlledListManager/SearchAddDelete.vue";
+import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
 import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
@@ -22,7 +23,7 @@ const lists: Ref<ControlledList[]> = ref([]);
 const selected: Ref<ControlledList[]> = ref([]);
 const searchValue = ref("");
 
-const { displayedList, setDisplayedList } = inject("displayedList");
+const { displayedList, setDisplayedList } = inject(displayedListKey);
 
 // Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
 // https://github.com/archesproject/arches/pull/10569/files#r1496212837
