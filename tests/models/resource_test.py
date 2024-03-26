@@ -288,17 +288,17 @@ class ResourceTests(ArchesTestCase):
     def test_self_referring_resource_instance_descriptor(self):
         # Create a nodegroup with a string node and a resource-instance node.
         graph = Graph.new(name="Self-referring descriptor test", is_resource=True)
-        node_group = models.NodeGroup.objects.create()
+        nodegroup = models.NodeGroup.objects.create()
         string_node = models.Node.objects.create(
             graph=graph,
-            nodegroup=node_group,
+            nodegroup=nodegroup,
             name="String Node",
             datatype="string",
             istopnode=False,
         )
         resource_instance_node = models.Node.objects.create(
             graph=graph,
-            nodegroup=node_group,
+            nodegroup=nodegroup,
             name="Resource Node",
             datatype="resource-instance",
             istopnode=False,
@@ -311,7 +311,7 @@ class ResourceTests(ArchesTestCase):
             config={
                 "descriptor_types": {
                     "name": {
-                        "nodegroup_id": str(node_group.nodegroupid),
+                        "nodegroup_id": str(nodegroup.nodegroupid),
                         # The bug report did not have <Resource Node> in the descriptor
                         # template, but including it here to allow the assertion to fail
                         "string_template": "<String Node> <Resource Node>",
@@ -331,7 +331,7 @@ class ResourceTests(ArchesTestCase):
         # Create a tile that references itself
         resource = models.ResourceInstance.objects.create(graph=graph)
         tile = models.TileModel.objects.create(
-            nodegroup=node_group,
+            nodegroup_id=nodegroup.pk,
             resourceinstance=resource,
             data={
                 str(string_node.pk): {

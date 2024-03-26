@@ -1647,7 +1647,8 @@ class Graph(models.GraphModel):
                     nodeobj = JSONSerializer().serializeToPython(node, use_raw_i18n_json=use_raw_i18n_json)
                     nodeobj["parentproperty"] = parentproperties[node.nodeid]
                     nodes.append(nodeobj)
-                ret["nodes"] = sorted(nodes, key=lambda k: (k["sortorder"], k["nodeid"]))
+
+                ret["nodes"] = sorted(nodes, key=lambda k: (k["sortorder"] if k["sortorder"] is not None else float('inf'), k["nodeid"]))
             else:
                 ret.pop("nodes", None)
 
