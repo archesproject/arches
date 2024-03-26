@@ -39,6 +39,7 @@ const letter = computed(() => {
 .circle {
     width: 1.5rem;
     height: 1.5rem;
+    min-width: 1.5rem;
     border-radius: 50%;
     background-color: v-bind("color");
     font-weight: 600;
