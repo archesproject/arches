@@ -1680,6 +1680,11 @@ class SpatialView(APIBase):
         # spatialview_geometrynodeid = request.get("geometrynodeid", None)
         spatialview = None
 
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatialview_id = identifier
+            else:
+                spatialview_slug = identifier
         # permission check
         permitted_nodegroupids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
         spatialviews_dict = {str(sv.geometrynode.pk): sv for sv in models.SpatialView.objects.all()}
@@ -1739,6 +1744,12 @@ class SpatialView(APIBase):
         are_valid = not any(graph_id != geom_node.graph_id for graph_id in attribute_node_graphs)
 
         return are_valid
+
+
+    def identifier_is_uuid(self, identifier):
+        uuid_pattern = re.compile(settings.UUID_REGEX, re.IGNORECASE)
+        return uuid_pattern.match(identifier)
+
 
     @method_decorator(group_required("Application Administrator"))
     def post(self, request, identifier=None):
