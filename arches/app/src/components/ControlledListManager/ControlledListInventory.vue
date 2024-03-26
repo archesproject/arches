@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import ProgressSpinner from "primevue/progressspinner";
@@ -10,9 +11,8 @@ import ControlledListSplash from "@/components/ControlledListManager/ControlledL
 import SidepanelDataView from "@/components/ControlledListManager/SidepanelDataView.vue";
 
 import type { Ref } from "@/types/Ref";
-import type { ControlledList } from "@/types/ControlledListManager";
 
-const displayedList: Ref<ControlledList | null> = defineModel("displayedList");
+const { displayedList } = inject("displayedList");
 const editing: Ref<boolean> = defineModel("editing");
 
 const { $gettext } = useGettext();
@@ -37,7 +37,7 @@ const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
             </div>
 
             <Suspense>
-                <SidepanelDataView v-model="displayedList" />
+                <SidepanelDataView />
                 <template #fallback>
                     <ProgressSpinner />
                 </template>

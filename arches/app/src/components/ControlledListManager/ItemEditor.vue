@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
@@ -10,19 +10,19 @@ import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/c
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Language } from "@/types/arches";
-import type { ControlledList, ControlledListItem } from "@/types/ControlledListManager";
+import type { ControlledListItem } from "@/types/ControlledListManager";
 
 const props: {
-    displayedList: ControlledList
     editable: boolean,
     itemId: string,
     selectedLanguage: Language,
-} = defineProps(["displayedList", "editable", "itemId", "selectedLanguage"]);
+} = defineProps(["editable", "itemId", "selectedLanguage"]);
+const { displayedList } = inject("displayedList");
 
 const { $gettext } = useGettext();
 
 const item = computed(() => {
-    if (!props.displayedList) {
+    if (!displayedList) {
         return null;
     }
 
@@ -41,7 +41,7 @@ const item = computed(() => {
         }
     };
 
-    return recurse(props.displayedList.items);
+    return recurse(displayedList.value.items);
 });
 
 const iconLabel = (item: ControlledListItem) => {

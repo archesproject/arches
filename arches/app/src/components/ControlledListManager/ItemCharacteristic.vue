@@ -27,7 +27,7 @@ const disabled = computed(() => {
     return !props.editable || !editing.value;
 });
 
-const dirtyFormValue = ref("");
+const formValue = ref("");
 
 const inputValue = computed({
     get() {
@@ -38,7 +38,7 @@ const inputValue = computed({
         }
     },
     set(newVal: string) {
-        dirtyFormValue.value = newVal;
+        formValue.value = newVal;
     },
 });
 
@@ -58,11 +58,11 @@ const onSave = () => {
     const field = props.field;
     if (field === "uri") {
         // eslint-disable-next-line vue/no-mutating-props
-        (props.item as ControlledListItem)[field] = dirtyFormValue.value;
+        (props.item as ControlledListItem)[field] = formValue.value;
     }
     if (field === 'name') {
         // eslint-disable-next-line vue/no-mutating-props
-        (props.item as ControlledList)[field] = dirtyFormValue.value;
+        (props.item as ControlledList)[field] = formValue.value;
     }
 
     const isList = Object.hasOwn(props.item, "items");
@@ -79,7 +79,7 @@ const onCancel = () => {
         originalValue = (props.item as ControlledList)[props.field];
     }
 
-    dirtyFormValue.value = originalValue;
+    formValue.value = originalValue;
 };
 </script>
 

@@ -1,18 +1,12 @@
 <script setup lang="ts">
+import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
 
-import type { ControlledList } from "@/types/ControlledListManager";
-
-const props: {
-    displayedList: ControlledList;
-    editable: boolean;
-} = defineProps([
-    "displayedList",
-    "editable",
-]);
+const props: { editable: boolean } = defineProps(["editable"]);
+const { displayedList } = inject("displayedList");
 
 const { $gettext } = useGettext();
 const LIST_DETAILS = $gettext("List Details");
@@ -22,13 +16,13 @@ const LIST_DETAILS = $gettext("List Details");
     <h3>{{ LIST_DETAILS }}</h3>
     <div>
         <ItemCharacteristic
-            :item="props.displayedList"
+            :item="displayedList"
             :editable="props.editable"
             field="name"
             :label="$gettext('Name')"
         />
         <ItemCharacteristic
-            :item="props.displayedList"
+            :item="displayedList"
             :editable="false"
             field="dynamic"
             :label="$gettext('Dynamic')"
@@ -39,7 +33,7 @@ const LIST_DETAILS = $gettext("List Details");
         </h4>
         <div class="nodes">
             <div
-                v-for="node in props.displayedList.nodes"
+                v-for="node in displayedList.nodes"
                 :key="node.id"
             >
                 <ReferenceNodeLink :node />
