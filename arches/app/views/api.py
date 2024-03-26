@@ -1798,7 +1798,7 @@ class SpatialView(APIBase):
             spatialview.isactive = isactive or None
             spatialview.save()
             
-            return JSONResponse(staus=200)
+            return JSONResponse(status=200)
         return JSONErrorResponse(_("No json request payload"), status=400)
         
     @method_decorator(group_required("Application Administrator"))
