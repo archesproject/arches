@@ -172,7 +172,9 @@ class URLDataType(BaseDataType):
             pass
 
     def get_rdf_uri(self, node, data, which="r"):
-        return URIRef(data["url"])
+        if data and "url" in data:
+            return URIRef(data["url"])
+        return None
 
     def accepts_rdf_uri(self, uri):
         return self.URL_REGEX.match(uri) and not (
