@@ -241,6 +241,8 @@ define([
                 if (!self.multiple && value && !Array.isArray(value)) {
                     value = [value];
                     resourceids = value.map(item => item.resourceId());
+                } else if (self.multiple && value && Array.isArray(value)) {
+                    resourceids = value.map(item => item.resourceId());
                 }
                 if(!!value) {
                     self.prePopulateResourceInstanceDataLookup(resourceids)
