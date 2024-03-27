@@ -2,7 +2,7 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
+import ListCharacteristic from "@/components/ControlledListManager/ListCharacteristic.vue";
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
 import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
@@ -16,14 +16,12 @@ const LIST_DETAILS = $gettext("List Details");
 <template>
     <h3>{{ LIST_DETAILS }}</h3>
     <div>
-        <ItemCharacteristic
-            :item="displayedList"
+        <ListCharacteristic
             :editable="props.editable"
             field="name"
             :label="$gettext('Name')"
         />
-        <ItemCharacteristic
-            :item="displayedList"
+        <ListCharacteristic
             :editable="false"
             field="dynamic"
             :label="$gettext('Dynamic')"

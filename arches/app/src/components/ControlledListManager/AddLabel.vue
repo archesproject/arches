@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 
-import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
+import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type {
     NewLabel,
@@ -13,7 +13,7 @@ import type {
 } from "@/types/ControlledListManager";
 
 const props: { type: ValueType } = defineProps(["type"]);
-const { item } = inject("item");
+const { item } = inject(itemKey);
 
 const modalVisible = ref(false);
 
