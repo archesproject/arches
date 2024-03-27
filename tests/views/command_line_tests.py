@@ -37,7 +37,8 @@ class CommandLineTests(ArchesTestCase):
     def setUpClass(cls):
         cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
-            # TODO: pull this up higher so that it's not depending on running outside a transaction
+            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
+            # https://github.com/archesproject/arches/issues/10719
             test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
             with captured_stdout():
                 management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
