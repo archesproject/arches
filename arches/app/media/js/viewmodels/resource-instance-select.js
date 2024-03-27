@@ -213,7 +213,7 @@ define([
                     // resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
                     return resourceLookup;
                 });
-        }
+        };
         
         this.lookupResourceInstanceData = function(resourceid) {
             if (resourceLookup[resourceid]) {
@@ -240,7 +240,7 @@ define([
                 var value = ko.unwrap(values);
                 if (!self.multiple && value && !Array.isArray(value)) {
                     value = [value];
-                    resourceids = value.map(rxr => ko.unwrap(rxr.resourceId));
+                    resourceids = value.map(item => item.resourceId());
                 }
                 if(!!value) {
                     self.prePopulateResourceInstanceDataLookup(resourceids)
