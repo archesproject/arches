@@ -10,6 +10,7 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { upsertLabel } from "@/components/ControlledListManager/api.ts";
+import { itemKey } from "@/components/ControlledListManager/const.ts";
 
 import type { Ref } from "@/types/Ref";
 import type {
@@ -22,7 +23,7 @@ const props: {
     label: Label | NewLabel;
     isInsert: boolean;
 } = defineProps(["header", "label", "isInsert"]);
-const { appendItemLabel, updateItemLabel } = inject("item");
+const { appendItemLabel, updateItemLabel } = inject(itemKey);
 
 const value = ref(props.label.value);
 const language = ref(props.label.language);

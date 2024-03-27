@@ -7,6 +7,7 @@ import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
 import { displayedListKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
+import { itemKey } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Language } from "@/types/arches";
@@ -61,7 +62,7 @@ const updateItemLabel = computed(() => {
     };
 });
 
-provide("item", { item, appendItemLabel, removeItemLabel, updateItemLabel });
+provide(itemKey, { item, appendItemLabel, removeItemLabel, updateItemLabel });
 
 const iconLabel = (item: ControlledListItem) => {
     return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
@@ -81,7 +82,6 @@ const iconLabel = (item: ControlledListItem) => {
         :style="{ marginBottom: 0 }"
     />
     <ItemCharacteristic
-        :item
         :editable="true"
         field="uri"
         :style="{ display: 'flex', alignItems: 'center', width: '80%' }"

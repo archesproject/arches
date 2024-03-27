@@ -8,7 +8,7 @@ import { deleteLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 
-import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
+import { itemKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 
 import type {
     Label,
@@ -16,7 +16,7 @@ import type {
 } from "@/types/ControlledListManager";
 
 const props: { type: ValueType | "URI" } = defineProps(["type"]);
-const { item, removeItemLabel } = inject("item");
+const { item, removeItemLabel } = inject(itemKey);
 
 const toast = useToast();
 const { $gettext } = useGettext();

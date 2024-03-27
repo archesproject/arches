@@ -5,15 +5,15 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { postItemToServer } from "@/components/ControlledListManager/api.ts";
-import { itemKey } from "@/components/ControlledListManager/const.ts";
+import { postListToServer } from "@/components/ControlledListManager/api.ts";
+import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
 const props: {
     editable: boolean;
-    field: "uri";
+    field: "name" | "dynamic";
     label: string;
 } = defineProps(["editable", "field", "label"]);
-const { item } = inject(itemKey);
+const { displayedList } = inject(displayedListKey);
 
 const editing = ref(false);
 const disabled = computed(() => {
@@ -24,7 +24,7 @@ const formValue = ref("");
 
 const inputValue = computed({
     get() {
-        return item.value[props.field];
+        return displayedList.value[props.field];
     },
     set(newVal: string) {
         formValue.value = newVal;
@@ -36,13 +36,13 @@ const { $gettext } = useGettext();
 
 const onSave = () => {
     editing.value = false;
-    item.value[props.field] = formValue.value;
-    postItemToServer(item.value, toast, $gettext);
+    displayedList.value[props.field] = formValue.value;
+    postListToServer(displayedList.value, toast, $gettext);
 };
 
 const onCancel = () => {
     editing.value = false;
-    formValue.value = item.value[props.field];
+    formValue.value = displayedList.value[props.field];
 };
 </script>
 
@@ -105,7 +105,7 @@ input {
     text-align: center;
     border-width: 2px;
     height: 3rem;
-    width: 100%;
+    width: 12rem;
 }
 
 .characteristic input[disabled] {
