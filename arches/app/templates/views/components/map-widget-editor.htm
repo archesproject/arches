@@ -22,6 +22,7 @@
 {% block sidepanel %}
 <!-- ko foreach: { data: [$data], as: 'self' } -->
 <!--ko if: activeTab() === 'editor' -->
+<div style="height: 95%">
     <div class="workbench-card-sidepanel-header-container">
         <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button" 
             data-bind="onEnterkeyClick, onSpaceClick, text: label,
@@ -30,9 +31,7 @@
         "></p>
     </div>
     <div class="workbench-card-sidepanel-border"></div>
-
-    <div>
-        <div class="new-provisional-edit-card-container">
+        <div class="new-provisional-edit-card-container" style="height: 100%">
             <!-- ko if: geoJSONString() !== undefined -->
             <div class="card">
                 <div class="geojson-editor" data-bind="codemirror: {

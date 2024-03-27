@@ -1,7 +1,7 @@
 
 module.exports = {
     input: {
-      path: "./arches/app/src", // only files in this directory are considered for extraction
+      path: "./src", // only files in this directory are considered for extraction
       include: ["**/*.vue", "**/*.ts"], // glob patterns to select files for extraction
       exclude: [], // glob patterns to exclude files from extraction
       jsExtractorOpts:[ // custom extractor keyword. default empty.
@@ -32,7 +32,7 @@ module.exports = {
         compileTemplate: false, // do not compile <template> tag when its lang is not html
       },
       output: {
-        path: "./arches/locale", // output path of all created files
+        path: "./locale", // output path of all created files
         potPath: "./messages.pot", // relative to output.path, so by default "./src/language/messages.pot"
         jsonPath: "./", // relative to output.path, so by default "./src/language/translations.json"
         locales: ["en"],

@@ -73,7 +73,6 @@ class Command(BaseCommand):
             "--operation",
             action="store",
             dest="operation",
-            default="setup",
             choices=[
                 "setup",
                 "install",
@@ -263,6 +262,10 @@ class Command(BaseCommand):
         parser.add_argument("--languages", action="store", dest="languages", help="languages desired as a comma separated list")
 
     def handle(self, *args, **options):
+        if options["operation"] is None:
+            self.print_help("manage.py", "packages")
+            return
+        
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
         celery_worker_running = task_management.check_if_celery_available()
@@ -631,10 +634,11 @@ class Command(BaseCommand):
 
         @transaction.atomic
         def load_sql(package_dir, sql_dir):
-            sql_files = glob.glob(os.path.join(package_dir, sql_dir, "*.sql"))
+            sql_files = sorted(glob.glob(os.path.join(package_dir, sql_dir, "*.sql")))
             try:
                 with connection.cursor() as cursor:
                     for sql_file in sql_files:
+                        print("  %s" % sql_file)
                         with open(sql_file, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
@@ -643,10 +647,11 @@ class Command(BaseCommand):
                 print("Failed to load sql files")
 
         def load_resource_views(package_dir):
-            resource_views = glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql"))
+            resource_views = sorted(glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql")))
             try:
                 with connection.cursor() as cursor:
                     for view in resource_views:
+                        print("  %s" % view)
                         with open(view, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)

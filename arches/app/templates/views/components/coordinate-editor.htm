@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <!-- ko if: coordinateEditing() -->
-<div class="card map-coordinate-editor .fixed">
+<div class="card map-coordinate-editor" style="display: flex; flex-direction: column">
     <div class="map-coordinate-editor-header">
         <span data-bind="text: $root.translations.editCoordinates"></span>
     </div>

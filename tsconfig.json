@@ -6,7 +6,7 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "noImplicitThis": true,
+    "noImplicitThis": false,
     "strict": true,
     "verbatimModuleSyntax": true,
     "target": "ESNext",
@@ -18,12 +18,15 @@
     "paths": {
       "@/*": [
         "*.ts",
-        "*.vue",
-      ],
-    },
+        "*.vue"
+      ]
+    }
   },
   "include": [
     "**/*.ts",
-    "**/*.vue",
+    "**/*.vue"
   ],
+  "vueCompilerOptions": {
+    "skipTemplateCodegen": true
+  }
 }
