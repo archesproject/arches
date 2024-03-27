@@ -34,10 +34,14 @@ const inputValue = computed({
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const onSave = () => {
+const onSave = async () => {
     editing.value = false;
+    const originalValue = item.value[props.field];
     item.value[props.field] = formValue.value;
-    postItemToServer(item.value, toast, $gettext);
+    const success = await postItemToServer(item.value, toast, $gettext);
+    if (!success) {
+        item.value[props.field] = originalValue;
+    }
 };
 
 const onCancel = () => {

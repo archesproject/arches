@@ -34,6 +34,8 @@ export const postItemToServer = async (
             const body = await response.json();
             errorText = body.message;
             throw new Error();
+        } else {
+            return await response.json();
         }
     } catch {
         toast.add({
@@ -71,6 +73,8 @@ export const postListToServer = async (
             const body = await response.json();
             errorText = body.message;
             throw new Error();
+        } else {
+            return await response.json();
         }
     } catch {
         toast.add({
