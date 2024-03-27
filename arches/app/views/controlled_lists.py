@@ -285,7 +285,7 @@ class ControlledListView(View):
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(status=200)
+        return JSONResponse(serialize(clist))
 
     def delete(self, request, **kwargs):
         list_id: UUID = kwargs.get("id")
@@ -360,7 +360,7 @@ class ControlledListItemView(View):
 
         try:
             with transaction.atomic():
-                for _item in ControlledListItem.objects.filter(
+                for item in ControlledListItem.objects.filter(
                     pk=item_id
                 ).select_for_update():
                     handle_items([data])
@@ -373,7 +373,7 @@ class ControlledListItemView(View):
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(status=200)
+        return JSONResponse(serialize(item))
 
     def delete(self, request, **kwargs):
         item_id = kwargs.get("id")
