@@ -56,8 +56,8 @@ const removeItemLabel = computed(() => {
 });
 const updateItemLabel = computed(() => {
     return (updatedLabel: Label) => {
-        const toUpdate = item.value.labels.findIndex((l: Label) => l.id === updatedLabel.id);
-        toUpdate.language = updatedLabel.value;
+        const toUpdate = item.value.labels.find((l: Label) => l.id === updatedLabel.id);
+        toUpdate.language = updatedLabel.language;
         toUpdate.value = updatedLabel.value;
     };
 });

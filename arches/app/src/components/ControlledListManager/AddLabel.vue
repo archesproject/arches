@@ -59,7 +59,7 @@ const buttonLabel = computed(() => {
         v-model="modalVisible"
         :header="buttonLabel"
         :label="newLabel"
-        is-insert="true"
+        :is-insert="true"
     />
 </template>
 
