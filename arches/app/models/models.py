@@ -1876,7 +1876,6 @@ class ControlledList(models.Model):
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # TODO(?): expose schemes
     uri = models.URLField(max_length=2048, null=True, blank=True, unique=True)
     controlled_list = models.ForeignKey(
         ControlledList,
