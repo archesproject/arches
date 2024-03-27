@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
 
     def create_editable_future_graphs(self):
-        print("\BEGIN Create editable_future_graphs...")
+        print("\nBEGIN Create editable_future_graphs...")
 
         for graph in self.graphs:
             print("\nCreating editable_future_graph for %s" % graph.name)
@@ -101,7 +101,7 @@ class Command(BaseCommand):
             print("\n%s has been updated. Creating a new publication for %s" % graph.name, graph.name)
             graph.publish()
 
-        print("\END Create editable_future_graphs. Success!")
+        print("\nEND Create editable_future_graphs. Success!")
 
 
     def publish(self, username):
