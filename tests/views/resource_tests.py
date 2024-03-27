@@ -84,10 +84,11 @@ class CommandLineTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
-
+        # TODO: pull this up higher so that it's not depending on running outside a transaction
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+
+        super().setUpClass()
         add_users()
 
     def test_resource_instance_permission_assignment(self):

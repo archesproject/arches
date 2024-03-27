@@ -146,7 +146,7 @@ class Card(models.CardModel):
                         card_id = widget.get("card_id", None)
                         widget_id = widget.get("widget_id", None)
                         if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
-                            widget_model, _ = models.CardXNodeXWidget.objects.get_or_create(
+                            widget_model, unused = models.CardXNodeXWidget.objects.get_or_create(
                                 node_id=node_id, card_id=card_id, widget_id=widget_id
                             )
                         else:

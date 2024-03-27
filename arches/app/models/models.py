@@ -24,17 +24,21 @@ from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
-from django.db.models import JSONField
+from django.db.models import Deferrable, JSONField
+from django.db.models.fields.json import KT
+from django.db.models.functions import Cast
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
-from django.core.validators import RegexValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db.models import Q, Max
+from django.db.models.fields.json import KT
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
@@ -618,6 +622,16 @@ class NodeGroup(models.Model):
         )
 
 
+class WithControlledListManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            controlled_list=Cast(
+                KT("config__controlledList"),
+                output_field=models.UUIDField(),
+            )
+        )
+
+
 class Node(models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
@@ -650,6 +664,11 @@ class Node(models.Model):
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
     )
+
+    objects = models.Manager()
+    # custom manager provides indexed lookup on controlled lists, e.g.
+    # Node.with_controlled_list.filter(controlled_list=your_list_id_as_uuid)
+    with_controlled_list = WithControlledListManager()
 
     def get_child_nodes_and_edges(self):
         """
@@ -724,6 +743,12 @@ class Node(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
             models.UniqueConstraint(fields=["alias", "graph"], name="unique_alias_graph"),
+        ]
+        indexes = [
+            models.Index(
+                Cast(KT("config__controlledList"), output_field=models.UUIDField()),
+                name="lists_reffed_by_node_idx",
+            )
         ]
 
 
@@ -1836,3 +1861,80 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+
+### Controlled List Manager
+class ControlledList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=127, null=False)
+    dynamic = models.BooleanField(default=False)
+    search_only = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "controlled_lists"
+
+
+class ControlledListItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uri = models.URLField(max_length=2048, null=True, blank=True, unique=True)
+    controlled_list = models.ForeignKey(
+        ControlledList,
+        db_column="listid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_items",
+    )
+    sortorder = models.IntegerField(validators=[MinValueValidator(0)])
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.CASCADE, related_name="children"
+    )
+    guide = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "controlled_list_items"
+        constraints = [
+            # Sort order concerns the list as a whole, not subsets
+            # of the hierarchy.
+            models.UniqueConstraint(
+                fields=["controlled_list", "sortorder"],
+                name="unique_list_sortorder",
+                deferrable=Deferrable.DEFERRED,
+            ),
+        ]
+
+    def clean(self):
+        if not self.controlled_list_item_labels.filter(value_type="prefLabel").exists():
+            raise ValidationError(_("At least one preferred label is required."))
+
+
+class ControlledListItemLabel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    controlled_list_item = models.ForeignKey(
+        ControlledListItem,
+        db_column="itemid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_item_labels",
+    )
+    value_type = models.ForeignKey(
+        DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "label"}
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+    )
+    value = models.CharField(max_length=1024, null=False)
+
+    class Meta:
+        db_table = "controlled_list_item_labels"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["controlled_list_item", "value", "value_type", "language"],
+                name="unique_item_value_valuetype_language",
+            ),
+            models.UniqueConstraint(
+                fields=["controlled_list_item", "language"],
+                condition=Q(value_type="prefLabel"),
+                name="unique_item_preflabel_language",
+            ),
+        ]

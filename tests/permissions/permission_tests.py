@@ -87,10 +87,12 @@ class PermissionTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
-
+        # TODO: pull this up higher so that it's not depending on running outside a transaction
+        # same issue in command_line_tests.py
         test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
         management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+
+        super().setUpClass()
         cls.add_users()
 
 

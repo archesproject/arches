@@ -821,7 +821,7 @@ class EDTFDataType(BaseDataType):
                     if edtf.lower is None and edtf.upper is None:
                         raise Exception(_("Invalid date specified."))
 
-        if not value.get('op'):
+        if not value.get("op"):
             pass
         elif value["op"] == "null" or value["op"] == "not_null":
             self.append_null_search_filters(value, node, query, request)
@@ -1888,7 +1888,7 @@ class BaseDomainDataType(BaseDataType):
         for option in node.config["options"]:
             if option["id"] == option_id:
                 return get_localized_value(option["text"], return_lang=return_lang)
-        raise Exception(_("No domain option found for option id {0}, in node conifg: {1}".format(option_id, node.config["options"])))
+        raise Exception(_("No domain option found for option id {0}, in node config: {1}".format(option_id, node.config["options"])))
 
     def get_option_id_from_text(self, value):
         # this could be better written with most of the logic in SQL tbh
@@ -2567,3 +2567,103 @@ def get_value_from_jsonld(json_ld_node):
             return
     except IndexError as e:
         return
+
+
+class ReferenceDataType(BaseDataType):
+    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
+        errors = []
+        title = _("Invalid Reference Datatype Value")
+        if value is None:
+            return errors
+        
+        if type(value) == list and len(value):
+            for reference in value:
+                if "uri" in reference and len(reference["uri"]):
+                    pass
+                else:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": _("Reference objects require a 'uri' property and corresponding value"),
+                            "title": title,
+                        }
+                    )
+                if "labels" in reference:
+                    pref_label_languages = []
+                    for label in reference["labels"]:
+                        if not all(key in label for key in ("id", "value", "language", "valuetype")):
+                            errors.append(
+                                {
+                                    "type": "ERROR",
+                                    "message": _(
+                                        "Reference labels require properties: id(uuid), value(string), language(e.g. 'en'), and valuetype(e.g. 'prefLabel')"
+                                    ),
+                                    "title": title,
+                                }
+                            )
+                        if label["valuetype"] == "prefLabel":
+                            pref_label_languages.append(label["language"])
+                            
+                    if len(set(pref_label_languages)) < len(pref_label_languages):
+                        errors.append(
+                            {
+                                "type": "ERROR",
+                                "message": _("A reference can have only one prefLabel per language"),
+                                "title": title,
+                            }
+                        )
+        else:
+            errors.append({"type": "ERROR", "message": _("Reference value must be a list of reference objects"), "title": title})
+        return errors
+
+    def transform_value_for_tile(self, value, **kwargs):
+        ret = value
+        return ret
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
+    def transform_export_values(self, value, *args, **kwargs):
+        new_values = value
+        return ",".join(new_values)
+    
+    def get_display_value(self, tile, node, **kwargs):
+        labels = []
+        requested_language = kwargs.pop("language", None)
+        current_language = requested_language or get_language()
+        for item in self.get_tile_data(tile)[str(node.nodeid)]:
+            for label in item["labels"]:
+                if label["language"] == current_language and label["valuetype"] == "prefLabel":
+                    labels.append(label.get("value", ""))
+        return ", ".join(labels)
+
+    def collects_multiple_values(self):
+        return True
+
+    def default_es_mapping(self):
+        mapping = {
+            "properties": {
+                "uri": {"type": "keyword"},
+                "id": {"type": "keyword"},
+                "labels": {
+                    "properties": {},
+                },
+            }
+        }
+        return mapping
+
+    def validate_node(self, node):
+        valid = False
+        message = ""
+        title = ""
+        try:
+            uuid.UUID(node.config["controlledList"])
+            valid = True
+        except (TypeError, KeyError):
+            message = _("A reference datatype node must be configured with a controlled list")
+            title = _("Invalid Node Configuration")
+            logger.error(message)
+
+        return {"success": valid, "message": message, "title": title}
