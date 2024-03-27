@@ -101,6 +101,11 @@ define([
                     });
                     parentNode.childNodes.remove(node);
                     parentNode.selected(true);
+
+                    // adds event to trigger dirty state in graph-designer
+                    document.dispatchEvent(
+                        new Event('deleteNode')
+                    );
                 }else{
                     this.trigger('error', response, 'deleteNode');
                 }

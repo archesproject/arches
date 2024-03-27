@@ -63,7 +63,8 @@ class SearchView(MapBaseManagerView):
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication=None)
+            .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
         )
         geocoding_providers = models.Geocoder.objects.all()
         if user_is_resource_exporter(request.user):

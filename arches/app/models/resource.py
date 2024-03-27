@@ -217,7 +217,6 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         # This initializes serialized graph (for use in superclass?). Setup for the above. NOt sure
         if not self.get_serialized_graph():
             pass
@@ -228,9 +227,11 @@ class Resource(models.ResourceInstance):
         context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
+        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
+
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            tile.save(request=request, index=False, transaction_id=transaction_id, context=context)
+            tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
         if request is None:
             if user is None:
                 user = {}
@@ -243,7 +244,6 @@ class Resource(models.ResourceInstance):
         except NotUserNorGroup:
             pass
 
-        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index(context)
 
@@ -497,7 +497,6 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -621,7 +620,8 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
+                .exclude(source_identifier__isnull=False)
             )
 
         graph_lookup = {
@@ -860,23 +860,3 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
-
-
-class PublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Published Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)
-
-
-class UnpublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Unpublished Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)

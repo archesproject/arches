@@ -24,7 +24,7 @@ import uuid
 import arches.app.utils.zip as arches_zip
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.models.resource import Resource, PublishedModelError
+from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -95,6 +95,7 @@ class TileData(View):
         if self.action == "update_tile":
             json = request.POST.get("data", None)
             accepted_provisional = request.POST.get("accepted_provisional", None)
+            resource_creation = False
             if accepted_provisional is not None:
                 accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
             if json is not None:
@@ -111,22 +112,19 @@ class TileData(View):
                 try:
                     models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
                 except ObjectDoesNotExist:
+                    resource_creation = True
                     try:
                         resource = Resource(uuid.UUID(str(data["resourceinstance_id"])))
                     except ValueError:
                         resource = Resource()
                     graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
                     resource.graph_id = graphid
-                    try:
-                        resource.save(user=request.user, transaction_id=transaction_id)
-                        data["resourceinstance_id"] = resource.pk
-                        resource.index()
-                    except PublishedModelError as e:
-                        message = _("Unable to save. Please verify the model is currently unpublished.")
-                        return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                    resource.save(user=request.user, transaction_id=transaction_id)
+                    data["resourceinstance_id"] = resource.pk
+                    resource.index()
                 tile_id = data["tileid"]
                 resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
-                is_active = resource_instance.graph.publication is not None
+                is_active = resource_instance.graph.is_active
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
@@ -141,16 +139,13 @@ class TileData(View):
                             try:
                                 if accepted_provisional is None:
                                     try:
-                                        tile.save(request=request, transaction_id=transaction_id)
+                                        tile.save(request=request, resource_creation=resource_creation, transaction_id=transaction_id)
                                     except TileValidationError as e:
                                         resource_tiles_exist = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance).exists()
                                         if not resource_tiles_exist:
                                             Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
                                         title = _("Unable to save. Please verify your input is valid")
                                         return self.handle_save_error(e, tile_id, title=title)
-                                    except PublishedModelError as e:
-                                        message = _("Unable to save. Please verify the model is not currently published.")
-                                        return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
                                     except Exception as e:
                                         title = _("Unable to save.")
                                         return self.handle_save_error(e, tile_id, title=title, message=str(e))
@@ -163,7 +158,7 @@ class TileData(View):
                                             "edit": accepted_provisional_edit,
                                             "provisional_editor": provisional_editor,
                                         }
-                                    tile.save(request=request, provisional_edit_log_details=prov_edit_log_details)
+                                    tile.save(request=request, resource_creation=resource_creation, provisional_edit_log_details=prov_edit_log_details)
 
                                 if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                                     tile.data = tile.provisionaledits[str(request.user.id)]["value"]
@@ -230,7 +225,7 @@ class TileData(View):
                 try:
                     tile = Tile.objects.get(tileid=data["tileid"])
                     resource_instance = tile.resourceinstance
-                    is_active = resource_instance.graph.publication_id is not None
+                    is_active = resource_instance.graph.is_active
                 except ObjectDoesNotExist:
                     return JSONErrorResponse(
                         title=_("This tile is no longer available"),

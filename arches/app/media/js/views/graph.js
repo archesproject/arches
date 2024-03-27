@@ -135,11 +135,26 @@ require([
                 graphId: ko.observable(null),
                 showFind: ko.observable(false),
                 currentList: ko.computed(function() {
+                    let resources;
+
                     if (self.viewModel.showResources()) {
-                        return self.viewModel.resources();
+                        resources = self.viewModel.resources();
                     } else {
-                        return self.viewModel.graphs() ;
+                        resources = self.viewModel.graphs();
                     }
+
+                    return resources.reduce((acc, resource) => { 
+                        if (!resource.source_identifier_id) {
+                            const editableFutureGraph = resources.find(graph => graph.source_identifier_id === resource.graphid);
+                            
+                            if (editableFutureGraph) {
+                                resource['has_unpublished_changes'] = editableFutureGraph['has_unpublished_changes'];
+                            }
+                            
+                            acc.push(resource);
+                        }
+                        return acc;
+                    }, []);
                 }),
                 newResource: function() {
                     newGraph('new', {isresource: true});

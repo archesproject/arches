@@ -47,6 +47,7 @@ define([
             self.slug = ko.observable(null);
             self.alias = ko.observable(null);
             self.hasCustomAlias = ko.observable(false);
+            self.sourceIdentifierId = ko.observable(null);
             self.nodeGroupId = ko.observable('');
             var datatype = ko.observable('');
             self.datatype = ko.computed({
@@ -184,6 +185,7 @@ define([
                     config: config,
                     issearchable: self.issearchable,
                     isrequired: self.isrequired,
+                    is_immutable: self.is_immutable,
                     fieldname: self.fieldname,
                     exportable: self.exportable,
                     alias: self.alias,
@@ -267,6 +269,7 @@ define([
             self.exportable(source.exportable);
             self.alias(source.alias);
             self.hasCustomAlias(source.hascustomalias);
+            self.sourceIdentifierId(source.source_identifier_id);
 
             if (source.config) {
                 self.setupConfig(source.config);
@@ -274,6 +277,7 @@ define([
 
             self.nodeid = source.nodeid;
             self.istopnode = source.istopnode;
+            self.is_immutable = source.is_immutable;
             self.sourceBranchPublicationId = source.sourcebranchpublication_id;
 
             self.set('id', self.nodeid);
@@ -324,6 +328,12 @@ define([
                     this._node(this.json());
                 }
             };
+
+            // adds event to trigger dirty state in graph-designer
+            // need to execute before save to avoid issues with graph caching
+            document.dispatchEvent(
+                new Event('nodeSave')
+            );
             return this._doRequest({
                 type: method,
                 url: this._getURL(method),

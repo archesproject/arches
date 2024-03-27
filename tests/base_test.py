@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import psycopg2
 from contextlib import contextmanager
 
 from django.test import TestCase
@@ -118,7 +119,11 @@ class ArchesTestCase(TestCase):
             oauth_client_secret=OAUTH_CLIENT_SECRET,
             jwt_algorithm=test_settings.JWT_ALGORITHM,
         )
-        cursor.execute(sql)
+
+        try:
+            cursor.execute(sql)
+        except psycopg2.errors.UniqueViolation:  # entry already in database
+            pass
 
     @classmethod
     def tearDownClass(cls):

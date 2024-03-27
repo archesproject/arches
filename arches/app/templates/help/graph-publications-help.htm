@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!-- this html is included in help-panel-base.htm -->
+<div class="ep-help-content">
+    <div>
+        <a href="javascript:void(0)" class="ep-help-topic-toggle">
+            <h4>{% trans "Overview" %}</h4>
+            &nbsp;<i class="ep-help-topic-toggle-icon fa fa-chevron-down"></i>
+        </a>
+        <div class="ep-help-topic-content" style="display:block;">
+            {% blocktrans %}
+            <p>
+                The Arches graphs are the visualizations of the data relationships that exist in the Arches system. These relationships are based on a mapping of the CIDOC Conceptual Reference Model (CRM), an ontology focused on cultural heritage (ISO 21127:2006), to the draft International Core Data Standard for Archaeological and Architectural Heritage (CDS).
+            </p>
+            {% endblocktrans %}
+            {% blocktrans %}
+            <p>
+                Whenever a graph is published via the Graph Designer, a historical record of that graph is kept in the database. The historical record consists of a JSON representation of the graph, the user that published the graph, the date and time the graph was published, and any notes the user wrote when publishing the graph. 
+            </p>
+            <p>
+                In the Published Graphs Manager, a permissioned user is able to select which historical record of the graph should be considered active. Changing the active historical record will affect the Graph Designer, Resource Manager, Resource reports, Search, and any custom logic involving the graph.
+            </p>
+            {% endblocktrans %}
+        </div>
+    </div>
+</div>
