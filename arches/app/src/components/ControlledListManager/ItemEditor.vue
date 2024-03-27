@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed, inject, provide } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
@@ -10,7 +10,7 @@ import { displayedListKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/Contr
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Language } from "@/types/arches";
-import type { ControlledListItem } from "@/types/ControlledListManager";
+import type { ControlledListItem, Label } from "@/types/ControlledListManager";
 
 const props: {
     editable: boolean,
@@ -44,6 +44,25 @@ const item = computed(() => {
     return recurse(displayedList.value.items);
 });
 
+const appendItemLabel = computed(() => {
+    return (newLabel: Label) => { item.value.labels.push(newLabel); };
+});
+const removeItemLabel = computed(() => {
+    return (removedLabel: Label) => {
+        const toDelete = item.value.labels.findIndex((l: Label) => l.id === removedLabel.id);
+        item.value.labels.splice(toDelete, 1);
+    };
+});
+const updateItemLabel = computed(() => {
+    return (updatedLabel: Label) => {
+        const toUpdate = item.value.labels.findIndex((l: Label) => l.id === updatedLabel.id);
+        toUpdate.language = updatedLabel.value;
+        toUpdate.value = updatedLabel.value;
+    };
+});
+
+provide("item", { item, appendItemLabel, removeItemLabel, updateItemLabel });
+
 const iconLabel = (item: ControlledListItem) => {
     return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
 };
@@ -55,16 +74,9 @@ const iconLabel = (item: ControlledListItem) => {
         <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
         <span class="item-type">{{ iconLabel(item) }}</span>
     </span>
+    <LabelEditor :type="PREF_LABEL" />
+    <LabelEditor :type="ALT_LABEL" />
     <LabelEditor
-        :item
-        :type="PREF_LABEL"
-    />
-    <LabelEditor
-        :item
-        :type="ALT_LABEL"
-    />
-    <LabelEditor
-        :item
         :type="URI"
         :style="{ marginBottom: 0 }"
     />

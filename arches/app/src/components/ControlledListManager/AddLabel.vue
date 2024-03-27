@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
@@ -8,17 +8,12 @@ import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type {
-    ControlledListItem,
-    Label,
     NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props: {
-    item: ControlledListItem;
-    type: ValueType;
-    onInsert: (label: Label) => Promise<Label>;
-} = defineProps(["item", "type", "onInsert"]);
+const props: { type: ValueType } = defineProps(["type"]);
+const { item } = inject("item");
 
 const modalVisible = ref(false);
 
@@ -31,7 +26,7 @@ const newLabel: NewLabel = computed(() => {
         valuetype: props.type,
         language: arches.activeLanguage,
         value: '',
-        item_id: props.item.id,
+        item_id: item.value.id,
     };
 });
 
@@ -64,7 +59,7 @@ const buttonLabel = computed(() => {
         v-model="modalVisible"
         :header="buttonLabel"
         :label="newLabel"
-        :on-insert
+        is-insert="true"
     />
 </template>
 

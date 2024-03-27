@@ -156,7 +156,9 @@ def handle_items(item_dicts):
             label["value_type_id"] = label.pop("valuetype")
             label.pop("item_id")  # trust the item, not the label
             labels_to_save.append(
-                ControlledListItemLabel(controlled_list_item_id=item_to_save.id, **label)
+                ControlledListItemLabel(
+                    controlled_list_item_id=item_to_save.id, **label
+                )
             )
 
         # Recurse
@@ -427,9 +429,24 @@ class ControlledListItemLabelView(View):
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")
-        objs_deleted, unused = ControlledListItemLabel.objects.filter(
-            pk=label_id
-        ).delete()
-        if not objs_deleted:
+        try:
+            label = ControlledListItemLabel.objects.get(pk=label_id)
+        except:
             return JSONErrorResponse(status=404)
+        if (
+            label.value_type_id == "prefLabel"
+            and len(
+                label.controlled_list_item.controlled_list_item_labels.filter(
+                    value_type="prefLabel"
+                )
+            )
+            < 2
+        ):
+            return JSONErrorResponse(
+                message=_(
+                    "Deleting the item's only remaining preferred label is not permitted."
+                ),
+                status=400,
+            )
+        label.delete()
         return JSONResponse(status=204)

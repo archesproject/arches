@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { useToast } from "primevue/usetoast";
@@ -11,20 +11,12 @@ import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 import { ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 
 import type {
-    ControlledListItem,
     Label,
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props: {
-    item: ControlledListItem;
-    type: ValueType | "URI";
-} = defineProps(["item", "type"]);
-
-const onInsert = (label: Label) => {
-    // eslint-disable-next-line vue/no-mutating-props
-    props.item.labels.push(label);
-};
+const props: { type: ValueType | "URI" } = defineProps(["type"]);
+const { item, removeItemLabel } = inject("item");
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -62,10 +54,10 @@ const headings: { heading: string; subheading: string } = computed(() => {
 });
 
 const onDelete = async (label: Label) => {
-    await deleteLabel(label, toast, $gettext);
-    const toDelete = props.item.labels.findIndex(l => l.id === label.id);
-    // eslint-disable-next-line vue/no-mutating-props
-    props.item.labels.splice(toDelete, 1);
+    const deleted = await deleteLabel(label, toast, $gettext);
+    if (deleted) {
+        removeItemLabel.value(label);
+    }
 };
 </script>
 
@@ -86,9 +78,7 @@ const onDelete = async (label: Label) => {
         </div>
         <AddLabel
             v-if="type !== URI"
-            :item
             :type="type"
-            :on-insert
         />
     </div>
 </template>

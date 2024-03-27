@@ -134,6 +134,8 @@ export const deleteLabel = async (
             const body = await response.json();
             errorText = body.message;
             throw new Error();
+        } else {
+            return true;
         }
     } catch {
         toast.add({

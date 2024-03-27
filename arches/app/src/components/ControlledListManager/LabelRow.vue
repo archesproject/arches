@@ -46,7 +46,7 @@ const header = computed(() => {
         v-model="modalVisible"
         :header
         :label
-        :on-insert="null"
+        is-insert="false"
     />
 </template>
 

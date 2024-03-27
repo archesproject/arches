@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -20,9 +20,9 @@ import type {
 const props: {
     header: string;
     label: Label | NewLabel;
-    // updates don't need an insert callback
-    onInsert: null | ((label: Label) => Promise<Label>);
-} = defineProps(["header", "label", "onInsert"]);
+    isInsert: boolean;
+} = defineProps(["header", "label", "isInsert"]);
+const { appendItemLabel, updateItemLabel } = inject("item");
 
 const value = ref(props.label.value);
 const language = ref(props.label.language);
@@ -46,14 +46,11 @@ const onSave = async () => {
     );
 
     if (upsertedLabel) {
-        if (props.onInsert) {
-            props.onInsert(upsertedLabel);
+        if (props.isInsert) {
+            appendItemLabel.value(upsertedLabel);
             value.value = "";
         } else {
-            /* eslint-disable vue/no-mutating-props */
-            props.label.language = language.value;
-            props.label.value = value.value;
-            /* eslint-enable vue/no-mutating-props */
+            updateItemLabel.value(upsertedLabel);
         }
         visible.value = false;
     }
