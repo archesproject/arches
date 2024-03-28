@@ -200,7 +200,7 @@ define([
         };
         
         this.prePopulateResourceInstanceDataLookup = function(resourceids) {
-            window.fetch(arches.urls.search_results + "?ids=" + resourceids)
+            return window.fetch(arches.urls.search_results + "?ids=" + resourceids)
                 .then(function(response){
                     if(response.ok) {
                         return response.json();
