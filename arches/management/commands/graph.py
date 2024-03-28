@@ -95,10 +95,10 @@ class Command(BaseCommand):
         print("\nBEGIN Create editable_future_graphs...")
 
         for graph in self.graphs:
-            print("\nCreating editable_future_graph for %s" % graph.name)
+            print("\nCreating editable_future_graph for %s..." % graph.name)
             graph.create_editable_future_graph()
 
-            print("\n%s has been updated. Creating a new publication for %s" % graph.name, graph.name)
+            print("\n%s has been updated! Creating a new publication for %s." % (graph.name, graph.name))
             graph.publish()
 
         print("\nEND Create editable_future_graphs. Success!")
