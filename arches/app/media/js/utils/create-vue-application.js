@@ -1,9 +1,16 @@
 import PrimeVue from 'primevue/config';
+import AnimateOnScroll from 'primevue/animateonscroll';
+import ConfirmationService from 'primevue/confirmationservice';
+import DialogService from 'primevue/dialogservice';
+import FocusTrap from 'primevue/focustrap';
+import StyleClass from 'primevue/styleclass';
+import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
-export default async function createVueApp(vueComponent){
+export default async function createVueApplication(vueComponent){
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
@@ -32,6 +39,13 @@ export default async function createVueApp(vueComponent){
         const app = createApp(vueComponent);
         app.use(PrimeVue);
         app.use(gettext);
+        app.use(ConfirmationService);
+        app.use(DialogService);
+        app.use(ToastService);
+        app.directive('animateonscroll', AnimateOnScroll);
+        app.directive('focustrap', FocusTrap);
+        app.directive('styleclass', StyleClass);
+        app.directive('tooltip', Tooltip);
 
         return app;
     });

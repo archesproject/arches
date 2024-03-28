@@ -15,7 +15,6 @@ from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
-from operator import attrgetter
 from urllib import parse
 from collections import OrderedDict
 from django.contrib.auth import authenticate
@@ -1155,7 +1154,10 @@ class ResourceReport(APIBase):
 
             cardwidgets = [
                 widget
-                for widgets in [sorted(card.cardxnodexwidget_set.all(), key=attrgetter("sortorder")) for card in permitted_cards]
+                for widgets in [
+                    sorted(card.cardxnodexwidget_set.all(), key=lambda x: x.sortorder or 0)
+                    for card in permitted_cards
+                ]
                 for widget in widgets
             ]
 
