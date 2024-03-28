@@ -192,6 +192,8 @@ define([
 
             }
         };
+        this.select2ConfigMulti = { ...this.select2Config };
+        this.select2ConfigMulti.multiple = true;
     };
 
     return ConceptSelectViewModel;
