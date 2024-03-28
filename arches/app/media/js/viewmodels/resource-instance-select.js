@@ -199,22 +199,6 @@ define([
             }
         };
         
-        this.prePopulateResourceInstanceDataLookup = function(resourceids) {
-            return window.fetch(arches.urls.search_results + "?ids=" + resourceids)
-                .then(function(response){
-                    if(response.ok) {
-                        return response.json();
-                    }
-                })
-                .then(function(json) {
-                    json["results"]["hits"]["hits"].forEach(function(hit) {
-                        resourceLookup[hit._id] = hit;
-                    });
-                    // resourceLookup[resourceid] = json["results"]["hits"]["hits"][0];
-                    return resourceLookup;
-                });
-        };
-        
         this.lookupResourceInstanceData = function(resourceid) {
             if (resourceLookup[resourceid]) {
                 return Promise.resolve(resourceLookup[resourceid]);
@@ -235,37 +219,31 @@ define([
         if(self.renderContext !== 'search'){
             var updateNameAndOntologyClass = function(values) {
                 var names = [];
-                var resourceids = [];
-                var resourceInstance = {};
                 var value = ko.unwrap(values);
                 if (!self.multiple && value && !Array.isArray(value)) {
                     value = [value];
-                    resourceids = value.map(item => item.resourceId());
-                } else if (self.multiple && value && Array.isArray(value)) {
-                    resourceids = value.map(item => item.resourceId());
                 }
                 if(!!value) {
-                    self.prePopulateResourceInstanceDataLookup(resourceids)
-                    .then(function(resourceLookup){
-                        value.forEach(function(val) {
-                            if (val) {
-                                if(!val.resourceName) {
-                                    Object.defineProperty(val, 'resourceName', {value: ko.observable()});
-                                }
-                                if(!val.ontologyClass) {
-                                    Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
-                                }
-                                if(!val.iconClass) {
-                                    Object.defineProperty(val, 'iconClass', {value: ko.observable()});
-                                }
-                                resourceInstance = resourceLookup[val.resourceId];
-                                names.push(resourceInstance["_source"].displayname);
-                                self.displayValue(names.join(', '));
-                                val.resourceName(resourceInstance["_source"].displayname)
-                                val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
-                                val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                    value.forEach(function(val) {
+                        if (val) {
+                            if(!val.resourceName) {
+                                Object.defineProperty(val, 'resourceName', {value: ko.observable()});
                             }
-                        });
+                            if(!val.ontologyClass) {
+                                Object.defineProperty(val, 'ontologyClass', {value:ko.observable()});
+                            }
+                            if(!val.iconClass) {
+                                Object.defineProperty(val, 'iconClass', {value: ko.observable()});
+                            }
+                            self.lookupResourceInstanceData(ko.unwrap(val.resourceId))
+                                .then(function(resourceInstance) {
+                                    names.push(resourceInstance["_source"].displayname);
+                                    self.displayValue(names.join(', '));
+                                    val.resourceName(resourceInstance["_source"].displayname)
+                                    val.iconClass(self.graphLookup[resourceInstance["_source"].graph_id]?.iconclass || 'fa fa-question')
+                                    val.ontologyClass(resourceInstance["_source"].root_ontology_class);
+                                });
+                        }
                     });
                 }
             };
