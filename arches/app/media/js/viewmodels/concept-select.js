@@ -20,11 +20,11 @@ define([
             var valueList = self.value() || self.defaultValue();
             self.displayName();
             
-            if (!self.multiple && valueList) {
-                valueList = [valueList];
-            }
             if (Array.isArray(valueList)) {
                 return valueList;
+            }
+            if (!self.multiple && valueList) {
+                return [valueList];
             }
             return [];
         });
