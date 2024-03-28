@@ -21,11 +21,10 @@ const { $gettext } = useGettext();
 const LIST_SUMMARY = $gettext("List Summary");
 
 const { displayedList } = inject(displayedListKey);
-const editing: Ref<boolean> = defineModel("editing");
 
 // Key for selected item in Tree view, could be list or list item
 // e.g. { "2000000-...": true }
-const selectedKey: Ref<typeof TreeSelectionKeys> = ref({[displayedList.value.id]: true});
+const selectedKey: Ref<typeof TreeSelectionKeys> = ref({});
 const selectedTreeNodeId = computed(() => {
     return Object.keys(selectedKey.value)[0] ?? null;
 });
@@ -34,7 +33,7 @@ const selectedLanguage: Ref<Language> = ref(
 );
 
 const listOrItemView = computed(() => {
-    if (selectedKey.value === null) {
+    if (selectedKey.value === null  || displayedList.value === null) {
         return ListCharacteristics;
     }
     const selectedTreeNodeId = Object.keys(selectedKey.value)[0];
@@ -69,7 +68,6 @@ const listOrItemView = computed(() => {
                     :key="displayedList.id"
                     v-model:selected-key="selectedKey"
                     v-model:selected-language="selectedLanguage"
-                    v-model:editing="editing"
                     :displayed-list
                 />
             </SplitterPanel>
@@ -81,7 +79,6 @@ const listOrItemView = computed(() => {
                     :is="listOrItemView"
                     :key="selectedTreeNodeId"
                     :item-id="selectedTreeNodeId"
-                    :editable="editing"
                     :selected-language="selectedLanguage"
                 />
             </SplitterPanel>
