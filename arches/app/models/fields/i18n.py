@@ -5,6 +5,7 @@ from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
+from django.db.models.functions.comparison import Cast
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
@@ -237,6 +238,17 @@ class I18n_JSON(NothingNode):
     def _parse(self, value, lang, use_nulls):
         ret = {}
 
+        if isinstance(value, Cast):
+            # Django 4.2 regression: bulk_update() sends Cast expressions
+            # https://code.djangoproject.com/ticket/35167
+            values = set(case.result.value for case in value.source_expressions[0].cases)
+            value = list(values)[0]
+            if len(values) > 1:
+                # Prevent silent data loss.
+                raise NotImplementedError(
+                    "Heterogenous values provided to I18n_JSON field bulk_update():\n"
+                    f"{tuple(str(v) for v in values)}"
+                )
         if isinstance(value, str):
             try:
                 ret = json.loads(value)
@@ -248,6 +260,8 @@ class I18n_JSON(NothingNode):
             ret = value.raw_value
         elif isinstance(value, dict):
             ret = value
+        else:
+            raise TypeError(value)
         self.raw_value = ret
 
         if "i18n_properties" in self.raw_value:

@@ -1,34 +1,32 @@
-@import url(fonts/openSans.css);
-@import url(../node_modules/bootstrap/dist/css/bootstrap.min.css);
-@import url(../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
-@import url(../node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
-@import url(nifty.min.css);
-@import url(../node_modules/font-awesome/css/font-awesome.min.css);
-@import url(../node_modules/ionicons/css/ionicons.min.css);
-@import url(../node_modules/lt-themify-icons/themify-icons.css);
-@import url(../node_modules/chosen-js/chosen.css);
-// @import url(../node_modules/select2/select2.css);
-// @import url(../node_modules/select2/select2-bootstrap.css);
-@import url(../node_modules/select-woo/dist/css/selectWoo.min.css);
-@import url(../node_modules/mapbox-gl/dist/mapbox-gl.css);
-@import url(../node_modules/nouislider/distribute/nouislider.min.css);
-@import url(../node_modules/codemirror/lib/codemirror.css);
-@import url(../node_modules/codemirror/theme/monokai.css);
-@import url(../node_modules/datatables.net-bs/css/dataTables.bootstrap.css);
-@import url(../node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.css);
-@import url(../node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
-@import url(../node_modules/leaflet/dist/leaflet.css);
-@import url(../node_modules/leaflet-draw/dist/leaflet.draw.css);
+@import url(../fonts/openSans.css);
+@import url(node_modules/bootstrap/dist/css/bootstrap.min.css);
+@import url(node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css);
+@import url(node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
+@import url(nifty.css);
+@import url(node_modules/font-awesome/css/font-awesome.min.css);
+@import url(node_modules/ionicons/css/ionicons.min.css);
+@import url(node_modules/lt-themify-icons/themify-icons.css);
+@import url(node_modules/chosen-js/chosen.css);
+@import url(node_modules/select-woo/dist/css/selectWoo.min.css);
+@import url(node_modules/mapbox-gl/dist/mapbox-gl.css);
+@import url(node_modules/nouislider/distribute/nouislider.min.css);
+@import url(node_modules/codemirror/lib/codemirror.css);
+@import url(node_modules/codemirror/theme/monokai.css);
+@import url(node_modules/datatables.net-bs/css/dataTables.bootstrap.css);
+@import url(node_modules/datatables.net-responsive-bs/css/responsive.bootstrap.css);
+@import url(node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.min.css);
+@import url(node_modules/leaflet/dist/leaflet.css);
+@import url(node_modules/leaflet-draw/dist/leaflet.draw.css);
 @import url(../css/tree/tree.css);
-@import url(../node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
-@import url(../node_modules/leaflet.fullscreen/Control.FullScreen.css);
+@import url(node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
+@import url(node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
-@import "css/abstracts";
-@import "sidenav.scss";
-@import "edit-history.scss";
-@import "tree.scss";
-@import "jqtree.scss";
-@import "rdm.scss";
+@import "abstracts";
+@import "sidenav";
+@import "edit-history";
+@import "tree";
+@import "jqtree";
+@import "rdm";
 
 html {
     font-size: 0.62rem;
@@ -5154,7 +5152,7 @@ div.card-grid-item.selected {
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100%-220px);
+    width: calc(100% - 220px);
 }
 
 .no-icon {
@@ -5573,12 +5571,12 @@ div.card-grid-item.selected {
     width: 100%;
     height: 50px;
     overflow: hidden;
+    display: flex;
 }
 
 .ep-graph-title {
     font-size: 1.6rem;
     padding: 5px;
-    flex-wrap: wrap;
     align-items: center;
 }
 
@@ -11826,12 +11824,11 @@ a.filter-tools:hover {
 }
 
 .map-coordinate-editor {
-    margin-top: 15px;
+    margin-top: 5px;
 }
 
 .map-coordinate-editor-crs-selector {
-    position: fixed;
-    margin-top: 25px;
+    margin-top: 10px;
     background: #fff;
     padding-bottom: 8px;
     border-bottom: 1px solid #ddd;
@@ -11851,8 +11848,9 @@ a.filter-tools:hover {
 }
 
 .map-coordinate-editor-list {
-    padding: 0 5px;
-    margin-top: 70px;
+    padding-top: 5px;
+    padding-left: 5px;
+    overflow-y: auto;
 }
 
 .map-coordinate-editor-list a:focus i {
@@ -11896,21 +11894,18 @@ a.filter-tools:hover {
 }
 
 .map-coordinate-editor-header {
-    position: fixed;
     background: #fff;
     padding: 6px 0;
     font-size: 1.2em;
     width: 370px;
-    margin-top: -6px;
 }
 
 .map-coordinate-editor-pair.map-coordinate-editor-new-coordinates {
-    padding: 0 0px 10px 4px;
+    padding: 5px 0px 5px 4px;
 }
 
 .map-coordinate-editor-button-container {
-    position: sticky;
-    bottom: -17px;
+    display: inline-flex;
     background: #fff;
     width: 400px;
     padding: 10px 5px;
@@ -12372,7 +12367,7 @@ a.filter-tools:hover {
             .dl-horizontal {
                 display: flex;
                 flex-direction: column;
-                align-items: start;
+                align-items: flex-start;
                 margin: 10px 6px;
 
                 .rp-no-data {
