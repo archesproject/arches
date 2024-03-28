@@ -130,7 +130,7 @@ define([
                 var setSelectionData = function(data) {
                     var valueData = [];
 
-                    if (self.multiple) {
+                    if (self.multiple || Array.isArray(valueList)) {
                         if (!(data instanceof Array)) { data = [data]; }
                         
                         valueData = data.map(function(valueId) {
