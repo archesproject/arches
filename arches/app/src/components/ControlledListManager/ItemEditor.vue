@@ -6,44 +6,16 @@ import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacter
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
-import { displayedListKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
-import type { Language } from "@/types/arches";
 import type { ControlledListItem, Label } from "@/types/ControlledListManager";
 
-const props: {
-    editable: boolean,
-    itemId: string,
-    selectedLanguage: Language,
-} = defineProps(["editable", "itemId", "selectedLanguage"]);
-const { displayedList } = inject(displayedListKey);
+const { displayedRow: item } = inject(displayedRowKey);
+const selectedLanguage = inject(selectedLanguageKey);
 
 const { $gettext } = useGettext();
-
-const item = computed(() => {
-    if (!displayedList) {
-        return null;
-    }
-
-    const recurse = (items: ControlledListItem[]) => {
-        for (const item of items) {
-            if (item.id === props.itemId) {
-                return item;
-            }
-            for (const child of item.children) {
-                const maybeFound = recurse([child]);
-                if (maybeFound) {
-                    const found = (maybeFound as ControlledListItem);
-                    return found;
-                }
-            }
-        }
-    };
-
-    return recurse(displayedList.value.items);
-});
 
 const appendItemLabel = computed(() => {
     return (newLabel: Label) => { item.value.labels.push(newLabel); };
@@ -71,7 +43,10 @@ const iconLabel = (item: ControlledListItem) => {
 
 <template>
     <span class="item-header">
-        <LetterCircle :labelled="item" />
+        <LetterCircle
+            v-if="item"
+            :labelled="item"
+        />
         <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
         <span class="item-type">{{ iconLabel(item) }}</span>
     </span>

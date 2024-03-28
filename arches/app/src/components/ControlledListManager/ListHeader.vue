@@ -2,19 +2,27 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { displayedListKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const { displayedList } = inject(displayedListKey);
+const { displayedRow } = inject(displayedRowKey);
+const selectedLanguage = inject(selectedLanguageKey);
 
 const heading = computed(() => {
-    if (!displayedList) {
+    if (!displayedRow.value) {
         return $gettext("List Editor");
     }
+    if (displayedRow.value.depth === undefined) {
+        return $gettext(
+            "List Editor > %{listName}",
+            { listName: displayedRow.value.name },
+        );
+    }
     return $gettext(
-        "List Editor > %{listName}",
-        { listName: displayedList.value.name },
+        "Item Editor > %{bestLabel}",
+        { bestLabel: bestLabel(displayedRow.value, selectedLanguage.value.code).value },
     );
 });
 </script>
