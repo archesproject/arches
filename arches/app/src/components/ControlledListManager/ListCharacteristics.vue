@@ -6,7 +6,6 @@ import ListCharacteristic from "@/components/ControlledListManager/ListCharacter
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
 import { displayedListKey } from "@/components/ControlledListManager/const.ts";
 
-const props: { editable: boolean } = defineProps(["editable"]);
 const { displayedList } = inject(displayedListKey);
 
 const { $gettext } = useGettext();
@@ -17,7 +16,7 @@ const LIST_DETAILS = $gettext("List Details");
     <h3>{{ LIST_DETAILS }}</h3>
     <div>
         <ListCharacteristic
-            :editable="props.editable"
+            :editable="true"
             field="name"
             :label="$gettext('Name')"
         />

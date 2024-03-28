@@ -29,15 +29,9 @@ const props: { displayedList: ControlledList } = defineProps(["displayedList"]);
 const selectedKey: Ref<typeof TreeSelectionKeys> = defineModel("selectedKey");
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
 const selectedLanguage: Ref<Language> = defineModel("selectedLanguage");
-const editing: Ref<boolean> = defineModel("editing");
 
 const { $gettext } = useGettext();
-
-const MANAGE_LIST = $gettext("Manage List");
-const RETURN = $gettext("Return to List Manager");
-
 const lightGray = "#f4f4f4"; // todo: import from theme somewhere
-const buttonGreen = "#10b981";
 
 function itemAsNode(item: ControlledListItem): typeof TreeNode {
     return {
@@ -160,16 +154,6 @@ expandAll();
             </span>
         </template>
     </Tree>
-    <div
-        :style="{ background: lightGray }"
-    >
-        <Button
-            class="button manage-list"
-            :label="editing ? RETURN : MANAGE_LIST"
-            raised
-            @click="editing = !editing"
-        />
-    </div>
 </template>
 
 <style scoped>
@@ -196,9 +180,5 @@ a {
     font-weight: 600;
     color: white;
     text-wrap: nowrap;
-}
-.button.manage-list {
-    background: v-bind(buttonGreen);
-    border: 1px solid v-bind(buttonGreen);
 }
 </style>
