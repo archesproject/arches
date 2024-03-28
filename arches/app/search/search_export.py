@@ -25,6 +25,8 @@ from io import BytesIO
 import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
+from django.test.client import Client
+from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.urls import reverse
 from arches.app.models import models
@@ -36,7 +38,6 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.response import JSONResponse
 import arches.app.utils.zip as zip_utils
-from arches.app.views import search as SearchView
 from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
@@ -148,7 +149,13 @@ class SearchResultsExporter(object):
 
     def export(self, format, report_link):
         ret = []
-        search_res_json = SearchView.search_results(self.search_request)
+        base_url = reverse("search_results")
+        query_params = self.search_request.GET.copy()
+        query_string = urlencode(query_params)
+        search_res_url = f"{base_url}?{query_string}"
+        client = Client()
+        response = client.get(search_res_url)
+        search_res_json = response.json()
         if search_res_json.status_code == 500:
             return ret
         results = JSONDeserializer().deserialize(search_res_json.content)
