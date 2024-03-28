@@ -151,7 +151,7 @@ class BaseConceptDataType(BaseDataType):
             values_list = value.get("val", [])
 
             if values_list:
-                field_name = "tiles.data.%s" % (str(node.pk))
+                field_name = f"tiles.data.{str(node.pk)}"
                 for val in values_list:
                     match_q = Match(field=field_name, type="phrase", query=val)
 
