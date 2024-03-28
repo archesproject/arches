@@ -1,43 +1,46 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, inject, ref } from "vue";
+import { computed, provide, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
+import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
-import { displayedListKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 
+import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
 import type { Ref } from "@/types/Ref";
-import type { TreeSelectionKeys } from "primevue/tree/Tree";
 
 const lightGray = "#f4f4f4";
 const { $gettext } = useGettext();
-const LIST_SUMMARY = $gettext("List Summary");
 
-const { displayedList } = inject(displayedListKey);
+// Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
+// https://github.com/archesproject/arches/pull/10569/files#r1496212837
+const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
 
-// Key for selected item in Tree view, could be list or list item
-// e.g. { "2000000-...": true }
-const selectedKey: Ref<typeof TreeSelectionKeys> = ref({});
-const selectedTreeNodeId = computed(() => {
-    return Object.keys(selectedKey.value)[0] ?? null;
-});
+const displayedRow: Ref<Selectable | null> = ref(null);
+function setDisplayedRow(val: Selectable | null) {
+    displayedRow.value = val;
+}
+provide(displayedRowKey, { displayedRow, setDisplayedRow });
+
 const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
 );
+provide(selectedLanguageKey, selectedLanguage);
 
 const listOrItemView = computed(() => {
-    if (selectedKey.value === null  || displayedList.value === null) {
+    if (!displayedRow.value) {
         return ListCharacteristics;
     }
-    const selectedTreeNodeId = Object.keys(selectedKey.value)[0];
-    if (!selectedTreeNodeId || selectedTreeNodeId === displayedList.value.id) {
+    if ((displayedRow.value as ControlledListItem).depth === undefined) {
         return ListCharacteristics;
     }
     return ItemEditor;
@@ -48,7 +51,6 @@ const listOrItemView = computed(() => {
     <div class="list-editor-container">
         <ListHeader />
         <Splitter
-            v-if="displayedList"
             :pt="{
                 root: { style: { height: '97%' } },
                 gutter: { style: { background: lightGray } },
@@ -62,24 +64,26 @@ const listOrItemView = computed(() => {
                     root: { style: { display: 'flex', flexDirection: 'column' } },
                 }"
             >
-                <h3>{{ LIST_SUMMARY }}</h3>
-                <!-- Use a key so that on list switch, the expandAll() in ListTree.setup runs -->
-                <ListTree
-                    :key="displayedList.id"
-                    v-model:selected-key="selectedKey"
-                    v-model:selected-language="selectedLanguage"
-                    :displayed-list
-                />
+                <Suspense>
+                    <ListTree />
+                    <template #fallback>
+                        <ProgressSpinner />
+                    </template>
+                </Suspense>
             </SplitterPanel>
             <SplitterPanel
                 :size="60"
                 :min-size="25"
+                :style="{ margin: '1rem' }"
             >
                 <component
                     :is="listOrItemView"
-                    :key="selectedTreeNodeId"
-                    :item-id="selectedTreeNodeId"
-                    :selected-language="selectedLanguage"
+                    v-if="displayedRow"
+                    :key="displayedRow.id"
+                />
+                <ControlledListSplash
+                    v-else
+                    :description="SELECT_A_LIST"
                 />
             </SplitterPanel>
         </Splitter>
@@ -92,12 +96,7 @@ const listOrItemView = computed(() => {
     flex-direction: column;
     height: 100%;
 }
-h3 {
-    font-size: 1.5rem;
-    margin: 1rem;
-}
 .p-splitter-panel {
-    margin: 1rem;
     overflow-y: auto;
 }
 </style>

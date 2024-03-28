@@ -6,14 +6,14 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
-import { displayedListKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
 
 const props: {
     editable: boolean;
     field: "name" | "dynamic";
     label: string;
 } = defineProps(["editable", "field", "label"]);
-const { displayedList } = inject(displayedListKey);
+const { displayedRow } = inject(displayedRowKey);
 
 const editing = ref(false);
 const disabled = computed(() => {
@@ -24,7 +24,7 @@ const formValue = ref("");
 
 const inputValue = computed({
     get() {
-        return displayedList.value[props.field];
+        return displayedRow.value[props.field];
     },
     set(newVal: string) {
         formValue.value = newVal;
@@ -36,17 +36,17 @@ const { $gettext } = useGettext();
 
 const onSave = async () => {
     editing.value = false;
-    const originalValue = displayedList.value[props.field];
-    displayedList.value[props.field] = formValue.value;
-    const success = await postListToServer(displayedList.value, toast, $gettext);
+    const originalValue = displayedRow.value[props.field];
+    displayedRow.value[props.field] = formValue.value;
+    const success = await postListToServer(displayedRow.value, toast, $gettext);
     if (!success) {
-        displayedList.value[props.field] = originalValue;
+        displayedRow.value[props.field] = originalValue;
     }
 };
 
 const onCancel = () => {
     editing.value = false;
-    formValue.value = displayedList.value[props.field];
+    formValue.value = displayedRow.value[props.field];
 };
 </script>
 

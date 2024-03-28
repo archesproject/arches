@@ -4,9 +4,9 @@ import { useGettext } from "vue3-gettext";
 
 import ListCharacteristic from "@/components/ControlledListManager/ListCharacteristic.vue";
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
-import { displayedListKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
 
-const { displayedList } = inject(displayedListKey);
+const { displayedRow } = inject(displayedRowKey);
 
 const { $gettext } = useGettext();
 const LIST_DETAILS = $gettext("List Details");
@@ -31,7 +31,7 @@ const LIST_DETAILS = $gettext("List Details");
         </h4>
         <div class="nodes">
             <div
-                v-for="node in displayedList.nodes"
+                v-for="node in displayedRow.nodes"
                 :key="node.id"
             >
                 <ReferenceNodeLink :node />
