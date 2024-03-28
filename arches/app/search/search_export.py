@@ -25,6 +25,8 @@ from io import BytesIO
 import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
+from django.test.client import Client
+from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.urls import reverse
 from arches.app.models import models
