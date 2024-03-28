@@ -155,12 +155,13 @@ class BaseConceptDataType(BaseDataType):
                 for val in values_list:
                     match_q = Match(field=field_name, type="phrase", query=val)
 
-                    if match_any:
-                        query.should(match_q)
-                    elif match_any is False:
-                        query.must(match_q)
-                    elif match_any is None:
-                        query.must_not(match_q)
+                    match match_any:
+                        case True:
+                            query.should(match_q)
+                        case False:
+                            query.must(match_q)
+                        case None:
+                            query.must_not(match_q)
                 query.filter(Exists(field=field_name))
         
         except KeyError as e:
