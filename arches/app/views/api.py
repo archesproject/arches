@@ -401,7 +401,11 @@ class MVT(APIBase):
 
     def create_mvt_cache_key(node, zoom, x, y, user, mvt_snapshot=None):
         if not mvt_snapshot:
-            mvt_snapshot = models.EditLog.objects.filter(nodegroupid=str(node.nodegroup_id)).count()
+            mvt_snapshot = (
+                cache.get(f'editlog_nodegroupid_{str(node.nodegroup_id)}_count')
+                or
+                models.EditLog.objects.filter(nodegroupid=str(node.nodegroup_id)).count()
+            )
         return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{mvt_snapshot}_{user.id}"
 
 @method_decorator(csrf_exempt, name="dispatch")
