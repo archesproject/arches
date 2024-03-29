@@ -1825,7 +1825,11 @@ class Graph(models.GraphModel):
             raise GraphValidationError(_("The json-ld context you supplied wasn't formatted correctly."), 1006)
 
         if self.slug is not None:
-            graphs_with_matching_slug = models.GraphModel.objects.exclude(slug__isnull=True).filter(slug=self.slug)
+            graphs_with_matching_slug = (
+                models.GraphModel.objects.exclude(slug__isnull=True)
+                .exclude(source_identifier__isnull=False)
+                .filter(slug=self.slug)
+            )
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 if self.source_identifier_id:
                     if self.source_identifier_id != graphs_with_matching_slug[0].graphid:
