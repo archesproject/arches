@@ -155,13 +155,57 @@ const deleteLists = async (listIds: string[]) => {
     }
 };
 
+const deleteItems = async (itemIds: string[]) => {
+    if (!itemIds.length) {
+        return;
+    }
+    const promises = itemIds.map((id) =>
+        fetch(arches.urls.controlled_list_item(id), {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+        })
+    );
+
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            setDisplayedRow(null);
+        }
+        responses.forEach(async (response) => {
+            if (!response.ok) {
+                const body = await response.json();
+                toast.add({
+                    severity: ERROR,
+                    summary: $gettext("Item deletion failed"),
+                    detail: body.message,
+                });
+            }
+        });
+    } catch {
+        toast.add({
+            severity: ERROR,
+            summary: $gettext("Item deletion failed"),
+        });
+    }
+};
+
+
 const onDelete = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const toDelete = Object.keys(selectedKeys.value);
+    const toDelete = Object.entries(selectedKeys.value).filter(
+        ([key, data]) => (data as any).checked
+    ).map(([id, data]) => id);
     selectedKeys.value = {};
-    await deleteLists(toDelete);
+
+    const allListIds = controlledListItemsTree.value.map((node: typeof TreeNode) => node.data.id);
+    const listsToDelete = toDelete.filter(id => allListIds.includes(id));
+    const itemsToDelete = toDelete.filter(id => !listsToDelete.includes(id));
+    await deleteItems(itemsToDelete);
+    await deleteLists(listsToDelete);
     await fetchLists();
 };
 
@@ -181,7 +225,7 @@ await fetchLists();
         <!-- We might want an are you sure? modal -->
         <Button
             class="list-button"
-            :label="$ngettext('Delete List', 'Delete Lists', Object.keys(selectedKeys ?? {}).length)"
+            :label="$gettext('Delete')"
             raised
             :disabled="!Object.keys(selectedKeys).length"
             :pt="{ root: { style: { background: buttonPink } } }"
