@@ -3,7 +3,7 @@
 import arches.app.models.fields.i18n
 import datetime
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations, models, connection
 import django.db.models.deletion
 import re
 import uuid
@@ -15,6 +15,30 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("models", "9511_update_tile_nodegroup_reference"),
     ]
+
+    def delete_editable_future_graphs(apps, schema_editor):
+        with connection.cursor() as cursor:
+            cursor.execute("ALTER TABLE graphs DISABLE TRIGGER ALL;")
+            
+            cursor.execute("DELETE FROM graphs WHERE source_identifier IS NOT NULL;")
+            cursor.execute("DELETE FROM nodes WHERE source_identifier IS NOT NULL;")
+            cursor.execute("DELETE FROM edges WHERE source_identifier IS NOT NULL;")
+            cursor.execute("DELETE FROM cards WHERE source_identifier IS NOT NULL;")
+            cursor.execute("DELETE FROM cards_x_nodes_x_widgets WHERE source_identifier IS NOT NULL;")
+            cursor.execute("""
+                DELETE FROM node_groups
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM nodes
+                    WHERE nodes.nodegroupid = node_groups.nodegroupid
+                );
+            """)
+
+            cursor.execute("ALTER TABLE graphs ENABLE TRIGGER ALL;")
+
+    def create_editable_future_graphs(apps, schema_editor):
+        # the `create_editable_future_graph` function is not available when importing `Graph` via `apps.get_model()`
+        pass
 
     operations = [
         migrations.CreateModel(
@@ -60,4 +84,5 @@ class Migration(migrations.Migration):
             name='slug',
             field=models.TextField(null=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), 'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.', 'invalid')]),
         ),
+        migrations.RunPython(create_editable_future_graphs, delete_editable_future_graphs),
     ]

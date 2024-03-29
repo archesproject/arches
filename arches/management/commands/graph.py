@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.core.management.base import BaseCommand
 from arches.app.models.graph import Graph
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import connection, transaction
 
 
 class Command(BaseCommand):
@@ -94,14 +94,15 @@ class Command(BaseCommand):
     def create_editable_future_graphs(self):
         print("\nBEGIN Create editable_future_graphs...")
 
-        for graph in self.graphs:
-            print("\nCreating editable_future_graph for %s..." % graph.name)
-            graph.create_editable_future_graph()
+        with transaction.atomic():
+            for graph in self.graphs:
+                print("\nCreating editable_future_graph for %s..." % graph.name)
+                graph.create_editable_future_graph()
 
-            print("\n%s has been updated! Creating a new publication for %s." % (graph.name, graph.name))
-            graph.publish()
+                print("%s has been updated! Creating a new publication for %s." % (graph.name, graph.name))
+                graph.publish()
 
-        print("\nEND Create editable_future_graphs. Success!")
+            print("\nEND Create editable_future_graphs. Success!")
 
 
     def publish(self, username):
