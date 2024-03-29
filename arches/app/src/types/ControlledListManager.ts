@@ -27,6 +27,10 @@ export type ControlledListItem = {
     depth: number,
 };
 
+export type NewItem = {
+    parent_id: string,  // list or item
+};
+
 export type ControlledList = {
     id: string,
     name: string,
