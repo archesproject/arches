@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import TYPE_CHECKING
@@ -26,6 +27,8 @@ from arches.app.utils.string_utils import str_to_bool
 
 if TYPE_CHECKING:
     from uuid import UUID
+
+logger = logging.getLogger(__name__)
 
 
 def serialize(obj, depth_map=None, flat=False, nodes=False):
@@ -316,37 +319,45 @@ class ControlledListView(View):
 class ControlledListItemView(View):
     def add_new_item(self, request):
         data = JSONDeserializer().deserialize(request.body)
+        parent_id = data["parent_id"]
 
+        # The front end shows lists and items in the same tree, and when
+        # sending the parent id to the endpoint, it doesn't really know
+        # if the parent is a list or an item. The backend does care whether
+        # the parent is a list or an item, so we figure it out here.
         try:
-            lst = (
-                ControlledList.objects.filter(pk=data["list_id"])
-                .annotate(max_sortorder=Max("items__sortorder"))
-                .get()
-            )
-        except ControlledList.DoesNotExist:
-            return JSONErrorResponse(status=404)
-
-        if lst.max_sortorder is None:
-            sortorder = 0
-        else:
-            sortorder = lst.max_sortorder + 1
+            controlled_list_id = ControlledListItem.objects.get(
+                pk=parent_id
+            ).controlled_list_id
+        except ControlledListItem.DoesNotExist:
+            controlled_list_id = parent_id
 
         try:
             with transaction.atomic():
-                item = ControlledListItem(
-                    list=lst,
-                    sortorder=sortorder,
-                    parent_id=data.get("parent_id", None),
+                controlled_list = (
+                    ControlledList.objects.filter(pk=controlled_list_id)
+                    .annotate(
+                        max_sortorder=Max(
+                            "controlled_list_items__sortorder", default=-1
+                        )
+                    )
+                    .get()
                 )
-                item.save()
-                label = ControlledListItemLabel(
-                    item=item,
+                item = ControlledListItem.objects.create(
+                    controlled_list=controlled_list,
+                    sortorder=controlled_list.max_sortorder + 1,
+                    parent_id=None if controlled_list_id == parent_id else parent_id,
+                )
+                ControlledListItemLabel.objects.create(
+                    controlled_list_item=item,
                     value=_("New Label: ") + datetime.now().isoformat(),
                     value_type_id="prefLabel",
                     language_id=get_language(),
                 )
-                label.save()
-        except:
+        except ControlledList.DoesNotExist:
+            return JSONErrorResponse(status=404)
+        except Exception as e:
+            logger.error(e)
             return JSONErrorResponse()
 
         return JSONResponse(serialize(item))

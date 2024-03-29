@@ -1,4 +1,5 @@
 import json
+import uuid
 from collections import defaultdict
 
 from django.contrib.auth.models import Group, User
@@ -18,6 +19,17 @@ from arches.app.models.models import (
 )
 from arches.app.views.controlled_lists import serialize
 from tests.base_test import ArchesTestCase
+
+# these tests can be run from the command line via
+# python manage.py test tests.views.controlled_lists_tests --settings="tests.test_settings"
+
+
+SYNCED_PK = uuid.uuid4()
+
+
+def sync_pk_for_comparison(item):
+    item.pk = SYNCED_PK
+    return item
 
 
 class ControlledListTests(ArchesTestCase):
@@ -57,7 +69,9 @@ class ControlledListTests(ArchesTestCase):
             ]
             + [
                 ControlledListItem(
-                    uri=f"https://getty.edu/{num}", controlled_list=cls.list2, sortorder=num
+                    uri=f"https://getty.edu/{num}",
+                    controlled_list=cls.list2,
+                    sortorder=num,
                 )
                 for num in range(5)
             ]
@@ -66,9 +80,9 @@ class ControlledListTests(ArchesTestCase):
         parent = ControlledListItem.objects.get(
             controlled_list=cls.list2, uri="https://getty.edu/0"
         )
-        for child in ControlledListItem.objects.filter(controlled_list=cls.list2).exclude(
-            pk=parent.pk
-        ):
+        for child in ControlledListItem.objects.filter(
+            controlled_list=cls.list2
+        ).exclude(pk=parent.pk):
             child.parent = parent
             child.save()
 
@@ -79,7 +93,9 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     value_type=cls.pref_label,
-                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list1)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(
+                        controlled_list=cls.list1
+                    )[num],
                 )
                 for num in range(5)
             ]
@@ -88,7 +104,9 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     value_type=cls.alt_label,
-                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list1)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(
+                        controlled_list=cls.list1
+                    )[num],
                 )
                 for num in range(5)
             ]
@@ -97,7 +115,9 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     value_type=cls.pref_label,
-                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list2)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(
+                        controlled_list=cls.list2
+                    )[num],
                 )
                 for num in range(5)
             ]
@@ -106,7 +126,9 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     value_type=cls.alt_label,
-                    controlled_list_item=ControlledListItem.objects.filter(controlled_list=cls.list2)[num],
+                    controlled_list_item=ControlledListItem.objects.filter(
+                        controlled_list=cls.list2
+                    )[num],
                 )
                 for num in range(5)
             ]
@@ -223,6 +245,46 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(ControlledList.objects.count(), 1)
         self.assertEqual(ControlledList.objects.first().pk, self.list2.pk)
 
+    def test_create_list_item(self):
+        self.client.force_login(self.admin)
+        existing_pks = [item.pk for item in self.list1.controlled_list_items.all()]
+
+        self.client.post(
+            reverse("controlled_list_item_add"),
+            {"parent_id": str(self.list1.pk)},
+            content_type="application/json",
+        )
+
+        self.assertQuerySetEqual(
+            self.list1.controlled_list_items.exclude(pk__in=existing_pks),
+            [ControlledListItem(pk=SYNCED_PK, controlled_list=self.list1, sortorder=5)],
+            transform=sync_pk_for_comparison,
+        )
+
+    def test_create_list_item_nested(self):
+        self.client.force_login(self.admin)
+        existing_pks = [item.pk for item in self.list1.controlled_list_items.all()]
+
+        parent_item = self.list1.controlled_list_items.order_by("uri").first()
+        self.client.post(
+            reverse("controlled_list_item_add"),
+            {"parent_id": str(parent_item.pk)},
+            content_type="application/json",
+        )
+
+        self.assertQuerySetEqual(
+            self.list1.controlled_list_items.exclude(pk__in=existing_pks),
+            [
+                ControlledListItem(
+                    pk=SYNCED_PK,
+                    controlled_list=self.list1,
+                    sortorder=5,
+                    parent_id=parent_item.pk,
+                )
+            ],
+            transform=sync_pk_for_comparison,
+        )
+
     def test_reorder_list_items_valid(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, depth_map=defaultdict(int))
@@ -238,9 +300,9 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(
             [
                 item.sortorder
-                for item in ControlledListItem.objects.filter(controlled_list=self.list1).order_by(
-                    "uri"
-                )
+                for item in ControlledListItem.objects.filter(
+                    controlled_list=self.list1
+                ).order_by("uri")
             ],
             [1, 0, 2, 3, 4],
         )
