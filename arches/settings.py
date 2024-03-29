@@ -17,9 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import inspect
-import json
 import os
-import sys
 from datetime import datetime, timedelta
 from contextlib import suppress
 
@@ -312,7 +310,6 @@ TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -357,8 +354,9 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    "compressor",
 )
+
+ARCHES_APPLICATIONS = ()
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -501,7 +499,10 @@ DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 TIMEWHEEL_DATE_TIERS = None
 
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
-CACHE_BY_USER = {"anonymous": 3600 * 24}
+CACHE_BY_USER = {
+    "default": 3600 * 24, #24hrs
+    "anonymous": 3600 * 24 #24hrs
+    }
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
@@ -691,8 +692,6 @@ CANTALOUPE_DIR = os.path.join(ROOT_DIR, UPLOADED_FILES_DIR)
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
 ACCESSIBILITY_MODE = False
-
-COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
 
 # Dictionary containing any additional context items for customising email templates
 with suppress(NameError):  # need to suppress i18n NameError for test runner

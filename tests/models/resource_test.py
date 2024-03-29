@@ -47,6 +47,8 @@ from tests.base_test import ArchesTestCase
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         LanguageSynchronizer.synchronize_settings_with_db()
 
         models.ResourceInstance.objects.all().delete()
@@ -144,6 +146,7 @@ class ResourceTests(ArchesTestCase):
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
         cls.user.delete()
+        super().tearDownClass()
 
     def test_get_node_value_string(self):
         """
@@ -268,8 +271,6 @@ class ResourceTests(ArchesTestCase):
         r2 = Resource(graph_id=self.search_model_graphid)
         r1.save()
         r2.save()
-        self.addCleanup(r1.delete)
-        self.addCleanup(r2.delete)
 
         # Ensure we start from scratch
         r1.descriptor_function = None
@@ -282,3 +283,75 @@ class ResourceTests(ArchesTestCase):
             q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
         ]
         self.assertEqual(len(function_x_graph_selects), 1)
+
+    def test_self_referring_resource_instance_descriptor(self):
+        # Create a nodegroup with a string node and a resource-instance node.
+        graph = Graph.new(name="Self-referring descriptor test", is_resource=True)
+        node_group = models.NodeGroup.objects.create()
+        string_node = models.Node.objects.create(
+            graph=graph,
+            nodegroup=node_group,
+            name="String Node",
+            datatype="string",
+            istopnode=False,
+        )
+        resource_instance_node = models.Node.objects.create(
+            graph=graph,
+            nodegroup=node_group,
+            name="Resource Node",
+            datatype="resource-instance",
+            istopnode=False,
+        )
+
+        # Configure the primary descriptor to use the string node
+        models.FunctionXGraph.objects.create(
+            graph=graph,
+            function_id="60000000-0000-0000-0000-000000000001",
+            config={
+                "descriptor_types": {
+                    "name": {
+                        "nodegroup_id": str(node_group.nodegroupid),
+                        # The bug report did not have <Resource Node> in the descriptor
+                        # template, but including it here to allow the assertion to fail
+                        "string_template": "<String Node> <Resource Node>",
+                    },
+                    "map_popup": {
+                        "nodegroup_id": None,
+                        "string_template": "",
+                    },
+                    "description": {
+                        "nodegroup_id": None,
+                        "string_template": "",
+                    },
+                },
+            },
+        )
+
+        # Create a tile that references itself
+        resource = models.ResourceInstance.objects.create(graph=graph)
+        tile = models.TileModel.objects.create(
+            nodegroup=node_group,
+            resourceinstance=resource,
+            data={
+                str(string_node.pk): {
+                    "en": {"value": "test value", "direction": "ltr"},
+                },
+                str(resource_instance_node.pk): {
+                    "resourceId": str(resource.pk),
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                },
+            },
+            sortorder=0,
+        )
+        models.ResourceXResource.objects.create(
+            nodeid=resource_instance_node,
+            resourceinstanceidfrom=resource,
+            resourceinstanceidto=resource,
+            tileid=tile,
+        )
+        r = Resource.objects.get(pk=resource.pk)
+        r.save_descriptors()
+
+        # Until 7.4, a RecursionError was caught after this value was repeated many times.
+        self.assertEqual(r.displayname(), "test value ")

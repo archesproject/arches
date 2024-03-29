@@ -98,10 +98,10 @@ define([
             }
 
             /* cached workflowComponentAbstract logic */ 
-            if (config.workflowHistory.stepData) {
-                const stepData = config.workflowHistory[ko.unwrap(self.name)];
-                self.componentIdLookup(stepData[COMPONENT_ID_LOOKUP_LABEL]);
-                self.locked(config.workflowHistory.stepdata.locked);
+            if (config.workflowHistory.stepdata) {
+                const stepData = config.workflowHistory.stepdata[ko.unwrap(self.name)];
+                self.componentIdLookup(stepData?.[COMPONENT_ID_LOOKUP_LABEL]);
+                self.locked(stepData?.locked);
             }
     
             /* cached informationBox logic */
@@ -130,10 +130,10 @@ define([
 
         this.updateWorkflowComponentAbstractLookup = function(workflowComponentAbtractData) {
             var workflowComponentAbstractLookup = self.workflowComponentAbstractLookup();
-            var workflowComponentAbstractId = self.id();
+            var workflowComponentAbstractId = null;
 
-            if (config.workflowHistory.stepData) {
-                const componentIdLookup = config.workflowHistory.stepData[COMPONENT_ID_LOOKUP_LABEL];
+            if (config.workflowHistory.stepdata) {
+                const componentIdLookup = config.workflowHistory.stepdata?.[ko.unwrap(self.name)]?.[COMPONENT_ID_LOOKUP_LABEL];
                 if (componentIdLookup) {
                     workflowComponentAbstractId = componentIdLookup[workflowComponentAbtractData.uniqueInstanceName];
                 }
@@ -214,6 +214,7 @@ define([
                     [ko.unwrap(self.name)]: {
                         [key]: value,
                         locked: self.locked(),
+                        stepId: self.id(),
                     },
                 },
             };

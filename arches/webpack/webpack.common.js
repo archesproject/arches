@@ -14,12 +14,21 @@ const { VueLoaderPlugin } = require("vue-loader");
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
-const { buildVueFilePathLookup } = require('./webpack-utils/build-vue-filepath-lookup');
-
+const { buildCSSFilepathLookup } = require('./webpack-utils/build-css-filepath-lookup');
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
         const createWebpackConfig = function(data) {  // reads from application's settings.py
+            if (!data) {
+                console.error(
+                    '\x1b[31m%s\x1b[0m',  // red
+                    "Webpack did not receive application data! Aborting..."
+                )
+                return;
+            }
+            // prevents subsequent builds, this usually happens when using application containers.
+            projectSettings.stdout.removeAllListeners()
+
             const parsedData = JSON.parse(data);
             console.log('Data imported from settings.py:', parsedData)
             
@@ -60,21 +69,25 @@ module.exports = () => {
                 return acc;
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
+            // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
             const javascriptRelativeFilepathToAbsoluteFilepathLookup = { 
                 ...archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup,
+                ...archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup,
                 ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup,
-                ...archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup
             };
 
             // END create JavaScript filepath lookups
             // BEGIN create node modules aliases
+            const parsedPackageJSONFilepaths = {};
+
             let archesCorePackageJSONFilepath = Path.resolve(__dirname, ROOT_DIR, '../package.json')
             if (!fs.existsSync(archesCorePackageJSONFilepath)) {
                 archesCorePackageJSONFilepath = Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'arches', 'package.json')
             }
 
             const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
+            parsedPackageJSONFilepaths[Path.join(archesCorePackageJSON.name, 'package.json').replace(/\\/g, '/')] = archesCorePackageJSONFilepath;
+
             const parsedArchesCoreNodeModulesAliases = Object.entries(archesCorePackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
                 if (subPath.slice(0, 7) === 'plugins') {  // handles for node_modules -esque plugins in arches core
                     acc[alias] = Path.resolve(__dirname, ROOT_DIR, 'app', 'media', subPath);
@@ -85,10 +98,14 @@ module.exports = () => {
                 return acc;
             }, {});
 
+            let parsedProjectNodeModulesAliases = {};
+            let projectPackageJSON;
+
             const projectJSONFilepath = Path.resolve(__dirname, APP_ROOT, 'package.json');
-            let parsedProjectNodeModulesAliases = {}
             if (fs.existsSync(projectJSONFilepath)) {  // handles running Arches without a project
-                const projectPackageJSON = require(projectJSONFilepath);
+                projectPackageJSON = require(projectJSONFilepath);
+                parsedPackageJSONFilepaths[Path.join(projectPackageJSON.name, 'package.json').replace(/\\/g, '/')] = projectJSONFilepath;
+
                 parsedProjectNodeModulesAliases = Object.entries(projectPackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
                     if (parsedArchesCoreNodeModulesAliases[alias]) {
                         console.warn(
@@ -106,17 +123,19 @@ module.exports = () => {
             let parsedArchesApplicationsNodeModulesAliases = {};
             for (const archesApplication of ARCHES_APPLICATIONS) {
                 try {
-                    let filepath;
+                    let archesApplicationJSONFilepath;
 
                     if (!ARCHES_APPLICATIONS_PATHS[archesApplication].includes('site-packages')) {  
                         // if the path doesn't include site-packages then we can assume it's linked via egg/wheel
-                        filepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], '..', 'package.json');
+                        archesApplicationJSONFilepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], '..', 'package.json');
                     }
                     else {
-                        filepath = Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', archesApplication, 'package.json')
+                        archesApplicationJSONFilepath = Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', archesApplication, 'package.json')
                     }
+                    
+                    const archesApplicationPackageJSON = require(archesApplicationJSONFilepath);
+                    parsedPackageJSONFilepaths[Path.join(archesApplicationPackageJSON.name, 'package.json').replace(/\\/g, '/')] = archesApplicationJSONFilepath;
 
-                    const archesApplicationPackageJSON = require(filepath);
                     for (const [alias, subPath] of Object.entries(archesApplicationPackageJSON['nodeModulesPaths'])) {
                         if (
                             parsedArchesApplicationsNodeModulesAliases[alias]
@@ -137,11 +156,11 @@ module.exports = () => {
                 }
             }
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
+            // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
             const nodeModulesAliases = {
                 ...parsedArchesCoreNodeModulesAliases,
+                ...parsedArchesApplicationsNodeModulesAliases,
                 ...parsedProjectNodeModulesAliases,
-                ...parsedArchesApplicationsNodeModulesAliases
             };
 
             // END create node modules aliases
@@ -157,11 +176,11 @@ module.exports = () => {
                 };
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
+            // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
             const templateFilepathLookup = { 
                 ...coreArchesTemplatePathConfiguration,
+                ...archesApplicationsTemplatePathConfiguration,
                 ...projectTemplatePathConfiguration,
-                ...archesApplicationsTemplatePathConfiguration
             };
 
             // END create template filepath lookup
@@ -177,36 +196,45 @@ module.exports = () => {
                 };
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
+            // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
             const imageFilepathLookup = { 
                 ...coreArchesImagePathConfiguration,
+                ...archesApplicationsImagePathConfiguration,
                 ...projectImagePathConfiguration,
-                ...archesApplicationsImagePathConfiguration
             };
 
             // END create image filepath lookup
-            // BEGIN create vue filepath lookup
+            // BEGIN create CSS filepath lookup
 
-            const coreArchesVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'src'), {});
-            const projectVuePathConfiguration = buildVueFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'src'), {});
+            const coreArchesCSSFilepathConfiguration = buildCSSFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'), {});
+            const projectCSSFilepathConfiguration = buildCSSFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'css'), {});
 
-            const archesApplicationsVuePaths = []
-            const archesApplicationsVuePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
-                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'src');
-                archesApplicationsVuePaths.push(path);
+            const archesApplicationsCSSFilepaths = [];
+            const archesApplicationsCSSFilepathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
+                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'css');
+                archesApplicationsCSSFilepaths.push(path);
 
                 return {
                     ...acc,
-                    ...buildVueFilePathLookup(path, {})
+                    ...buildCSSFilepathLookup(path, {})
                 };
             }, {});
 
-            // order is important! Arches core files are overwritten by project files, project files are overwritten by archesApplication files
-            const vueFilepathLookup = { 
-                ...coreArchesVuePathConfiguration,
-                ...projectVuePathConfiguration,
-                ...archesApplicationsVuePathConfiguration
+            const CSSFilepathLookup = {
+                ...coreArchesCSSFilepathConfiguration,
+                ...archesApplicationsCSSFilepathConfiguration,
+                ...projectCSSFilepathConfiguration,
             };
+
+            // END create CSS filepath lookup
+            // BEGIN create vue filepath lookup
+
+            const archesApplicationsVuePaths = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => { 
+                const path = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'src');
+                acc.push(path);
+                
+                return acc;
+            }, []);
 
             // END create vue filepath lookup
             // BEGIN create universal constants
@@ -233,9 +261,9 @@ module.exports = () => {
             resolve({
                 entry: { 
                     ...archesCoreEntryPointConfiguration,
-                    ...projectEntryPointConfiguration,
                     ...archesApplicationsEntrypointConfiguration,
-                    ...vueFilepathLookup,
+                    ...projectEntryPointConfiguration,
+                    ...CSSFilepathLookup,
                 },
                 devServer: {
                     port: WEBPACK_DEVELOPMENT_SERVER_PORT,
@@ -245,10 +273,16 @@ module.exports = () => {
                     publicPath: STATIC_URL,
                     libraryTarget: 'amd-require',
                     clean: true,
+                    assetModuleFilename: 'img/[hash][ext][query]',
                 },
                 plugins: [
                     new CleanWebpackPlugin(),
                     new webpack.DefinePlugin(universalConstants),
+                    new webpack.DefinePlugin({
+                        __VUE_OPTIONS_API__: 'true',
+                        __VUE_PROD_DEVTOOLS__: 'false',
+                        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+                    }),
                     new webpack.ProvidePlugin({
                         $:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
                         jQuery:  Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules', 'jquery', 'dist', 'jquery.min'),
@@ -257,24 +291,6 @@ module.exports = () => {
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
                     new VueLoaderPlugin(),
-                    {
-                        apply: (compiler) => {
-                            compiler.hooks.afterEmit.tap("webpack", () => {
-                                fs.writeFile(
-                                    Path.resolve(__dirname, APP_ROOT, 'media', 'build', '.gitignore'), 
-                                    "# Ignore everything in this directory\n*\n# Except this file\n!.gitignore\n",
-                                     err => {
-                                        if (err) {
-                                            console.error(
-                                                '\x1b[31m%s\x1b[0m',  // red
-                                                err
-                                            );
-                                        }
-                                    }
-                                );
-                            });
-                        },
-                    },
                 ],
                 resolveLoader: {
                     alias: {
@@ -287,16 +303,27 @@ module.exports = () => {
                         ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                         ...templateFilepathLookup,
                         ...imageFilepathLookup,
-                        ...vueFilepathLookup,
                         ...nodeModulesAliases,
-                        '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')]
+                        ...parsedPackageJSONFilepaths,
+                        '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
+                        'node_modules': Path.resolve(__dirname, APP_ROOT, 'media', 'node_modules')
                     },
                 },
                 module: {
                     rules: [
                         {
+                            test: /\.tsx?$/,
+                            exclude: /node_modules/,
+                            loader: Path.join(APP_ROOT, 'media', 'node_modules', 'ts-loader'),
+                            options: { 
+                                appendTsSuffixTo: [/\.vue$/],
+                                transpileOnly: true
+                            }
+                        },
+                        {
                             test: /\.vue$/,
-                            loader: Path.join(APP_ROOT, 'media', 'node_modules', 'vue-loader'),
+                            exclude: /node_modules/,
+                            loader:Path.join(APP_ROOT, 'media', 'node_modules', 'vue-loader'),
                         },
                         {
                             test: /\.mjs$/,
@@ -314,6 +341,12 @@ module.exports = () => {
                         },
                         {
                             test: /\.css$/,
+                            exclude: [
+                                /node_modules/,
+                                Path.resolve(__dirname, APP_ROOT, 'media', 'css'),
+                                Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'),
+                                ...archesApplicationsCSSFilepaths
+                            ],
                             use: [
                                 {
                                     'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'style-loader'),
@@ -324,7 +357,13 @@ module.exports = () => {
                             ],
                         },
                         {
-                            test: /\.scss$/i,
+                            test: /\.s?css$/i,
+                            exclude: [
+                                /node_modules/,
+                                Path.resolve(__dirname, APP_ROOT, 'src'),
+                                Path.resolve(__dirname, ROOT_DIR, 'app', 'src'),
+                                ...archesApplicationsVuePaths,
+                            ],
                             use: [
                                 {
                                     'loader': MiniCssExtractPlugin.loader,
@@ -337,11 +376,22 @@ module.exports = () => {
                                 },
                                 {
                                     'loader': Path.join(APP_ROOT, 'media', 'node_modules', 'sass-loader'),
+                                    options: {
+                                        sassOptions: {
+                                            indentWidth: 4,
+                                            includePaths: [
+                                                Path.resolve(__dirname, APP_ROOT, 'media', 'css'),
+                                                ...archesApplicationsCSSFilepaths,
+                                                Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'),
+                                            ],
+                                        },
+                                    },
                                 }
                             ],
                         },
                         {
                             test: /\.html?$/i,
+                            exclude: /node_modules/,
                             loader: Path.join(APP_ROOT, 'media', 'node_modules', 'html-loader'),
                             options: {
                                 esModule: false,
@@ -353,16 +403,17 @@ module.exports = () => {
 
                                     let templatePath;
 
+                                    if (resourcePath.includes(APP_ROOT)) {  // project-level component
+                                        templatePath = resourcePath.split(APP_ROOT)[1];
+                                    }
+
                                     for (const archesApplicationPath of Object.values(ARCHES_APPLICATIONS_PATHS)) {  // arches application component
-                                        if (resourcePath.includes(archesApplicationPath)) {
+                                        if (!templatePath && resourcePath.includes(archesApplicationPath)) {
                                             templatePath = resourcePath.split(archesApplicationPath)[1];
                                         }
                                     }
 
-                                    if (!templatePath && resourcePath.includes(APP_ROOT)) {  // project-level component
-                                        templatePath = resourcePath.split(APP_ROOT)[1];
-                                    }
-                                    else if (!templatePath) {  // arches core component
+                                    if (!templatePath) {  // arches core component
                                         templatePath = resourcePath.split(Path.join(ROOT_DIR, 'app'))[1];
                                     }
 
@@ -431,10 +482,12 @@ module.exports = () => {
                         },
                         {
                             test: /\.(txt|DS_Store)$/i,
+                            exclude: /node_modules/,
                             use: Path.join(APP_ROOT, 'media', 'node_modules', 'raw-loader'),
                         },
                         {
                             test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                            exclude: /node_modules/,
                             type: 'asset/resource',
                         },
                     ],

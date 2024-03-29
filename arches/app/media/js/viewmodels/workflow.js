@@ -130,7 +130,7 @@ define([
             var stepName = ko.unwrap(stepConfigData.name);
             if (stepConfigData.workflowHistory.stepdata?.[stepName]) {
                 // stepdata might exist without this specific stepName if injected
-                stepConfigData.id = Object.values(stepConfigData.workflowHistory.stepdata[stepName].componentIdLookup)[0];
+                stepConfigData.id = stepConfigData.workflowHistory.stepdata[stepName].stepId;
             }
 
             stepConfigData.informationBoxDisplayed = ko.observable(self.getInformationBoxDisplayedStateFromLocalStorage(stepName));
@@ -448,8 +448,8 @@ define([
             self.alert(
                 new AlertViewModel(
                     'ep-alert-red',
-                    'Are you sure you would like to delete this workflow?',
-                    'All data created during the course of this workflow will be deleted.',
+                    arches.translations.deleteWorkflowTitle,
+                    arches.translations.deleteWorkflowWarning,
                     function(){}, //does nothing when canceled
                     self.reverseWorkflowTransactions,
                 )

@@ -146,7 +146,7 @@
         <!-- /ko -->
         <!-- ko if: numberOfTiles() > 0 -->
         <h3 style="margin-top: 0px;">
-            <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>5?5:numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
+            <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>previewLimit()?previewLimit():numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
         </h3>
         <h3 style="margin-top: 0px;color:red;" data-bind="if: numberOfTiles() > config.updateLimit">
             <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.bulkEditLimitWarning(config.updateLimit.toLocaleString())"></span>
@@ -274,7 +274,7 @@
             <div data-bind="foreach: statusDetails">
                 <div data-bind="text: $data"></div>
             </div>
-            <div data-bind="ifnot: ['indexed','failed'].includes(selectedLoadEvent().status)">
+            <div data-bind="ifnot: ['indexed','failed','cancelled','unloaded'].includes(selectedLoadEvent().status)">
                 <i class="fa fa-spin fa-spinner fa-lg"></i>
             </div>
             <!-- /ko -->

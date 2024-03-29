@@ -1,12 +1,15 @@
 import uuid
 import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.urls import reverse
 from django.test.client import Client
 
 from arches.app.models.models import WorkflowHistory
 from tests.base_test import ArchesTestCase
+
+# these tests can be run from the command line via
+# python manage.py test tests.views.workflow_tests --settings="tests.test_settings"
 
 
 class WorkflowHistoryTests(ArchesTestCase):
@@ -15,6 +18,9 @@ class WorkflowHistoryTests(ArchesTestCase):
         cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
+        cls.editor = User.objects.create_user(username="editor", email="editor@resources.com", password="Test12345!")
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(cls.editor)
         super().setUpClass()
 
     def setUp(self):
@@ -30,6 +36,7 @@ class WorkflowHistoryTests(ArchesTestCase):
                     "componentIdLookup": {
                         "project-name": "84d0578f-6061-4015-a44d-c7b64cdb0551",
                     },
+                    "stepId": "d0d644c2-3bbb-4f9c-aa52-4a4c1c544d07",
                     "locked": False,
                 },
                 # etc...
@@ -72,7 +79,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         response = self.client.get(reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}))
 
         self.assertEqual(response.status_code, 403)
-        self.assertIn(b"Permission Denied", response.content)
+        self.assertIn(b"Forbidden", response.content)
 
         self.client.force_login(self.admin)
         response = self.client.get(reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}))
@@ -82,13 +89,6 @@ class WorkflowHistoryTests(ArchesTestCase):
 
     def test_post_workflow_history(self):
         """Partial updates of componentdata and stepdata are allowed."""
-        self.client.force_login(self.anonymous)
-        response = self.client.post(reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}))
-
-        self.assertEqual(response.status_code, 403)
-        self.assertIn(b"Permission Denied", response.content)
-
-        self.client.force_login(self.admin)
         post_data = {
             "workflowid": str(self.history.workflowid),  # required
             "workflowname": 'test-name',
@@ -98,6 +98,7 @@ class WorkflowHistoryTests(ArchesTestCase):
                     "componentIdLookup": {
                         "project-statement": "ae8f2027-f2e1-447c-8763-125e65d4b666",
                     },
+                    "stepId": "8a9d8ea7-9430-4732-9cc4-6efacf6b43b7",
                     "locked": False,
                 },
             },
@@ -126,6 +127,18 @@ class WorkflowHistoryTests(ArchesTestCase):
             },
         }
 
+        # Non-superuser cannot update someone else's workflow.
+        self.client.force_login(self.editor)
+        response = self.client.post(
+            reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
+            post_data,
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(b"Forbidden", response.content)
+
+        self.client.force_login(self.admin)
         response = self.client.post(
             reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
             post_data,

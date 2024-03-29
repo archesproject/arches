@@ -52,6 +52,7 @@ from arches.app.utils.permission_backend import (
     get_restricted_users,
     get_restricted_instances,
     user_can_read_graph,
+    get_nodegroups_by_perm,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -227,9 +228,11 @@ class Resource(models.ResourceInstance):
         context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
+        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
+
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            tile.save(request=request, index=False, transaction_id=transaction_id, context=context)
+            tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
         if request is None:
             if user is None:
                 user = {}
@@ -242,7 +245,6 @@ class Resource(models.ResourceInstance):
         except NotUserNorGroup:
             pass
 
-        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index(context)
 
@@ -254,7 +256,8 @@ class Resource(models.ResourceInstance):
 
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
         if user:
-            self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
+            readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
+            self.tiles = [tile for tile in self.tiles if tile.nodegroup is not None and tile.nodegroup in readable_nodegroups]
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
