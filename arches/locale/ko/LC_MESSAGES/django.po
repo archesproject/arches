@@ -1,0 +1,1633 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-28 01:00-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: app/datatypes/base.py:39
+#, python-brace-format
+msgid "{0} error, {1} {2} - {3}. Unable to save."
+msgstr ""
+
+#: app/datatypes/base.py:200
+msgid "Multiple provisional edits. Returning first edit"
+msgstr ""
+
+#: app/datatypes/base.py:204
+msgid "Tile has no authoritative or provisional data"
+msgstr ""
+
+#: app/datatypes/concept_types.py:150
+msgid ""
+"The widget used to save this data appears to be incorrect for this datatype. "
+"Contact system admin to resolve"
+msgstr ""
+
+#: app/datatypes/concept_types.py:151
+msgid "Invalid Concept Datatype Widget"
+msgstr ""
+
+#: app/datatypes/concept_types.py:159
+msgid "This is an invalid concept prefLabel, or an incomplete UUID"
+msgstr ""
+
+#: app/datatypes/concept_types.py:160
+msgid "Invalid Concept PrefLabel/Uuid"
+msgstr ""
+
+#: app/datatypes/concept_types.py:168
+msgid "This UUID is not an available concept value"
+msgstr ""
+
+#: app/datatypes/concept_types.py:169
+msgid "Concept Id Not Found"
+msgstr ""
+
+#: app/datatypes/concept_types.py:187 app/datatypes/concept_types.py:331
+#, python-brace-format
+msgid "Unable to convert {0} to concept label"
+msgstr ""
+
+#: app/datatypes/datatypes.py:119
+msgid "This is not a string"
+msgstr ""
+
+#: app/datatypes/datatypes.py:120
+msgid "Invalid String Format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:399
+msgid "Not a properly formatted number"
+msgstr ""
+
+#: app/datatypes/datatypes.py:400
+msgid "Invalid Number Format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:491
+msgid "Not of type boolean"
+msgstr ""
+
+#: app/datatypes/datatypes.py:492
+msgid "Invalid Boolean"
+msgstr ""
+
+#: app/datatypes/datatypes.py:573
+msgid ""
+"Incorrect format. Confirm format is in settings.DATE_FORMATS or set the "
+"format in settings.DATE_IMPORT_EXPORT_FORMAT."
+msgstr ""
+
+#: app/datatypes/datatypes.py:575
+msgid "Invalid Date Format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:638
+#, python-brace-format
+msgid "{value} is an invalid date format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:739
+msgid ""
+"Incorrect Extended Date Time Format. See http://www.loc.gov/standards/"
+"datetime/ for supported formats"
+msgstr ""
+
+#: app/datatypes/datatypes.py:740
+msgid "Invalid EDTF Format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:793
+msgid ""
+"Only dates that specify an exact year, month,                         and "
+"day can be used with the \"=\", \">\", \"<\", \">=\", and \"<=\" operators"
+msgstr ""
+
+#: app/datatypes/datatypes.py:822
+msgid "Invalid date specified."
+msgstr ""
+
+#: app/datatypes/datatypes.py:853
+#, python-brace-format
+msgid ""
+"Geometry has too many coordinates for Elasticsearch "
+"({0}),                         Please limit to less then {1} coordinates of "
+"5 digits of precision or less."
+msgstr ""
+
+#: app/datatypes/datatypes.py:858
+msgid "Geometry Too Many Coordinates for ES"
+msgstr ""
+
+#: app/datatypes/datatypes.py:871
+msgid ""
+"Geometry does not fall within the bounding box of the selected coordinate "
+"system.                          Adjust your coordinates or your settings."
+"DATA_EXTENT_VALIDATION property."
+msgstr ""
+
+#: app/datatypes/datatypes.py:874
+msgid "Geometry Out Of Bounds"
+msgstr ""
+
+#: app/datatypes/datatypes.py:885
+msgid "Not a properly formatted geometry"
+msgstr ""
+
+#: app/datatypes/datatypes.py:886
+msgid "Invalid Geometry Format"
+msgstr ""
+
+#: app/datatypes/datatypes.py:903
+msgid "Unable to serialize some geometry features"
+msgstr ""
+
+#: app/datatypes/datatypes.py:904
+msgid "Unable to Serialize Geometry"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1500 app/datatypes/datatypes.py:1542
+msgid "Invalid File Type"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1501
+msgid "File type not permitted"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1534
+msgid "Missing alt text"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1535
+#, python-brace-format
+msgid "The image '{0}' is missing an alternative text."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1543
+msgid "This node allows only images."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1546
+#, python-brace-format
+msgid "This node has a limit of {0} files. Please reduce files."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1547
+msgid "Exceed Maximun Number of Files"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1555
+#, python-brace-format
+msgid ""
+"This node has a file-size limit of {0}. Please reduce file size or contact "
+"your sysadmin."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1559
+msgid "Exceed File Size Limit"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1564
+#, python-brace-format
+msgid "The file \"{0}\" does not exist in \"{1}\""
+msgstr ""
+
+#: app/datatypes/datatypes.py:1565
+msgid "File Not Found"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1569
+#, python-brace-format
+msgid "datatype: {0}, value: {1} - {2} ."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1570
+msgid "Unexpected File Error"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1634 app/datatypes/datatypes.py:1724
+msgid "File does not exist"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1756
+msgid "The file url is invalid"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1758
+msgid "A file is not available for this tile"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1760
+msgid "This file's fileid is not a valid UUID"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1891
+#, python-brace-format
+msgid "No domain option found for option id {0}, in node conifg: {1}"
+msgstr ""
+
+#: app/datatypes/datatypes.py:1941
+msgid ""
+"Invalid domain id. Please check the node this value is mapped to for a list "
+"of valid domain ids."
+msgstr ""
+
+#: app/datatypes/datatypes.py:1942
+msgid "Invalid Domain Id"
+msgstr ""
+
+#: app/datatypes/datatypes.py:2266
+#, python-brace-format
+msgid "The related resource with id '{0}' is not in the system."
+msgstr ""
+
+#: app/datatypes/datatypes.py:2269
+#, python-brace-format
+msgid "The related resource with id '{0}' is not a valid uuid."
+msgstr ""
+
+#: app/datatypes/datatypes.py:2270
+msgid "Invalid Resource Instance Datatype"
+msgstr ""
+
+#: app/datatypes/datatypes.py:2484
+#, python-brace-format
+msgid "{0} {1} is not a valid tile id. This data was not imported."
+msgstr ""
+
+#: app/datatypes/datatypes.py:2485
+msgid "Invalid Tile Id"
+msgstr ""
+
+#: app/datatypes/url.py:81
+msgid "This is not a valid HTTP/HTTPS URL"
+msgstr ""
+
+#: app/datatypes/url.py:82
+msgid "Invalid HTTP/HTTPS URL"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:60
+#: app/etl_modules/base_import_module.py:62
+msgid "Delegating load reversal to Celery task"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:144
+msgid "Unable to initialize load: {}"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:161
+msgid "Unable to stage data: {}"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:208
+msgid "Resource Model"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:209
+msgid "Node"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:210
+msgid "Edit Operation"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:211
+msgid "Language"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:214
+msgid "Old Text"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:214
+msgid "New Text"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:218
+#, python-brace-format
+msgid "Missing required value: {required_input}"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:231
+msgid "Unable to edit staged data: {}"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:351
+#: app/etl_modules/base_data_editor.py:435
+msgid "Missing input error"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:362
+#: app/etl_modules/base_data_editor.py:384
+#: app/etl_modules/bulk_data_deletion.py:204
+#: app/etl_modules/bulk_data_deletion.py:239
+msgid "Invalid Search Url"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:362
+#: app/etl_modules/base_data_editor.py:384
+#: app/etl_modules/bulk_data_deletion.py:204
+#: app/etl_modules/bulk_data_deletion.py:239
+msgid "Please, enter a valid search url"
+msgstr ""
+
+#: app/etl_modules/base_data_editor.py:539
+#: app/etl_modules/base_data_editor.py:547
+#: app/etl_modules/bulk_data_deletion.py:298 app/etl_modules/decorators.py:27
+#: app/views/etl_manager.py:119
+msgid "Error"
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:200
+msgid "Legacy id(s) already exist. Legacy ids must be unique"
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:224
+msgid "Invalid excel file/zip specified"
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:225
+msgid "Upload a valid excel file"
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:255
+#: app/etl_modules/base_import_module.py:296
+msgid "Invalid Uploaded File"
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:256
+msgid ""
+"This file has missing information or invalid formatting. Make sure the file "
+"is complete and in the expected format."
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:273
+msgid "Unable to initialize load"
+msgstr ""
+
+#: app/etl_modules/base_import_module.py:295
+msgid "Unable to read file"
+msgstr ""
+
+#: app/etl_modules/branch_excel_importer.py:111
+#: app/etl_modules/tile_excel_importer.py:116
+msgid "All rows must have a valid resource id"
+msgstr ""
+
+#: app/etl_modules/bulk_data_deletion.py:147
+msgid "Unable to delete resources: {}"
+msgstr ""
+
+#: app/etl_modules/bulk_data_deletion.py:167
+msgid "Unable to delete tiles: {}"
+msgstr ""
+
+#: app/etl_modules/bulk_data_deletion.py:350
+msgid "Indexing Error"
+msgstr ""
+
+#: app/etl_modules/bulk_data_deletion.py:350
+msgid ""
+"The database may need to be reindexed. Please contact your administrator."
+msgstr ""
+
+#: app/etl_modules/decorators.py:16
+msgid "Delegating load to Celery task"
+msgstr ""
+
+#: app/etl_modules/decorators.py:18
+msgid "delegated_to_celery"
+msgstr ""
+
+#: app/etl_modules/decorators.py:21 app/views/etl_manager.py:118
+msgid ""
+"Unable to perform this operation because Celery does not appear to be "
+"running. Please contact your administrator."
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:100
+msgid "No csv file found"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:101
+msgid "Upload a valid csv file"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:139
+msgid "No valid node is selected"
+msgstr ""
+
+#: app/etl_modules/import_single_csv.py:141
+msgid "Only one column should be selected for id"
+msgstr ""
+
+#: app/etl_modules/save.py:82
+msgid "Failed to complete load"
+msgstr ""
+
+#: app/etl_modules/save.py:83
+msgid "Unable to insert record into staging table"
+msgstr ""
+
+#: app/functions/primary_descriptors.py:74
+#, python-brace-format
+msgid "Invalid nodegroupid, {0}, participating in descriptor function."
+msgstr ""
+
+#: app/functions/primary_descriptors.py:76 app/models/resource.py:613
+#: app/models/resource.py:715 app/views/resource.py:765 app/views/search.py:398
+msgid "Undefined"
+msgstr ""
+
+#: app/models/concept.py:154
+msgid "Only include values for include or exclude, but not both"
+msgstr ""
+
+#: app/models/concept.py:850
+#, python-format
+msgid "Invalid subconcept definition: %s"
+msgstr ""
+
+#: app/models/concept.py:858
+#, python-format
+msgid "Invalid related concept definition: %s"
+msgstr ""
+
+#: app/models/concept.py:869
+#, python-format
+msgid "Invalid value definition: %s"
+msgstr ""
+
+#: app/models/concept.py:1293
+msgid "Need to include values when creating a collection"
+msgstr ""
+
+#: app/models/concept.py:1401
+msgid ""
+"Index of label failed.  Index type (scheme id) could not be derived from the "
+"label."
+msgstr ""
+
+#: app/models/fields/i18n.py:184
+msgid "A I18n_TextField object"
+msgstr ""
+
+#: app/models/fields/i18n.py:395
+msgid "A I18n_JSONField object"
+msgstr ""
+
+#: app/models/graph.py:79
+msgid "New Node"
+msgstr ""
+
+#: app/models/graph.py:269
+msgid "Top Node"
+msgstr ""
+
+#: app/models/graph.py:498
+#, python-brace-format
+msgid ""
+"Duplicate node alias: \"{0}\". All aliases must be unique in a resource "
+"model."
+msgstr ""
+
+#: app/models/graph.py:502
+#, python-brace-format
+msgid "Fail to save node \"{0}\"."
+msgstr ""
+
+#: app/models/graph.py:565
+#, python-brace-format
+msgid ""
+"Your resource model: {0}, already has instances saved. You cannot delete a "
+"Resource Model with instances."
+msgstr ""
+
+#: app/models/graph.py:721
+msgid "Please unpublish your graph before adding a node."
+msgstr ""
+
+#: app/models/graph.py:729
+#, python-brace-format
+msgid ""
+"Your resource model: {0}, already has instances saved. You cannot modify a "
+"Resource Model with instances."
+msgstr ""
+
+#: app/models/graph.py:761
+msgid "Ontology rules don't allow this node to be appended"
+msgstr ""
+
+#: app/models/graph.py:1038
+#, python-brace-format
+msgid ""
+"Your resource model: {self.name}, already has instances "
+"saved.                             You cannot delete nodes from a Resource "
+"Model with instances."
+msgstr ""
+
+#: app/models/graph.py:1074
+msgid "Please unpublish your graph before adding a branch."
+msgstr ""
+
+#: app/models/graph.py:1078
+msgid "The graph you wish to append needs to define an ontology"
+msgstr ""
+
+#: app/models/graph.py:1091
+msgid "Ontology rules don't allow this graph to be appended"
+msgstr ""
+
+#: app/models/graph.py:1582
+#, python-brace-format
+msgid ""
+"Your resource model: {self.name}, already has instances "
+"saved.                                 You cannot modify a Resource Model "
+"with instances."
+msgstr ""
+
+#: app/models/graph.py:1601
+#, python-brace-format
+msgid "Duplicate node name: \"{0}\". All node names in a card must be unique."
+msgstr ""
+
+#: app/models/graph.py:1610
+#, python-brace-format
+msgid "Duplicate node name: \"{0}\". All sibling node names must be unique."
+msgstr ""
+
+#: app/models/graph.py:1646
+#, python-brace-format
+msgid ""
+"The top node of your resource graph: {self.root.name} needs to be a "
+"collector.                             Hint: check that nodegroup_id of your "
+"resource node(s) are not null."
+msgstr ""
+
+#: app/models/graph.py:1652
+msgid "The top node of your resource graph must have a datatype of 'semantic'."
+msgstr ""
+
+#: app/models/graph.py:1657
+msgid ""
+"If your graph contains more than one node and is not a resource the root "
+"must be a collector."
+msgstr ""
+
+#: app/models/graph.py:1662
+msgid "Field name must not be blank."
+msgstr ""
+
+#: app/models/graph.py:1664
+msgid "Field name must contain only alpha-numeric characters or underscores."
+msgstr ""
+
+#: app/models/graph.py:1666
+msgid "Field name cannot begin with an underscore or number"
+msgstr ""
+
+#: app/models/graph.py:1672
+#, python-brace-format
+msgid "Field name must be unique to the graph; '{fieldname}' already exists."
+msgstr ""
+
+#: app/models/graph.py:1694
+#, python-brace-format
+msgid "A valid {0} ontology class must be selected"
+msgstr ""
+
+#: app/models/graph.py:1697
+#, python-brace-format
+msgid "'{0}' is not a valid {1} ontology class"
+msgstr ""
+
+#: app/models/graph.py:1705
+#, python-brace-format
+msgid ""
+"You must specify an ontology property. Your graph isn't semantically "
+"valid.                                 Entity domain '{edge.domainnode."
+"ontologyclass}' and                                 Entity range '{edge."
+"rangenode.ontologyclass}' can not be related via Property '{edge."
+"ontologyproperty}'."
+msgstr ""
+
+#: app/models/graph.py:1724
+#, python-brace-format
+msgid ""
+"Your graph isn't semantically valid. Entity domain '{edge.domainnode."
+"ontologyclass}' and                                 Entity range '{edge."
+"rangenode.ontologyclass}' cannot                                 be related "
+"via Property '{edge.ontologyproperty}'."
+msgstr ""
+
+#: app/models/graph.py:1732
+#, python-brace-format
+msgid ""
+"'{0}' is not found in the {1} ontology or is not a valid ontology property "
+"for Entity domain '{2}'."
+msgstr ""
+
+#: app/models/graph.py:1741
+msgid ""
+"You have assigned ontology classes to your graph nodes but not assigned an "
+"ontology to your graph."
+msgstr ""
+
+#: app/models/graph.py:1763
+msgid "The json-ld context you supplied wasn't formatted correctly."
+msgstr ""
+
+#: app/models/graph.py:1768
+#, python-brace-format
+msgid "Another resource model already uses the slug '{self.slug}'"
+msgstr ""
+
+#: app/models/graph.py:1797
+msgid "Multiple published graphs returned for language and publication_id"
+msgstr ""
+
+#: app/models/graph.py:1848
+msgid "Graph Publication Error"
+msgstr ""
+
+#: app/models/graph.py:1857
+msgid "Graph Validation Error"
+msgstr ""
+
+#: app/models/models.py:511
+msgid "Only resource models may be edited - branches are not editable"
+msgstr ""
+
+#: app/models/models.py:513
+msgid ""
+"This Model is currently unpublished and not available for instance creation."
+msgstr ""
+
+#: app/models/models.py:1644
+msgid "Image Service Validation Error"
+msgstr ""
+
+#: app/models/models.py:1679
+msgid ""
+"This image service cannot be deleted because the following canvases have "
+"resource annotations: {}"
+msgstr ""
+
+#: app/models/resource.py:868
+msgid "Published Model Error"
+msgstr ""
+
+#: app/models/resource.py:878
+msgid "Unpublished Model Error"
+msgstr ""
+
+#: app/models/tile.py:289
+msgid ""
+"This card violates a unique constraint.                                 The "
+"following value is already saved: "
+msgstr ""
+
+#: app/models/tile.py:317
+#, python-brace-format
+msgid ""
+"Error checking for missing node. Nodeid: {nodeid} with value: {value}, not "
+"in nodes.                     You may have a node in your business data that "
+"no longer exists in any graphs."
+msgstr ""
+
+#: app/models/tile.py:322
+msgid "This card requires values for the following: "
+msgstr ""
+
+#: app/models/tile.py:349
+#, python-brace-format
+msgid "{0}"
+msgstr ""
+
+#: app/models/tile.py:697 app/models/tile.py:708 app/models/tile.py:725
+msgid "No associated functions or other TypeError raised by a function"
+msgstr ""
+
+#: app/models/tile.py:763
+msgid "Tile Validation Error"
+msgstr ""
+
+#: app/models/tile.py:774
+msgid "Tile Cardinality Error"
+msgstr ""
+
+#: app/search/base_index.py:182
+msgid "Search Index Error:"
+msgstr ""
+
+#: app/search/base_index.py:192
+msgid "Search Index Not Defined Error:"
+msgstr ""
+
+#: app/search/base_index.py:193
+#, python-format
+msgid ""
+"The index \"%s\" is not defined in settings.ELASTICSEARCH_CUSTOM_INDEXES"
+msgstr ""
+
+#: app/search/components/map_filter.py:75
+msgid "Feature geometry is not defined"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:289
+msgid ""
+"You need at least one of the following operators in a Range expression: gte, "
+"gt, lte, or lt"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:291
+msgid "You can only use one of either: gte or gt"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:293
+msgid "You can only use one of either: lte or lt"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:454
+msgid "You need to specify either a \"field\" or a \"script\""
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:456
+msgid "You need to specify a name for your aggregation"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:458
+msgid "You need to specify an aggregation type"
+msgstr ""
+
+#: app/search/elasticsearch_dsl_builder.py:647
+msgid "You need to specify a path for your nested aggregation"
+msgstr ""
+
+#: app/search/search_export.py:220
+#, python-brace-format
+msgid "Shapefile are fieldnames required for the following nodes: {0}"
+msgstr ""
+
+#: app/search/time_wheel.py:134
+msgid ""
+"CACHE_BY_USER setting does not have a 'default'. Adding a default can "
+"improve search page performance."
+msgstr ""
+
+#: app/tasks.py:33
+msgid "files_deleted"
+msgstr ""
+
+#: app/tasks.py:93
+msgid ""
+"Hello,\n"
+"Your request to download a set of search results is now ready. You have "
+"until {} to access this download, after which time it'll be deleted."
+msgstr ""
+
+#: app/tasks.py:94 app/tasks.py:158
+msgid "Thank you"
+msgstr ""
+
+#: app/tasks.py:98
+msgid "Download Now"
+msgstr ""
+
+#: app/tasks.py:107
+msgid ""
+"Your search '{}' is ready for download. You have until {} to access this "
+"file, after which we'll automatically remove it."
+msgstr ""
+
+#: app/tasks.py:153
+msgid "Resources have completed loading."
+msgstr ""
+
+#: app/tasks.py:157
+msgid ""
+"Hello,\n"
+"Your package has successfully loaded into your Arches project."
+msgstr ""
+
+#: app/tasks.py:163
+msgid "Log me in"
+msgstr ""
+
+#: app/tasks.py:222 app/tasks.py:260 app/tasks.py:297 app/tasks.py:321
+#: app/tasks.py:344 app/tasks.py:390
+msgid "Completed"
+msgstr ""
+
+#: app/tasks.py:222 app/tasks.py:228 app/tasks.py:255 app/tasks.py:260
+#: app/tasks.py:297 app/tasks.py:303 app/tasks.py:321 app/tasks.py:327
+#: app/tasks.py:344 app/tasks.py:350 app/tasks.py:390 app/tasks.py:396
+msgid "Failed"
+msgstr ""
+
+#: app/tasks.py:230
+msgid "{}: {} [{}]"
+msgstr ""
+
+#: app/tasks.py:267
+msgid "Excel Export: {}"
+msgstr ""
+
+#: app/tasks.py:305
+msgid "Single CSV Import: {} [{}]"
+msgstr ""
+
+#: app/tasks.py:329
+msgid "Bulk Data Edit: {} [{}]"
+msgstr ""
+
+#: app/tasks.py:352
+msgid "Bulk Data Deletion: [{}]"
+msgstr ""
+
+#: app/tasks.py:398
+msgid "{}: {}"
+msgstr ""
+
+#: app/templates/admin/change_form.html:44
+msgid "Attention:"
+msgstr ""
+
+#: app/templates/admin/change_form.html:50
+msgid ""
+"The user permission cache must be cleared before making any changes to "
+"Users, Groups, or Models. This may temporarily slow performance for some "
+"users. To continue, please clear the cache by clicking the button below."
+msgstr ""
+
+#: app/templates/registration/password_reset_complete.html:5
+msgid "Home"
+msgstr ""
+
+#: app/templates/registration/password_reset_complete.html:6
+msgid "Password reset"
+msgstr ""
+
+#: app/templates/registration/password_reset_complete.html:15
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+#: app/templates/registration/password_reset_complete.html:18
+msgid "Sign In"
+msgstr ""
+
+#: app/templates/registration/password_reset_confirm.html:5
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: app/templates/registration/password_reset_confirm.html:24
+msgid "Exit"
+msgstr ""
+
+#: app/templates/registration/password_reset_confirm.html:25
+msgid "Set new password"
+msgstr ""
+
+#: app/templates/registration/password_reset_confirm.html:30
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: app/templates/registration/password_reset_done.html:3
+msgid "New password set"
+msgstr ""
+
+#: app/templates/registration/password_reset_done.html:6
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+#: app/templates/registration/password_reset_done.html:7
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#: app/templates/registration/password_reset_done.html:8
+msgid "Return Home"
+msgstr ""
+
+#: app/templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: app/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: app/templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: app/templates/registration/password_reset_email.html:10
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: app/templates/registration/password_reset_form.html:4
+msgid "Password recovery"
+msgstr ""
+
+#: app/templates/registration/password_reset_form.html:6
+msgid "Password Recovery"
+msgstr ""
+
+#: app/templates/registration/password_reset_form.html:14
+msgid "Enter the email associated with your account to change your password."
+msgstr ""
+
+#: app/templates/registration/password_reset_form.html:21
+msgid "Enter your email"
+msgstr ""
+
+#: app/templates/registration/password_reset_form.html:27
+msgid "Recover my password"
+msgstr ""
+
+#: app/utils/compatibility.py:48
+#, python-brace-format
+msgid ""
+"A {0} Arches version is not specified. Unable to check {0} version {1} "
+"compatibility"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/csvfile.py:833
+#, python-brace-format
+msgid "No datatype detected for {0}"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/csvfile.py:1140
+#, python-brace-format
+msgid "Total resources saved: {save_count}"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:47
+#, python-brace-format
+msgid "{0} of {1} resources saved"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:57
+#, python-brace-format
+msgid "{0} of {1} relations saved"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:182
+msgid "No import errors"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:186
+msgid ""
+"***** Errors occured during import. Some data may not have been imported. "
+"For more information, check resource import error log: "
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:217
+#, python-brace-format
+msgid " {0}: {1}\n"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/format.py:269
+msgid ""
+"Must supply either a graph id or a list of resource instance ids to export"
+msgstr ""
+
+#: app/utils/data_management/resources/formats/rdffile.py:156
+msgid ""
+"Unable to return range value because domain is None, re https://github.com/"
+"archesproject/arches/pull/9783/files"
+msgstr ""
+
+#: app/utils/data_management/sparql_providers/aat_provider.py:34
+msgid "Getty AAT"
+msgstr ""
+
+#: app/utils/data_management/sparql_providers/aat_provider.py:90
+#, python-format
+msgid ""
+"<strong>Error in SPARQL query:</strong><br>Test this query directly by "
+"pasting the query below into the Getty's                         own SPARQL "
+"endpoint at <a href='http://vocab.getty.edu/sparql' target='_blank'>http://"
+"vocab.getty.edu/sparql</a>                         <i><pre>%s</pre></i>Query "
+"returned 0 results, please check the query for "
+"errors.                          You may need to add the appropriate "
+"languages into the database for this query to work<br><br>"
+msgstr ""
+
+#: app/utils/forms.py:64
+msgid ""
+"This email address has already been registered with the "
+"system.                             If you forgot your password, click the "
+"'exit' link below and go to the login page to reset your password."
+msgstr ""
+
+#: app/utils/forms.py:113
+msgid "New password"
+msgstr ""
+
+#: app/utils/forms.py:115
+msgid "Re-enter new password"
+msgstr ""
+
+#: app/utils/message_contexts.py:31
+msgid "Setting email context failed"
+msgstr ""
+
+#: app/utils/password_validation.py:12
+#, python-brace-format
+msgid "Be longer than {0} characters"
+msgstr ""
+
+#: app/utils/password_validation.py:20
+msgid "Have at least 1 letter"
+msgstr ""
+
+#: app/utils/password_validation.py:37
+msgid "Your password must contain at least one special character"
+msgstr ""
+
+#: app/utils/password_validation.py:43
+msgid "Have at least 1 special character"
+msgstr ""
+
+#: app/utils/password_validation.py:56
+msgid "Your password must contain at least one number"
+msgstr ""
+
+#: app/utils/password_validation.py:60
+msgid "Have at least 1 number"
+msgstr ""
+
+#: app/utils/password_validation.py:74
+msgid "Your password must contain both upper and lower case letters"
+msgstr ""
+
+#: app/utils/password_validation.py:78
+msgid "Have least 1 upper and lower case character"
+msgstr ""
+
+#: app/utils/response.py:61
+msgid "Could not return JSON Response"
+msgstr ""
+
+#: app/utils/task_management.py:28
+msgid "Celery worker connection failed. Reattempting"
+msgstr ""
+
+#: app/utils/task_management.py:30
+msgid ""
+"Failed to connect to celery due to a BrokenPipeError/ConnectionResetError"
+msgstr ""
+
+#: app/utils/task_management.py:33
+msgid "A celery broker is running, but a celery worker is not available"
+msgstr ""
+
+#: app/utils/task_management.py:37
+msgid "Unable to connect to a celery broker"
+msgstr ""
+
+#: app/utils/thumbnail_generator.py:80
+msgid "Unable to generate a thumbnail from the supplied file."
+msgstr ""
+
+#: app/utils/thumbnail_generator.py:81
+msgid "Thumbnail Generation Error"
+msgstr ""
+
+#: app/views/api.py:79
+msgid "Failed to dispatch Kibana proxy"
+msgstr ""
+
+#: app/views/api.py:81
+msgid "KibanaProxy failed"
+msgstr ""
+
+#: app/views/api.py:105
+msgid "Failed to create API request"
+msgstr ""
+
+#: app/views/api.py:152 app/views/api.py:833 app/views/resource.py:236
+#: app/views/resource.py:611
+msgid "Unnamed Resource"
+msgstr ""
+
+#: app/views/api.py:514
+#, python-brace-format
+msgid "The specified resource '{0}' does not exist. JSON-LD export failed."
+msgstr ""
+
+#: app/views/api.py:829 app/views/resource.py:232
+msgid "New Resource"
+msgstr ""
+
+#: app/views/api.py:835 app/views/resource.py:239
+msgid "System Settings"
+msgstr ""
+
+#: app/views/api.py:1337
+msgid "Tile not found."
+msgstr ""
+
+#: app/views/api.py:1369
+msgid "No nodegroup matching query parameters found."
+msgstr ""
+
+#: app/views/api.py:1418
+msgid "No nodes matching query parameters found."
+msgstr ""
+
+#: app/views/api.py:1426
+#, python-format
+msgid "No graph found for graphid %s"
+msgstr ""
+
+#: app/views/api.py:1486
+msgid "User does not have permission to edit this node."
+msgstr ""
+
+#: app/views/api.py:1494 app/views/tile.py:184 app/views/tile.py:187
+#: app/views/tile.py:266 app/views/tile.py:268 app/views/tile.py:272
+#: app/views/tile.py:319 app/views/workflow_history.py:66
+msgid "Request Failed"
+msgstr ""
+
+#: app/views/api.py:1494 app/views/tile.py:187 app/views/tile.py:266
+msgid "Permission Denied"
+msgstr ""
+
+#: app/views/auth.py:173 app/views/auth.py:196 app/views/auth.py:256
+msgid "User signup has been disabled. Please contact your administrator."
+msgstr ""
+
+#: app/views/auth.py:211
+msgid ""
+"Thanks for your interest in {}. Click on link below                     to "
+"confirm your email address! Use your email address to login."
+msgstr ""
+
+#: app/views/auth.py:215
+msgid ""
+"This link expires in 24 hours.  If you can't get to it before "
+"then,                     don't worry, you can always try again with the "
+"same email address."
+msgstr ""
+
+#: app/views/auth.py:219
+msgid "Signup for {}"
+msgstr ""
+
+#: app/views/auth.py:229
+msgid "Welcome to {}!"
+msgstr ""
+
+#: app/views/auth.py:234
+#, python-format
+msgid ""
+"An email has been sent to <br><strong>%s</strong><br> with a link to "
+"activate your account"
+msgstr ""
+
+#: app/views/auth.py:276
+msgid "The signup link has expired, please try signing up again.  Thanks!"
+msgstr ""
+
+#: app/views/auth.py:296
+msgid "Too many requests"
+msgstr ""
+
+#: app/views/auth.py:304
+msgid "Invalid password"
+msgstr ""
+
+#: app/views/auth.py:306
+msgid "New password and confirmation must match"
+msgstr ""
+
+#: app/views/auth.py:317
+msgid "Password successfully updated"
+msgstr ""
+
+#: app/views/auth.py:359 app/views/auth.py:378
+msgid "Make sure to set your OAUTH_CLIENT_ID in settings.py"
+msgstr ""
+
+#: app/views/auth.py:425
+msgid "Click on link below to update your two-factor authentication settings."
+msgstr ""
+
+#: app/views/auth.py:427
+msgid ""
+"This link expires in 15 minutes. If you did not request this "
+"change,                         contact your Administrator immediately."
+msgstr ""
+
+#: app/views/auth.py:431
+msgid "Update Two-Factor Authentication Settings"
+msgstr ""
+
+#: app/views/auth.py:441
+msgid "Arches Two-Factor Authentication"
+msgstr ""
+
+#: app/views/auth.py:446
+msgid ""
+"There has been error sending an email to this address. Please contact your "
+"system administrator."
+msgstr ""
+
+#: app/views/base.py:40
+#, python-brace-format
+msgid "This project is incompatible with Arches {0}."
+msgstr ""
+
+#: app/views/concept.py:67
+msgid "Reference Data Manager"
+msgstr ""
+
+#: app/views/concept.py:68
+msgid "Using the RDM"
+msgstr ""
+
+#: app/views/concept.py:238
+msgid "Unable to Load SKOS File"
+msgstr ""
+
+#: app/views/concept.py:238
+msgid "There was an issue saving the contents of the file to Arches. "
+msgstr ""
+
+#: app/views/concept.py:274
+msgid "Unable to Delete"
+msgstr ""
+
+#: app/views/concept.py:274
+msgid ""
+"This concept or one of it's subconcepts is already in use by an existing "
+"resource."
+msgstr ""
+
+#: app/views/concept.py:327
+msgid "Success"
+msgstr ""
+
+#: app/views/concept.py:327
+msgid "Collection successfully created from the selected concept"
+msgstr ""
+
+#: app/views/concept.py:329
+msgid "Unable to Make Collection"
+msgstr ""
+
+#: app/views/concept.py:329
+msgid "Unable to make a collection from the selected concept."
+msgstr ""
+
+#: app/views/etl_manager.py:103 app/views/etl_manager.py:110
+msgid "Cancel Request sent to Celery"
+msgstr ""
+
+#: app/views/graph.py:162
+msgid "Arches Designer"
+msgstr ""
+
+#: app/views/graph.py:165
+msgid "Using the Arches Designer"
+msgstr ""
+
+#: app/views/graph.py:182
+#, python-brace-format
+msgid ""
+"No namespaces appear to be associated with {ontology.ontologyid} in the "
+"ontologies table. This is not a problem as long as all necessary namespaces "
+"are included in the ONTOLOGY_NAMESPACES setting."
+msgstr ""
+
+#: app/views/graph.py:231
+msgid "Branch Library"
+msgstr ""
+
+#: app/views/graph.py:231
+msgid "Find a graph branch"
+msgstr ""
+
+#: app/views/graph.py:277
+msgid "Designing a Resource Model"
+msgstr ""
+
+#: app/views/graph.py:279
+msgid "Designing a Branch"
+msgstr ""
+
+#: app/views/graph.py:362
+msgid "New Resource Model"
+msgstr ""
+
+#: app/views/graph.py:362
+msgid "New Branch"
+msgstr ""
+
+#: app/views/graph.py:371 app/views/graph.py:383
+msgid "Datatype Error"
+msgstr ""
+
+#: app/views/graph.py:373
+msgid ""
+"If you want to change the datatype of an existing node.\n"
+"                                Delete and then re-create the node, or "
+"export the branch then edit the datatype and re-import the branch."
+msgstr ""
+
+#: app/views/graph.py:384
+msgid ""
+"This node cannot be restricted to images only as it holds non-images already."
+msgstr ""
+
+#: app/views/graph.py:463
+msgid "Unable to delete nodes of a published graph"
+msgstr ""
+
+#: app/views/graph.py:463
+msgid "Please unpublish your graph before deleting a node"
+msgstr ""
+
+#: app/views/graph.py:535
+msgid "Unable to process publication"
+msgstr ""
+
+#: app/views/graph.py:535
+msgid "Please contact your administrator if issue persists"
+msgstr ""
+
+#: app/views/graph.py:589
+msgid "Managing Functions"
+msgstr ""
+
+#: app/views/manifest_manager.py:281
+msgid "IIIF server proxy not configured"
+msgstr ""
+
+#: app/views/manifest_manager.py:287
+msgid "Manifest Validation Error"
+msgstr ""
+
+#: app/views/map.py:92 app/views/map.py:94
+msgid "Map Layer Manager"
+msgstr ""
+
+#: app/views/map.py:132
+msgid "Tileserver proxy not configured"
+msgstr ""
+
+#: app/views/plugin.py:96
+msgid "Plugin Help"
+msgstr ""
+
+#: app/views/plugin.py:98
+msgid "Help"
+msgstr ""
+
+#: app/views/resource.py:89
+msgid "Resource Manager"
+msgstr ""
+
+#: app/views/resource.py:91
+msgid "Creating Resources"
+msgstr ""
+
+#: app/views/resource.py:350
+msgid "Managing System Settings"
+msgstr ""
+
+#: app/views/resource.py:352
+msgid "Using the Resource Editor"
+msgstr ""
+
+#: app/views/resource.py:357
+msgid "Unable to Delete Resource"
+msgstr ""
+
+#: app/views/resource.py:358
+msgid ""
+"User does not have permissions to delete this instance because the instance "
+"or its data is restricted"
+msgstr ""
+
+#: app/views/resource.py:367
+msgid "Unable to delete. Please verify the model is not currently published."
+msgstr ""
+
+#: app/views/resource.py:555 app/views/resource.py:561
+msgid "Resource Created"
+msgstr ""
+
+#: app/views/resource.py:556
+msgid "Resource Deleted"
+msgstr ""
+
+#: app/views/resource.py:557
+msgid "Tile Deleted"
+msgstr ""
+
+#: app/views/resource.py:558
+msgid "Tile Created"
+msgstr ""
+
+#: app/views/resource.py:559
+msgid "Tile Updated"
+msgstr ""
+
+#: app/views/resource.py:560
+msgid "Edit Deleted"
+msgstr ""
+
+#: app/views/resource.py:580
+msgid "Recent Edits"
+msgstr ""
+
+#: app/views/resource.py:791
+msgid "Failed to fetch resource instance descriptors"
+msgstr ""
+
+#: app/views/resource.py:806
+msgid "No active report template is available for this resource."
+msgstr ""
+
+#: app/views/resource.py:919
+msgid "Unable to delete. Relationship does not exist"
+msgstr ""
+
+#: app/views/resource.py:981 app/views/resource.py:995 app/views/tile.py:154
+msgid "Unable to save. Please verify the model is not currently published."
+msgstr ""
+
+#: app/views/search.py:106
+msgid "Search"
+msgstr ""
+
+#: app/views/search.py:110
+msgid "Searching the Database"
+msgstr ""
+
+#: app/views/search.py:233
+#, python-brace-format
+msgid ""
+"Your search exceeds the {download_limit} instance download "
+"limit.                  Anonymous users cannot run an export exceeding this "
+"limit.                  Please sign in with your {app_name} account or "
+"refine your search"
+msgstr ""
+
+#: app/views/search.py:249
+#, python-brace-format
+msgid ""
+"{total} instances have been submitted for export.                     Click "
+"the Bell icon to check for a link to download your data"
+msgstr ""
+
+#: app/views/search.py:254
+#, python-brace-format
+msgid ""
+"Your search exceeds the {download_limit} instance download limit. Please "
+"refine your search"
+msgstr ""
+
+#: app/views/search.py:281
+msgid ""
+"Either no instances were identified for export or no resources have "
+"exportable geometry nodes                Please confirm that the models of "
+"instances you would like to export have geometry nodes and "
+"that                those nodes are set as exportable"
+msgstr ""
+
+#: app/views/search.py:412
+msgid "There was an error retrieving the search results"
+msgstr ""
+
+#: app/views/search.py:511
+msgid "Downloading"
+msgstr ""
+
+#: app/views/search.py:513
+msgid "The requested file is no longer available"
+msgstr ""
+
+#: app/views/tile.py:73
+msgid "Saving tile failed"
+msgstr ""
+
+#: app/views/tile.py:127
+msgid "Unable to save. Please verify the model is currently unpublished."
+msgstr ""
+
+#: app/views/tile.py:136 app/views/tile.py:238
+msgid "This tile is no longer available"
+msgstr ""
+
+#: app/views/tile.py:136
+msgid "It was likely deleted by another user"
+msgstr ""
+
+#: app/views/tile.py:151
+msgid "Unable to save. Please verify your input is valid"
+msgstr ""
+
+#: app/views/tile.py:157
+msgid "Unable to save."
+msgstr ""
+
+#: app/views/tile.py:184
+msgid "Unable to Save. Verify model status is active"
+msgstr ""
+
+#: app/views/tile.py:239
+msgid "It was likely already deleted by another user"
+msgstr ""
+
+#: app/views/tile.py:268
+msgid "Unable to delete. Verify model status is active"
+msgstr ""
+
+#: app/views/tile.py:272
+msgid "You do not have permissions to delete a tile with authoritative data."
+msgstr ""
+
+#: app/views/tile.py:315
+msgid "Too large to be zipped.  Try downloading a single file."
+msgstr ""
+
+#: app/views/user.py:52
+msgid "Not yet logged in"
+msgstr ""
+
+#: app/views/user.py:112 app/views/user.py:146
+msgid "Profile Manager"
+msgstr ""
+
+#: app/views/user.py:115 app/views/user.py:149
+msgid "Profile Editing"
+msgstr ""
+
+#: app/views/user.py:172
+msgid ""
+"Your {} profile was just changed. If this was unexpected, please contact "
+"your administrator at {}"
+msgstr ""
+
+#: app/views/user.py:174
+msgid ""
+"Your {} profile was just changed. If this was unexpected, please contact "
+"your administrator."
+msgstr ""
+
+#: app/views/user.py:185
+msgid "Your {} Profile Has Changed!"
+msgstr ""
+
+#: app/views/workflow_history.py:67
+msgid "Workflow already completed"
+msgstr ""
+
+#: management/commands/load_ontology.py:84
+msgid ""
+"You must supply an ontology_config.json within your ontology source "
+"directory."
+msgstr ""
+
+#: management/commands/load_ontology.py:85
+#, python-brace-format
+msgid "'{config_file}' was not found."
+msgstr ""
+
+#: management/commands/load_ontology.py:89
+msgid "You must supply a version number using the -vn/--version argument."
+msgstr ""
+
+#: settings.py:699
+msgid "Hi"
+msgstr ""
