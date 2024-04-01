@@ -391,6 +391,9 @@ class Tile(models.TileModel):
 
         return data
 
+    def load_child_tiles(self):
+        self.tiles = list(Tile.objects.filter(parenttile_id=self.pk))
+
     def ensure_userprofile_exists(self, request):
         try:
             if hasattr(request.user, "userprofile") is not True:
