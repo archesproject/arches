@@ -77,7 +77,7 @@ jobs:
 
       - name: Compare coverage with baseline
         run: |
-          current_coverage=$(coverage report -m | grep TOTAL | awk '{print $4}' | tr -d '%')
+          current_coverage=$(coverage report -m | grep TOTAL | awk '{print $4}' | tr -d '%' || echo "0")
           baseline_coverage=$(cat .coverage_baseline)
           if (( current_coverage < baseline_coverage )); then
             echo "Coverage decreased from $baseline_coverage% to $current_coverage%"
