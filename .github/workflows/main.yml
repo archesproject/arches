@@ -68,3 +68,18 @@ jobs:
       - name: Report coverage
         run: |
           coverage report
+
+      - name: Retrieve baseline coverage
+        run: |
+          git fetch origin dev/7.6.x:dev/7.6.x
+          baseline_coverage=$(git show dev/7.6.x:.coverage | coverage report -m | grep TOTAL | awk '{print $4}')
+          echo "$baseline_coverage" > .coverage_baseline
+
+      - name: Compare coverage with baseline
+        run: |
+          current_coverage=$(coverage report -m | grep TOTAL | awk '{print $4}')
+          baseline_coverage=$(cat .coverage_baseline)
+          if (( $(awk "BEGIN {print ($current_coverage < $baseline_coverage)}") )); then
+            echo "Coverage decreased from $baseline_coverage% to $current_coverage%"
+            exit 1
+          fi
