@@ -25,7 +25,7 @@ try:
 except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
-PACKAGE_NAME = "arches"
+PACKAGE_NAME = "{{ project_name }}"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
 
@@ -111,12 +111,12 @@ LANGUAGES = [
 DOCKER = False
 
 try:
-    from arches.settings_local import *
+    from {{ project_name }}.settings_local import *
 except ImportError:
     pass
 
 if DOCKER:
     try:
-        from arches.settings_docker import *
+        from {{ project_name }}.settings_docker import *
     except ImportError:
         pass
