@@ -109,14 +109,3 @@ LANGUAGES = [
 ]
 
 DOCKER = False
-
-try:
-    from {{ project_name }}.settings_local import *
-except ImportError:
-    pass
-
-if DOCKER:
-    try:
-        from {{ project_name }}.settings_docker import *
-    except ImportError:
-        pass

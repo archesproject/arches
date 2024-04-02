@@ -1,5 +1,6 @@
 *.pyc
 *.log
+*.coverage
 {{ project_name }}/logs
 {{ project_name }}/export_deliverables
 {{ project_name }}/cantaloupe/*

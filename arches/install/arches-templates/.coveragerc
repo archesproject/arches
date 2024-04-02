@@ -1,0 +1,14 @@
+[run]
+source =
+    {{ project_name }}/
+
+omit =
+    */python?.?/*
+    */models/migrations/*
+    */settings*.py
+    */urls.py
+    */wsgi.py
+    */celery.py
+
+[report]
+show_missing = true
