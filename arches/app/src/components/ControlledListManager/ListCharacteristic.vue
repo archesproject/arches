@@ -109,7 +109,7 @@ input {
     text-align: center;
     border-width: 2px;
     height: 3rem;
-    width: 12rem;
+    width: 30rem;
 }
 
 .characteristic input[disabled] {
