@@ -13,7 +13,7 @@ jobs:
         image: postgis/postgis:13-3.0
         env:
           POSTGRES_PASSWORD: postgis
-          POSTGRES_DB: arches
+          POSTGRES_DB: ${{ github.event.repository.name }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -25,6 +25,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -41,10 +42,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install .
-          pip install -r arches/install/requirements.txt
-          pip install -r arches/install/requirements_dev.txt
+          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
+          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
           echo Python packages installed
-
 
       - uses: ankane/setup-elasticsearch@v1
         with:
@@ -61,10 +61,68 @@ jobs:
         run: |
           python manage.py makemigrations --check
 
-      - name: Run Arches unit tests
+      - name: Run unit tests
         run: |
           python -W default::DeprecationWarning -m coverage run manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
+      - name: Generate report coverage
+        run: |
+          coverage json
+
+      - name: Upload coverage report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: |
+            coverage.json
+
+  check-coverage:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use the latest available version
+          check-latest: true
+
+      - name: Download coverage report artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-report
+          path: .
+
       - name: Report coverage
         run: |
-          coverage report
+          cat coverage.json
+
+      - name: Retrieve baseline coverage
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+          baseline_coverage=$(git show ${{ github.event.pull_request.base.ref }}:coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          echo "$baseline_coverage" > .coverage_baseline
+
+      - name: Compare coverage with baseline
+        if: github.event_name == 'pull_request'
+        run: |
+          current_coverage=$(cat coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          baseline_coverage=$(cat .coverage_baseline)
+
+          # Compare current coverage with baseline coverage using floating-point comparison
+          if awk -v current="$current_coverage" -v baseline="$baseline_coverage" 'BEGIN { exit (current < baseline) ? 0 : 1 }'; then
+            echo "Coverage decreased from $baseline_coverage% to $current_coverage%"
+            exit 1
+          else
+            echo "$baseline_coverage% == $current_coverage%, Coverage didn't decrease. Committing new coverage.json."
+
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+
+            git add -f coverage.json
+
+            git commit -m "automatically update coverage.json"
+
+            git push -f origin HEAD:${{ github.head_ref }}
+          fi
