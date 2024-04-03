@@ -21,9 +21,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x",
-        "eslint-config-prettier": "9.1.0",
-        "prettier": "3.2.5"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#jtw/prettier"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
