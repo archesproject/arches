@@ -70,11 +70,11 @@ jobs:
           coverage json
 
       - name: Upload coverage report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: |
-            coverage.json
+          path: coverage.json
+          overwrite: true
 
   check-coverage:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
           check-latest: true
 
       - name: Download coverage report artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: coverage-report
           path: .
