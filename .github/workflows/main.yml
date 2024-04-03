@@ -100,8 +100,13 @@ jobs:
 
       - name: Retrieve baseline coverage
         run: |
-          set -e
           git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+
+          if ! git show ${{ github.event.pull_request.base.ref }}:coverage.json > /dev/null; then
+            echo "Error: coverage.json does not exist in the branch."
+            exit 1
+          fi
+
           baseline_coverage=$(git show ${{ github.event.pull_request.base.ref }}:coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
           echo "$baseline_coverage" > .coverage_baseline
 
@@ -122,8 +127,6 @@ jobs:
             git config user.email github-actions@github.com
 
             git add -f coverage.json
-
             git commit -m "automatically update coverage.json"
-
             git push -f origin HEAD:${{ github.head_ref }}
           fi
