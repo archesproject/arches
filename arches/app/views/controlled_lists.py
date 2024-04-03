@@ -350,7 +350,7 @@ class ControlledListItemView(View):
                 )
                 ControlledListItemLabel.objects.create(
                     controlled_list_item=item,
-                    value=_("New Label: ") + datetime.now().isoformat(),
+                    value=_("New Item: ") + datetime.now().isoformat(),
                     value_type_id="prefLabel",
                     language_id=get_language(),
                 )
