@@ -19,7 +19,7 @@ class Command(BaseCommand):
         """
         This will replace the following files in your project:
         .babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json, 
-        nodemon.json and tsconfig.json, and the entire webpack directory.
+        .prettierrc, nodemon.json and tsconfig.json, and the entire webpack directory.
         
         Continue?
         """
@@ -87,7 +87,7 @@ class Command(BaseCommand):
 
     def update_to_v7_6(self):
         # ensure project has a `messages.pot` file
-        for dotfile in ["nodemon.json", "tsconfig.json"]:
+        for dotfile in ["nodemon.json", "tsconfig.json", ".prettierrc"]:
             print("Copying {} to project root directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", dotfile), settings.APP_ROOT)
     

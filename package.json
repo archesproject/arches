@@ -6,9 +6,10 @@
         "build_development": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.dev.js",
         "build_production": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.prod.js",
         "build_test": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.dev.js --env test=true",
-        "eslint:check": "./arches/app/media/node_modules/.bin/eslint ./arches/app/src --resolve-plugins-relative-to ./arches/app/media --ext .vue,.ts --parser ./arches/app/media/node_modules/vue-eslint-parser/index.js",
-        "eslint:fix": "./arches/app/media/node_modules/.bin/eslint ./arches/app/src --resolve-plugins-relative-to ./arches/app/media --ext .vue,.ts --parser ./arches/app/media/node_modules/vue-eslint-parser/index.js --fix",
-        "eslint:watch": "./arches/app/media/node_modules/.bin/nodemon --watch ./arches/app/src --ext ts,vue --exec yarn --silent eslint:check",
+        "eslint:check": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/eslint ./arches/app/src --resolve-plugins-relative-to ./arches/app/media --ext .vue,.ts --parser ./arches/app/media/node_modules/vue-eslint-parser/index.js",
+        "eslint:fix": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/eslint ./arches/app/src --resolve-plugins-relative-to ./arches/app/media --ext .vue,.ts --parser ./arches/app/media/node_modules/vue-eslint-parser/index.js --fix",
+        "eslint:watch": "NODE_PATH=./arches/app/media/node_modules ./arches/app/media/node_modules/.bin/nodemon --watch ./arches/app/src --ext ts,vue --exec yarn --silent eslint:check",
+        "format": "yarn prettier arches/app/src --write",
         "gettext:extract": "./arches/app/media/node_modules/.bin/vue-gettext-extract",
         "gettext:compile": "./arches/app/media/node_modules/.bin/vue-gettext-compile",
         "ts:check": "./arches/app/media/node_modules/.bin/vue-tsc --noEmit",
@@ -20,7 +21,9 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x",
+        "eslint-config-prettier": "9.1.0",
+        "prettier": "3.2.5"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",

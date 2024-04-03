@@ -1,7 +1,7 @@
 // import declarations from other projects or Arches core
 
 // declare modules that have been added to your project (should mirror `package.json`)
-declare module 'arches';
+declare module "arches";
 declare module "@babel/runtime";
 declare module "@mapbox/geojson-extent";
 declare module "@mapbox/geojsonhint";
@@ -69,5 +69,5 @@ declare module "vue3-gettext";
 declare module "webpack-bundle-tracker";
 
 // declare filetypes used in `./src/` folder
-declare module '*.ts';
-declare module '*.vue';
+declare module "*.ts";
+declare module "*.vue";

@@ -3,6 +3,7 @@ module.exports = {
         "eslint:recommended",
         'plugin:@typescript-eslint/recommended',
         'plugin:vue/vue3-recommended',
+        "prettier"
     ],
     "root": true,
     "env": {
@@ -39,9 +40,6 @@ module.exports = {
     "overrides": [
         {
             "files": [ "*.vue" ],
-            "rules": {
-                "vue/html-indent": [2, 4],
-            }
         },
         {
             "files": [ "*.js" ],

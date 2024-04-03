@@ -57,6 +57,9 @@ jobs:
           rm yarn.lock
           yarn && yarn build_test
 
+      - name: Check formatting of frontend files
+        run: yarn && yarn format --check --no-write
+
       - name: Check for missing migrations
         run: |
           python manage.py makemigrations --check
