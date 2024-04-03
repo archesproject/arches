@@ -211,7 +211,7 @@ class TileExcelImporter(BaseImportModule):
         format = request.POST.get("format")
         if format == "xls":
             wb = create_tile_excel_workbook(request.POST.get("id"))
-            with NamedTemporaryFile(suffix='.xlsx') as tmp:
+            with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
                 wb.save(tmp.name)
                 tmp.seek(0)
                 response = HttpResponse(tmp.read(), content_type="application/vnd.ms-excel")

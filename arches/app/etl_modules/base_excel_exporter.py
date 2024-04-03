@@ -56,7 +56,7 @@ class BaseExcelExporter:
                 f["downloadfile"].seek(0)
                 zip.writestr(f["name"], f["downloadfile"].read())
 
-            with NamedTemporaryFile(suffix='.xlsx') as tmp_excel_file:
+            with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_excel_file:
                 wb.save(tmp_excel_file.name)
 
                 with open(tmp_excel_file.name, 'rb') as excel_file:
