@@ -319,13 +319,13 @@ urlpatterns = [
     re_path(r"^etl-manager$", ETLManagerView.as_view(), name="etl_manager"),
     re_path(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     re_path(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
-    path("controlled_lists/", ControlledListsView.as_view(), name="controlled_lists"),
-    path("controlled_list/", ControlledListView.as_view(), name="controlled_list_add"),
-    path("controlled_list/<uuid:id>/", ControlledListView.as_view(), name="controlled_list"),
-    path("controlled_list_item/", ControlledListItemView.as_view(), name="controlled_list_item_add"),
-    path("controlled_list_item/<uuid:id>/", ControlledListItemView.as_view(), name="controlled_list_item"),
-    path("controlled_list_item_label/<uuid:id>/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label"),
-    path("controlled_list_item_label/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label_add"),
+    path("api/controlled_lists/", ControlledListsView.as_view(), name="controlled_lists"),
+    path("api/controlled_list/", ControlledListView.as_view(), name="controlled_list_add"),
+    path("api/controlled_list/<uuid:id>/", ControlledListView.as_view(), name="controlled_list"),
+    path("api/controlled_list_item/", ControlledListItemView.as_view(), name="controlled_list_item_add"),
+    path("api/controlled_list_item/<uuid:id>/", ControlledListItemView.as_view(), name="controlled_list_item"),
+    path("api/controlled_list_item_label/<uuid:id>/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label"),
+    path("api/controlled_list_item_label/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label_add"),
 ]
 
 if settings.DEBUG:
