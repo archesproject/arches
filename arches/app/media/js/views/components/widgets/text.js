@@ -181,7 +181,7 @@ define([
         });
 
         if (self.currentDefaultText() === "") {
-            self.defaultValue("")
+            self.defaultValue("");
         }
 
     };
