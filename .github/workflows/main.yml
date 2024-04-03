@@ -100,6 +100,7 @@ jobs:
 
       - name: Retrieve baseline coverage
         run: |
+          set -e
           git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
           baseline_coverage=$(git show ${{ github.event.pull_request.base.ref }}:coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
           echo "$baseline_coverage" > .coverage_baseline
