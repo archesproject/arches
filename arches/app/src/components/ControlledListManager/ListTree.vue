@@ -25,7 +25,6 @@ const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
 
 const { $gettext } = useGettext();
-const lightGray = "#f4f4f4"; // todo: import from theme somewhere
 
 const onRowSelect = (node: typeof TreeNode) => {
     setDisplayedRow(node.data);
@@ -47,7 +46,7 @@ const onRowSelect = (node: typeof TreeNode) => {
         :filter="true"
         filter-mode="lenient"
         :filter-placeholder="$gettext('Find')"
-        selection-mode="checkbox"
+        selection-mode="single"
         :pt="{
             root: { style: { flexGrow: 1, margin: '1rem' } },
             input: {
@@ -55,10 +54,7 @@ const onRowSelect = (node: typeof TreeNode) => {
             },
             container: { style: { fontSize: '14px' } },
             content: ({ context }) : { context: TreeContext } => ({
-                style: {
-                    background: context.selected ? lightGray : '',
-                    height: '3.5rem',
-                },
+                style: { height: '3.5rem' },
             }),
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
         }"

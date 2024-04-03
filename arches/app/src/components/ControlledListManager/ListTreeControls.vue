@@ -134,11 +134,18 @@ const addChild = async (parent_id: string) => {
         if (response.ok) {
             const newItem = await response.json();
             const parent = findItemInTree(controlledListItemsTree.value, parent_id);
-            parent.data.items.unshift(newItem);
             parent.children.unshift(itemAsNode(newItem));
             if (parent.data.name) {
-                expandNode(parent);
+                // Parent node is a list
+                parent.data.items.unshift(newItem);
+            } else {
+                // Parent node is an item
+                parent.data.children.unshift(newItem);
             }
+            expandedKeys.value = {
+                ...expandedKeys.value,
+                [parent.key]: true,
+            };
         } else {
             throw new Error();
         }
@@ -224,7 +231,7 @@ const deleteItems = async (itemIds: string[]) => {
 
 
 const addLabel = computed(() => {
-    const selectedKeysList = Object.keys(selectedKeys);
+    const selectedKeysList = Object.keys(selectedKeys.value);
     if (selectedKeysList.length === 0) {
         return ADD_NEW_LIST;
     }
@@ -244,21 +251,27 @@ const onCreate = async () => {
     }
 };
 
-const onDelete = async () => {
+const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const toDelete = Object.entries(selectedKeys.value).filter(
-        ([, data]) => (data as typeof TreeSelectionKeys).checked
-    ).map(([id, ]) => id);
+    const deletes = Object.entries(selectedKeys.value).map(([id, ]) => id);
+    if (deletes.length !== 1) {
+        throw new Error('Mass deletion not yet implemented.');
+    }
+    const toDelete = deletes[0];
     selectedKeys.value = {};
 
     const allListIds = controlledListItemsTree.value.map((node: typeof TreeNode) => node.data.id);
-    const listsToDelete = toDelete.filter(id => allListIds.includes(id));
-    const itemsToDelete = toDelete.filter(id => !listsToDelete.includes(id));
-    await deleteItems(itemsToDelete);
-    await deleteLists(listsToDelete);
-    await fetchLists();
+    if (allListIds.includes(toDelete)) {
+        await deleteLists(deletes);
+    } else {
+        await deleteItems(deletes);
+    }
+};
+
+const deleteAndRefetch = async () => {
+    await deleteSelected().then(fetchLists);
 };
 
 await fetchLists();
@@ -282,7 +295,7 @@ await fetchLists();
             raised
             :disabled="!Object.keys(selectedKeys).length"
             :pt="{ root: { style: { background: buttonPink } } }"
-            @click="onDelete"
+            @click="deleteAndRefetch"
         />
     </div>
     <div class="controls">
