@@ -20,7 +20,7 @@ from arches.app.utils.data_management.resources.formats.rdffile import JsonLdRea
 from pyld.jsonld import expand
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/jsonld_import_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.importer.jsonld_import_tests --settings="tests.test_settings"
 
 
 class JsonLDImportTests(ArchesTestCase):

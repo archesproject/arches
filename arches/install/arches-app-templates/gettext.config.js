@@ -2,7 +2,7 @@
 module.exports = {
     input: {
       path: "./{{ app_name }}/src", // only files in this directory are considered for extraction
-      include: ["**/*.vue"], // glob patterns to select files for extraction
+      include: ["**/*.vue", "**/*.ts"], // glob patterns to select files for extraction
       exclude: [], // glob patterns to exclude files from extraction
       jsExtractorOpts:[ // custom extractor keyword. default empty.
           {

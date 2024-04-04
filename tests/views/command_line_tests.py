@@ -34,7 +34,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.test.client import Client
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/command_line_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.command_line_tests --settings="tests.test_settings"
 
 
 class CommandLineTests(TestCase):

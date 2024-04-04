@@ -367,7 +367,7 @@ run_tests() {
 	echo "----- RUNNING ARCHES TESTS -----"
 	echo ""
 	cd_arches_root
-	python manage.py test tests --pattern="*.py" --settings="tests.test_settings" --exe
+	python manage.py test tests --settings="tests.test_settings" --exe
 	if [ $? -ne 0 ]; then
         echo "Error: Not all tests ran succesfully."
 		echo "Exiting..."

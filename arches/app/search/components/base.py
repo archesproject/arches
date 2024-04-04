@@ -1,3 +1,4 @@
+from arches.app.const import ExtensionType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -60,7 +61,7 @@ class SearchFilterFactory(object):
             except:
                 filter_instance = None
                 class_method = get_class_from_modulename(
-                    search_filter.modulename, search_filter.classname, settings.SEARCH_COMPONENT_LOCATIONS
+                    search_filter.modulename, search_filter.classname, ExtensionType.SEARCH_COMPONENTS
                 )
                 if class_method:
                     filter_instance = class_method(self.request)
