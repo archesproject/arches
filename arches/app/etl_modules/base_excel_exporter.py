@@ -1,6 +1,7 @@
 from datetime import datetime
 from io import BytesIO
 import json
+import os
 import zipfile
 from tempfile import NamedTemporaryFile
 from django.core.files import File as DjangoFile
@@ -58,9 +59,10 @@ class BaseExcelExporter:
 
             with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_excel_file:
                 wb.save(tmp_excel_file.name)
-
                 with open(tmp_excel_file.name, 'rb') as excel_file:
                     zip.writestr(excel_file_name, excel_file.read())
+
+        os.unlink(tmp_excel_file.name)
 
         buffer.flush()
         zip_stream = buffer.getvalue()

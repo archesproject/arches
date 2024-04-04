@@ -216,6 +216,7 @@ class TileExcelImporter(BaseImportModule):
                 tmp.seek(0)
                 response = HttpResponse(tmp.read(), content_type="application/vnd.ms-excel")
                 response["Content-Disposition"] = "attachment"
-                return {"success": True, "raw": response}
+            os.unlink(tmp.name)
+            return {"success": True, "raw": response}
         else:
             return {"success": False, "data": "failed"}
