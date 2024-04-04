@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 FALSE,
                 '46ef064b-2611-4708-9f52-60136bd8a65b',
                 TRUE
-            );
+            ) ON CONFLICT DO NOTHING;
             INSERT INTO widgets(
                 widgetid,
                 name,
@@ -50,9 +50,8 @@ class Migration(migrations.Migration):
                     "placeholder": "Enter text",
                     "defaultValue": ""
                 }'
-            );
+            ) ON CONFLICT DO NOTHING;
             """,
-            reverse_sql = """ 
-            """
+            reverse_sql=migrations.RunSQL.noop
             ),
         ]
