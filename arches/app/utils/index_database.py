@@ -8,7 +8,7 @@ import pyprind
 import sys
 from types import SimpleNamespace
 from django.db import connection, connections
-from django.db.models import Q
+from django.db.models import prefetch_related_objects, Prefetch, Q, QuerySet
 from arches.app.models import models
 from arches.app.models.models import Value
 from arches.app.models.resource import Resource
@@ -184,6 +184,39 @@ def index_resources_using_multiprocessing(
         pool.join()
 
 
+def optimize_resource_iteration(resources: Iterable[Resource]):
+    """
+    - select related graphs
+    - prefetch tiles (onto .tiles)
+    - prefetch primary descriptors (onto graph.descriptor_function)
+
+    The caller is responsible for moving the descriptor function
+    prefetch from the graph to the resource instance. (This is a
+    symptom of this probably better belonging on the graph anyway.)
+    """
+    tiles_prefetch = Prefetch("tilemodel_set", to_attr="tiles")
+    # Same queryset as Resource.save_descriptors()
+    descriptor_query = models.FunctionXGraph.objects.filter(
+        function__functiontype="primarydescriptors",
+    ).select_related("function")
+    descriptor_prefetch = Prefetch(
+        "graph__functionxgraph_set",
+        queryset=descriptor_query,
+        to_attr="descriptor_function",
+    )
+
+    if isinstance(resources, QuerySet):
+        return (
+            resources.select_related("graph")
+            .prefetch_related(tiles_prefetch)
+            .prefetch_related(descriptor_prefetch)
+        )
+    else:  # public API that arches itself does not currently use
+        prefetch_related_objects(resources, tiles_prefetch)
+        prefetch_related_objects(resources, descriptor_prefetch)
+        return resources
+
+
 def index_resources_using_singleprocessing(
     resources: Iterable[Resource], batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False, title=None, recalculate_descriptors=False
 ):
@@ -193,25 +226,21 @@ def index_resources_using_singleprocessing(
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
-            last_resource = None
-            for resource in resources:
+
+            for resource in optimize_resource_iteration(resources):
+                resource.descriptor_function = resource.graph.descriptor_function
                 resource.set_node_datatypes(node_datatypes)
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if recalculate_descriptors:
-                    # Reuse the queryset for FunctionXGraph rows if the graph is the same.
-                    if last_resource and (resource.graph_id == last_resource.graph_id):
-                        resource.descriptor_function = last_resource.descriptor_function
                     resource.save_descriptors()
                 if quiet is False and bar is not None:
                     bar.update(item_id=resource)
                 document, terms = resource.get_documents_to_index(
-                    fetchTiles=True, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+                    fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
                 )
                 doc_indexer.add(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document)
                 for term in terms:
                     term_indexer.add(index=TERMS_INDEX, id=term["_id"], data=term["_source"])
-
-                last_resource = resource
 
     return os.getpid()
 
