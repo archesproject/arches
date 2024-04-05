@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 from arches.app.models import models
