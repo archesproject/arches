@@ -311,15 +311,6 @@ class EditLog(models.Model):
             models.Index(fields=["transactionid"]),
         ]
 
-@receiver(post_save, sender=EditLog)
-def cache_editlog_nodegroup_count(sender, instance, **kwargs):
-    cache = caches["default"]
-    cache.set(
-        f'editlog_nodegroupid_{instance.nodegroupid}_count',
-        EditLog.objects.filter(nodegroupid=instance.nodegroupid).count(),
-        settings.CACHE_BY_USER["editlog"]
-    )
-
 
 class ExternalOauthToken(models.Model):
     token_id = models.UUIDField(primary_key=True, serialize=False, unique=True)
