@@ -501,7 +501,7 @@ TIMEWHEEL_DATE_TIERS = None
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
 CACHE_BY_USER = {
     "default": 3600 * 24, #24hrs
-    "anonymous": 3600 * 24, #24hrs
+    "anonymous": 3600 * 24 #24hrs
 }
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
