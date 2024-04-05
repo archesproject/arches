@@ -500,7 +500,6 @@ TIMEWHEEL_DATE_TIERS = None
 CACHE_BY_USER = {
     "default": 3600 * 24, #24hrs
     "anonymous": 3600 * 24, #24hrs
-    "editlog": 3600 * 24 * 7 #7 days
 }
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
