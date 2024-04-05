@@ -62,7 +62,7 @@ class ArchesCommand(TemplateCommand):
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
         # need to manually replace instances of {{ project_name }} in some files
-        path_to_project = os.path.join(target, project_name) if target else os.path.join(os.getcwd(), project_name)
+        path_to_project = os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
 
         for relative_file_path in ['.yarnrc']:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path),'r')
@@ -75,18 +75,25 @@ class ArchesCommand(TemplateCommand):
             file.write(updated_file_data)
             file.close()
 
-
 def command_create_app(args):
-    cmd = ArchesCommand()
     options = vars(args)
-    proj_name = options['name']
+    name = options['name']
+    directory = options['directory']
+
+    cmd = ArchesCommand()
     cmd.handle(options)
-    yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    os.chdir(yarn_path)
+
+    project_path = os.path.join(os.getcwd(), (directory if directory else name))
+
+    os.chdir(project_path)
     subprocess.call("yarn install", shell=True)
+
+    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+
+    os.chdir(os.path.join(project_path, name))
     if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
         os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+
     open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
 
 
