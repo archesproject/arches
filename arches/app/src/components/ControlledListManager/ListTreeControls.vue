@@ -8,7 +8,9 @@ import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledLis
 import { bestLabel, findItemInTree } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
+import ConfirmDialog from "primevue/confirmdialog";
 import Dropdown from "primevue/dropdown";
+import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 import type { TreeExpandedKeys, TreeSelectionKeys, TreeNode } from "primevue/tree/Tree";
@@ -28,13 +30,14 @@ const controlledListItemsTree = defineModel();
 const expandedKeys: Ref<typeof TreeExpandedKeys> = defineModel("expandedKeys");
 const selectedKeys: Ref<typeof TreeSelectionKeys> = defineModel("selectedKeys");
 
-const { $gettext } = useGettext();
+const { $gettext, $ngettext } = useGettext();
 const ADD_NEW_LIST = $gettext("Add New List");
 const ADD_CHILD_ITEM = $gettext("Add Child Item");
 const lightGray = "#f4f4f4"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
+const confirm = useConfirm();
 const toast = useToast();
 
 const expandAll = () => {
@@ -255,7 +258,7 @@ const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const deletes = Object.entries(selectedKeys.value).map(([id, ]) => id);
+    const deletes = Object.keys(selectedKeys.value);
     if (deletes.length !== 1) {
         throw new Error('Mass deletion not yet implemented.');
     }
@@ -270,8 +273,26 @@ const deleteSelected = async () => {
     }
 };
 
-const deleteAndRefetch = async () => {
-    await deleteSelected().then(fetchLists);
+const confirmDelete = () => {
+    const numItems = Object.keys(selectedKeys.value).length;
+    confirm.require({
+        message: $ngettext(
+            "Are you sure you want to delete %{ numItems } item (including all children)?",
+            "Are you sure you want to delete %{ numItems } items (including all children)?",
+            numItems,
+            { numItems },
+        ),
+        header: $gettext("Confirm deletion"),
+        icon: "fa fa-exclamation-triangle",
+        rejectLabel: $gettext("Cancel"),
+        rejectClass: "p-button-secondary p-button-outlined",
+        acceptLabel: $gettext("Delete"),
+        draggable: false,
+        accept: async () => {
+            await deleteSelected().then(fetchLists);
+        },
+        reject: () => {},
+    });
 };
 
 await fetchLists();
@@ -288,14 +309,14 @@ await fetchLists();
             :pt="{ root: { style: { background: buttonGreen } } }"
             @click="onCreate"
         />
-        <!-- We might want an are you sure? modal -->
+        <ConfirmDialog :draggable="false" />
         <Button
             class="list-button"
             :label="$gettext('Delete')"
             raised
             :disabled="!Object.keys(selectedKeys).length"
             :pt="{ root: { style: { background: buttonPink } } }"
-            @click="deleteAndRefetch"
+            @click="confirmDelete"
         />
     </div>
     <div class="controls">
@@ -355,5 +376,26 @@ await fetchLists();
     justify-content: center;
     font-weight: 600;
     text-wrap: nowrap;
+}
+</style>
+
+<style>
+.p-confirm-dialog {
+    font-size: small;
+}
+.p-dialog-header {
+    background: #2d3c4b;
+    color: white;
+}
+.p-dialog-title {
+    font-weight: 800;
+}
+.p-dialog-content {
+    padding-top: 1.25rem;
+}
+.p-confirm-dialog-accept {
+    background: #ed7979;
+    color: white;
+    font-weight: 600;
 }
 </style>
