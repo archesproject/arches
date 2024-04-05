@@ -1199,8 +1199,7 @@ class TileModel(models.Model):  # Tile
 
     @property
     def nodegroup(self):
-        nodegroup_query = NodeGroup.objects.filter(pk=self.nodegroup_id)
-        return nodegroup_query.first()
+        return NodeGroup.objects.get(pk=self.nodegroup_id)
 
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
