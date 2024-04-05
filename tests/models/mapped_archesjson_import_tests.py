@@ -29,7 +29,7 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/mapped_archesjson_import_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.mapped_archesjson_import_tests --settings="tests.test_settings"
 
 
 class mappedArchesJSONImportTests(ArchesTestCase):

@@ -63,7 +63,7 @@ jobs:
 
       - name: Run Arches unit tests
         run: |
-          python -W default::DeprecationWarning -m coverage run manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+          python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
 
       - name: Report coverage
         run: |

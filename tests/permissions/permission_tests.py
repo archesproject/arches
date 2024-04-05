@@ -41,7 +41,7 @@ from arches.app.utils.permission_backend import user_has_resource_model_permissi
 from arches.app.utils.permission_backend import get_restricted_users
 
 # these tests can be run from the command line via
-# python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.permissions.permission_tests --settings="tests.test_settings"
 
 
 class PermissionTests(ArchesTestCase):

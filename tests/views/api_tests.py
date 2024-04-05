@@ -39,7 +39,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from django.contrib.auth.models import User, Group, AnonymousUser
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.api_tests --settings="tests.test_settings"
 
 
 class APITests(ArchesTestCase):
