@@ -399,22 +399,8 @@ class MVT(APIBase):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
-    def create_mvt_cache_key(node, zoom, x, y, user, mvt_snapshot=None):
-        if not mvt_snapshot:
-            mvt_snapshot = cache.get(
-                f'editlog_nodegroupid_{str(node.nodegroup_id)}_count'
-            )
-            if not mvt_snapshot:
-                mvt_snapshot = models.EditLog.objects.filter(
-                    nodegroupid=str(node.nodegroup_id)
-                ).count()
-                cache.set(
-                    f'editlog_nodegroupid_{str(node.nodegroup_id)}_count',
-                    mvt_snapshot, 
-                    settings.CACHE_BY_USER["editlog"]
-                )
-
-        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{mvt_snapshot}_{user.id}"
+    def create_mvt_cache_key(node, zoom, x, y, user):
+        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
