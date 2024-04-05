@@ -1,0 +1,32 @@
+{% load i18n %}
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                value: op,
+                data:[
+                    { text: $root.translations.like, id: '~' },
+                    { text: $root.translations.notLike, id: '!~' },
+                    { text: $root.translations.equals, id: 'eq' },
+                    { text: $root.translations.not, id: '!eq' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ]
+        }}">
+    </select>
+</div>
+
+<div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <input 
+        type="text" 
+        class="form-control input-lg" 
+        style="height: 36px;" 
+        data-bind="
+            attr: {placeholder: $root.translations.value, 'aria-label': node.label},
+            textInput: searchValue
+        "
+    >
+</div>
+<!-- /ko -->
