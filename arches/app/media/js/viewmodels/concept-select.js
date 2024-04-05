@@ -22,8 +22,7 @@ define([
             
             if (Array.isArray(valueList)) {
                 return valueList;
-            }
-            if (!self.multiple && valueList) {
+            } else if (!self.multiple && valueList) {
                 return [valueList];
             }
             return [];
