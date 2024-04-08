@@ -187,14 +187,17 @@ def index_resources_using_multiprocessing(
 def optimize_resource_iteration(resources: Iterable[Resource]):
     """
     - select related graphs
-    - prefetch tiles (onto .tiles)
+    - prefetch tiles (onto .prefetched_tiles)
     - prefetch primary descriptors (onto graph.descriptor_function)
 
     The caller is responsible for moving the descriptor function
-    prefetch from the graph to the resource instance. (This is a
-    symptom of this probably better belonging on the graph anyway.)
+    prefetch from the graph to the resource instance--a symptom of
+    this being more of a graph property--and for moving the prefetched
+    tiles to .tiles (because the Resource proxy model initializes
+    .tiles to an emtpy array and Django thinks that represents the
+    state in the db.)
     """
-    tiles_prefetch = Prefetch("tilemodel_set", to_attr="tiles")
+    tiles_prefetch = Prefetch("tilemodel_set", to_attr="prefetched_tiles")
     # Same queryset as Resource.save_descriptors()
     descriptor_query = models.FunctionXGraph.objects.filter(
         function__functiontype="primarydescriptors",
@@ -208,12 +211,14 @@ def optimize_resource_iteration(resources: Iterable[Resource]):
     if isinstance(resources, QuerySet):
         return (
             resources.select_related("graph")
-            .prefetch_related(tiles_prefetch)
-            .prefetch_related(descriptor_prefetch)
+            .prefetch_related(tiles_prefetch, descriptor_prefetch)
         )
     else:  # public API that arches itself does not currently use
-        prefetch_related_objects(resources, tiles_prefetch)
-        prefetch_related_objects(resources, descriptor_prefetch)
+        for r in resources:
+            # retrieve graph -- better for this to have been selected already
+            r.graph
+
+        prefetch_related_objects(resources, tiles_prefetch, descriptor_prefetch)
         return resources
 
 
@@ -228,6 +233,7 @@ def index_resources_using_singleprocessing(
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
 
             for resource in optimize_resource_iteration(resources):
+                resource.tiles = resource.prefetched_tiles
                 resource.descriptor_function = resource.graph.descriptor_function
                 resource.set_node_datatypes(node_datatypes)
                 resource.set_serialized_graph(get_serialized_graph(resource.graph))
