@@ -194,7 +194,7 @@ def optimize_resource_iteration(resources: Iterable[Resource]):
     prefetch from the graph to the resource instance--a symptom of
     this being more of a graph property--and for moving the prefetched
     tiles to .tiles (because the Resource proxy model initializes
-    .tiles to an emtpy array and Django thinks that represents the
+    .tiles to an empty array and Django thinks that represents the
     state in the db.)
     """
     tiles_prefetch = Prefetch("tilemodel_set", to_attr="prefetched_tiles")
