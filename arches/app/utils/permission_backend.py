@@ -164,7 +164,7 @@ def get_users_for_object(perm, obj):
     return ret
 
 
-def get_nodegroups_by_perm(user, perms, any_perm=True):
+def get_nodegroups_by_perm(user, perms, any_perm=True, nodegroups=None):
     """
     returns a list of node groups that a user has the given permission on
 
@@ -172,6 +172,7 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     user -- the user to check
     perms -- the permssion string eg: "read_nodegroup" or list of strings
     any_perm -- True to check ANY perm in "perms" or False to check ALL perms
+    nodegroups -- list of NodeGroup objects
 
     """
     if not isinstance(perms, list):
@@ -188,7 +189,9 @@ def get_nodegroups_by_perm(user, perms, any_perm=True):
     permitted_nodegroups = set()
     NodegroupPermissionsChecker = CachedObjectPermissionChecker(user, NodeGroup)
 
-    for nodegroup in NodeGroup.objects.all():
+    nodegroups_to_check = nodegroups if nodegroups else NodeGroup.objects.all()
+
+    for nodegroup in nodegroups_to_check:
         explicit_perms = NodegroupPermissionsChecker.get_perms(nodegroup)
 
         if len(explicit_perms):

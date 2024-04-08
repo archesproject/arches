@@ -96,7 +96,10 @@ class Graph(models.GraphModel):
                     ):
                         setattr(self, key, value)
 
-                self.update_permissions(args[0])
+                try:
+                    self.update_permissions(args[0])
+                except AttributeError:  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
+                    pass
 
                 nodegroups = dict((item["nodegroupid"], item) for item in args[0]["nodegroups"])
                 for node in args[0]["nodes"]:

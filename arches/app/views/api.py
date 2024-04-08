@@ -1215,20 +1215,25 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(request.user, perm)
-                    permitted_cards.append(card)
+            nodegroups = [models.NodeGroup(**serialized_nodegroup) for serialized_nodegroup in published_graph.serialized_graph['nodegroups']]
+            readable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, perm, any_perm=True, nodegroups=nodegroups)]
+            writable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, 'write_nodegroup', any_perm=True, nodegroups=nodegroups)]
 
-            cardwidgets = [
+            permitted_cards = sorted([
+                card 
+                for card 
+                in graph.cards.values() 
+                if str(card.nodegroup_id) in readable_nodegroup_ids
+                and str(card.nodegroup_id) in writable_nodegroup_ids
+            ], key=lambda card: card.sortorder)
+
+            permitted_card_ids = [card.pk for card in permitted_cards]
+            cardwidgets = sorted([
                 widget
-                for widgets in [
-                    sorted(card.cardxnodexwidget_set.all(), key=lambda x: x.sortorder or 0)
-                    for card in permitted_cards
-                ]
-                for widget in widgets
-            ]
+                for widget
+                in graph.widgets
+                if widget['card_id'] in permitted_card_ids
+            ], key=lambda widget: widget['sortorder'])
 
             resp["cards"] = permitted_cards
             resp["cardwidgets"] = cardwidgets

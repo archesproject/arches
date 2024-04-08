@@ -254,9 +254,14 @@ class Resource(models.ResourceInstance):
         """
 
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+
         if user:
-            readable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perm, any_perm=True)]
-            self.tiles = [tile for tile in self.tiles if tile.nodegroup_id in readable_nodegroup_ids]
+            published_graph = models.PublishedGraph.objects.get(publication=self.graph_publication, language=get_language())
+            nodegroups = [models.NodeGroup(**serialized_nodegroup) for serialized_nodegroup in published_graph.serialized_graph['nodegroups']]
+
+            readable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perm, any_perm=True, nodegroups=nodegroups)]
+
+            self.tiles = [tile for tile in self.tiles if str(tile.nodegroup_id) in readable_nodegroup_ids]
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
