@@ -2,10 +2,12 @@
 import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import Button from "primevue/button";
 import Tree from "primevue/tree";
 
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
+import MoveItem from "@/components/ControlledListManager/MoveItem.vue";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
@@ -25,6 +27,7 @@ const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
 
 const { $gettext } = useGettext();
+const modalVisible = ref(false);
 
 const onRowSelect = (node: typeof TreeNode) => {
     setDisplayedRow(node.data);
@@ -65,12 +68,31 @@ const onRowSelect = (node: typeof TreeNode) => {
         </template>
         <template #default="slotProps">
             {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
-            <span v-if="slotProps.node.data.uri">
-                (<a
-                    :href="slotProps.node.data.uri"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >{{ slotProps.node.data.uri }}</a>)
+            <span
+                v-if="slotProps.node.data.uri"
+                class="after-node-label"
+            >
+                <span>
+                    (<a
+                        :href="slotProps.node.data.uri"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        :class="slotProps.node.key in selectedKeys ? 'selected' : ''"
+                    >
+                    {{ slotProps.node.data.uri }}
+                    </a>)
+                </span>
+                <Button
+                    v-if="slotProps.node.key in selectedKeys"
+                    type="button"
+                    class="move-button"
+                    :label="$gettext('Move')"
+                    @click="modalVisible = true"
+                />
+                <MoveItem
+                    v-model="modalVisible"
+                    :itemData="slotProps.node.data"
+                />
             </span>
         </template>
     </Tree>
@@ -79,5 +101,17 @@ const onRowSelect = (node: typeof TreeNode) => {
 <style scoped>
 a {
     color: var(--blue-500);
+    font-size: 1.3rem; /* same as arches.scss selected */
+}
+.after-node-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+}
+.move-button {
+    background-color: aliceblue;
+    color: black;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
 }
 </style>
