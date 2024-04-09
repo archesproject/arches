@@ -30,7 +30,7 @@ from rdflib.namespace import RDF, RDFS, XSD
 from django.utils import translation
 
 # these tests can be run from the command line via
-# python manage.py test tests/exporter/datatype_to_rdf_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.exporter.datatype_to_rdf_tests --settings="tests.test_settings"
 
 ARCHES_NS = Namespace(test_settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")

@@ -42,7 +42,7 @@ from arches.app.search.mappings import (
 )
 
 # these tests can be run from the command line via
-# python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests --settings="tests.test_settings"
 
 OAUTH_CLIENT_ID = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
 OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\

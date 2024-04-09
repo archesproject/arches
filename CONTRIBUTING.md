@@ -49,7 +49,7 @@ If I am working on ticket "Cool New Feature (ticket #1231)" my branch may be nam
     Note 2: If you have created or deleted files in the file system, you'll have to precede this `commit` command with `git add .` which with add these new (or deleted) files to your git index.
 * Test your changes locally to ensure all the tests pass (make sure your virtual environment is activate first):
     ```shell
-   python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+   python manage.py test tests --settings="tests.test_settings"
    ```
 * Push your branch to GitHub:
     ```shell
