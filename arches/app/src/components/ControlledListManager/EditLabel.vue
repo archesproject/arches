@@ -100,16 +100,16 @@ const onSave = async () => {
         <div class="controls">
             <Button
                 type="button"
+                class="delete"
+                :label="$gettext('Cancel edit')"
+                @click="visible = false; value = props.label.value"
+            />
+            <Button
+                type="button"
                 class="save"
                 :label="$gettext('Save')"
                 :disabled="!value || !language"
                 @click="onSave"
-            />
-            <Button
-                type="button"
-                class="delete"
-                :label="$gettext('Cancel edit')"
-                @click="visible = false; value = props.label.value"
             />
         </div>
     </Dialog>
@@ -129,6 +129,7 @@ label, .p.dropdown-label {
 .controls {
     display: flex;
     gap: 1rem;
+    justify-content: end;
 }
 .controls > button {
     color: white;
