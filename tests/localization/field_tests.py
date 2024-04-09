@@ -1,4 +1,6 @@
 import json
+
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.fields.i18n import I18n_String, I18n_TextField, I18n_JSON, I18n_JSONField
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
@@ -355,3 +357,13 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         m.save()
         m = self.LocalizationTestJsonModel.objects.get(pk=3)
         self.assertEqual(m.config.raw_value, expected_output_json)
+
+
+class AsSqlTests(ArchesTestCase):
+    def test_domain_datatype(self):
+        datatype = DataTypeFactory().get_instance("domain-value")
+        domain_value = I18n_JSON({"en": "it's a bird"})
+
+        # Apostrophe in "it's" is doubly-escaped so it doesn't close the string
+        expected = "jsonb_set(None, array[\'en\'], \'\"it\'\'s a bird\"\')"
+        self.assertEqual(datatype.i18n_as_sql(domain_value, None, None), expected)
