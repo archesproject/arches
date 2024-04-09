@@ -2,6 +2,7 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListCharacteristic from "@/components/ControlledListManager/ListCharacteristic.vue";
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
 import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
@@ -9,11 +10,16 @@ import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
 const { displayedRow } = inject(displayedRowKey);
 
 const { $gettext } = useGettext();
-const LIST_DETAILS = $gettext("List Details");
 </script>
 
 <template>
-    <h3>{{ LIST_DETAILS }}</h3>
+    <span class="controlled-list-header">
+        <LetterCircle
+            v-if="displayedRow"
+            :labelled="displayedRow"
+        />
+        <h3>{{ displayedRow.name }}</h3>
+    </span>
     <div>
         <ListCharacteristic
             :editable="true"
@@ -41,11 +47,19 @@ const LIST_DETAILS = $gettext("List Details");
 </template>
 
 <style scoped>
-h3 {
-    font-size: 1.5rem;
-    margin: 1rem;
+.controlled-list-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 1rem 0rem 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid;
+    width: 80%;
+}
+
+h3 {
+    margin: 0;
+    font-size: 1.5rem;
 }
 
 h4 {
