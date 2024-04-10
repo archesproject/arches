@@ -268,6 +268,5 @@ class URLDataType(BaseDataType):
         }
 
     def pre_tile_save(self, tile, nodeid):
-        if tile.data[nodeid]:
-            if tile and "url_label" not in tile.data[nodeid]:
-                tile.data[nodeid]["url_label"] = ""
+        if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
+            tile_val["url_label"] = ""
