@@ -74,3 +74,50 @@ class StringDataTypeTests(ArchesTestCase):
         string.clean(tile2, nodeid)
 
         self.assertIsNotNone(tile2.data[nodeid])
+
+
+class URLDataTypeTests(ArchesTestCase):
+    def test_validate(self):
+        url = DataTypeFactory().get_instance("url")
+
+        no_errors = url.validate({"url": "https://www.google.com/", "url_label": "Google"})
+        self.assertEqual(len(no_errors), 0)
+
+        some_errors_invalid_url = url.validate({"url": "google", "url_label": "Google"})
+        self.assertEqual(len(some_errors_invalid_url), 1)
+
+        # this should probably just be 1 error, but the url empty string not None is causing both
+        some_errors_no_url = url.validate({"url": "", "url_label": "Google"})
+        self.assertEqual(len(some_errors_no_url), 2)
+
+    def test_pre_tile_save(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        url_no_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "https://www.google.com/"}},
+        }
+        tile1 = Tile(url_no_label)
+        url.pre_tile_save(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+        self.assertTrue("url_label" in tile1.data[nodeid])
+        self.assertFalse(tile1.data[nodeid]["url_label"])
+
+        url_with_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "https://www.google.com/", "url_label": "Google"}},
+        }
+        tile2 = Tile(url_with_label)
+        url.pre_tile_save(tile2, nodeid)
+        self.assertIsNotNone(tile2.data[nodeid])
+        self.assertTrue("url_label" in tile2.data[nodeid])
+        self.assertTrue(tile2.data[nodeid]["url_label"])
