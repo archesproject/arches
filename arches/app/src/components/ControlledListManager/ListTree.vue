@@ -29,8 +29,28 @@ const selectedLanguage = inject(selectedLanguageKey);
 const { $gettext } = useGettext();
 const modalVisible = ref(false);
 
+const collapseNodesRecursive = (node: typeof TreeNode) => {
+    if (node.children && node.children.length) {
+        expandedKeys.value = {
+            ...expandedKeys.value,
+            [node.key]: false,
+        };
+        for (const child of node.children) {
+            collapseNodesRecursive(child);
+        }
+    }
+};
+
 const onRowSelect = (node: typeof TreeNode) => {
     setDisplayedRow(node.data);
+    expandedKeys.value = {
+        ...expandedKeys.value,
+        [node.key]: true,
+    };
+    if (node.data.name) {
+        tree.value.filter(list => list.data.id !== node.data.id)
+            .forEach(list => collapseNodesRecursive(list));
+    }
 };
 </script>
 
