@@ -51,10 +51,11 @@ const onRowSelect = (node: typeof TreeNode) => {
         :filter-placeholder="$gettext('Find')"
         selection-mode="single"
         :pt="{
-            root: { style: { flexGrow: 1, margin: '1rem' } },
+            root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden' } },
             input: {
                 style: { height: '3.5rem', fontSize: '14px' },
             },
+            wrapper: { style: { overflowY: 'auto', maxHeight: '100%' } },
             container: { style: { fontSize: '14px' } },
             content: ({ context }) : { context: TreeContext } => ({
                 style: { height: '3.5rem' },
@@ -67,32 +68,21 @@ const onRowSelect = (node: typeof TreeNode) => {
             <LetterCircle :labelled="slotProps.node.data" />
         </template>
         <template #default="slotProps">
-            {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
-            <span
-                v-if="slotProps.node.data.uri"
-                class="after-node-label"
-            >
-                <span>
-                    (<a
-                        :href="slotProps.node.data.uri"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        :class="slotProps.node.key in selectedKeys ? 'selected' : ''"
-                    >
-                    {{ slotProps.node.data.uri }}
-                    </a>)
+            <span class="label-and-actions">
+                {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
+                <span v-if="!slotProps.node.data.name">
+                    <Button
+                        v-if="slotProps.node.key in selectedKeys"
+                        type="button"
+                        class="move-button"
+                        :label="$gettext('Move')"
+                        @click="modalVisible = true"
+                    />
+                    <MoveItem
+                        v-model="modalVisible"
+                        :itemData="slotProps.node.data"
+                    />
                 </span>
-                <Button
-                    v-if="slotProps.node.key in selectedKeys"
-                    type="button"
-                    class="move-button"
-                    :label="$gettext('Move')"
-                    @click="modalVisible = true"
-                />
-                <MoveItem
-                    v-model="modalVisible"
-                    :itemData="slotProps.node.data"
-                />
             </span>
         </template>
     </Tree>
@@ -103,7 +93,7 @@ a {
     color: var(--blue-500);
     font-size: 1.3rem; /* same as arches.scss selected */
 }
-.after-node-label {
+.label-and-actions {
     display: inline-flex;
     align-items: center;
     gap: 1rem;

@@ -371,7 +371,7 @@ await fetchLists();
     flex: 0.33;
     border: 0;
     background: v-bind(lightGray);
-    height: 4rem;
+    height: 3rem;
     margin: 0.5rem;
     justify-content: center;
     font-weight: 600;

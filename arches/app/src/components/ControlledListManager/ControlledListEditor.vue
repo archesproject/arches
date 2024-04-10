@@ -96,7 +96,4 @@ const listOrItemView = computed(() => {
     flex-direction: column;
     height: 100%;
 }
-.p-splitter-panel {
-    overflow-y: auto;
-}
 </style>
