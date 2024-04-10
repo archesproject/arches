@@ -1,4 +1,5 @@
-import type { ControlledListItem } from "@/types/ControlledListManager";
+import type { Language } from "@/types/arches";
+import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
 import type { TreeNode } from "primevue/tree/Tree";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
@@ -30,4 +31,28 @@ export const findItemInTree = (tree: typeof TreeNode[], itemId: string) => {
     }
 
     return recurse(tree);
+};
+
+export const itemAsNode = (
+    item: ControlledListItem,
+    selectedLanguage: Language,
+): typeof TreeNode => {
+    return {
+        key: item.id,
+        label: bestLabel(item, selectedLanguage.code).value,
+        children: item.children.map(child => itemAsNode(child, selectedLanguage)),
+        data: item,
+    };
+};
+
+export const listAsNode = (
+    list: ControlledList,
+    selectedLanguage: Language,
+): typeof TreeNode => {
+    return {
+        key: list.id,
+        label: list.name,
+        children: list.items.map(item => itemAsNode(item, selectedLanguage)),
+        data: list,
+    };
 };

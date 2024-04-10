@@ -5,7 +5,12 @@ import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
-import { bestLabel, findItemInTree } from "@/components/ControlledListManager/utils.ts";
+import {
+    bestLabel,
+    findItemInTree,
+    itemAsNode,
+    listAsNode,
+} from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -60,24 +65,6 @@ const expandNode = (node: typeof TreeNode) => {
     }
 };
 
-function itemAsNode(item: ControlledListItem): typeof TreeNode {
-    return {
-        key: item.id,
-        label: bestLabel(item, selectedLanguage.value.code).value,
-        children: item.children.map(child => itemAsNode(child)),
-        data: item,
-    };
-}
-
-function listAsNode(list: ControlledList): typeof TreeNode {
-    return {
-        key: list.id,
-        label: list.name,
-        children: list.items.map(item => itemAsNode(item)),
-        data: list,
-    };
-}
-
 const fetchLists = async () => {
     let errorText;
     try {
@@ -90,7 +77,7 @@ const fetchLists = async () => {
         } else {
             await response.json().then((data) => {
                 controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
-                    l => listAsNode(l)
+                    l => listAsNode(l, selectedLanguage.value)
                 );
             });
         }
@@ -137,7 +124,7 @@ const addChild = async (parent_id: string) => {
         if (response.ok) {
             const newItem = await response.json();
             const parent = findItemInTree(controlledListItemsTree.value, parent_id);
-            parent.children.unshift(itemAsNode(newItem));
+            parent.children.unshift(itemAsNode(newItem, selectedLanguage.value));
             if (parent.data.name) {
                 // Parent node is a list
                 parent.data.items.unshift(newItem);

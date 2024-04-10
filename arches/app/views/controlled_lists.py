@@ -85,6 +85,7 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                 depth_map[obj.id] = depth_map[obj.parent_id] + 1
             data = {
                 "id": str(obj.id),
+                "controlled_list_id": str(obj.controlled_list_id),
                 "uri": obj.uri,
                 "sortorder": obj.sortorder,
                 "guide": obj.guide,

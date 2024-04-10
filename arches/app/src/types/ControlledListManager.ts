@@ -18,6 +18,7 @@ export type ValueType = "prefLabel" | "altLabel";
 
 export type ControlledListItem = {
     id: string,
+    controlled_list_id: string,
     uri: string,
     sortorder: number,
     guide: boolean,
