@@ -19,18 +19,20 @@ import type {
     TreeNode,
     TreeSelectionKeys,
 } from "primevue/tree/Tree";
-import type { ControlledList } from "@/types/ControlledListManager";
+import type {
+    ControlledList,
+    ControlledListItem,
+} from "@/types/ControlledListManager";
 
 const tree: Ref<typeof TreeNode[]> = ref([]);
 const selectedKeys: Ref<typeof TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
 
-const { displayedRow, setDisplayedRow } = inject(displayedRowKey);
+const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
 
 const toast = useToast();
 const { $gettext } = useGettext();
-const modalVisible = ref(false);
 
 const collapseNodesRecursive = (node: typeof TreeNode) => {
     if (node.children && node.children.length) {
@@ -103,13 +105,16 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
     let reorderedSiblings: ControlledListItem[];
     if (up) {
         const leftNeighbor = itemsToLeft.pop();
+        if (!leftNeighbor) {  // should be impossible, not localized
+            throw new Error('Cannot shift upward - already at top');
+        }
         reorderedSiblings = [...itemsToLeft, item, leftNeighbor, ...itemsToRight];
     } else {
         const [rightNeighbor, ...rest] = itemsToRight;
         reorderedSiblings = [...itemsToLeft, rightNeighbor, item, ...rest];
     }
 
-    const recalculateSortOrderRecursive = (acc, items) => {
+    const recalculateSortOrderRecursive = (acc: number, items: ControlledListItem[]) => {
         // Patch in the reordered siblings.
         if (items.some(x => x.id === item.id)) {
             items = reorderedSiblings;
@@ -133,6 +138,31 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
             ...tree.value.slice(oldListIndex + 1),
         ];
     }
+};
+
+const isFirstItem = (item: ControlledListItem) => {
+    const siblings: typeof TreeNode[] = (
+        item.parent_id
+        ? findItemInTree(tree.value, item.parent_id).data.children
+        : findItemInTree(tree.value, item.controlled_list_id).data.items
+    );
+    if (!siblings) {
+        throw new Error("Unexpected lack of siblings");
+    }
+    return siblings[0].id === item.id;
+};
+
+
+const isLastItem = (item: ControlledListItem) => {
+    const siblings: typeof TreeNode[] = (
+        item.parent_id
+        ? findItemInTree(tree.value, item.parent_id).data.children
+        : findItemInTree(tree.value, item.controlled_list_id).data.items
+    );
+    if (!siblings) {
+        throw new Error("Unexpected lack of siblings");
+    }
+    return siblings[siblings.length - 1].id === item.id;
 };
 </script>
 
@@ -160,7 +190,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
             wrapper: { style: { overflowY: 'auto', maxHeight: '100%' } },
             container: { style: { fontSize: '14px' } },
             content: ({ context }) : { context: TreeContext } => ({
-                style: { height: '3.5rem' },
+                style: { height: '4rem' },
             }),
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
         }"
@@ -172,14 +202,17 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
         <template #default="slotProps">
             <span class="label-and-actions">
                 {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
-                <span v-if="!slotProps.node.data.name" style="display: flex; gap: 4px;">
+                <span
+                    v-if="!slotProps.node.data.name"
+                    class="move-buttons"
+                >
                     <Button
                         v-if="slotProps.node.key in selectedKeys"
                         type="button"
                         class="move-button"
                         icon="fa fa-caret-up"
                         :aria-label="$gettext('Move up')"
-                        :disabled="slotProps.node.data.sortorder === 0"
+                        :disabled="isFirstItem(slotProps.node.data)"
                         @click="onReorder(slotProps.node.data, true)"
                     />
                     <Button
@@ -188,9 +221,9 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
                         class="move-button"
                         icon="fa fa-caret-down"
                         :aria-label="$gettext('Move down')"
+                        :disabled="isLastItem(slotProps.node.data)"
                         @click="onReorder(slotProps.node.data, false)"
                     />
-                    <!--TODO(jtw): disable down button somehow when on last item-->
                 </span>
             </span>
         </template>
@@ -198,19 +231,21 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
 </template>
 
 <style scoped>
-a {
-    color: var(--blue-500);
-    font-size: 1.3rem; /* same as arches.scss selected */
-}
 .label-and-actions {
     display: inline-flex;
     align-items: center;
     gap: 1rem;
+}
+.move-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 .move-button {
     background-color: aliceblue;
     color: black;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+    height: 1.5rem;
 }
 </style>

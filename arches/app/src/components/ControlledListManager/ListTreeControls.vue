@@ -6,7 +6,6 @@ import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import {
-    bestLabel,
     findItemInTree,
     itemAsNode,
     listAsNode,
@@ -20,11 +19,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { TreeExpandedKeys, TreeSelectionKeys, TreeNode } from "primevue/tree/Tree";
 import type { Ref } from "@/types/Ref";
-import type {
-    ControlledList,
-    ControlledListItem,
-    NewItem,
-} from "@/types/ControlledListManager";
+import type { ControlledList, NewItem } from "@/types/ControlledListManager";
 
 const ERROR = "error";  // not user-facing
 

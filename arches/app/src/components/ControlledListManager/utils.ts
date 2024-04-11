@@ -1,5 +1,8 @@
 import type { Language } from "@/types/arches";
-import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
+import type {
+    ControlledList,
+    ControlledListItem,
+} from "@/types/ControlledListManager";
 import type { TreeNode } from "primevue/tree/Tree";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
@@ -52,7 +55,9 @@ export const listAsNode = (
     return {
         key: list.id,
         label: list.name,
-        children: list.items.map(item => itemAsNode(item, selectedLanguage)),
+        children: list.items.map(
+            (item: ControlledListItem) => itemAsNode(item, selectedLanguage)
+        ),
         data: list,
     };
 };
