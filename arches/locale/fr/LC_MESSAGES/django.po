@@ -4500,7 +4500,7 @@ msgstr "Détails"
 
 #: app/templates/javascript.htm:401
 msgid "Report"
-msgstr "Signaler"
+msgstr "Rapport"
 
 #: app/templates/javascript.htm:402
 #: app/templates/views/graph/graph-base.htm:48
