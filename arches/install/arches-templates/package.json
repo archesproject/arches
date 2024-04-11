@@ -8,6 +8,7 @@
         "eslint:check": "./{{ project_name }}/media/node_modules/.bin/eslint ./{{ project_name }}/src --resolve-plugins-relative-to ./{{ project_name }}/media --ext .vue,.ts --parser ./{{ project_name }}/media/node_modules/vue-eslint-parser/index.js",
         "eslint:watch": "./{{ project_name }}/media/node_modules/.bin/nodemon --watch ./{{ project_name }}/src --ext ts,vue --exec yarn --silent eslint:check",
         "eslint:fix": "./{{ project_name }}/media/node_modules/.bin/eslint ./{{ project_name }}/src --resolve-plugins-relative-to ./{{ project_name }}/media --ext .vue,.ts --parser ./{{ project_name }}/media/node_modules/vue-eslint-parser/index.js --fix",
+        "format": "./{{ project_name }}/media/node_modules/.bin/prettier ./{{ project_name }}/src --write",
         "gettext:extract": "./{{ project_name }}/media/node_modules/.bin/vue-gettext-extract",
         "gettext:compile": "./{{ project_name }}/media/node_modules/.bin/vue-gettext-compile",
         "ts:check": "./{{ project_name }}/media/node_modules/.bin/vue-tsc --noEmit",
