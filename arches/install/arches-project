@@ -58,18 +58,23 @@ class ArchesCommand(TemplateCommand):
         elif complete_version[3] in ['alpha','beta','rc']:
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
         options["arches_semantic_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
+        options["arches_next_minor_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
 
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
         # need to manually replace instances of {{ project_name }} in some files
         path_to_project = os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
 
-        for relative_file_path in ['.yarnrc']:  # relative to app root directory
+        for relative_file_path in [".yarnrc", "pyproject.toml"]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path),'r')
             file_data = file.read()
             file.close()
 
-            updated_file_data = file_data.replace('{{ project_name }}', project_name)
+            updated_file_data = (
+                file_data.replace("{{ project_name }}", project_name)
+                .replace("{{ arches_semantic_version }}", options["arches_semantic_version"])
+                .replace("{{ arches_next_minor_version }}", options["arches_next_minor_version"])
+            )
 
             file = open(os.path.join(path_to_project, relative_file_path),'w')
             file.write(updated_file_data)
