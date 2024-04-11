@@ -80,15 +80,18 @@ class URLDataTypeTests(ArchesTestCase):
     def test_validate(self):
         url = DataTypeFactory().get_instance("url")
 
+        # Valid tile
         no_errors = url.validate({"url": "https://www.google.com/", "url_label": "Google"})
         self.assertEqual(len(no_errors), 0)
-
+        # Invalid URL
         some_errors_invalid_url = url.validate({"url": "google", "url_label": "Google"})
         self.assertEqual(len(some_errors_invalid_url), 1)
-
-        # this should probably just be 1 error, but the url empty string not None is causing both
+        # No URL added - cannot save label without URL
+        some_errors_no_url = url.validate({"url_label": "Google"})
+        self.assertEqual(len(some_errors_no_url), 1)
+        # No URL added - with url empty string in object
         some_errors_no_url = url.validate({"url": "", "url_label": "Google"})
-        self.assertEqual(len(some_errors_no_url), 2)
+        self.assertEqual(len(some_errors_no_url), 1)
 
     def test_pre_tile_save(self):
         url = DataTypeFactory().get_instance("url")

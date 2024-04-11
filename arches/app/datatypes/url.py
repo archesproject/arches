@@ -73,7 +73,7 @@ class URLDataType(BaseDataType):
 
         if value is not None:
             try:
-                if value.get("url") is not None:
+                if value.get("url"):
                     # check URL conforms to URL structure
                     url_test = self.URL_REGEX.match(value["url"])
                     if url_test is None:
