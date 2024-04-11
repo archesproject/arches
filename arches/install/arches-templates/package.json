@@ -21,6 +21,9 @@
     "dependencies": {
         "arches": "archesproject/arches#{{ arches_version }}"
     },
+    "resolutions": {
+        "@vue/compiler-sfc": "^3.4.21"
+    },
     "nodeModulesPaths": {
     }
 }
